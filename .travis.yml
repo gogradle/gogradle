@@ -1,4 +1,4 @@
-language: groovy
+language: java
 cache:
   directories:
     - $HOME/.gradle/caches/

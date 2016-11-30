@@ -1,8 +1,10 @@
 group 'com.github.blindpirate'
 version '0.0.1-SNAPSHOT'
 
-apply plugin: 'groovy'
+Thread.sleep(5000)
+
 apply plugin: 'java'
+apply plugin: 'groovy'
 apply plugin: 'idea'
 
 sourceCompatibility = 1.6

@@ -1,7 +1,7 @@
-package com.github.blindpirate.golang.plugin
+package com.github.blindpirate.golang.plugin;
 
-import org.gradle.api.Plugin
-import org.gradle.api.Project
+import org.gradle.api.Plugin;
+import org.gradle.api.Project;
 
 class GolangPlugin implements Plugin<Project> {
 
@@ -25,6 +25,6 @@ class GolangPlugin implements Plugin<Project> {
     public static final String BUILD_CONFIGURATION_NAME = "build";
 
     @Override
-    void apply(Project project) {
+    public void apply(Project project) {
     }
 }
