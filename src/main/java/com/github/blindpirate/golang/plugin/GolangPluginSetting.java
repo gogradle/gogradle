@@ -1,6 +1,6 @@
 package com.github.blindpirate.golang.plugin;
 
-import com.github.blindpirate.golang.plugin.core.build.BuildMode;
+import com.github.blindpirate.golang.plugin.core.mode.BuildMode;
 
 public class GolangPluginSetting {
     private BuildMode buildMode;
