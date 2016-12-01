@@ -1,17 +1,9 @@
 package com.github.blindpirate.golang.plugin.core.dependency.tmp;
 
-import com.github.blindpirate.golang.plugin.core.dependency.GolangPackageDependency;
 import org.gradle.api.file.DirectoryTree;
-import org.gradle.api.file.FileTree;
-import org.gradle.api.file.FileVisitDetails;
-import org.gradle.api.file.FileVisitor;
-import org.gradle.api.file.SourceDirectorySet;
 
 import java.io.File;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 
 
 public abstract class AbstractDependencyFactory implements DependencyFactory {

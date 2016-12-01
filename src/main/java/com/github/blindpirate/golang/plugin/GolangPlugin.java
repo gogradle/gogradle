@@ -2,6 +2,8 @@ package com.github.blindpirate.golang.plugin;
 
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.plugins.ExtensionAware;
+import org.gradle.api.plugins.ExtensionContainer;
 
 class GolangPlugin implements Plugin<Project> {
 
@@ -26,5 +28,10 @@ class GolangPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        configureSettings(project);
+    }
+
+    private void configureSettings(Project project) {
+        project.getExtensions().create("golang", GolangPluginSetting.class);
     }
 }
