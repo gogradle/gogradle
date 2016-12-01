@@ -1,8 +1,11 @@
 package com.github.blindpirate.golang.plugin.core.dependency;
 
+import com.github.blindpirate.golang.plugin.core.GolangPackageModule;
 import org.gradle.api.artifacts.Dependency;
 
 public abstract class GolangPackageDependency implements Dependency {
+
+    public abstract GolangPackageModule getPackage();
 
     private String name;
 
