@@ -1,12 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.vendor;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.VendorPackageModule;
+import com.github.blindpirate.gogradle.core.dependency.DependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.GitHubPackageResolver;
-import com.github.blindpirate.golang.plugin.core.dependency.DefaultDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.DependencyFactory;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.util.FileUtils;
 
@@ -22,7 +20,7 @@ import java.util.List;
 
 /**
  * A {@link VendorDependencyFactory is a factory that reads vendor directory and resolves them to
- * {@link VendorPackageModule }}
+ * {@link com.github.blindpirate.gogradle.core.FileSystemPackageModule}
  */
 public class VendorDependencyFactory implements DependencyFactory {
     List<PackageNameResolver> resolvers = new ArrayList<>();

@@ -2,14 +2,14 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 
-public class ScmPackageDependency extends GolangPackageDependency {
-    @Override
-    public GolangPackageModule getPackage() {
-        return null;
+public abstract class ScmPackageDependency implements GolangPackageDependency {
+    private String name;
+
+    public String getName() {
+        return name;
     }
 
-    @Override
-    public String getVersion() {
-        return null;
-    }
+    public abstract String getVersion();
+
+
 }
