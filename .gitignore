@@ -2,7 +2,6 @@
 .idea
 build/
 classes/
-config/
 *.iml
 
 # Ignore Gradle GUI config
