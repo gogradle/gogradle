@@ -6,6 +6,12 @@ import java.util.List;
 
 public class FactoryUtil {
 
+    public static class NoViableFactoryException extends RuntimeException {
+        public NoViableFactoryException(String message) {
+            super(message);
+        }
+    }
+
     public static <MATERIAL, PRODUCT> PRODUCT produce(List<? extends PickyFactory<MATERIAL, PRODUCT>> factories,
                                                       MATERIAL material) {
         for (PickyFactory<MATERIAL, PRODUCT> factory : factories) {
@@ -13,6 +19,6 @@ public class FactoryUtil {
                 return factory.produce(material);
             }
         }
-        throw new IllegalArgumentException("cannot produce product!");
+        throw new NoViableFactoryException("cannot produce product!");
     }
 }
