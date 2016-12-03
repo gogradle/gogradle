@@ -39,15 +39,6 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
     }
 
     private Dependency doAdd(Configuration configuration, Object dependencyNotation, Closure configureClosure) {
-        if (dependencyNotation instanceof Configuration) {
-            Configuration other = (Configuration) dependencyNotation;
-            if (!configurationContainer.contains(other)) {
-                throw new UnsupportedOperationException("Currently you can only declare dependencies on configurations from the same project.");
-            }
-            configuration.extendsFrom(other);
-            return null;
-        }
-
         Dependency dependency = create(dependencyNotation, configureClosure);
         configuration.getDependencies().add(dependency);
         return dependency;

@@ -8,7 +8,8 @@ import org.gradle.internal.reflect.Instantiator;
 
 import static org.gradle.api.artifacts.Configuration.Namer;
 
-public class GolangConfigurationContainer extends AbstractNamedDomainObjectContainer<Configuration> implements ConfigurationContainer {
+public class GolangConfigurationContainer extends AbstractNamedDomainObjectContainer<Configuration>
+        implements ConfigurationContainer {
 
     private final Instantiator instantiator;
 

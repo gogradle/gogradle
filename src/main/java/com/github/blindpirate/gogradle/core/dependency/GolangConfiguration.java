@@ -25,7 +25,7 @@ import java.util.Set;
 public class GolangConfiguration implements Configuration {
 
     private final String name;
-    private final GolangDependencySet dependencies=new GolangDependencySet();
+    private final GolangDependencySet dependencies = new GolangDependencySet();
 
     public GolangConfiguration(String name) {
         this.name = name;

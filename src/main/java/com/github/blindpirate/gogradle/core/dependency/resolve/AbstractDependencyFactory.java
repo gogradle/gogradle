@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
 
 import java.util.List;
 

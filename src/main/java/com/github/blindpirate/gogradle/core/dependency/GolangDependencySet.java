@@ -4,23 +4,15 @@ import groovy.lang.Closure;
 import org.gradle.api.Action;
 import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.DomainObjectSet;
-import org.gradle.api.NamedDomainObjectSet;
-import org.gradle.api.Namer;
-import org.gradle.api.Rule;
-import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.TaskDependency;
-import org.gradle.internal.Cast;
 
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
-import java.util.SortedMap;
-import java.util.SortedSet;
 
 public class GolangDependencySet implements DependencySet {
 
