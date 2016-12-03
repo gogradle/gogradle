@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import org.gradle.api.Action;
+import org.gradle.api.Namer;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
@@ -23,6 +24,21 @@ import java.util.Map;
 import java.util.Set;
 
 public class GolangConfiguration implements Configuration {
+
+
+    private final String name;
+
+    public GolangConfiguration(String name) {
+        this.name = name;
+    }
+
+    public static class Namer implements org.gradle.api.Namer<GolangConfiguration> {
+        @Override
+        public String determineName(GolangConfiguration configuration) {
+            return configuration.getName();
+        }
+    }
+
     @Override
     public ResolutionStrategy getResolutionStrategy() {
         return null;
@@ -47,7 +63,7 @@ public class GolangConfiguration implements Configuration {
 
     @Override
     public String getName() {
-        return null;
+        return name;
     }
 
     @Override

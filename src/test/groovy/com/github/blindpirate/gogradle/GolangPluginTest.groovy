@@ -2,38 +2,43 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.util.FileUtils
 import org.gradle.api.Project
+import org.gradle.internal.reflect.Instantiator
 import org.gradle.testfixtures.internal.ProjectBuilderImpl
-import org.junit.After
-import org.junit.Before
+import org.junit.AfterClass
 import org.junit.Test
 
 class GolangPluginTest {
-    File tmpProjectFolder
-    File tmpUserhomeFolder
+    static File tmpProjectFolder = tmpDirectory()
+    static File tmpUserhomeFolder = tmpDirectory()
+    static Project project = new ProjectBuilderImpl()
+            .createProject("test", tmpProjectFolder, tmpUserhomeFolder);
 
-    private tmpDirectory() {
+    static private tmpDirectory() {
         File ret = new File("build/tmp/" + UUID.randomUUID());
         ret.mkdir()
         ret;
     }
 
-    @Before
-    public void setUp() {
-        tmpProjectFolder = tmpDirectory()
-        tmpUserhomeFolder = tmpDirectory()
-    }
-
-    @After
-    public void cleanUp() {
+    @AfterClass
+    public static void cleanUp() {
         FileUtils.forceDelete(tmpProjectFolder)
         FileUtils.forceDelete(tmpUserhomeFolder)
     }
 
+    private Instantiator getInstantiator() {
+        return project.services.get(Instantiator);
+    }
+
     @Test
     public void 'smoke test should success'() {
-        Project project = new ProjectBuilderImpl()
-                .createProject("test", tmpProjectFolder, tmpUserhomeFolder);
-        project.getPluginManager().apply(GolangPlugin)
+        project.pluginManager.apply(GolangPlugin)
+    }
+
+    @Test
+    public void 'build and test should be added to configurations'() {
+        project.pluginManager.apply(GolangPlugin)
+        assert project.configurations.build
+        assert project.configurations.test
     }
 
 }

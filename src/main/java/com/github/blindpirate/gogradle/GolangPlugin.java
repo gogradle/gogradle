@@ -43,7 +43,7 @@ class GolangPlugin implements Plugin<Project> {
         project.setProperty("dependencyHandler",
                 instantiator.newInstance(GolangDependencyHandler.class));
         project.setProperty("configurationContainer",
-                instantiator.newInstance(GolangConfigurationContainer.class));
+                instantiator.newInstance(GolangConfigurationContainer.class, instantiator));
 
         configureSettings(project);
         configureConfigurations(project);
@@ -51,8 +51,8 @@ class GolangPlugin implements Plugin<Project> {
 
     private void configureConfigurations(Project project) {
         ConfigurationContainer configurations = project.getConfigurations();
-        configurations.maybeCreate(BUILD_CONFIGURATION_NAME);
-        configurations.maybeCreate(TEST_CONFIGURATION_NAME);
+        configurations.create(BUILD_CONFIGURATION_NAME);
+        configurations.create(TEST_CONFIGURATION_NAME);
     }
 
     private void configureSettings(Project project) {
