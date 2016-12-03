@@ -121,12 +121,16 @@ public class GolangDependencySet implements NamedDomainObjectSet<GolangPackageDe
     }
 
     @Override
-    public GolangPackageDependency getByName(String name, Closure configureClosure) throws UnknownDomainObjectException {
+    public GolangPackageDependency getByName(String name,
+                                             Closure configureClosure)
+            throws UnknownDomainObjectException {
         return null;
     }
 
     @Override
-    public GolangPackageDependency getByName(String name, Action<? super GolangPackageDependency> configureAction) throws UnknownDomainObjectException {
+    public GolangPackageDependency getByName(String name,
+                                             Action<? super GolangPackageDependency> configureAction)
+            throws UnknownDomainObjectException {
         return null;
     }
 
@@ -151,12 +155,14 @@ public class GolangDependencySet implements NamedDomainObjectSet<GolangPackageDe
     }
 
     @Override
-    public <S extends GolangPackageDependency> DomainObjectCollection<S> withType(Class<S> type, Action<? super S> configureAction) {
+    public <S extends GolangPackageDependency> DomainObjectCollection<S> withType(Class<S> type,
+                                                                                  Action<? super S> configureAction) {
         return null;
     }
 
     @Override
-    public <S extends GolangPackageDependency> DomainObjectCollection<S> withType(Class<S> type, Closure configureClosure) {
+    public <S extends GolangPackageDependency> DomainObjectCollection<S> withType(Class<S> type,
+                                                                                  Closure configureClosure) {
         return null;
     }
 

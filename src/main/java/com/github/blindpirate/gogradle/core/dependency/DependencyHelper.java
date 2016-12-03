@@ -14,7 +14,8 @@ public class DependencyHelper {
         return vendorDependencies;
     }
 
-    private static GolangDependencySet resolveVendor(DependencyResolutionStrategy strategy, GolangPackageModule module) {
+    private static GolangDependencySet resolveVendor(DependencyResolutionStrategy strategy,
+                                                     GolangPackageModule module) {
         if (!strategy.required(module, Vendor)) {
             return GolangDependencySet.emptySet();
         }

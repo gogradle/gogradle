@@ -1,12 +1,10 @@
 package com.github.blindpirate.gogradle.core.task;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.core.FileSystemPackageModule;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.cache.CacheDirectoryManager;
 import com.github.blindpirate.gogradle.core.pack.LocalFileSystemPackageModule;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
-import com.github.blindpirate.gogradle.core.cache.CacheDirectoryManager;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -28,7 +26,7 @@ class PrepareTask extends DefaultTask {
     private GopathManager gopathManager;
 
     @Inject
-    GolangPluginSetting setting;
+    private GolangPluginSetting setting;
 
     @TaskAction
     public void task() {
@@ -43,6 +41,7 @@ class PrepareTask extends DefaultTask {
                 LocalFileSystemPackageModule.fromFileSystem(
                         setting.getRootPackage(),
                         rootDir);
+        projectModule.getDependencies();
     }
 
 }

@@ -1,7 +1,10 @@
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
@@ -26,6 +29,7 @@ class GolangPlugin implements Plugin<Project> {
     public static final String TOOL_TASK_NAME = "tool";
 
     public static final String BUILD_CONFIGURATION_NAME = "build";
+    private static final String TEST_CONFIGURATION_NAME = "test";
 
     private final Instantiator instantiator;
 
@@ -36,7 +40,19 @@ class GolangPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
+        project.setProperty("dependencyHandler",
+                instantiator.newInstance(GolangDependencyHandler.class));
+        project.setProperty("configurationContainer",
+                instantiator.newInstance(GolangConfigurationContainer.class));
+
         configureSettings(project);
+        configureConfigurations(project);
+    }
+
+    private void configureConfigurations(Project project) {
+        ConfigurationContainer configurations = project.getConfigurations();
+        configurations.maybeCreate(BUILD_CONFIGURATION_NAME);
+        configurations.maybeCreate(TEST_CONFIGURATION_NAME);
     }
 
     private void configureSettings(Project project) {

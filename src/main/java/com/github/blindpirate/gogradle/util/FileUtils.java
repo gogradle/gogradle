@@ -1,7 +1,5 @@
 package com.github.blindpirate.gogradle.util;
 
-import org.gradle.api.file.ConfigurableFileTree;
-
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
@@ -9,6 +7,10 @@ import java.nio.file.Path;
 public class FileUtils {
     public static void forceMkdir(final File directory) throws IOException {
         org.apache.commons.io.FileUtils.forceMkdir(directory);
+    }
+
+    public static void forceDelete(final File file) throws IOException {
+        org.apache.commons.io.FileUtils.forceDelete(file);
     }
 
 

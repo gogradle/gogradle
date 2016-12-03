@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Date;
 
 public class LocalFileSystemPackageModule extends FileSystemPackageModule {
 
@@ -24,7 +23,7 @@ public class LocalFileSystemPackageModule extends FileSystemPackageModule {
 
     public static GolangPackageModule fromFileSystem(String name, File rootDir) {
         LocalFileSystemPackageModule ret = new LocalFileSystemPackageModule(name, rootDir.toPath());
-        ret.updateTime = new Date(rootDir.lastModified());
+        ret.setUpdateTime(rootDir.lastModified());
         return ret;
     }
 }

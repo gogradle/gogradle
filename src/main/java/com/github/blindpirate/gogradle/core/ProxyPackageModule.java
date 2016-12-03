@@ -2,10 +2,8 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.pack.AbstractPakcageModule;
-import org.gradle.api.artifacts.DependencySet;
 
 import java.nio.file.Path;
-import java.util.Date;
 
 /**
  * A {@link ProxyPackageModule} is a proxy that represent a package that may be resolved later.
@@ -17,7 +15,8 @@ public class ProxyPackageModule extends AbstractPakcageModule {
     private GolangPackageModule delegate;
 
     private GolangDependencySet dependencies;
-    private Date updateTime;
+
+    private long updateTime;
 
     public ProxyPackageModule(String name, GolangPackageModule delegate) {
         super(name);
@@ -37,8 +36,8 @@ public class ProxyPackageModule extends AbstractPakcageModule {
     }
 
     @Override
-    public Date getUpdateTime() {
-        if (updateTime == null) {
+    public long getUpdateTime() {
+        if (updateTime == 0L) {
             updateTime = delegate.getUpdateTime();
         }
         return updateTime;

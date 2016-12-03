@@ -25,7 +25,7 @@ import static com.github.blindpirate.gogradle.core.dependency.vendor.VendorDirec
  * {@link com.github.blindpirate.gogradle.core.FileSystemPackageModule}
  */
 public class VendorDependencyFactory implements DependencyFactory {
-    List<PackageNameResolver> resolvers = new ArrayList<>();
+    private List<PackageNameResolver> resolvers = new ArrayList<>();
 
     {
         resolvers.add(new GitHubPackageResolver());

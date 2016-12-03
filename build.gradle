@@ -1,11 +1,14 @@
 group 'com.github.blindpirate'
 version '0.0.1-SNAPSHOT'
 
-Thread.sleep(5000)
+//Thread.sleep(5000)
 
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
+apply plugin: 'findbugs'
+apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
 
 sourceCompatibility = 1.7
 
@@ -21,6 +24,24 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.5.0.201609210915-r'
     testCompile group: 'junit', name: 'junit', version: '4.11'
+}
+
+checkstyle {
+    toolVersion = '6.7'
+}
+
+checkstyleTest {
+    enabled = false
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+}
+findbugs {
+    excludeFilter = file("$rootProject.projectDir/config/findbugs/excludeClosure.xml")
 }
 
 

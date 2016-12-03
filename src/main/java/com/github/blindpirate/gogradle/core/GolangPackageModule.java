@@ -1,10 +1,9 @@
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.core.pack.LocalFileSystemPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.pack.LocalFileSystemPackageModule;
 
 import java.nio.file.Path;
-import java.util.Date;
 
 /**
  * A package module is a minimum dependency unit. Actually, it's just a golang package.
@@ -35,6 +34,6 @@ public interface GolangPackageModule extends GolangPackage {
      * @return the update time determined by the package. It may be the last modified time
      * of a file on filesystem or in scm.
      */
-    Date getUpdateTime();
+    long getUpdateTime();
 
 }

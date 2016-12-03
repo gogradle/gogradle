@@ -1,17 +1,15 @@
 package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyResolutionStrategy;
-import com.github.blindpirate.gogradle.core.dependency.DependencyResolutionStrategy;
-import com.github.blindpirate.gogradle.core.pack.AbstractPakcageModule;
 import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
+import com.github.blindpirate.gogradle.core.dependency.DependencyResolutionStrategy;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.GolangPackageDependency;
-import com.github.blindpirate.gogradle.core.pack.LocalFileSystemPackageModule;
+import com.github.blindpirate.gogradle.core.pack.AbstractPakcageModule;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Date;
 
 /**
  * A {@link FileSystemPackageModule} is a directory in file system,
@@ -21,7 +19,7 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
 
     private Path rootDir;
 
-    protected Date updateTime;
+    private long updateTime;
 
     private GolangDependencySet dependencies;
 
@@ -29,6 +27,10 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
             = new DefaultDependencyResolutionStrategy();
 
     public abstract FileSystemPackageModule vendor(Path relativePathToVendor);
+
+    protected void setUpdateTime(long updateTime) {
+        this.updateTime = updateTime;
+    }
 
     public FileSystemPackageModule(String name, Path rootDir) {
         super(name);
@@ -54,7 +56,7 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
     }
 
     @Override
-    public Date getUpdateTime() {
+    public long getUpdateTime() {
         return updateTime;
     }
 
