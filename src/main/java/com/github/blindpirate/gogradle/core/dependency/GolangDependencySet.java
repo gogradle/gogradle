@@ -17,6 +17,11 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 
 public class GolangDependencySet implements NamedDomainObjectSet<GolangPackageDependency> {
+
+    public static GolangDependencySet emptySet(){
+        return new GolangDependencySet();
+    }
+
     @Override
     public <S extends GolangPackageDependency> NamedDomainObjectSet<S> withType(Class<S> type) {
         return null;

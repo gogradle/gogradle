@@ -19,6 +19,8 @@ import java.util.List;
  */
 public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
 
+    public static final int MAX_DEPTH = 100;
+
     private Path vendorPath;
 
     private List<PackageNameResolver> resolvers;
@@ -42,7 +44,12 @@ public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
     @Override
     public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
             throws IOException {
-        context.setCurrentPath(dir);
+        if (dir.equals(vendorPath)) {
+            // ignore vendor root
+            return FileVisitResult.CONTINUE;
+        }
+
+        context.setCurrentPath(vendorPath.relativize(dir));
 
         VendorPackageNameResolveResult result = FactoryUtil.produce(resolvers, context);
 

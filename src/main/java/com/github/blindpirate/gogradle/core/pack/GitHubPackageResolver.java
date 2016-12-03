@@ -30,6 +30,6 @@ public class GitHubPackageResolver implements PackageNameResolver {
     @Override
     public boolean accept(VendorResolveContext vendorResolveContext) {
         Path packagePath = vendorResolveContext.getCurrentPath();
-        return GITHUB_HOST.equals(packagePath.getName(0));
+        return GITHUB_HOST.equals(packagePath.getName(0).toString());
     }
 }

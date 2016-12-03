@@ -4,19 +4,21 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.vendor.VendorDependencyFactory;
 import com.google.common.base.Optional;
 
+import static com.github.blindpirate.gogradle.core.dependency.DependencyResolutionStrategy.DependencyType.Vendor;
+
 public class DependencyHelper {
-    private static VendorDependencyFactory vendorDependencyFactory;
+    private static VendorDependencyFactory vendorDependencyFactory = new VendorDependencyFactory();
 
     public static GolangDependencySet resolveFirstLevelDependencies(DependencyResolutionStrategy strategy,
                                                                     GolangPackageModule module) {
-        Optional<GolangDependencySet> vendorDependencies = resolveVendor(strategy, module);
-        return null;
+        GolangDependencySet vendorDependencies = resolveVendor(strategy, module);
+        return vendorDependencies;
     }
 
-    private static Optional<GolangDependencySet> resolveVendor(DependencyResolutionStrategy strategy, GolangPackageModule module) {
-        if (!strategy.needVendorDependencies(module)) {
-            return Optional.absent();
+    private static GolangDependencySet resolveVendor(DependencyResolutionStrategy strategy, GolangPackageModule module) {
+        if (!strategy.required(module, Vendor)) {
+            GolangDependencySet.emptySet();
         }
-        return Optional.of(vendorDependencyFactory.produce(module));
+        return vendorDependencyFactory.produce(module);
     }
 }

@@ -17,6 +17,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import static com.github.blindpirate.gogradle.core.dependency.vendor.VendorDirectoryVistor.MAX_DEPTH;
+
 
 /**
  * A {@link VendorDependencyFactory is a factory that reads vendor directory and resolves them to
@@ -39,7 +41,7 @@ public class VendorDependencyFactory implements DependencyFactory {
         Path vendorPath = vendorDir(module).toPath();
         VendorDirectoryVistor vistor = new VendorDirectoryVistor(module, vendorPath, resolvers);
         try {
-            Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), -1, vistor);
+            Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), MAX_DEPTH, vistor);
         } catch (IOException e) {
             throw new DependencyResolutionException(e);
         }

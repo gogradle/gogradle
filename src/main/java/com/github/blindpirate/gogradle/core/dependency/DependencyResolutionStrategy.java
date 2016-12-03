@@ -2,17 +2,20 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 
+import java.util.Map;
+
 /**
  * Direct how to merge vendor dependency, source dependency, and external dependency
  */
 public interface DependencyResolutionStrategy {
-    boolean needVendorDependencies(GolangPackageModule module);
 
-    boolean needSourceDependencies(GolangPackageModule module);
+    enum DependencyType {
+        Vendor,
+        Source,
+        External
+    }
 
-    boolean needExternalDependencies(GolangPackageModule module);
+    boolean required(GolangPackageModule module, DependencyType type);
 
-    GolangDependencySet resolve(GolangDependencySet vendorDependencies,
-                                GolangDependencySet sourceDependencies,
-                                GolangDependencySet externalDependencies);
+    GolangDependencySet resolve(Map<DependencyType, GolangDependencySet> dependencySets);
 }

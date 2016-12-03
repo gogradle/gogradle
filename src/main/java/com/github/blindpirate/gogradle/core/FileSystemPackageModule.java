@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyResolutionStrategy;
 import com.github.blindpirate.gogradle.core.dependency.DependencyResolutionStrategy;
 import com.github.blindpirate.gogradle.core.pack.AbstractPakcageModule;
 import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
@@ -19,7 +20,8 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
 
     protected Date updateTime;
 
-    private DependencyResolutionStrategy dependencyResolutionStrategy;
+    private DependencyResolutionStrategy dependencyResolutionStrategy
+            = new DefaultDependencyResolutionStrategy();
 
     public abstract FileSystemPackageModule vendor(Path relativePathToVendor);
 
