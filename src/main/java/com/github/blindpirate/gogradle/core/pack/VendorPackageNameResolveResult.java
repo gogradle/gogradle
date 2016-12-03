@@ -1,17 +1,17 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.core.FileSystemPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.GolangPackageDependency;
+import com.github.blindpirate.gogradle.core.FileSystemModule;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 
 public class VendorPackageNameResolveResult {
 
-    private FileSystemPackageModule module;
+    private FileSystemModule module;
 
     public boolean isFinished() {
         return module != null;
     }
 
-    public GolangPackageDependency getDependency() {
+    public GolangDependency getDependency() {
         return module;
     }
 
@@ -19,7 +19,7 @@ public class VendorPackageNameResolveResult {
         return new VendorPackageNameResolveResult();
     }
 
-    public static VendorPackageNameResolveResult of(FileSystemPackageModule module) {
+    public static VendorPackageNameResolveResult of(FileSystemModule module) {
         VendorPackageNameResolveResult ret = new VendorPackageNameResolveResult();
         ret.module = module;
         return ret;

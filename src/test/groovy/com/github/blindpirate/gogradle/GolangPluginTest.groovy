@@ -41,4 +41,14 @@ class GolangPluginTest {
         assert project.configurations.test
     }
 
+    @Test
+    public void 'add a dependency to configuration should success'() {
+        project.pluginManager.apply(GolangPlugin)
+        project.dependencies {
+            build 'github.com'
+        }
+
+        assert project.configurations.build.dependencies.size() == 1
+    }
+
 }

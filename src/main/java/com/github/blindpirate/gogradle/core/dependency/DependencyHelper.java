@@ -1,9 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.vendor.VendorDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionStrategy;
+import com.github.blindpirate.gogradle.core.dependency.resolve.VendorDependencyFactory;
 
-import static com.github.blindpirate.gogradle.core.dependency.DependencyResolutionStrategy.DependencyType.Vendor;
+import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionStrategy.DependencyType.Vendor;
 
 public class DependencyHelper {
     private static VendorDependencyFactory vendorDependencyFactory = new VendorDependencyFactory();

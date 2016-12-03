@@ -8,7 +8,7 @@ class LocalFileSystemPackageModuleTest {
         def uri = getClass().getClassLoader().getResource('vendor_test').toURI();
         def rootDir = new File(uri)
 
-        LocalFileSystemPackageModule module = LocalFileSystemPackageModule.fromFileSystem('testpackage', rootDir);
+        LocalFileSystemModule module = LocalFileSystemModule.fromFileSystem('testpackage', rootDir);
 
         assert module.dependencies.any {
             it.package.name == 'github.com/e/f'

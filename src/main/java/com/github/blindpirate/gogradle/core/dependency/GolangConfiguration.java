@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.dependency;
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import org.gradle.api.Action;
-import org.gradle.api.Namer;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
@@ -25,8 +24,8 @@ import java.util.Set;
 
 public class GolangConfiguration implements Configuration {
 
-
     private final String name;
+    private final GolangDependencySet dependencies=new GolangDependencySet();
 
     public GolangConfiguration(String name) {
         this.name = name;
@@ -174,7 +173,7 @@ public class GolangConfiguration implements Configuration {
 
     @Override
     public DependencySet getDependencies() {
-        return null;
+        return dependencies;
     }
 
     @Override

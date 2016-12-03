@@ -2,20 +2,21 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyResolutionStrategy;
 import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
-import com.github.blindpirate.gogradle.core.dependency.DependencyResolutionStrategy;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionStrategy;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.GolangPackageDependency;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.pack.AbstractPakcageModule;
+import org.gradle.api.artifacts.Dependency;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 /**
- * A {@link FileSystemPackageModule} is a directory in file system,
+ * A {@link FileSystemModule} is a directory in file system,
  * regardless of stable or transient
  */
-public abstract class FileSystemPackageModule extends AbstractPakcageModule implements GolangPackageDependency {
+public abstract class FileSystemModule extends AbstractPakcageModule implements GolangDependency {
 
     private Path rootDir;
 
@@ -26,13 +27,34 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
     private DependencyResolutionStrategy dependencyResolutionStrategy
             = new DefaultDependencyResolutionStrategy();
 
-    public abstract FileSystemPackageModule vendor(Path relativePathToVendor);
+    // Interface method in Dependency. Do not implement them temporarily.
+    @Override
+    public String getGroup() {
+        return null;
+    }
+
+    @Override
+    public String getVersion() {
+        return null;
+    }
+
+    @Override
+    public boolean contentEquals(Dependency dependency) {
+        return false;
+    }
+
+    @Override
+    public Dependency copy() {
+        return null;
+    }
+
+    public abstract FileSystemModule vendor(Path relativePathToVendor);
 
     protected void setUpdateTime(long updateTime) {
         this.updateTime = updateTime;
     }
 
-    public FileSystemPackageModule(String name, Path rootDir) {
+    public FileSystemModule(String name, Path rootDir) {
         super(name);
         this.rootDir = rootDir;
     }

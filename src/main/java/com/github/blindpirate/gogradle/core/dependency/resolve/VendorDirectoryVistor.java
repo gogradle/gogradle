@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.vendor;
+package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.pack.VendorPackageNameResolveResult;

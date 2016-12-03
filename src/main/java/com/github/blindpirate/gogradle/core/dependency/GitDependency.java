@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 
-public class GitPackageDependency extends ScmPackageDependency {
+public class GitDependency extends ScmDependency {
 
     private String url;
     private String commit;
@@ -20,7 +20,7 @@ public class GitPackageDependency extends ScmPackageDependency {
         return tag;
     }
 
-    public GitPackageDependency(String url, String commit, String tag) {
+    public GitDependency(String url, String commit, String tag) {
         super(null);
         this.url = url;
         this.commit = commit;

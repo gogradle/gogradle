@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.pack.LocalFileSystemPackageModule;
+import com.github.blindpirate.gogradle.core.pack.LocalFileSystemModule;
 
 import java.nio.file.Path;
 
@@ -29,7 +29,7 @@ public interface GolangPackageModule extends GolangPackage {
      * The time will be used to getPackage conflict finally.
      * In general, the newest version of a package will win.
      * <p>
-     * {@link LocalFileSystemPackageModule}
+     * {@link LocalFileSystemModule}
      *
      * @return the update time determined by the package. It may be the last modified time
      * of a file on filesystem or in scm.

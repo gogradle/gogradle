@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
+import com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GolangDependencyParser;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
@@ -32,21 +34,36 @@ class GolangPlugin implements Plugin<Project> {
     private static final String TEST_CONFIGURATION_NAME = "test";
 
     private final Instantiator instantiator;
+    private final GolangDependencyParser dependencyParser;
 
     @Inject
     public GolangPlugin(Instantiator instantiator) {
         this.instantiator = instantiator;
+        this.dependencyParser = new DefaultGolangDependencyParser();
     }
 
     @Override
     public void apply(Project project) {
-        project.setProperty("dependencyHandler",
-                instantiator.newInstance(GolangDependencyHandler.class));
-        project.setProperty("configurationContainer",
-                instantiator.newInstance(GolangConfigurationContainer.class, instantiator));
+
+        customizeProjectInternalServices(project);
 
         configureSettings(project);
         configureConfigurations(project);
+    }
+
+    private void customizeProjectInternalServices(Project project) {
+        GolangConfigurationContainer configurationContainer =
+                instantiator.newInstance(
+                        GolangConfigurationContainer.class,
+                        instantiator);
+
+        project.setProperty("configurationContainer", configurationContainer);
+
+        project.setProperty("dependencyHandler",
+                instantiator.newInstance(
+                        GolangDependencyHandler.class,
+                        configurationContainer,
+                        dependencyParser));
     }
 
     private void configureConfigurations(Project project) {

@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.vendor;
+package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import org.gradle.api.file.FileVisitDetails;
 import org.gradle.api.file.FileVisitor;

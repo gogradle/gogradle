@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionStrategy;
 
 import java.util.Map;
 

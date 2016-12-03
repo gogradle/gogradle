@@ -1,9 +1,8 @@
-package com.github.blindpirate.gogradle.core.dependency.vendor;
+package com.github.blindpirate.gogradle.core.dependency.resolve;
 
+import com.github.blindpirate.gogradle.core.FileSystemModule;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.DependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.GitHubPackageResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.util.FileUtils;
@@ -17,12 +16,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static com.github.blindpirate.gogradle.core.dependency.vendor.VendorDirectoryVistor.MAX_DEPTH;
-
 
 /**
  * A {@link VendorDependencyFactory is a factory that reads vendor directory and resolves them to
- * {@link com.github.blindpirate.gogradle.core.FileSystemPackageModule}
+ * {@link FileSystemModule }
  */
 public class VendorDependencyFactory implements DependencyFactory {
     private List<PackageNameResolver> resolvers = new ArrayList<>();
@@ -41,7 +38,7 @@ public class VendorDependencyFactory implements DependencyFactory {
         Path vendorPath = vendorDir(module).toPath();
         VendorDirectoryVistor vistor = new VendorDirectoryVistor(module, vendorPath, resolvers);
         try {
-            Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), MAX_DEPTH, vistor);
+            Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), VendorDirectoryVistor.MAX_DEPTH, vistor);
         } catch (IOException e) {
             throw new DependencyResolutionException(e);
         }

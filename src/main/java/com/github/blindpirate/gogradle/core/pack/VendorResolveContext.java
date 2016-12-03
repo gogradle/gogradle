@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.FileSystemPackageModule;
+import com.github.blindpirate.gogradle.core.FileSystemModule;
 
 import java.nio.file.Path;
 
@@ -17,10 +17,10 @@ public class VendorResolveContext {
      */
     private Path currentPath;
 
-    private FileSystemPackageModule parentModule;
+    private FileSystemModule parentModule;
 
     public VendorResolveContext(GolangPackageModule parentModuleOfVendorDirectory) {
-        this.parentModule = (FileSystemPackageModule) parentModuleOfVendorDirectory;
+        this.parentModule = (FileSystemModule) parentModuleOfVendorDirectory;
     }
 
     public void setCurrentPath(Path currentPath) {
@@ -31,7 +31,7 @@ public class VendorResolveContext {
         return currentPath;
     }
 
-    public FileSystemPackageModule getParentModule() {
+    public FileSystemModule getParentModule() {
         return parentModule;
     }
 }
