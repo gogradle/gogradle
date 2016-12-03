@@ -10,6 +10,7 @@ import org.gradle.api.UnknownDomainObjectException;
 import org.gradle.api.specs.Spec;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -18,7 +19,9 @@ import java.util.SortedSet;
 
 public class GolangDependencySet implements NamedDomainObjectSet<GolangPackageDependency> {
 
-    public static GolangDependencySet emptySet(){
+    private Set<GolangPackageDependency> dependencies = new HashSet<>();
+
+    public static GolangDependencySet emptySet() {
         return new GolangDependencySet();
     }
 
@@ -29,67 +32,67 @@ public class GolangDependencySet implements NamedDomainObjectSet<GolangPackageDe
 
     @Override
     public int size() {
-        return 0;
+        return dependencies.size();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return dependencies.isEmpty();
     }
 
     @Override
     public boolean contains(Object o) {
-        return false;
+        return dependencies.contains(o);
     }
 
     @Override
     public Iterator<GolangPackageDependency> iterator() {
-        return null;
+        return dependencies.iterator();
     }
 
     @Override
     public Object[] toArray() {
-        return new Object[0];
+        return dependencies.toArray();
     }
 
     @Override
     public <T> T[] toArray(T[] a) {
-        return null;
+        return dependencies.toArray(a);
     }
 
     @Override
     public boolean add(GolangPackageDependency e) {
-        return false;
+        return dependencies.add(e);
     }
 
     @Override
     public boolean remove(Object o) {
-        return false;
+        return dependencies.remove(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return false;
+        return dependencies.containsAll(c);
     }
 
     @Override
     public boolean addAll(Collection<? extends GolangPackageDependency> c) {
-        return false;
+        return dependencies.addAll(c);
     }
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return false;
+        return dependencies.removeAll(c);
     }
 
     @Override
     public boolean retainAll(Collection<?> c) {
-        return false;
+        return dependencies.retainAll(c);
     }
 
     @Override
     public void clear() {
-
+        dependencies.clear();
     }
 
     @Override

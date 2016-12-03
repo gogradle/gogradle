@@ -8,7 +8,7 @@ public class VendorPackageNameResolveResult {
     private FileSystemPackageModule module;
 
     public boolean isFinished() {
-        return module == null;
+        return module != null;
     }
 
     public GolangPackageDependency getDependency() {

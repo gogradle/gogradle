@@ -15,9 +15,10 @@ public class LocalFileSystemPackageModule extends FileSystemPackageModule {
 
     @Override
     public FileSystemPackageModule vendor(Path relativePathToVendor) {
+        Path relativeToParent = addVendorPrefix(relativePathToVendor);
         LocalFileSystemPackageModule ret = new LocalFileSystemPackageModule(
                 relativePathToVendor.toString(),
-                relativePathToVendor.resolve(this.getRootDir()));
+                this.getRootDir().resolve(relativeToParent));
         return ret;
     }
 

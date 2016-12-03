@@ -6,8 +6,11 @@ import com.github.blindpirate.gogradle.core.pack.AbstractPakcageModule;
 import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.GolangPackageDependency;
+import com.github.blindpirate.gogradle.core.pack.LocalFileSystemPackageModule;
 
+import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Date;
 
 /**
@@ -20,6 +23,8 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
 
     protected Date updateTime;
 
+    private GolangDependencySet dependencies;
+
     private DependencyResolutionStrategy dependencyResolutionStrategy
             = new DefaultDependencyResolutionStrategy();
 
@@ -30,8 +35,17 @@ public abstract class FileSystemPackageModule extends AbstractPakcageModule impl
         this.rootDir = rootDir;
     }
 
+    protected Path addVendorPrefix(Path relativePathToVendor) {
+        String relativeToParentModule = "vendor" + File.separator + relativePathToVendor;
+        return Paths.get(relativeToParentModule);
+    }
+
     public GolangDependencySet getDependencies() {
-        return DependencyHelper.resolveFirstLevelDependencies(dependencyResolutionStrategy, this);
+        if (dependencies == null) {
+            dependencies =
+                    DependencyHelper.resolveDirectDependencies(dependencyResolutionStrategy, this);
+        }
+        return dependencies;
     }
 
     @Override
