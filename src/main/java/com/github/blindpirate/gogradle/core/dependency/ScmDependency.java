@@ -1,9 +1,12 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.vcs.Vcs;
 import org.gradle.api.artifacts.Dependency;
 
 public abstract class ScmDependency implements GolangDependency {
     private String name;
+
+    public abstract Vcs vcs();
 
     public ScmDependency(String name) {
         this.name = name;
@@ -11,6 +14,10 @@ public abstract class ScmDependency implements GolangDependency {
 
     public String getName() {
         return name;
+    }
+
+    protected void setName(String name) {
+        this.name = name;
     }
 
     @Override
