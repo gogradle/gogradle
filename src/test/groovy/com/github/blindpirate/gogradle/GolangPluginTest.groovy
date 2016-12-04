@@ -1,29 +1,15 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.util.FileUtils
 import org.gradle.api.Project
 import org.gradle.internal.reflect.Instantiator
-import org.gradle.testfixtures.internal.ProjectBuilderImpl
-import org.junit.AfterClass
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(GogradleRunner)
+@WithProject
 class GolangPluginTest {
-    static File tmpProjectFolder = tmpDirectory()
-    static File tmpUserhomeFolder = tmpDirectory()
-    static Project project = new ProjectBuilderImpl()
-            .createProject("test", tmpProjectFolder, tmpUserhomeFolder);
 
-    static private tmpDirectory() {
-        File ret = new File("build/tmp/" + UUID.randomUUID());
-        ret.mkdir()
-        ret;
-    }
-
-    @AfterClass
-    public static void cleanUp() {
-        FileUtils.forceDelete(tmpProjectFolder)
-        FileUtils.forceDelete(tmpUserhomeFolder)
-    }
+    Project project
 
     private Instantiator getInstantiator() {
         return project.services.get(Instantiator);

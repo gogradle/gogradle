@@ -1,12 +1,16 @@
 package com.github.blindpirate.gogradle.core.pack
 
+import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.WithResource
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(GogradleRunner)
+@WithResource('vendor_test.zip')
 class LocalFileSystemPackageModuleTest {
     @Test
     void 'create cascading vendor package should success'() {
-        def uri = getClass().getClassLoader().getResource('vendor_test').toURI();
-        def rootDir = new File(uri)
+        def rootDir = new File("build/tmp/resource/vendor_test")
 
         LocalFileSystemModule module = LocalFileSystemModule.fromFileSystem('testpackage', rootDir);
 
