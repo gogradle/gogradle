@@ -4,6 +4,9 @@ import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContai
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.GolangDependencyParser;
+import com.google.inject.AbstractModule;
+import com.google.inject.Guice;
+import com.google.inject.Injector;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
@@ -33,13 +36,29 @@ class GolangPlugin implements Plugin<Project> {
     public static final String BUILD_CONFIGURATION_NAME = "build";
     private static final String TEST_CONFIGURATION_NAME = "test";
 
+
+    // injected by gradle
     private final Instantiator instantiator;
-    private final GolangDependencyParser dependencyParser;
+
+    private final Injector injector;
+    private final GolangPluginSetting settings;
 
     @Inject
     public GolangPlugin(Instantiator instantiator) {
         this.instantiator = instantiator;
-        this.dependencyParser = new DefaultGolangDependencyParser();
+        this.injector = initGuice();
+        this.settings = injector.getInstance(GolangPluginSetting.class);
+    }
+
+    private Injector initGuice() {
+        return Guice.createInjector(new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(GolangDependencyParser.class).to(DefaultGolangDependencyParser.class);
+                bind(Instantiator.class).toInstance(instantiator);
+                bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
+            }
+        });
     }
 
     @Override
@@ -51,19 +70,22 @@ class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
     }
 
+    /**
+     * Here we cannot use guice since we need GroovyObject to be mixed in
+     * {@link org.gradle.api.internal.AbstractClassGenerator}
+     */
     private void customizeProjectInternalServices(Project project) {
-        GolangConfigurationContainer configurationContainer =
-                instantiator.newInstance(
-                        GolangConfigurationContainer.class,
-                        instantiator);
+        GolangDependencyParser parser = injector.getInstance(GolangDependencyParser.class);
 
+        GolangConfigurationContainer configurationContainer =
+                instantiator.newInstance(GolangConfigurationContainer.class,
+                        instantiator);
         project.setProperty("configurationContainer", configurationContainer);
 
         project.setProperty("dependencyHandler",
-                instantiator.newInstance(
-                        GolangDependencyHandler.class,
+                instantiator.newInstance(GolangDependencyHandler.class,
                         configurationContainer,
-                        dependencyParser));
+                        parser));
     }
 
     private void configureConfigurations(Project project) {
@@ -73,6 +95,6 @@ class GolangPlugin implements Plugin<Project> {
     }
 
     private void configureSettings(Project project) {
-        project.getExtensions().create("golang", GolangPluginSetting.class);
+        project.getExtensions().add("golang", settings);
     }
 }

@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.pack.LocalFileSystemModule;
 
@@ -10,7 +11,7 @@ import java.nio.file.Path;
  * <p>
  * It represents either a symbol or an existing underlying directory of code
  */
-public interface GolangPackageModule extends GolangPackage {
+public interface GolangPackageModule extends GolangDependency, GolangPackage {
     /**
      * Dependencies of golang package module = vendor(if any) + declaration(if any) + imports in code
      *

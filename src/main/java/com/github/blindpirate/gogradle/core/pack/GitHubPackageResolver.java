@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.core.FileSystemModule;
+import com.github.blindpirate.gogradle.core.GolangPackageModule;
 
 import java.nio.file.Path;
 
@@ -22,7 +22,7 @@ public class GitHubPackageResolver implements PackageNameResolver {
     }
 
     private VendorPackageNameResolveResult createByDirectory(VendorResolveContext context) {
-        FileSystemModule module = context.getParentModule()
+        GolangPackageModule module = context.getParentModule()
                 .vendor(context.getCurrentPath());
         return VendorPackageNameResolveResult.of(module);
     }

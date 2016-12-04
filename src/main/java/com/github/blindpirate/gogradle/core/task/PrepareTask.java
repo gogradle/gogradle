@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.task;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.cache.CacheDirectoryManager;
+import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.pack.LocalFileSystemModule;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import org.gradle.api.DefaultTask;
@@ -20,7 +20,7 @@ class PrepareTask extends DefaultTask {
     private GoBinaryManager binaryManager;
 
     @Inject
-    private CacheDirectoryManager cacheDirectoryManager;
+    private CacheManager cacheManager;
 
     @Inject
     private GopathManager gopathManager;

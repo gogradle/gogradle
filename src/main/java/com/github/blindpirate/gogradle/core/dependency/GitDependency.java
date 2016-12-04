@@ -1,8 +1,12 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.ProxyPackageModule;
+import com.github.blindpirate.gogradle.core.cache.git.GitReader;
 import com.github.blindpirate.gogradle.core.vcs.Vcs;
 import com.github.zafarkhaja.semver.Version;
+
+import javax.inject.Inject;
 
 import static com.github.blindpirate.gogradle.core.vcs.Vcs.Git;
 
@@ -13,6 +17,9 @@ public class GitDependency extends ScmDependency {
     private String tag;
 
     private Version semVersion;
+
+    @Inject
+    private GitReader metadataFetcher;
 
     public Version getSemVersion() {
         return semVersion;
@@ -44,7 +51,8 @@ public class GitDependency extends ScmDependency {
 
     @Override
     public GolangPackageModule getPackage() {
-        return null;
+        GolangPackageModule tmpModule = metadataFetcher.resolve(this);
+        return new ProxyPackageModule(tmpModule);
     }
 
     public static GitDependencyBuilder builder() {

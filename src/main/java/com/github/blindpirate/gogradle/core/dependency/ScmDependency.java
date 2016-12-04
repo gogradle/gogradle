@@ -1,9 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.vcs.Vcs;
-import org.gradle.api.artifacts.Dependency;
 
-public abstract class ScmDependency implements GolangDependency {
+public abstract class ScmDependency extends AbstractGolangDependency {
     private String name;
 
     public abstract Vcs vcs();
@@ -18,20 +17,5 @@ public abstract class ScmDependency implements GolangDependency {
 
     protected void setName(String name) {
         this.name = name;
-    }
-
-    @Override
-    public String getGroup() {
-        return null;
-    }
-
-    @Override
-    public boolean contentEquals(Dependency dependency) {
-        return false;
-    }
-
-    @Override
-    public Dependency copy() {
-        return null;
     }
 }

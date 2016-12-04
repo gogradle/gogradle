@@ -6,6 +6,8 @@ import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.internal.AbstractNamedDomainObjectContainer;
 import org.gradle.internal.reflect.Instantiator;
 
+import javax.inject.Inject;
+
 import static org.gradle.api.artifacts.Configuration.Namer;
 
 public class GolangConfigurationContainer extends AbstractNamedDomainObjectContainer<Configuration>
@@ -13,6 +15,7 @@ public class GolangConfigurationContainer extends AbstractNamedDomainObjectConta
 
     private final Instantiator instantiator;
 
+    @Inject
     public GolangConfigurationContainer(Instantiator instantiator) {
         super(Configuration.class, instantiator, new Namer());
         this.instantiator = instantiator;

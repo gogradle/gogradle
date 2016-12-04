@@ -11,35 +11,28 @@ import java.nio.file.Path;
  * When resolved, it will record all information of underlying package module.
  */
 public class ProxyPackageModule extends AbstractPakcageModule {
-
-    private GolangPackageModule delegate;
-
     private GolangDependencySet dependencies;
 
     private long updateTime;
 
-    public ProxyPackageModule(String name, GolangPackageModule delegate) {
-        super(name);
-        this.delegate = delegate;
+    public ProxyPackageModule(GolangPackageModule delegate) {
+        super(delegate.getName());
+        this.dependencies = delegate.getDependencies();
+        this.updateTime = delegate.getUpdateTime();
     }
 
+
     public GolangDependencySet getDependencies() {
-        if (dependencies == null) {
-            dependencies = delegate.getDependencies();
-        }
         return dependencies;
     }
 
     @Override
     public Path getRootDir() {
-        return delegate.getRootDir();
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public long getUpdateTime() {
-        if (updateTime == 0L) {
-            updateTime = delegate.getUpdateTime();
-        }
         return updateTime;
     }
 }

@@ -48,7 +48,7 @@ public abstract class FileSystemModule extends AbstractPakcageModule implements 
         return null;
     }
 
-    public abstract FileSystemModule vendor(Path relativePathToVendor);
+    public abstract GolangPackageModule vendor(Path relativePathToVendor);
 
     protected void setUpdateTime(long updateTime) {
         this.updateTime = updateTime;

@@ -15,6 +15,7 @@ import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
 import org.gradle.util.CollectionUtils;
 import org.gradle.util.ConfigureUtil;
 
+import javax.inject.Inject;
 import java.util.List;
 import java.util.Map;
 
@@ -24,6 +25,7 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     private final GolangDependencyParser dependencyParser;
 
+    @Inject
     public GolangDependencyHandler(ConfigurationContainer configurationContainer,
                                    GolangDependencyParser dependencyParser) {
         this.configurationContainer = configurationContainer;

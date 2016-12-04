@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core.cache;
 
+import java.nio.file.Path;
+
 // by default the global cache directory is located in ~/.gradle/go/
 // + ~/.gradle/go
 //   - gopath
@@ -8,8 +10,10 @@ package com.github.blindpirate.gogradle.core.cache;
 // + ${projectRoot}
 //   - build
 //     - gopath
-public interface CacheDirectoryManager {
+public interface CacheManager {
     void ensureGlobalCacheExistAndWritable();
 
     void ensureProjectBuildCacheExist();
+
+    Path getGlobalCachePath(String packageName);
 }
