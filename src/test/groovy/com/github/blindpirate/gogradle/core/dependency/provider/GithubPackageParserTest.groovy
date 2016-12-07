@@ -2,9 +2,9 @@ package com.github.blindpirate.gogradle.core.dependency.provider
 
 import org.junit.Test
 
-class GithubPackageProviderTest {
+class GithubPackageParserTest {
 
-    GithubPackageProvider provider = new GithubPackageProvider();
+    GithubNotationParser provider = new GithubNotationParser();
 
     @Test
     public void 'parsing name should success'() {
