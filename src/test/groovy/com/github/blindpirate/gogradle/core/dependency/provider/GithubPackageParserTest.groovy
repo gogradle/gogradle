@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.provider
 
+import com.github.blindpirate.gogradle.core.dependency.parse.GithubNotationParser
 import org.junit.Test
 
 class GithubPackageParserTest {

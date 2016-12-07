@@ -2,27 +2,37 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionException;
-import com.github.blindpirate.gogradle.general.PickyFactory;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 
-import java.util.ArrayList;
+import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.List;
 
-public class DefaultGolangDependencyParser implements GolangDependencyParser {
+import static com.github.blindpirate.gogradle.util.FactoryUtil.NoViableFactoryException;
 
-    private List<PickyFactory<Object, GolangDependency>> factories = new ArrayList<>();
+public class DefaultGolangDependencyParser implements NotationParser {
 
-    {
-        factories.add(new StringNotationParser());
-        factories.add(new MapNotationParser());
+    private final List<NotationParser> factories;
+
+    @Inject
+    public DefaultGolangDependencyParser(DefaultStringNotationParser stringNotationParser,
+                                         DefaultMapNotationoParser mapNotationParser) {
+        this.factories = Arrays.asList(stringNotationParser, mapNotationParser);
     }
 
+
     @Override
-    public GolangDependency parseNotation(Object notaion) {
+    public boolean accept(Object notation) {
+        return true;
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    public GolangDependency produce(Object notation) {
         try {
-            return FactoryUtil.produce(factories, notaion);
-        } catch (FactoryUtil.NoViableFactoryException e) {
-            throw new DependencyResolutionException("Unsupported dependency notation:" + notaion.getClass());
+            return FactoryUtil.produce(factories, notation);
+        } catch (NoViableFactoryException e) {
+            throw new DependencyResolutionException("Unsupported dependency notation:" + notation.getClass());
         }
     }
 }
