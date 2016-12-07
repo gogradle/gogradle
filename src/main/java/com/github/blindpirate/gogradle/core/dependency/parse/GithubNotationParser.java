@@ -4,13 +4,16 @@ import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.core.dependency.GitDependency.*;
+import static com.github.blindpirate.gogradle.core.dependency.GitDependency.NEWEST_COMMIT;
+import static com.github.blindpirate.gogradle.core.dependency.GitDependency.builder;
 import static com.github.blindpirate.gogradle.util.MapUtils.*;
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static com.github.blindpirate.gogradle.util.MapUtils.getString;
+import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
+import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
+import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
 
 public class GithubNotationParser extends MapStringNotationParser {
 
@@ -66,6 +69,8 @@ public class GithubNotationParser extends MapStringNotationParser {
         String version = getString(notation, "version");
         String tag = getString(notation, "tag");
         String commit = getString(notation, "commit");
+        boolean transitive = getBooleanValue(notation, "transitive", true);
+        boolean excludeVendor = getBooleanValue(notation, "excludeVendor", false);
 
         if (isBlank(url)) {
             url = buildUrl(name);
@@ -75,13 +80,18 @@ public class GithubNotationParser extends MapStringNotationParser {
             commit = NEWEST_COMMIT;
         }
 
-        return GitDependency.builder()
+        GitDependency ret = GitDependency.builder()
                 .withName(name)
                 .withUrl(url)
                 .withVersion(version)
                 .withTag(tag)
                 .withCommit(commit)
                 .build();
+
+        // TODO not good practice
+        ret.setExcludeVendor(excludeVendor);
+        ret.setTransitive(transitive);
+        return ret;
     }
 
 

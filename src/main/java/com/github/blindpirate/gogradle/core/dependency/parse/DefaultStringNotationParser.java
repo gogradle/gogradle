@@ -8,7 +8,7 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 
-import static com.github.blindpirate.gogradle.util.FactoryUtil.*;
+import static com.github.blindpirate.gogradle.util.FactoryUtil.NoViableFactoryException;
 
 /**
  * Parses a string to a dependency.
