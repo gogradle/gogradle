@@ -3,16 +3,37 @@ package com.github.blindpirate.gogradle;
 import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.GolangDependencyParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationoParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.DefaultStringNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GithubNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.StringNotationParser;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
+import com.github.blindpirate.gogradle.vcs.GitPackageFetcher;
+import com.github.blindpirate.gogradle.vcs.PackageFetcher;
+import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.inject.AbstractModule;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import com.google.inject.Provides;
+import com.google.inject.name.Names;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.List;
+
+import static com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser.GolangDependencyNotationParsers;
+import static com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationoParser.MapNotationParsers;
+import static com.github.blindpirate.gogradle.core.dependency.parse.DefaultStringNotationParser.StringNotationParsers;
+import static com.github.blindpirate.gogradle.util.CollectionUtils.*;
+import static java.util.Arrays.asList;
+import static java.util.Collections.unmodifiableList;
 
 class GolangPlugin implements Plugin<Project> {
 
@@ -54,20 +75,68 @@ class GolangPlugin implements Plugin<Project> {
         return Guice.createInjector(new AbstractModule() {
             @Override
             protected void configure() {
-                bind(GolangDependencyParser.class).to(DefaultGolangDependencyParser.class);
+                bind(NotationParser.class).to(DefaultGolangDependencyParser.class);
                 bind(Instantiator.class).toInstance(instantiator);
                 bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
+
+                bind(MapNotationParser.class).annotatedWith(Names.named(VcsType.Git.toString()))
+                        .to(GitNotationParser.class);
+                bind(PackageFetcher.class).annotatedWith(Names.named(VcsType.Git.toString()))
+                        .to(GitPackageFetcher.class);
+            }
+
+            @Inject
+            @Provides
+            @Singleton
+            @GolangDependencyNotationParsers
+            public List<? extends NotationParser> notationParsers(
+                    DefaultStringNotationParser stringNotationParser,
+                    DefaultMapNotationoParser mapNotationParser) {
+                return immutableList(
+                        stringNotationParser,
+                        mapNotationParser);
+            }
+
+            @Inject
+            @Provides
+            @Singleton
+            @StringNotationParsers
+            public List<? extends StringNotationParser> stringNotationParsers(
+                    GithubNotationParser githubNotationParser) {
+                return immutableList(githubNotationParser);
+            }
+
+            @Inject
+            @Provides
+            @Singleton
+            @MapNotationParsers
+            public List<? extends MapNotationParser> mapNoataionParsers(
+                    GithubNotationParser githubNotationParser) {
+                return immutableList(githubNotationParser);
+            }
+
+            @Inject
+            @Provides
+            @Singleton
+            @GitNotationParser.GitNotationParsers
+            public List<? extends MapNotationParser> gitNotationParsers(
+                    GithubNotationParser githubNotationParser) {
+                return immutableList(githubNotationParser);
             }
         });
     }
 
     @Override
     public void apply(Project project) {
-
+        //language=RegExp
+        prepareForServices();
         customizeProjectInternalServices(project);
-
         configureSettings(project);
         configureConfigurations(project);
+    }
+
+    private void prepareForServices() {
+        VcsType.setInjector(injector);
     }
 
     /**
@@ -75,7 +144,7 @@ class GolangPlugin implements Plugin<Project> {
      * {@link org.gradle.api.internal.AbstractClassGenerator}
      */
     private void customizeProjectInternalServices(Project project) {
-        GolangDependencyParser parser = injector.getInstance(GolangDependencyParser.class);
+        DefaultGolangDependencyParser parser = injector.getInstance(DefaultGolangDependencyParser.class);
 
         GolangConfigurationContainer configurationContainer =
                 instantiator.newInstance(GolangConfigurationContainer.class,

@@ -5,19 +5,27 @@ import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.common.base.Optional;
+import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;
-import java.util.Arrays;
+import java.lang.annotation.Retention;
+import java.lang.annotation.Target;
 import java.util.List;
 import java.util.Map;
 
+import static java.lang.annotation.ElementType.FIELD;
+import static java.lang.annotation.ElementType.METHOD;
+import static java.lang.annotation.ElementType.PARAMETER;
+import static java.lang.annotation.RetentionPolicy.RUNTIME;
+
 public class DefaultMapNotationoParser implements MapNotationParser {
 
-    private final List<? extends MapNotationParser> parsers;
+    private final List<? extends MapNotationParser> delegates;
 
     @Inject
-    public DefaultMapNotationoParser(GithubNotationParser githubNotationParser) {
-        parsers = Arrays.asList(githubNotationParser);
+    public DefaultMapNotationoParser(
+            @MapNotationParsers List<? extends MapNotationParser> delegates) {
+        this.delegates = delegates;
     }
 
     @Override
@@ -28,13 +36,7 @@ public class DefaultMapNotationoParser implements MapNotationParser {
     @Override
     public GolangDependency produce(Object notation) {
         Map<String, Object> notationMap = (Map<String, Object>) notation;
-        ensureNameExist(notationMap);
-
-        if (vcsSpecified(notationMap)) {
-            return buildByVcs(notationMap);
-        } else {
-            return FactoryUtil.produce(parsers, notation);
-        }
+        return parseMap(notationMap);
     }
 
     private void ensureNameExist(Map<String, ?> notation) {
@@ -53,6 +55,23 @@ public class DefaultMapNotationoParser implements MapNotationParser {
     private Optional<VcsType> extractVcsType(Map<String, ?> notation) {
         Object value = notation.get(VCS_KEY);
         return value == null ? Optional.<VcsType>absent() : VcsType.of(value.toString());
+    }
+
+    @Override
+    public GolangDependency parseMap(Map<String, Object> notation) {
+        ensureNameExist(notation);
+
+        if (vcsSpecified(notation)) {
+            return buildByVcs(notation);
+        } else {
+            return FactoryUtil.produce(delegates, (Object) notation);
+        }
+    }
+
+    @BindingAnnotation
+    @Target({FIELD, PARAMETER, METHOD})
+    @Retention(RUNTIME)
+    public @interface MapNotationParsers {
     }
 
 }

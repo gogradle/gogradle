@@ -3,13 +3,12 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.MapUtils;
 
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.NEWEST_COMMIT;
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.builder;
-import static com.github.blindpirate.gogradle.util.MapUtils.*;
+import static com.github.blindpirate.gogradle.util.MapUtils.getBooleanValue;
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;

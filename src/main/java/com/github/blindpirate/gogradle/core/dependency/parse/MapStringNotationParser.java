@@ -28,7 +28,4 @@ public abstract class MapStringNotationParser implements MapNotationParser, Stri
         }
     }
 
-    protected abstract GolangDependency parseMap(Map<String, Object> notation);
-
-    protected abstract GolangDependency parseString(String notation);
 }
