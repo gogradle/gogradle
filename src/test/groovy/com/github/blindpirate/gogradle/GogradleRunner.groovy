@@ -17,6 +17,15 @@ import java.nio.file.Paths
 
 import static com.github.blindpirate.gogradle.util.FileUtils.forceDelete
 
+/**
+ * <ul>
+ *  <li>1.Check the usage of {@link WithProject} and inject {@link Project} instance if necessary.</li>
+ *  <li>2.Check the usage of {@link WithResource} and copy (or unzip) resources to temp directory if necessary.</li>
+ *  <li>3.Inject fields annotated with{@link @Mock} and {@link @InjectMocks}.</li>
+ *  <li>4.Clean up temp directories.</li>
+ * <ul>
+ */
+// TODO: ignore @AccessWeb when offline
 public class GogradleRunner extends BlockJUnit4ClassRunner {
     Object instance
 
