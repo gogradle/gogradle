@@ -7,6 +7,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -15,6 +16,9 @@ import java.util.Map;
  * To support mocking, it does not use public static method intentionally.
  */
 public class HttpUtils {
+    private static final int TEN_SECONDS = 10000;
+    private static final int FOUR_KB = 4096;
+
     /**
      * Send a get request
      *
@@ -96,22 +100,22 @@ public class HttpUtils {
         headers.put("Content-Type", "application/x-www-form-urlencoded");
 
         // parse parameters
-        String body = "";
+        StringBuilder body = new StringBuilder();
         if (params != null) {
             boolean first = true;
-            for (String param : params.keySet()) {
+            for (Map.Entry<String, String> param : params.entrySet()) {
                 if (first) {
                     first = false;
                 } else {
-                    body += "&";
+                    body.append("&");
                 }
-                String value = params.get(param);
-                body += URLEncoder.encode(param, "UTF-8") + "=";
-                body += URLEncoder.encode(value, "UTF-8");
+                String value = param.getValue();
+                body.append(URLEncoder.encode(param.getKey(), "UTF-8") + "=");
+                body.append(URLEncoder.encode(value, "UTF-8"));
             }
         }
 
-        return post(url, body, headers);
+        return post(url, body.toString(), headers);
     }
 
     /**
@@ -173,23 +177,22 @@ public class HttpUtils {
      */
     public String appendQueryParams(String url,
                                     Map<String, String> params) throws IOException {
-        String fullUrl = url;
+        StringBuilder fullUrl = new StringBuilder(url);
         if (params != null) {
-            boolean first = (fullUrl.indexOf('?') == -1);
-            for (String param : params.keySet()) {
+            boolean first = (url.indexOf('?') == -1);
+            for (Map.Entry<String, String> param : params.entrySet()) {
                 if (first) {
-                    fullUrl += '?';
+                    fullUrl.append('?');
                     first = false;
                 } else {
-                    fullUrl += '&';
+                    fullUrl.append('&');
                 }
-                String value = params.get(param);
-                fullUrl += URLEncoder.encode(param, "UTF-8") + '=';
-                fullUrl += URLEncoder.encode(value, "UTF-8");
+                fullUrl.append(URLEncoder.encode(param.getKey(), "UTF-8")).append('=');
+                fullUrl.append(URLEncoder.encode(param.getValue(), "UTF-8"));
             }
         }
 
-        return fullUrl;
+        return fullUrl.toString();
     }
 
     /**
@@ -264,8 +267,8 @@ public class HttpUtils {
         // connection
         URL u = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) u.openConnection();
-        conn.setConnectTimeout(10000);
-        conn.setReadTimeout(10000);
+        conn.setConnectTimeout(TEN_SECONDS);
+        conn.setReadTimeout(TEN_SECONDS);
 
         // method
         if (method != null) {
@@ -274,8 +277,8 @@ public class HttpUtils {
 
         // headers
         if (headers != null) {
-            for (String key : headers.keySet()) {
-                conn.addRequestProperty(key, headers.get(key));
+            for (Map.Entry<String, String> entry : headers.entrySet()) {
+                conn.addRequestProperty(entry.getKey(), entry.getValue());
             }
         }
 
@@ -283,7 +286,7 @@ public class HttpUtils {
         if (body != null) {
             conn.setDoOutput(true);
             OutputStream os = conn.getOutputStream();
-            os.write(body.getBytes());
+            os.write(body.getBytes("UTF-8"));
             os.flush();
             os.close();
         }
@@ -294,7 +297,7 @@ public class HttpUtils {
         is.close();
 
         // handle redirects
-        if (conn.getResponseCode() == 301) {
+        if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM) {
             String location = conn.getHeaderField("Location");
             return fetch(method, location, body, headers);
         }
@@ -310,10 +313,15 @@ public class HttpUtils {
      * @throws IOException
      */
     public String streamToString(InputStream in) throws IOException {
-        StringBuffer out = new StringBuffer();
-        byte[] b = new byte[4096];
-        for (int n; (n = in.read(b)) != -1; ) {
-            out.append(new String(b, 0, n));
+        StringBuilder out = new StringBuilder();
+        byte[] b = new byte[FOUR_KB];
+        int n;
+        while (true) {
+            n = in.read(b);
+            if (n == -1) {
+                break;
+            }
+            out.append(new String(b, 0, n, Charset.forName("UTF-8")));
         }
         return out.toString();
     }
