@@ -13,9 +13,6 @@ import org.jsoup.select.Elements;
 import javax.inject.Inject;
 import java.io.IOException;
 import java.nio.file.Path;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 // import "example.org/pkg/foo"
 // will result in the following requests:
@@ -30,7 +27,7 @@ import java.util.regex.Pattern;
 // TODO the verification not implemented yet
 public class GoImportMetadataFetcher implements PackageFetcher {
     @Inject
-    HttpUtils httpUtils;
+    private HttpUtils httpUtils;
 
     @Override
     public void fetch(String packageName, Path location) {
@@ -57,7 +54,7 @@ public class GoImportMetadataFetcher implements PackageFetcher {
                 //String importPath = matcher.group(1);
                 VcsType vcs = extractVcs(content);
                 String realUrl = extractRealUrl(content);
-                vcs.fetch(realUrl, location);
+                vcs.getFetcher().fetch(realUrl, location);
             }
         } catch (IOException e) {
             throw new PackageResolutionException("Error in access:" + url);

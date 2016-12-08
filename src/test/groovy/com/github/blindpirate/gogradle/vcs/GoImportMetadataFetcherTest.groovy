@@ -29,17 +29,12 @@ class GoImportMetadataFetcherTest {
     @Mock
     PackageFetcher bzr
 
-    boolean setUpDone;
 
-    @Before
-    public void setUp() {
-        if (!setUpDone) {
-            setUpDone = true
-            VcsType.Git.setFetcher(git)
-            VcsType.Svn.setFetcher(svn)
-            VcsType.Mercurial.setFetcher(hg)
-            VcsType.Bazaar.setFetcher(bzr)
-        }
+    public GoImportMetadataFetcherTest() {
+        VcsType.Git.setFetcher(git)
+        VcsType.Svn.setFetcher(svn)
+        VcsType.Mercurial.setFetcher(hg)
+        VcsType.Bazaar.setFetcher(bzr)
     }
 
     @Test
