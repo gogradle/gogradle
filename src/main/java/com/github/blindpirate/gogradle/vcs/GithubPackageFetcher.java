@@ -7,8 +7,8 @@ import java.nio.file.Paths;
 
 public class GithubPackageFetcher extends GitPackageFetcher {
 
-    //	import "github.com/user/project"
-    //  import "github.com/user/project/sub/directory"
+    //import "github.com/user/project"
+    //import "github.com/user/project/sub/directory"
     @Override
     protected void fetchViaHttp(String packageName, Path location) {
         throw new UnsupportedOperationException("Github does not support http!");

@@ -1,11 +1,15 @@
 package com.github.blindpirate.gogradle.vcs;
 
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.google.common.base.Optional;
+import com.google.inject.Injector;
+import com.google.inject.Key;
+import com.google.inject.name.Names;
 
 import java.nio.file.Path;
 
-public enum VcsType implements PackageFetcher {
+public enum VcsType {
     Git("git"),
     Mercurial("hg"),
     Svn("svn"),
@@ -13,20 +17,25 @@ public enum VcsType implements PackageFetcher {
 
     private String suffix;
 
-    private PackageFetcher fetcher;
+    private static Injector injector;
 
-    public void setFetcher(PackageFetcher fetcher) {
-        Assert.isTrue(this.fetcher == null, "Fetcher must be inited only once!");
-        this.fetcher = fetcher;
+
+    public static void setInjector(Injector injector) {
+        VcsType.injector = injector;
+    }
+
+
+    public PackageFetcher getFetcher() {
+        return injector.getInstance(Key.get(PackageFetcher.class, Names.named(toString())));
+    }
+
+
+    public NotationParser getParser() {
+        return injector.getInstance(Key.get(NotationParser.class, Names.named(toString())));
     }
 
     VcsType(String suffix) {
         this.suffix = suffix;
-    }
-
-
-    public void fetch(String packageName, Path location) {
-        fetcher.fetch(packageName, location);
     }
 
     public static Optional<VcsType> of(String name) {

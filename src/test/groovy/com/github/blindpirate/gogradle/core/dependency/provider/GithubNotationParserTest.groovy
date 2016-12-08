@@ -120,5 +120,18 @@ class GithubNotationParserTest {
         assert dependency.commit == GitDependency.NEWEST_COMMIT
     }
 
+    @Test
+    public void 'map notation with extra properties should be set'() {
+        GitDependency dependency = parser.produce(
+                [name         : 'github.com/a/b',
+                 transitive   : true,
+                 excludeVendor: true]
+        )
+
+        assertWithNameAndUrl(dependency)
+        assert dependency.transitive
+        assert dependency.excludeVendor
+    }
+
 
 }

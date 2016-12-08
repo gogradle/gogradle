@@ -10,7 +10,6 @@ import com.github.blindpirate.gogradle.core.dependency.parse.GithubNotationParse
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.StringNotationParser;
-import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.vcs.GitPackageFetcher;
 import com.github.blindpirate.gogradle.vcs.PackageFetcher;
 import com.github.blindpirate.gogradle.vcs.VcsType;
@@ -31,9 +30,7 @@ import java.util.List;
 import static com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser.GolangDependencyNotationParsers;
 import static com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationoParser.MapNotationParsers;
 import static com.github.blindpirate.gogradle.core.dependency.parse.DefaultStringNotationParser.StringNotationParsers;
-import static com.github.blindpirate.gogradle.util.CollectionUtils.*;
-import static java.util.Arrays.asList;
-import static java.util.Collections.unmodifiableList;
+import static com.github.blindpirate.gogradle.util.CollectionUtils.immutableList;
 
 class GolangPlugin implements Plugin<Project> {
 
@@ -64,6 +61,7 @@ class GolangPlugin implements Plugin<Project> {
     private final Injector injector;
     private final GolangPluginSetting settings;
 
+    // This is invoked by gradle, not our Guice.
     @Inject
     public GolangPlugin(Instantiator instantiator) {
         this.instantiator = instantiator;
@@ -79,7 +77,7 @@ class GolangPlugin implements Plugin<Project> {
                 bind(Instantiator.class).toInstance(instantiator);
                 bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
 
-                bind(MapNotationParser.class).annotatedWith(Names.named(VcsType.Git.toString()))
+                bind(NotationParser.class).annotatedWith(Names.named(VcsType.Git.toString()))
                         .to(GitNotationParser.class);
                 bind(PackageFetcher.class).annotatedWith(Names.named(VcsType.Git.toString()))
                         .to(GitPackageFetcher.class);
