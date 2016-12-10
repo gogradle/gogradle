@@ -12,7 +12,7 @@ import org.junit.runner.RunWith
 import static com.github.blindpirate.gogradle.util.FileUtils.forceDelete
 
 @RunWith(GogradleRunner)
-@WithResource("test.zip")
+@WithResource("test-for-gradle.zip")
 class GitUtilsTest {
 
     private static final String INITIAL_COMMIT = "b12418e026113005c55a5f52887f3d314f8e5fb1"
