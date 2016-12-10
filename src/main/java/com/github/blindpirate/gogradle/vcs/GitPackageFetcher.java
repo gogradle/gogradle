@@ -1,17 +1,18 @@
 package com.github.blindpirate.gogradle.vcs;
 
-import com.github.blindpirate.gogradle.core.cache.git.GitInteractionException;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.GitUtils;
 import com.github.blindpirate.gogradle.util.VcsUtils;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 
+import javax.inject.Inject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GitPackageFetcher implements PackageFetcher {
-    private static final String HTTPS = "https://";
-    private static final String HTTP = "http://";
+
+    @Inject
+    private GitUtils gitUtils;
+
 
     // https://golang.org/cmd/go/#hdr-Remote_import_paths
     // When a version control system supports multiple protocols,
@@ -19,12 +20,25 @@ public class GitPackageFetcher implements PackageFetcher {
     // then git+ssh://.
     @Override
     public void fetch(String packageName, Path location) {
-        try {
-            fetchViaHttps(packageName, location);
-            fetchViaHttp(packageName, location);
-        } catch (Throwable e) {
-            fetchViaSsh(packageName, location);
+        if (packageNameStartsWithProtocol(packageName)) {
+            gitUtils.cloneWithUrl(packageName, location);
+        } else {
+            try {
+                fetchViaHttps(packageName, location);
+                fetchViaHttp(packageName, location);
+            } catch (Throwable e) {
+                fetchViaSsh(packageName, location);
+            }
         }
+    }
+
+    private boolean packageNameStartsWithProtocol(String packageName) {
+        return packageName != null
+                &&
+                (packageName.startsWith(HTTP)
+                        || packageName.startsWith(HTTPS)
+                        || packageName.startsWith(SSH));
+
     }
 
     protected void fetchViaSsh(String packageName, Path location) {
@@ -33,24 +47,14 @@ public class GitPackageFetcher implements PackageFetcher {
 
     protected void fetchViaHttp(String packageName, Path location) {
         String repoUrl = getRepoUrlFromPackageName(packageName);
-        fetchWithUrl(HTTP + repoUrl, location);
+        gitUtils.cloneWithUrl(HTTP + repoUrl, location);
     }
 
     protected void fetchViaHttps(String packageName, Path location) {
         String repoUrl = getRepoUrlFromPackageName(packageName);
-        fetchWithUrl(HTTPS + repoUrl, location);
+        gitUtils.cloneWithUrl(HTTPS + repoUrl, location);
     }
 
-    protected void fetchWithUrl(String gitUrl, Path location) {
-        try {
-            Git.cloneRepository()
-                    .setURI(gitUrl)
-                    .setDirectory(location.toFile())
-                    .call();
-        } catch (GitAPIException e) {
-            throw new GitInteractionException("Exception in git operation", e);
-        }
-    }
 
     protected String getRepoUrlFromPackageName(String packageName) {
         Assert.isTrue(packageName.contains(".git"), "absent 'git' suffix in package name:" + packageName);

@@ -1,25 +1,33 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.core.cache.git.GitInteractionException;
+import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionException;
+import com.github.zafarkhaja.semver.ParseException;
+import com.github.zafarkhaja.semver.UnexpectedCharacterException;
+import com.github.zafarkhaja.semver.Version;
 import com.google.common.base.Optional;
+import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
+import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.ResetCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
+import org.eclipse.jgit.errors.IncorrectObjectTypeException;
+import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.Config;
-import org.eclipse.jgit.lib.Constants;
 import org.eclipse.jgit.lib.ObjectId;
-import org.eclipse.jgit.lib.ObjectLoader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTree;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -92,8 +100,27 @@ public class GitUtils {
         if (ref == null) {
             return Optional.absent();
         } else {
-            return Optional.of(ref.getObjectId().getName());
+            return Optional.of(getCommitByRef(repository, ref));
         }
+    }
+
+    private String getCommitByRef(Repository repository, Ref ref) {
+        try (Git git = Git.wrap(repository)) {
+            LogCommand log = git.log();
+            Ref peeledRef = repository.peel(ref);
+            if (peeledRef.getPeeledObjectId() != null) {
+                log.add(peeledRef.getPeeledObjectId());
+            } else {
+                log.add(ref.getObjectId());
+            }
+
+            for (RevCommit commit : log.call()) {
+                return commit.getId().getName();
+            }
+        } catch (GitAPIException | MissingObjectException | IncorrectObjectTypeException e) {
+            throw new IllegalStateException(e);
+        }
+        return null;
     }
 
     public void resetToCommit(Repository repository, String commitId) {
@@ -104,6 +131,54 @@ public class GitUtils {
             reset.call();
         } catch (GitAPIException e) {
             throw new DependencyResolutionException("Can not reset to specific commit:" + commitId);
+        }
+    }
+
+    public Optional<String> findCommitBySemVersion(Repository repository, String semVersionExpression) {
+        Map<String, Ref> tags = repository.getTags();
+
+        List<Pair<String, Version>> satisfiedVersion = new ArrayList<>();
+
+        for (Map.Entry<String, Ref> entry : tags.entrySet()) {
+            String tag = entry.getKey();
+
+            try {
+                Version version = Version.valueOf(tag);
+                if (version.satisfies(semVersionExpression)) {
+                    String commitId = getCommitByRef(repository, entry.getValue());
+                    satisfiedVersion.add(Pair.of(commitId, version));
+                }
+            } catch (UnexpectedCharacterException e) {
+                continue;
+            } catch (IllegalArgumentException | ParseException e) {
+                continue;
+            }
+        }
+
+        if (satisfiedVersion.isEmpty()) {
+            return Optional.absent();
+        }
+
+        Collections.sort(satisfiedVersion, new Comparator<Pair<String, Version>>() {
+            @Override
+            public int compare(Pair<String, Version> version1, Pair<String, Version> version2) {
+                return version2.getRight().compareTo(version1.getRight());
+            }
+        });
+
+        return Optional.of(satisfiedVersion.get(0).getLeft());
+    }
+
+    public Repository hardResetAndUpdate(Repository repository) {
+        try {
+            Git git = Git.wrap(repository);
+            // Add all unstaged files and then reset to clear them
+            git.add().addFilepattern(".").call();
+            git.reset().setMode(ResetCommand.ResetType.HARD).call();
+            git.pull().call();
+            return repository;
+        } catch (GitAPIException e) {
+            throw new GitInteractionException("Exception in git operation", e);
         }
     }
 

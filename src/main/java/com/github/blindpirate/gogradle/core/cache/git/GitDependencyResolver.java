@@ -3,11 +3,8 @@ package com.github.blindpirate.gogradle.core.cache.git;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.pack.AbstractDependencyResolver;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.GitUtils;
 import com.google.common.base.Optional;
-import org.eclipse.jgit.api.Git;
-import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.lib.Repository;
 
 import javax.inject.Inject;

@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.List;
@@ -15,6 +16,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+@Singleton
 public class GitNotationParser implements MapNotationParser {
 
     private final List<? extends MapNotationParser> delegates;

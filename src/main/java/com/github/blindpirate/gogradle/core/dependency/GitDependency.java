@@ -2,27 +2,26 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.ProxyPackageModule;
-import com.github.blindpirate.gogradle.core.cache.git.GitReader;
-import com.github.blindpirate.gogradle.core.vcs.Vcs;
-import com.github.zafarkhaja.semver.Version;
+import com.github.blindpirate.gogradle.core.cache.git.GitDependencyResolver;
+import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import javax.inject.Inject;
 
-import static com.github.blindpirate.gogradle.core.vcs.Vcs.Git;
+import static com.github.blindpirate.gogradle.vcs.VcsType.Git;
 
-public class GitDependency extends ScmDependency {
+public class GitDependency extends AbstractDependency {
+
+    public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
 
     private String url;
     private String commit;
     private String tag;
 
-    private Version semVersion;
-
     @Inject
-    private GitReader metadataFetcher;
+    private GitDependencyResolver gitDependencyResolver;
 
-    public Version getSemVersion() {
-        return semVersion;
+    public GitDependency(String name) {
+        super(name);
     }
 
     public String getUrl() {
@@ -37,74 +36,41 @@ public class GitDependency extends ScmDependency {
         return tag;
     }
 
-    public GitDependency(String url, String commit, String tag) {
-        super(null);
-        this.url = url;
-        this.commit = commit;
-        this.tag = tag;
-    }
-
     @Override
     public String getVersion() {
-        return commit;
+        return tag;
     }
+
+    public GitDependency setUrl(String url) {
+        this.url = url;
+        return this;
+    }
+
+    public GitDependency setCommit(String commit) {
+        this.commit = commit;
+        return this;
+    }
+
+    public GitDependency setTag(String tag) {
+        this.tag = tag;
+        return this;
+    }
+
+    public GitDependency setVersion(String version) {
+        this.tag = version;
+        return this;
+    }
+
 
     @Override
     public GolangPackageModule getPackage() {
-        GolangPackageModule tmpModule = metadataFetcher.resolve(this);
+        GolangPackageModule tmpModule = gitDependencyResolver.resolve(this);
         return new ProxyPackageModule(tmpModule);
     }
 
-    public static GitDependencyBuilder builder() {
-        return new GitDependencyBuilder();
-    }
-
     @Override
-    public Vcs vcs() {
+    public VcsType vcs() {
         return Git;
     }
 
-    public static final class GitDependencyBuilder {
-        private String name;
-        private String url;
-        private String commit;
-        private String tag;
-        private Version semVersion;
-
-        private GitDependencyBuilder() {
-        }
-
-
-        public GitDependencyBuilder withName(String name) {
-            this.name = name;
-            return this;
-        }
-
-        public GitDependencyBuilder withUrl(String url) {
-            this.url = url;
-            return this;
-        }
-
-        public GitDependencyBuilder withCommit(String commit) {
-            this.commit = commit;
-            return this;
-        }
-
-        public GitDependencyBuilder withTag(String tag) {
-            this.tag = tag;
-            return this;
-        }
-
-        public GitDependencyBuilder withSemVersion(Version semVersion) {
-            this.semVersion = semVersion;
-            return this;
-        }
-
-        public GitDependency build() {
-            GitDependency gitDependency = new GitDependency(url, commit, tag);
-            gitDependency.setName(this.name);
-            gitDependency.semVersion = this.semVersion;
-            return gitDependency;
-        }
-    }
 }

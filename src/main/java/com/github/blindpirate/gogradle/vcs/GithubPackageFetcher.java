@@ -1,11 +1,16 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.GitUtils;
 
+import javax.inject.Inject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 public class GithubPackageFetcher extends GitPackageFetcher {
+
+    @Inject
+    private GitUtils gitUtils;
 
     //import "github.com/user/project"
     //import "github.com/user/project/sub/directory"
@@ -21,7 +26,7 @@ public class GithubPackageFetcher extends GitPackageFetcher {
         Assert.isTrue(path.getNameCount() >= 3,
                 "Illegal package on github:" + packageName);
         String sshUrl = String.format("git@github.com:%s", path.subpath(1, 3));
-        fetchWithUrl(sshUrl, location);
+        gitUtils.cloneWithUrl(sshUrl, location);
     }
 
     @Override
