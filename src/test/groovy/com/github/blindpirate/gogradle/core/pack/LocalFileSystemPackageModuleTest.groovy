@@ -8,11 +8,12 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('vendor_test.zip')
 class LocalFileSystemPackageModuleTest {
+
+    File resource
+
     @Test
     void 'create cascading vendor package should success'() {
-        def rootDir = new File("build/tmp/resource/vendor_test")
-
-        LocalFileSystemModule module = LocalFileSystemModule.fromFileSystem('testpackage', rootDir);
+        LocalFileSystemModule module = LocalFileSystemModule.fromFileSystem('testpackage', resource);
 
         assert module.dependencies.any {
             it.package.name == 'github.com/e/f'
