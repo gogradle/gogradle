@@ -80,9 +80,10 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
 
     File pushResourceToStack(String resourceName) {
         File destDir = tmpRandomDirectory("resource");
+        // when resource name is empty, the new created empty dir will be used
         if (resourceName.endsWith('zip')) {
             unzipResourceToDir(resourceName, destDir)
-        } else {
+        } else if (resourceName != '') {
             copyResourceToDir(resourceName, destDir)
         }
 
@@ -112,6 +113,13 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
+        // TODO not valid yet
+        if (System.getProperty("TEST_ARE_OFFLINE")
+                && findAnnotation(method, AccessWeb)) {
+            notifier.fireTestIgnored(description)
+            return
+        }
+
         beforeOneTest(method)
 
         super.runChild(method, notifier);
@@ -143,20 +151,27 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     }
 
     WithProject findWithProject(FrameworkMethod method) {
-        WithProject annoOnClass = method.method.declaringClass.getAnnotation(WithProject)
-        if (annoOnClass) {
-            return annoOnClass
+        WithProject annoOnMethod = findAnnoOnMethod(method, WithProject)
+        if (annoOnMethod) {
+            return annoOnMethod
         }
-        return method.method.getAnnotation(WithProject)
-
+        return findAnnoOnClass(method, WithProject)
     }
 
     WithResource findWithResource(FrameworkMethod method) {
-        WithResource annoOnClass = method.method.declaringClass.getAnnotation(WithResource)
-        if (annoOnClass) {
-            return annoOnClass
+        WithResource annoOnMethod = findAnnoOnMethod(method, WithResource)
+        if (annoOnMethod) {
+            return annoOnMethod
         }
-        return method.method.getAnnotation(WithResource)
+        return findAnnoOnClass(method, WithResource)
+    }
+
+    def findAnnoOnMethod(FrameworkMethod method, Class clazz) {
+        return method.method.getAnnotation(clazz)
+    }
+
+    def findAnnoOnClass(FrameworkMethod method, Class clazz) {
+        return method.method.declaringClass.getAnnotation(clazz)
     }
 
     def tmpRandomDirectory(String prefix) {
