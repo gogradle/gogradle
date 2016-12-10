@@ -1,12 +1,22 @@
 package com.github.blindpirate.gogradle.core.dependency.provider
 
+import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.GithubNotationParser
+import com.google.inject.Injector
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.InjectMocks
+import org.mockito.Mock
 
+@RunWith(GogradleRunner)
 class GithubNotationParserTest {
 
-    GithubNotationParser parser = new GithubNotationParser();
+    @InjectMocks
+    GithubNotationParser parser
+    @Mock
+    Injector injector
+
 
     @Test
     public void 'package not starting with github.com should be rejected'() {

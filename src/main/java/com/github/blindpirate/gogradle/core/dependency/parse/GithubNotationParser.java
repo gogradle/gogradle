@@ -3,17 +3,21 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.google.inject.Injector;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.NEWEST_COMMIT;
-import static com.github.blindpirate.gogradle.core.dependency.GitDependency.builder;
 import static com.github.blindpirate.gogradle.util.MapUtils.getBooleanValue;
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
+import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
 
+@Singleton
 public class GithubNotationParser extends MapStringNotationParser {
 
     // TODO there are too many "github.com"s in the code
@@ -22,6 +26,8 @@ public class GithubNotationParser extends MapStringNotationParser {
     private static final String TAG_SEPERATOR = "@";
     private static final String COMMIT_SEPERATOR = "#";
 
+    @Inject
+    private Injector injector;
 
     @Override
     public boolean acceptString(String notation) {
@@ -75,32 +81,36 @@ public class GithubNotationParser extends MapStringNotationParser {
             url = buildUrl(name);
         }
 
+        if (isBlank(tag) && isNotBlank(version)) {
+            tag = version;
+        }
+
         if (allBlank(version, tag, commit)) {
             commit = NEWEST_COMMIT;
         }
 
-        GitDependency ret = GitDependency.builder()
-                .withName(name)
-                .withUrl(url)
-                .withVersion(version)
-                .withTag(tag)
-                .withCommit(commit)
-                .build();
+        GitDependency ret = new GitDependency(name);
+        injector.injectMembers(ret);
 
-        // TODO not good practice
-        ret.setExcludeVendor(excludeVendor);
-        ret.setTransitive(transitive);
+        ret.setVersion(version)
+                .setTag(tag)
+                .setCommit(commit)
+                .setUrl(url)
+                .setName(name)
+                .setTransitive(transitive)
+                .setExcludeVendor(excludeVendor);
+
         return ret;
     }
 
 
     private GolangDependency buildByName(String notation) {
         String url = buildUrl(notation);
-        return builder()
-                .withName(notation)
-                .withUrl(url)
-                .withNewestCommit()
-                .build();
+        GitDependency ret = new GitDependency(notation);
+        injector.injectMembers(ret);
+        ret.setUrl(url)
+                .setCommit(NEWEST_COMMIT);
+        return ret;
     }
 
     private GolangDependency buildByCommit(String notation) {
@@ -111,11 +121,12 @@ public class GithubNotationParser extends MapStringNotationParser {
         String name = array[0];
         String url = buildUrl(name);
         String commit = array[1];
-        return builder()
-                .withName(name)
-                .withUrl(url)
-                .withCommit(commit)
-                .build();
+
+        GitDependency ret = new GitDependency(name);
+        injector.injectMembers(ret);
+        ret.setUrl(url)
+                .setCommit(commit);
+        return ret;
     }
 
     private String buildUrl(String name) {
@@ -129,11 +140,11 @@ public class GithubNotationParser extends MapStringNotationParser {
         String url = buildUrl(name);
         String tag = notation.substring(indexOfAt + 1);
 
-        return builder()
-                .withName(name)
-                .withUrl(url)
-                .withTag(tag)
-                .build();
+        GitDependency ret = new GitDependency(name);
+        injector.injectMembers(ret);
+        ret.setUrl(url)
+                .setTag(tag);
+        return ret;
     }
 
 }
