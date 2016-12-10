@@ -26,9 +26,4 @@ class VcsTypeTest {
         assert !VcsType.ofDotSuffix('.a').isPresent()
     }
 
-    @Test(expected = IllegalStateException)
-    public void "vcs's fetcher can only be set once"() {
-        VcsType.Git.setFetcher(gitPackageFetcher)
-        VcsType.Git.setFetcher(gitPackageFetcher)
-    }
 }

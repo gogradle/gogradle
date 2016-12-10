@@ -1,13 +1,10 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.google.common.base.Optional;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 import com.google.inject.name.Names;
-
-import java.nio.file.Path;
 
 public enum VcsType {
     Git("git"),
@@ -23,7 +20,6 @@ public enum VcsType {
     public static void setInjector(Injector injector) {
         VcsType.injector = injector;
     }
-
 
     public PackageFetcher getFetcher() {
         return injector.getInstance(Key.get(PackageFetcher.class, Names.named(toString())));
