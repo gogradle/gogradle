@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
@@ -23,10 +22,6 @@ public class DefaultCacheManagerTest {
     DefaultCacheManager cacheManager
     @Mock
     GolangDependency dependency
-
-    @Before
-    void replaceGradleHome() {
-    }
 
     @Test
     void "validation of global cache directory should success"() {
