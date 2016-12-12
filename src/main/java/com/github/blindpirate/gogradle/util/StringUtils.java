@@ -9,6 +9,7 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.join(list, seperator);
     }
 
+
     /**
      * Split and trim. Will remove empty strings
      *
@@ -27,7 +28,20 @@ public class StringUtils {
         return result.toArray(new String[result.size()]);
     }
 
-    private static boolean isNotBlank(String s) {
+    public static boolean isNotBlank(String s) {
         return org.apache.commons.lang3.StringUtils.isNotBlank(s);
+    }
+
+    public static boolean isBlank(String s) {
+        return org.apache.commons.lang3.StringUtils.isBlank(s);
+    }
+
+    public static boolean allBlank(String... strs) {
+        for (String s : strs) {
+            if (isNotBlank(s)) {
+                return false;
+            }
+        }
+        return true;
     }
 }
