@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.GolangDependencyParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser;
 import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import groovy.lang.MissingMethodException;
@@ -12,22 +12,25 @@ import org.gradle.api.artifacts.dsl.ComponentMetadataHandler;
 import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
+import org.gradle.internal.Cast;
 import org.gradle.util.CollectionUtils;
 import org.gradle.util.ConfigureUtil;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 
+@Singleton
 public class GolangDependencyHandler extends GroovyObjectSupport implements DependencyHandler {
 
     private final ConfigurationContainer configurationContainer;
 
-    private final GolangDependencyParser dependencyParser;
+    private final DefaultGolangDependencyParser dependencyParser;
 
     @Inject
     public GolangDependencyHandler(ConfigurationContainer configurationContainer,
-                                   GolangDependencyParser dependencyParser) {
+                                   DefaultGolangDependencyParser dependencyParser) {
         this.configurationContainer = configurationContainer;
         this.dependencyParser = dependencyParser;
     }
@@ -52,7 +55,9 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     @Override
     public Dependency create(Object dependencyNotation, Closure configureClosure) {
-        Dependency dependency = dependencyParser.parseNotation(dependencyNotation);
+        // first level
+        Dependency dependency = dependencyParser.produce(dependencyNotation);
+        Cast.cast(AbstractGolangDependency.class, dependency).setFirstLevel(true);
         return ConfigureUtil.configure(configureClosure, dependency);
     }
 
