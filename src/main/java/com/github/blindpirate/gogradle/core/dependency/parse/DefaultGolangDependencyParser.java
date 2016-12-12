@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
+import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;
@@ -37,10 +38,11 @@ public class DefaultGolangDependencyParser implements NotationParser {
     @SuppressWarnings("unchecked")
     @Override
     public GolangDependency produce(Object notation) {
-        try {
-            return FactoryUtil.<Object, GolangDependency>produce(delegates, notation).get();
-        } catch (NoViableFactoryException e) {
-            throw new DependencyResolutionException("Unsupported dependency notation:" + notation.getClass());
+        Optional<GolangDependency> ret = FactoryUtil.produce(delegates, notation);
+        if (ret.isPresent()) {
+            return ret.get();
+        } else {
+            throw new DependencyResolutionException("Unsupported class:" + notation.getClass());
         }
     }
 
