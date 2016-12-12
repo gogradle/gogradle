@@ -3,9 +3,9 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 
-public abstract class AbstractPakcageModule extends AbstractGolangDependency implements GolangPackageModule {
+public abstract class AbstractPackageModule extends AbstractGolangDependency implements GolangPackageModule {
 
-    public AbstractPakcageModule(String name) {
+    public AbstractPackageModule(String name) {
         this.name = name;
     }
 
