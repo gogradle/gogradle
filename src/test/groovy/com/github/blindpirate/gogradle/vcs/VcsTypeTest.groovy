@@ -5,6 +5,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.vcs.VcsType.*
+
 @RunWith(GogradleRunner)
 class VcsTypeTest {
     @Mock
@@ -12,18 +14,18 @@ class VcsTypeTest {
 
     @Test
     public void 'get vcs type by name should success'() {
-        assert VcsType.of('git').get() == VcsType.Git
-        assert VcsType.of('hg').get() == VcsType.Mercurial
-        assert VcsType.of('svn').get() == VcsType.Svn
-        assert VcsType.of('bzr').get() == VcsType.Bazaar
+        assert of('git').get() == Git
+        assert of('hg').get() == Mercurial
+        assert of('svn').get() == Svn
+        assert of('bzr').get() == Bazaar
 
-        assert VcsType.ofDotSuffix('.git').get() == VcsType.Git
-        assert VcsType.ofDotSuffix('.hg').get() == VcsType.Mercurial
-        assert VcsType.ofDotSuffix('.svn').get() == VcsType.Svn
-        assert VcsType.ofDotSuffix('.bzr').get() == VcsType.Bazaar
+        assert ofDotSuffix('.git').get() == Git
+        assert ofDotSuffix('.hg').get() == Mercurial
+        assert ofDotSuffix('.svn').get() == Svn
+        assert ofDotSuffix('.bzr').get() == Bazaar
 
-        assert !VcsType.of('a').isPresent()
-        assert !VcsType.ofDotSuffix('.a').isPresent()
+        assert !of('a').isPresent()
+        assert !ofDotSuffix('.a').isPresent()
     }
 
 }

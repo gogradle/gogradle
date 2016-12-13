@@ -16,7 +16,6 @@ public enum VcsType {
 
     private static Injector injector;
 
-
     public static void setInjector(Injector injector) {
         VcsType.injector = injector;
     }
