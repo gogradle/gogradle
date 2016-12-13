@@ -4,10 +4,12 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.vcs.VcsType;
+import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.List;
@@ -18,12 +20,13 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
-public class DefaultMapNotationoParser implements MapNotationParser {
+@Singleton
+public class DefaultMapNotationParser implements MapNotationParser {
 
     private final List<? extends MapNotationParser> delegates;
 
     @Inject
-    public DefaultMapNotationoParser(
+    public DefaultMapNotationParser(
             @MapNotationParsers List<? extends MapNotationParser> delegates) {
         this.delegates = delegates;
     }
@@ -43,12 +46,12 @@ public class DefaultMapNotationoParser implements MapNotationParser {
         Assert.isTrue(notation.containsKey(NAME_KEY), "name must be specified!");
     }
 
-    private GolangDependency buildByVcs(Map<String, ?> notation) {
+    private GolangDependency buildByVcs(Map<String, Object> notation) {
         VcsType vcs = extractVcsType(notation).get();
         return vcs.getParser().produce(notation);
     }
 
-    private boolean vcsSpecified(Map<String, ?> notation) {
+    private boolean vcsSpecified(Map<String, Object> notation) {
         return extractVcsType(notation).isPresent();
     }
 
@@ -64,7 +67,7 @@ public class DefaultMapNotationoParser implements MapNotationParser {
         if (vcsSpecified(notation)) {
             return buildByVcs(notation);
         } else {
-            return FactoryUtil.produce(delegates, (Object) notation);
+            return FactoryUtil.<Object, GolangDependency>produce(delegates, notation).get();
         }
     }
 
