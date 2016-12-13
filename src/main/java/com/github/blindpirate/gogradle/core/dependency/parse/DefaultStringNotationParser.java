@@ -1,17 +1,17 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionException;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
+import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.util.Arrays;
 import java.util.List;
 
-import static com.github.blindpirate.gogradle.util.FactoryUtil.NoViableFactoryException;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -21,6 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * Parses a string to a dependency.
  * Currently, only dependency with well-known hosts can be parsed properly.
  */
+@Singleton
 public class DefaultStringNotationParser implements StringNotationParser {
 
     private final List<? extends StringNotationParser> parsers;
@@ -43,9 +44,10 @@ public class DefaultStringNotationParser implements StringNotationParser {
 
     @Override
     public GolangDependency parseString(String notation) {
-        try {
-            return FactoryUtil.produce(parsers, (Object) notation);
-        } catch (NoViableFactoryException e) {
+        Optional<GolangDependency> ret = FactoryUtil.produce(parsers, (Object) notation);
+        if (ret.isPresent()) {
+            return ret.get();
+        } else {
             throw new DependencyResolutionException("Cannot resolve dependency:" + notation);
         }
     }
