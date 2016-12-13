@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.cache.git;
+package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
@@ -8,8 +8,9 @@ import com.google.common.base.Optional;
 import org.eclipse.jgit.lib.Repository;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.file.Path;
-
+@Singleton
 public class GitDependencyResolver extends AbstractDependencyResolver<Repository, String> {
 
     private static final String DEFAULT_BRANCH = "master";

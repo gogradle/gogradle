@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.cache.git
+package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
