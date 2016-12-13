@@ -26,9 +26,6 @@ public class GithubNotationParser extends MapStringNotationParser {
     private static final String TAG_SEPERATOR = "@";
     private static final String COMMIT_SEPERATOR = "#";
 
-    @Inject
-    private Injector injector;
-
     @Override
     public boolean acceptString(String notation) {
         return notation.startsWith(GITHUB_HOST);
@@ -75,7 +72,6 @@ public class GithubNotationParser extends MapStringNotationParser {
         String tag = getString(notation, "tag");
         String commit = getString(notation, "commit");
         boolean transitive = getBooleanValue(notation, "transitive", true);
-        boolean excludeVendor = getBooleanValue(notation, "excludeVendor", false);
 
         if (isBlank(url)) {
             url = buildUrl(name);
@@ -89,27 +85,24 @@ public class GithubNotationParser extends MapStringNotationParser {
             commit = NEWEST_COMMIT;
         }
 
-        GitDependency ret = new GitDependency(name);
-        injector.injectMembers(ret);
+        GitDependency ret = new GitDependency();
 
         ret.setVersion(version)
                 .setTag(tag)
                 .setCommit(commit)
                 .setUrl(url)
-                .setName(name)
                 .setTransitive(transitive)
-                .setExcludeVendor(excludeVendor);
-
+                .setName(name);
         return ret;
     }
 
 
     private GolangDependency buildByName(String notation) {
         String url = buildUrl(notation);
-        GitDependency ret = new GitDependency(notation);
-        injector.injectMembers(ret);
+        GitDependency ret = new GitDependency();
         ret.setUrl(url)
-                .setCommit(NEWEST_COMMIT);
+                .setCommit(NEWEST_COMMIT)
+                .setName(notation);
         return ret;
     }
 
@@ -122,10 +115,10 @@ public class GithubNotationParser extends MapStringNotationParser {
         String url = buildUrl(name);
         String commit = array[1];
 
-        GitDependency ret = new GitDependency(name);
-        injector.injectMembers(ret);
+        GitDependency ret = new GitDependency();
         ret.setUrl(url)
-                .setCommit(commit);
+                .setCommit(commit)
+                .setName(name);
         return ret;
     }
 
@@ -140,10 +133,10 @@ public class GithubNotationParser extends MapStringNotationParser {
         String url = buildUrl(name);
         String tag = notation.substring(indexOfAt + 1);
 
-        GitDependency ret = new GitDependency(name);
-        injector.injectMembers(ret);
+        GitDependency ret = new GitDependency();
         ret.setUrl(url)
-                .setTag(tag);
+                .setTag(tag)
+                .setName(name);
         return ret;
     }
 

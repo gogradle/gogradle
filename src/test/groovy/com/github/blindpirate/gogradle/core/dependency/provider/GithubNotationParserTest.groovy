@@ -134,13 +134,13 @@ class GithubNotationParserTest {
     public void 'map notation with extra properties should be set'() {
         GitDependency dependency = parser.produce(
                 [name         : 'github.com/a/b',
-                 transitive   : true,
-                 excludeVendor: true]
+//                 excludeVendor: true,
+                 transitive   : true]
         )
 
         assertWithNameAndUrl(dependency)
         assert dependency.transitive
-        assert dependency.excludeVendor
+//        assert dependency.excludeVendor
     }
 
 
