@@ -57,4 +57,12 @@ public class FileUtils {
             throw new IllegalStateException(e);
         }
     }
+
+    public static void touch(File file) {
+        try {
+            org.apache.commons.io.FileUtils.touch(file);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }
