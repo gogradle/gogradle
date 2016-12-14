@@ -23,11 +23,19 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
     }
 
     public GolangDependencySet(Class<? extends GolangDependency> type, Instantiator instantiator) {
-        super(type, instantiator);
+        super(type, instantiator, GolangDependency.Namer.INSTANCE);
     }
 
     public static GolangDependencySet merge(List<GolangDependencySet> sets) {
-        return null;
+        GolangDependencySet result = new GolangDependencySet();
+        for (GolangDependencySet set : sets) {
+            for (GolangDependency dependency : set) {
+                if (!result.contains(dependency)) {
+                    result.add(dependency);
+                }
+            }
+        }
+        return result;
     }
 
     public DependencySet toDependencySet() {

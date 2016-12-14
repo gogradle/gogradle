@@ -7,9 +7,11 @@ import org.gradle.api.internal.AbstractNamedDomainObjectContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import static org.gradle.api.artifacts.Configuration.Namer;
 
+@Singleton
 public class GolangConfigurationContainer extends AbstractNamedDomainObjectContainer<Configuration>
         implements ConfigurationContainer {
 

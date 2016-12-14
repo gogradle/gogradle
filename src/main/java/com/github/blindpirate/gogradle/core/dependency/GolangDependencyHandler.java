@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.DefaultGolangDependencyParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import groovy.lang.MissingMethodException;
@@ -26,11 +26,11 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     private final ConfigurationContainer configurationContainer;
 
-    private final DefaultGolangDependencyParser dependencyParser;
+    private final DefaultNotationParser dependencyParser;
 
     @Inject
     public GolangDependencyHandler(ConfigurationContainer configurationContainer,
-                                   DefaultGolangDependencyParser dependencyParser) {
+                                   DefaultNotationParser dependencyParser) {
         this.configurationContainer = configurationContainer;
         this.dependencyParser = dependencyParser;
     }
