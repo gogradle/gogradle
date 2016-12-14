@@ -19,12 +19,12 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Singleton
-public class DefaultGolangDependencyParser implements NotationParser {
+public class DefaultNotationParser implements NotationParser {
 
     private final List<? extends NotationParser> delegates;
 
     @Inject
-    public DefaultGolangDependencyParser(
+    public DefaultNotationParser(
             @GolangDependencyNotationParsers List<? extends NotationParser> delegates) {
         this.delegates = delegates;
     }

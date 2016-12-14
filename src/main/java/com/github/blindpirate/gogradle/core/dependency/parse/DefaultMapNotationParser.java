@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.common.base.Objects;
@@ -38,36 +40,16 @@ public class DefaultMapNotationParser implements MapNotationParser {
 
     @Override
     public GolangDependency produce(Object notation) {
-        Map<String, Object> notationMap = (Map<String, Object>) notation;
-        return parseMap(notationMap);
-    }
-
-    private void ensureNameExist(Map<String, ?> notation) {
-        Assert.isTrue(notation.containsKey(NAME_KEY), "name must be specified!");
-    }
-
-    private GolangDependency buildByVcs(Map<String, Object> notation) {
-        VcsType vcs = extractVcsType(notation).get();
-        return vcs.getParser().produce(notation);
-    }
-
-    private boolean vcsSpecified(Map<String, Object> notation) {
-        return extractVcsType(notation).isPresent();
-    }
-
-    private Optional<VcsType> extractVcsType(Map<String, ?> notation) {
-        Object value = notation.get(VCS_KEY);
-        return value == null ? Optional.<VcsType>absent() : VcsType.of(value.toString());
+        return parseMap(Cast.cast(Map.class, notation));
     }
 
     @Override
     public GolangDependency parseMap(Map<String, Object> notation) {
-        ensureNameExist(notation);
-
-        if (vcsSpecified(notation)) {
-            return buildByVcs(notation);
+        Optional<GolangDependency> result = FactoryUtil.<Object, GolangDependency>produce(delegates, notation);
+        if (result.isPresent()) {
+            return result.get();
         } else {
-            return FactoryUtil.<Object, GolangDependency>produce(delegates, notation).get();
+            throw new DependencyResolutionException("Unable to parse notation:" + notation);
         }
     }
 

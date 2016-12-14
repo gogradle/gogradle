@@ -7,12 +7,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class DefaultGolangDependencyParserTest {
+class DefaultNotationParserTest {
 
     @Mock
     NotationParser parser1
@@ -21,11 +20,11 @@ class DefaultGolangDependencyParserTest {
     @Mock
     GolangDependency dependency
 
-    DefaultGolangDependencyParser parser
+    DefaultNotationParser parser
 
     @Before
     void setUp() {
-        parser = new DefaultGolangDependencyParser([parser1, parser2]);
+        parser = new DefaultNotationParser([parser1, parser2]);
     }
 
     @Test(expected = DependencyResolutionException)

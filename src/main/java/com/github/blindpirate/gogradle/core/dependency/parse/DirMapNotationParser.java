@@ -6,8 +6,10 @@ import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.MapUtils;
 
+import javax.inject.Singleton;
 import java.util.Map;
 
+@Singleton
 public class DirMapNotationParser extends AutoConfigureMapNotationParser {
     private static final String PATH_KEY = "path";
 

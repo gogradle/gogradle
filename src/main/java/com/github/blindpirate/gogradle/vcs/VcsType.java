@@ -24,11 +24,6 @@ public enum VcsType {
         return injector.getInstance(Key.get(PackageFetcher.class, Names.named(toString())));
     }
 
-
-    public NotationParser getParser() {
-        return injector.getInstance(Key.get(NotationParser.class, Names.named(toString())));
-    }
-
     VcsType(String suffix) {
         this.suffix = suffix;
     }
