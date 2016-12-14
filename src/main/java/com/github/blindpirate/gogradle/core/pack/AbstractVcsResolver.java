@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.ProxyPackageModule;
 import com.github.blindpirate.gogradle.core.TempFileModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
@@ -11,20 +12,22 @@ import javax.inject.Inject;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-public abstract class AbstractDependencyResolver<REPOSITORY, VERSION> implements DependencyResolver {
+public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements DependencyResolver {
 
     @Inject
     private CacheManager cacheManager;
 
     @Override
     public GolangPackageModule resolve(final GolangDependency dependency) {
-        return cacheManager.runWithGlobalCacheLock(dependency, new Callable<GolangPackageModule>() {
+        GolangPackageModule module = cacheManager.runWithGlobalCacheLock(dependency, new Callable<GolangPackageModule>() {
             @Override
             public GolangPackageModule call() {
                 Path path = cacheManager.getGlobalCachePath(dependency.getName());
                 return doResolve(dependency, path);
             }
         });
+
+        return new ProxyPackageModule(module);
     }
 
     private GolangPackageModule doResolve(GolangDependency dependency, Path path) {
