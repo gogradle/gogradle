@@ -11,6 +11,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Path;
 
@@ -25,6 +26,7 @@ import java.nio.file.Path;
 // the go tool will verify that https://example.org/?go-get=1 contains the same meta tag and
 // then git clone https://code.org/r/p/exproj into GOPATH/src/example.org.
 // TODO the verification not implemented yet
+@Singleton
 public class GoImportMetadataFetcher implements PackageFetcher {
     @Inject
     private HttpUtils httpUtils;

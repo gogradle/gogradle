@@ -2,6 +2,10 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.util.HttpUtils
+import com.google.inject.Injector
+import com.google.inject.Key
+import com.google.inject.name.Named
+import com.google.inject.name.Names
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,6 +13,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.vcs.PackageFetcher.HTTPS
+import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyMap
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.verify
@@ -28,13 +33,13 @@ class GoImportMetadataFetcherTest {
     PackageFetcher hg
     @Mock
     PackageFetcher bzr
+    @Mock
+    Injector injector;
 
-
-    public GoImportMetadataFetcherTest() {
-        VcsType.Git.setFetcher(git)
-        VcsType.Svn.setFetcher(svn)
-        VcsType.Mercurial.setFetcher(hg)
-        VcsType.Bazaar.setFetcher(bzr)
+    @Before
+    public void setUp() {
+        VcsType.setInjector(injector)
+        when(injector.getInstance(Key.get(PackageFetcher.class, Names.named('Git')))).thenReturn(git)
     }
 
     @Test
