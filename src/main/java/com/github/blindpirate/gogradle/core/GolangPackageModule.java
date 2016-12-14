@@ -13,7 +13,7 @@ import java.nio.file.Path;
  */
 public interface GolangPackageModule extends GolangDependency, GolangPackage {
     /**
-     * Dependencies of golang package module = vendor(if any) + declaration(if any) + imports in code
+     * Dependencies of golang package module = vendor(if any) + external tools(if any) + imports in code
      *
      * @return
      */

@@ -2,16 +2,15 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.pack.DependencyResolver;
-import com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import org.omg.CORBA.Object;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public abstract class AbstractNotationDependency extends AbstractGolangDependency {
+import static com.github.blindpirate.gogradle.core.dependency.DependencyHelper.INJECTOR_INSTANCE;
 
-    private VcsType vcsType;
+public abstract class AbstractNotationDependency extends AbstractGolangDependency {
 
     private boolean transitive = true;
 
@@ -19,15 +18,11 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
 
     @Override
     public GolangPackageModule getPackage() {
-        DependencyResolver resolver = DependencyHelper.injector.getInstance(this.resolverClass());
+        DependencyResolver resolver = INJECTOR_INSTANCE.getInstance(this.resolverClass());
         return resolver.resolve(this);
     }
 
     protected abstract Class<? extends DependencyResolver> resolverClass();
-
-    public VcsType getVcsType() {
-        return vcsType;
-    }
 
     public boolean isTransitive() {
         return transitive;
@@ -41,14 +36,14 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         this.excludes.putAll(map);
     }
 
-    public AbstractNotationDependency setVcsType(VcsType vcsType) {
-        this.vcsType = vcsType;
-        return this;
-    }
-
     public AbstractNotationDependency setTransitive(boolean transitive) {
         this.transitive = transitive;
         return this;
+    }
+
+    @Override
+    public String getVersion() {
+        throw new UnsupportedOperationException();
     }
 
 }

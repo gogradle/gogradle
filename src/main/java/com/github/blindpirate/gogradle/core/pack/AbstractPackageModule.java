@@ -12,11 +12,6 @@ public abstract class AbstractPackageModule extends AbstractGolangDependency imp
     private String name;
 
     @Override
-    public String getGroup() {
-        return null;
-    }
-
-    @Override
     public String getName() {
         return name;
     }
