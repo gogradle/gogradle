@@ -3,8 +3,11 @@ package com.github.blindpirate.gogradle.vcs.git
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.cache.CacheManager
+import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
 import com.github.blindpirate.gogradle.util.GitUtils
+import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Test
@@ -41,11 +44,22 @@ class GitDependencyResolverTest {
     @Mock
     Repository repository
 
+    @Mock
+    Injector injector
+
+    @Mock
+    DependencyFactory factory
+
     // injected by GogradleRunner
     File resource
 
     @Before
     public void setUp() {
+
+        when(injector.getInstance(DependencyFactory)).thenReturn(factory)
+
+        DependencyHelper.INJECTOR_INSTANCE = injector
+
         when(cacheManager.runWithGlobalCacheLock(any(GitDependency), any(Callable)))
                 .thenAnswer(new Answer<Object>() {
             @Override
@@ -60,7 +74,6 @@ class GitDependencyResolverTest {
         Path path = resource.toPath()
         // given:
         when(cacheManager.getGlobalCachePath(anyString())).thenReturn(path)
-
         when(dependency.getUrl()).thenReturn("url")
 
         // when:

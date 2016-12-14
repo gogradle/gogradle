@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.pack.AbstractDependencyResolver;
+import com.github.blindpirate.gogradle.core.pack.AbstractVcsResolver;
 import com.github.blindpirate.gogradle.util.GitUtils;
 import com.google.common.base.Optional;
 import org.eclipse.jgit.lib.Repository;
@@ -11,7 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 @Singleton
-public class GitDependencyResolver extends AbstractDependencyResolver<Repository, String> {
+public class GitDependencyResolver extends AbstractVcsResolver<Repository, String> {
 
     private static final String DEFAULT_BRANCH = "master";
     @Inject
