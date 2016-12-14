@@ -13,8 +13,9 @@ import java.io.File;
 
 /**
  * This task perform preparation such as Go executable and GOPATH.
+ *
  */
-class PrepareTask extends DefaultTask {
+public class PrepareTask extends DefaultTask {
 
     @Inject
     private GoBinaryManager binaryManager;
@@ -43,5 +44,6 @@ class PrepareTask extends DefaultTask {
                         rootDir);
         projectModule.getDependencies();
     }
+
 
 }
