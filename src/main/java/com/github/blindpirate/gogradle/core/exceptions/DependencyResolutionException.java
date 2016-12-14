@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.resolve;
+package com.github.blindpirate.gogradle.core.exceptions;
 
 import org.gradle.api.GradleException;
 
