@@ -9,7 +9,7 @@ import java.util.Collection;
 
 public class DependencyHelper {
 
-    public static Injector injector;
+    public static Injector INJECTOR_INSTANCE;
 
     public static GolangDependencySet parseMany(Collection<?> notations, NotationParser parser) {
         GolangDependencySet ret = new GolangDependencySet();
@@ -22,6 +22,6 @@ public class DependencyHelper {
     }
 
     public static GolangDependencySet produceDependencies(GolangPackageModule module) {
-        return injector.getInstance(DependencyFactory.class).produce(module);
+        return INJECTOR_INSTANCE.getInstance(DependencyFactory.class).produce(module);
     }
 }
