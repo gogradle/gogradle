@@ -5,9 +5,11 @@ import com.github.blindpirate.gogradle.util.GitUtils;
 import com.github.blindpirate.gogradle.util.VcsUtils;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+@Singleton
 public class GitPackageFetcher implements PackageFetcher {
 
     @Inject
