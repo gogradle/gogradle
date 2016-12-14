@@ -1,8 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.github.blindpirate.gogradle.core.cache.git.GitInteractionException;
-import com.github.blindpirate.gogradle.core.dependency.GitDependency;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolutionException;
+import com.github.blindpirate.gogradle.vcs.git.GitInteractionException;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.UnexpectedCharacterException;
 import com.github.zafarkhaja.semver.Version;
