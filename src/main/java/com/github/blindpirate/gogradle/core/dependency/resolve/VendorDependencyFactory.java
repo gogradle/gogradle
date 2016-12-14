@@ -3,10 +3,12 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.core.FileSystemModule;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.GitHubPackageResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.util.FileUtils;
 
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
@@ -23,6 +25,7 @@ import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDire
  * A {@link VendorDependencyFactory is a factory that reads vendor directory and resolves them to
  * {@link FileSystemModule }
  */
+@Singleton
 public class VendorDependencyFactory implements DependencyFactory {
     private List<PackageNameResolver> resolvers = new ArrayList<>();
 

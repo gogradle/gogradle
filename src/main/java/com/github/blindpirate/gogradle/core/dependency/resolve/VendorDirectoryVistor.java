@@ -51,7 +51,7 @@ public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
 
         context.setCurrentPath(vendorPath.relativize(dir));
 
-        VendorPackageNameResolveResult result = FactoryUtil.produce(resolvers, context);
+        VendorPackageNameResolveResult result = FactoryUtil.produce(resolvers, context).get();
 
         if (result.isFinished()) {
             dependencies.add(result.getDependency());
