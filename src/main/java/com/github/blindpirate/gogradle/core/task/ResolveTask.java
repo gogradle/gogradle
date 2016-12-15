@@ -14,13 +14,12 @@ import java.io.File;
 
 public class ResolveTask extends DefaultTask {
     @Inject
-    GolangPluginSetting settings;
+    GolangPluginSetting setting;
 
     @Inject
     DependencyTreeFactory dependencyTreeFactory;
 
     private DependencyTreeNode tree;
-
 
     public ResolveTask() {
         dependsOn(GolangPlugin.PREPARE_TASK_NAME);
@@ -28,9 +27,9 @@ public class ResolveTask extends DefaultTask {
 
     @TaskAction
     public void resolve() {
-        File rootDir = getProject().getProjectDir();
+        File rootDir = getProject().getRootDir();
         GolangPackageModule projectModule = LocalFileSystemModule.fromFileSystem(
-                settings.getRootPackage(),
+                setting.getPackageName(),
                 rootDir);
         tree = dependencyTreeFactory.getTree(projectModule);
     }
