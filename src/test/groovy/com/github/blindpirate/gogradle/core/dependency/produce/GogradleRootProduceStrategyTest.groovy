@@ -10,7 +10,6 @@ import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor
 import com.google.common.base.Optional
 import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.DependencySet
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -19,6 +18,8 @@ import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Develop
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asOptional
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
@@ -52,24 +53,6 @@ class GogradleRootProduceStrategyTest {
     GolangDependency b2
     @Mock
     GolangDependency c2
-
-    GolangDependencySet asGolangDependencySet(GolangDependency... dependencies) {
-        return dependencies.inject(new GolangDependencySet(), { ret, dependency ->
-            ret.add(dependency)
-            return ret
-        })
-    }
-
-    Optional<GolangDependencySet> asOptional(GolangDependency... dependencies) {
-        if (dependencies.size() == 0) {
-            return Optional.absent()
-        }
-        return Optional.of(asGolangDependencySet(dependencies))
-    }
-
-    DependencySet asDependencySet(GolangDependency... dependencies) {
-        return asGolangDependencySet(dependencies).toDependencySet()
-    }
 
     @Before
     void setUp() {
