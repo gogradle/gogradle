@@ -2,9 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTree;
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.google.common.base.Optional;
 import org.gradle.api.artifacts.Dependency;
 
 import javax.inject.Inject;
@@ -15,33 +16,34 @@ import javax.inject.Singleton;
  */
 @Singleton
 public class DependencyTreeFactory {
-
     @Inject
     private DependencyFactory factory;
-
     @Inject
     private DependencyRegistry registry;
 
-    public DependencyTree getTree(GolangPackageModule module) {
+    public DependencyTreeNode getTree(GolangPackageModule module) {
+        return getSubTreeRootNode(module).get();
+    }
 
-        if (registry.shouldBeIgnore(module)) {
-            return null;
+    private Optional<DependencyTreeNode> getSubTreeRootNode(GolangPackageModule module) {
+        if (!registry.register(module)) {
+            return Optional.absent();
         }
 
         GolangDependencySet dependencies = factory.produce(module);
-        DependencyTree ret = new DependencyTree(module);
+        DependencyTreeNode ret = new DependencyTreeNode(module);
 
         // can be run concurrently
         for (Dependency dependency : dependencies) {
             GolangPackageModule backingModule = ((GolangDependency) dependency).getPackage();
-            DependencyTree childNode = getTree(backingModule);
+            Optional<DependencyTreeNode> childNode = getSubTreeRootNode(backingModule);
 
-            if (childNode != null) {
-                ret.addChild(childNode);
+            if (childNode.isPresent()) {
+                ret.addChild(childNode.get());
             }
         }
 
-        return ret;
+        return Optional.of(ret);
     }
 
 }
