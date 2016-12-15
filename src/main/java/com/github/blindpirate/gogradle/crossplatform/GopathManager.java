@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.task;
+package com.github.blindpirate.gogradle.crossplatform;
 
 
 import com.google.common.base.Optional;
