@@ -9,6 +9,10 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.join(list, seperator);
     }
 
+    public static String trimToNull(String s) {
+        return org.apache.commons.lang3.StringUtils.trimToNull(s);
+    }
+
 
     /**
      * Split and trim. Will remove empty strings
