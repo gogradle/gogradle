@@ -18,6 +18,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.util.CollectionUtils.flatten;
+import static org.codehaus.groovy.runtime.InvokerHelper.EMPTY_ARGS;
+import static org.codehaus.groovy.runtime.InvokerHelper.invokeMethod;
 
 @Singleton
 public class DefaultLockedDependencyManager implements LockedDependencyManager {
@@ -102,17 +104,18 @@ public class DefaultLockedDependencyManager implements LockedDependencyManager {
     }
 
     private String toString(Map<String, String> notation) {
-        if (notation.isEmpty()) {
-            return "[:]\n";
-        }
-        StringBuilder sb = new StringBuilder();
-        sb.append("[");
-        for (Map.Entry<String, String> entry : notation.entrySet()) {
-            sb.append("'").append(entry.getKey()).append("'").append(":");
-            sb.append("'").append(entry.getValue()).append("'").append(",");
-        }
-        sb.append("]");
-        return sb.toString();
+        return invokeMethod(notation, "inspect", EMPTY_ARGS).toString();
+//        if (notation.isEmpty()) {
+//            return "[:]\n";
+//        }
+//        StringBuilder sb = new StringBuilder();
+//        sb.append("[");
+//        for (Map.Entry<String, String> entry : notation.entrySet()) {
+//            sb.append("'").append(entry.getKey()).append("'").append(":");
+//            sb.append("'").append(entry.getValue()).append("'").append(",");
+//        }
+//        sb.append("]");
+//        return sb.toString();
     }
 
     // return start line index or lines.size()

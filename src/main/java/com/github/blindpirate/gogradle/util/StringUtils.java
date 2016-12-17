@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class StringUtils {
@@ -51,6 +52,9 @@ public class StringUtils {
     }
 
     public static List<String> split(String s, String regex) {
+        if ("".equals(s)) {
+            return Collections.emptyList();
+        }
         return Arrays.asList(s.split(regex));
     }
 }
