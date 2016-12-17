@@ -22,4 +22,12 @@ public class CollectionUtils {
 
         return ret;
     }
+
+    public static <T> List<T> flatten(List<T>... lists) {
+        List<T> result = new ArrayList<>();
+        for (List<T> list : lists) {
+            result.addAll(list);
+        }
+        return result;
+    }
 }

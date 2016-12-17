@@ -65,4 +65,12 @@ public class FileUtils {
             throw new IllegalStateException(e);
         }
     }
+
+    public static void write(File file, CharSequence data) {
+        try {
+            org.apache.commons.io.FileUtils.write(file, data, "UTF8");
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
 }
