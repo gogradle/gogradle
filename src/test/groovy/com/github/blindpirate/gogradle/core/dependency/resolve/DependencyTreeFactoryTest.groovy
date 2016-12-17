@@ -49,11 +49,11 @@ class DependencyTreeFactoryTest {
         when(dependencyFactory.produce(_0)).thenReturn(dependenciesOf0)
         when(dependencyFactory.produce(_01)).thenReturn(dependenciesOf01)
 
-        [_02,_011,_012].each {
+        [_02, _011, _012].each {
             when(dependencyFactory.produce(it)).thenReturn(new GolangDependencySet())
         }
 
-        [_0, _01, _02, _011].each {
+        [_0, _01, _02, _011, _012].each {
             when(it.getPackage()).thenReturn(it)
             when(dependencyRegistry.register(it)).thenReturn(true)
         }
