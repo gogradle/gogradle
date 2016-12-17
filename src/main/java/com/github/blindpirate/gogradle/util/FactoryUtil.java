@@ -13,7 +13,8 @@ public class FactoryUtil {
         }
     }
 
-    public static <MATERIAL, PRODUCT> Optional<PRODUCT> produce(List<? extends PickyFactory<MATERIAL, PRODUCT>> factories, MATERIAL material) {
+    public static <MATERIAL, PRODUCT> Optional<PRODUCT> produce(
+            List<? extends PickyFactory<MATERIAL, PRODUCT>> factories, MATERIAL material) {
         for (PickyFactory<MATERIAL, PRODUCT> factory : factories) {
             if (factory.accept(material)) {
                 return Optional.of(factory.produce(material));
