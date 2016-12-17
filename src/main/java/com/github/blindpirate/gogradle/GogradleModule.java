@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.cache.DefaultCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
+import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.external.godep.GodepDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
@@ -55,6 +57,7 @@ public class GogradleModule extends AbstractModule {
         bind(CacheManager.class).to(DefaultCacheManager.class);
         bind(Instantiator.class).toInstance(instantiator);
         bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
+        bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
 
         bind(PackageFetcher.class).annotatedWith(Names.named(Git.toString()))
                 .to(GitPackageFetcher.class);
