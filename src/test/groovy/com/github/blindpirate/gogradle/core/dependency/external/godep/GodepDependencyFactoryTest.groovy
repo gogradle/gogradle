@@ -27,6 +27,8 @@ class GodepDependencyFactoryTest {
     GolangPackageModule module
     @Mock
     MapNotationParser mapNotationParser
+    @Mock
+    GolangDependency dependency
 
     @WithResource('')
     @Test
@@ -42,23 +44,17 @@ class GodepDependencyFactoryTest {
     @WithResource('godep-test.zip')
     public void 'package with Godeps/Godeps.json should be analyzed properly'() {
         // given:
-        GolangDependency github_com_kr_fs = mock(GolangDependency)
-        GolangDependency github_com_kr_pretty = mock(GolangDependency)
-
-        when(github_com_kr_fs.getName()).thenReturn('github.com/kr/fs')
-        when(github_com_kr_pretty.getName()).thenReturn('github.com/kr/pretty')
-
         when(module.getRootDir()).thenReturn(resource.toPath())
         when(mapNotationParser.accept(any())).thenReturn(true)
-        when(mapNotationParser.produce(eq([name: "github.com/kr/fs", commit: '2788f0dbd16903de03cb8186e5c7d97b69ad387b'])))
-                .thenReturn(github_com_kr_fs)
-        when(mapNotationParser.produce(eq([name  : "github.com/kr/pretty",
-                                           commit: 'f31442d60e51465c69811e2107ae978868dbea5c'])))
-                .thenReturn(github_com_kr_pretty)
+        when(mapNotationParser.produce(anyMap())).thenReturn(dependency)
+        when(dependency.getName()).thenReturn('name')
+
         // when:
         def result = godepDependencyFactory.produce(module)
         // then:
-        assert result.size() == 2
+        verify(mapNotationParser).produce(eq([name: "github.com/kr/fs", commit: '2788f0dbd16903de03cb8186e5c7d97b69ad387b']))
+        verify(mapNotationParser).produce(eq([name  : "github.com/kr/pretty",
+                                              commit: 'f31442d60e51465c69811e2107ae978868dbea5c']))
 
     }
 }
