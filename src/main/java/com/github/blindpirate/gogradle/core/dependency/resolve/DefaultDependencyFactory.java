@@ -21,7 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultDependencyFactory implements DependencyFactory, ModuleDependencyVistor {
 
-    private final List<? extends DependencyFactory> externalDependencyFactories;
+    private final List<DependencyFactory> externalDependencyFactories;
 
     private final SourceCodeDependencyFactory sourceCodeDependencyFactory;
 
@@ -29,7 +29,7 @@ public class DefaultDependencyFactory implements DependencyFactory, ModuleDepend
 
     @Inject
     public DefaultDependencyFactory(@ExternalDependencyFactories
-                                            List<? extends DependencyFactory> externalDependencyFactories,
+                                            List<DependencyFactory> externalDependencyFactories,
                                     SourceCodeDependencyFactory sourceCodeDependencyFactory,
                                     VendorDependencyFactory vendorDependencyFactory) {
         this.externalDependencyFactories = externalDependencyFactories;

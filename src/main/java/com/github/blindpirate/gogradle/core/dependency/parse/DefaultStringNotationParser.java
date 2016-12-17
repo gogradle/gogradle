@@ -24,11 +24,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultStringNotationParser implements StringNotationParser {
 
-    private final List<? extends StringNotationParser> parsers;
+    private final List<StringNotationParser> parsers;
 
     @Inject
     public DefaultStringNotationParser(
-            @StringNotationParsers List<? extends StringNotationParser> parsers) {
+            @StringNotationParsers List<StringNotationParser> parsers) {
         this.parsers = parsers;
     }
 

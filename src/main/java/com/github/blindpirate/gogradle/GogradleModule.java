@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.external.godep.GodepDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.external.gopm.GopmDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultStringNotationParser;
@@ -17,6 +18,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.StringNotationParse
 import com.github.blindpirate.gogradle.core.dependency.parse.VcsMapNotaionParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.vcs.BitbucketPackageFetcher;
 import com.github.blindpirate.gogradle.vcs.DefaultPackageFetcher;
 import com.github.blindpirate.gogradle.vcs.GitPackageFetcher;
@@ -67,7 +69,7 @@ public class GogradleModule extends AbstractModule {
     @Provides
     @Singleton
     @DefaultNotationParser.GolangDependencyNotationParsers
-    public List<? extends NotationParser> notationParsers(
+    public List<NotationParser> notationParsers(
             DefaultStringNotationParser stringNotationParser,
             DefaultMapNotationParser mapNotationParser) {
         return immutableList(
@@ -79,9 +81,10 @@ public class GogradleModule extends AbstractModule {
     @Provides
     @Singleton
     @DefaultStringNotationParser.StringNotationParsers
-    public List<? extends StringNotationParser> stringNotationParsers(
+    public List<StringNotationParser> stringNotationParsers(
             GithubNotationParser githubNotationParser) {
-        return immutableList(githubNotationParser);
+        return CollectionUtils.<StringNotationParser>immutableList(
+                githubNotationParser);
     }
 
 
@@ -89,7 +92,7 @@ public class GogradleModule extends AbstractModule {
     @Provides
     @Singleton
     @DefaultMapNotationParser.MapNotationParsers
-    public List<? extends MapNotationParser> mapNotationParsers(
+    public List<MapNotationParser> mapNotationParsers(
             DirMapNotationParser dirMapNotationParser,
             VcsMapNotaionParser vcsMapNotaionParser,
             GithubNotationParser githubNotationParser) {
@@ -103,9 +106,12 @@ public class GogradleModule extends AbstractModule {
     @Provides
     @Singleton
     @DefaultDependencyFactory.ExternalDependencyFactories
-    public List<? extends DependencyFactory> externalDependencyFactories(
-            GodepDependencyFactory godepDependencyFactory) {
-        return immutableList(godepDependencyFactory);
+    public List<DependencyFactory> externalDependencyFactories(
+            GodepDependencyFactory godepDependencyFactory,
+            GopmDependencyFactory gopmDependencyFactory) {
+        return CollectionUtils.<DependencyFactory>immutableList(
+                godepDependencyFactory,
+                gopmDependencyFactory);
     }
 
     @Inject

@@ -20,11 +20,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultNotationParser implements NotationParser {
 
-    private final List<? extends NotationParser> delegates;
+    private final List<NotationParser> delegates;
 
     @Inject
     public DefaultNotationParser(
-            @GolangDependencyNotationParsers List<? extends NotationParser> delegates) {
+            @GolangDependencyNotationParsers List<NotationParser> delegates) {
         this.delegates = delegates;
     }
 

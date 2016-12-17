@@ -22,11 +22,11 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultMapNotationParser implements MapNotationParser {
 
-    private final List<? extends MapNotationParser> delegates;
+    private final List<MapNotationParser> delegates;
 
     @Inject
     public DefaultMapNotationParser(
-            @MapNotationParsers List<? extends MapNotationParser> delegates) {
+            @MapNotationParsers List<MapNotationParser> delegates) {
         this.delegates = delegates;
     }
 

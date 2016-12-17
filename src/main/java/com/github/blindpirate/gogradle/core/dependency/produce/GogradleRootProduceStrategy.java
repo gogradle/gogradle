@@ -6,12 +6,13 @@ import com.github.blindpirate.gogradle.core.dependency.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.DependencySetFacade;
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory.ExternalDependencyFactories;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
 import com.google.common.base.Optional;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.Cast;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,19 +23,33 @@ import static com.github.blindpirate.gogradle.util.CollectionUtils.collectOption
 
 /**
  * In {@code Develop} mode, dependencies in build.gradle have top priority.
- * In {@code Reproducible} mode, dependencies in vendor (or setting.gradle) have top priority
+ * In {@code Reproducible} mode, dependencies in vendor (or settings.gradle) have top priority.
+ * <p>
+ * Additionally, if there aren't any dependencies in either build.gradle or settings.gradle,
+ * a scan for external dependency management tools will be performed.
  */
 @Singleton
 public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
 
-    @Inject
-    private GolangPluginSetting settings;
-    @Inject
-    private ConfigurationContainer configurationContainer;
-    @Inject
-    private LockedDependencyManager lockedDependenciesManager;
+    private final GolangPluginSetting settings;
+    private final ConfigurationContainer configurationContainer;
+    private final LockedDependencyManager lockedDependenciesManager;
+
+    private final List<DependencyFactory> externalDependencyFactories;
+
+    public GogradleRootProduceStrategy(GolangPluginSetting settings,
+                                       ConfigurationContainer configurationContainer,
+                                       LockedDependencyManager lockedDependenciesManager,
+                                       @ExternalDependencyFactories
+                                               List<DependencyFactory> externalDependencyFactories) {
+        this.settings = settings;
+        this.configurationContainer = configurationContainer;
+        this.lockedDependenciesManager = lockedDependenciesManager;
+        this.externalDependencyFactories = externalDependencyFactories;
+    }
 
     @Override
+
     public GolangDependencySet produce(GolangPackageModule module, ModuleDependencyVistor vistor) {
 
         // Here we can just fetch them from internal container
