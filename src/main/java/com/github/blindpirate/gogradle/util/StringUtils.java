@@ -51,10 +51,11 @@ public class StringUtils {
         return true;
     }
 
-    public static List<String> split(String s, String regex) {
+
+    public static List<String> splitToLines(String s) {
         if ("".equals(s)) {
             return Collections.emptyList();
         }
-        return Arrays.asList(s.split(regex));
+        return Arrays.asList(s.split("\n"));
     }
 }

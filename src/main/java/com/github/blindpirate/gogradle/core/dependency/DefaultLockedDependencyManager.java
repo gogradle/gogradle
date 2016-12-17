@@ -82,7 +82,7 @@ public class DefaultLockedDependencyManager implements LockedDependencyManager {
         File file = project.getRootDir().toPath().resolve(SETTINGS_FILE).toFile();
         FileUtils.touch(file);
         String fileContent = IOUtils.toString(file);
-        List<String> lines = StringUtils.split(fileContent, "\\n");
+        List<String> lines = StringUtils.splitToLines(fileContent);
         int startLineIndex = findStartLineIndex(lines);
         List<String> contentBeforeLock = lines.subList(0, startLineIndex);
         List<String> lockContent = toString(notations);
