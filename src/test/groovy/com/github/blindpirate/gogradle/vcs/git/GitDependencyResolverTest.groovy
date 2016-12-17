@@ -7,8 +7,10 @@ import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
 import com.github.blindpirate.gogradle.util.GitUtils
+import com.google.common.base.Optional
 import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.revwalk.RevCommit
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -20,6 +22,7 @@ import org.mockito.stubbing.Answer
 import java.nio.file.Path
 import java.util.concurrent.Callable
 
+import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.*
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
@@ -31,32 +34,38 @@ class GitDependencyResolverTest {
 
     @Mock
     GitDependency dependency
-
+    @Mock
+    CacheManager cacheManager
+    @Mock
+    GitUtils gitUtils
+    @Mock
+    Repository repository
+    @Mock
+    Injector injector
+    @Mock
+    DependencyFactory factory
+    @Mock
+    RevCommit revCommit
     @InjectMocks
     GitDependencyResolver resolver
 
-    @Mock
-    CacheManager cacheManager
-
-    @Mock
-    GitUtils gitUtils
-
-    @Mock
-    Repository repository
-
-    @Mock
-    Injector injector
-
-    @Mock
-    DependencyFactory factory
-
     // injected by GogradleRunner
     File resource
+    Path path
 
     @Before
     public void setUp() {
+        path = resource.toPath()
 
         when(injector.getInstance(DependencyFactory)).thenReturn(factory)
+        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(path)
+        when(gitUtils.getRepository(path)).thenReturn(repository)
+        when(gitUtils.hardResetAndUpdate(repository)).thenReturn(repository)
+        when(gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH))
+                .thenReturn(Optional.of(revCommit))
+
+        when(dependency.getUrl()).thenReturn("url")
+        when(dependency.getName()).thenReturn("name")
 
         DependencyHelper.INJECTOR_INSTANCE = injector
 
@@ -71,10 +80,6 @@ class GitDependencyResolverTest {
 
     @Test
     public void 'nonexistent repo should be cloned'() {
-        Path path = resource.toPath()
-        // given:
-        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(path)
-        when(dependency.getUrl()).thenReturn("url")
 
         // when:
         resolver.resolve(dependency)
@@ -86,21 +91,15 @@ class GitDependencyResolverTest {
 
     @Test
     public void 'existed repository should be updated'() {
-        Path path = resource.toPath()
         path.resolve('placeholder').toFile().createNewFile()
 
         // given:
-        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(path)
-        when(gitUtils.getRepository(path)).thenReturn(repository)
         when(gitUtils.getRemoteUrl(repository)).thenReturn(['url'] as Set)
-        when(dependency.getUrl()).thenReturn('url')
 
         // when:
         resolver.resolve(dependency)
 
         // then:
         verify(gitUtils).hardResetAndUpdate(repository)
-
-
     }
 }

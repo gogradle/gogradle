@@ -1,32 +1,62 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
+import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.VcsTempFileModule;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.pack.AbstractVcsResolver;
+import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.GitUtils;
 import com.google.common.base.Optional;
+import com.google.common.collect.ImmutableMap;
 import org.eclipse.jgit.lib.Repository;
+import org.eclipse.jgit.revwalk.RevCommit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.nio.file.Path;
-@Singleton
-public class GitDependencyResolver extends AbstractVcsResolver<Repository, String> {
+import java.util.Map;
 
-    private static final String DEFAULT_BRANCH = "master";
+import static com.github.blindpirate.gogradle.core.dependency.GitDependency.*;
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
+import static com.github.blindpirate.gogradle.util.DateUtils.*;
+
+@Singleton
+public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCommit> {
+
+    public static final String DEFAULT_BRANCH = "master";
+
     @Inject
     private GitUtils gitUtils;
 
     @Override
-    protected void resetToSpecifiedVersion(Repository repository, String commitId) {
-        gitUtils.resetToCommit(repository, commitId);
+    protected GolangPackageModule createModule(GolangDependency dependency,
+                                               Path path,
+                                               Repository repository,
+                                               RevCommit commit) {
+        GitDependency gitDependency = (GitDependency) dependency;
+        Map<String, String> lockedNotation = ImmutableMap.of(
+                NAME_KEY, gitDependency.getName(),
+                URL_KEY, gitDependency.getUrl(),
+                COMMIT_KEY, commit.getName()
+        );
+        return new VcsTempFileModule(dependency.getName(),
+                path,
+                toMilliseconds(commit.getCommitTime()),
+                lockedNotation);
     }
 
     @Override
-    protected String determineVersion(Repository repository, GolangDependency dependency) {
+    protected void resetToSpecificVersion(Repository repository, RevCommit commit) {
+        gitUtils.resetToCommit(repository, commit.getId().toString());
+    }
+
+    @Override
+    protected RevCommit determineVersion(Repository repository, GolangDependency dependency) {
         GitDependency gitDependency = (GitDependency) dependency;
         if (gitDependency.getTag() != null) {
-            Optional<String> commit = gitUtils.findCommitByTag(repository, gitDependency.getTag());
+            Optional<RevCommit> commit = gitUtils.findCommitByTag(repository, gitDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
             }
@@ -38,13 +68,13 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, Strin
         }
 
         if (gitDependency.getCommit() != null) {
-            Optional<String> commit = gitUtils.findCommit(repository, gitDependency.getCommit());
+            Optional<RevCommit> commit = gitUtils.findCommit(repository, gitDependency.getCommit());
             return commit.get();
         }
 
         // use HEAD of master branch
         // TODO the default branch may not be master
-        return gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH);
+        return gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH).get();
     }
 
     @Override

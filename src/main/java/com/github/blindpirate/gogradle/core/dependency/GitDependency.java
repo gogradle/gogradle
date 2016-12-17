@@ -1,28 +1,19 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.ProxyPackageModule;
-import com.github.blindpirate.gogradle.core.cache.git.GitDependencyResolver;
-import com.github.blindpirate.gogradle.vcs.VcsType;
+import com.github.blindpirate.gogradle.core.pack.DependencyResolver;
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver;
 
-import javax.inject.Inject;
+import java.util.Map;
 
-import static com.github.blindpirate.gogradle.vcs.VcsType.Git;
-
-public class GitDependency extends AbstractDependency {
+public class GitDependency extends AbstractNotationDependency {
 
     public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
 
+    public static final String URL_KEY = "url";
+    public static final String COMMIT_KEY="commit";
     private String url;
     private String commit;
     private String tag;
-
-    @Inject
-    private GitDependencyResolver gitDependencyResolver;
-
-    public GitDependency(String name) {
-        super(name);
-    }
 
     public String getUrl() {
         return url;
@@ -33,11 +24,6 @@ public class GitDependency extends AbstractDependency {
     }
 
     public String getTag() {
-        return tag;
-    }
-
-    @Override
-    public String getVersion() {
         return tag;
     }
 
@@ -56,21 +42,21 @@ public class GitDependency extends AbstractDependency {
         return this;
     }
 
+    @Override
+    public String getVersion() {
+        return tag;
+    }
+
+
     public GitDependency setVersion(String version) {
         this.tag = version;
         return this;
     }
 
-
     @Override
-    public GolangPackageModule getPackage() {
-        GolangPackageModule tmpModule = gitDependencyResolver.resolve(this);
-        return new ProxyPackageModule(tmpModule);
+    protected Class<? extends DependencyResolver> resolverClass() {
+        return GitDependencyResolver.class;
     }
 
-    @Override
-    public VcsType vcs() {
-        return Git;
-    }
 
 }
