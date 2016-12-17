@@ -2,11 +2,8 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
-import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.google.common.base.Objects;
 import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 

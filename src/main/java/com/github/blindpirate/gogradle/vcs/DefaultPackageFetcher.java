@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.google.common.base.Optional;
-import com.google.common.collect.ImmutableMap;
 import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;

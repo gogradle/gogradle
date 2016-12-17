@@ -3,14 +3,12 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.pack.DependencyResolver;
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver;
 
-import java.util.Map;
-
 public class GitDependency extends AbstractNotationDependency {
 
     public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
 
     public static final String URL_KEY = "url";
-    public static final String COMMIT_KEY="commit";
+    public static final String COMMIT_KEY = "commit";
     private String url;
     private String commit;
     private String tag;

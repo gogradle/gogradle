@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.vcs;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.google.common.base.Optional;
 import com.google.inject.Injector;
 import com.google.inject.Key;

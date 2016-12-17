@@ -12,7 +12,7 @@ import java.util.Map;
 import static com.github.blindpirate.gogradle.vcs.VcsType.Git;
 
 public class VcsMapNotaionParser extends AutoConfigureMapNotationParser {
-    Map<VcsType, Class<? extends GolangDependency>> typeToClassMap =
+    private Map<VcsType, Class<? extends GolangDependency>> typeToClassMap =
             ImmutableMap.<VcsType, Class<? extends GolangDependency>>of(
                     Git, GitDependency.class);
 

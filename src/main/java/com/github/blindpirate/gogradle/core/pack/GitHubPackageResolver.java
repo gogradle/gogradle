@@ -2,8 +2,10 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 
+import javax.inject.Singleton;
 import java.nio.file.Path;
 
+@Singleton
 public class GitHubPackageResolver implements PackageNameResolver {
     private static final String GITHUB_HOST = "github.com";
 

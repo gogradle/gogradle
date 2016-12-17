@@ -85,9 +85,9 @@ public class GolangPlugin implements Plugin<Project> {
         taskContainer.create(PREPARE_TASK_NAME, PrepareTask.class);
         taskContainer.create(RESOLVE_TASK_NAME, ResolveTask.class);
         taskContainer.create(DEPENDENCIES_TASK_NAME, DependenciesTask.class);
-        taskContainer.create(CLEAN_TASK_NAME,CleanTask.class);
-        taskContainer.create(INSTALL_TASK_NAME,InstallTask.class);
-        taskContainer.create(BUILD_TASK_NAME,BuildTask.class);
+        taskContainer.create(CLEAN_TASK_NAME, CleanTask.class);
+        taskContainer.create(INSTALL_TASK_NAME, InstallTask.class);
+        taskContainer.create(BUILD_TASK_NAME, BuildTask.class);
     }
 
     private void prepareForServices() {

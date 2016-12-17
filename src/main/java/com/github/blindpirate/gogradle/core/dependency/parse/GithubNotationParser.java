@@ -3,18 +3,15 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.google.inject.Injector;
+import com.github.blindpirate.gogradle.util.ConfigureUtils;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.NEWEST_COMMIT;
-import static com.github.blindpirate.gogradle.util.MapUtils.getBooleanValue;
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
-import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
 
 @Singleton
@@ -66,33 +63,24 @@ public class GithubNotationParser extends MapStringNotationParser {
 
     @Override
     public GolangDependency parseMap(Map<String, Object> notation) {
-        String name = getString(notation, "name");
         String url = getString(notation, "url");
+        String name = getString(notation, "name");
         String version = getString(notation, "version");
         String tag = getString(notation, "tag");
         String commit = getString(notation, "commit");
-        boolean transitive = getBooleanValue(notation, "transitive", true);
 
         if (isBlank(url)) {
-            url = buildUrl(name);
-        }
-
-        if (isBlank(tag) && isNotBlank(version)) {
-            tag = version;
+            notation.put("url", buildUrl(name));
         }
 
         if (allBlank(version, tag, commit)) {
-            commit = NEWEST_COMMIT;
+            notation.put("commit", NEWEST_COMMIT);
         }
 
         GitDependency ret = new GitDependency();
 
-        ret.setVersion(version)
-                .setTag(tag)
-                .setCommit(commit)
-                .setUrl(url)
-                .setTransitive(transitive)
-                .setName(name);
+        ConfigureUtils.configureByMapQuietly(notation, ret);
+
         return ret;
     }
 

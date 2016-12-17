@@ -4,9 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.VcsTempFileModule;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.pack.AbstractVcsResolver;
-import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.GitUtils;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -18,9 +16,10 @@ import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.core.dependency.GitDependency.*;
+import static com.github.blindpirate.gogradle.core.dependency.GitDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.core.dependency.GitDependency.URL_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
-import static com.github.blindpirate.gogradle.util.DateUtils.*;
+import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 
 @Singleton
 public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCommit> {

@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy;
-import org.gradle.api.Namer;
 import org.gradle.api.artifacts.Dependency;
 
 /**
@@ -25,15 +24,16 @@ public interface GolangDependency extends Dependency {
     DependencyProduceStrategy getProduceStrategy();
 
     /**
-     * Dependencies in root project (including vendor or build.gradle) have higher priority than transitive dependencies.
+     * Dependencies in root project (including vendor or build.gradle)
+     * have higher priority than transitive dependencies.
      *
      * @return
      */
     boolean isFirstLevel();
 
-    class Namer implements org.gradle.api.Namer<GolangDependency> {
+    final class Namer implements org.gradle.api.Namer<GolangDependency> {
 
-        public static Namer INSTANCE = new Namer();
+        public static final Namer INSTANCE = new Namer();
 
         private Namer() {
         }
