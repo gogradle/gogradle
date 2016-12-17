@@ -13,6 +13,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.file.Path
+
 import static org.mockito.Matchers.any
 import static org.mockito.Mockito.when
 
@@ -30,12 +32,16 @@ class ResolveTaskTest {
     private ProjectInternal project
     @Mock
     private File rootDir
+    @Mock
+    private Path rootPath
 
     @Before
     void setUp() {
         task = AbstractTask.injectIntoNewInstance(project, 'task', ResolveTask, { new ResolveTask() })
         ReflectionUtils.setField(task, 'setting', setting)
         ReflectionUtils.setField(task, 'dependencyTreeFactory', factory)
+        when(rootDir.toPath()).thenReturn(rootPath)
+        when(rootPath.toFile()).thenReturn(rootDir)
     }
 
     @Test
@@ -43,6 +49,7 @@ class ResolveTaskTest {
         // given
         when(setting.getPackageName()).thenReturn("package")
         when(project.getRootDir()).thenReturn(rootDir)
+        when(rootDir.lastModified()).thenReturn(1L)
         when(factory.getTree(any(GolangPackageModule))).thenReturn(tree)
 
         // when
