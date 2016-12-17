@@ -9,7 +9,7 @@ import java.nio.file.Path;
 public class LocalFileSystemModule extends FileSystemModule {
 
     public LocalFileSystemModule(String name, Path rootDir) {
-        super(name, rootDir);
+        super(name, rootDir, rootDir.toFile().lastModified());
     }
 
     @Override
@@ -23,7 +23,6 @@ public class LocalFileSystemModule extends FileSystemModule {
 
     public static GolangPackageModule fromFileSystem(String name, File rootDir) {
         LocalFileSystemModule ret = new LocalFileSystemModule(name, rootDir.toPath());
-        ret.setUpdateTime(rootDir.lastModified());
         return ret;
     }
 }

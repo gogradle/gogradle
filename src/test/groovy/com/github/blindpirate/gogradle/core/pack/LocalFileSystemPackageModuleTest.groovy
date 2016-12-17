@@ -2,14 +2,31 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.resolve.VendorDependencyFactory
+import com.google.inject.Injector
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
 
 @RunWith(GogradleRunner)
 @WithResource('vendor_test.zip')
 class LocalFileSystemPackageModuleTest {
 
     File resource
+
+    @Mock
+    Injector injector
+
+
+    @Before
+    void setUp() {
+        DependencyHelper.INJECTOR_INSTANCE = injector
+        Mockito.when(injector.getInstance(DependencyFactory.class)).thenReturn(new VendorDependencyFactory())
+    }
 
     @Test
     void 'create cascading vendor package should success'() {
