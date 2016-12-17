@@ -1,10 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy;
-import com.github.blindpirate.gogradle.util.Assert;
 import org.gradle.api.artifacts.Dependency;
-
-import static com.github.blindpirate.gogradle.util.Assert.*;
 
 public abstract class AbstractGolangDependency implements GolangDependency {
 

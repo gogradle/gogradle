@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
+import org.gradle.api.artifacts.Dependency;
 
 public abstract class AbstractPackageModule extends AbstractGolangDependency implements GolangPackageModule {
 
@@ -23,6 +24,11 @@ public abstract class AbstractPackageModule extends AbstractGolangDependency imp
 
     @Override
     public String getVersion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Dependency copy() {
         throw new UnsupportedOperationException();
     }
 

@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.pack.DependencyResolver;
-import com.github.blindpirate.gogradle.vcs.VcsType;
 import org.omg.CORBA.Object;
 
 import java.util.HashMap;
