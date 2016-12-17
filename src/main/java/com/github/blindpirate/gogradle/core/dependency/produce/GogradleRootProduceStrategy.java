@@ -9,6 +9,7 @@ import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory.ExternalDependencyFactories;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
+import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.google.common.base.Optional;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.Cast;
@@ -25,7 +26,7 @@ import static com.github.blindpirate.gogradle.util.CollectionUtils.collectOption
  * In {@code Develop} mode, dependencies in build.gradle have top priority.
  * In {@code Reproducible} mode, dependencies in vendor (or settings.gradle) have top priority.
  * <p>
- * Additionally, if there aren't any dependencies in either build.gradle or settings.gradle,
+ * Additionally, if there aren't any dependencies in build.gradle,
  * a scan for external dependency management tools will be performed.
  */
 @Singleton
@@ -53,19 +54,18 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     public GolangDependencySet produce(GolangPackageModule module, ModuleDependencyVistor vistor) {
 
         // Here we can just fetch them from internal container
-        GolangDependencySet dependenciesInBuildDotGradle = getDependenciesInBuildDotGradle();
-
+        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradleOrExternalTool(module);
         Optional<GolangDependencySet> lockedDependencies = getLockedDependencies();
         Optional<GolangDependencySet> vendorDependencies = vistor.visitVendorDependencies(module);
 
         List<GolangDependencySet> candidates = new ArrayList<>();
 
         if (settings.getBuildMode() == Develop) {
-            candidates.add(dependenciesInBuildDotGradle);
+            candidates.add(declaredDependencies);
             candidates.addAll(collectOptional(vendorDependencies, lockedDependencies));
         } else {
             candidates.addAll(collectOptional(vendorDependencies, lockedDependencies));
-            candidates.add(dependenciesInBuildDotGradle);
+            candidates.add(declaredDependencies);
         }
 
         GolangDependencySet result = GolangDependencySet.merge(candidates);
@@ -82,11 +82,21 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
         return lockedDependenciesManager.getLockedDependencies();
     }
 
-    private GolangDependencySet getDependenciesInBuildDotGradle() {
+    private GolangDependencySet getDependenciesInBuildDotGradleOrExternalTool(GolangPackageModule module) {
         GolangConfiguration configuration =
                 (GolangConfiguration) configurationContainer.getByName(BUILD_CONFIGURATION_NAME);
 
-        return Cast.cast(DependencySetFacade.class, configuration.getDependencies()).toGolangDependencies();
+        GolangDependencySet dependenciesInBuildDotGradle
+                = Cast.cast(DependencySetFacade.class, configuration.getDependencies()).toGolangDependencies();
+        if (dependenciesInBuildDotGradle.isEmpty()) {
+            Optional<GolangDependencySet> externalDependencies = FactoryUtil.produce(
+                    externalDependencyFactories,
+                    module);
+            if (externalDependencies.isPresent()) {
+                return externalDependencies.get();
+            }
+        }
+        return dependenciesInBuildDotGradle;
     }
 
 }

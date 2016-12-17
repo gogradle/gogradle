@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor
 import com.google.common.base.Optional
 import org.gradle.api.artifacts.ConfigurationContainer
@@ -18,15 +19,17 @@ import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Develop
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asOptional
+import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GogradleRootProduceStrategyTest {
-    @InjectMocks
+
     GogradleRootProduceStrategy strategy
     @Mock
     GolangPluginSetting golangPluginSetting
@@ -36,6 +39,8 @@ class GogradleRootProduceStrategyTest {
     ConfigurationContainer configurationContainer
     @Mock
     GolangConfiguration configuration
+    @Mock
+    DependencyFactory externalDependencyFactory
 
     @Mock
     GolangPackageModule module
@@ -56,6 +61,11 @@ class GogradleRootProduceStrategyTest {
 
     @Before
     void setUp() {
+        strategy = new GogradleRootProduceStrategy(
+                golangPluginSetting,
+                configurationContainer,
+                lockedDependencyManager,
+                Arrays.asList(externalDependencyFactory))
         when(a1.getName()).thenReturn('a')
         when(b1.getName()).thenReturn('b')
         when(c1.getName()).thenReturn('c')
@@ -94,10 +104,10 @@ class GogradleRootProduceStrategyTest {
         def resultDependencies = strategy.produce(module, visitor)
 
         // then
-        assert resultDependencies.any { it == a1 }
-        assert resultDependencies.any { it == b1 }
-        assert !resultDependencies.any { it == a2 }
-        assert !resultDependencies.any { it == b2 }
+        assert resultDependencies.any { it.is(a1) }
+        assert resultDependencies.any { it.is(b1) }
+        assert !resultDependencies.any { it.is(a2) }
+        assert !resultDependencies.any { it.is(b2) }
 
     }
 
@@ -113,10 +123,10 @@ class GogradleRootProduceStrategyTest {
         def result = strategy.produce(module, visitor)
 
         // then
-        assert result.any { it == a2 }
-        assert result.any { it == b2 }
-        assert !result.any { it == a1 }
-        assert !result.any { it == b1 }
+        assert result.any { it.is(a2) }
+        assert result.any { it.is(b2) }
+        assert !result.any { it.is(a1) }
+        assert !result.any { it.is(b1) }
     }
 
     @Test
@@ -131,9 +141,9 @@ class GogradleRootProduceStrategyTest {
         def result = strategy.produce(module, visitor)
 
         // then
-        assert result.any { it == a2 }
-        assert result.any { it == b1 }
-        assert !result.any { it == a1 }
+        assert result.any { it.is(a2) }
+        assert result.any { it.is(b1) }
+        assert !result.any { it.is(a1) }
     }
 
     @Test
@@ -149,8 +159,25 @@ class GogradleRootProduceStrategyTest {
 
         // then
         verify(visitor).visitSourceCodeDependencies(module)
-
     }
 
+    @Test
+    void 'external tools should be scanned when no dependencies exist in build.gradle'() {
+        // given
+        when(golangPluginSetting.getBuildMode()).thenReturn(Develop)
+        when(externalDependencyFactory.accept(module)).thenReturn(true)
+
+        GolangDependencySet set = asGolangDependencySet(a1)
+        when(externalDependencyFactory.produce(module)).thenReturn(set)
+        dependenciesInBuildDotGradle()
+        lockedDependencies()
+        vendorDependencies()
+
+        // when
+        def result = strategy.produce(module, visitor)
+
+        // then
+        assert result.any { it.is(a1) }
+    }
 
 }
