@@ -117,7 +117,10 @@ public class GopmfileParser {
         return parseLines(depsLines);
     }
 
-    private int determineNextSectionIndex(List<String> lines, int targetLineIndex, int depsLineIndex, int resLineIndex) {
+    private int determineNextSectionIndex(List<String> lines,
+                                          int targetLineIndex,
+                                          int depsLineIndex,
+                                          int resLineIndex) {
         int nextSectionIndex = lines.size();
         if (targetLineIndex > depsLineIndex || resLineIndex > depsLineIndex) {
             nextSectionIndex = Math.max(targetLineIndex, resLineIndex);
