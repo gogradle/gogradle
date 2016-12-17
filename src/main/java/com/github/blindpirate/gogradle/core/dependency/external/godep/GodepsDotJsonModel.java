@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 
 // Godeps/Godeps.json
+@SuppressWarnings({"checkstyle:membername", "checkstyle:parametername"})
 public class GodepsDotJsonModel {
     private String ImportPath;
     private String GoVersion;

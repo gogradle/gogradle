@@ -39,9 +39,9 @@ class GodepDependencyFactoryTest {
     }
 
     @Test
+    @WithResource('godep-test.zip')
     public void 'package with Godeps/Godeps.json should be analyzed properly'() {
         // given:
-        resource = new File(getClass().getResource('/godep-test').toURI())
         GolangDependency github_com_kr_fs = mock(GolangDependency)
         GolangDependency github_com_kr_pretty = mock(GolangDependency)
 
