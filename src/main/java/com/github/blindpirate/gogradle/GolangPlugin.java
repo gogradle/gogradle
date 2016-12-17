@@ -3,14 +3,20 @@ package com.github.blindpirate.gogradle;
 import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
+import com.github.blindpirate.gogradle.core.task.BuildTask;
+import com.github.blindpirate.gogradle.core.task.CleanTask;
+import com.github.blindpirate.gogradle.core.task.DependenciesTask;
+import com.github.blindpirate.gogradle.core.task.InstallTask;
 import com.github.blindpirate.gogradle.core.task.PrepareTask;
 import com.github.blindpirate.gogradle.core.task.ResolveTask;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
+import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
@@ -23,8 +29,6 @@ public class GolangPlugin implements Plugin<Project> {
     public static final String RESOLVE_TASK_NAME = "resolve";
     // show dependencies tree
     public static final String DEPENDENCIES_TASK_NAME = "dependencies";
-    // migrate from an existing project managed by other package management tool
-    public static final String MIGRATE_TASK_NAME = "migrate";
 
     public static final String CHECK_TASK_NAME = "check";
     public static final String BUILD_TASK_NAME = "build";
@@ -32,13 +36,6 @@ public class GolangPlugin implements Plugin<Project> {
     public static final String INSTALL_TASK_NAME = "install";
     public static final String TEST_TASK_NAME = "test";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
-
-    // Not implemented yet
-    public static final String MAKE_TASK_NAME = "make";
-    public static final String FMT_TASK_NAME = "fmt";
-    public static final String VET_TASK_NAME = "vet";
-    public static final String GENERATE_TASK_NAME = "generate";
-    public static final String TOOL_TASK_NAME = "tool";
 
     public static final String BUILD_CONFIGURATION_NAME = "build";
     private static final String TEST_CONFIGURATION_NAME = "test";
@@ -71,11 +68,26 @@ public class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
 
         configureTasks(project);
+        addHookToProject(project);
+    }
+
+    private void addHookToProject(Project project) {
+        project.afterEvaluate(new Action<Project>() {
+            @Override
+            public void execute(Project project) {
+                settings.verify();
+            }
+        });
     }
 
     private void configureTasks(Project project) {
-        project.getTasks().create(PREPARE_TASK_NAME, PrepareTask.class);
-        project.getTasks().create(RESOLVE_TASK_NAME, ResolveTask.class);
+        TaskContainer taskContainer = project.getTasks();
+        taskContainer.create(PREPARE_TASK_NAME, PrepareTask.class);
+        taskContainer.create(RESOLVE_TASK_NAME, ResolveTask.class);
+        taskContainer.create(DEPENDENCIES_TASK_NAME, DependenciesTask.class);
+        taskContainer.create(CLEAN_TASK_NAME,CleanTask.class);
+        taskContainer.create(INSTALL_TASK_NAME,InstallTask.class);
+        taskContainer.create(BUILD_TASK_NAME,BuildTask.class);
     }
 
     private void prepareForServices() {

@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
@@ -91,11 +92,27 @@ class GolangPluginTest {
 
     @Test
     public void 'adding a directory dependency should success'() {
+        project.dependencies {
+            build name: 'github.com/a/b', dir: '${GOPATH}/a/b'
+        }
 
-//        project.dependencies {
-//            build dir('${GOPATH}/a/b') as pkg('github.com/a/b')
-//        }
-        // TODO verify the dependencies
+        def dependency = findFirstInDependencies()
+        assert dependency.name == 'github.com/a/b'
+        assert dependency instanceof LocalDirectoryDependency
+    }
+
+    @Test
+    public void 'adding and configuring a directory dependency should success'() {
+        project.dependencies {
+            build(name: 'github.com/a/b', dir: '${GOPATH}/a/b') {
+                transitive = false
+            }
+        }
+
+        def dependency = findFirstInDependencies()
+        assert dependency instanceof LocalDirectoryDependency
+        assert !dependency.transitive
+
     }
 
     @Test
@@ -103,7 +120,8 @@ class GolangPluginTest {
         project.dependencies {
             build('github.com/a/b@1.0.0-RELEASE') {
                 transitive = true
-                excludeVendor = true
+                // TODO should we support this feature?
+                // excludeVendor = true
                 exclude module: 'github.com/c/d'
             }
 
@@ -115,13 +133,13 @@ class GolangPluginTest {
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0-RELEASE'
         assert ab.transitive
-        assert ab.excludeVendor
+        //assert ab.excludeVendor
         assert ab.excludes.containsValue('github.com/c/d')
 
         def cd = findFirstInDependencies('github.com/c/d')
         assert cd.url == 'git@github.com:a/b.git'
         assert !cd.transitive
-        assert !cd.excludeVendor // default value
+        // assert !cd.excludeVendor // default value
 
 
     }
