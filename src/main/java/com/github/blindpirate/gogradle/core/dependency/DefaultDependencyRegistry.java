@@ -1,22 +1,24 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.GolangPackageModule;
+
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
 public class DefaultDependencyRegistry implements DependencyRegistry {
-    private Map<String, GolangDependency> packages = new HashMap<>();
+    private Map<String, GolangPackageModule> packages = new HashMap<>();
 
     @Override
-    public boolean registry(GolangDependency dependency) {
+    public boolean register(GolangPackageModule module) {
         synchronized (packages) {
-            GolangDependency existingDependency = packages.get(dependency.getName());
-            if (existingDependency != null && theyAreAllFirstLevel(existingDependency, dependency)) {
-                throw new IllegalStateException("First-level package " + dependency.getName() + " conflict!");
-            } else if (dependency.isFirstLevel() ||
-                    existingDependencyIsOutOfDate(existingDependency, dependency)) {
-                packages.put(dependency.getName(), dependency);
+            GolangPackageModule existingModule = packages.get(module.getName());
+            if (existingModule != null && theyAreAllFirstLevel(existingModule, module)) {
+                throw new IllegalStateException("First-level package " + module.getName() + " conflict!");
+            } else if (module.isFirstLevel()
+                    || existingModuleIsOutOfDate(existingModule, module)) {
+                packages.put(module.getName(), module);
                 return true;
             } else {
                 return false;
@@ -24,15 +26,14 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         }
     }
 
-    private boolean existingDependencyIsOutOfDate(GolangDependency existingDependency, GolangDependency dependency) {
-        if (existingDependency == null) {
+    private boolean existingModuleIsOutOfDate(GolangPackageModule existingModule, GolangPackageModule module) {
+        if (existingModule == null) {
             return true;
         }
-        return existingDependency.getPackage().getUpdateTime()
-                < dependency.getPackage().getUpdateTime();
+        return existingModule.getUpdateTime() < module.getUpdateTime();
     }
 
-    private boolean theyAreAllFirstLevel(GolangDependency existedDependency, GolangDependency dependency) {
-        return existedDependency.isFirstLevel() && dependency.isFirstLevel();
+    private boolean theyAreAllFirstLevel(GolangPackageModule existedModule, GolangPackageModule module) {
+        return existedModule.isFirstLevel() && module.isFirstLevel();
     }
 }
