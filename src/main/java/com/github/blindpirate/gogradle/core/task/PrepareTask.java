@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.pack.LocalFileSystemModule;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
+import com.github.blindpirate.gogradle.crossplatform.GopathManager;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -40,7 +41,7 @@ public class PrepareTask extends DefaultTask {
         File rootDir = getProject().getProjectDir();
         GolangPackageModule projectModule =
                 LocalFileSystemModule.fromFileSystem(
-                        setting.getRootPackage(),
+                        setting.getPackageName(),
                         rootDir);
         projectModule.getDependencies();
     }

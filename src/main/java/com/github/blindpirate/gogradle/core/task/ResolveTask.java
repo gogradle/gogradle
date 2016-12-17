@@ -14,10 +14,10 @@ import java.io.File;
 
 public class ResolveTask extends DefaultTask {
     @Inject
-    GolangPluginSetting setting;
+    private GolangPluginSetting setting;
 
     @Inject
-    DependencyTreeFactory dependencyTreeFactory;
+    private DependencyTreeFactory dependencyTreeFactory;
 
     private DependencyTreeNode tree;
 
