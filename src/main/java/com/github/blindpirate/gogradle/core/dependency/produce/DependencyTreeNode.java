@@ -3,8 +3,8 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
-import java.util.Set;
 
 public class DependencyTreeNode {
     private GolangDependency value;
@@ -18,6 +18,10 @@ public class DependencyTreeNode {
     public DependencyTreeNode addChild(DependencyTreeNode child) {
         children.add(child);
         return this;
+    }
+
+    public GolangDependency getValue() {
+        return value;
     }
 
     public String print() {
@@ -42,5 +46,9 @@ public class DependencyTreeNode {
                     .print(prefixOfChildren, true));
         }
         return sb.toString();
+    }
+
+    public List<DependencyTreeNode> getGetChildren() {
+        return Collections.unmodifiableList(children);
     }
 }
