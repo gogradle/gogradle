@@ -9,6 +9,8 @@ public class GitDependency extends AbstractNotationDependency {
 
     public static final String URL_KEY = "url";
     public static final String COMMIT_KEY = "commit";
+    public static final String BRANCH_KEY = "branch";
+    public static final String TAG_KEY = "tag";
     private String url;
     private String commit;
     private String tag;
