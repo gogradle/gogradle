@@ -69,16 +69,17 @@ public class GitUtils {
         }
     }
 
-    public String headCommitOfBranch(Repository repository, String branch) {
+    public Optional<RevCommit> headCommitOfBranch(Repository repository, String branch) {
         try {
             Ref headRef = repository.exactRef("refs/heads/" + branch);
-            return headRef.getObjectId().getName();
+            String commitId = headRef.getObjectId().name();
+            return findCommit(repository, commitId);
         } catch (IOException e) {
             throw new GitInteractionException("Cannot resolve HEAD of " + repository + ":" + branch);
         }
     }
 
-    public Optional<String> findCommit(Repository repository, String commit) {
+    public Optional<RevCommit> findCommit(Repository repository, String commit) {
         try {
             RevWalk walk = new RevWalk(repository);
             ObjectId id = repository.resolve(commit);
@@ -87,13 +88,13 @@ public class GitUtils {
             }
             RevCommit rev = walk.parseCommit(id);
 
-            return Optional.of(rev.getId().toString());
+            return Optional.of(rev);
         } catch (IOException e) {
             return Optional.absent();
         }
     }
 
-    public Optional<String> findCommitByTag(Repository repository, String tag) {
+    public Optional<RevCommit> findCommitByTag(Repository repository, String tag) {
         Map<String, Ref> refMap = repository.getTags();
         Ref ref = refMap.get(tag);
         if (ref == null) {
@@ -103,7 +104,7 @@ public class GitUtils {
         }
     }
 
-    private String getCommitByRef(Repository repository, Ref ref) {
+    private RevCommit getCommitByRef(Repository repository, Ref ref) {
         try (Git git = Git.wrap(repository)) {
             LogCommand log = git.log();
             Ref peeledRef = repository.peel(ref);
@@ -114,7 +115,7 @@ public class GitUtils {
             }
 
             for (RevCommit commit : log.call()) {
-                return commit.getId().getName();
+                return commit;
             }
         } catch (GitAPIException | MissingObjectException | IncorrectObjectTypeException e) {
             throw new IllegalStateException(e);
@@ -133,10 +134,10 @@ public class GitUtils {
         }
     }
 
-    public Optional<String> findCommitBySemVersion(Repository repository, String semVersionExpression) {
+    public Optional<RevCommit> findCommitBySemVersion(Repository repository, String semVersionExpression) {
         Map<String, Ref> tags = repository.getTags();
 
-        List<Pair<String, Version>> satisfiedVersion = new ArrayList<>();
+        List<Pair<RevCommit, Version>> satisfiedVersion = new ArrayList<>();
 
         for (Map.Entry<String, Ref> entry : tags.entrySet()) {
             String tag = entry.getKey();
@@ -144,8 +145,8 @@ public class GitUtils {
             try {
                 Version version = Version.valueOf(tag);
                 if (version.satisfies(semVersionExpression)) {
-                    String commitId = getCommitByRef(repository, entry.getValue());
-                    satisfiedVersion.add(Pair.of(commitId, version));
+                    RevCommit commit = getCommitByRef(repository, entry.getValue());
+                    satisfiedVersion.add(Pair.of(commit, version));
                 }
             } catch (UnexpectedCharacterException e) {
                 continue;
@@ -158,9 +159,9 @@ public class GitUtils {
             return Optional.absent();
         }
 
-        Collections.sort(satisfiedVersion, new Comparator<Pair<String, Version>>() {
+        Collections.sort(satisfiedVersion, new Comparator<Pair<RevCommit, Version>>() {
             @Override
-            public int compare(Pair<String, Version> version1, Pair<String, Version> version2) {
+            public int compare(Pair<RevCommit, Version> version1, Pair<RevCommit, Version> version2) {
                 return version2.getRight().compareTo(version1.getRight());
             }
         });

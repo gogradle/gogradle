@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -50,7 +51,7 @@ class GitUtilsTest {
 
     @Test
     public void 'getting a tag should success'() {
-        assert gitUtils.findCommitByTag(repository, '1.0.0').get() == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
+        assert gitUtils.findCommitByTag(repository, '1.0.0').get().name() == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
     @Test
@@ -60,6 +61,7 @@ class GitUtilsTest {
 
     @Test
     @AccessWeb
+    @Ignore
     public void 'clone with https should success'() {
         File tmpDir = new File("build/tmp/nonexistent-${UUID.randomUUID()}")
 
@@ -80,7 +82,7 @@ class GitUtilsTest {
 
     @Test
     public void 'finding commit by sem version should success'() {
-        String commidId = gitUtils.findCommitBySemVersion(repository, '1.0.0').get()
+        String commidId = gitUtils.findCommitBySemVersion(repository, '1.0.0').get().name()
         assert commidId == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
@@ -112,6 +114,6 @@ class GitUtilsTest {
     }
 
     def semVersionMatch(String semVersion, String resultCommit) {
-        return gitUtils.findCommitBySemVersion(repository, semVersion).get() == resultCommit
+        return gitUtils.findCommitBySemVersion(repository, semVersion).get().name() == resultCommit
     }
 }
