@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.ProxyPackageModule;
-import com.github.blindpirate.gogradle.core.TempFileModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.FileUtils;
@@ -19,7 +17,8 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
 
     @Override
     public GolangPackageModule resolve(final GolangDependency dependency) {
-        GolangPackageModule module = cacheManager.runWithGlobalCacheLock(dependency, new Callable<GolangPackageModule>() {
+        GolangPackageModule module
+                = cacheManager.runWithGlobalCacheLock(dependency, new Callable<GolangPackageModule>() {
             @Override
             public GolangPackageModule call() {
                 Path path = cacheManager.getGlobalCachePath(dependency.getName());
@@ -27,17 +26,23 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
             }
         });
 
-        return new ProxyPackageModule(module);
+        module.getDependencies();
+        return module;
     }
 
     private GolangPackageModule doResolve(GolangDependency dependency, Path path) {
         REPOSITORY repository = resolveToGlobalCache(dependency, path);
         VERSION version = determineVersion(repository, dependency);
-        resetToSpecifiedVersion(repository, version);
-        return new TempFileModule(dependency.getName(), path);
+        resetToSpecificVersion(repository, version);
+        return createModule(dependency, path, repository, version);
     }
 
-    protected abstract void resetToSpecifiedVersion(REPOSITORY repository, VERSION version);
+    protected abstract GolangPackageModule createModule(GolangDependency dependency,
+                                                        Path path,
+                                                        REPOSITORY repository,
+                                                        VERSION version);
+
+    protected abstract void resetToSpecificVersion(REPOSITORY repository, VERSION version);
 
     protected abstract VERSION determineVersion(REPOSITORY repository, GolangDependency dependency);
 
