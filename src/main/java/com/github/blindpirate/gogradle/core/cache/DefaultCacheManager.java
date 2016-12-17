@@ -6,7 +6,6 @@ import org.gradle.wrapper.GradleUserHomeLookup;
 
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;

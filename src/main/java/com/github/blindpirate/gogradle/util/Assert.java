@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.util;
 import org.apache.http.util.Asserts;
 
 import java.util.Collection;
-import java.util.List;
 
 public class Assert {
     public static void isTrue(boolean value) {
