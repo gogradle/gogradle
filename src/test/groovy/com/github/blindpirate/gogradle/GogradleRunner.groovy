@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.util.FileUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import net.lingala.zip4j.core.ZipFile
 import org.gradle.api.Project
+import org.gradle.testfixtures.ProjectBuilder
 import org.gradle.testfixtures.internal.ProjectBuilderImpl
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
@@ -102,14 +103,18 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     def setUpProject() {
         projectDir = tmpRandomDirectory('project')
         userhomeDir = tmpRandomDirectory('userhome')
-        project = new ProjectBuilderImpl().createProject('test', projectDir, userhomeDir)
+        project = ProjectBuilder.builder()
+                .withGradleUserHomeDir(userhomeDir)
+                .withProjectDir(projectDir)
+                .withName('test')
+                .build()
     }
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
         // TODO not valid yet
         if (System.getProperty("TEST_ARE_OFFLINE")
-                && findAnnotation(method, AccessWeb)) {
+                && findAnnoOnMethod(method, AccessWeb)) {
             notifier.fireTestIgnored(description)
             return
         }
