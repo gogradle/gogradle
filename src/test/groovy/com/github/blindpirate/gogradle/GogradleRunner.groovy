@@ -31,16 +31,15 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     Object currentInstance
 
     // Every time we find a @WithProject, a new temp project folder,a new user home folder and
-    // a new project currentInstance will
-    // be created then pushed into corresponding stack.
-    // At the end of that method, these resources will be popped and destroyed
-    ArrayDeque<File> tmpProjectDirStack = new ArrayDeque<>()
-    ArrayDeque<File> tmpUserhomeDirStack = new ArrayDeque<>()
-    ArrayDeque<Project> projectStack = new ArrayDeque<>()
+    // a new project currentInstance will be created
+    // At the end of that method, these resources will be destroyed
+    File projectDir
+    File userhomeDir
+    Project project
 
     // Every time we find a @WithResource, that resource will be copyed(or unzipped) to a temp dir
-    // At the end of that method, these resource will be popped and destroyed
-    ArrayDeque<File> tmpResourceDirStack = new ArrayDeque<>()
+    // At the end of that method, these resource will be  destroyed
+    File resourceDir
 
     public GogradleRunner(Class<?> klass) throws InitializationError {
         super(klass);
@@ -55,30 +54,29 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     }
 
     def injectProjectAndResourceIfNecessary() {
-        if (!projectStack.isEmpty()) {
-            ReflectionUtils.setField(currentInstance, 'project', projectStack.last)
+        if (project != null) {
+            ReflectionUtils.setField(currentInstance, 'project', project)
         }
 
-        if (!tmpResourceDirStack.isEmpty()) {
-            ReflectionUtils.setField(currentInstance, 'resource', tmpResourceDirStack.last)
+        if (resourceDir != null) {
+            ReflectionUtils.setField(currentInstance, 'resource', resourceDir)
         }
     }
 
-    void popResourceFromStack() {
-        File tmpResourceDir = tmpResourceDirStack.pop()
-        forceDelete(tmpResourceDir)
+    void cleanUpResource() {
+        forceDelete(resourceDir)
+        resourceDir = null
     }
 
-    Object popProjectFromStack() {
-        File tmpProjectDir = tmpProjectDirStack.pop()
-        File tmpUserhomeDir = tmpUserhomeDirStack.pop()
-        projectStack.pop()
-
-        forceDelete(tmpProjectDir)
-        forceDelete(tmpUserhomeDir)
+    Object cleanUpProject() {
+        forceDelete(projectDir)
+        forceDelete(userhomeDir)
+        projectDir = null
+        userhomeDir = null
+        project = null
     }
 
-    File pushResourceToStack(String resourceName) {
+    File setUpResource(String resourceName) {
         File destDir = tmpRandomDirectory("resource");
         // when resource name is empty, the new created empty dir will be used
         if (resourceName.endsWith('zip')) {
@@ -87,7 +85,7 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
             copyResourceToDir(resourceName, destDir)
         }
 
-        tmpResourceDirStack.push(destDir)
+        resourceDir = destDir
     }
 
     def copyResourceToDir(String resourceName, File destDir) {
@@ -101,14 +99,10 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
         zipFile.extractAll(destDir.toString())
     }
 
-    def pushProjectToStack() {
-        File tmpProjectDir = tmpRandomDirectory('project')
-        File tmpUserhomeDir = tmpRandomDirectory('userhome')
-        Project project = new ProjectBuilderImpl().createProject('test', tmpProjectDir, tmpUserhomeDir)
-
-        tmpProjectDirStack.push(tmpProjectDir)
-        tmpUserhomeDirStack.push(tmpUserhomeDir)
-        projectStack.push(project)
+    def setUpProject() {
+        projectDir = tmpRandomDirectory('project')
+        userhomeDir = tmpRandomDirectory('userhome')
+        project = new ProjectBuilderImpl().createProject('test', projectDir, userhomeDir)
     }
 
     @Override
@@ -130,11 +124,11 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     void afterOneTest(FrameworkMethod method) {
         WithResource withResource = findWithResource(method)
         if (withResource) {
-            popResourceFromStack()
+            cleanUpResource()
         }
         WithProject withProject = findWithProject(method)
         if (withProject) {
-            popProjectFromStack()
+            cleanUpProject()
         }
     }
 
@@ -142,11 +136,11 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     def beforeOneTest(FrameworkMethod method) {
         WithResource withResource = findWithResource(method);
         if (withResource) {
-            pushResourceToStack(withResource.value())
+            setUpResource(withResource.value())
         }
         WithProject withProject = findWithProject(method)
         if (withProject) {
-            pushProjectToStack()
+            setUpProject()
         }
     }
 
