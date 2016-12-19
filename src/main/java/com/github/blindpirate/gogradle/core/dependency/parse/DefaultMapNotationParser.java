@@ -1,59 +1,45 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.util.Cast;
-import com.github.blindpirate.gogradle.util.FactoryUtil;
-import com.google.common.base.Optional;
-import com.google.inject.BindingAnnotation;
+import com.github.blindpirate.gogradle.core.pack.PackageInfo;
+import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.MapUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.List;
 import java.util.Map;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Singleton
 public class DefaultMapNotationParser implements MapNotationParser {
-
-    private final List<MapNotationParser> delegates;
+    private final DirMapNotationParser dirMapNotationParser;
+    private final PackageNameResolver packageNameResolver;
 
     @Inject
-    public DefaultMapNotationParser(
-            @MapNotationParsers List<MapNotationParser> delegates) {
-        this.delegates = delegates;
+    public DefaultMapNotationParser(DirMapNotationParser dirMapNotationParser,
+                                    PackageNameResolver packageNameResolver) {
+        this.dirMapNotationParser = dirMapNotationParser;
+        this.packageNameResolver = packageNameResolver;
     }
 
     @Override
-    public boolean accept(Object notation) {
-        return notation instanceof Map;
-    }
-
-    @Override
-    public GolangDependency produce(Object notation) {
-        return parseMap(Cast.cast(Map.class, notation));
-    }
-
-    @Override
-    public GolangDependency parseMap(Map<String, Object> notation) {
-        Optional<GolangDependency> result = FactoryUtil.<Object, GolangDependency>produce(delegates, notation);
-        if (result.isPresent()) {
-            return result.get();
+    public GolangDependency parse(Map<String, Object> notation) {
+        Assert.isTrue(notation.containsKey(NAME_KEY), "Name must be specified!");
+        if (notation.containsKey(DIR_KEY)) {
+            return dirMapNotationParser.parse(notation);
         } else {
-            throw new DependencyResolutionException("Unable to parse notation:" + notation);
+            return parseWithVcs(notation);
         }
     }
 
-    @BindingAnnotation
-    @Target({FIELD, PARAMETER, METHOD})
-    @Retention(RUNTIME)
-    public @interface MapNotationParsers {
+    private GolangDependency parseWithVcs(Map<String, Object> notation) {
+        String packageName = MapUtils.getString(notation, NAME_KEY);
+        PackageInfo packageInfo = packageNameResolver.produce(packageName);
+        notation.put(INFO_KEY, packageInfo);
+        MapNotationParser parser =
+                packageInfo.getVcsType().getService(MapNotationParser.class);
+
+        return parser.parse(notation);
     }
 
 }

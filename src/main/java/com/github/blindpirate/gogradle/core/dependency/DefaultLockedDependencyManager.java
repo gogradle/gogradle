@@ -60,7 +60,7 @@ public class DefaultLockedDependencyManager implements LockedDependencyManager {
     private GolangDependencySet parseList(List<Map<String, Object>> lock) {
         GolangDependencySet ret = new GolangDependencySet();
         for (Map<String, Object> notaion : lock) {
-            ret.add(notationParser.produce(notaion));
+            ret.add(notationParser.parse(notaion));
         }
         return ret;
     }

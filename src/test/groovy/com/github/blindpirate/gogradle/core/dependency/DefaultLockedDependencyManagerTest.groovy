@@ -50,8 +50,8 @@ class DefaultLockedDependencyManagerTest {
         def dependency2 = mockDependency('github.com/b/c')
         project.gradle.ext.lock = [notation1, notation2]
         project.gradle.ext.lock = [notation1, notation2]
-        when(notationParser.produce(notation1)).thenReturn(dependency1)
-        when(notationParser.produce(notation2)).thenReturn(dependency2)
+        when(notationParser.parse(notation1)).thenReturn(dependency1)
+        when(notationParser.parse(notation2)).thenReturn(dependency2)
 
         // when
         GolangDependencySet result = manager.getLockedDependencies().get();
