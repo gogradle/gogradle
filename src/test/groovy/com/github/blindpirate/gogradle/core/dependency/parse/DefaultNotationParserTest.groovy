@@ -14,9 +14,9 @@ import static org.mockito.Mockito.*
 class DefaultNotationParserTest {
 
     @Mock
-    NotationParser parser1
+    MapNotationParser mapNotationParser
     @Mock
-    NotationParser parser2
+    NotationConverter notationConverter
     @Mock
     GolangDependency dependency
 
@@ -24,24 +24,37 @@ class DefaultNotationParserTest {
 
     @Before
     void setUp() {
-        parser = new DefaultNotationParser([parser1, parser2]);
+        parser = new DefaultNotationParser(mapNotationParser, notationConverter)
     }
 
     @Test(expected = DependencyResolutionException)
     public void 'parsing unrecognized class should fail'() {
-        parser.produce({})
+        parser.parse({})
     }
 
     @Test
-    public void 'parsing a notation should success'() {
+    public void 'string should be converted to map before parsing'() {
         // given
-        when(parser1.accept(any())).thenReturn(false)
-        when(parser2.accept(any())).thenReturn(true)
-        when(parser2.produce(any())).thenReturn(dependency)
+        String stringNotation = 'notation'
+        Map mapNotation = [name: 'notation']
+        when(notationConverter.convert(stringNotation)).thenReturn(mapNotation)
+        // when
+        parser.parse(stringNotation)
 
         // then
-        assert parser.produce(new Object()) == dependency
+        verify(mapNotationParser).parse(mapNotation)
+    }
 
+    @Test
+    public void 'map parsing should be delegated to MapNotationParser'(){
+        // given
+        Map notation=[name:'notation']
+
+        // when
+        parser.parse(notation)
+
+        // then
+        verify(mapNotationParser).parse(notation)
     }
 
 }

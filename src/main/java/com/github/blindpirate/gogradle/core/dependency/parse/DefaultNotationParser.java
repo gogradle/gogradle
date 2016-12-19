@@ -2,52 +2,37 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.util.FactoryUtil;
-import com.google.common.base.Optional;
-import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.lang.annotation.Retention;
-import java.lang.annotation.Target;
-import java.util.List;
-
-import static java.lang.annotation.ElementType.FIELD;
-import static java.lang.annotation.ElementType.METHOD;
-import static java.lang.annotation.ElementType.PARAMETER;
-import static java.lang.annotation.RetentionPolicy.RUNTIME;
+import java.util.Map;
 
 @Singleton
-public class DefaultNotationParser implements NotationParser {
+public class DefaultNotationParser implements NotationParser<Object> {
 
-    private final List<NotationParser> delegates;
+    private final MapNotationParser mapNotationParser;
+
+    private final NotationConverter notationConverter;
 
     @Inject
-    public DefaultNotationParser(
-            @GolangDependencyNotationParsers List<NotationParser> delegates) {
-        this.delegates = delegates;
+    public DefaultNotationParser(MapNotationParser mapNotationParser, NotationConverter notationConverter) {
+        this.mapNotationParser = mapNotationParser;
+        this.notationConverter = notationConverter;
     }
 
-
     @Override
-    public boolean accept(Object notation) {
-        return true;
+    public GolangDependency parse(Object notation) {
+        Map<String, Object> notationMap = convertToMap(notation);
+        return mapNotationParser.parse(notationMap);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public GolangDependency produce(Object notation) {
-        Optional<GolangDependency> ret = FactoryUtil.produce(delegates, notation);
-        if (ret.isPresent()) {
-            return ret.get();
+    private Map<String, Object> convertToMap(Object notation) {
+        if (notation instanceof String) {
+            return notationConverter.convert((String) notation);
+        } else if (notation instanceof Map) {
+            return (Map<String, Object>) notation;
         } else {
-            throw new DependencyResolutionException("Unsupported class:" + notation.getClass());
+            throw new DependencyResolutionException("Unable to parse notation of class: " + notation.getClass());
         }
-    }
-
-    @BindingAnnotation
-    @Target({FIELD, PARAMETER, METHOD})
-    @Retention(RUNTIME)
-    public @interface GolangDependencyNotationParsers {
     }
 }
