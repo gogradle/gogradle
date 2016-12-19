@@ -4,6 +4,7 @@ import com.google.common.base.Optional;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
@@ -29,5 +30,9 @@ public class CollectionUtils {
             result.addAll(list);
         }
         return result;
+    }
+
+    public static <T> boolean isEmpty(Collection<T> c) {
+        return c == null || c.isEmpty();
     }
 }
