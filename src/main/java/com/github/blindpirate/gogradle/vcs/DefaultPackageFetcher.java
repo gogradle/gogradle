@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.vcs;
 
+import com.github.blindpirate.gogradle.core.pack.PackageInfo;
+import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 
@@ -23,65 +25,18 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultPackageFetcher implements PackageFetcher {
 
-    private final Map<String, PackageFetcher> knownHosts;
-
-    private GoImportMetadataFetcher goImportMetadataFetcher;
+    private final PackageNameResolver packageNameResolver;
 
     @Inject
-    public DefaultPackageFetcher(@KnownHostPackageFetchers
-                                         Map<String, PackageFetcher> knownHosts,
-                                 GoImportMetadataFetcher goImportMetadataFetcher) {
-        this.knownHosts = knownHosts;
-        this.goImportMetadataFetcher = goImportMetadataFetcher;
+    public DefaultPackageFetcher(PackageNameResolver packageNameResolver) {
+        this.packageNameResolver = packageNameResolver;
     }
 
     @Override
     public void fetch(String packageName, Path location) {
-        if (isKnownHost(packageName)) {
-            fetchAsKnownHost(packageName, location);
-        } else if (packageNameContainsVcsType(packageName)) {
-            fetchWithVcs(packageName, location);
-        } else {
-            fetchByFindingMetaTag(packageName, location);
-        }
+        PackageInfo packageInfo = packageNameResolver.produce(packageName);
+        PackageFetcher actualFetcher = packageInfo.getVcsType()
+                .getService(PackageFetcher.class);
+        actualFetcher.fetch(packageName, location);
     }
-
-    private void fetchByFindingMetaTag(String packageName, Path location) {
-        goImportMetadataFetcher.fetch(packageName, location);
-    }
-
-    private void fetchWithVcs(String packageName, Path location) {
-        VcsType type = getVcsType(packageName).get();
-        type.getFetcher().fetch(packageName, location);
-    }
-
-
-    private boolean packageNameContainsVcsType(String packageName) {
-        return getVcsType(packageName).isPresent();
-    }
-
-    private void fetchAsKnownHost(String packageName, Path location) {
-        PackageFetcher fetcher = getKnownHostFetcher(packageName).get();
-        fetcher.fetch(packageName, location);
-    }
-
-    private boolean isKnownHost(String packageName) {
-        return getKnownHostFetcher(packageName).isPresent();
-    }
-
-    private Optional<PackageFetcher> getKnownHostFetcher(String packageName) {
-        Path path = Paths.get(packageName);
-        if (path.getNameCount() <= 0) {
-            return Optional.absent();
-        } else {
-            return Optional.fromNullable(knownHosts.get(path.getName(0).toString()));
-        }
-    }
-
-    @BindingAnnotation
-    @Target({FIELD, PARAMETER, METHOD})
-    @Retention(RUNTIME)
-    public @interface KnownHostPackageFetchers {
-    }
-
 }

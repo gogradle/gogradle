@@ -1,6 +1,10 @@
 package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.pack.PackageInfo
+import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
+import com.github.blindpirate.gogradle.util.MockUtils
+import com.google.inject.Injector
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -9,39 +13,38 @@ import org.mockito.Mock
 import java.nio.file.Path
 
 import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class DefaultPackageFetcherTest {
     @Mock
-    GoImportMetadataFetcher goImportMetadataFetcher
+    PackageNameResolver packageNameResolver
     @Mock
-    PackageFetcher githubPackageFetcher
+    PackageFetcher vcsFetcher
     @Mock
     Path path
+    @Mock
+    PackageInfo packageInfo
+    @Mock
+    Injector injector
 
     DefaultPackageFetcher defaultPackageFetcher
 
     @Before
     void setUp() {
-        defaultPackageFetcher = new DefaultPackageFetcher(
-                ['github.com': githubPackageFetcher],
-                goImportMetadataFetcher)
+        defaultPackageFetcher = new DefaultPackageFetcher(packageNameResolver)
     }
 
     @Test
-    void 'package with known host should be delegated to corresponding fetcher'() {
+    void 'package should be delegated to corresponding fetcher'() {
+        String packageName = 'package';
+        // given
+        when(packageNameResolver.produce(packageName)).thenReturn(packageInfo)
+        when(packageInfo.getVcsType()).thenReturn(VcsType.Git)
+        MockUtils.mockVcsService(injector, PackageFetcher, Git, vcsFetcher)
         // when
-        defaultPackageFetcher.fetch('github.com/a/b', path)
+        defaultPackageFetcher.fetch(packageName, path)
         // then
-        verify(githubPackageFetcher).fetch('github.com/a/b', path);
-    }
-
-    @Test
-    void 'package with unknown host should be fetched by GoImportMetadataFetcher'() {
-        // when
-        defaultPackageFetcher.fetch('wtf.com/a/b/c', path)
-        // then
-        verify(goImportMetadataFetcher).fetch('wtf.com/a/b/c', path)
-
+        verify(vcsFetcher).fetch(packageName, path);
     }
 }

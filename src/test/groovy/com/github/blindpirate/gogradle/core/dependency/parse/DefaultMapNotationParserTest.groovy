@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.pack.PackageInfo
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Injector
@@ -37,7 +38,6 @@ class DefaultMapNotationParserTest {
     @Before
     void setUp() {
         parser = new DefaultMapNotationParser(dirMapNotationParser, packageNameResolver)
-        VcsType.setInjector(injector)
     }
 
     @Test(expected = Exception)
@@ -63,8 +63,7 @@ class DefaultMapNotationParserTest {
         Map notation = [name: 'name']
         when(packageNameResolver.produce('name')).thenReturn(packageInfo)
         when(packageInfo.getVcsType()).thenReturn(VcsType.Git)
-        when(injector.getInstance(Key.get(MapNotationParser, Git)))
-                .thenReturn(vcsMapNotationParser)
+        MockUtils.mockVcsService(injector, MapNotationParser, Git, vcsMapNotationParser)
 
         // when
         parser.parse(notation)
