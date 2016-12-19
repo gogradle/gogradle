@@ -26,19 +26,16 @@ public abstract class AbstractGolangDependency implements GolangDependency {
         return strategy;
     }
 
-    public AbstractGolangDependency setName(String name) {
+    public void setName(String name) {
         this.name = name;
-        return this;
     }
 
-    public AbstractGolangDependency setFirstLevel(boolean firstLevel) {
+    public void setFirstLevel(boolean firstLevel) {
         this.firstLevel = firstLevel;
-        return this;
     }
 
-    public AbstractGolangDependency setStrategy(DependencyProduceStrategy strategy) {
+    public void setStrategy(DependencyProduceStrategy strategy) {
         this.strategy = strategy;
-        return this;
     }
 
     @Override

@@ -35,9 +35,8 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         this.excludes.putAll(map);
     }
 
-    public AbstractNotationDependency setTransitive(boolean transitive) {
+    public void setTransitive(boolean transitive) {
         this.transitive = transitive;
-        return this;
     }
 
     @Override
