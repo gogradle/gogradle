@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.pack.LocalFileSystemModule;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
-import com.github.blindpirate.gogradle.crossplatform.GopathManager;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -14,7 +13,6 @@ import java.io.File;
 
 /**
  * This task perform preparation such as Go executable and GOPATH.
- *
  */
 public class PrepareTask extends DefaultTask {
 
@@ -23,9 +21,6 @@ public class PrepareTask extends DefaultTask {
 
     @Inject
     private CacheManager cacheManager;
-
-    @Inject
-    private GopathManager gopathManager;
 
     @Inject
     private GolangPluginSetting setting;
