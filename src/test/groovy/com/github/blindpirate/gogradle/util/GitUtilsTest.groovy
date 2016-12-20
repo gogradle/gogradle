@@ -33,10 +33,14 @@ class GitUtilsTest {
         assert gitUtils.headCommitOfBranch(repository, 'master')
     }
 
-    // TODO multiple urls
+    @Test
+    public void 'getting remote urls of repository should success'() {
+        assert gitUtils.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
+    }
+
     @Test
     public void 'getting remote url of repository should success'() {
-        assert gitUtils.getRemoteUrl(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
+        assert gitUtils.getRemoteUrl(repository) == "https://github.com/blindpirate/test-for-gogradle.git"
     }
 
     @Test
@@ -104,6 +108,7 @@ class GitUtilsTest {
 
     @Test
     @AccessWeb
+    @Ignore
     @WithResource('out-of-date-git-repo.zip')
     public void 'git reset --hard HEAD && git pull should success'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()

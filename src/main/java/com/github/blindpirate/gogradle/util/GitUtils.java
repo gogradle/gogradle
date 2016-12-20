@@ -32,6 +32,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.github.blindpirate.gogradle.util.CollectionUtils.*;
+
 @Singleton
 public class GitUtils {
     public Repository getRepository(Path path) {
@@ -48,7 +50,7 @@ public class GitUtils {
         }
     }
 
-    public Set<String> getRemoteUrl(Repository repository) {
+    public Set<String> getRemoteUrls(Repository repository) {
         Config config = repository.getConfig();
         Set<String> remotes = config.getSubsections("remote");
         Set<String> ret = new HashSet<>();
@@ -57,6 +59,13 @@ public class GitUtils {
         }
         return ret;
     }
+
+    public String getRemoteUrl(Repository repository) {
+        Optional<String> result = findFirst(getRemoteUrls(repository));
+        Assert.isTrue(result.isPresent(), "Cannot find remote url!");
+        return result.get();
+    }
+
 
     public void cloneWithUrl(String gitUrl, Path location) {
         try {
