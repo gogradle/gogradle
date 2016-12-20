@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.cache.CacheManager
 import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.util.GitUtils
 import com.google.common.base.Optional
 import com.google.inject.Injector
@@ -51,20 +52,20 @@ class GitDependencyResolverTest {
 
     // injected by GogradleRunner
     File resource
-    Path path
+    Path repositoryPath
 
     @Before
     public void setUp() {
-        path = resource.toPath()
+        repositoryPath = resource.toPath()
 
         when(injector.getInstance(DependencyFactory)).thenReturn(factory)
-        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(path)
-        when(gitUtils.getRepository(path)).thenReturn(repository)
+        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(repositoryPath)
+        when(gitUtils.getRepository(repositoryPath)).thenReturn(repository)
         when(gitUtils.hardResetAndUpdate(repository)).thenReturn(repository)
         when(gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(Optional.of(revCommit))
 
-        when(dependency.getUrl()).thenReturn("url")
+        when(gitUtils.getRemoteUrl(repository)).thenReturn("url")
         when(dependency.getName()).thenReturn("name")
 
         DependencyHelper.INJECTOR_INSTANCE = injector
@@ -79,27 +80,48 @@ class GitDependencyResolverTest {
     }
 
     @Test
-    public void 'nonexistent repo should be cloned'() {
-
+    void 'nonexistent repo should be cloned when user specify a url'() {
+        // given:
+        when(dependency.getUrl()).thenReturn("url")
         // when:
         resolver.resolve(dependency)
-
         // then:
-        verify(gitUtils).cloneWithUrl('url', path)
+        verify(gitUtils).cloneWithUrl('url', repositoryPath)
     }
 
-
     @Test
-    public void 'existed repository should be updated'() {
-        path.resolve('placeholder').toFile().createNewFile()
-
+    void 'multiple urls should be tried to clone the repo'() {
         // given:
-        when(gitUtils.getRemoteUrl(repository)).thenReturn(['url'] as Set)
-
+        when(dependency.getUrls()).thenReturn(['url1', 'url2'])
+        when(gitUtils.cloneWithUrl('url1', repositoryPath)).thenThrow(new IllegalStateException())
         // when:
         resolver.resolve(dependency)
+        // then:
+        verify(gitUtils).cloneWithUrl('url2', repositoryPath)
+    }
 
+    @Test
+    void 'existed repository should be updated'() {
+        repositoryPath.resolve('placeholder').toFile().createNewFile()
+
+        // given:
+        when(gitUtils.getRemoteUrls(repository)).thenReturn(['url'] as Set)
+        when(dependency.getUrl()).thenReturn('url')
+        // when:
+        resolver.resolve(dependency)
         // then:
         verify(gitUtils).hardResetAndUpdate(repository)
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'exception should be thrown when every url has been tried'() {
+        // given
+        when(dependency.getUrls()).thenReturn(['url1', 'url2'])
+        ['url1', 'url2'].each {
+            when(gitUtils.cloneWithUrl(it, repositoryPath)).thenThrow(new IllegalStateException())
+        }
+
+        // when
+        resolver.resolve(dependency)
     }
 }
