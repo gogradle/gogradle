@@ -11,6 +11,6 @@ public class LocalFileResolver implements DependencyResolver {
     public GolangPackageModule resolve(GolangDependency dependency) {
         LocalDirectoryDependency directoryDependency = (LocalDirectoryDependency) dependency;
         return new LocalFileSystemModule(directoryDependency.getName(),
-                Paths.get(directoryDependency.getPath()));
+                Paths.get(directoryDependency.getDir()));
     }
 }

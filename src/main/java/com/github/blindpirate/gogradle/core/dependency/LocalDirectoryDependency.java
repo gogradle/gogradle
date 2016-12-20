@@ -5,17 +5,17 @@ import com.github.blindpirate.gogradle.core.pack.LocalFileResolver;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency {
 
-    private String path;
+    private String dir;
 
     public static LocalDirectoryDependency of(String name, String path) {
         LocalDirectoryDependency ret = new LocalDirectoryDependency();
         ret.setName(name);
-        ret.path = path;
+        ret.dir = path;
         return ret;
     }
 
-    public String getPath() {
-        return path;
+    public String getDir() {
+        return dir;
     }
 
     @Override
