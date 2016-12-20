@@ -44,60 +44,7 @@ class GitNotationConverterTest {
     void assertWithTag(String notation, String tag) {
         assert converter.convert(notation) == [name: 'github.com/a/b', tag: tag]
     }
-//
-//    void assertWithNameAndUrl(GitDependency dependency) {
-//        assert dependency.name == 'github.com/a/b'
-//        assert dependency.url == 'https://github.com/a/b.git'
-//    }
-//
-//    @Test
-//    public void 'map notation with tag should be parsed correctly'() {
-//        GitDependency dependency = converter.parse([name: 'github.com/a/b', tag: 'v1.0.0'])
-//        assertWithNameAndUrl(dependency)
-//        assert dependency.tag == 'v1.0.0'
-//        assert !dependency.commit
-//    }
-//
-//    @Test
-//    public void 'map notation with version should be parsed correctly'() {
-//        GitDependency dependency = converter.parse([name: 'github.com/a/b', version: '1.0.0'])
-//        assertWithNameAndUrl(dependency)
-//        assert dependency.tag == '1.0.0'
-//        assert dependency.version == '1.0.0'
-//        assert !dependency.commit
-//    }
-//
-//    @Test
-//    public void 'map notation with commit should be parsed correctly'() {
-//        GitDependency dependency = converter.parse([name: 'github.com/a/b', commit: 'commitId'])
-//        assertWithNameAndUrl(dependency)
-//        assert dependency.commit == 'commitId'
-//        assert !dependency.tag
-//        assert !dependency.version
-//    }
-//
-//    @Test
-//    public void 'map notation with url should be parsed correctly'() {
-//        GitDependency dependency = converter.parse([name: 'github.com/a/b', url: 'git@github.com:a/b.git'])
-//        assert dependency.name == 'github.com/a/b'
-//        assert dependency.url == 'git@github.com:a/b.git'
-//        assert !dependency.tag
-//        assert !dependency.version
-//        assert dependency.commit == GitDependency.NEWEST_COMMIT
-//    }
-//
-//    @Test
-//    public void 'map notation with extra properties should be set'() {
-//        GitDependency dependency = converter.parse(
-//                [name      : 'github.com/a/b',
-////                 excludeVendor: true,
-//                 transitive: true]
-//        )
-//
-//        assertWithNameAndUrl(dependency)
-//        assert dependency.transitive
-////        assert dependency.excludeVendor
-//    }
+
 
 
 }
