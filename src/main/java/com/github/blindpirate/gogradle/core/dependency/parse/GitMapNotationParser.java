@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 
 import javax.inject.Singleton;
@@ -13,11 +12,9 @@ import static com.github.blindpirate.gogradle.core.dependency.GitDependency.COMM
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.NEWEST_COMMIT;
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.TAG_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.URLS_KEY;
-import static com.github.blindpirate.gogradle.core.dependency.GitDependency.URL_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.VERSION_KEY;
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
-import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 
 @Singleton
 public class GitMapNotationParser extends AutoConfigureMapNotationParser {
