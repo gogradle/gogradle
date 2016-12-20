@@ -1,12 +1,13 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
 import com.google.inject.Injector;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collection;
+import java.util.Map;
 
 public class DependencyHelper {
 
@@ -14,12 +15,10 @@ public class DependencyHelper {
     @SuppressFBWarnings("MS_SHOULD_BE_FINAL")
     public static Injector INJECTOR_INSTANCE;
 
-    public static GolangDependencySet parseMany(Collection<?> notations, NotationParser parser) {
+    public static GolangDependencySet parseMany(Collection<? extends Map> notations, MapNotationParser parser) {
         GolangDependencySet ret = new GolangDependencySet();
-        for (Object notation : notations) {
-            if (parser.accept(notation)) {
-                ret.add(parser.produce(notation));
-            }
+        for (Map notation : notations) {
+            ret.add(parser.parse(notation));
         }
         return ret;
     }
