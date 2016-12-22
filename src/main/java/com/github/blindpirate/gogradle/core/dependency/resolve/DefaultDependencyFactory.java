@@ -44,28 +44,19 @@ public class DefaultDependencyFactory implements DependencyFactory, ModuleDepend
 
     @Override
     public Optional<GolangDependencySet> visitVendorDependencies(GolangPackageModule module) {
-        if (vendorDependencyFactory.accept(module)) {
-            return Optional.of(vendorDependencyFactory.produce(module));
-        } else {
-            return Optional.absent();
-        }
+        return vendorDependencyFactory.produce(module);
     }
 
     @Override
     public GolangDependencySet visitSourceCodeDependencies(GolangPackageModule module) {
-        return sourceCodeDependencyFactory.produce(module);
+        return sourceCodeDependencyFactory.produce(module).get();
     }
 
 
     @Override
-    public GolangDependencySet produce(GolangPackageModule module) {
+    public Optional<GolangDependencySet> produce(GolangPackageModule module) {
         DependencyProduceStrategy strategy = module.getProduceStrategy();
-        return strategy.produce(module, this);
-    }
-
-    @Override
-    public boolean accept(GolangPackageModule module) {
-        return true;
+        return Optional.of(strategy.produce(module, this));
     }
 
     @BindingAnnotation

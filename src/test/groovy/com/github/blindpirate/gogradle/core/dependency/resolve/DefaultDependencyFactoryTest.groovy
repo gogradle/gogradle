@@ -4,11 +4,13 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy
+import com.google.common.base.Optional
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -41,17 +43,12 @@ class DefaultDependencyFactoryTest {
         )
     }
 
-    @Test
-    void 'should access any module'() {
-        assert factory.accept(null)
-    }
 
     @Test
     void 'visiting external dependencies should success'() {
         // given:
-        when(external1.accept(module)).thenReturn(false)
-        when(external2.accept(module)).thenReturn(true)
-        when(external2.produce(module)).thenReturn(dependencySet)
+        when(external1.produce(module)).thenReturn(Optional.absent())
+        when(external2.produce(module)).thenReturn(Optional.of(dependencySet))
 
         // then:
         assert factory.visitExternalDependencies(module).get() == dependencySet
@@ -60,7 +57,7 @@ class DefaultDependencyFactoryTest {
     @Test
     void 'visiting source dependencies should success'() {
         // given:
-        when(sourceCodeDependencyFactory.produce(module)).thenReturn(dependencySet)
+        when(sourceCodeDependencyFactory.produce(module)).thenReturn(Optional.of(dependencySet))
         // then:
         assert factory.visitSourceCodeDependencies(module) == dependencySet
     }
@@ -68,13 +65,12 @@ class DefaultDependencyFactoryTest {
     @Test
     void 'visiting vendor dependencies should success'() {
         // given:
-        when(vendorDependencyFactory.accept(module)).thenReturn(false)
+        when(vendorDependencyFactory.produce(module)).thenReturn(Optional.absent())
         // then:
         assert !factory.visitVendorDependencies(module).isPresent()
 
         //given:
-        when(vendorDependencyFactory.accept(module)).thenReturn(true)
-        when(vendorDependencyFactory.produce(module)).thenReturn(dependencySet)
+        when(vendorDependencyFactory.produce(module)).thenReturn(Optional.of(dependencySet))
         // then:
         assert factory.visitVendorDependencies(module).get() == dependencySet
     }
@@ -83,6 +79,7 @@ class DefaultDependencyFactoryTest {
     void 'producing should be delegated to strategy'() {
         // given:
         when(module.getProduceStrategy()).thenReturn(strategy)
+        when(strategy.produce(module,factory)).thenReturn(dependencySet)
 
         // when:
         factory.produce(module)
