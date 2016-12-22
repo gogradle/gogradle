@@ -45,7 +45,7 @@ class ResolveTaskTest {
     }
 
     @Test
-    void 'dependency resolution should be success'() {
+    void 'dependency resolution should success'() {
         // given
         when(setting.getPackageName()).thenReturn("package")
         when(project.getRootDir()).thenReturn(rootDir)
