@@ -1,7 +1,11 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 public class PackageResolutionException extends RuntimeException {
-    public PackageResolutionException(String message) {
+    private PackageResolutionException(String message) {
         super(message);
+    }
+
+    public static PackageResolutionException cannotResolveName(String packageName) {
+        return new PackageResolutionException("Cannot resolve package:" + packageName);
     }
 }
