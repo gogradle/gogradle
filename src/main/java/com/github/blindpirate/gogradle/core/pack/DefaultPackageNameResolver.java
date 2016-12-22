@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
@@ -21,7 +20,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultPackageNameResolver implements PackageNameResolver {
 
-    private Map<String, PackageInfo> cache = new ConcurrentHashMap<>();
+    private Map<String, Optional<PackageInfo>> cache = new ConcurrentHashMap<>();
 
     private final List<PackageNameResolver> delegates;
 
@@ -32,22 +31,14 @@ public class DefaultPackageNameResolver implements PackageNameResolver {
     }
 
     @Override
-    public PackageInfo produce(String packageName) {
-        PackageInfo resultInCache = cache.get(packageName);
+    public Optional<PackageInfo> produce(String packageName) {
+        Optional<PackageInfo> resultInCache = cache.get(packageName);
         if (resultInCache != null) {
             return resultInCache;
         }
         Optional<PackageInfo> result = FactoryUtil.produce(delegates, packageName);
-        if (!result.isPresent()) {
-            throw new DependencyResolutionException("Unable to resolve package:" + packageName);
-        }
-        cache.put(packageName, result.get());
-        return result.get();
-    }
-
-    @Override
-    public boolean accept(String s) {
-        return true;
+        cache.put(packageName, result);
+        return result;
     }
 
     @BindingAnnotation

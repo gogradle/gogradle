@@ -7,11 +7,10 @@ class GithubPackageNameResolverTest {
 
     GithubPackageNameResolver resolver = new GithubPackageNameResolver();
 
-
     @Test
     void 'parsing name should success'() {
         // when
-        PackageInfo result = resolver.produce('github.com/a/b')
+        PackageInfo result = resolver.produce('github.com/a/b').get()
 
         // then
         assert result.name == 'github.com/a/b'
@@ -22,7 +21,7 @@ class GithubPackageNameResolverTest {
     @Test
     void 'parsing a long name should success'() {
         // when
-        PackageInfo info = resolver.produce('github.com/a/b/c')
+        PackageInfo info = resolver.produce('github.com/a/b/c').get()
 
         // then
         assert info.name == 'github.com/a/b/c'
@@ -33,7 +32,7 @@ class GithubPackageNameResolverTest {
     void 'parsing a long long name should success'() {
         // when
         String wtf = 'github.com/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z'
-        PackageInfo info = resolver.produce(wtf)
+        PackageInfo info = resolver.produce(wtf).get()
 
         // then
         assert info.name == wtf
