@@ -2,13 +2,13 @@ package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.cache.CacheManager
 import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
-import com.github.blindpirate.gogradle.util.GitUtils
-import com.google.common.base.Optional
 import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
@@ -24,6 +24,7 @@ import java.nio.file.Path
 import java.util.concurrent.Callable
 
 import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.*
+import static com.google.common.base.Optional.*
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
@@ -38,7 +39,7 @@ class GitDependencyResolverTest {
     @Mock
     CacheManager cacheManager
     @Mock
-    GitUtils gitUtils
+    GitAccessor gitUtils
     @Mock
     Repository repository
     @Mock
@@ -47,6 +48,8 @@ class GitDependencyResolverTest {
     DependencyFactory factory
     @Mock
     RevCommit revCommit
+    @Mock
+    GolangDependencySet dependencySet
     @InjectMocks
     GitDependencyResolver resolver
 
@@ -59,11 +62,12 @@ class GitDependencyResolverTest {
         repositoryPath = resource.toPath()
 
         when(injector.getInstance(DependencyFactory)).thenReturn(factory)
+        when(factory.produce(any(GolangPackageModule))).thenReturn(of(dependencySet))
         when(cacheManager.getGlobalCachePath(anyString())).thenReturn(repositoryPath)
         when(gitUtils.getRepository(repositoryPath)).thenReturn(repository)
         when(gitUtils.hardResetAndUpdate(repository)).thenReturn(repository)
         when(gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH))
-                .thenReturn(Optional.of(revCommit))
+                .thenReturn(of(revCommit))
 
         when(gitUtils.getRemoteUrl(repository)).thenReturn("url")
         when(dependency.getName()).thenReturn("name")
@@ -123,5 +127,10 @@ class GitDependencyResolverTest {
 
         // when
         resolver.resolve(dependency)
+    }
+
+    @Test
+    void 'resetting to a  commit should success'() {
+        // TODO
     }
 }

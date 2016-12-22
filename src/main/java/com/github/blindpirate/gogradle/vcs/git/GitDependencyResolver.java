@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.AbstractVcsResolver;
 import com.github.blindpirate.gogradle.util.Cast;
-import com.github.blindpirate.gogradle.util.GitUtils;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jgit.lib.Repository;
@@ -33,7 +32,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     public static final String DEFAULT_BRANCH = "master";
 
     @Inject
-    private GitUtils gitUtils;
+    private GitAccessor gitAccessor;
 
     @Override
     protected GolangPackageModule createModule(GolangDependency dependency,
@@ -43,7 +42,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
         GitDependency gitDependency = (GitDependency) dependency;
         Map<String, String> lockedNotation = ImmutableMap.of(
                 NAME_KEY, gitDependency.getName(),
-                URLS_KEY, gitUtils.getRemoteUrl(repository),
+                URLS_KEY, gitAccessor.getRemoteUrl(repository),
                 COMMIT_KEY, commit.getName()
         );
         return new VcsTempFileModule(dependency.getName(),
@@ -54,44 +53,44 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
 
     @Override
     protected void resetToSpecificVersion(Repository repository, RevCommit commit) {
-        gitUtils.resetToCommit(repository, commit.getId().toString());
+        gitAccessor.resetToCommit(repository, commit.getId().toString());
     }
 
     @Override
     protected RevCommit determineVersion(Repository repository, GolangDependency dependency) {
         GitDependency gitDependency = (GitDependency) dependency;
         if (gitDependency.getTag() != null) {
-            Optional<RevCommit> commit = gitUtils.findCommitByTag(repository, gitDependency.getTag());
+            Optional<RevCommit> commit = gitAccessor.findCommitByTag(repository, gitDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
             }
 
-            commit = gitUtils.findCommitBySemVersion(repository, gitDependency.getTag());
+            commit = gitAccessor.findCommitBySemVersion(repository, gitDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
             }
         }
 
         if (gitDependency.getCommit() != null) {
-            Optional<RevCommit> commit = gitUtils.findCommit(repository, gitDependency.getCommit());
+            Optional<RevCommit> commit = gitAccessor.findCommit(repository, gitDependency.getCommit());
             return commit.get();
         }
 
         // use HEAD of master branch
         // TODO the default branch may not be master
-        return gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH).get();
+        return gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH).get();
     }
 
     @Override
     protected Repository updateRepository(Repository repository, Path path) {
-        return gitUtils.hardResetAndUpdate(repository);
+        return gitAccessor.hardResetAndUpdate(repository);
     }
 
     @Override
     protected Repository initRepository(GolangDependency dependency, Path path) {
         List<String> urls = determineUrls(dependency);
         tryCloneWithEveryUrl(dependency, urls, path);
-        return gitUtils.getRepository(path);
+        return gitAccessor.getRepository(path);
     }
 
     private List<String> determineUrls(GolangDependency dependency) {
@@ -106,7 +105,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     private void tryCloneWithEveryUrl(GolangDependency dependency, List<String> urls, Path path) {
         for (int i = 0; i < urls.size(); ++i) {
             try {
-                gitUtils.cloneWithUrl(urls.get(i), path);
+                gitAccessor.cloneWithUrl(urls.get(i), path);
             } catch (Throwable e) {
                 // ignore
                 // TODO Logger.debug
@@ -120,9 +119,9 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
 
     @Override
     protected Optional<Repository> repositoryMatch(Path repoPath, GolangDependency dependency) {
-        Repository repository = gitUtils.getRepository(repoPath);
+        Repository repository = gitAccessor.getRepository(repoPath);
         List<String> urls = determineUrls(dependency);
-        Set<String> remoteUrls = gitUtils.getRemoteUrls(repository);
+        Set<String> remoteUrls = gitAccessor.getRemoteUrls(repository);
 
         if (Collections.disjoint(urls, remoteUrls)) {
             return Optional.absent();
