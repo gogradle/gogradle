@@ -34,7 +34,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
 
     private GolangDependency parseWithVcs(Map<String, Object> notation) {
         String packageName = MapUtils.getString(notation, NAME_KEY);
-        PackageInfo packageInfo = packageNameResolver.produce(packageName);
+        PackageInfo packageInfo = packageNameResolver.produce(packageName).get();
         notation.put(INFO_KEY, packageInfo);
         MapNotationParser parser =
                 packageInfo.getVcsType().getService(MapNotationParser.class);

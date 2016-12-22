@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsType
+import com.google.common.base.Optional
 import com.google.inject.Injector
 import com.google.inject.Key
 import org.junit.Before
@@ -61,7 +62,7 @@ class DefaultMapNotationParserTest {
     void 'notation should be delegated to vcs parser'() {
         // given
         Map notation = [name: 'name']
-        when(packageNameResolver.produce('name')).thenReturn(packageInfo)
+        when(packageNameResolver.produce('name')).thenReturn(Optional.of(packageInfo))
         when(packageInfo.getVcsType()).thenReturn(VcsType.Git)
         MockUtils.mockVcsService(injector, MapNotationParser, Git, vcsMapNotationParser)
 
