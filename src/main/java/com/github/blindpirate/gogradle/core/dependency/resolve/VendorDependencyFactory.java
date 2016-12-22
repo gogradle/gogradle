@@ -4,19 +4,16 @@ import com.github.blindpirate.gogradle.core.FileSystemModule;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.core.pack.GitHubPackageResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
-import com.github.blindpirate.gogradle.util.FileUtils;
+import com.google.common.base.Optional;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitOption;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDirectoryVistor.MAX_DEPTH;
 
@@ -27,21 +24,28 @@ import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDire
  */
 @Singleton
 public class VendorDependencyFactory implements DependencyFactory {
-    private List<PackageNameResolver> resolvers = new ArrayList<>();
+    static final String VENDOR_DIRECTORY = "vendor";
 
-    {
-        resolvers.add(new GitHubPackageResolver());
+    private final PackageNameResolver packageNameResolver;
+
+    @Inject
+    public VendorDependencyFactory(PackageNameResolver packageNameResolver) {
+        this.packageNameResolver = packageNameResolver;
     }
 
-
     @Override
-    public GolangDependencySet produce(GolangPackageModule module) {
-        return resolveVendor(module);
+    public Optional<GolangDependencySet> produce(GolangPackageModule module) {
+        if (vendorDirExist(module)) {
+            return Optional.of(resolveVendor(module));
+        } else {
+            return Optional.absent();
+        }
     }
 
     private GolangDependencySet resolveVendor(GolangPackageModule module) {
-        Path vendorPath = vendorDir(module).toPath();
-        VendorDirectoryVistor vistor = new VendorDirectoryVistor(module, vendorPath, resolvers);
+        Path vendorPath = vendorPath(module);
+        FileSystemModule fileSystemModule = (FileSystemModule) module;
+        VendorDirectoryVistor vistor = new VendorDirectoryVistor(fileSystemModule, packageNameResolver);
         try {
             Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), MAX_DEPTH, vistor);
         } catch (IOException e) {
@@ -50,13 +54,12 @@ public class VendorDependencyFactory implements DependencyFactory {
         return vistor.getDependencies();
     }
 
-    private File vendorDir(GolangPackageModule module) {
-        return FileUtils.locate(module.getRootDir(), "vendor");
+    private boolean vendorDirExist(GolangPackageModule module) {
+        return Files.exists(module.getRootDir().resolve(VENDOR_DIRECTORY));
     }
 
-    @Override
-    public boolean accept(GolangPackageModule module) {
-        File vendorDir = vendorDir(module);
-        return vendorDir.isDirectory();
+    private Path vendorPath(GolangPackageModule module) {
+        return module.getRootDir().resolve(VENDOR_DIRECTORY);
     }
+
 }
