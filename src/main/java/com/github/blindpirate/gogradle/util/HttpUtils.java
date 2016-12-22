@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.util;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -176,7 +177,7 @@ public class HttpUtils {
      * @throws IOException
      */
     public String appendQueryParams(String url,
-                                    Map<String, String> params) throws IOException {
+                                    Map<String, String> params) {
         StringBuilder fullUrl = new StringBuilder(url);
         if (params != null) {
             boolean first = (url.indexOf('?') == -1);
@@ -187,8 +188,12 @@ public class HttpUtils {
                 } else {
                     fullUrl.append('&');
                 }
-                fullUrl.append(URLEncoder.encode(param.getKey(), "UTF-8")).append('=');
-                fullUrl.append(URLEncoder.encode(param.getValue(), "UTF-8"));
+                try {
+                    fullUrl.append(URLEncoder.encode(param.getKey(), "UTF-8")).append('=');
+                    fullUrl.append(URLEncoder.encode(param.getValue(), "UTF-8"));
+                } catch (UnsupportedEncodingException e) {
+                    // ok to ignore
+                }
             }
         }
 
