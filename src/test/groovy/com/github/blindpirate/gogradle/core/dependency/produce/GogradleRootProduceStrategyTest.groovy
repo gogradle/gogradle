@@ -2,33 +2,27 @@ package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor
 import com.google.common.base.Optional
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Develop
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asOptional
-import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class GogradleRootProduceStrategyTest {
+class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
     GogradleRootProduceStrategy strategy
     @Mock
@@ -39,39 +33,15 @@ class GogradleRootProduceStrategyTest {
     ConfigurationContainer configurationContainer
     @Mock
     GolangConfiguration configuration
-    @Mock
-    DependencyFactory externalDependencyFactory
 
-    @Mock
-    GolangPackageModule module
-    @Mock
-    ModuleDependencyVistor visitor
-    @Mock
-    GolangDependency a1
-    @Mock
-    GolangDependency b1
-    @Mock
-    GolangDependency c1
-    @Mock
-    GolangDependency a2
-    @Mock
-    GolangDependency b2
-    @Mock
-    GolangDependency c2
 
     @Before
     void setUp() {
         strategy = new GogradleRootProduceStrategy(
                 golangPluginSetting,
                 configurationContainer,
-                lockedDependencyManager,
-                Arrays.asList(externalDependencyFactory))
-        when(a1.getName()).thenReturn('a')
-        when(b1.getName()).thenReturn('b')
-        when(c1.getName()).thenReturn('c')
-        when(a2.getName()).thenReturn('a')
-        when(b2.getName()).thenReturn('b')
-        when(c2.getName()).thenReturn('c')
+                lockedDependencyManager)
+
 
         when(configurationContainer.getByName(anyString()))
                 .thenReturn(configuration)
@@ -85,11 +55,6 @@ class GogradleRootProduceStrategyTest {
     void lockedDependencies(GolangDependency... dependencies) {
         Optional<GolangDependencySet> result = asOptional(dependencies)
         when(lockedDependencyManager.getLockedDependencies()).thenReturn(result)
-    }
-
-    void vendorDependencies(GolangDependency... dependencies) {
-        Optional<GolangDependencySet> result = asOptional(dependencies)
-        when(visitor.visitVendorDependencies(module)).thenReturn(result)
     }
 
     @Test
@@ -150,6 +115,7 @@ class GogradleRootProduceStrategyTest {
     void 'source code should be scanned when no dependencies exist'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(Develop)
+        externalDependencies()
         dependenciesInBuildDotGradle()
         lockedDependencies()
         vendorDependencies()
@@ -165,10 +131,9 @@ class GogradleRootProduceStrategyTest {
     void 'external tools should be scanned when no dependencies exist in build.gradle'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(Develop)
-        when(externalDependencyFactory.accept(module)).thenReturn(true)
 
-        GolangDependencySet set = asGolangDependencySet(a1)
-        when(externalDependencyFactory.produce(module)).thenReturn(set)
+
+        externalDependencies(a1)
         dependenciesInBuildDotGradle()
         lockedDependencies()
         vendorDependencies()

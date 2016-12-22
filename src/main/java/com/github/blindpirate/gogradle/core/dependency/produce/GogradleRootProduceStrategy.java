@@ -6,10 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.DependencySetFacade;
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory.ExternalDependencyFactories;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
-import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.google.common.base.Optional;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.Cast;
@@ -36,17 +33,13 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     private final ConfigurationContainer configurationContainer;
     private final LockedDependencyManager lockedDependenciesManager;
 
-    private final List<DependencyFactory> externalDependencyFactories;
 
     public GogradleRootProduceStrategy(GolangPluginSetting settings,
                                        ConfigurationContainer configurationContainer,
-                                       LockedDependencyManager lockedDependenciesManager,
-                                       @ExternalDependencyFactories
-                                               List<DependencyFactory> externalDependencyFactories) {
+                                       LockedDependencyManager lockedDependenciesManager) {
         this.settings = settings;
         this.configurationContainer = configurationContainer;
         this.lockedDependenciesManager = lockedDependenciesManager;
-        this.externalDependencyFactories = externalDependencyFactories;
     }
 
     @Override
@@ -54,7 +47,7 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     public GolangDependencySet produce(GolangPackageModule module, ModuleDependencyVistor vistor) {
 
         // Here we can just fetch them from internal container
-        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradleOrExternalTool(module);
+        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradleOrExternalTool(module, vistor);
         Optional<GolangDependencySet> lockedDependencies = getLockedDependencies();
         Optional<GolangDependencySet> vendorDependencies = vistor.visitVendorDependencies(module);
 
@@ -82,16 +75,15 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
         return lockedDependenciesManager.getLockedDependencies();
     }
 
-    private GolangDependencySet getDependenciesInBuildDotGradleOrExternalTool(GolangPackageModule module) {
+    private GolangDependencySet getDependenciesInBuildDotGradleOrExternalTool(GolangPackageModule module,
+                                                                              ModuleDependencyVistor vistor) {
         GolangConfiguration configuration =
                 (GolangConfiguration) configurationContainer.getByName(BUILD_CONFIGURATION_NAME);
 
         GolangDependencySet dependenciesInBuildDotGradle
                 = Cast.cast(DependencySetFacade.class, configuration.getDependencies()).toGolangDependencies();
         if (dependenciesInBuildDotGradle.isEmpty()) {
-            Optional<GolangDependencySet> externalDependencies = FactoryUtil.produce(
-                    externalDependencyFactories,
-                    module);
+            Optional<GolangDependencySet> externalDependencies = vistor.visitExternalDependencies(module);
             if (externalDependencies.isPresent()) {
                 return externalDependencies.get();
             }
