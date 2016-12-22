@@ -1,5 +1,6 @@
 # Gogradle - a full-featured build tool for golang
 Don't use me. I'm under development.
+My final goal is building complicated golang system such as Kubernetes.
 
 # Golang workspace convention
 
@@ -219,6 +220,27 @@ gradle.ext.lock=[
 [:]
 ]
 ```
+# Roadmap
+
+## Multi VCS support
+## Full platform support
+## Without go installed
+## IDE intergration 
+
+# TODO LIST
+
+- how to handle GOPATH? - ignore global GOPATH totally
+- lockfile use yaml
+- exceptions & logs
+- unresolvable packages and its vendor path
+- same package in vendor tree
+- Develop/Reproducible switch
+- exclude and transitive
+
+# problems met
+
+- some ssl cert can only be loaded in newest jdk
+
 
 
 
