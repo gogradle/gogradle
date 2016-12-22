@@ -20,12 +20,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 public class GitMapNotationParser extends AutoConfigureMapNotationParser {
 
     @Override
-    protected Class<? extends GolangDependency> determineDependencyClass(Map<String, Object> notationMap) {
-        return GitDependency.class;
-    }
-
-
-    @Override
     protected void preConfigure(Map<String, Object> notation) {
         String version = getString(notation, VERSION_KEY);
         String tag = getString(notation, TAG_KEY);
@@ -39,6 +33,11 @@ public class GitMapNotationParser extends AutoConfigureMapNotationParser {
         if (allBlank(version, tag, commit)) {
             notation.put("commit", NEWEST_COMMIT);
         }
+    }
+
+    @Override
+    protected Class<? extends GolangDependency> determineDependencyClass(Map<String, Object> notationMap) {
+        return GitDependency.class;
     }
 
 }

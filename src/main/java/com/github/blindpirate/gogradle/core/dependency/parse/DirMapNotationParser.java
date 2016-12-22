@@ -8,6 +8,7 @@ import java.util.Map;
 
 @Singleton
 public class DirMapNotationParser extends AutoConfigureMapNotationParser {
+
     @Override
     protected Class<? extends GolangDependency> determineDependencyClass(Map<String, Object> notationMap) {
         return LocalDirectoryDependency.class;
