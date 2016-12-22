@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.google.common.base.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -37,9 +38,9 @@ public class GodepDependencyFactory extends ExternalDependencyFactory {
     }
 
     @Override
-    public GolangDependencySet produce(GolangPackageModule module) {
+    public Optional<GolangDependencySet> doProduce(GolangPackageModule module) {
         GodepsDotJsonModel model = parse(module);
-        return DependencyHelper.parseMany(model.toNotations(), mapNotationParser);
+        return Optional.of(DependencyHelper.parseMany(model.toNotations(), mapNotationParser));
     }
 
     private GodepsDotJsonModel parse(GolangPackageModule module) {

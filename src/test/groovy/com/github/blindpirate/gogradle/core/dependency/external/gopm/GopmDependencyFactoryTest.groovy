@@ -35,7 +35,6 @@ class GopmDependencyFactoryTest {
 
     @Before
     void setUp() {
-        when(mapNotationParser.accept(anyMap())).thenReturn(true)
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
         when(dependency.getName()).thenReturn("name")
     }
@@ -43,7 +42,7 @@ class GopmDependencyFactoryTest {
 /**
  * github.com/a/b =
  github.com/c/d
- github.com/e/f = /dir/to/my/project
+ github.com/e/f = /path/to/my/project
  github.com/g/h = d:\projects\xorm
  golang.org/i/j = branch:master
  golang.org/k/l = tag:v0.9.0
@@ -61,7 +60,7 @@ class GopmDependencyFactoryTest {
         // then
         verify(mapNotationParser).parse(eq([name: 'github.com/a/b']))
         verify(mapNotationParser).parse(eq([name: 'github.com/c/d']))
-        verify(mapNotationParser).parse(eq([name: 'github.com/e/f', dir: '/dir/to/my/project']))
+        verify(mapNotationParser).parse(eq([name: 'github.com/e/f', dir: '/path/to/my/project']))
         verify(mapNotationParser).parse(eq([name: 'github.com/g/h', dir: /d:\projects\xorm/]))
         verify(mapNotationParser).parse(eq([name: 'golang.org/i/j', branch: 'master']))
         verify(mapNotationParser).parse(eq([name: 'golang.org/k/l', tag: 'v0.9.0']))

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.google.common.base.Optional;
 
 import javax.inject.Singleton;
 
@@ -11,12 +12,8 @@ import javax.inject.Singleton;
 @Singleton
 public class SourceCodeDependencyFactory implements DependencyFactory {
     @Override
-    public GolangDependencySet produce(GolangPackageModule module) {
+    public Optional<GolangDependencySet> produce(GolangPackageModule module) {
         throw new IllegalStateException("Not implemented yet!");
     }
 
-    @Override
-    public boolean accept(GolangPackageModule module) {
-        throw new IllegalStateException("Not implemented yet!");
-    }
 }

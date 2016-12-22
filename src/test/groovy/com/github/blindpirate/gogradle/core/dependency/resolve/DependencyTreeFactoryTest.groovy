@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode
+import com.google.common.base.Optional
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,6 +13,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static com.google.common.base.Optional.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -46,11 +48,11 @@ class DependencyTreeFactoryTest {
 
         def dependenciesOf0 = asGolangDependencySet(_01, _02)
         def dependenciesOf01 = asGolangDependencySet(_011, _012)
-        when(dependencyFactory.produce(_0)).thenReturn(dependenciesOf0)
-        when(dependencyFactory.produce(_01)).thenReturn(dependenciesOf01)
+        when(dependencyFactory.produce(_0)).thenReturn(of(dependenciesOf0))
+        when(dependencyFactory.produce(_01)).thenReturn(of(dependenciesOf01))
 
         [_02, _011, _012].each {
-            when(dependencyFactory.produce(it)).thenReturn(new GolangDependencySet())
+            when(dependencyFactory.produce(it)).thenReturn(of(new GolangDependencySet()))
         }
 
         [_0, _01, _02, _011, _012].each {

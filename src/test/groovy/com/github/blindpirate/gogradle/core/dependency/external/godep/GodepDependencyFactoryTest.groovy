@@ -10,8 +10,9 @@ import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 
-import static org.mockito.Matchers.any
-import static org.mockito.Mockito.*
+import static org.mockito.ArgumentMatchers.anyMap
+import static org.mockito.ArgumentMatchers.eq
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -34,7 +35,7 @@ class GodepDependencyFactoryTest {
         when(module.getRootDir()).thenReturn(resource.toPath())
 
         // then:
-        assert !godepDependencyFactory.accept(module)
+        assert !godepDependencyFactory.produce(module).isPresent()
     }
 
     @Test
@@ -42,7 +43,6 @@ class GodepDependencyFactoryTest {
     public void 'package with Godeps/Godeps.json should be analyzed properly'() {
         // given:
         when(module.getRootDir()).thenReturn(resource.toPath())
-        when(mapNotationParser.accept(any())).thenReturn(true)
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
         when(dependency.getName()).thenReturn('name')
 

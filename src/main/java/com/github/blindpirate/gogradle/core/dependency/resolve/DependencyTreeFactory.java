@@ -30,7 +30,7 @@ public class DependencyTreeFactory {
             return Optional.absent();
         }
 
-        GolangDependencySet dependencies = factory.produce(module);
+        GolangDependencySet dependencies = factory.produce(module).get();
         DependencyTreeNode ret = new DependencyTreeNode(module);
 
         // can be run concurrently

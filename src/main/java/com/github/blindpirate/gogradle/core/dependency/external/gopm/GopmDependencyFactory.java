@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
+import com.google.common.base.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,9 +31,9 @@ public class GopmDependencyFactory extends ExternalDependencyFactory {
     }
 
     @Override
-    public GolangDependencySet produce(GolangPackageModule module) {
+    public Optional<GolangDependencySet> doProduce(GolangPackageModule module) {
         File dotGopmfile = module.getRootDir().resolve(GOPMFILE).toFile();
         List<Map<String, Object>> notations = gopmfileParser.parse(dotGopmfile);
-        return DependencyHelper.parseMany(notations, mapNoationParser);
+        return Optional.of(DependencyHelper.parseMany(notations, mapNoationParser));
     }
 }
