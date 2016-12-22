@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.google.common.base.Optional;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -17,9 +19,15 @@ public abstract class ExternalDependencyFactory implements DependencyFactory {
     protected abstract List<String> identityFiles();
 
     @Override
-    public boolean accept(GolangPackageModule module) {
-        return anyFileExist(module);
+    public Optional<GolangDependencySet> produce(GolangPackageModule module) {
+        if (anyFileExist(module)) {
+            return doProduce(module);
+        } else {
+            return Optional.absent();
+        }
     }
+
+    protected abstract Optional<GolangDependencySet> doProduce(GolangPackageModule module);
 
     private boolean anyFileExist(GolangPackageModule module) {
         List<String> identityFiles = identityFiles();

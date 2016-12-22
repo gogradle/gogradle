@@ -21,7 +21,7 @@ public abstract class FileSystemModule extends AbstractPackageModule implements 
 
     private GolangDependencySet dependencies;
 
-    public abstract GolangPackageModule vendor(Path relativePathToVendor);
+    public abstract FileSystemModule vendor(String packageName);
 
     public FileSystemModule(String name, Path rootDir, long updateTime) {
         super(name);
@@ -29,14 +29,14 @@ public abstract class FileSystemModule extends AbstractPackageModule implements 
         this.updateTime = updateTime;
     }
 
-    protected Path addVendorPrefix(Path relativePathToVendor) {
+    protected Path addVendorPrefix(String relativePathToVendor) {
         String relativeToParentModule = "vendor" + File.separator + relativePathToVendor;
         return Paths.get(relativeToParentModule);
     }
 
     public GolangDependencySet getDependencies() {
         if (dependencies == null) {
-            dependencies = DependencyHelper.produceDependencies(this);
+            dependencies = DependencyHelper.produceDependencies(this).get();
         }
         return dependencies;
     }

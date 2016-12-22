@@ -56,7 +56,7 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
     @Override
     public Dependency create(Object dependencyNotation, Closure configureClosure) {
         // first level
-        Dependency dependency = dependencyParser.produce(dependencyNotation);
+        Dependency dependency = dependencyParser.parse(dependencyNotation);
         Cast.cast(AbstractGolangDependency.class, dependency).setFirstLevel(true);
         return ConfigureUtil.configure(configureClosure, dependency);
     }
