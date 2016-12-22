@@ -8,6 +8,7 @@ import com.google.common.base.Optional
 import org.junit.Before
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asOptional
 import static org.mockito.Mockito.when
 
@@ -48,6 +49,11 @@ abstract class DependencyProduceStrategyTest {
     void externalDependencies(GolangDependency... dependencies) {
         Optional<GolangDependencySet> set = asOptional(dependencies)
         when(visitor.visitExternalDependencies(module)).thenReturn(set)
+    }
+
+    void sourceCodeDependencies(GolangDependency... dependencies) {
+        GolangDependencySet set = asGolangDependencySet(dependencies)
+        when(visitor.visitSourceCodeDependencies(module)).thenReturn(set)
     }
 
 
