@@ -35,4 +35,12 @@ public class CollectionUtils {
     public static <T> boolean isEmpty(Collection<T> c) {
         return c == null || c.isEmpty();
     }
+
+    public static <T> T findFirst(Collection<T> c) {
+        for (T element : c) {
+            return element;
+        }
+        return null;
+    }
+
 }
