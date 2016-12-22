@@ -8,38 +8,30 @@ import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContai
 import com.github.blindpirate.gogradle.core.dependency.external.godep.GodepDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.external.gopm.GopmDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.DefaultStringNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.GithubNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitMapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.StringNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.VcsMapNotaionParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
+import com.github.blindpirate.gogradle.core.pack.DefaultPackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.GithubPackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.GlobalCachePackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.MetadataPackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
-import com.github.blindpirate.gogradle.vcs.BitbucketPackageFetcher;
-import com.github.blindpirate.gogradle.vcs.DefaultPackageFetcher;
-import com.github.blindpirate.gogradle.vcs.GitPackageFetcher;
-import com.github.blindpirate.gogradle.vcs.GithubPackageFetcher;
-import com.github.blindpirate.gogradle.vcs.JazzFetcher;
-import com.github.blindpirate.gogradle.vcs.LaunchpadFetcher;
-import com.github.blindpirate.gogradle.vcs.PackageFetcher;
-import com.google.common.collect.ImmutableMap;
+import com.github.blindpirate.gogradle.vcs.Git;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
-import com.google.inject.name.Names;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.List;
-import java.util.Map;
-
-import static com.github.blindpirate.gogradle.util.CollectionUtils.immutableList;
-import static com.github.blindpirate.gogradle.vcs.VcsType.Git;
 
 /**
  * Provides configurations for Guice dependency injection.
@@ -53,54 +45,22 @@ public class GogradleModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        bind(Instantiator.class).toInstance(instantiator);
+
         bind(NotationParser.class).to(DefaultNotationParser.class);
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
         bind(DependencyFactory.class).to(DefaultDependencyFactory.class);
         bind(CacheManager.class).to(DefaultCacheManager.class);
-        bind(Instantiator.class).toInstance(instantiator);
         bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
+        bind(PackageNameResolver.class).to(DefaultPackageNameResolver.class);
+        bind(NotationConverter.class).to(DefaultNotationConverter.class);
 
-        bind(PackageFetcher.class).annotatedWith(Names.named(Git.toString()))
-                .to(GitPackageFetcher.class);
+        bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
+
     }
 
-    @Inject
-    @Provides
-    @Singleton
-    @DefaultNotationParser.GolangDependencyNotationParsers
-    public List<NotationParser> notationParsers(
-            DefaultStringNotationParser stringNotationParser,
-            DefaultMapNotationParser mapNotationParser) {
-        return immutableList(
-                stringNotationParser,
-                mapNotationParser);
-    }
-
-    @Inject
-    @Provides
-    @Singleton
-    @DefaultStringNotationParser.StringNotationParsers
-    public List<StringNotationParser> stringNotationParsers(
-            GithubNotationParser githubNotationParser) {
-        return CollectionUtils.<StringNotationParser>immutableList(
-                githubNotationParser);
-    }
-
-
-    @Inject
-    @Provides
-    @Singleton
-    @DefaultMapNotationParser.MapNotationParsers
-    public List<MapNotationParser> mapNotationParsers(
-            DirMapNotationParser dirMapNotationParser,
-            VcsMapNotaionParser vcsMapNotaionParser,
-            GithubNotationParser githubNotationParser) {
-        return immutableList(
-                dirMapNotationParser,
-                vcsMapNotaionParser,
-                githubNotationParser);
-    }
 
     @Inject
     @Provides
@@ -117,18 +77,16 @@ public class GogradleModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    @DefaultPackageFetcher.KnownHostPackageFetchers
-    public Map<String, PackageFetcher> knownHostPackageFetchers(
-            BitbucketPackageFetcher bitbucketPackageFetcher,
-            GithubPackageFetcher githubPackageFetcher,
-            LaunchpadFetcher launchpadFetcher,
-            JazzFetcher jazzFetcher) {
-        return ImmutableMap.of(
-                "bitbucket.org", bitbucketPackageFetcher,
-                "github.com", githubPackageFetcher,
-                "launchpad.net", launchpadFetcher,
-                "hub.jazz.net", jazzFetcher
-        );
+    @DefaultPackageNameResolver.PackageNameResolvers
+    public List<PackageNameResolver> packageNameResolvers(
+            GithubPackageNameResolver githubPackageNameResolver,
+            GlobalCachePackageNameResolver globalCachePackageNameResolver,
+            MetadataPackageNameResolver metadataPackageNameResolver) {
+        return CollectionUtils.immutableList(
+                githubPackageNameResolver,
+                globalCachePackageNameResolver,
+                metadataPackageNameResolver);
     }
+
 
 }
