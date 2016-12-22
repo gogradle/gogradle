@@ -21,7 +21,7 @@ public class VcsTempFileModule extends FileSystemModule implements LockEnabled {
     }
 
     @Override
-    public GolangPackageModule vendor(Path relativePathToVendor) {
+    public FileSystemModule vendor(String packageName) {
         return null;
     }
 

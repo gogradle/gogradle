@@ -13,7 +13,7 @@ public class LocalFileSystemModule extends FileSystemModule {
     }
 
     @Override
-    public FileSystemModule vendor(Path relativePathToVendor) {
+    public FileSystemModule vendor(String relativePathToVendor) {
         Path relativeToParent = addVendorPrefix(relativePathToVendor);
         LocalFileSystemModule ret = new LocalFileSystemModule(
                 relativePathToVendor.toString(),
