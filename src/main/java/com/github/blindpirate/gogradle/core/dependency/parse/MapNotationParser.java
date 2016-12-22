@@ -4,11 +4,12 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 
 import java.util.Map;
 
-public interface MapNotationParser extends NotationParser {
-    String VCS_KEY = "vcs";
+public interface MapNotationParser extends NotationParser<Map<String, Object>> {
     String NAME_KEY = "name";
     String DIR_KEY = "dir";
+    String INFO_KEY = "info";
 
-    GolangDependency parseMap(Map<String, Object> notation);
+    @Override
+    GolangDependency parse(Map<String, Object> notation);
 
 }
