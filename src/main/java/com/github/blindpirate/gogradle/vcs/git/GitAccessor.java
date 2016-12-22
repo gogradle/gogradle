@@ -1,7 +1,9 @@
-package com.github.blindpirate.gogradle.util;
+package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.vcs.git.GitInteractionException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
+import com.github.blindpirate.gogradle.vcs.VcsAccessor;
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.UnexpectedCharacterException;
 import com.github.zafarkhaja.semver.Version;
@@ -32,10 +34,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.blindpirate.gogradle.util.CollectionUtils.*;
-
 @Singleton
-public class GitUtils {
+public class GitAccessor implements VcsAccessor {
+    @Override
+    public List<String> getRemoteUrls(Path repoRoot) {
+        Repository repository = getRepository(repoRoot);
+        return new ArrayList<>(getRemoteUrls(repository));
+    }
+
     public Repository getRepository(Path path) {
         try {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
@@ -59,13 +65,6 @@ public class GitUtils {
         }
         return ret;
     }
-
-    public String getRemoteUrl(Repository repository) {
-        Optional<String> result = findFirst(getRemoteUrls(repository));
-        Assert.isTrue(result.isPresent(), "Cannot find remote url!");
-        return result.get();
-    }
-
 
     public void cloneWithUrl(String gitUrl, Path location) {
         try {
@@ -191,4 +190,9 @@ public class GitUtils {
         }
     }
 
+    public String getRemoteUrl(Repository repository) {
+        Set<String> urls = getRemoteUrls(repository);
+        Assert.isTrue(!urls.isEmpty(), "Cannot get remote urls of repository:" + repository.getDirectory());
+        return CollectionUtils.findFirst(urls);
+    }
 }

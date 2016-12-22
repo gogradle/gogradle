@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.util
 import com.github.blindpirate.gogradle.AccessWeb
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Ignore
@@ -13,14 +14,14 @@ import static com.github.blindpirate.gogradle.util.FileUtils.forceDelete
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")
-class GitUtilsTest {
+class GitAccessorTest {
 
     private static final String INITIAL_COMMIT = "b12418e026113005c55a5f52887f3d314f8e5fb1"
 
     // injected by GogradleRunner
     File resource
 
-    GitUtils gitUtils = new GitUtils();
+    GitAccessor gitUtils = new GitAccessor();
     Repository repository
 
     @Before
