@@ -1,5 +1,8 @@
 package com.github.blindpirate.gogradle.general;
 
+import com.google.common.base.Optional;
+
 public interface Factory<MATERIAL, PRODUCT> {
-    PRODUCT produce(MATERIAL material);
+    Optional<PRODUCT> produce(MATERIAL material);
+
 }
