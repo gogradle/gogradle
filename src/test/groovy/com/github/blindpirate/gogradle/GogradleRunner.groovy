@@ -120,10 +120,11 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
         }
 
         beforeOneTest(method)
-
-        super.runChild(method, notifier);
-
-        afterOneTest(method);
+        try {
+            super.runChild(method, notifier);
+        } finally {
+            afterOneTest(method);
+        }
     }
 
     void afterOneTest(FrameworkMethod method) {
