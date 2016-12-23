@@ -6,20 +6,16 @@ import com.google.inject.AbstractModule
 import com.google.inject.Guice
 import com.google.inject.Injector
 import com.google.inject.matcher.Matchers
-import org.gradle.api.logging.LogLevel
 import org.gradle.api.logging.Logger
-import org.gradle.internal.logging.sink.OutputEventRenderer
-import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLogger
-import org.gradle.internal.logging.slf4j.OutputEventListenerBackedLoggerContext
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito
 
-import static org.mockito.Mockito.*
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -79,6 +75,7 @@ class DebugLogMethodInterceptorTest {
     void assertEnterAndExit() {
         assert stringCaptor.allValues[0].startsWith('Entering')
         assert stringCaptor.allValues[1].startsWith('Exiting')
+        assert argumentsCaptor.allValues.size() == 7
     }
 
     @Test
@@ -88,10 +85,11 @@ class DebugLogMethodInterceptorTest {
         // then
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
-        assert argumentsCaptor.allValues.size() == 6
         assert argumentsCaptor.allValues[0] == 'doNothing'
         assert argumentsCaptor.allValues[3] == 'doNothing'
         assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[6] == null
+
     }
 
     @Test
@@ -101,10 +99,10 @@ class DebugLogMethodInterceptorTest {
         // then
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
-        assert argumentsCaptor.allValues.size() == 6
         assert argumentsCaptor.allValues[0] == 'doProtectedNothing'
         assert argumentsCaptor.allValues[3] == 'doProtectedNothing'
         assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[6] == null
     }
 
     @Test
@@ -116,10 +114,10 @@ class DebugLogMethodInterceptorTest {
         assert result == null
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
-        assert argumentsCaptor.allValues.size() == 6
         assert argumentsCaptor.allValues[0] == 'returnNull'
         assert argumentsCaptor.allValues[3] == 'returnNull'
         assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[6] == null
     }
 
     @Test
@@ -130,10 +128,10 @@ class DebugLogMethodInterceptorTest {
         assert result == ''
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
-        assert argumentsCaptor.allValues.size() == 6
         assert argumentsCaptor.allValues[0] == 'returnString'
         assert argumentsCaptor.allValues[3] == 'returnString'
         assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[6] == result
     }
 
     @Test
@@ -143,10 +141,10 @@ class DebugLogMethodInterceptorTest {
         // then
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
-        assert argumentsCaptor.allValues.size() == 6
         assert argumentsCaptor.allValues[0] == 'longTime'
         assert argumentsCaptor.allValues[3] == 'longTime'
         assert argumentsCaptor.allValues[5].toDouble() > 100
+        assert argumentsCaptor.allValues[6] == null
     }
 
     @Test
@@ -160,7 +158,6 @@ class DebugLogMethodInterceptorTest {
         // then
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
-        assert argumentsCaptor.allValues.size() == 7
         assert argumentsCaptor.allValues[0] == 'throwException'
         assert argumentsCaptor.allValues[3] == 'throwException'
         assert argumentsCaptor.allValues[5].toDouble() < 10

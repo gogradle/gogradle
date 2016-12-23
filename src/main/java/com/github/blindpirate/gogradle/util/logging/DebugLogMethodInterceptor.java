@@ -16,28 +16,31 @@ public class DebugLogMethodInterceptor implements MethodInterceptor {
         beforeMethod(methodInvocation);
         long startTime = System.nanoTime();
         Throwable exception = null;
+        Object ret = null;
         try {
-            return methodInvocation.proceed();
+            ret = methodInvocation.proceed();
+            return ret;
         } catch (Throwable e) {
             exception = e;
             throw e;
         } finally {
             long endTime = System.nanoTime();
-            afterMethod(methodInvocation, exception, endTime - startTime);
+            afterMethod(methodInvocation, ret, exception, endTime - startTime);
         }
     }
 
-    private void afterMethod(MethodInvocation methodInvocation, Throwable e, long nanoseconds) {
+    private void afterMethod(MethodInvocation methodInvocation, Object returnValue, Throwable e, long nanoseconds) {
         if (!LOGGER.isDebugEnabled()) {
             return;
         }
         Object target = methodInvocation.getThis();
         Method method = methodInvocation.getMethod();
         if (e == null) {
-            LOGGER.debug("Exiting method {} of class {}, total time is {} ms",
+            LOGGER.debug("Exiting method {} of class {}, total time is {} ms, return {}",
                     method.getName(),
                     target.getClass().getSimpleName(),
-                    toString(nanoseconds));
+                    toString(nanoseconds),
+                    returnValue);
         } else {
             LOGGER.debug("Exiting method {} of class {}, total time is {} ms, exception is {}",
                     method.getName(),
