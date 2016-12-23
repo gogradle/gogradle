@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
@@ -28,6 +29,7 @@ public class MetadataPackageNameResolver implements PackageNameResolver {
     }
 
     @Override
+    @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
         Optional<PackageInfo> httpsResult = fetchViaWeb(packageName, HTTPS + packageName);
         if (httpsResult.isPresent()) {

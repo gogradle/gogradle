@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.common.base.Optional;
 import com.google.common.collect.Sets;
 
@@ -12,6 +13,7 @@ import java.util.Set;
 public class StandardPackageNameResolver implements PackageNameResolver {
 
     @Override
+    @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
         Path path = Paths.get(packageName);
         if (isStandardPackage(path)) {

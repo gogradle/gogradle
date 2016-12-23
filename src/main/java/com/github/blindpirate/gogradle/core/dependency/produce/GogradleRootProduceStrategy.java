@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.DependencySetFacade;
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.common.base.Optional;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.Cast;
@@ -43,7 +44,7 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     }
 
     @Override
-
+    @DebugLog
     public GolangDependencySet produce(GolangPackageModule module, ModuleDependencyVistor vistor) {
 
         // Here we can just fetch them from internal container

@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 
@@ -38,22 +39,26 @@ public class DefaultDependencyFactory implements DependencyFactory, ModuleDepend
     }
 
     @Override
+    @DebugLog
     public Optional<GolangDependencySet> visitExternalDependencies(GolangPackageModule module) {
         return FactoryUtil.produce(externalDependencyFactories, module);
     }
 
     @Override
+    @DebugLog
     public Optional<GolangDependencySet> visitVendorDependencies(GolangPackageModule module) {
         return vendorDependencyFactory.produce(module);
     }
 
     @Override
+    @DebugLog
     public GolangDependencySet visitSourceCodeDependencies(GolangPackageModule module) {
         return sourceCodeDependencyFactory.produce(module).get();
     }
 
 
     @Override
+    @DebugLog
     public Optional<GolangDependencySet> produce(GolangPackageModule module) {
         DependencyProduceStrategy strategy = module.getProduceStrategy();
         return Optional.of(strategy.produce(module, this));

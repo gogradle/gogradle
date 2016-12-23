@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.util.FactoryUtil;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.common.base.Optional;
 import com.google.inject.BindingAnnotation;
 
@@ -31,6 +32,7 @@ public class DefaultPackageNameResolver implements PackageNameResolver {
     }
 
     @Override
+    @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
         Optional<PackageInfo> resultInCache = cache.get(packageName);
         if (resultInCache != null) {

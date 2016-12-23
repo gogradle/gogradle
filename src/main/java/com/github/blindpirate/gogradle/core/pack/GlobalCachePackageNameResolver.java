@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.common.base.Optional;
 
@@ -22,6 +23,7 @@ public class GlobalCachePackageNameResolver implements PackageNameResolver {
     }
 
     @Override
+    @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
         Path path = Paths.get(packageName);
         while (isNotRoot(path)) {
