@@ -17,6 +17,15 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    // Note that just declaring this sourceset creates two configurations.
+    main {
+        java {
+            srcDirs += ['src/main/antlr']
+        }
+    }
+}
+
 dependencies {
     antlr "org.antlr:antlr4:4.6"
 
@@ -62,8 +71,10 @@ findbugs {
 }
 
 generateGrammarSource {
+    // WARNING: DO NOT put source files here, every time this task executed, this directory will be overwritten
+    // Don't ask me how I know it.  T^T
     outputDirectory = file('src/main/antlr/com/github/blindpirate/gogradle/antlr')
-    arguments += ['-package','com.github.blindpirate.gogradle.antlr']
+    arguments += ['-package', 'com.github.blindpirate.gogradle.antlr']
 }
 
 task wrapper(type: Wrapper) {
