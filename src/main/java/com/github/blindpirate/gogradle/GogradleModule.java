@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.core.pack.GithubPackageNameResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackageNameResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackageNameResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.StandardPackageNameResolver;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.vcs.Git;
 import com.google.inject.AbstractModule;
@@ -80,9 +81,11 @@ public class GogradleModule extends AbstractModule {
     @DefaultPackageNameResolver.PackageNameResolvers
     public List<PackageNameResolver> packageNameResolvers(
             GithubPackageNameResolver githubPackageNameResolver,
+            StandardPackageNameResolver standardPackageNameResolver,
             GlobalCachePackageNameResolver globalCachePackageNameResolver,
             MetadataPackageNameResolver metadataPackageNameResolver) {
         return CollectionUtils.immutableList(
+                standardPackageNameResolver,
                 githubPackageNameResolver,
                 globalCachePackageNameResolver,
                 metadataPackageNameResolver);

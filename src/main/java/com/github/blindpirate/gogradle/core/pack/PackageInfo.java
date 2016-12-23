@@ -14,6 +14,7 @@ public class PackageInfo {
     private List<String> urls;
     // the import path corresponding to the repository root
     private String rootName;
+    private boolean standard;
 
     public String getName() {
         return name;
@@ -31,8 +32,19 @@ public class PackageInfo {
         return rootName;
     }
 
+    public boolean isStandard() {
+        return standard;
+    }
+
     public static PackageInfoBuilder builder() {
         return new PackageInfoBuilder();
+    }
+
+    public static PackageInfo standardPackage(String packageName) {
+        PackageInfo info = new PackageInfo();
+        info.standard = true;
+        info.name = packageName;
+        return info;
     }
 
 
