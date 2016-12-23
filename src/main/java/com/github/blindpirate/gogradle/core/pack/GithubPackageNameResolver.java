@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.common.base.Optional;
 
@@ -16,18 +16,23 @@ public class GithubPackageNameResolver implements PackageNameResolver {
     private static final String GITHUB_HOST = "github.com";
 
     @Override
+    @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
-
-        if (isInvalidGithubPackage(packageName)) {
+        if (isNotGithubPackage(packageName)) {
             return Optional.absent();
+        } else if (isIncomplete(packageName)) {
+            return Optional.of(PackageInfo.INCOMPLETE);
         } else {
             return doProduce(packageName);
         }
     }
 
-    private boolean isInvalidGithubPackage(String packageName) {
-        return !packageName.startsWith(GITHUB_HOST)
-                || toPath(packageName).getNameCount() < 3;
+    private boolean isIncomplete(String packageName) {
+        return toPath(packageName).getNameCount() < 3;
+    }
+
+    private boolean isNotGithubPackage(String packageName) {
+        return !packageName.startsWith(GITHUB_HOST);
     }
 
     public Optional<PackageInfo> doProduce(String packageName) {

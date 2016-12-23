@@ -8,6 +8,8 @@ import com.github.blindpirate.gogradle.core.dependency.produce.VendorOnlyProduce
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.google.common.base.Optional;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
@@ -21,6 +23,7 @@ import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDepe
  * Analyze vendor directory to generate dependencies.
  */
 public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
+    private static final Logger LOGGER = Logging.getLogger(VendorDirectoryVistor.class);
 
     static final int MAX_DEPTH = 100;
 
@@ -52,16 +55,22 @@ public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
         }
 
         // relative path, i.e "github.com/a/b"
-        Path currentPath = parentModuleVendor.relativize(currentAbsolutePath);
+        String packageName = parentModuleVendor.relativize(currentAbsolutePath).toString();
 
-        Optional<PackageInfo> packageInfo = resolver.produce(currentPath.toString());
-        if (packageInfo.isPresent()) {
+        Optional<PackageInfo> packageInfo = resolver.produce(packageName);
+        if (isRootPackage(packageInfo)) {
             // current path is root of a repo
-            dependencies.add(createDependency(currentPath.toString()));
+            LOGGER.debug("Produce package {}.", packageName);
+            dependencies.add(createDependency(packageName));
             return FileVisitResult.SKIP_SUBTREE;
         } else {
+            LOGGER.debug("Cannot produce package with path {}, skip.", packageName);
             return FileVisitResult.CONTINUE;
         }
+    }
+
+    private boolean isRootPackage(Optional<PackageInfo> packageInfo) {
+        return packageInfo.isPresent() && packageInfo.get() != PackageInfo.INCOMPLETE;
     }
 
     private GolangDependency createDependency(String packageName) {

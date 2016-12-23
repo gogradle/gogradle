@@ -8,7 +8,7 @@ class GithubPackageNameResolverTest {
     GithubPackageNameResolver resolver = new GithubPackageNameResolver();
 
     @Test
-    void 'parsing name should success'() {
+    void 'resolving name should success'() {
         // when
         PackageInfo result = resolver.produce('github.com/a/b').get()
 
@@ -17,9 +17,17 @@ class GithubPackageNameResolverTest {
         assertVcsTypeUrlsAndRootName(result)
     }
 
+    @Test
+    void 'resolving an incomplete name should success'() {
+        // when
+        PackageInfo result = resolver.produce('github.com/a').get()
+        // then
+        assert result == PackageInfo.INCOMPLETE
+    }
+
 
     @Test
-    void 'parsing a long name should success'() {
+    void 'resolving a long name should success'() {
         // when
         PackageInfo info = resolver.produce('github.com/a/b/c').get()
 
@@ -29,7 +37,7 @@ class GithubPackageNameResolverTest {
     }
 
     @Test
-    void 'parsing a long long name should success'() {
+    void 'resolving a long long name should success'() {
         // when
         String wtf = 'github.com/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z'
         PackageInfo info = resolver.produce(wtf).get()

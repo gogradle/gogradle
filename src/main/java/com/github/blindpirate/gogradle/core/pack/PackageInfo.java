@@ -6,8 +6,9 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PackageInfo {
-    public static final PackageInfo UNRESOLVABLE =
-            builder().withName("UNRESOLVABLE").build();
+    // the package name can be recognized, but it's incomplete, e.g. "github.com/a"
+    public static final PackageInfo INCOMPLETE =
+            builder().withName("INCOMPLETE").build();
 
     private String name;
     private VcsType vcsType;
