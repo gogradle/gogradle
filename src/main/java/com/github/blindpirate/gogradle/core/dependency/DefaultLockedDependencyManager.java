@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.util.FileUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.base.Optional;
@@ -80,14 +79,14 @@ public class DefaultLockedDependencyManager implements LockedDependencyManager {
 
     private void writeToSettingsDotGradle(List<Map<String, String>> notations) {
         File file = project.getRootDir().toPath().resolve(SETTINGS_FILE).toFile();
-        FileUtils.touch(file);
+        IOUtils.touch(file);
         String fileContent = IOUtils.toString(file);
         List<String> lines = StringUtils.splitToLines(fileContent);
         int startLineIndex = findStartLineIndex(lines);
         List<String> contentBeforeLock = lines.subList(0, startLineIndex);
         List<String> lockContent = toString(notations);
         List<String> resultFileContent = flatten(contentBeforeLock, lockContent);
-        FileUtils.write(file, StringUtils.join(resultFileContent, "\n"));
+        IOUtils.write(file, StringUtils.join(resultFileContent, "\n"));
     }
 
     // TODO should be more strict

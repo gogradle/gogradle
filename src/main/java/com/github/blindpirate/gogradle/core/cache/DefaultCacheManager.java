@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.cache;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.util.FileUtils;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.wrapper.GradleUserHomeLookup;
 
 import javax.inject.Singleton;
@@ -14,7 +14,7 @@ import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-import static com.github.blindpirate.gogradle.util.FileUtils.ensureExsitAndWritable;
+import static com.github.blindpirate.gogradle.util.IOUtils.ensureExsitAndWritable;
 
 @Singleton
 public class DefaultCacheManager implements CacheManager {
@@ -81,12 +81,12 @@ public class DefaultCacheManager implements CacheManager {
                 .resolve(GO_LOCKFILES_PATH)
                 .resolve(lockFileName)
                 .toFile();
-        FileUtils.touch(lockFile);
+        IOUtils.touch(lockFile);
         return lockFile;
     }
 
     private void createPackageDirectoryIfNeccessary(GolangDependency dependency) {
         Path path = getGlobalCachePath(dependency.getName());
-        FileUtils.ensureExistAndWritable(path);
+        IOUtils.ensureExistAndWritable(path);
     }
 }

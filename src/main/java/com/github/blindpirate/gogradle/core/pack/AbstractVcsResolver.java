@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.util.FileUtils;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.common.base.Optional;
 
 import javax.inject.Inject;
@@ -61,7 +61,7 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
 
 
     private Optional<REPOSITORY> ensureGlobalCacheEmptyOrMatch(GolangDependency dependency, Path path) {
-        if (FileUtils.dirIsEmpty(path)) {
+        if (IOUtils.dirIsEmpty(path)) {
             return Optional.absent();
         } else {
             Optional<REPOSITORY> ret = repositoryMatch(path, dependency);
