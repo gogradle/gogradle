@@ -11,6 +11,8 @@ import com.google.common.base.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -30,6 +32,7 @@ import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCommit> {
 
     public static final String DEFAULT_BRANCH = "master";
+    private static final Logger LOGGER = Logging.getLogger(GitDependencyResolver.class);
 
     @Inject
     private GitAccessor gitAccessor;
@@ -53,7 +56,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
 
     @Override
     protected void resetToSpecificVersion(Repository repository, RevCommit commit) {
-        gitAccessor.resetToCommit(repository, commit.getId().toString());
+        gitAccessor.resetToCommit(repository, commit.getName());
     }
 
     @Override
@@ -104,14 +107,13 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
 
     private void tryCloneWithEveryUrl(GolangDependency dependency, List<String> urls, Path path) {
         for (int i = 0; i < urls.size(); ++i) {
+            String url = urls.get(i);
             try {
-                gitAccessor.cloneWithUrl(urls.get(i), path);
+                gitAccessor.cloneWithUrl(url, path);
             } catch (Throwable e) {
-                // ignore
-                // TODO Logger.debug
+                LOGGER.warn("Clone {} with url {} failed", dependency.getName(), url, e);
                 if (i == urls.size() - 1) {
-                    throw new DependencyResolutionException("Cannot clone git dependency:"
-                            + dependency.getName());
+                    throw DependencyResolutionException.cannotCloneRepository(dependency, e);
                 }
             }
         }
