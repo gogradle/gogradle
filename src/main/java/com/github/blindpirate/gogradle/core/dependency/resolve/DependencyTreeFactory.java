@@ -5,7 +5,9 @@ import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+
 import java.util.Optional;
+
 import org.gradle.api.artifacts.Dependency;
 
 import javax.inject.Inject;
@@ -31,9 +33,17 @@ public class DependencyTreeFactory {
         }
 
         GolangDependencySet dependencies = factory.produce(module).get();
-        DependencyTreeNode ret = new DependencyTreeNode(module);
 
+        resolveDependencies(dependencies);
+
+        DependencyTreeNode node = walkDownForEachDependency(module, dependencies);
+
+        return Optional.of(node);
+    }
+
+    private DependencyTreeNode walkDownForEachDependency(GolangPackageModule module, GolangDependencySet dependencies) {
         // can be run concurrently
+        DependencyTreeNode ret = new DependencyTreeNode(module);
         for (Dependency dependency : dependencies) {
             GolangPackageModule backingModule = ((GolangDependency) dependency).getPackage();
             Optional<DependencyTreeNode> childNode = getSubTreeRootNode(backingModule);
@@ -42,8 +52,11 @@ public class DependencyTreeFactory {
                 ret.addChild(childNode.get());
             }
         }
+        return ret;
+    }
 
-        return Optional.of(ret);
+    private void resolveDependencies(GolangDependencySet dependencies) {
+        dependencies.forEach(dependency -> dependency.getPackage());
     }
 
 }
