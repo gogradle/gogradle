@@ -15,7 +15,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Collections;
 
-import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDirectoryVistor.MAX_DEPTH;
+import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DIRECTORY_WALK_DEPTH;
 
 
 /**
@@ -45,13 +45,13 @@ public class VendorDependencyFactory implements DependencyFactory {
     private GolangDependencySet resolveVendor(GolangPackageModule module) {
         Path vendorPath = vendorPath(module);
         FileSystemModule fileSystemModule = (FileSystemModule) module;
-        VendorDirectoryVistor vistor = new VendorDirectoryVistor(fileSystemModule, packageNameResolver);
+        VendorDirectoryVisitor visitor = new VendorDirectoryVisitor(fileSystemModule, packageNameResolver);
         try {
-            Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), MAX_DEPTH, vistor);
+            Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), MAX_DIRECTORY_WALK_DEPTH, visitor);
         } catch (IOException e) {
-            throw new DependencyResolutionException(e);
+            throw DependencyResolutionException.cannotResolveVendor(module, e);
         }
-        return vistor.getDependencies();
+        return visitor.getDependencies();
     }
 
     private boolean vendorDirExist(GolangPackageModule module) {

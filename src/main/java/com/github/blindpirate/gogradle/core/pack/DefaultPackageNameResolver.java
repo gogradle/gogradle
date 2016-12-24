@@ -21,7 +21,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 @Singleton
 public class DefaultPackageNameResolver implements PackageNameResolver {
 
-    private Map<String, Optional<PackageInfo>> cache = new ConcurrentHashMap<>();
+    private Map<String, PackageInfo> cache = new ConcurrentHashMap<>();
 
     private final List<PackageNameResolver> delegates;
 
@@ -34,13 +34,22 @@ public class DefaultPackageNameResolver implements PackageNameResolver {
     @Override
     @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
-        Optional<PackageInfo> resultInCache = cache.get(packageName);
+        PackageInfo resultInCache = cache.get(packageName);
         if (resultInCache != null) {
-            return resultInCache;
+            return Optional.of(resultInCache);
         }
         Optional<PackageInfo> result = FactoryUtil.produce(delegates, packageName);
-        cache.put(packageName, result);
+
+        reportErrorIfResolutionFailed(packageName, result);
+
+        cache.put(packageName, result.get());
         return result;
+    }
+
+    private void reportErrorIfResolutionFailed(String packageName, Optional<PackageInfo> result) {
+        if (!result.isPresent()) {
+            throw PackageResolutionException.cannotResolveName(packageName);
+        }
     }
 
     @BindingAnnotation

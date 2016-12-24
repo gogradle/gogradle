@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
-import com.google.common.base.Optional;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -22,10 +21,8 @@ import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDepe
 /**
  * Analyze vendor directory to generate dependencies.
  */
-public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
-    private static final Logger LOGGER = Logging.getLogger(VendorDirectoryVistor.class);
-
-    static final int MAX_DEPTH = 100;
+public class VendorDirectoryVisitor extends SimpleFileVisitor<Path> {
+    private static final Logger LOGGER = Logging.getLogger(VendorDirectoryVisitor.class);
 
     private Path parentModuleVendor;
 
@@ -39,8 +36,8 @@ public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
         return dependencies;
     }
 
-    public VendorDirectoryVistor(FileSystemModule parentModule,
-                                 PackageNameResolver resolver) {
+    public VendorDirectoryVisitor(FileSystemModule parentModule,
+                                  PackageNameResolver resolver) {
         this.resolver = resolver;
         this.parentModule = parentModule;
         this.parentModuleVendor = parentModule.getRootDir().resolve(VENDOR_DIRECTORY);
@@ -57,8 +54,8 @@ public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
         // relative path, i.e "github.com/a/b"
         String packageName = parentModuleVendor.relativize(currentAbsolutePath).toString();
 
-        Optional<PackageInfo> packageInfo = resolver.produce(packageName);
-        if (isRootPackage(packageInfo)) {
+        PackageInfo packageInfo = resolver.produce(packageName).get();
+        if (packageInfo != PackageInfo.INCOMPLETE) {
             // current path is root of a repo
             LOGGER.debug("Produce package {}.", packageName);
             dependencies.add(createDependency(packageName));
@@ -67,10 +64,6 @@ public class VendorDirectoryVistor extends SimpleFileVisitor<Path> {
             LOGGER.debug("Cannot produce package with path {}, skip.", packageName);
             return FileVisitResult.CONTINUE;
         }
-    }
-
-    private boolean isRootPackage(Optional<PackageInfo> packageInfo) {
-        return packageInfo.isPresent() && packageInfo.get() != PackageInfo.INCOMPLETE;
     }
 
     private GolangDependency createDependency(String packageName) {
