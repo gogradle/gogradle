@@ -64,9 +64,10 @@ tasks.withType(FindBugs) {
         xml.enabled false
         html.enabled true
     }
-}
-findbugs {
-    excludeFilter = file("$rootProject.projectDir/config/findbugs/excludeClosure.xml")
+    def antlrDirPath = 'com/github/blindpirate/gogradle/antlr'
+    classes = classes.filter {
+        !it.path.contains(antlrDirPath) && !(it.name ==~ /.*_closure\d+\.class/)
+    }
 }
 
 generateGrammarSource {

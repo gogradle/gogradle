@@ -1,8 +1,0 @@
-<FindBugsFilter>
-<Match>
-    <Source name="~.*\.groovy" />
-    <And>
-        <Bug pattern="SE_NO_SERIALVERSIONID"/> <!-- FB doesn't understand Groovy closures -->
-    </And>
-</Match>
-</FindBugsFilter>
