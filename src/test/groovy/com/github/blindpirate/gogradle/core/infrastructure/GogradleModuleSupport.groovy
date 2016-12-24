@@ -8,7 +8,7 @@ import org.gradle.internal.reflect.Instantiator
 import org.junit.Before
 import org.mockito.Mock
 
-abstract class TestWithRealInjector {
+abstract class GogradleModuleSupport {
     @Mock
     Instantiator instantiator
 

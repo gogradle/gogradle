@@ -2,13 +2,13 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.infrastructure.TestWithRealInjector
+import com.github.blindpirate.gogradle.core.infrastructure.GogradleModuleSupport
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithResource('vendor_test.zip')
-class VendorWalkTest extends TestWithRealInjector {
+class VendorWalkTest extends GogradleModuleSupport {
 
     File resource
 
