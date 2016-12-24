@@ -23,7 +23,10 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     @Mock
     GolangPackageModule module
 
-
+    @Before
+    void setUp() {
+        factory = injector.getInstance(SourceCodeDependencyFactory)
+    }
 
     @WithResource('golang-example-master.zip')
     @Test
