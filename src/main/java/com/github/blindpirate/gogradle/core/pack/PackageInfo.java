@@ -49,6 +49,16 @@ public class PackageInfo {
         return info;
     }
 
+    @Override
+    public String toString() {
+        return "PackageInfo{" +
+                "name='" + name + '\'' +
+                ", vcsType=" + vcsType +
+                ", urls=" + urls +
+                ", rootName='" + rootName + '\'' +
+                ", standard=" + standard +
+                '}';
+    }
 
     public static final class PackageInfoBuilder {
         private String name;
