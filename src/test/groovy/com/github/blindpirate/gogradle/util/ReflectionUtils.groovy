@@ -24,4 +24,8 @@ public class ReflectionUtils {
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
         field.set(object, value)
     }
+
+    public static boolean allFieldsEquals(Object actual, Object expected, List<String> fieldNames) {
+        return fieldNames.every { actual[it] == expected[it] }
+    }
 }

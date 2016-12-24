@@ -21,15 +21,6 @@ public class IOUtils {
         org.apache.commons.io.FileUtils.forceDelete(file);
     }
 
-
-    public static File locate(File dir, String relativePath) {
-        return new File(dir, relativePath);
-    }
-
-    public static File locate(Path path, String relativePath) {
-        return path.resolve(relativePath).toFile();
-    }
-
     public static boolean dirIsEmpty(Path dir) {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             return !dirStream.iterator().hasNext();
@@ -77,6 +68,10 @@ public class IOUtils {
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }
+    }
+
+    public static void write(File dir, String fileName, CharSequence data) {
+        write(dir.toPath().resolve(fileName).toFile(), data);
     }
 
     public static String toString(File file) {

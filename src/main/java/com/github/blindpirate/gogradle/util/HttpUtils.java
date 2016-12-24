@@ -1,8 +1,5 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.github.blindpirate.gogradle.GolangPlugin;
-import com.github.blindpirate.gogradle.GolangPluginSetting;
-
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -15,7 +12,7 @@ import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.*;
+import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
 
 /**
  * Utils for http access.

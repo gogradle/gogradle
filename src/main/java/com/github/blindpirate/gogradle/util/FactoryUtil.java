@@ -1,11 +1,9 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.general.Factory;
-import org.gradle.internal.impldep.org.apache.commons.cli.Option;
-
-import java.util.Optional;
 
 import java.util.List;
+import java.util.Optional;
 
 public class FactoryUtil {
     public static <MATERIAL, PRODUCT> Optional<PRODUCT> produce(
