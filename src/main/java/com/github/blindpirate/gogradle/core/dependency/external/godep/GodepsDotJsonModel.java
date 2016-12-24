@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.core.dependency.external.godep;
 
 import com.google.common.collect.ImmutableMap;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;

@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.util.logging;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
-import org.gradle.api.logging.LogLevel;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -55,6 +54,7 @@ public class DebugLogMethodInterceptor implements MethodInterceptor {
         return "[" + e.getClass().getSimpleName() + "]" + e.getMessage();
     }
 
+    @SuppressWarnings({"checkstyle:magicnumber"})
     private String toString(long nanoseconds) {
         return String.format("%.3f", nanoseconds / 1000_000d);
     }

@@ -3,14 +3,13 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy;
-import com.github.blindpirate.gogradle.core.dependency.produce.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
-import java.util.Optional;
 import com.google.inject.Injector;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 public class DependencyHelper {
 

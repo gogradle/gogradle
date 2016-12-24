@@ -1,16 +1,12 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
-
-import java.util.Arrays;
-import java.util.Optional;
-
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
 import java.lang.annotation.Annotation;
-import java.util.List;
-import java.util.Map;
+import java.util.Arrays;
+import java.util.Optional;
 
 public enum VcsType {
     Git("git", ".git", Git.class),

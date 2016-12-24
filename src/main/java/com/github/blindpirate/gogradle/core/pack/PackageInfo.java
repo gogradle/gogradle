@@ -6,7 +6,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class PackageInfo {
-    // the package name can be recognized, but it's incomplete, e.g. "github.com/a"
+    // the package path can be recognized, but it's incomplete, e.g. "github.com/a"
     public static final PackageInfo INCOMPLETE =
             builder().withName("INCOMPLETE").build();
 

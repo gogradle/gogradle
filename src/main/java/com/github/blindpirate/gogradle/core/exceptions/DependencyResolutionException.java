@@ -2,11 +2,12 @@ package com.github.blindpirate.gogradle.core.exceptions;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.api.GradleException;
 
 import java.io.IOException;
 
-public class DependencyResolutionException extends GradleException {
+public final class DependencyResolutionException extends GradleException {
     private DependencyResolutionException() {
     }
 
@@ -32,5 +33,17 @@ public class DependencyResolutionException extends GradleException {
 
     public static DependencyResolutionException cannotCloneRepository(GolangDependency dependency, Throwable e) {
         return new DependencyResolutionException("Cloning repository of " + dependency.getName() + " failed.", e);
+    }
+
+    public static DependencyResolutionException cannotParseNotation(Object notation) {
+        return new DependencyResolutionException("Cannot parse notation " + String.valueOf(notation));
+    }
+
+    public static DependencyResolutionException cannotResetToCommit(String commitId, GitAPIException e) {
+        return new DependencyResolutionException("Cannot reset to specified commit:" + commitId, e);
+    }
+
+    public static DependencyResolutionException cannotParseGodepsDotJson(GolangPackageModule module, IOException e) {
+        return new DependencyResolutionException("Cannot parse godeps.json of " + module.getName(), e);
     }
 }

@@ -1,19 +1,15 @@
 package com.github.blindpirate.gogradle.core.dependency.external.gopm;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
-
-import java.util.Optional;
-
 import org.apache.commons.lang3.tuple.Pair;
-import org.gradle.internal.impldep.org.apache.commons.cli.Option;
 import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 
 import javax.inject.Singleton;
 import java.io.File;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.BRANCH_KEY;
