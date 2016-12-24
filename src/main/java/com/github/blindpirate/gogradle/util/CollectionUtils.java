@@ -1,46 +1,34 @@
 package com.github.blindpirate.gogradle.util;
 
-import java.util.Optional;
+import org.codehaus.groovy.runtime.DefaultGroovyMethods;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
+
+import static java.util.Arrays.asList;
+import static java.util.Arrays.stream;
 
 public class CollectionUtils {
     public static <T> List<T> immutableList(T... elements) {
-        return Collections.unmodifiableList(Arrays.asList(elements));
+        return Collections.unmodifiableList(asList(elements));
     }
 
     public static <T> List<T> collectOptional(Optional<T>... optionals) {
-        List<T> ret = new ArrayList<>();
-        for (Optional<T> optional : optionals) {
-            if (optional.isPresent()) {
-                ret.add(optional.get());
-            }
-        }
-
-        return ret;
+        return stream(optionals)
+                .reduce(new ArrayList<>(),
+                        (list, optional) -> {
+                            if (optional.isPresent()) {
+                                list.add(optional.get());
+                            }
+                            return list;
+                        },
+                        Functions.returnFirstArg());
     }
 
+    @SuppressWarnings("unchecked")
     public static <T> List<T> flatten(List<T>... lists) {
-        List<T> result = new ArrayList<>();
-        for (List<T> list : lists) {
-            result.addAll(list);
-        }
-        return result;
+        return (List<T>) DefaultGroovyMethods.flatten(lists);
     }
-
-    public static <T> boolean isEmpty(Collection<T> c) {
-        return c == null || c.isEmpty();
-    }
-
-    public static <T> T findFirst(Collection<T> c) {
-        for (T element : c) {
-            return element;
-        }
-        return null;
-    }
-
 }
