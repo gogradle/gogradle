@@ -45,6 +45,7 @@ public class PackageInfo {
         PackageInfo info = new PackageInfo();
         info.standard = true;
         info.name = packageName;
+        info.rootName = packageName;
         return info;
     }
 
