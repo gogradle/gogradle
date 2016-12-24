@@ -18,6 +18,11 @@ import java.util.List;
 import java.util.Set;
 
 public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDependency> {
+    public GolangDependencySet(Collection<? extends GolangDependency> dependencies) {
+        this();
+        dependencies.forEach(d -> this.add(d));
+    }
+
     public GolangDependencySet() {
         this(GolangDependency.class, DirectInstantiator.INSTANCE);
     }
