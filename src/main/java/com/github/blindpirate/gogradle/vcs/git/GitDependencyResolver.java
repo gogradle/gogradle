@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.AbstractVcsResolver;
 import com.github.blindpirate.gogradle.util.Cast;
-import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -21,6 +20,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.COMMIT_KEY;
@@ -76,7 +76,11 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
 
         if (gitDependency.getCommit() != null) {
             Optional<RevCommit> commit = gitAccessor.findCommit(repository, gitDependency.getCommit());
-            return commit.get();
+            if (commit.isPresent()) {
+                return commit.get();
+            } else {
+                throw DependencyResolutionException.cannotFindGitCommit(gitDependency);
+            }
         }
 
         // use HEAD of master branch
@@ -92,7 +96,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     @Override
     protected Repository initRepository(GolangDependency dependency, Path path) {
         List<String> urls = determineUrls(dependency);
-        tryCloneWithEveryUrl(dependency, urls, path);
+        tryCloneWithUrls(dependency, urls, path);
         return gitAccessor.getRepository(path);
     }
 
@@ -105,11 +109,12 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
         }
     }
 
-    private void tryCloneWithEveryUrl(GolangDependency dependency, List<String> urls, Path path) {
+    private void tryCloneWithUrls(GolangDependency dependency, List<String> urls, Path path) {
         for (int i = 0; i < urls.size(); ++i) {
             String url = urls.get(i);
             try {
                 gitAccessor.cloneWithUrl(url, path);
+                return;
             } catch (Throwable e) {
                 LOGGER.warn("Clone {} with url {} failed", dependency.getName(), url, e);
                 if (i == urls.size() - 1) {
