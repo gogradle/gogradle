@@ -15,6 +15,7 @@ import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
 import org.eclipse.jgit.lib.Config;
 import org.eclipse.jgit.lib.ObjectId;
+import org.eclipse.jgit.lib.ProgressMonitor;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -67,6 +68,32 @@ public class GitAccessor implements VcsAccessor {
         try {
             Git.cloneRepository()
                     .setURI(gitUrl)
+                    .setProgressMonitor(new ProgressMonitor() {
+                        @Override
+                        public void start(int totalTasks) {
+                            System.out.println("total tasks:"+totalTasks);
+                        }
+
+                        @Override
+                        public void beginTask(String title, int totalWork) {
+                            System.out.println("title:"+title+"totalWork:"+totalWork);
+                        }
+
+                        @Override
+                        public void update(int completed) {
+                            System.out.println("completed:"+completed);
+                        }
+
+                        @Override
+                        public void endTask() {
+
+                        }
+
+                        @Override
+                        public boolean isCancelled() {
+                            return false;
+                        }
+                    })
                     .setDirectory(location.toFile())
                     .call();
         } catch (GitAPIException e) {
