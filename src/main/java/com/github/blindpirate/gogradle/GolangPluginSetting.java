@@ -5,6 +5,8 @@ import com.github.blindpirate.gogradle.util.Assert;
 
 import javax.inject.Singleton;
 
+import java.nio.charset.Charset;
+
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.valueOf;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
@@ -14,6 +16,8 @@ import static com.github.blindpirate.gogradle.util.StringUtils.trimToNull;
 public class GolangPluginSetting {
     // indicate the global GOPATH (in system environment variables)
     private boolean useGlobalGopath = false;
+    public static final String DEFAULT_CHARSET = "UTF-8";
+    public static final int MAX_DIRECTORY_WALK_DEPTH = 100;
     private String globalGopath;
     private BuildMode buildMode = Reproducible;
     private String packageName;

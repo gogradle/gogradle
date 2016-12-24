@@ -1,5 +1,8 @@
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.GolangPlugin;
+import com.github.blindpirate.gogradle.GolangPluginSetting;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -11,6 +14,8 @@ import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
+
+import static com.github.blindpirate.gogradle.GolangPluginSetting.*;
 
 /**
  * Utils for http access.
@@ -111,8 +116,8 @@ public class HttpUtils {
                     body.append("&");
                 }
                 String value = param.getValue();
-                body.append(URLEncoder.encode(param.getKey(), "UTF-8") + "=");
-                body.append(URLEncoder.encode(value, "UTF-8"));
+                body.append(URLEncoder.encode(param.getKey(), DEFAULT_CHARSET) + "=");
+                body.append(URLEncoder.encode(value, DEFAULT_CHARSET));
             }
         }
 
@@ -189,8 +194,8 @@ public class HttpUtils {
                     fullUrl.append('&');
                 }
                 try {
-                    fullUrl.append(URLEncoder.encode(param.getKey(), "UTF-8")).append('=');
-                    fullUrl.append(URLEncoder.encode(param.getValue(), "UTF-8"));
+                    fullUrl.append(URLEncoder.encode(param.getKey(), DEFAULT_CHARSET)).append('=');
+                    fullUrl.append(URLEncoder.encode(param.getValue(), DEFAULT_CHARSET));
                 } catch (UnsupportedEncodingException e) {
                     // ok to ignore
                 }
@@ -233,8 +238,8 @@ public class HttpUtils {
                 }
             }
 
-            params.put(URLDecoder.decode(param, "UTF-8"),
-                    URLDecoder.decode(value, "UTF-8"));
+            params.put(URLDecoder.decode(param, DEFAULT_CHARSET),
+                    URLDecoder.decode(value, DEFAULT_CHARSET));
         }
 
         return params;
@@ -291,7 +296,7 @@ public class HttpUtils {
         if (body != null) {
             conn.setDoOutput(true);
             OutputStream os = conn.getOutputStream();
-            os.write(body.getBytes("UTF-8"));
+            os.write(body.getBytes(DEFAULT_CHARSET));
             os.flush();
             os.close();
         }
@@ -326,7 +331,7 @@ public class HttpUtils {
             if (n == -1) {
                 break;
             }
-            out.append(new String(b, 0, n, Charset.forName("UTF-8")));
+            out.append(new String(b, 0, n, Charset.forName(DEFAULT_CHARSET)));
         }
         return out.toString();
     }
