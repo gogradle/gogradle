@@ -10,7 +10,7 @@ import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.util.FileUtils.forceDelete
+import static IOUtils.forceDelete
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")

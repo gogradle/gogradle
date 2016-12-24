@@ -1,11 +1,10 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.util.FileUtils
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import net.lingala.zip4j.core.ZipFile
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
-import org.gradle.testfixtures.internal.ProjectBuilderImpl
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
@@ -15,7 +14,7 @@ import org.mockito.MockitoAnnotations
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import static com.github.blindpirate.gogradle.util.FileUtils.forceDelete
+import static IOUtils.forceDelete
 
 /**
  * <ul>
@@ -28,6 +27,11 @@ import static com.github.blindpirate.gogradle.util.FileUtils.forceDelete
  */
 // TODO: ignore @AccessWeb when offline
 public class GogradleRunner extends BlockJUnit4ClassRunner {
+
+    private static final String PROJECT_FEILD = 'project'
+    private static final String PROJECT_DIR_FEILD = 'projectDir'
+    private static final String USERHOME_FIELD = 'userhome'
+    private static final String RESOURC_FIELD = 'resource'
 
     Object currentInstance
 
@@ -56,11 +60,21 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
 
     def injectProjectAndResourceIfNecessary() {
         if (project != null) {
-            ReflectionUtils.setField(currentInstance, 'project', project)
+            setFieldSafely(currentInstance, PROJECT_FEILD, project)
+            setFieldSafely(currentInstance, PROJECT_DIR_FEILD, projectDir)
+            setFieldSafely(currentInstance, USERHOME_FIELD, userhomeDir)
         }
 
         if (resourceDir != null) {
-            ReflectionUtils.setField(currentInstance, 'resource', resourceDir)
+            setFieldSafely(currentInstance, RESOURC_FIELD, resourceDir)
+        }
+    }
+
+    def setFieldSafely(Object instance, String fieldName, Object value) {
+        try {
+            ReflectionUtils.setField(instance, fieldName, value)
+        } catch (Throwable e) {
+            // ignore
         }
     }
 
@@ -91,7 +105,7 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
 
     def copyResourceToDir(String resourceName, File destDir) {
         Path source = Paths.get(this.class.classLoader.getResource(resourceName).toURI())
-        FileUtils.copyDirectory(source.toFile(), destDir)
+        IOUtils.copyDirectory(source.toFile(), destDir)
     }
 
     def unzipResourceToDir(String resourceName, File destDir) {
@@ -175,7 +189,7 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
     }
 
     def tmpRandomDirectory(String prefix) {
-        File ret = new File("build/tmp/${prefix}-${UUID.randomUUID()}")
+        File ret = new File("build/tmp/${prefix}-${UUID.randomUUID()}").absoluteFile
         ret.mkdir()
         ret
     }
