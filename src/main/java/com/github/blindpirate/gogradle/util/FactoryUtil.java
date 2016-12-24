@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.general.Factory;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import java.util.List;
 
@@ -14,6 +14,6 @@ public class FactoryUtil {
                 return result;
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 }

@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.google.common.base.Optional
+import java.util.Optional
 import org.gradle.api.artifacts.DependencySet
 
 import static org.mockito.Mockito.mock
@@ -18,7 +18,7 @@ public class DependencyUtils {
 
     static Optional<GolangDependencySet> asOptional(GolangDependency... dependencies) {
         if (dependencies.size() == 0) {
-            return Optional.absent()
+            return Optional.empty()
         }
         return Optional.of(asGolangDependencySet(dependencies))
     }

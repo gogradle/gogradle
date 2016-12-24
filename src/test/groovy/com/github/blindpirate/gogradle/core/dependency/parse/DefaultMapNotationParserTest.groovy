@@ -7,7 +7,7 @@ import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.google.common.base.Optional
+import java.util.Optional
 import com.google.inject.Injector
 import com.google.inject.Key
 import org.junit.Before

@@ -6,7 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager
-import com.google.common.base.Optional
+import java.util.Optional
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.junit.Before
 import org.junit.Test

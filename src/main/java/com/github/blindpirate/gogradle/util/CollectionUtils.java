@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import java.util.ArrayList;
 import java.util.Arrays;

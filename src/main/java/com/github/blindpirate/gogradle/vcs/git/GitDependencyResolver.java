@@ -7,7 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.AbstractVcsResolver;
 import com.github.blindpirate.gogradle.util.Cast;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
@@ -126,7 +126,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
         Set<String> remoteUrls = gitAccessor.getRemoteUrls(repository);
 
         if (Collections.disjoint(urls, remoteUrls)) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(repository);
         }

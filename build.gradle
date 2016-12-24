@@ -10,7 +10,6 @@ apply plugin: 'checkstyle'
 apply plugin: 'jacoco'
 apply plugin: 'antlr'
 
-sourceCompatibility = 1.7
 
 repositories {
     mavenLocal()

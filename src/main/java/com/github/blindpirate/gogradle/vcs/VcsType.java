@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
@@ -37,7 +37,7 @@ public enum VcsType {
                 return Optional.of(type);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     public <T> T getService(Class<T> serviceClass) {

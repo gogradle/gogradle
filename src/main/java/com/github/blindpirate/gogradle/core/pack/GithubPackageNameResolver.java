@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,7 +19,7 @@ public class GithubPackageNameResolver implements PackageNameResolver {
     @DebugLog
     public Optional<PackageInfo> produce(String packageName) {
         if (isNotGithubPackage(packageName)) {
-            return Optional.absent();
+            return Optional.empty();
         } else if (isIncomplete(packageName)) {
             return Optional.of(PackageInfo.INCOMPLETE);
         } else {

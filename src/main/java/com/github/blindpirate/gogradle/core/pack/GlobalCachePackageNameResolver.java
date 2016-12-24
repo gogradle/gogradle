@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -33,7 +33,7 @@ public class GlobalCachePackageNameResolver implements PackageNameResolver {
             }
             path = path.getParent();
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private PackageInfo buildPackageInfo(VcsType vcsType, String packageName, Path repoRootPath) {
@@ -55,7 +55,7 @@ public class GlobalCachePackageNameResolver implements PackageNameResolver {
                 return Optional.of(vcs);
             }
         }
-        return Optional.absent();
+        return Optional.empty();
     }
 
     private boolean isNotRoot(Path path) {

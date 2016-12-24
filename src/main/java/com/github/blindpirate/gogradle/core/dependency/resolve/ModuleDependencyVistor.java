@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface ModuleDependencyVistor {
 

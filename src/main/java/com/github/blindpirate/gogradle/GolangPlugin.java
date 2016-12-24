@@ -15,6 +15,7 @@ import com.google.inject.Injector;
 import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
+import org.gradle.api.Task;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
@@ -46,6 +47,12 @@ public class GolangPlugin implements Plugin<Project> {
 
     private final Injector injector;
     private final GolangPluginSetting settings;
+    private Action<? super Task> dependencyInjectionAction = new Action<Task>() {
+        @Override
+        public void execute(Task task) {
+            injector.injectMembers(task);
+        }
+    };
 
     // This is invoked by gradle, not our Guice.
     @Inject
@@ -82,12 +89,12 @@ public class GolangPlugin implements Plugin<Project> {
 
     private void configureTasks(Project project) {
         TaskContainer taskContainer = project.getTasks();
-        taskContainer.create(PREPARE_TASK_NAME, PrepareTask.class);
-        taskContainer.create(RESOLVE_TASK_NAME, ResolveTask.class);
-        taskContainer.create(DEPENDENCIES_TASK_NAME, DependenciesTask.class);
-        taskContainer.create(CLEAN_TASK_NAME, CleanTask.class);
-        taskContainer.create(INSTALL_TASK_NAME, InstallTask.class);
-        taskContainer.create(BUILD_TASK_NAME, BuildTask.class);
+        taskContainer.create(PREPARE_TASK_NAME, PrepareTask.class, dependencyInjectionAction);
+        taskContainer.create(RESOLVE_TASK_NAME, ResolveTask.class, dependencyInjectionAction);
+        taskContainer.create(DEPENDENCIES_TASK_NAME, DependenciesTask.class, dependencyInjectionAction);
+        taskContainer.create(CLEAN_TASK_NAME, CleanTask.class, dependencyInjectionAction);
+        taskContainer.create(INSTALL_TASK_NAME, InstallTask.class, dependencyInjectionAction);
+        taskContainer.create(BUILD_TASK_NAME, BuildTask.class, dependencyInjectionAction);
     }
 
     private void prepareForServices() {

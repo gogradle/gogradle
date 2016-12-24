@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.inject.BindingAnnotation;
 
 import javax.inject.Inject;

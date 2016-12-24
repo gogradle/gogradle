@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import java.nio.file.Path;
 import java.util.List;
@@ -23,7 +23,7 @@ public abstract class ExternalDependencyFactory implements DependencyFactory {
         if (anyFileExist(module)) {
             return doProduce(module);
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

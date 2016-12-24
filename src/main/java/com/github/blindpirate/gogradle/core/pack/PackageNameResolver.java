@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 
 import com.github.blindpirate.gogradle.general.Factory;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface PackageNameResolver extends Factory<String, PackageInfo> {
     String HTTP="http://";

@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 public interface LockedDependencyManager {
     Optional<GolangDependencySet> getLockedDependencies();

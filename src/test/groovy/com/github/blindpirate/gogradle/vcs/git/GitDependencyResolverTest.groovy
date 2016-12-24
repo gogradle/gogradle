@@ -24,7 +24,7 @@ import java.nio.file.Path
 import java.util.concurrent.Callable
 
 import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.*
-import static com.google.common.base.Optional.*
+import static java.util.Optional.*
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify

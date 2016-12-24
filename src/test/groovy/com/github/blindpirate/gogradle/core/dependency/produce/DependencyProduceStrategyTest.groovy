@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor
-import com.google.common.base.Optional
+import java.util.Optional
 import org.junit.Before
 import org.mockito.Mock
 

@@ -32,7 +32,7 @@ public class DefaultNotationParser implements NotationParser<Object> {
         } else if (notation instanceof Map) {
             return (Map<String, Object>) notation;
         } else {
-            throw new DependencyResolutionException("Unable to parse notation of class: " + notation.getClass());
+             throw DependencyResolutionException.cannotParseNotation(notation);
         }
     }
 }

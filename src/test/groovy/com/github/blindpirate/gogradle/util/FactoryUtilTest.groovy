@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.general.Factory
-import com.google.common.base.Optional
+import java.util.Optional
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -23,7 +23,7 @@ class FactoryUtilTest {
     @Test
     public void 'production with PickyFactory should success'() {
         // given:
-        when(factory1.produce(material)).thenReturn(Optional.absent())
+        when(factory1.produce(material)).thenReturn(Optional.empty())
         when(factory2.produce(material)).thenReturn(Optional.of(product))
 
         // when:
@@ -36,8 +36,8 @@ class FactoryUtilTest {
     @Test
     public void 'production when not accepted should fail'() {
         // given:
-        when(factory1.produce(material)).thenReturn(Optional.absent())
-        when(factory2.produce(material)).thenReturn(Optional.absent())
+        when(factory1.produce(material)).thenReturn(Optional.empty())
+        when(factory2.produce(material)).thenReturn(Optional.empty())
 
         // when:
         def result = FactoryUtil.produce([factory1, factory2], material)

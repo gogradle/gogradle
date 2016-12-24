@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode
-import com.google.common.base.Optional
+import java.util.Optional
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,7 +13,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.*
-import static com.google.common.base.Optional.*
+import static java.util.Optional.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

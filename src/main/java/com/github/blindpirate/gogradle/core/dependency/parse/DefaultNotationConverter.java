@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.pack.PackageInfo;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageResolutionException;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

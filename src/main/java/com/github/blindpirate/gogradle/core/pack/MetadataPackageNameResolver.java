@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -47,7 +47,7 @@ public class MetadataPackageNameResolver implements PackageNameResolver {
             Elements elements = document.select("meta[name=go-import]");
             if (elements.isEmpty()) {
                 LOGGER.info("Missing meta in response of {}", url);
-                return Optional.absent();
+                return Optional.empty();
             } else {
                 String content = elements.get(0).attr("content");
                 // TODO According to https://golang.org/cmd/go/#hdr-Remote_import_paths
@@ -58,7 +58,7 @@ public class MetadataPackageNameResolver implements PackageNameResolver {
             }
         } catch (IOException e) {
             LOGGER.warn("Exception in accessing {}", url, e);
-            return Optional.absent();
+            return Optional.empty();
         }
 
     }

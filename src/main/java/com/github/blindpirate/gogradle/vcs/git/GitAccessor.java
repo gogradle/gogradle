@@ -7,7 +7,9 @@ import com.github.blindpirate.gogradle.vcs.VcsAccessor;
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.UnexpectedCharacterException;
 import com.github.zafarkhaja.semver.Version;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
+
 import org.apache.commons.lang3.tuple.Pair;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
@@ -92,13 +94,13 @@ public class GitAccessor implements VcsAccessor {
             RevWalk walk = new RevWalk(repository);
             ObjectId id = repository.resolve(commit);
             if (id == null) {
-                return Optional.absent();
+                return Optional.empty();
             }
             RevCommit rev = walk.parseCommit(id);
 
             return Optional.of(rev);
         } catch (IOException e) {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 
@@ -106,7 +108,7 @@ public class GitAccessor implements VcsAccessor {
         Map<String, Ref> refMap = repository.getTags();
         Ref ref = refMap.get(tag);
         if (ref == null) {
-            return Optional.absent();
+            return Optional.empty();
         } else {
             return Optional.of(getCommitByRef(repository, ref));
         }
@@ -138,7 +140,7 @@ public class GitAccessor implements VcsAccessor {
         try {
             reset.call();
         } catch (GitAPIException e) {
-            throw new DependencyResolutionException("Can not reset to specific commit:" + commitId);
+            throw DependencyResolutionException.cannotResetToCommit(commitId, e);
         }
     }
 
@@ -164,7 +166,7 @@ public class GitAccessor implements VcsAccessor {
         }
 
         if (satisfiedVersion.isEmpty()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         Collections.sort(satisfiedVersion, new Comparator<Pair<RevCommit, Version>>() {

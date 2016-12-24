@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -38,7 +38,7 @@ public class VendorDependencyFactory implements DependencyFactory {
         if (vendorDirExist(module)) {
             return Optional.of(resolveVendor(module));
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

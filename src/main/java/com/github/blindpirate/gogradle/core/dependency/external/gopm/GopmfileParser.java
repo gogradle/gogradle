@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.external.gopm;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 
@@ -87,7 +87,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.splitToLines;
  * include = public|scripts|templates
  */
 // TODO
-// FileBasedConfig in JGit can't parse this since it sees the key 'github/x/y' as invalid key
+// FileBasedConfig in JGit can't parse this since it sees the key 'github/x/y' as invalid key (unfortunately, it is)
 // current parser is simple, we should use ANTLR to do the parsing.
 @Singleton
 public class GopmfileParser {
@@ -150,7 +150,7 @@ public class GopmfileParser {
 
     private Optional<Pair<String, String>> parseLine(String line) {
         if (isBlank(line)) {
-            return Optional.absent();
+            return Optional.empty();
         }
         String[] nameAndValue = splitAndTrim(line, "=");
         String name = nameAndValue[0];

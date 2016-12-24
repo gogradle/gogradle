@@ -1,13 +1,14 @@
 package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.google.common.base.Optional.absent
-import static com.google.common.base.Optional.of
+import static java.util.Optional.empty
+import static java.util.Optional.of
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -26,7 +27,7 @@ class DefaultPackageNameResolverTest {
     @Before
     void setUp() {
         resolver = new DefaultPackageNameResolver([resolver1, resolver2])
-        when(resolver1.produce(packageName)).thenReturn(absent())
+        when(resolver1.produce(packageName)).thenReturn(empty())
         when(resolver2.produce(packageName)).thenReturn(of(packageInfo))
     }
 
@@ -45,13 +46,13 @@ class DefaultPackageNameResolverTest {
         verify(resolver2, times(1)).produce(packageName)
     }
 
-    @Test
-    void 'absent result should be returned if unable to resolve'() {
+    @Test(expected = PackageResolutionException)
+    void 'exception should be thrown if unable to resolve'() {
         // given
-        when(resolver2.produce(packageName)).thenReturn(absent())
+        when(resolver2.produce(packageName)).thenReturn(empty())
 
         // then
-        assert !resolver.produce(packageName).isPresent()
+        resolver.produce(packageName)
     }
 
 }

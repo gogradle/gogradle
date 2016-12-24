@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

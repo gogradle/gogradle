@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.gradle.api.Project;
 import org.gradle.api.internal.DynamicObjectUtil;
 import org.gradle.api.invocation.Gradle;
@@ -44,11 +44,11 @@ public class DefaultLockedDependencyManager implements LockedDependencyManager {
         GetPropertyResult ext = getDynamicProperty(gradle, EXT);
         GetPropertyResult lock = getDynamicProperty(ext.getValue(), LOCK);
         if (!lock.isFound()) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         if (!(lock.getValue() instanceof List)) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         GolangDependencySet result = parseList((List<Map<String, Object>>) lock.getValue());

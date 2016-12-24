@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy
-import com.google.common.base.Optional
+import java.util.Optional
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,7 +47,7 @@ class DefaultDependencyFactoryTest {
     @Test
     void 'visiting external dependencies should success'() {
         // given:
-        when(external1.produce(module)).thenReturn(Optional.absent())
+        when(external1.produce(module)).thenReturn(Optional.empty())
         when(external2.produce(module)).thenReturn(Optional.of(dependencySet))
 
         // then:
@@ -65,7 +65,7 @@ class DefaultDependencyFactoryTest {
     @Test
     void 'visiting vendor dependencies should success'() {
         // given:
-        when(vendorDependencyFactory.produce(module)).thenReturn(Optional.absent())
+        when(vendorDependencyFactory.produce(module)).thenReturn(Optional.empty())
         // then:
         assert !factory.visitVendorDependencies(module).isPresent()
 

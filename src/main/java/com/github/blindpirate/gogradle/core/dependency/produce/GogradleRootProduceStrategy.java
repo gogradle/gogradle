@@ -8,7 +8,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.Depen
 import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.Cast;
 

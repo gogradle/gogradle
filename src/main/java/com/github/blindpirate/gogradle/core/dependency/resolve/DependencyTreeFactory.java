@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import org.gradle.api.artifacts.Dependency;
 
 import javax.inject.Inject;
@@ -27,7 +27,7 @@ public class DependencyTreeFactory {
 
     private Optional<DependencyTreeNode> getSubTreeRootNode(GolangPackageModule module) {
         if (!registry.register(module)) {
-            return Optional.absent();
+            return Optional.empty();
         }
 
         GolangDependencySet dependencies = factory.produce(module).get();

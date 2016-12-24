@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.inject.Injector;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 

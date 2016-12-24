@@ -95,7 +95,7 @@ class GlobalCachePackageNameResolverTest {
     }
 
     @Test
-    void 'resolving parent of package should return Optional.absent()'() {
+    void 'resolving parent of package should return Optional.empty()'() {
         assert !resolver.produce('github.com/a').isPresent()
     }
 

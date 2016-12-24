@@ -7,7 +7,8 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.google.common.base.Optional;
+
+import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -48,7 +49,7 @@ public class GodepDependencyFactory extends ExternalDependencyFactory {
         try {
             return JSON.parseObject(new FileInputStream(file), GodepsDotJsonModel.class);
         } catch (IOException e) {
-            throw new DependencyResolutionException(e);
+            throw DependencyResolutionException.cannotParseGodepsDotJson(module, e);
         }
     }
 

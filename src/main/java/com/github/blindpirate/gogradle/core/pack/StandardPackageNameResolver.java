@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
-import com.google.common.base.Optional;
+import java.util.Optional;
 import com.google.common.collect.Sets;
 
 import javax.inject.Singleton;
@@ -19,7 +19,7 @@ public class StandardPackageNameResolver implements PackageNameResolver {
         if (isStandardPackage(path)) {
             return Optional.of(PackageInfo.standardPackage(packageName));
         } else {
-            return Optional.absent();
+            return Optional.empty();
         }
     }
 

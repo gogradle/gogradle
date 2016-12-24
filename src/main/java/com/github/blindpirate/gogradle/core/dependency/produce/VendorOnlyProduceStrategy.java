@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
-import com.google.common.base.Optional;
+import java.util.Optional;
 
 import javax.inject.Singleton;
 
