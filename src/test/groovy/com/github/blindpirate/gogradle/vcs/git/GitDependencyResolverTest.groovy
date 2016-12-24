@@ -27,8 +27,7 @@ import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.DEFA
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -39,7 +38,7 @@ class GitDependencyResolverTest {
     @Mock
     CacheManager cacheManager
     @Mock
-    GitAccessor gitUtils
+    GitAccessor gitAccessor
     @Mock
     Repository repository
     @Mock
@@ -64,12 +63,12 @@ class GitDependencyResolverTest {
         when(injector.getInstance(DependencyFactory)).thenReturn(factory)
         when(factory.produce(any(GolangPackageModule))).thenReturn(of(dependencySet))
         when(cacheManager.getGlobalCachePath(anyString())).thenReturn(repositoryPath)
-        when(gitUtils.getRepository(repositoryPath)).thenReturn(repository)
-        when(gitUtils.hardResetAndUpdate(repository)).thenReturn(repository)
-        when(gitUtils.headCommitOfBranch(repository, DEFAULT_BRANCH))
+        when(gitAccessor.getRepository(repositoryPath)).thenReturn(repository)
+        when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
+        when(gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(of(revCommit))
 
-        when(gitUtils.getRemoteUrl(repository)).thenReturn("url")
+        when(gitAccessor.getRemoteUrl(repository)).thenReturn("url")
         when(dependency.getName()).thenReturn("name")
 
         InjectionHelper.INJECTOR_INSTANCE = injector
@@ -90,18 +89,29 @@ class GitDependencyResolverTest {
         // when:
         resolver.resolve(dependency)
         // then:
-        verify(gitUtils).cloneWithUrl('url', repositoryPath)
+        verify(gitAccessor).cloneWithUrl('url', repositoryPath)
     }
 
     @Test
     void 'multiple urls should be tried to clone the repo'() {
         // given:
         when(dependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(gitUtils.cloneWithUrl('url1', repositoryPath)).thenThrow(new IllegalStateException())
+        when(gitAccessor.cloneWithUrl('url1', repositoryPath)).thenThrow(new IllegalStateException())
         // when:
         resolver.resolve(dependency)
         // then:
-        verify(gitUtils).cloneWithUrl('url2', repositoryPath)
+        verify(gitAccessor).cloneWithUrl('url2', repositoryPath)
+    }
+
+    @Test
+    void 'subsequent url should be ignored if cloning succeed'() {
+        // given:
+        when(dependency.getUrls()).thenReturn(['url1', 'url2'])
+        // when:
+        resolver.resolve(dependency)
+        // then:
+        verify(gitAccessor, times(0)).cloneWithUrl('url2', repositoryPath)
+
     }
 
     @Test
@@ -109,12 +119,12 @@ class GitDependencyResolverTest {
         repositoryPath.resolve('placeholder').toFile().createNewFile()
 
         // given:
-        when(gitUtils.getRemoteUrls(repository)).thenReturn(['url'] as Set)
+        when(gitAccessor.getRemoteUrls(repository)).thenReturn(['url'] as Set)
         when(dependency.getUrl()).thenReturn('url')
         // when:
         resolver.resolve(dependency)
         // then:
-        verify(gitUtils).hardResetAndUpdate(repository)
+        verify(gitAccessor).hardResetAndUpdate(repository)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -122,7 +132,7 @@ class GitDependencyResolverTest {
         // given
         when(dependency.getUrls()).thenReturn(['url1', 'url2'])
         ['url1', 'url2'].each {
-            when(gitUtils.cloneWithUrl(it, repositoryPath)).thenThrow(new IllegalStateException())
+            when(gitAccessor.cloneWithUrl(it, repositoryPath)).thenThrow(new IllegalStateException())
         }
 
         // when
@@ -130,7 +140,23 @@ class GitDependencyResolverTest {
     }
 
     @Test
-    void 'resetting to a  commit should success'() {
-        // TODO
+    void 'resetting to a commit should success'() {
+        // given
+        revCommit = RevCommit.parse([48] * 64 as byte[])
+        when(dependency.getCommit()).thenReturn(revCommit.name)
+        when(gitAccessor.findCommit(repository, revCommit.name)).thenReturn(of(revCommit))
+        // when
+        resolver.resolve(dependency)
+        // then
+        verify(gitAccessor).resetToCommit(repository, revCommit.name)
     }
+
+    @Test(expected = DependencyResolutionException)
+    void 'trying to resolve an inexistent commit should result in an exception'() {
+        revCommit = RevCommit.parse([48] * 64 as byte[])
+        when(dependency.getCommit()).thenReturn(revCommit.name)
+        // when
+        resolver.resolve(dependency)
+    }
+
 }

@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.exceptions;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.dependency.GitDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.api.GradleException;
@@ -45,5 +46,10 @@ public final class DependencyResolutionException extends GradleException {
 
     public static DependencyResolutionException cannotParseGodepsDotJson(GolangPackageModule module, IOException e) {
         return new DependencyResolutionException("Cannot parse godeps.json of " + module.getName(), e);
+    }
+
+    public static DependencyResolutionException cannotFindGitCommit(GitDependency gitDependency) {
+        return new DependencyResolutionException("Cannot find commit " + gitDependency.getCommit() + " in repository of "
+                + gitDependency.getName() + ", did they force to delete this commit?");
     }
 }
