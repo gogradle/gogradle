@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.util.Assert;
+
 import java.util.Optional;
 
 import java.nio.file.Path;
@@ -33,13 +34,7 @@ public abstract class ExternalDependencyFactory implements DependencyFactory {
         List<String> identityFiles = identityFiles();
         Assert.isNotEmpty(identityFiles, "Identity files must not be empty!");
         Path rootDir = module.getRootDir();
-
-        for (String file : identityFiles) {
-            if (rootDir.resolve(file).toFile().exists()) {
-                return true;
-            }
-        }
-
-        return false;
+        return identityFiles.stream()
+                .anyMatch(file -> rootDir.resolve(file).toFile().exists());
     }
 }

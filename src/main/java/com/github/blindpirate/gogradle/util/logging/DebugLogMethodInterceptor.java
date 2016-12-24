@@ -7,6 +7,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.lang.reflect.Method;
+import java.util.Arrays;
 
 public class DebugLogMethodInterceptor implements MethodInterceptor {
     private static final Logger LOGGER = Logging.getLogger(DebugLogMethodInterceptor.class);
@@ -72,9 +73,7 @@ public class DebugLogMethodInterceptor implements MethodInterceptor {
 
     private String toString(Object[] arguments) {
         StringBuilder sb = new StringBuilder("[");
-        for (Object argument : arguments) {
-            sb.append(argument);
-        }
+        Arrays.stream(arguments).forEach(arg -> sb.append(arg));
         sb.append("]");
         return sb.toString();
     }

@@ -3,6 +3,8 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
+
+import java.util.Arrays;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -50,12 +52,9 @@ public class GlobalCachePackageNameResolver implements PackageNameResolver {
 
     private Optional<VcsType> findVcsRepo(Path path) {
         Path realPath = cacheManager.getGlobalCachePath(path.toString());
-        for (VcsType vcs : VcsType.values()) {
-            if (exists(realPath.resolve(vcs.getRepo()))) {
-                return Optional.of(vcs);
-            }
-        }
-        return Optional.empty();
+        return Arrays.stream(VcsType.values())
+                .filter(vcs -> exists(realPath.resolve(vcs.getRepo())))
+                .findFirst();
     }
 
     private boolean isNotRoot(Path path) {

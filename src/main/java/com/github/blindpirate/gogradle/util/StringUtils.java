@@ -16,13 +16,6 @@ public class StringUtils {
     }
 
 
-    /**
-     * Split and trim. Will remove empty strings
-     *
-     * @param str
-     * @param seperator
-     * @return
-     */
     public static String[] splitAndTrim(String str, String seperator) {
         String[] array = org.apache.commons.lang3.StringUtils.split(str, seperator);
         List<String> result = new ArrayList<>();
@@ -43,12 +36,7 @@ public class StringUtils {
     }
 
     public static boolean allBlank(String... strs) {
-        for (String s : strs) {
-            if (isNotBlank(s)) {
-                return false;
-            }
-        }
-        return true;
+        return Arrays.stream(strs).allMatch(StringUtils::isBlank);
     }
 
 

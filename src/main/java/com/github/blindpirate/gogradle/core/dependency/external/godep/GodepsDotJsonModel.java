@@ -5,6 +5,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 // Godeps/Godeps.json
 @SuppressWarnings({"checkstyle:membername", "checkstyle:parametername"})
@@ -15,11 +16,7 @@ public class GodepsDotJsonModel {
     private List<DepsBean> Deps;
 
     public List<Map<String, Object>> toNotations() {
-        List<Map<String, Object>> ret = new ArrayList<>();
-        for (DepsBean dep : Deps) {
-            ret.add(dep.toNotation());
-        }
-        return ret;
+        return Deps.stream().map(DepsBean::toNotation).collect(Collectors.toList());
     }
 
     public String getImportPath() {

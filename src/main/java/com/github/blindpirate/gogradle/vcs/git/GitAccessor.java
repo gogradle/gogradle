@@ -35,6 +35,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Singleton
 public class GitAccessor implements VcsAccessor {
@@ -61,11 +62,9 @@ public class GitAccessor implements VcsAccessor {
     public Set<String> getRemoteUrls(Repository repository) {
         Config config = repository.getConfig();
         Set<String> remotes = config.getSubsections("remote");
-        Set<String> ret = new HashSet<>();
-        for (String remoteName : remotes) {
-            ret.add(config.getString("remote", remoteName, "url"));
-        }
-        return ret;
+        return remotes.stream()
+                .map(remoteName -> config.getString("remote", remoteName, "url"))
+                .collect(Collectors.toSet());
     }
 
     public void cloneWithUrl(String gitUrl, Path location) {
@@ -195,6 +194,6 @@ public class GitAccessor implements VcsAccessor {
     public String getRemoteUrl(Repository repository) {
         Set<String> urls = getRemoteUrls(repository);
         Assert.isTrue(!urls.isEmpty(), "Cannot get remote urls of repository:" + repository.getDirectory());
-        return CollectionUtils.findFirst(urls);
+        return urls.stream().findFirst().get();
     }
 }

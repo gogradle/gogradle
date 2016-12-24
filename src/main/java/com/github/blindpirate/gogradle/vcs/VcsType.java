@@ -1,7 +1,10 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
+
+import java.util.Arrays;
 import java.util.Optional;
+
 import com.google.inject.Injector;
 import com.google.inject.Key;
 
@@ -32,12 +35,9 @@ public enum VcsType {
     }
 
     public static Optional<VcsType> of(String name) {
-        for (VcsType type : values()) {
-            if (type.toString().equals(name) || type.suffix.equals(name)) {
-                return Optional.of(type);
-            }
-        }
-        return Optional.empty();
+        return Arrays.stream(values())
+                .filter(type -> type.toString().equals(name) || type.suffix.equals(name))
+                .findFirst();
     }
 
     public <T> T getService(Class<T> serviceClass) {

@@ -1,8 +1,11 @@
 package com.github.blindpirate.gogradle.core.dependency.external.gopm;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
+
 import java.util.Optional;
+
 import org.apache.commons.lang3.tuple.Pair;
+import org.gradle.internal.impldep.org.apache.commons.cli.Option;
 import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 
 import javax.inject.Singleton;
@@ -11,6 +14,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.BRANCH_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.COMMIT_KEY;
@@ -138,14 +142,12 @@ public class GopmfileParser {
     }
 
     private List<Map<String, Object>> parseLines(List<String> deps) {
-        List<Map<String, Object>> ret = new ArrayList<>();
-        for (String line : deps) {
-            Optional<Pair<String, String>> nameAndValue = parseLine(line);
-            if (nameAndValue.isPresent()) {
-                ret.add(toNotation(nameAndValue.get().getLeft(), nameAndValue.get().getRight()));
-            }
-        }
-        return ret;
+        return deps.stream()
+                .map(this::parseLine)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .map(this::toNotation)
+                .collect(Collectors.toList());
     }
 
     private Optional<Pair<String, String>> parseLine(String line) {
@@ -159,7 +161,10 @@ public class GopmfileParser {
 
     }
 
-    private Map<String, Object> toNotation(String name, String value) {
+    private Map<String, Object> toNotation(Pair<String, String> nameAndValue) {
+        String name = nameAndValue.getLeft();
+        String value = nameAndValue.getRight();
+
         Map<String, Object> ret = new HashedMap();
         ret.put(NAME_KEY, name);
         if (value.startsWith(BRANCH_KEYWORD)) {
