@@ -66,7 +66,6 @@ class GitAccessorTest {
 
     @Test
     @AccessWeb
-    @Ignore
     public void 'clone with https should success'() {
         File tmpDir = new File("build/tmp/nonexistent-${UUID.randomUUID()}")
 
@@ -109,7 +108,6 @@ class GitAccessorTest {
 
     @Test
     @AccessWeb
-    @Ignore
     @WithResource('out-of-date-git-repo.zip')
     public void 'git reset --hard HEAD && git pull should success'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()
