@@ -9,7 +9,6 @@ import com.github.blindpirate.gogradle.core.task.DependenciesTask;
 import com.github.blindpirate.gogradle.core.task.InstallTask;
 import com.github.blindpirate.gogradle.core.task.PrepareTask;
 import com.github.blindpirate.gogradle.core.task.ResolveTask;
-import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -68,8 +67,6 @@ public class GolangPlugin implements Plugin<Project> {
 
     @Override
     public void apply(Project project) {
-        //language=RegExp
-        prepareForServices();
         customizeProjectInternalServices(project);
         configureSettings(project);
         configureConfigurations(project);
@@ -79,12 +76,7 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void addHookToProject(Project project) {
-        project.afterEvaluate(new Action<Project>() {
-            @Override
-            public void execute(Project project) {
-                settings.verify();
-            }
-        });
+        project.afterEvaluate(p -> settings.verify());
     }
 
     private void configureTasks(Project project) {
@@ -95,10 +87,6 @@ public class GolangPlugin implements Plugin<Project> {
         taskContainer.create(CLEAN_TASK_NAME, CleanTask.class, dependencyInjectionAction);
         taskContainer.create(INSTALL_TASK_NAME, InstallTask.class, dependencyInjectionAction);
         taskContainer.create(BUILD_TASK_NAME, BuildTask.class, dependencyInjectionAction);
-    }
-
-    private void prepareForServices() {
-        VcsType.setInjector(injector);
     }
 
     /**
