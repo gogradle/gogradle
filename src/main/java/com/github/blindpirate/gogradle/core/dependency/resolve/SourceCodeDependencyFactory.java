@@ -119,7 +119,7 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
                 throws IOException {
             super.visitFile(file, attrs);
 
-            if (file.getFileName().toString().endsWith(".go")) {
+            if (String.valueOf(file.getFileName()).endsWith(".go")) {
                 String fileContent = IOUtils.toString(file.toFile());
                 importPaths.addAll(goImportExtractor.extract(fileContent));
             }
@@ -129,7 +129,7 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
 
 
         private boolean isVendorDirectory(Path dir) {
-            return VENDOR_DIRECTORY.equals(dir.getFileName().toString());
+            return VENDOR_DIRECTORY.equals(String.valueOf(dir.getFileName()));
         }
 
     }

@@ -4,14 +4,13 @@ import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-import java.util.Arrays;
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 import static java.nio.file.Files.exists;
 
@@ -58,6 +57,6 @@ public class GlobalCachePackageNameResolver implements PackageNameResolver {
     }
 
     private boolean isNotRoot(Path path) {
-        return path.getParent() != null;
+        return path != null && path.getParent() != null;
     }
 }
