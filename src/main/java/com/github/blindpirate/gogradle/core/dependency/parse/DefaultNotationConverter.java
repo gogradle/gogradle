@@ -3,7 +3,10 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageResolutionException;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
+
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -20,6 +23,7 @@ public class DefaultNotationConverter implements NotationConverter {
     }
 
     @Override
+    @DebugLog
     public Map<String, Object> convert(String notation) {
         VcsType vcs = extractVcs(notation);
         return vcs.getNotationConverter().convert(notation);
@@ -31,6 +35,7 @@ public class DefaultNotationConverter implements NotationConverter {
         if (!info.isPresent()) {
             throw PackageResolutionException.cannotResolveName(packageName);
         }
+        Assert.isTrue(!info.get().isStandard(), "Cannot convert a standard package!");
         return info.get().getVcsType();
     }
 
