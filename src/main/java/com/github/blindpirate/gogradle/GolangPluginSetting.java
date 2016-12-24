@@ -5,8 +5,6 @@ import com.github.blindpirate.gogradle.util.Assert;
 
 import javax.inject.Singleton;
 
-import java.nio.charset.Charset;
-
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.valueOf;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;

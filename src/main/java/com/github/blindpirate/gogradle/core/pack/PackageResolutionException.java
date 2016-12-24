@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-public class PackageResolutionException extends RuntimeException {
+public final class PackageResolutionException extends RuntimeException {
     private PackageResolutionException(String message) {
         super(message);
     }
