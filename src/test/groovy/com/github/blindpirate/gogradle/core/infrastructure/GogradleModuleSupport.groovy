@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.infrastructure
 
 import com.github.blindpirate.gogradle.GogradleModule
-import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
+import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.google.inject.Guice
 import com.google.inject.Injector
 import org.gradle.internal.reflect.Instantiator
@@ -17,6 +17,6 @@ abstract class GogradleModuleSupport {
     @Before
     void initInjector() {
         injector = Guice.createInjector(new GogradleModule(instantiator))
-        DependencyHelper.INJECTOR_INSTANCE = injector
+        InjectionHelper.INJECTOR_INSTANCE = injector
     }
 }

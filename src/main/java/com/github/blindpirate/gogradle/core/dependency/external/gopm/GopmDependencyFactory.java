@@ -1,11 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.external.gopm;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -13,6 +12,7 @@ import java.io.File;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Singleton
 public class GopmDependencyFactory extends ExternalDependencyFactory {
@@ -34,6 +34,6 @@ public class GopmDependencyFactory extends ExternalDependencyFactory {
     public Optional<GolangDependencySet> doProduce(GolangPackageModule module) {
         File dotGopmfile = module.getRootDir().resolve(GOPMFILE).toFile();
         List<Map<String, Object>> notations = gopmfileParser.parse(dotGopmfile);
-        return Optional.of(DependencyHelper.parseMany(notations, mapNoationParser));
+        return Optional.of(InjectionHelper.parseMany(notations, mapNoationParser));
     }
 }

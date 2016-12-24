@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.FileSystemModule;
-import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorOnlyProduceStrategy;
@@ -68,7 +68,7 @@ public class VendorDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     private GolangDependency createDependency(String packageName) {
         FileSystemModule module = parentModule.vendor(packageName);
-        module.setStrategy(DependencyHelper.strategy(VendorOnlyProduceStrategy.class));
+        module.setStrategy(InjectionHelper.strategy(VendorOnlyProduceStrategy.class));
         module.getDependencies();
         return module;
     }

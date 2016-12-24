@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.pack.AbstractPackageModule;
@@ -36,7 +35,7 @@ public abstract class FileSystemModule extends AbstractPackageModule implements 
 
     public GolangDependencySet getDependencies() {
         if (dependencies == null) {
-            dependencies = DependencyHelper.produceDependencies(this).get();
+            dependencies = InjectionHelper.produceDependencies(this).get();
         }
         return dependencies;
     }

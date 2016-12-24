@@ -3,8 +3,8 @@ package com.github.blindpirate.gogradle.vcs.git
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.GolangPackageModule
+import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.github.blindpirate.gogradle.core.cache.CacheManager
-import com.github.blindpirate.gogradle.core.dependency.DependencyHelper
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
@@ -23,8 +23,8 @@ import org.mockito.stubbing.Answer
 import java.nio.file.Path
 import java.util.concurrent.Callable
 
-import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.*
-import static java.util.Optional.*
+import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.DEFAULT_BRANCH
+import static java.util.Optional.of
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
@@ -72,7 +72,7 @@ class GitDependencyResolverTest {
         when(gitUtils.getRemoteUrl(repository)).thenReturn("url")
         when(dependency.getName()).thenReturn("name")
 
-        DependencyHelper.INJECTOR_INSTANCE = injector
+        InjectionHelper.INJECTOR_INSTANCE = injector
 
         when(cacheManager.runWithGlobalCacheLock(any(GitDependency), any(Callable)))
                 .thenAnswer(new Answer<Object>() {

@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.vcs;
 
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
-import com.google.inject.Injector;
 import com.google.inject.Key;
 
 import java.lang.annotation.Annotation;
@@ -16,13 +16,8 @@ public enum VcsType {
 
     private String suffix;
 
-    private static Injector injector;
     private String repo;
     private Class<? extends Annotation> annoClass;
-
-    public static void setInjector(Injector injector) {
-        VcsType.injector = injector;
-    }
 
     VcsType(String suffix, String repo, Class annoClass) {
         this.suffix = suffix;
@@ -37,7 +32,7 @@ public enum VcsType {
     }
 
     public <T> T getService(Class<T> serviceClass) {
-        return injector.getInstance(Key.get(serviceClass, annoClass));
+        return InjectionHelper.INJECTOR_INSTANCE.getInstance(Key.get(serviceClass, annoClass));
     }
 
     public String getRepo() {

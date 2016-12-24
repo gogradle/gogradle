@@ -2,13 +2,11 @@ package com.github.blindpirate.gogradle.core.dependency.external.godep;
 
 import com.alibaba.fastjson.JSON;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.DependencyHelper;
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-
-import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -17,6 +15,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * In newest version of godep, it will read dependency versions from GOPATH
@@ -41,7 +40,7 @@ public class GodepDependencyFactory extends ExternalDependencyFactory {
     @Override
     public Optional<GolangDependencySet> doProduce(GolangPackageModule module) {
         GodepsDotJsonModel model = parse(module);
-        return Optional.of(DependencyHelper.parseMany(model.toNotations(), mapNotationParser));
+        return Optional.of(InjectionHelper.parseMany(model.toNotations(), mapNotationParser));
     }
 
     private GodepsDotJsonModel parse(GolangPackageModule module) {

@@ -7,7 +7,7 @@ import org.omg.CORBA.Object;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.core.dependency.DependencyHelper.INJECTOR_INSTANCE;
+import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 
 public abstract class AbstractNotationDependency extends AbstractGolangDependency {
 
