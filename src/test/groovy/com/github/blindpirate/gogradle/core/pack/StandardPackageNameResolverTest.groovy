@@ -30,6 +30,14 @@ class StandardPackageNameResolverTest {
     }
 
     @Test
+    void 'resolving pseudo package "C" should succss'() {
+        PackageInfo info = resolver.produce('C').get()
+        assert info.isStandard()
+        assert info.name == 'C'
+        assert info.rootName == 'C'
+    }
+
+    @Test
     void 'absent value should be returned when resolving non-standard package'() {
         assert !resolver.produce('github.com/a/b').isPresent()
     }

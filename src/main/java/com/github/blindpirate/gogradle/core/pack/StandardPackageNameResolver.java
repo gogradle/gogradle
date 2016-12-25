@@ -1,12 +1,12 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
-import java.util.Optional;
 import com.google.common.collect.Sets;
 
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Optional;
 import java.util.Set;
 
 @Singleton
@@ -30,7 +30,9 @@ public class StandardPackageNameResolver implements PackageNameResolver {
 
     // https://golang.org/pkg/
     private final Set<String> standardFirstLevelPackages =
-            Sets.newHashSet("archive",
+            Sets.newHashSet(
+                    "C", // a pseudo-package, see https://golang.org/cmd/cgo/
+                    "archive",
                     "bufio",
                     "builtin",
                     "bytes",
