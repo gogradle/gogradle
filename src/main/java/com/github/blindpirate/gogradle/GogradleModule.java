@@ -27,6 +27,8 @@ import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
 import com.github.blindpirate.gogradle.vcs.Git;
+import com.github.blindpirate.gogradle.vcs.VcsAccessor;
+import com.github.blindpirate.gogradle.vcs.git.GitAccessor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.matcher.Matchers;
@@ -62,6 +64,7 @@ public class GogradleModule extends AbstractModule {
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
+        bind(VcsAccessor.class).annotatedWith(Git.class).to(GitAccessor.class);
 
         bindInterceptor(Matchers.any(), Matchers.annotatedWith(DebugLog.class), new DebugLogMethodInterceptor());
 
