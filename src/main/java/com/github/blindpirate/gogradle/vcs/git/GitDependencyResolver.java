@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.core.dependency.GitDependency.NEWEST_COMMIT;
 import static com.github.blindpirate.gogradle.core.dependency.GitDependency.URLS_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
@@ -74,7 +75,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
             }
         }
 
-        if (gitDependency.getCommit() != null) {
+        if (isConcreteCommit(gitDependency.getCommit())) {
             Optional<RevCommit> commit = gitAccessor.findCommit(repository, gitDependency.getCommit());
             if (commit.isPresent()) {
                 return commit.get();
@@ -86,6 +87,10 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
         // use HEAD of master branch
         // TODO the default branch may not be master
         return gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH).get();
+    }
+
+    private boolean isConcreteCommit(String commit) {
+        return commit != null && !NEWEST_COMMIT.equals(commit);
     }
 
     @Override

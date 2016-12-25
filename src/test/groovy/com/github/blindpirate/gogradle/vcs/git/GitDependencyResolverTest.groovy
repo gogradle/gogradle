@@ -153,8 +153,18 @@ class GitDependencyResolverTest {
 
     @Test(expected = DependencyResolutionException)
     void 'trying to resolve an inexistent commit should result in an exception'() {
+        // given
         revCommit = RevCommit.parse([48] * 64 as byte[])
         when(dependency.getCommit()).thenReturn(revCommit.name)
+        // when
+        resolver.resolve(dependency)
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'exception in locked block should not be swallowed'() {
+        // given
+        when(cacheManager.runWithGlobalCacheLock(any(GitDependency), any(Callable)))
+                .thenThrow(new IOException())
         // when
         resolver.resolve(dependency)
     }
