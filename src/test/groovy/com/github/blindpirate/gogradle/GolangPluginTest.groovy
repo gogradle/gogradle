@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.github.blindpirate.gogradle.core.dependency.GitDependency
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import org.gradle.api.Project
@@ -14,22 +15,27 @@ class GolangPluginTest {
     Project project
 
     @Before
-    public void applyPlugin() {
+    void applyPlugin() {
         project.pluginManager.apply(GolangPlugin)
     }
 
     @Test
-    public void 'smoke test should success'() {
+    void 'smoke test should success'() {
     }
 
     @Test
-    public void 'build and test should be added to configurations'() {
+    void 'InjectionHelper.INJECTOR_INSTANCE should be assigned'() {
+        assert InjectionHelper.INJECTOR_INSTANCE != null
+    }
+
+    @Test
+    void 'build and test should be added to configurations'() {
         assert project.configurations.build
         assert project.configurations.test
     }
 
     @Test
-    public void 'adding a dependency to configuration should success'() {
+    void 'adding a dependency to configuration should success'() {
         project.dependencies {
             build 'github.com/a/b'
         }
@@ -41,7 +47,7 @@ class GolangPluginTest {
     }
 
     @Test
-    public void 'adding a dependency in form of map should success'() {
+    void 'adding a dependency in form of map should success'() {
         project.dependencies {
             build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: '1.0.0', vcs: 'git'
         }
@@ -63,7 +69,7 @@ class GolangPluginTest {
     }
 
     @Test
-    public void 'adding some dependencies should success'() {
+    void 'adding some dependencies should success'() {
         project.dependencies {
             build 'github.com/a/b@1.0.0',
                     'github.com/c/d#2.0.0'
@@ -91,7 +97,7 @@ class GolangPluginTest {
     }
 
     @Test
-    public void 'adding a directory dependency should success'() {
+    void 'adding a directory dependency should success'() {
         project.dependencies {
             build name: 'github.com/a/b', dir: '${GOPATH}/a/b'
         }
@@ -102,7 +108,7 @@ class GolangPluginTest {
     }
 
     @Test
-    public void 'adding and configuring a directory dependency should success'() {
+    void 'adding and configuring a directory dependency should success'() {
         project.dependencies {
             build(name: 'github.com/a/b', dir: '${GOPATH}/a/b') {
                 transitive = false
@@ -116,7 +122,7 @@ class GolangPluginTest {
     }
 
     @Test
-    public void 'configuring a dependency should success'() {
+    void 'configuring a dependency should success'() {
         project.dependencies {
             build('github.com/a/b@1.0.0-RELEASE') {
                 transitive = true
@@ -145,7 +151,7 @@ class GolangPluginTest {
     }
 
     @Test
-    public void 'configuring via params should success'() {
+    void 'configuring via params should success'() {
         project.dependencies {
             build name: 'github.com/a/b', transitive: false
         }
