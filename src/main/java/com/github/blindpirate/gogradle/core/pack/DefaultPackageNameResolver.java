@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.inject.BindingAnnotation;
@@ -48,7 +49,7 @@ public class DefaultPackageNameResolver implements PackageNameResolver {
     private void updateCache(String packageName, PackageInfo packageInfo) {
         cache.put(packageName, packageInfo);
         if (packageInfo != PackageInfo.INCOMPLETE) {
-            cache.put(packageInfo.getRootName(), copyWithSameRoot(packageInfo, packageInfo.getRootName()));
+            cache.put(packageInfo.getRootName(), packageInfo.cloneWithSameRoot(packageInfo.getRootName()));
         }
     }
 
@@ -63,20 +64,11 @@ public class DefaultPackageNameResolver implements PackageNameResolver {
             Path current = path.subpath(0, i);
             PackageInfo existingPackage = cache.get(current.toString());
             if (isValid(existingPackage)) {
-                PackageInfo result = copyWithSameRoot(existingPackage, packageName);
+                PackageInfo result = existingPackage.cloneWithSameRoot(packageName);
                 return Optional.of(result);
             }
         }
         return Optional.empty();
-    }
-
-    private PackageInfo copyWithSameRoot(PackageInfo anotherPackage, String packageName) {
-        return PackageInfo.builder()
-                .withName(packageName)
-                .withRootName(anotherPackage.getRootName())
-                .withVcsType(anotherPackage.getVcsType())
-                .withUrls(anotherPackage.getUrls())
-                .build();
     }
 
     private boolean isValid(PackageInfo existingPackage) {

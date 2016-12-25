@@ -18,7 +18,7 @@ class StandardPackageNameResolverTest {
         PackageInfo info = resolver.produce('archive/zip').get()
         assert info.isStandard()
         assert info.name == 'archive/zip'
-        assert info.rootName == 'archive/zip'
+        assert info.rootName == 'archive'
     }
 
     @Test
@@ -26,7 +26,7 @@ class StandardPackageNameResolverTest {
         PackageInfo info = resolver.produce('net/http/cgi').get()
         assert info.isStandard()
         assert info.name == 'net/http/cgi'
-        assert info.rootName == 'net/http/cgi'
+        assert info.rootName == 'net'
     }
 
     @Test

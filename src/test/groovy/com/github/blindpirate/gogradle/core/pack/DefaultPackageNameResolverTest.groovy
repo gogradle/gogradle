@@ -22,8 +22,11 @@ class DefaultPackageNameResolverTest {
     @Mock
     PackageNameResolver resolver2
 
-    @Mock
-    PackageInfo packageInfo
+    PackageInfo packageInfo = PackageInfo.builder().withName('root/package')
+            .withRootName('root')
+            .withVcsType(VcsType.Git)
+            .withUrls(['url'])
+            .build()
 
     DefaultPackageNameResolver resolver
 
@@ -34,8 +37,6 @@ class DefaultPackageNameResolverTest {
         resolver = new DefaultPackageNameResolver([resolver1, resolver2])
         when(resolver1.produce(packageName)).thenReturn(empty())
         when(resolver2.produce(packageName)).thenReturn(of(packageInfo))
-        when(packageInfo.getName()).thenReturn('package')
-        when(packageInfo.getRootName()).thenReturn('root')
     }
 
 
@@ -54,7 +55,7 @@ class DefaultPackageNameResolverTest {
     }
 
     @Test
-    void 'root package should be put into cache after successful resolution'() {
+    void 'package and its root package should be put into cache after successful resolution'() {
         // given
         PackageInfo info = PackageInfo.builder()
                 .withName('github.com/a/b/c')
@@ -70,7 +71,7 @@ class DefaultPackageNameResolverTest {
     }
 
     @Test
-    void 'root package should not be put into cache after resolution to incoplete package'() {
+    void 'root of an incomplete package should not be put into cache after resolution'() {
         // given
         when(resolver1.produce('gihub.com/a')).thenReturn(of(PackageInfo.INCOMPLETE))
         // when
@@ -113,7 +114,6 @@ class DefaultPackageNameResolverTest {
         assert result3.name == 'github.com/a/b/c/d'
         assert allFieldsEquals(result2, rootInfo, ['vcsType', 'urls', 'rootName'])
         assert allFieldsEquals(result3, rootInfo, ['vcsType', 'urls', 'rootName'])
-
     }
 
 }

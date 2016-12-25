@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 
@@ -42,11 +44,22 @@ public class PackageInfo {
     }
 
     public static PackageInfo standardPackage(String packageName) {
-        PackageInfo info = new PackageInfo();
-        info.standard = true;
-        info.name = packageName;
-        info.rootName = packageName;
-        return info;
+        Path path = Paths.get(packageName);
+        return builder()
+                .withName(packageName)
+                .withRootName(path.getName(0).toString())
+                .withStandard(true)
+                .build();
+    }
+
+    public PackageInfo cloneWithSameRoot(String anotherPackage) {
+        return builder().
+                withName(anotherPackage)
+                .withRootName(rootName)
+                .withVcsType(vcsType)
+                .withUrls(urls)
+                .withStandard(standard)
+                .build();
     }
 
     @Override
@@ -65,6 +78,7 @@ public class PackageInfo {
         private VcsType vcsType;
         private List<String> urls;
         private String rootName;
+        private boolean standard;
 
         public PackageInfoBuilder withName(String name) {
             this.name = name;
@@ -91,12 +105,18 @@ public class PackageInfo {
             return this;
         }
 
+        public PackageInfoBuilder withStandard(boolean standard) {
+            this.standard = standard;
+            return this;
+        }
+
         public PackageInfo build() {
             PackageInfo packageInfo = new PackageInfo();
             packageInfo.urls = this.urls;
             packageInfo.rootName = this.rootName;
             packageInfo.name = this.name;
             packageInfo.vcsType = this.vcsType;
+            packageInfo.standard = this.standard;
             return packageInfo;
         }
     }
