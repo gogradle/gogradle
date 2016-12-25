@@ -104,7 +104,7 @@ func main(){}
     }
 
     @Test
-    void 'all directory should be searched'() {
+    void 'directory should be searched recursively'() {
         // given
         File sub = resource.toPath().resolve('sub').toFile()
         File subsub = sub.toPath().resolve('sub').toFile()
@@ -117,6 +117,47 @@ func main(){}
         // then
         assert result.size() == 1
         assert result.any { it.is(dependency) }
+    }
+
+    @Test
+    void 'files starting with `_` and `dot` should be ignored'() {
+        // given
+        IOUtils.write(resource, '_.go', mainDotGo)
+        IOUtils.write(resource, '.should_be_ignored.go', mainDotGo)
+        // when
+        GolangDependencySet result = factory.produce(module).get()
+        // then
+        assert result.isEmpty()
+    }
+
+    @Test
+    void 'files ending with `_test` should be ignored'() {
+        // given
+        IOUtils.write(resource, 'a_test.go', mainDotGo)
+        IOUtils.write(resource, '_test.go', mainDotGo)
+        // when
+        GolangDependencySet result = factory.produce(module).get()
+        // then
+        assert result.isEmpty()
+    }
+
+    @Test
+    void 'files in vendor directory should be ignored'() {
+        // given
+        File vendorDir = resource.toPath().resolve('vendor').toFile()
+        IOUtils.forceMkdir(vendorDir)
+        IOUtils.write(vendorDir, "main.go", mainDotGo)
+        // then
+        assert factory.produce(module).get().isEmpty()
+    }
+    @Test
+    void 'files in testdata directory should be ignored'() {
+        // given
+        File vendorDir = resource.toPath().resolve('testdata').toFile()
+        IOUtils.forceMkdir(vendorDir)
+        IOUtils.write(vendorDir, "main.go", mainDotGo)
+        // then
+        assert factory.produce(module).get().isEmpty()
     }
 
     String mainDotGo = '''

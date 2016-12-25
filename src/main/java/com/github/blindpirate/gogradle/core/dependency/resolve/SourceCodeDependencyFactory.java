@@ -34,6 +34,9 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
  */
 @Singleton
 public class SourceCodeDependencyFactory implements DependencyFactory {
+
+    private static final String TESTDATA_DIRECTORY = "testdata";
+
     private final GoImportExtractor goImportExtractor = new GoImportExtractor();
     private final PackageNameResolver packageNameResolver;
     private final NotationParser notationParser;
@@ -107,11 +110,19 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                 throws IOException {
             super.preVisitDirectory(dir, attrs);
-            if (isVendorDirectory(dir)) {
+            if (isVendorDirectory(dir) || isTestdataDirectory(dir)) {
                 return FileVisitResult.SKIP_SUBTREE;
             } else {
                 return FileVisitResult.CONTINUE;
             }
+        }
+
+        private boolean isTestdataDirectory(Path dir) {
+            return directoryNameEquals(dir, TESTDATA_DIRECTORY);
+        }
+
+        private boolean directoryNameEquals(Path dir, String name) {
+            return name.equals(String.valueOf(dir.getFileName()));
         }
 
         @Override
@@ -119,7 +130,7 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
                 throws IOException {
             super.visitFile(file, attrs);
 
-            if (String.valueOf(file.getFileName()).endsWith(".go")) {
+            if (fileShouldBeIncluded(file)) {
                 String fileContent = IOUtils.toString(file.toFile());
                 importPaths.addAll(goImportExtractor.extract(fileContent));
             }
@@ -127,9 +138,23 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
             return FileVisitResult.CONTINUE;
         }
 
+        private boolean fileShouldBeIncluded(Path file) {
+            String fileName = String.valueOf(file.getFileName());
+            if (!fileName.endsWith(".go")) {
+                return false;
+            }
+            if (fileName.startsWith(".") || fileName.startsWith("_")) {
+                return false;
+            }
+            if (fileName.endsWith("_test.go")) {
+                return false;
+            }
+            return true;
+        }
+
 
         private boolean isVendorDirectory(Path dir) {
-            return VENDOR_DIRECTORY.equals(String.valueOf(dir.getFileName()));
+            return directoryNameEquals(dir, VENDOR_DIRECTORY);
         }
 
     }
