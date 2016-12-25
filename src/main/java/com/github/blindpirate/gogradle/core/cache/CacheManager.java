@@ -28,6 +28,6 @@ public interface CacheManager {
      * @param <T>
      * @return
      */
-    <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable);
+    <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable) throws Exception;
 
 }

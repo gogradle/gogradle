@@ -52,4 +52,8 @@ public final class DependencyResolutionException extends GradleException {
         return new DependencyResolutionException("Cannot find commit " + gitDependency.getCommit() + " in repository of "
                 + gitDependency.getName() + ", did they force to delete this commit?");
     }
+
+    public static DependencyResolutionException cannotResolveToPackage(GolangDependency dependency, Exception e) {
+        return new DependencyResolutionException("Cannot resolve " + dependency.getName() + " to go code.", e);
+    }
 }

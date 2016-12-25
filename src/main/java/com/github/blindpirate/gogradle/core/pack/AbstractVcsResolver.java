@@ -3,13 +3,12 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
-
-import java.util.Optional;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
-import java.util.concurrent.Callable;
+import java.util.Optional;
 
 public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements DependencyResolver {
 
@@ -18,12 +17,15 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
 
     @Override
     public GolangPackageModule resolve(final GolangDependency dependency) {
-        GolangPackageModule module = cacheManager.runWithGlobalCacheLock(dependency, () -> {
-            Path path = cacheManager.getGlobalCachePath(dependency.getName());
-            return doResolve(dependency, path);
-        });
-
-        return module;
+        try {
+            GolangPackageModule module = cacheManager.runWithGlobalCacheLock(dependency, () -> {
+                Path path = cacheManager.getGlobalCachePath(dependency.getName());
+                return doResolve(dependency, path);
+            });
+            return module;
+        } catch (Exception e) {
+            throw DependencyResolutionException.cannotResolveToPackage(dependency,e);
+        }
     }
 
     private GolangPackageModule doResolve(GolangDependency dependency, Path path) {

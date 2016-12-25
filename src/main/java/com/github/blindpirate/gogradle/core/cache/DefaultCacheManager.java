@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.cache;
 
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.wrapper.GradleUserHomeLookup;
@@ -9,11 +10,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
+import static com.github.blindpirate.gogradle.GolangPluginSetting.*;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureExsitAndWritable;
 
 @Singleton
@@ -40,7 +44,8 @@ public class DefaultCacheManager implements CacheManager {
 
     // TODO can package a/b/c and package a/b be concurrent?
     @Override
-    public synchronized <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable) {
+    public synchronized <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable)
+            throws Exception {
         FileChannel channel = null;
         FileLock lock = null;
         createPackageDirectoryIfNeccessary(dependency);
@@ -49,34 +54,18 @@ public class DefaultCacheManager implements CacheManager {
             channel = new RandomAccessFile(lockFile, "rw").getChannel();
             lock = channel.lock();
             return callable.call();
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-            // if getting lock failed, we should be here
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             if (lock != null) {
-                try {
-                    lock.release();
-                } catch (IOException e) {
-
-                }
+                lock.release();
             }
             if (channel != null) {
-                try {
-                    channel.close();
-                } catch (IOException e) {
-
-                }
+                channel.close();
             }
         }
-        return null;
     }
 
-    private File createLockFileIfNecessary(GolangDependency dependency) {
-        String lockFileName = dependency.getName().replaceAll("/", "_");
+    private File createLockFileIfNecessary(GolangDependency dependency) throws UnsupportedEncodingException {
+        String lockFileName = URLEncoder.encode(dependency.getName(), DEFAULT_CHARSET);
         File lockFile = gradleHome
                 .resolve(GO_LOCKFILES_PATH)
                 .resolve(lockFileName)
