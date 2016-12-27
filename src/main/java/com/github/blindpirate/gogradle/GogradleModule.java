@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.core.BuildConstraintManager;
+import com.github.blindpirate.gogradle.core.DefaultBuildConstraintManager;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.cache.DefaultCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
@@ -31,12 +33,14 @@ import com.github.blindpirate.gogradle.vcs.VcsAccessor;
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
+import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.lang.reflect.Method;
 import java.util.List;
 
 /**
@@ -61,12 +65,19 @@ public class GogradleModule extends AbstractModule {
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
         bind(PackageNameResolver.class).to(DefaultPackageNameResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
+        bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
         bind(VcsAccessor.class).annotatedWith(Git.class).to(GitAccessor.class);
 
-        bindInterceptor(Matchers.any(), Matchers.annotatedWith(DebugLog.class), new DebugLogMethodInterceptor());
+        bindInterceptor(Matchers.any(), new AbstractMatcher<Method>() {
+            @Override
+            public boolean matches(Method method) {
+                return method.isAnnotationPresent(DebugLog.class)
+                        && !method.isSynthetic();
+            }
+        }, new DebugLogMethodInterceptor());
 
 
     }

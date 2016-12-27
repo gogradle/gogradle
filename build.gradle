@@ -2,6 +2,8 @@ group 'com.github.blindpirate'
 version '0.0.1-SNAPSHOT'
 
 
+
+
 apply plugin: 'java'
 apply plugin: 'groovy'
 apply plugin: 'idea'
@@ -44,6 +46,8 @@ dependencies {
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
     testCompile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.3.2'
 }
+
+test.dependsOn 'jar'
 
 test {
     if (gradle.startParameter.isOffline()) {
