@@ -5,6 +5,8 @@ import com.github.blindpirate.gogradle.util.Assert;
 
 import javax.inject.Singleton;
 
+import java.util.List;
+
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.valueOf;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
@@ -19,6 +21,7 @@ public class GolangPluginSetting {
     private String globalGopath;
     private BuildMode buildMode = Reproducible;
     private String packageName;
+    private List<String> buildTags;
     // should we use global GOPATH or isolate this build?
     // if true, files in global GOPATH will be used and modified just as go binary do
     // private boolean globalGopath;
@@ -35,19 +38,15 @@ public class GolangPluginSetting {
         return useGlobalGopath;
     }
 
-    public void setUseGlobalGopath(boolean useGlobalGopath) {
-        this.useGlobalGopath = useGlobalGopath;
-    }
-
     public String getGlobalGopath() {
         if (globalGopath == null) {
-            setGlobalGopath(System.getenv("GOPATH"));
+            this.globalGopath = trimToNull(System.getenv("GOPATH"));
         }
         return globalGopath;
     }
 
-    public void setGlobalGopath(String globalGopath) {
-        this.globalGopath = trimToNull(globalGopath);
+    public List<String> getBuildTags() {
+        return buildTags;
     }
 
     public BuildMode getBuildMode() {
@@ -60,10 +59,6 @@ public class GolangPluginSetting {
 
     public String getPackageName() {
         return packageName;
-    }
-
-    public void setPackageName(String packageName) {
-        this.packageName = packageName;
     }
 
     public void verify() {

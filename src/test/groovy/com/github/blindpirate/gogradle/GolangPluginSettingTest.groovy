@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Before
 import org.junit.Test
 
@@ -44,6 +45,13 @@ class GolangPluginSettingTest {
         assert process.waitFor() == GopathTest.SUCCESS_CODE
     }
 
+    @Test
+    void 'setting build tags should success'() {
+        // when
+        setting.buildTags = ['a', 'b']
+        assert setting.buildTags == ['a', 'b']
+    }
+
 
     public static class GopathTest {
         public static final int SUCCESS_CODE = 0;
@@ -61,8 +69,8 @@ class GolangPluginSettingTest {
 
         private static GolangPluginSetting newInstance() {
             GolangPluginSetting ret = new GolangPluginSetting();
-            ret.setPackageName("name");
-            ret.setUseGlobalGopath(true);
+            ret.packageName = "name";
+            ret.useGlobalGopath = true;
             return ret;
         }
     }
