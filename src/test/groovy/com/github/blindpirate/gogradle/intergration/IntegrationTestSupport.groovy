@@ -2,10 +2,13 @@ package com.github.blindpirate.gogradle.intergration
 
 import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.util.IOUtils
+import org.apache.commons.lang3.StringUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.junit.Before
+
+import static org.apache.commons.lang3.StringUtils.*
 
 class IntegrationTestSupport {
 
@@ -38,7 +41,10 @@ org.gradle.jvmargs=-XX:MaxPermSize=4g -XX:+HeapDumpOnOutOfMemoryError -Xmx4g -ag
         GradleConnector connector = GradleConnector.newConnector()
                 .forProjectDirectory(resource)
                 .useGradleUserHomeDir(userhome)
-                .useInstallation(new File(System.getenv('GRADLE_HOME')))
+
+        if (isNotBlank(System.getenv('GRADLE_HOME'))) {
+            connector.useInstallation(new File(System.getenv('GRADLE_HOME')))
+        }
 
         ProjectConnection connection = connector.connect()
         try {
