@@ -1,9 +1,26 @@
 package com.github.blindpirate.gogradle.core.dependency.produce
 
+import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.BuildConstraintManager
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
 
+import static org.mockito.Mockito.when
+
+@RunWith(GogradleRunner)
 class GoImportExtractorTest {
-    GoImportExtractor extractor = new GoImportExtractor()
+    @Mock
+    BuildConstraintManager manager
+
+    GoImportExtractor extractor
+
+    @Before
+    void setUp() {
+        extractor = new GoImportExtractor(manager)
+        when(manager.getCtx()).thenReturn([] as Set)
+    }
 
     @Test
     void 'single import should be extracted correctly'() {
@@ -70,4 +87,67 @@ balabalabala
         assert extractor.extract('''such a mess''') == []
     }
 
+
+    @Test
+    void 'a single build constraint should take effect'() {
+        // given
+        String buildTags = '''
+/*redundant comment*/
+// redundant comment
+// +build appengine // redundant comment
+'''
+        // then
+        assert !evaluateBuildTags(buildTags, [])
+        assert evaluateBuildTags(buildTags, ['appengine'])
+    }
+
+    @Test
+    void 'a single negative build constraint should take effect'() {
+        // given
+        String buildTags = '''
+/*redundant comment*/
+// redundant comment
+// +build !appengine /*redundant comment*/
+'''
+        // then
+        assert evaluateBuildTags(buildTags, [])
+        assert !evaluateBuildTags(buildTags, ['appengine'])
+
+    }
+
+    @Test
+    void 'a single complicated build constraint should take effect'() {
+        // should be treated as (linux AND 386) OR (darwin AND (NOT cgo))
+        // given
+        String buildTags = '// +build linux,386 darwin,!cgo'
+        // then
+        assert !evaluateBuildTags(buildTags, [])
+        assert evaluateBuildTags(buildTags, ['darwin'])
+        assert !evaluateBuildTags(buildTags, ['linux'])
+        assert !evaluateBuildTags(buildTags, ['386'])
+        assert !evaluateBuildTags(buildTags, ['darwin', 'cgo'])
+    }
+
+    @Test
+    void 'mutiple build constraints should take effect'() {
+        // given
+        // should be treated as (linux OR darwin) AND 386
+        String buildTags = '''
+// +build linux darwin
+// +build 386
+'''
+        // then
+        assert !evaluateBuildTags(buildTags, [])
+        assert evaluateBuildTags(buildTags, ['linux', '386'])
+        assert evaluateBuildTags(buildTags, ['darwin', '386'])
+    }
+
+    boolean evaluateBuildTags(String buildTags, List ctx) {
+        when(manager.getCtx()).thenReturn(ctx as Set)
+        String code = buildTags + '''
+package main
+import "fmt"
+'''
+        return !extractor.extract(code).isEmpty()
+    }
 }

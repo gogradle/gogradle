@@ -26,15 +26,15 @@
  THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 /**
- * A Go grammar for ANTLR 4 derived from the Go Language Specification
- * https://golang.org/ref/spec
+ * A Go grammar which only handles imports and build tags.
+ * It's base on https://github.com/antlr/grammars-v4/tree/master/golang
  *
  */
-grammar GolangImport;
+grammar GolangBuildInfo;
 
 //SourceFile       = PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } .
 sourceFile
-    : packageClause ';'? ( importDecl ';'? )* .*
+    : commentLine* packageClause ';'? ( importDecl ';'? )* .*
     ;
 
 //PackageClause  = "package" PackageName .
@@ -55,10 +55,27 @@ importPath
     : STRING_LIT
     ;
 
+commentLine
+    : '//' '+build' buildTag
+    | '//' .*?
+    ;
 
+buildTag
+    :   buildOption buildOption*
+    ;
 
+buildOption
+    : buildTerm (',' buildTerm)*
+    ;
+
+buildTerm
+    : IDENTIFIER
+    | '!' buildTerm
+    ;
+
+// treat number as identifier since we don't care
 IDENTIFIER
-    : LETTER ( LETTER | UNICODE_DIGIT )*
+    : ( LETTER | UNICODE_DIGIT )*
     ;
 
 
@@ -69,6 +86,7 @@ STRING_LIT
     : RAW_STRING_LIT
     | INTERPRETED_STRING_LIT
     ;
+
 
 fragment RAW_STRING_LIT
 //    : '`' ( UNICODE_CHAR | NEWLINE )* '`'
@@ -430,21 +448,35 @@ fragment UNICODE_LETTER
  | [\uFFDA-\uFFDC]
  ;
 
-ANYOTHER:
-    . -> skip
-    ;
+
 
 //
 // Whitespace and comments
 //
 
+//BUILD_TAG_START
+//    :   '// +build'
+//    ;
+
 WS  :  [ \t\r\n\u000C]+ -> skip
     ;
+
+//BUILD_TAG_LINE
+//    : '//' WS '+build' (IDENTIFIER|','|'!'|' '|UNICODE_DIGIT)+
+//    ;
+
+//BUILD_DIRECTIVE : '//' ~('\r'|'\n')* {!getText().contains("+build")}? {System.out.println(">>> found build directive");};
+//NORMAL_COMMENT : '//' ~('\r'|'\n')* -> channel(HIDDEN);
 
 COMMENT
     :   '/*' .*? '*/' -> skip
     ;
 
-LINE_COMMENT
-    :   '//' ~[\r\n]* -> skip
+//LINE_COMMENT
+//    :   '//' ~[\r\n]* -> skip;
+
+ANYOTHER
+    :
+    . -> skip
     ;
+
