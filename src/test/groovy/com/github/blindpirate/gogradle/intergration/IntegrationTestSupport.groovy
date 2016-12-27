@@ -30,7 +30,7 @@ org.gradle.jvmargs=-XX:MaxPermSize=4g -XX:+HeapDumpOnOutOfMemoryError -Xmx4g -ag
     @Before
     void baseSetUp() {
         IOUtils.touch(resource.toPath().resolve('settings.gradle').toFile())
-        //System.setProperty('gradle.user.home', userhome.absolutePath)
+        System.setProperty('gradle.user.home', userhome.absolutePath)
         //IOUtils.write(userhome, 'gradle.properties', gradleDotProperties)
     }
 
