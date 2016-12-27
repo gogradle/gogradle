@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.inject.BindingAnnotation;

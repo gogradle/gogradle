@@ -64,13 +64,13 @@ public class PackageInfo {
 
     @Override
     public String toString() {
-        return "PackageInfo{" +
-                "name='" + name + '\'' +
-                ", vcsType=" + vcsType +
-                ", urls=" + urls +
-                ", rootName='" + rootName + '\'' +
-                ", standard=" + standard +
-                '}';
+        return "PackageInfo{"
+                + "name='" + name + '\''
+                + ", vcsType=" + vcsType
+                + ", urls=" + urls
+                + ", rootName='" + rootName + '\''
+                + ", standard=" + standard
+                + '}';
     }
 
     public static final class PackageInfoBuilder {

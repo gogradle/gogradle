@@ -71,17 +71,17 @@ public class GitAccessor implements VcsAccessor {
                     .setProgressMonitor(new ProgressMonitor() {
                         @Override
                         public void start(int totalTasks) {
-                            System.out.println("total tasks:"+totalTasks);
+                            System.out.println("total tasks:" + totalTasks);
                         }
 
                         @Override
                         public void beginTask(String title, int totalWork) {
-                            System.out.println("title:"+title+"totalWork:"+totalWork);
+                            System.out.println("title:" + title + "totalWork:" + totalWork);
                         }
 
                         @Override
                         public void update(int completed) {
-                            System.out.println("completed:"+completed);
+                            System.out.println("completed:" + completed);
                         }
 
                         @Override

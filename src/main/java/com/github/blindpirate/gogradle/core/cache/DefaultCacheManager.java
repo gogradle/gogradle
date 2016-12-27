@@ -1,14 +1,11 @@
 package com.github.blindpirate.gogradle.core.cache;
 
-import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.wrapper.GradleUserHomeLookup;
 
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -17,7 +14,7 @@ import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.*;
+import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureExsitAndWritable;
 
 @Singleton

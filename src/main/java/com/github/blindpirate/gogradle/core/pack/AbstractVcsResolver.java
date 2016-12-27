@@ -24,7 +24,7 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
             });
             return module;
         } catch (Exception e) {
-            throw DependencyResolutionException.cannotResolveToPackage(dependency,e);
+            throw DependencyResolutionException.cannotResolveToPackage(dependency, e);
         }
     }
 
