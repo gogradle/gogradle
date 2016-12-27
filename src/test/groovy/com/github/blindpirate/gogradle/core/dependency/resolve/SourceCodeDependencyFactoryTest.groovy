@@ -2,10 +2,12 @@ package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
+import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor
 import com.github.blindpirate.gogradle.core.pack.PackageInfo
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -26,6 +28,10 @@ class SourceCodeDependencyFactoryTest {
     PackageNameResolver packageNameResolver
     @Mock
     NotationParser notationParser;
+    @Mock
+    BuildConstraintManager buildConstraintManager;
+
+    GoImportExtractor extractor
 
     SourceCodeDependencyFactory factory
 
@@ -38,7 +44,9 @@ class SourceCodeDependencyFactoryTest {
 
     @Before
     void setUp() {
-        factory = new SourceCodeDependencyFactory(packageNameResolver, notationParser)
+        extractor = new GoImportExtractor(buildConstraintManager)
+        factory = new SourceCodeDependencyFactory(packageNameResolver, notationParser, extractor)
+        when(buildConstraintManager.getCtx()).thenReturn([] as Set)
         when(module.getRootDir()).thenReturn(resource.toPath())
         when(notationParser.parse('github.com/a/b')).thenReturn(dependency)
         when(dependency.getName()).thenReturn('github.com/a/b')
@@ -150,6 +158,7 @@ func main(){}
         // then
         assert factory.produce(module).get().isEmpty()
     }
+
     @Test
     void 'files in testdata directory should be ignored'() {
         // given

@@ -17,7 +17,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.*;
+import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildOptionContext;
+import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTagContext;
+import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTermContext;
+import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.ImportPathContext;
 
 @Singleton
 public class GoImportExtractor {
@@ -111,8 +114,8 @@ public class GoImportExtractor {
     }
 
     // a BuildTags instance represents multiple build tag lines
-    private static class BuildTags {
-        List<BuildTag> buildTags = new ArrayList<>();
+    private static final class BuildTags {
+        private List<BuildTag> buildTags = new ArrayList<>();
 
         void addBuildTag(BuildTag tag) {
             this.buildTags.add(tag);
@@ -131,8 +134,8 @@ public class GoImportExtractor {
 
     // a BuildTag instance represents a build tag line, i.e. many BuildOptions separated by space
     // A build constraint(tag) is evaluated as the OR of space-separated options
-    private static class BuildTag {
-        List<BuildOption> buildOptions = new ArrayList<>();
+    private static final class BuildTag {
+        private List<BuildOption> buildOptions = new ArrayList<>();
 
         public boolean eval(Set<String> ctx) {
             return buildOptions.stream()
@@ -151,8 +154,8 @@ public class GoImportExtractor {
 
     // a BuildOption instance represents an option, i.e. many BuildTerms separated by comma
     // each option evaluates as the AND of its comma-separated terms
-    private static class BuildOption {
-        List<BuildTerm> buildTerms = new ArrayList<>();
+    private static final class BuildOption {
+        private List<BuildTerm> buildTerms = new ArrayList<>();
 
         public boolean eval(Set<String> ctx) {
             return buildTerms.stream()
@@ -164,9 +167,9 @@ public class GoImportExtractor {
         }
     }
 
-    private static class BuildTerm {
-        String name;
-        boolean precededByExclamation;
+    private static final class BuildTerm {
+        private String name;
+        private boolean precededByExclamation;
 
         private BuildTerm(String name, boolean precededByExclamation) {
             this.name = name;

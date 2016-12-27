@@ -9,6 +9,8 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
 import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,16 +38,19 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 public class SourceCodeDependencyFactory implements DependencyFactory {
 
     private static final String TESTDATA_DIRECTORY = "testdata";
+    private static final Logger LOGGER = Logging.getLogger(SourceCodeDependencyFactory.class);
 
-    private final GoImportExtractor goImportExtractor = new GoImportExtractor();
+    private final GoImportExtractor goImportExtractor;
     private final PackageNameResolver packageNameResolver;
     private final NotationParser notationParser;
 
     @Inject
     public SourceCodeDependencyFactory(PackageNameResolver packageNameResolver,
-                                       NotationParser notationParser) {
+                                       NotationParser notationParser,
+                                       GoImportExtractor extractor) {
         this.packageNameResolver = packageNameResolver;
         this.notationParser = notationParser;
+        this.goImportExtractor = extractor;
     }
 
     @Override
@@ -111,6 +116,7 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
                 throws IOException {
             super.preVisitDirectory(dir, attrs);
             if (isVendorDirectory(dir) || isTestdataDirectory(dir)) {
+                LOGGER.debug("Ignored directory {}", dir);
                 return FileVisitResult.SKIP_SUBTREE;
             } else {
                 return FileVisitResult.CONTINUE;
@@ -133,6 +139,8 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
             if (fileShouldBeIncluded(file)) {
                 String fileContent = IOUtils.toString(file.toFile());
                 importPaths.addAll(goImportExtractor.extract(fileContent));
+            } else {
+                LOGGER.debug("Ignored file {}" + file);
             }
 
             return FileVisitResult.CONTINUE;

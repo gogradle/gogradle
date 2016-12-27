@@ -112,7 +112,19 @@ balabalabala
         // then
         assert evaluateBuildTags(buildTags, [])
         assert !evaluateBuildTags(buildTags, ['appengine'])
+    }
 
+    @Test
+    void 'many NOT should be evaluated correctly'() {
+        // given
+        // (NOT linux AND NOT darwin) OR (NOT cgo)
+        String buildTags = '// +build !linux,!darwin !cgo'
+        // then
+        assert evaluateBuildTags(buildTags, [])
+        assert evaluateBuildTags(buildTags, ['linux'])
+        assert !evaluateBuildTags(buildTags, ['linux', 'cgo'])
+        assert evaluateBuildTags(buildTags, ['cgo'])
+        assert !evaluateBuildTags(buildTags, ['linux', 'darwin', 'cgo'])
     }
 
     @Test
