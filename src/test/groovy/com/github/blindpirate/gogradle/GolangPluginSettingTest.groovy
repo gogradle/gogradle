@@ -1,8 +1,10 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Before
 import org.junit.Test
+
+import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
+import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
 
 class GolangPluginSettingTest {
     GolangPluginSetting setting = new GolangPluginSetting()
@@ -18,31 +20,21 @@ class GolangPluginSettingTest {
         setting.verify()
     }
 
-//    @Test(expected = IllegalStateException)
-//    void 'verification should fail if no go executable found'() {
-//        setting.verify()
-//    }
-
-    private Process runGopathTestWithEnvs(String[] envs) {
-        String currentClasspath = System.getProperty("java.class.path");
-        String[] cmds = ['java', '-cp', currentClasspath, GopathTest.name] as String[]
-        return Runtime.runtime.exec(cmds, envs)
-    }
 
     @Test
     void 'verification should fail if useGlobalGopath==true but no GOPATH found'() {
         // when
-        Process process = runGopathTestWithEnvs([] as String[])
+        ProcessResult result = runProcessWithCurrentClasspath(GopathTest, [], [:])
         // then
-        assert process.waitFor() == GopathTest.FAILURE_CODE
+        assert result.code == GopathTest.FAILURE_CODE
     }
 
     @Test
     void 'verification should success if useGlobalGopath==true and GOPATH found'() {
         // when
-        Process process = runGopathTestWithEnvs(['GOPATH=/xxx'] as String[])
+        ProcessResult result = runProcessWithCurrentClasspath(GopathTest, [], [GOPATH: 'xxx'])
         // then
-        assert process.waitFor() == GopathTest.SUCCESS_CODE
+        assert result.code == GopathTest.SUCCESS_CODE
     }
 
     @Test

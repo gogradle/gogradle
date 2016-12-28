@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -77,6 +78,14 @@ public class IOUtils {
     public static String toString(File file) {
         try {
             return org.apache.commons.io.IOUtils.toString(new FileInputStream(file), DEFAULT_CHARSET);
+        } catch (IOException e) {
+            throw new IllegalStateException(e);
+        }
+    }
+
+    public static String toString(InputStream inputStream) {
+        try {
+            return org.apache.commons.io.IOUtils.toString(inputStream, DEFAULT_CHARSET);
         } catch (IOException e) {
             throw new IllegalStateException(e);
         }

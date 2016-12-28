@@ -1,24 +1,56 @@
 package com.github.blindpirate.gogradle.util;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.nio.charset.Charset;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
+import com.google.common.collect.Lists;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Map;
 
 public class ProcessUtils {
-    public static String getOutput(Process process) throws IOException, InterruptedException {
-        process.waitFor();
-        try (BufferedReader br =
-                     new BufferedReader(
-                             new InputStreamReader(process.getInputStream(), Charset.forName(DEFAULT_CHARSET)))) {
-            StringBuffer sb = new StringBuffer();
-            String line;
-            while ((line = br.readLine()) != null) {
-                sb.append(line).append("\n");
-            }
-            return sb.toString();
+    public static class ProcessResult {
+        private int code;
+        private String stdout;
+        private String stderr;
+
+        public int getCode() {
+            return code;
+        }
+
+        public String getStdout() {
+            return stdout;
+        }
+
+        public String getStderr() {
+            return stderr;
+        }
+
+        public ProcessResult(Process process) throws InterruptedException {
+            code = process.waitFor();
+            stdout = IOUtils.toString(process.getInputStream());
+            stderr = IOUtils.toString(process.getErrorStream());
+        }
+    }
+
+    public static ProcessResult run(List<String> args, Map<String, String> envs) throws IOException, InterruptedException {
+        ProcessBuilder pb = new ProcessBuilder().command(args);
+        pb.environment().putAll(envs);
+        Process process = pb.start();
+        return new ProcessResult(process);
+    }
+
+
+    public static ProcessResult runProcessWithCurrentClasspath(Class mainClass, List<String> args, Map<String, String> envs) {
+        String currentClasspath = System.getProperty("java.class.path");
+
+        List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());
+        cmds.addAll(args);
+        try {
+            ProcessResult ret = run(cmds, envs);
+            return ret;
+        } catch (IOException | InterruptedException e) {
+            System.out.println(e);
+            throw new IllegalStateException(e);
         }
     }
 }

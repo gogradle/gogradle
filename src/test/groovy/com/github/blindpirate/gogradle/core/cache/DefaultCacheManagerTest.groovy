@@ -4,16 +4,22 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.apache.commons.io.FileUtils
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import java.util.concurrent.Callable
-import java.util.concurrent.CountDownLatch
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
+
+import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
+@WithResource('')
 public class DefaultCacheManagerTest {
 
     File resource
@@ -22,37 +28,81 @@ public class DefaultCacheManagerTest {
     DefaultCacheManager cacheManager
     @Mock
     GolangDependency dependency
+    ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
-    @Test
-    void "validation of global cache directory should success"() {
-        cacheManager.ensureGlobalCacheExistAndWritable();
+    @Before
+    void setUp() {
+        when(dependency.getName()).thenReturn("concurrenttest")
+        ReflectionUtils.setField(cacheManager, "gradleHome", resource.getAbsoluteFile().toPath())
     }
 
     @Test
-    @WithResource('')
-    void 'multithread access should be safe'() {
-        // given:
-        Mockito.when(dependency.getName()).thenReturn("multithreadtest")
-        ReflectionUtils.setField(cacheManager, "gradleHome", resource.getAbsoluteFile().toPath())
+    void "validation of global cache directory should success"() {
+        // when
+        cacheManager.ensureGlobalCacheExistAndWritable();
+        // then
+        assert resource.toPath().resolve(DefaultCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
+        assert resource.toPath().resolve(DefaultCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
+        assert resource.toPath().resolve(DefaultCacheManager.GO_LOCKFILES_PATH).toFile().exists()
+    }
 
-        // when:
+    @Test
+    void 'multi-thread access should be safe'() {
+        // when
         int i = 0
-        CountDownLatch latch = new CountDownLatch(10)
-        10.times {
-            Thread.start {
-                cacheManager.runWithGlobalCacheLock(dependency, { 1000.times { i++ } } as Callable)
-                latch.countDown()
-            }
+        Callable thread = {
+            cacheManager.runWithGlobalCacheLock(dependency, { 1000.times { i++ } })
         }
+        List futures = (1..10).collect { threadPool.submit(thread as Callable) }
 
-        // then:
-        latch.await()
+        // then
+        futures.each { it.get() }
         assert i == 10 * 1000
     }
 
     @Test
-    void 'multi process access should be safe'() {
-        // TODO how to run a multi process test?
+    void 'multi-process access should be serialized'() {
+        // when
+        String filePath = resource.toPath().resolve('shared').toAbsolutePath().toString()
+
+        Callable runOneProcess = {
+            cacheManager.runWithGlobalCacheLock(dependency, {
+                runProcessWithCurrentClasspath(CounterProcess, [filePath], [:])
+            })
+        }
+
+        List futures = (1..10).collect {
+            threadPool.submit(runOneProcess as Callable)
+        }
+
+        // then
+        assert futures.any { it.get().code == CounterProcess.SUCCESS }
+    }
+
+    class CounterProcess {
+        public static final int ERROR = 1
+        public static final int SUCCESS = 0
+
+        public static void main(String[] args) {
+            // every process should not see other one's file
+            File file = new File(args[0])
+            if (file.exists()) {
+                fail()
+            } else {
+                FileUtils.touch(file)
+                Thread.sleep(5);
+                FileUtils.forceDelete(file)
+                success()
+            }
+        }
+
+        static void success() {
+            System.exit(SUCCESS)
+        }
+
+        static void fail() {
+            System.exit(ERROR)
+        }
     }
 
 

@@ -19,15 +19,16 @@ import static com.github.blindpirate.gogradle.util.IOUtils.ensureExsitAndWritabl
 
 @Singleton
 public class DefaultCacheManager implements CacheManager {
-    private static final String GOPATH_CACHE_PATH = "go/gopath";
-    private static final String GO_BINARAY_CACHE_PATH = "go/binary";
-    private static final String GO_LOCKFILES_PATH = "go/lockfiles";
-    private Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
+    public static final String GOPATH_CACHE_PATH = "go/gopath";
+    public static final String GO_BINARAY_CACHE_PATH = "go/binary";
+    public static final String GO_LOCKFILES_PATH = "go/lockfiles";
+    public Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
 
     @Override
     public void ensureGlobalCacheExistAndWritable() {
         ensureExsitAndWritable(gradleHome, GOPATH_CACHE_PATH);
         ensureExsitAndWritable(gradleHome, GO_BINARAY_CACHE_PATH);
+        ensureExsitAndWritable(gradleHome, GO_LOCKFILES_PATH);
     }
 
     @Override
@@ -39,7 +40,7 @@ public class DefaultCacheManager implements CacheManager {
         return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packageName);
     }
 
-    // TODO can package a/b/c and package a/b be concurrent?
+    // TODO in case of package a/b/c and package a/b accessed concurrently, we should lock its root package
     @Override
     public synchronized <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable)
             throws Exception {

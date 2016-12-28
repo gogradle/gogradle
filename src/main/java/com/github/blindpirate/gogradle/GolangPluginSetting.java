@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.core.Arch;
+import com.github.blindpirate.gogradle.core.Os;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.util.Assert;
 
@@ -22,6 +24,10 @@ public class GolangPluginSetting {
     private BuildMode buildMode = Reproducible;
     private String packageName;
     private List<String> buildTags;
+    private Arch hostArch;
+    private Os hostOs;
+    private Arch targetArch;
+    private Os targetOs;
     // should we use global GOPATH or isolate this build?
     // if true, files in global GOPATH will be used and modified just as go binary do
     // private boolean globalGopath;
