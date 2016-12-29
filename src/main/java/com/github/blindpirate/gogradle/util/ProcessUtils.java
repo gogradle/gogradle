@@ -32,7 +32,8 @@ public class ProcessUtils {
         }
     }
 
-    public static ProcessResult run(List<String> args, Map<String, String> envs) throws IOException, InterruptedException {
+    public static ProcessResult run(List<String> args, Map<String, String> envs)
+            throws IOException, InterruptedException {
         ProcessBuilder pb = new ProcessBuilder().command(args);
         pb.environment().putAll(envs);
         Process process = pb.start();
@@ -40,7 +41,9 @@ public class ProcessUtils {
     }
 
 
-    public static ProcessResult runProcessWithCurrentClasspath(Class mainClass, List<String> args, Map<String, String> envs) {
+    public static ProcessResult runProcessWithCurrentClasspath(Class mainClass,
+                                                               List<String> args,
+                                                               Map<String, String> envs) {
         String currentClasspath = System.getProperty("java.class.path");
 
         List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());
