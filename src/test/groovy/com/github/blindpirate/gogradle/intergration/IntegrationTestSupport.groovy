@@ -2,13 +2,13 @@ package com.github.blindpirate.gogradle.intergration
 
 import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.util.IOUtils
-import org.apache.commons.lang3.StringUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.junit.Before
 
-import static org.apache.commons.lang3.StringUtils.*
+import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank
+
 
 class IntegrationTestSupport {
 
