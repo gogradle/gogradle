@@ -22,10 +22,6 @@ public class Assert {
         return isNotNull(obj, "This object cannot be null!");
     }
 
-    public static <T> void exactInstanceOf(T instance, Class<? extends T> clazz) {
-        isTrue(instance.getClass() == clazz);
-    }
-
     public static <T> void isNotEmpty(Collection<T> identityFiles, String message) {
         isTrue(!identityFiles.isEmpty(), message);
     }
