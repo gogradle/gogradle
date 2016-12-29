@@ -46,10 +46,8 @@ public class ProcessUtils {
         List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());
         cmds.addAll(args);
         try {
-            ProcessResult ret = run(cmds, envs);
-            return ret;
+            return run(cmds, envs);
         } catch (IOException | InterruptedException e) {
-            System.out.println(e);
             throw new IllegalStateException(e);
         }
     }
