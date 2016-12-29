@@ -29,7 +29,7 @@ public class ResolveTask extends DefaultTask {
     public void resolve() {
         File rootDir = getProject().getRootDir();
         GolangPackageModule projectModule = LocalFileSystemModule.fromFileSystem(
-                setting.getPackageName(),
+                setting.getPackagePath(),
                 rootDir);
         tree = dependencyTreeFactory.getTree(projectModule);
     }

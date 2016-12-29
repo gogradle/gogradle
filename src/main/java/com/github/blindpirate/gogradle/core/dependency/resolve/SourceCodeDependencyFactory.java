@@ -7,7 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -41,14 +41,14 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
     private static final Logger LOGGER = Logging.getLogger(SourceCodeDependencyFactory.class);
 
     private final GoImportExtractor goImportExtractor;
-    private final PackageNameResolver packageNameResolver;
+    private final PackagePathResolver packagePathResolver;
     private final NotationParser notationParser;
 
     @Inject
-    public SourceCodeDependencyFactory(PackageNameResolver packageNameResolver,
+    public SourceCodeDependencyFactory(PackagePathResolver packagePathResolver,
                                        NotationParser notationParser,
                                        GoImportExtractor extractor) {
-        this.packageNameResolver = packageNameResolver;
+        this.packagePathResolver = packagePathResolver;
         this.notationParser = notationParser;
         this.goImportExtractor = extractor;
     }
@@ -92,12 +92,12 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
             return Optional.empty();
         }
 
-        PackageInfo info = packageNameResolver.produce(importPath).get();
+        PackageInfo info = packagePathResolver.produce(importPath).get();
         if (info.isStandard()) {
             return Optional.empty();
         }
 
-        return Optional.of(info.getRootName());
+        return Optional.of(info.getRootPath());
     }
 
     private boolean isRelativePath(String importPath) {

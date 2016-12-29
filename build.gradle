@@ -69,6 +69,7 @@ tasks.withType(FindBugs) {
         html.enabled true
     }
     def antlrDirPath = 'com/github/blindpirate/gogradle/antlr'
+    // FindBugs can't recognize groovy closure
     classes = classes.filter {
         !it.path.contains(antlrDirPath) && !(it.name ==~ /.*_closure\d+\.class/)
     }

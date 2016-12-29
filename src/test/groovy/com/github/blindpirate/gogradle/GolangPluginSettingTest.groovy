@@ -11,12 +11,12 @@ class GolangPluginSettingTest {
 
     @Before
     void setUp() {
-        setting.packageName = 'github.com/a/b'
+        setting.packagePath = 'github.com/a/b'
     }
 
     @Test(expected = IllegalStateException)
     void 'verification should fail if package name not set'() {
-        setting.packageName = ''
+        setting.packagePath = ''
         setting.verify()
     }
 
@@ -61,7 +61,7 @@ class GolangPluginSettingTest {
 
         private static GolangPluginSetting newInstance() {
             GolangPluginSetting ret = new GolangPluginSetting();
-            ret.packageName = "name";
+            ret.packagePath = "path";
             ret.useGlobalGopath = true;
             return ret;
         }

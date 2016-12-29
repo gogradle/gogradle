@@ -5,7 +5,7 @@ public final class PackageResolutionException extends RuntimeException {
         super(message);
     }
 
-    public static PackageResolutionException cannotResolveName(String packageName) {
-        return new PackageResolutionException("Cannot resolve package:" + packageName);
+    public static PackageResolutionException cannotResolvePath(String packagePath) {
+        return new PackageResolutionException("Cannot resolve package:" + packagePath);
     }
 }

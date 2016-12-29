@@ -3,9 +3,9 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
-class GithubPackageNameResolverTest {
+class GithubPackagePathResolverTest {
 
-    GithubPackageNameResolver resolver = new GithubPackageNameResolver();
+    GithubPackagePathResolver resolver = new GithubPackagePathResolver();
 
     @Test
     void 'resolving name should success'() {
@@ -13,8 +13,8 @@ class GithubPackageNameResolverTest {
         PackageInfo result = resolver.produce('github.com/a/b').get()
 
         // then
-        assert result.name == 'github.com/a/b'
-        assertVcsTypeUrlsAndRootName(result)
+        assert result.path == 'github.com/a/b'
+        assertVcsTypeUrlsAndRootPath(result)
     }
 
     @Test
@@ -32,8 +32,8 @@ class GithubPackageNameResolverTest {
         PackageInfo info = resolver.produce('github.com/a/b/c').get()
 
         // then
-        assert info.name == 'github.com/a/b/c'
-        assertVcsTypeUrlsAndRootName(info)
+        assert info.path == 'github.com/a/b/c'
+        assertVcsTypeUrlsAndRootPath(info)
     }
 
     @Test
@@ -43,15 +43,15 @@ class GithubPackageNameResolverTest {
         PackageInfo info = resolver.produce(wtf).get()
 
         // then
-        assert info.name == wtf
-        assertVcsTypeUrlsAndRootName(info)
+        assert info.path == wtf
+        assertVcsTypeUrlsAndRootPath(info)
     }
 
-    void assertVcsTypeUrlsAndRootName(PackageInfo info) {
+    void assertVcsTypeUrlsAndRootPath(PackageInfo info) {
         assert info.vcsType == VcsType.Git
         assert info.vcsType == VcsType.Git
         assert info.urls.contains('https://github.com/a/b.git')
         assert info.urls.contains('git@github.com:a/b')
-        assert info.rootName == 'github.com/a/b'
+        assert info.rootPath == 'github.com/a/b'
     }
 }

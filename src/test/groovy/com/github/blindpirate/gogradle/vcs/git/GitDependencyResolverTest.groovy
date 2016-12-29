@@ -69,7 +69,7 @@ class GitDependencyResolverTest {
                 .thenReturn(of(revCommit))
 
         when(gitAccessor.getRemoteUrl(repository)).thenReturn("url")
-        when(dependency.getName()).thenReturn("name")
+        when(dependency.getName()).thenReturn("path")
 
         InjectionHelper.INJECTOR_INSTANCE = injector
 

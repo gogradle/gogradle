@@ -11,11 +11,11 @@ class DirMapNotationParserTest {
     @Test
     void 'notation with dir should be parsed correctly'() {
         // when
-        GolangDependency dependency = parser.parse([name: 'name', dir: 'dir'])
+        GolangDependency dependency = parser.parse([name: 'path', dir: 'dir'])
 
         // then
         assert dependency instanceof LocalDirectoryDependency
-        assert dependency.name == 'name'
+        assert dependency.name == 'path'
         assert dependency.dir == 'dir'
     }
 }

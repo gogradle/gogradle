@@ -19,12 +19,12 @@ import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
-import com.github.blindpirate.gogradle.core.pack.DefaultPackageNameResolver;
-import com.github.blindpirate.gogradle.core.pack.GithubPackageNameResolver;
-import com.github.blindpirate.gogradle.core.pack.GlobalCachePackageNameResolver;
-import com.github.blindpirate.gogradle.core.pack.MetadataPackageNameResolver;
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
-import com.github.blindpirate.gogradle.core.pack.StandardPackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
@@ -63,7 +63,7 @@ public class GogradleModule extends AbstractModule {
         bind(CacheManager.class).to(DefaultCacheManager.class);
         bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
-        bind(PackageNameResolver.class).to(DefaultPackageNameResolver.class);
+        bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
 
@@ -98,17 +98,17 @@ public class GogradleModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    @DefaultPackageNameResolver.PackageNameResolvers
-    public List<PackageNameResolver> packageNameResolvers(
-            GithubPackageNameResolver githubPackageNameResolver,
-            StandardPackageNameResolver standardPackageNameResolver,
-            GlobalCachePackageNameResolver globalCachePackageNameResolver,
-            MetadataPackageNameResolver metadataPackageNameResolver) {
+    @DefaultPackagePathResolver.PackagePathResolvers
+    public List<PackagePathResolver> packagePathResolvers(
+            GithubPackagePathResolver githubPackagePathResolver,
+            StandardPackagePathResolver standardPackagePathResolver,
+            GlobalCachePackagePathResolver globalCachePackagePathResolver,
+            MetadataPackagePathResolver metadataPackagePathResolver) {
         return CollectionUtils.immutableList(
-                standardPackageNameResolver,
-                githubPackageNameResolver,
-                globalCachePackageNameResolver,
-                metadataPackageNameResolver);
+                standardPackagePathResolver,
+                githubPackagePathResolver,
+                globalCachePackagePathResolver,
+                metadataPackagePathResolver);
     }
 
 

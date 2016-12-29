@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('global-cache-test.zip')
-class GlobalCachePackageNameResolverTest {
+class GlobalCachePackagePathResolverTest {
     @Mock
     CacheManager cacheManager
     @Mock
@@ -35,18 +35,18 @@ class GlobalCachePackageNameResolverTest {
     @Mock
     Injector injector
 
-    GlobalCachePackageNameResolver resolver
+    GlobalCachePackagePathResolver resolver
 
     File resource
 
     @Before
     void setUp() {
-        resolver = new GlobalCachePackageNameResolver(cacheManager)
+        resolver = new GlobalCachePackagePathResolver(cacheManager)
         when(cacheManager.getGlobalCachePath(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                String packageName = invocation.getArgument(0);
-                return resource.toPath().resolve(packageName)
+                String packagePath = invocation.getArgument(0);
+                return resource.toPath().resolve(packagePath)
             }
         })
 
@@ -78,8 +78,8 @@ class GlobalCachePackageNameResolverTest {
 
         // then
         assert info.vcsType == VcsType.Git
-        assert info.name == 'github.com/a/b'
-        assert info.rootName == 'github.com/a/b'
+        assert info.path == 'github.com/a/b'
+        assert info.rootPath == 'github.com/a/b'
         assert info.urls.contains('url')
     }
 
@@ -89,8 +89,8 @@ class GlobalCachePackageNameResolverTest {
         PackageInfo info = resolver.produce('github.com/a/b/c').get()
         // then
         assert info.vcsType == VcsType.Git
-        assert info.name == 'github.com/a/b/c'
-        assert info.rootName == 'github.com/a/b'
+        assert info.path == 'github.com/a/b/c'
+        assert info.rootPath == 'github.com/a/b'
         assert info.urls.contains('url')
     }
 

@@ -20,7 +20,7 @@ public abstract class FileSystemModule extends AbstractPackageModule implements 
 
     private GolangDependencySet dependencies;
 
-    public abstract FileSystemModule vendor(String packageName);
+    public abstract FileSystemModule vendor(String packagePath);
 
     public FileSystemModule(String name, Path rootDir, long updateTime) {
         super(name);

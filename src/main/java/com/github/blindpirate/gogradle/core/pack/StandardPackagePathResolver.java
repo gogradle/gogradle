@@ -10,14 +10,14 @@ import java.util.Optional;
 import java.util.Set;
 
 @Singleton
-public class StandardPackageNameResolver implements PackageNameResolver {
+public class StandardPackagePathResolver implements PackagePathResolver {
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packageName) {
-        Path path = Paths.get(packageName);
+    public Optional<PackageInfo> produce(String packagePath) {
+        Path path = Paths.get(packagePath);
         if (isStandardPackage(path)) {
-            return Optional.of(PackageInfo.standardPackage(packageName));
+            return Optional.of(PackageInfo.standardPackage(packagePath));
         } else {
             return Optional.empty();
         }

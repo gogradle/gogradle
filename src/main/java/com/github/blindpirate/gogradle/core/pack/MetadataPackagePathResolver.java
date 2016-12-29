@@ -18,28 +18,28 @@ import javax.inject.Singleton;
 import java.io.IOException;
 
 @Singleton
-public class MetadataPackageNameResolver implements PackageNameResolver {
-    private static final Logger LOGGER = Logging.getLogger(MetadataPackageNameResolver.class);
+public class MetadataPackagePathResolver implements PackagePathResolver {
+    private static final Logger LOGGER = Logging.getLogger(MetadataPackagePathResolver.class);
 
     private final HttpUtils httpUtils;
 
     @Inject
-    public MetadataPackageNameResolver(HttpUtils httpUtils) {
+    public MetadataPackagePathResolver(HttpUtils httpUtils) {
         this.httpUtils = httpUtils;
     }
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packageName) {
-        Optional<PackageInfo> httpsResult = fetchViaWeb(packageName, HTTPS + packageName);
+    public Optional<PackageInfo> produce(String packagePath) {
+        Optional<PackageInfo> httpsResult = fetchViaWeb(packagePath, HTTPS + packagePath);
         if (httpsResult.isPresent()) {
             return httpsResult;
         } else {
-            return fetchViaWeb(packageName, HTTP + packageName);
+            return fetchViaWeb(packagePath, HTTP + packagePath);
         }
     }
 
-    private Optional<PackageInfo> fetchViaWeb(String packageName, String url) {
+    private Optional<PackageInfo> fetchViaWeb(String packagePath, String url) {
         try {
             String html = fetchHtml(url);
 
@@ -54,7 +54,7 @@ public class MetadataPackageNameResolver implements PackageNameResolver {
                 // we should verify it
                 //String importPath = matcher.group(1);
                 LOGGER.info("Meta tag of url {} is:{}", url, content);
-                return Optional.of(buildPackageInfo(packageName, content));
+                return Optional.of(buildPackageInfo(packagePath, content));
             }
         } catch (IOException e) {
             LOGGER.warn("Exception in accessing {}", url, e);
@@ -63,17 +63,17 @@ public class MetadataPackageNameResolver implements PackageNameResolver {
 
     }
 
-    private PackageInfo buildPackageInfo(String packageName, String content) {
+    private PackageInfo buildPackageInfo(String packagePath, String content) {
         String[] array = StringUtils.splitAndTrim(content, " ");
         Assert.isTrue(array.length > 2, "Invalid content:" + content);
-        String rootName = array[0];
+        String rootPath = array[0];
         VcsType vcs = VcsType.of(array[1]).get();
         String url = array[2];
 
         return PackageInfo.builder()
-                .withName(packageName)
+                .withPath(packagePath)
                 .withVcsType(vcs)
-                .withRootName(rootName)
+                .withRootPath(rootPath)
                 .withUrl(url)
                 .build();
     }

@@ -18,7 +18,7 @@ public interface CacheManager {
 
     void ensureProjectBuildCacheExist();
 
-    Path getGlobalCachePath(String packageName);
+    Path getGlobalCachePath(String packagePath);
 
     /**
      * Locks global cache directory of {@code dependency}, and call the {@code callable}

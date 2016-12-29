@@ -44,7 +44,7 @@ class GodepDependencyFactoryTest {
         // given:
         when(module.getRootDir()).thenReturn(resource.toPath())
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
-        when(dependency.getName()).thenReturn('name')
+        when(dependency.getName()).thenReturn('path')
 
         // when:
         def result = godepDependencyFactory.produce(module)

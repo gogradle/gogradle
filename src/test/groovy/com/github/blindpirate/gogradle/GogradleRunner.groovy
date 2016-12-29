@@ -93,7 +93,7 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
 
     File setUpResource(String resourceName) {
         File destDir = tmpRandomDirectory("resource");
-        // when resource name is empty, the new created empty dir will be used
+        // when resource path is empty, the new created empty dir will be used
         if (resourceName.endsWith('zip')) {
             unzipResourceToDir(resourceName, destDir)
         } else if (resourceName != '') {

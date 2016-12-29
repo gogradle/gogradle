@@ -10,17 +10,17 @@ import java.util.List;
 public class PackageInfo {
     // the package path can be recognized, but it's incomplete, e.g. "github.com/a"
     public static final PackageInfo INCOMPLETE =
-            builder().withName("INCOMPLETE").build();
+            builder().withPath("INCOMPLETE").build();
 
-    private String name;
+    private String path;
     private VcsType vcsType;
     private List<String> urls;
     // the import path corresponding to the repository root
-    private String rootName;
+    private String rootPath;
     private boolean standard;
 
-    public String getName() {
-        return name;
+    public String getPath() {
+        return path;
     }
 
     public VcsType getVcsType() {
@@ -31,8 +31,8 @@ public class PackageInfo {
         return urls;
     }
 
-    public String getRootName() {
-        return rootName;
+    public String getRootPath() {
+        return rootPath;
     }
 
     public boolean isStandard() {
@@ -43,19 +43,19 @@ public class PackageInfo {
         return new PackageInfoBuilder();
     }
 
-    public static PackageInfo standardPackage(String packageName) {
-        Path path = Paths.get(packageName);
+    public static PackageInfo standardPackage(String packagePath) {
+        Path path = Paths.get(packagePath);
         return builder()
-                .withName(packageName)
-                .withRootName(path.getName(0).toString())
+                .withPath(packagePath)
+                .withRootPath(path.getName(0).toString())
                 .withStandard(true)
                 .build();
     }
 
     public PackageInfo cloneWithSameRoot(String anotherPackage) {
         return builder().
-                withName(anotherPackage)
-                .withRootName(rootName)
+                withPath(anotherPackage)
+                .withRootPath(rootPath)
                 .withVcsType(vcsType)
                 .withUrls(urls)
                 .withStandard(standard)
@@ -65,23 +65,23 @@ public class PackageInfo {
     @Override
     public String toString() {
         return "PackageInfo{"
-                + "name='" + name + '\''
+                + "path='" + path + '\''
                 + ", vcsType=" + vcsType
                 + ", urls=" + urls
-                + ", rootName='" + rootName + '\''
+                + ", rootPath='" + rootPath + '\''
                 + ", standard=" + standard
                 + '}';
     }
 
     public static final class PackageInfoBuilder {
-        private String name;
+        private String path;
         private VcsType vcsType;
         private List<String> urls;
-        private String rootName;
+        private String rootPath;
         private boolean standard;
 
-        public PackageInfoBuilder withName(String name) {
-            this.name = name;
+        public PackageInfoBuilder withPath(String path) {
+            this.path = path;
             return this;
         }
 
@@ -100,8 +100,8 @@ public class PackageInfo {
             return this;
         }
 
-        public PackageInfoBuilder withRootName(String rootName) {
-            this.rootName = rootName;
+        public PackageInfoBuilder withRootPath(String rootPath) {
+            this.rootPath = rootPath;
             return this;
         }
 
@@ -113,8 +113,8 @@ public class PackageInfo {
         public PackageInfo build() {
             PackageInfo packageInfo = new PackageInfo();
             packageInfo.urls = this.urls;
-            packageInfo.rootName = this.rootName;
-            packageInfo.name = this.name;
+            packageInfo.rootPath = this.rootPath;
+            packageInfo.path = this.path;
             packageInfo.vcsType = this.vcsType;
             packageInfo.standard = this.standard;
             return packageInfo;

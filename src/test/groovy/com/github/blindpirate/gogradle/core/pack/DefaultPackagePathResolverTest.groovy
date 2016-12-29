@@ -16,50 +16,50 @@ import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class DefaultPackageNameResolverTest {
+class DefaultPackagePathResolverTest {
     @Mock
-    PackageNameResolver resolver1
+    PackagePathResolver resolver1
     @Mock
-    PackageNameResolver resolver2
+    PackagePathResolver resolver2
 
-    PackageInfo packageInfo = PackageInfo.builder().withName('root/package')
-            .withRootName('root')
+    PackageInfo packageInfo = PackageInfo.builder().withPath('root/package')
+            .withRootPath('root')
             .withVcsType(VcsType.Git)
             .withUrls(['url'])
             .build()
 
-    DefaultPackageNameResolver resolver
+    DefaultPackagePathResolver resolver
 
-    String packageName = 'packageName'
+    String packagePath = 'packagePath'
 
     @Before
     void setUp() {
-        resolver = new DefaultPackageNameResolver([resolver1, resolver2])
-        when(resolver1.produce(packageName)).thenReturn(empty())
-        when(resolver2.produce(packageName)).thenReturn(of(packageInfo))
+        resolver = new DefaultPackagePathResolver([resolver1, resolver2])
+        when(resolver1.produce(packagePath)).thenReturn(empty())
+        when(resolver2.produce(packagePath)).thenReturn(of(packageInfo))
     }
 
 
     @Test
     void 'resolving a package should success'() {
-        assert resolver.produce(packageName).get() == packageInfo
+        assert resolver.produce(packagePath).get() == packageInfo
     }
 
     @Test
     void 'resolution result should be cached'() {
         // when
-        resolver.produce(packageName)
-        resolver.produce(packageName)
+        resolver.produce(packagePath)
+        resolver.produce(packagePath)
         // then
-        verify(resolver2, times(1)).produce(packageName)
+        verify(resolver2, times(1)).produce(packagePath)
     }
 
     @Test
     void 'package and its root package should be put into cache after successful resolution'() {
         // given
         PackageInfo info = PackageInfo.builder()
-                .withName('github.com/a/b/c')
-                .withRootName('github.com/a/b')
+                .withPath('github.com/a/b/c')
+                .withRootPath('github.com/a/b')
                 .withVcsType(VcsType.Git)
                 .withUrls([])
                 .build()
@@ -83,18 +83,18 @@ class DefaultPackageNameResolverTest {
     @Test(expected = PackageResolutionException)
     void 'exception should be thrown if unable to resolve'() {
         // given
-        when(resolver2.produce(packageName)).thenReturn(empty())
+        when(resolver2.produce(packagePath)).thenReturn(empty())
 
         // then
-        resolver.produce(packageName)
+        resolver.produce(packagePath)
     }
 
     @Test
     void 'root package result should be leveraged when resolving children package'() {
         // given
         PackageInfo rootInfo = PackageInfo.builder()
-                .withName('github.com/a/b')
-                .withRootName('github.com/a/b')
+                .withPath('github.com/a/b')
+                .withRootPath('github.com/a/b')
                 .withVcsType(VcsType.Git)
                 .withUrls([])
                 .build()
@@ -110,10 +110,10 @@ class DefaultPackageNameResolverTest {
         // then
         verify(resolver1, times(0)).produce(anyString())
         assert result1 == rootInfo
-        assert result2.name == 'github.com/a/b/c'
-        assert result3.name == 'github.com/a/b/c/d'
-        assert allFieldsEquals(result2, rootInfo, ['vcsType', 'urls', 'rootName'])
-        assert allFieldsEquals(result3, rootInfo, ['vcsType', 'urls', 'rootName'])
+        assert result2.path == 'github.com/a/b/c'
+        assert result3.path == 'github.com/a/b/c/d'
+        assert allFieldsEquals(result2, rootInfo, ['vcsType', 'urls', 'rootPath'])
+        assert allFieldsEquals(result3, rootInfo, ['vcsType', 'urls', 'rootPath'])
     }
 
 }

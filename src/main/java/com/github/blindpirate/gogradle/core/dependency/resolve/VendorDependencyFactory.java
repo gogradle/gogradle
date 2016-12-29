@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.FileSystemModule;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -26,11 +26,11 @@ import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DIRECTORY_
 public class VendorDependencyFactory implements DependencyFactory {
     static final String VENDOR_DIRECTORY = "vendor";
 
-    private final PackageNameResolver packageNameResolver;
+    private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public VendorDependencyFactory(PackageNameResolver packageNameResolver) {
-        this.packageNameResolver = packageNameResolver;
+    public VendorDependencyFactory(PackagePathResolver packagePathResolver) {
+        this.packagePathResolver = packagePathResolver;
     }
 
     @Override
@@ -45,7 +45,7 @@ public class VendorDependencyFactory implements DependencyFactory {
     private GolangDependencySet resolveVendor(GolangPackageModule module) {
         Path vendorPath = vendorPath(module);
         FileSystemModule fileSystemModule = (FileSystemModule) module;
-        VendorDirectoryVisitor visitor = new VendorDirectoryVisitor(fileSystemModule, packageNameResolver);
+        VendorDirectoryVisitor visitor = new VendorDirectoryVisitor(fileSystemModule, packagePathResolver);
         try {
             Files.walkFileTree(vendorPath, Collections.<FileVisitOption>emptySet(), MAX_DIRECTORY_WALK_DEPTH, visitor);
         } catch (IOException e) {

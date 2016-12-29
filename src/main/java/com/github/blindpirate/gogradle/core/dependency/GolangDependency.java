@@ -31,6 +31,16 @@ public interface GolangDependency extends Dependency {
      */
     boolean isFirstLevel();
 
+
+    /**
+     * An identifier used to identify a unique version in various VCS.
+     * For example, commit id in Git.
+     *
+     * @return the revision
+     */
+    //String getRevision();
+
+
     final class Namer implements org.gradle.api.Namer<GolangDependency> {
 
         public static final Namer INSTANCE = new Namer();

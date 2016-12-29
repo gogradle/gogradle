@@ -9,7 +9,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
 import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor
 import com.github.blindpirate.gogradle.core.pack.PackageInfo
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when
 @WithResource('')
 class SourceCodeDependencyFactoryTest {
     @Mock
-    PackageNameResolver packageNameResolver
+    PackagePathResolver packagePathResolver
     @Mock
     NotationParser notationParser;
     @Mock
@@ -45,17 +45,17 @@ class SourceCodeDependencyFactoryTest {
     @Before
     void setUp() {
         extractor = new GoImportExtractor(buildConstraintManager)
-        factory = new SourceCodeDependencyFactory(packageNameResolver, notationParser, extractor)
+        factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor)
         when(buildConstraintManager.getCtx()).thenReturn([] as Set)
         when(module.getRootDir()).thenReturn(resource.toPath())
         when(notationParser.parse('github.com/a/b')).thenReturn(dependency)
         when(dependency.getName()).thenReturn('github.com/a/b')
-        when(packageNameResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 String name = invocation.getArgument(0);
                 if (name.startsWith('github.com')) {
-                    PackageInfo ret = PackageInfo.builder().withName(name).withRootName('github.com/a/b').build()
+                    PackageInfo ret = PackageInfo.builder().withPath(name).withRootPath('github.com/a/b').build()
                     return Optional.of(ret)
                 } else {
                     PackageInfo standardPackage = PackageInfo.standardPackage(name);

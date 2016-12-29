@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackageResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
@@ -15,11 +15,11 @@ import java.util.Map;
 
 @Singleton
 public class DefaultNotationConverter implements NotationConverter {
-    private final PackageNameResolver packageNameResolver;
+    private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public DefaultNotationConverter(PackageNameResolver packageNameResolver) {
-        this.packageNameResolver = packageNameResolver;
+    public DefaultNotationConverter(PackagePathResolver packagePathResolver) {
+        this.packagePathResolver = packagePathResolver;
     }
 
     @Override
@@ -30,17 +30,17 @@ public class DefaultNotationConverter implements NotationConverter {
     }
 
     private VcsType extractVcs(String notation) {
-        String packageName = extractPackageName(notation);
-        Optional<PackageInfo> info = packageNameResolver.produce(packageName);
+        String packagePath = extractPackagePath(notation);
+        Optional<PackageInfo> info = packagePathResolver.produce(packagePath);
         if (!info.isPresent()) {
-            throw PackageResolutionException.cannotResolveName(packageName);
+            throw PackageResolutionException.cannotResolvePath(packagePath);
         }
         Assert.isTrue(!info.get().isStandard(), "Cannot convert a standard package!");
         return info.get().getVcsType();
     }
 
 
-    private String extractPackageName(String notation) {
+    private String extractPackagePath(String notation) {
         for (int i = 0; i < notation.length(); ++i) {
             char c = notation.charAt(i);
             // TODO not accurate

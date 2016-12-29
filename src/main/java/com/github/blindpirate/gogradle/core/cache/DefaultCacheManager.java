@@ -36,8 +36,8 @@ public class DefaultCacheManager implements CacheManager {
     }
 
     @Override
-    public Path getGlobalCachePath(String packageName) {
-        return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packageName);
+    public Path getGlobalCachePath(String packagePath) {
+        return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packagePath);
     }
 
     // TODO in case of package a/b/c and package a/b accessed concurrently, we should lock its root package

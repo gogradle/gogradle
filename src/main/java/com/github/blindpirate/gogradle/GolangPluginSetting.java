@@ -22,7 +22,7 @@ public class GolangPluginSetting {
     public static final int MAX_DIRECTORY_WALK_DEPTH = 100;
     private String globalGopath;
     private BuildMode buildMode = Reproducible;
-    private String packageName;
+    private String packagePath;
     private List<String> buildTags;
     private Arch hostArch;
     private Os hostOs;
@@ -63,18 +63,18 @@ public class GolangPluginSetting {
         this.buildMode = valueOf(buildMode);
     }
 
-    public String getPackageName() {
-        return packageName;
+    public String getPackagePath() {
+        return packagePath;
     }
 
     public void verify() {
         verifyGlobalGopath();
 //        verifyGoExecutable();
-        verifyPackageName();
+        verifyPackagePath();
     }
 
-    private void verifyPackageName() {
-        Assert.isTrue(isNotBlank(packageName), "Package name must be specified!");
+    private void verifyPackagePath() {
+        Assert.isTrue(isNotBlank(packagePath), "Package name must be specified!");
     }
 
 //    private void verifyGoExecutable() {

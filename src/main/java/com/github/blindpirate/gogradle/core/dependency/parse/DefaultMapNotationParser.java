@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 
@@ -13,13 +13,13 @@ import java.util.Map;
 @Singleton
 public class DefaultMapNotationParser implements MapNotationParser {
     private final DirMapNotationParser dirMapNotationParser;
-    private final PackageNameResolver packageNameResolver;
+    private final PackagePathResolver packagePathResolver;
 
     @Inject
     public DefaultMapNotationParser(DirMapNotationParser dirMapNotationParser,
-                                    PackageNameResolver packageNameResolver) {
+                                    PackagePathResolver packagePathResolver) {
         this.dirMapNotationParser = dirMapNotationParser;
-        this.packageNameResolver = packageNameResolver;
+        this.packagePathResolver = packagePathResolver;
     }
 
     @Override
@@ -33,8 +33,8 @@ public class DefaultMapNotationParser implements MapNotationParser {
     }
 
     private GolangDependency parseWithVcs(Map<String, Object> notation) {
-        String packageName = MapUtils.getString(notation, NAME_KEY);
-        PackageInfo packageInfo = packageNameResolver.produce(packageName).get();
+        String packagePath = MapUtils.getString(notation, NAME_KEY);
+        PackageInfo packageInfo = packagePathResolver.produce(packagePath).get();
         notation.put(INFO_KEY, packageInfo);
         MapNotationParser parser =
                 packageInfo.getVcsType().getService(MapNotationParser.class);

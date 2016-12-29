@@ -2,39 +2,39 @@ package com.github.blindpirate.gogradle.core.pack
 
 import org.junit.Test
 
-class StandardPackageNameResolverTest {
-    StandardPackageNameResolver resolver = new StandardPackageNameResolver();
+class StandardPackagePathResolverTest {
+    StandardPackagePathResolver resolver = new StandardPackagePathResolver();
 
     @Test
     void 'resolving first-level standard package should success'() {
         PackageInfo info = resolver.produce("fmt").get()
         assert info.isStandard()
-        assert info.name == 'fmt'
-        assert info.rootName == 'fmt'
+        assert info.path == 'fmt'
+        assert info.rootPath == 'fmt'
     }
 
     @Test
     void 'resolving second-level standard package should success'() {
         PackageInfo info = resolver.produce('archive/zip').get()
         assert info.isStandard()
-        assert info.name == 'archive/zip'
-        assert info.rootName == 'archive'
+        assert info.path == 'archive/zip'
+        assert info.rootPath == 'archive'
     }
 
     @Test
     void 'resolving third-level standard package should success'() {
         PackageInfo info = resolver.produce('net/http/cgi').get()
         assert info.isStandard()
-        assert info.name == 'net/http/cgi'
-        assert info.rootName == 'net'
+        assert info.path == 'net/http/cgi'
+        assert info.rootPath == 'net'
     }
 
     @Test
     void 'resolving pseudo package "C" should succss'() {
         PackageInfo info = resolver.produce('C').get()
         assert info.isStandard()
-        assert info.name == 'C'
-        assert info.rootName == 'C'
+        assert info.path == 'C'
+        assert info.rootPath == 'C'
     }
 
     @Test

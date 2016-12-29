@@ -3,13 +3,11 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.pack.PackageInfo
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsType
-import java.util.Optional
 import com.google.inject.Injector
-import com.google.inject.Key
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +24,7 @@ class DefaultMapNotationParserTest {
     @Mock
     DirMapNotationParser dirMapNotationParser
     @Mock
-    PackageNameResolver packageNameResolver
+    PackagePathResolver packagePathResolver
     @Mock
     MapNotationParser vcsMapNotationParser
     @Mock
@@ -38,7 +36,7 @@ class DefaultMapNotationParserTest {
 
     @Before
     void setUp() {
-        parser = new DefaultMapNotationParser(dirMapNotationParser, packageNameResolver)
+        parser = new DefaultMapNotationParser(dirMapNotationParser, packagePathResolver)
     }
 
     @Test(expected = Exception)
@@ -50,7 +48,7 @@ class DefaultMapNotationParserTest {
     @Test
     void 'notation should be delegated to corresponding parser'() {
         // given
-        def notation = [name: 'name', dir: 'dir']
+        def notation = [name: 'path', dir: 'dir']
         // when
         parser.parse(notation)
 
@@ -61,8 +59,8 @@ class DefaultMapNotationParserTest {
     @Test
     void 'notation should be delegated to vcs parser'() {
         // given
-        Map notation = [name: 'name']
-        when(packageNameResolver.produce('name')).thenReturn(Optional.of(packageInfo))
+        Map notation = [name: 'path']
+        when(packagePathResolver.produce('path')).thenReturn(Optional.of(packageInfo))
         when(packageInfo.getVcsType()).thenReturn(VcsType.Git)
         MockUtils.mockVcsService(injector, MapNotationParser, Git, vcsMapNotationParser)
 
@@ -70,7 +68,7 @@ class DefaultMapNotationParserTest {
         parser.parse(notation)
 
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'name', 'info': packageInfo]))
+        verify(vcsMapNotationParser).parse(eq([name: 'path', 'info': packageInfo]))
 
     }
 

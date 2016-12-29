@@ -11,47 +11,47 @@ import static java.util.Arrays.asList;
 
 // github.com/user/project -> git@github.com:user/project.git
 // github.com/user/project -> https://github.com/user/project.git
-public class GithubPackageNameResolver implements PackageNameResolver {
+public class GithubPackagePathResolver implements PackagePathResolver {
 
     private static final String GITHUB_HOST = "github.com";
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packageName) {
-        if (isNotGithubPackage(packageName)) {
+    public Optional<PackageInfo> produce(String packagePath) {
+        if (isNotGithubPackage(packagePath)) {
             return Optional.empty();
-        } else if (isIncomplete(packageName)) {
+        } else if (isIncomplete(packagePath)) {
             return Optional.of(PackageInfo.INCOMPLETE);
         } else {
-            return doProduce(packageName);
+            return doProduce(packagePath);
         }
     }
 
-    private boolean isIncomplete(String packageName) {
-        return toPath(packageName).getNameCount() < 3;
+    private boolean isIncomplete(String packagePath) {
+        return toPath(packagePath).getNameCount() < 3;
     }
 
-    private boolean isNotGithubPackage(String packageName) {
-        return !packageName.startsWith(GITHUB_HOST);
+    private boolean isNotGithubPackage(String packagePath) {
+        return !packagePath.startsWith(GITHUB_HOST);
     }
 
-    public Optional<PackageInfo> doProduce(String packageName) {
-        Path path = toPath(packageName);
+    public Optional<PackageInfo> doProduce(String packagePath) {
+        Path path = toPath(packagePath);
         String httpsUrl = HTTPS + path.subpath(0, 3) + ".git";
         String sshUrl = String.format("git@github.com:%s", path.subpath(1, 3));
-        String rootPackageName = path.subpath(0, 3).toString();
+        String rootPackagePath = path.subpath(0, 3).toString();
 
         PackageInfo info = PackageInfo.builder()
-                .withName(packageName)
+                .withPath(packagePath)
                 .withVcsType(VcsType.Git)
-                .withRootName(rootPackageName)
+                .withRootPath(rootPackagePath)
                 .withUrls(asList(httpsUrl, sshUrl))
                 .build();
         return Optional.of(info);
     }
 
-    private Path toPath(String packageName) {
-        return Paths.get(packageName);
+    private Path toPath(String packagePath) {
+        return Paths.get(packagePath);
     }
 
 }

@@ -6,7 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.pack.PackageInfo;
-import com.github.blindpirate.gogradle.core.pack.PackageNameResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -28,7 +28,7 @@ public class VendorDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     private FileSystemModule parentModule;
 
-    private PackageNameResolver resolver;
+    private PackagePathResolver resolver;
 
     private GolangDependencySet dependencies = new GolangDependencySet();
 
@@ -37,7 +37,7 @@ public class VendorDirectoryVisitor extends SimpleFileVisitor<Path> {
     }
 
     public VendorDirectoryVisitor(FileSystemModule parentModule,
-                                  PackageNameResolver resolver) {
+                                  PackagePathResolver resolver) {
         this.resolver = resolver;
         this.parentModule = parentModule;
         this.parentModuleVendor = parentModule.getRootDir().resolve(VENDOR_DIRECTORY);
@@ -52,22 +52,22 @@ public class VendorDirectoryVisitor extends SimpleFileVisitor<Path> {
         }
 
         // relative path, i.e "github.com/a/b"
-        String packageName = parentModuleVendor.relativize(currentAbsolutePath).toString();
+        String packagePath = parentModuleVendor.relativize(currentAbsolutePath).toString();
 
-        PackageInfo packageInfo = resolver.produce(packageName).get();
+        PackageInfo packageInfo = resolver.produce(packagePath).get();
         if (packageInfo != PackageInfo.INCOMPLETE) {
             // current path is root of a repo
-            LOGGER.debug("Produce package {}.", packageName);
-            dependencies.add(createDependency(packageName));
+            LOGGER.debug("Produce package {}.", packagePath);
+            dependencies.add(createDependency(packagePath));
             return FileVisitResult.SKIP_SUBTREE;
         } else {
-            LOGGER.debug("Cannot produce package with path {}, skip.", packageName);
+            LOGGER.debug("Cannot produce package with path {}, skip.", packagePath);
             return FileVisitResult.CONTINUE;
         }
     }
 
-    private GolangDependency createDependency(String packageName) {
-        FileSystemModule module = parentModule.vendor(packageName);
+    private GolangDependency createDependency(String packagePath) {
+        FileSystemModule module = parentModule.vendor(packagePath);
         module.setStrategy(InjectionHelper.strategy(VendorOnlyProduceStrategy.class));
         module.getDependencies();
         return module;

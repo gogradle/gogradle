@@ -21,7 +21,7 @@ public class VcsTempFileModule extends FileSystemModule implements LockEnabled {
     }
 
     @Override
-    public FileSystemModule vendor(String packageName) {
+    public FileSystemModule vendor(String packagePath) {
         return null;
     }
 

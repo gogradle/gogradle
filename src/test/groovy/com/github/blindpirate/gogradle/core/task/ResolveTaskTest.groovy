@@ -47,7 +47,7 @@ class ResolveTaskTest {
     @Test
     void 'dependency resolution should success'() {
         // given
-        when(setting.getPackageName()).thenReturn("package")
+        when(setting.getPackagePath()).thenReturn("package")
         when(project.getRootDir()).thenReturn(rootDir)
         when(rootDir.lastModified()).thenReturn(1L)
         when(factory.getTree(any(GolangPackageModule))).thenReturn(tree)

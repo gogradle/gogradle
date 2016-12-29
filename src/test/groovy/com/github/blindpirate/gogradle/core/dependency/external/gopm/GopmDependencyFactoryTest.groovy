@@ -36,7 +36,7 @@ class GopmDependencyFactoryTest {
     @Before
     void setUp() {
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
-        when(dependency.getName()).thenReturn("name")
+        when(dependency.getName()).thenReturn("path")
     }
 
 /**
