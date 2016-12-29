@@ -15,20 +15,20 @@ import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
 import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
-import static com.github.blindpirate.gogradle.util.IOUtils.ensureExsitAndWritable;
+import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 
 @Singleton
 public class DefaultCacheManager implements CacheManager {
     public static final String GOPATH_CACHE_PATH = "go/gopath";
     public static final String GO_BINARAY_CACHE_PATH = "go/binary";
     public static final String GO_LOCKFILES_PATH = "go/lockfiles";
-    public Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
+    private Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
 
     @Override
     public void ensureGlobalCacheExistAndWritable() {
-        ensureExsitAndWritable(gradleHome, GOPATH_CACHE_PATH);
-        ensureExsitAndWritable(gradleHome, GO_BINARAY_CACHE_PATH);
-        ensureExsitAndWritable(gradleHome, GO_LOCKFILES_PATH);
+        ensureDirExistAndWritable(gradleHome, GOPATH_CACHE_PATH);
+        ensureDirExistAndWritable(gradleHome, GO_BINARAY_CACHE_PATH);
+        ensureDirExistAndWritable(gradleHome, GO_LOCKFILES_PATH);
     }
 
     @Override
@@ -74,6 +74,6 @@ public class DefaultCacheManager implements CacheManager {
 
     private void createPackageDirectoryIfNeccessary(GolangDependency dependency) {
         Path path = getGlobalCachePath(dependency.getName());
-        IOUtils.ensureExistAndWritable(path);
+        IOUtils.ensureDirExistAndWritable(path);
     }
 }
