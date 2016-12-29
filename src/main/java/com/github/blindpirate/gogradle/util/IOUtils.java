@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
+import org.apache.commons.io.FileUtils;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -13,45 +14,56 @@ import java.nio.file.Paths;
 
 import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
 
+/**
+ * Encapsulation of {@link FileUtils} and {@link org.apache.commons.io.IOUtils},
+ * it never throws checked exceptions.
+ */
 public class IOUtils {
-    public static void forceMkdir(final File directory) throws IOException {
-        org.apache.commons.io.FileUtils.forceMkdir(directory);
+    public static void forceMkdir(final File directory) {
+        try {
+            FileUtils.forceMkdir(directory);
+        } catch (IOException e) {
+            handleIOException(e);
+        }
     }
 
-    public static void forceDelete(final File file) throws IOException {
-        org.apache.commons.io.FileUtils.forceDelete(file);
+    private static void handleIOException(IOException e) {
+        throw new IllegalStateException(e);
+    }
+
+    public static void forceDelete(final File file) {
+        try {
+            FileUtils.forceDelete(file);
+        } catch (IOException e) {
+            handleIOException(e);
+        }
     }
 
     public static boolean dirIsEmpty(Path dir) {
         try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
             return !dirStream.iterator().hasNext();
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            handleIOException(e);
+            return false;
         }
     }
 
-    public static void ensureExistAndWritable(Path path) {
+    public static void ensureDirExistAndWritable(Path path) {
         Assert.isTrue(path.isAbsolute(), "path must be absolute!");
         File dir = path.toFile();
-        try {
-            IOUtils.forceMkdir(dir);
-        } catch (IOException e) {
-            throw new RuntimeException("Create directory "
-                    + path
-                    + " failed, please check if you have access to it.");
-        }
+        IOUtils.forceMkdir(dir);
         Assert.isTrue(Files.isWritable(dir.toPath()), "Cannot write to directory:" + path);
     }
 
-    public static void ensureExsitAndWritable(Path base, String relativePath) {
-        ensureExistAndWritable(base.resolve(Paths.get(relativePath)));
+    public static void ensureDirExistAndWritable(Path base, String relativePath) {
+        ensureDirExistAndWritable(base.resolve(Paths.get(relativePath)));
     }
 
     public static void copyDirectory(File src, File dest) {
         try {
             org.apache.commons.io.FileUtils.copyDirectory(src, dest);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            handleIOException(e);
         }
     }
 
@@ -59,7 +71,7 @@ public class IOUtils {
         try {
             org.apache.commons.io.FileUtils.touch(file);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            handleIOException(e);
         }
     }
 
@@ -67,19 +79,36 @@ public class IOUtils {
         try {
             org.apache.commons.io.FileUtils.write(file, data, GolangPluginSetting.DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            handleIOException(e);
         }
     }
 
-    public static void write(File dir, String fileName, CharSequence data) {
-        write(dir.toPath().resolve(fileName).toFile(), data);
+    public static void write(File baseDir, String fileName, CharSequence data) {
+        Path basePath = baseDir.toPath();
+        if (fileName.contains("/")) {
+            basePath = realBaseDir(basePath, fileName);
+            fileName = realFileName(fileName);
+            forceMkdir(basePath.toFile());
+        }
+        write(basePath.resolve(fileName).toFile(), data);
+    }
+
+    private static String realFileName(String fileNameWithSlash) {
+        Path path = Paths.get(fileNameWithSlash);
+        return path.getName(path.getNameCount() - 1).toString();
+    }
+
+    private static Path realBaseDir(Path basePath, String fileNameWithSlash) {
+        Path path = Paths.get(fileNameWithSlash);
+        return basePath.resolve(path.subpath(0, path.getNameCount() - 1));
     }
 
     public static String toString(File file) {
         try {
             return org.apache.commons.io.IOUtils.toString(new FileInputStream(file), DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            handleIOException(e);
+            return null;
         }
     }
 
@@ -87,7 +116,8 @@ public class IOUtils {
         try {
             return org.apache.commons.io.IOUtils.toString(inputStream, DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw new IllegalStateException(e);
+            handleIOException(e);
+            return null;
         }
     }
 }
