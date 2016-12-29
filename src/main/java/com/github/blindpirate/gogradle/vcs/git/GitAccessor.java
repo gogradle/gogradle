@@ -26,7 +26,6 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -118,14 +117,16 @@ public class GitAccessor implements VcsAccessor {
             } else {
                 log.add(ref.getObjectId());
             }
+            Iterable<RevCommit> commits = log.call();
 
-            for (RevCommit commit : log.call()) {
+            for (RevCommit commit : commits) {
                 return commit;
             }
+
+            throw new IllegalStateException("Cannot find commit!");
         } catch (GitAPIException | MissingObjectException | IncorrectObjectTypeException e) {
             throw new IllegalStateException(e);
         }
-        return null;
     }
 
     public void resetToCommit(Repository repository, String commitId) {
@@ -164,12 +165,8 @@ public class GitAccessor implements VcsAccessor {
             return Optional.empty();
         }
 
-        Collections.sort(satisfiedVersion, new Comparator<Pair<RevCommit, Version>>() {
-            @Override
-            public int compare(Pair<RevCommit, Version> version1, Pair<RevCommit, Version> version2) {
-                return version2.getRight().compareTo(version1.getRight());
-            }
-        });
+        Collections.sort(satisfiedVersion, (version1, version2) ->
+                version2.getRight().compareTo(version1.getRight()));
 
         return Optional.of(satisfiedVersion.get(0).getLeft());
     }

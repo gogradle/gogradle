@@ -21,47 +21,47 @@ class GitAccessorTest {
     // injected by GogradleRunner
     File resource
 
-    GitAccessor gitUtils = new GitAccessor();
+    GitAccessor gitAccessor = new GitAccessor();
     Repository repository
 
     @Before
     public void setUp() {
-        repository = gitUtils.getRepository(resource.toPath())
+        repository = gitAccessor.getRepository(resource.toPath())
     }
 
     @Test
     public void 'getting head commit of master branch should success'() {
-        assert gitUtils.headCommitOfBranch(repository, 'master')
+        assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
 
     @Test
     public void 'getting remote urls of repository should success'() {
-        assert gitUtils.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
+        assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
     }
 
     @Test
     public void 'getting remote url of repository should success'() {
-        assert gitUtils.getRemoteUrl(repository) == "https://github.com/blindpirate/test-for-gogradle.git"
+        assert gitAccessor.getRemoteUrl(repository) == "https://github.com/blindpirate/test-for-gogradle.git"
     }
 
     @Test
     public void 'finding initial commit should success'() {
-        assert gitUtils.findCommit(repository, INITIAL_COMMIT).isPresent()
+        assert gitAccessor.findCommit(repository, INITIAL_COMMIT).isPresent()
     }
 
     @Test
     public void 'finding inexistent commit should fail'() {
-        assert !gitUtils.findCommit(repository, 'nonexistence').isPresent()
+        assert !gitAccessor.findCommit(repository, 'nonexistence').isPresent()
     }
 
     @Test
     public void 'getting a tag should success'() {
-        assert gitUtils.findCommitByTag(repository, '1.0.0').get().name() == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
+        assert gitAccessor.findCommitByTag(repository, '1.0.0').get().name() == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
     @Test
     public void 'getting an inexistent tag should fail'() {
-        assert !gitUtils.findCommitByTag(repository, 'nonexistence').isPresent()
+        assert !gitAccessor.findCommitByTag(repository, 'nonexistence').isPresent()
     }
 
     @Test
@@ -69,7 +69,7 @@ class GitAccessorTest {
     public void 'clone with https should success'() {
         File tmpDir = new File("build/tmp/nonexistent-${UUID.randomUUID()}")
 
-        gitUtils.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", tmpDir.toPath());
+        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", tmpDir.toPath());
 
         assert tmpDir.toPath().resolve('.git').toFile().exists()
         forceDelete(tmpDir)
@@ -79,14 +79,14 @@ class GitAccessorTest {
     public void 'reset to initial commit should success'() {
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
 
-        gitUtils.resetToCommit(repository, INITIAL_COMMIT)
+        gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
 
         assert !resource.toPath().resolve('helloworld.go').toFile().exists()
     }
 
     @Test
     public void 'finding commit by sem version should success'() {
-        String commidId = gitUtils.findCommitBySemVersion(repository, '1.0.0').get().name()
+        String commidId = gitAccessor.findCommitBySemVersion(repository, '1.0.0').get().name()
         assert commidId == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
@@ -111,13 +111,13 @@ class GitAccessorTest {
     @WithResource('out-of-date-git-repo.zip')
     public void 'git reset --hard HEAD && git pull should success'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()
-        gitUtils.hardResetAndUpdate(repository)
+        gitAccessor.hardResetAndUpdate(repository)
 
         assert !resource.toPath().resolve('tmpfile').toFile().exists()
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
     }
 
     def semVersionMatch(String semVersion, String resultCommit) {
-        return gitUtils.findCommitBySemVersion(repository, semVersion).get().name() == resultCommit
+        return gitAccessor.findCommitBySemVersion(repository, semVersion).get().name() == resultCommit
     }
 }
