@@ -1,15 +1,22 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
 
+import javax.inject.Inject;
+import java.io.File;
+import java.util.Map;
 import java.util.Optional;
 
 import java.nio.file.Path;
 import java.util.List;
 
 public abstract class ExternalDependencyFactory implements DependencyFactory {
+    @Inject
+    protected MapNotationParser mapNotationParser;
 
     /**
      * Relative paths of identity files.
@@ -17,24 +24,25 @@ public abstract class ExternalDependencyFactory implements DependencyFactory {
      *
      * @return
      */
-    protected abstract List<String> identityFiles();
+    protected abstract String identityFileName();
 
     @Override
     public Optional<GolangDependencySet> produce(GolangPackageModule module) {
-        if (anyFileExist(module)) {
-            return doProduce(module);
+        File identityFile = identityFile(module);
+        if (identityFile.exists()) {
+            List<Map<String, Object>> mapNotations = adapt(identityFile);
+            return Optional.of(InjectionHelper.parseMany(mapNotations, mapNotationParser));
         } else {
             return Optional.empty();
         }
     }
 
-    protected abstract Optional<GolangDependencySet> doProduce(GolangPackageModule module);
+    protected abstract List<Map<String, Object>> adapt(File file);
 
-    private boolean anyFileExist(GolangPackageModule module) {
-        List<String> identityFiles = identityFiles();
-        Assert.isNotEmpty(identityFiles, "Identity files must not be empty!");
+    private File identityFile(GolangPackageModule module) {
+        String identityFile = identityFileName();
+        Assert.isNotBlank(identityFile, "Identity file must not be empty!");
         Path rootDir = module.getRootDir();
-        return identityFiles.stream()
-                .anyMatch(file -> rootDir.resolve(file).toFile().exists());
+        return rootDir.resolve(identityFile).toFile();
     }
 }
