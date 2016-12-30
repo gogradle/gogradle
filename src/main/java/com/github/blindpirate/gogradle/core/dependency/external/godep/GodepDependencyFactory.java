@@ -1,21 +1,19 @@
 package com.github.blindpirate.gogradle.core.dependency.external.godep;
 
-import com.alibaba.fastjson.JSON;
 import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
 
 /**
  * In newest version of godep, it will read dependency versions from GOPATH
@@ -45,11 +43,7 @@ public class GodepDependencyFactory extends ExternalDependencyFactory {
 
     private GodepsDotJsonModel parse(GolangPackageModule module) {
         File file = module.getRootDir().resolve(GODEPS_DOT_JSON_LOCATION).toFile();
-        try {
-            return JSON.parseObject(new FileInputStream(file), GodepsDotJsonModel.class);
-        } catch (IOException e) {
-            throw DependencyResolutionException.cannotParseGodepsDotJson(module, e);
-        }
+        return parseJson(file, GodepsDotJsonModel.class);
     }
 
 }
