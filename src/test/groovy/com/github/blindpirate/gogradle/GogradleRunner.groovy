@@ -26,7 +26,7 @@ import static IOUtils.forceDelete
  * <ul>
  */
 // TODO: ignore @AccessWeb when offline
-public class GogradleRunner extends BlockJUnit4ClassRunner {
+class GogradleRunner extends BlockJUnit4ClassRunner {
 
     private static final String PROJECT_FEILD = 'project'
     private static final String PROJECT_DIR_FEILD = 'projectDir'
@@ -184,8 +184,17 @@ public class GogradleRunner extends BlockJUnit4ClassRunner {
         return method.method.getAnnotation(clazz)
     }
 
-    def findAnnoOnClass(FrameworkMethod method, Class clazz) {
-        return method.method.declaringClass.getAnnotation(clazz)
+    def findAnnoOnClass(FrameworkMethod method, Class annoClass) {
+        Class currentClass = method.method.declaringClass
+        while (currentClass) {
+            def ret = currentClass.getAnnotation(annoClass)
+            if (ret) {
+                return ret
+            }
+            currentClass = currentClass.superclass
+        }
+
+        return null
     }
 
     def tmpRandomDirectory(String prefix) {
