@@ -2,12 +2,18 @@ package com.github.blindpirate.gogradle.core.dependency.external.godep;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Model of Godeps/Godeps.json.
+ *
+ * @see <a href="https://github.com/tools/godep/blob/master/Godeps/Godeps.json">Godeps.json</a>.
+ */
 // Godeps/Godeps.json
 @SuppressWarnings({"checkstyle:membername", "checkstyle:parametername"})
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -25,22 +31,7 @@ public class GodepsDotJsonModel {
         return Deps.stream().map(DepsBean::toNotation).collect(Collectors.toList());
     }
 
-    public String getImportPath() {
-        return ImportPath;
-    }
-
-    public String getGoVersion() {
-        return GoVersion;
-    }
-
-    public String getGodepVersion() {
-        return GodepVersion;
-    }
-
-    public List<DepsBean> getDeps() {
-        return Deps;
-    }
-
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class DepsBean {
         @JsonProperty("ImportPath")
         private String ImportPath;
@@ -50,21 +41,11 @@ public class GodepsDotJsonModel {
         private String Comment;
 
         public Map<String, Object> toNotation() {
-            return ImmutableMap.<String, Object>of(
+            Assert.isNotBlank(ImportPath,"ImportPath cannot be blank!");
+            Assert.isNotBlank(Rev,"Rev cannot be blank!");
+            return ImmutableMap.of(
                     "name", ImportPath,
-                    "commit", Rev);
-        }
-
-        public String getImportPath() {
-            return ImportPath;
-        }
-
-        public String getRev() {
-            return Rev;
-        }
-
-        public String getComment() {
-            return Comment;
+                    "revision", Rev);
         }
     }
 }
