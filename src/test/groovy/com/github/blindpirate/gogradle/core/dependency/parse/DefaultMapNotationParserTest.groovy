@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.pack.PackageInfo
+import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
@@ -30,7 +30,7 @@ class DefaultMapNotationParserTest {
     @Mock
     GolangDependency dependency
     @Mock
-    PackageInfo packageInfo
+    GolangPackage packageInfo
     @Mock
     Injector injector
 

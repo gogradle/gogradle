@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 
 import java.util.Map;
 
@@ -8,8 +8,8 @@ public interface MapNotationParser extends NotationParser<Map<String, Object>> {
     String NAME_KEY = "name";
     String DIR_KEY = "dir";
     String INFO_KEY = "info";
+    String VCS_KEY = "vcs";
 
     @Override
-    GolangDependency parse(Map<String, Object> notation);
-
+    NotationDependency parse(Map<String, Object> notation);
 }
