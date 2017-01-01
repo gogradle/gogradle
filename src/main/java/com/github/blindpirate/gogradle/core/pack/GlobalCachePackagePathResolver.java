@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
@@ -25,7 +26,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packagePath) {
+    public Optional<GolangPackage> produce(String packagePath) {
         Path path = Paths.get(packagePath);
         while (isNotRoot(path)) {
             Optional<VcsType> vcs = findVcsRepo(path);
@@ -37,10 +38,10 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
         return Optional.empty();
     }
 
-    private PackageInfo buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
+    private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
         Path realPath = cacheManager.getGlobalCachePath(repoRootPath.toString());
         List<String> urls = vcsType.getAccessor().getRemoteUrls(realPath);
-        return PackageInfo.builder()
+        return GolangPackage.builder()
                 .withPath(packagePath)
                 .withRootPath(repoRootPath.toString())
                 .withVcsType(vcsType)

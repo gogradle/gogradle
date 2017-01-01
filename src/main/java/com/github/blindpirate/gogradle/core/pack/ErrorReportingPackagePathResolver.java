@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.exceptions.PackageResolutionException;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.inject.BindingAnnotation;
@@ -21,39 +23,39 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Singleton
-public class DefaultPackagePathResolver implements PackagePathResolver {
+public class ErrorReportingPackagePathResolver implements PackagePathResolver {
 
-    private Map<String, PackageInfo> cache = new ConcurrentHashMap<>();
+    private Map<String, GolangPackage> cache = new ConcurrentHashMap<>();
 
     private final List<PackagePathResolver> delegates;
 
     @Inject
-    public DefaultPackagePathResolver(@PackagePathResolvers List<PackagePathResolver> delegates) {
+    public ErrorReportingPackagePathResolver(@PackagePathResolvers List<PackagePathResolver> delegates) {
         this.delegates = delegates;
     }
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packagePath) {
-        Optional<PackageInfo> resultFromCache = tryToFetchFromCache(packagePath);
+    public Optional<GolangPackage> produce(String packagePath) {
+        Optional<GolangPackage> resultFromCache = tryToFetchFromCache(packagePath);
         if (resultFromCache.isPresent()) {
             return resultFromCache;
         }
-        Optional<PackageInfo> result = FactoryUtil.produce(delegates, packagePath);
+        Optional<GolangPackage> result = FactoryUtil.produce(delegates, packagePath);
         reportErrorIfResolutionFailed(packagePath, result);
         updateCache(packagePath, result.get());
         return result;
     }
 
-    private void updateCache(String packagePath, PackageInfo packageInfo) {
-        cache.put(packagePath, packageInfo);
-        if (packageInfo != PackageInfo.INCOMPLETE) {
-            cache.put(packageInfo.getRootPath(), packageInfo.cloneWithSameRoot(packageInfo.getRootPath()));
+    private void updateCache(String packagePath, GolangPackage golangPackage) {
+        cache.put(packagePath, golangPackage);
+        if (golangPackage != GolangPackage.INCOMPLETE) {
+            cache.put(golangPackage.getRootPath(), golangPackage.cloneWithSameRoot(golangPackage.getRootPath()));
         }
     }
 
-    private Optional<PackageInfo> tryToFetchFromCache(String packagePath) {
-        PackageInfo exactMatch = cache.get(packagePath);
+    private Optional<GolangPackage> tryToFetchFromCache(String packagePath) {
+        GolangPackage exactMatch = cache.get(packagePath);
         if (exactMatch != null) {
             return Optional.of(exactMatch);
         }
@@ -61,20 +63,20 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
         Path path = Paths.get(packagePath);
         for (int i = 1; i < path.getNameCount(); ++i) {
             Path current = path.subpath(0, i);
-            PackageInfo existingPackage = cache.get(current.toString());
+            GolangPackage existingPackage = cache.get(current.toString());
             if (isValid(existingPackage)) {
-                PackageInfo result = existingPackage.cloneWithSameRoot(packagePath);
+                GolangPackage result = existingPackage.cloneWithSameRoot(packagePath);
                 return Optional.of(result);
             }
         }
         return Optional.empty();
     }
 
-    private boolean isValid(PackageInfo existingPackage) {
-        return existingPackage != null && existingPackage != PackageInfo.INCOMPLETE;
+    private boolean isValid(GolangPackage existingPackage) {
+        return existingPackage != null && existingPackage != GolangPackage.INCOMPLETE;
     }
 
-    private void reportErrorIfResolutionFailed(String packagePath, Optional<PackageInfo> result) {
+    private void reportErrorIfResolutionFailed(String packagePath, Optional<GolangPackage> result) {
         if (!result.isPresent()) {
             throw PackageResolutionException.cannotResolvePath(packagePath);
         }

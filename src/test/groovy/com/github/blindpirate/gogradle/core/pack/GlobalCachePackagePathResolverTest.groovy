@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.cache.CacheManager
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
@@ -74,7 +75,7 @@ class GlobalCachePackagePathResolverTest {
     @Test
     void 'resolving root package name should success'() {
         // when
-        PackageInfo info = resolver.produce('github.com/a/b').get()
+        GolangPackage info = resolver.produce('github.com/a/b').get()
 
         // then
         assert info.vcsType == VcsType.Git
@@ -86,7 +87,7 @@ class GlobalCachePackagePathResolverTest {
     @Test
     void 'resolving sub package name should success'() {
         // when
-        PackageInfo info = resolver.produce('github.com/a/b/c').get()
+        GolangPackage info = resolver.produce('github.com/a/b/c').get()
         // then
         assert info.vcsType == VcsType.Git
         assert info.path == 'github.com/a/b/c'

@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
@@ -35,7 +36,7 @@ class MetadataPackagePathResolverTest {
         when(httpUtils.get(realUrl)).thenReturn(tagInHtml(metaTag))
 
         // when
-        PackageInfo info = resolver.produce(packagePath).get()
+        GolangPackage info = resolver.produce(packagePath).get()
 
         // then
         assert info.urls.contains('https://code.org/r/p/exproj')

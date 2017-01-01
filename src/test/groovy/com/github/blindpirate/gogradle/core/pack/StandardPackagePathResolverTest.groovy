@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack
 
+import com.github.blindpirate.gogradle.core.GolangPackage
 import org.junit.Test
 
 class StandardPackagePathResolverTest {
@@ -7,7 +8,7 @@ class StandardPackagePathResolverTest {
 
     @Test
     void 'resolving first-level standard package should success'() {
-        PackageInfo info = resolver.produce("fmt").get()
+        GolangPackage info = resolver.produce("fmt").get()
         assert info.isStandard()
         assert info.path == 'fmt'
         assert info.rootPath == 'fmt'
@@ -15,7 +16,7 @@ class StandardPackagePathResolverTest {
 
     @Test
     void 'resolving second-level standard package should success'() {
-        PackageInfo info = resolver.produce('archive/zip').get()
+        GolangPackage info = resolver.produce('archive/zip').get()
         assert info.isStandard()
         assert info.path == 'archive/zip'
         assert info.rootPath == 'archive'
@@ -23,7 +24,7 @@ class StandardPackagePathResolverTest {
 
     @Test
     void 'resolving third-level standard package should success'() {
-        PackageInfo info = resolver.produce('net/http/cgi').get()
+        GolangPackage info = resolver.produce('net/http/cgi').get()
         assert info.isStandard()
         assert info.path == 'net/http/cgi'
         assert info.rootPath == 'net'
@@ -31,7 +32,7 @@ class StandardPackagePathResolverTest {
 
     @Test
     void 'resolving pseudo package "C" should succss'() {
-        PackageInfo info = resolver.produce('C').get()
+        GolangPackage info = resolver.produce('C').get()
         assert info.isStandard()
         assert info.path == 'C'
         assert info.rootPath == 'C'

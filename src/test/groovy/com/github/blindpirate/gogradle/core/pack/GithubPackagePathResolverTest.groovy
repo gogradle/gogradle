@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack
 
+import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
@@ -10,7 +11,7 @@ class GithubPackagePathResolverTest {
     @Test
     void 'resolving name should success'() {
         // when
-        PackageInfo result = resolver.produce('github.com/a/b').get()
+        GolangPackage result = resolver.produce('github.com/a/b').get()
 
         // then
         assert result.path == 'github.com/a/b'
@@ -20,16 +21,16 @@ class GithubPackagePathResolverTest {
     @Test
     void 'resolving an incomplete name should success'() {
         // when
-        PackageInfo result = resolver.produce('github.com/a').get()
+        GolangPackage result = resolver.produce('github.com/a').get()
         // then
-        assert result == PackageInfo.INCOMPLETE
+        assert result == GolangPackage.INCOMPLETE
     }
 
 
     @Test
     void 'resolving a long name should success'() {
         // when
-        PackageInfo info = resolver.produce('github.com/a/b/c').get()
+        GolangPackage info = resolver.produce('github.com/a/b/c').get()
 
         // then
         assert info.path == 'github.com/a/b/c'
@@ -40,14 +41,14 @@ class GithubPackagePathResolverTest {
     void 'resolving a long long name should success'() {
         // when
         String wtf = 'github.com/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z'
-        PackageInfo info = resolver.produce(wtf).get()
+        GolangPackage info = resolver.produce(wtf).get()
 
         // then
         assert info.path == wtf
         assertVcsTypeUrlsAndRootPath(info)
     }
 
-    void assertVcsTypeUrlsAndRootPath(PackageInfo info) {
+    void assertVcsTypeUrlsAndRootPath(GolangPackage info) {
         assert info.vcsType == VcsType.Git
         assert info.vcsType == VcsType.Git
         assert info.urls.contains('https://github.com/a/b.git')

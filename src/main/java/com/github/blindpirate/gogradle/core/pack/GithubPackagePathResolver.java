@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import java.util.Optional;
@@ -17,11 +18,11 @@ public class GithubPackagePathResolver implements PackagePathResolver {
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packagePath) {
+    public Optional<GolangPackage> produce(String packagePath) {
         if (isNotGithubPackage(packagePath)) {
             return Optional.empty();
         } else if (isIncomplete(packagePath)) {
-            return Optional.of(PackageInfo.INCOMPLETE);
+            return Optional.of(GolangPackage.INCOMPLETE);
         } else {
             return doProduce(packagePath);
         }
@@ -35,13 +36,13 @@ public class GithubPackagePathResolver implements PackagePathResolver {
         return !packagePath.startsWith(GITHUB_HOST);
     }
 
-    public Optional<PackageInfo> doProduce(String packagePath) {
+    public Optional<GolangPackage> doProduce(String packagePath) {
         Path path = toPath(packagePath);
         String httpsUrl = HTTPS + path.subpath(0, 3) + ".git";
         String sshUrl = String.format("git@github.com:%s", path.subpath(1, 3));
         String rootPackagePath = path.subpath(0, 3).toString();
 
-        PackageInfo info = PackageInfo.builder()
+        GolangPackage info = GolangPackage.builder()
                 .withPath(packagePath)
                 .withVcsType(VcsType.Git)
                 .withRootPath(rootPackagePath)

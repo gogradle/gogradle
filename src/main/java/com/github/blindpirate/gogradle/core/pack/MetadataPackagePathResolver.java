@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
@@ -30,8 +31,8 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
     @Override
     @DebugLog
-    public Optional<PackageInfo> produce(String packagePath) {
-        Optional<PackageInfo> httpsResult = fetchViaWeb(packagePath, HTTPS + packagePath);
+    public Optional<GolangPackage> produce(String packagePath) {
+        Optional<GolangPackage> httpsResult = fetchViaWeb(packagePath, HTTPS + packagePath);
         if (httpsResult.isPresent()) {
             return httpsResult;
         } else {
@@ -39,7 +40,7 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
         }
     }
 
-    private Optional<PackageInfo> fetchViaWeb(String packagePath, String url) {
+    private Optional<GolangPackage> fetchViaWeb(String packagePath, String url) {
         try {
             String html = fetchHtml(url);
 
@@ -63,14 +64,14 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
     }
 
-    private PackageInfo buildPackageInfo(String packagePath, String content) {
+    private GolangPackage buildPackageInfo(String packagePath, String content) {
         String[] array = StringUtils.splitAndTrim(content, " ");
         Assert.isTrue(array.length > 2, "Invalid content:" + content);
         String rootPath = array[0];
         VcsType vcs = VcsType.of(array[1]).get();
         String url = array[2];
 
-        return PackageInfo.builder()
+        return GolangPackage.builder()
                 .withPath(packagePath)
                 .withVcsType(vcs)
                 .withRootPath(rootPath)

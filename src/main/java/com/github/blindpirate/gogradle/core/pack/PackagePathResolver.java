@@ -1,14 +1,15 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.general.Factory;
 
 import java.util.Optional;
 
-public interface PackagePathResolver extends Factory<String, PackageInfo> {
+public interface PackagePathResolver extends Factory<String, GolangPackage> {
     String HTTP = "http://";
     String HTTPS = "https://";
 
     @Override
-    Optional<PackageInfo> produce(String packagePath);
+    Optional<GolangPackage> produce(String packagePath);
 }

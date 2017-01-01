@@ -1,6 +1,8 @@
 package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.exceptions.PackageResolutionException
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
@@ -16,25 +18,25 @@ import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class DefaultPackagePathResolverTest {
+class ErrorReportingPackagePathResolverTest {
     @Mock
     PackagePathResolver resolver1
     @Mock
     PackagePathResolver resolver2
 
-    PackageInfo packageInfo = PackageInfo.builder().withPath('root/package')
+    GolangPackage packageInfo = GolangPackage.builder().withPath('root/package')
             .withRootPath('root')
             .withVcsType(VcsType.Git)
             .withUrls(['url'])
             .build()
 
-    DefaultPackagePathResolver resolver
+    ErrorReportingPackagePathResolver resolver
 
     String packagePath = 'packagePath'
 
     @Before
     void setUp() {
-        resolver = new DefaultPackagePathResolver([resolver1, resolver2])
+        resolver = new ErrorReportingPackagePathResolver([resolver1, resolver2])
         when(resolver1.produce(packagePath)).thenReturn(empty())
         when(resolver2.produce(packagePath)).thenReturn(of(packageInfo))
     }
@@ -57,7 +59,7 @@ class DefaultPackagePathResolverTest {
     @Test
     void 'package and its root package should be put into cache after successful resolution'() {
         // given
-        PackageInfo info = PackageInfo.builder()
+        GolangPackage info = GolangPackage.builder()
                 .withPath('github.com/a/b/c')
                 .withRootPath('github.com/a/b')
                 .withVcsType(VcsType.Git)
@@ -73,7 +75,7 @@ class DefaultPackagePathResolverTest {
     @Test
     void 'root of an incomplete package should not be put into cache after resolution'() {
         // given
-        when(resolver1.produce('gihub.com/a')).thenReturn(of(PackageInfo.INCOMPLETE))
+        when(resolver1.produce('gihub.com/a')).thenReturn(of(GolangPackage.INCOMPLETE))
         // when
         resolver.produce('gihub.com/a')
         // then
@@ -92,20 +94,20 @@ class DefaultPackagePathResolverTest {
     @Test
     void 'root package result should be leveraged when resolving children package'() {
         // given
-        PackageInfo rootInfo = PackageInfo.builder()
+        GolangPackage rootInfo = GolangPackage.builder()
                 .withPath('github.com/a/b')
                 .withRootPath('github.com/a/b')
                 .withVcsType(VcsType.Git)
                 .withUrls([])
                 .build()
-        getField(resolver, 'cache').put('github.com', PackageInfo.INCOMPLETE)
-        getField(resolver, 'cache').put('github.com/a', PackageInfo.INCOMPLETE)
+        getField(resolver, 'cache').put('github.com', GolangPackage.INCOMPLETE)
+        getField(resolver, 'cache').put('github.com/a', GolangPackage.INCOMPLETE)
         getField(resolver, 'cache').put('github.com/a/b', rootInfo)
 
         // when
-        PackageInfo result1 = resolver.produce('github.com/a/b').get()
-        PackageInfo result2 = resolver.produce('github.com/a/b/c').get()
-        PackageInfo result3 = resolver.produce('github.com/a/b/c/d').get()
+        GolangPackage result1 = resolver.produce('github.com/a/b').get()
+        GolangPackage result2 = resolver.produce('github.com/a/b/c').get()
+        GolangPackage result3 = resolver.produce('github.com/a/b/c/d').get()
 
         // then
         verify(resolver1, times(0)).produce(anyString())
