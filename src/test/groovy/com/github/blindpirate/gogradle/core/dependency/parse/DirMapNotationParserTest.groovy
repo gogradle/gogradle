@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency
 import org.junit.Test
 
 class DirMapNotationParserTest {
@@ -14,7 +14,7 @@ class DirMapNotationParserTest {
         GolangDependency dependency = parser.parse([name: 'path', dir: 'dir'])
 
         // then
-        assert dependency instanceof LocalDirectoryDependency
+        assert dependency instanceof LocalDirectoryNotationDependency
         assert dependency.name == 'path'
         assert dependency.dir == 'dir'
     }
