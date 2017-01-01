@@ -1,7 +1,7 @@
-package com.github.blindpirate.gogradle.core.dependency.external.glock
+package com.github.blindpirate.gogradle.core.dependency.produce.external.glock
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +18,7 @@ class GlockDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without GLOCKFILE should be rejected'() {
-        assert !factory.produce(module).isPresent()
+        assert !factory.produce(resource).isPresent()
     }
 
     String GLOCKFILE = '''
@@ -32,11 +32,11 @@ code.google.com/p/go-uuid 7dda39b2e7d5
         // given
         prepareGlockfile(GLOCKFILE)
         // when
-        factory.produce(module)
+        factory.produce(resource)
         // then
-        verifyMapParsed([name: 'bitbucket.org/tebeka/selenium', revision: '02df1758050f'])
-        verifyMapParsed([name: 'code.google.com/p/cascadia', revision: '4f03c71bc42b'])
-        verifyMapParsed([name: 'code.google.com/p/go-uuid', revision: '7dda39b2e7d5'])
+        verifyMapParsed([name: 'bitbucket.org/tebeka/selenium', version: '02df1758050f'])
+        verifyMapParsed([name: 'code.google.com/p/cascadia', version: '4f03c71bc42b'])
+        verifyMapParsed([name: 'code.google.com/p/go-uuid', version: '7dda39b2e7d5'])
     }
 
     String glockfileWithCmds = '''
@@ -53,7 +53,7 @@ code.google.com/p/go-uuid 7dda39b2e7d5
         // given
         prepareGlockfile(glockfileWithCmds)
         // when
-        factory.produce(module)
+        factory.produce(resource)
         // then
         verify(mapNotationParser, times(3)).parse(anyMap())
     }
@@ -67,7 +67,7 @@ This is a corrupted line
         // given
         prepareGlockfile(glockfileWithCorruptedLine)
         // then
-        factory.produce(module)
+        factory.produce(resource)
     }
 
     void prepareGlockfile(String s) {

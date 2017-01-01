@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.external.glock;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.glock;
 
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -30,7 +30,7 @@ public class GlockfileParser {
         String[] packageAndRevision = StringUtils.splitAndTrim(line, "\\s");
         Assert.isTrue(packageAndRevision.length == 2, "Unrecognized line:" + line);
         return MapUtils.asMap("name", packageAndRevision[0],
-                "revision", packageAndRevision[1]);
+                "version", packageAndRevision[1]);
     }
 
     private boolean isNotCmdLine(String line) {

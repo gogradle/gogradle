@@ -1,6 +1,6 @@
-package com.github.blindpirate.gogradle.core.dependency.external.glock;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.glock;
 
-import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
 import javax.inject.Singleton;
 import java.io.File;
@@ -14,7 +14,7 @@ import java.util.Map;
  */
 @Singleton
 public class GlockDependencyFactory extends ExternalDependencyFactory {
-    private GlockfileParser parser=new GlockfileParser();
+    private GlockfileParser parser = new GlockfileParser();
 
     @Override
     protected String identityFileName() {
