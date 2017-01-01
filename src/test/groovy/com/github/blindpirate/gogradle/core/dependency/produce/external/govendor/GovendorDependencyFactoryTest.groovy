@@ -57,12 +57,22 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         factory.produce(resource)
     }
 
-    @Test(expected = RuntimeException)
-    void 'missing path or revision should cause an exception'() {
+    @Test(expected = IllegalStateException)
+    void 'missing path should cause an exception'() {
         // given
         prepareVendorDotJson('{"package":[{}]}')
         // then
         factory.produce(resource)
+    }
+
+    @Test
+    void 'missing revision should not cause an exception'() {
+        // given
+        prepareVendorDotJson('{"package":[{"path":"a"}]}')
+        // when
+        factory.produce(resource)
+        // then
+        verifyMapParsed([name: 'a'])
     }
     String vendorDotJsonWithExtraProperties = '''
     {
