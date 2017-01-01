@@ -1,8 +1,10 @@
-package com.github.blindpirate.gogradle.core.dependency.produce;
+package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
+
+import java.io.File;
 
 /**
  * Direct how to generate dependencies of an existing golang package module.
@@ -13,8 +15,5 @@ import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyV
 // GogradleReproducible: vendor>external
 
 public interface DependencyProduceStrategy {
-
-    DependencyProduceStrategy DEFAULT_STRATEGY = new DefaultDependencyProduceStrategy();
-
-    GolangDependencySet produce(GolangPackageModule module, ModuleDependencyVistor vistor);
+    GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor vistor);
 }

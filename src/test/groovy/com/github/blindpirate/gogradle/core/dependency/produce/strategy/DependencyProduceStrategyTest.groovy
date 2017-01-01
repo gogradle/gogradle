@@ -1,22 +1,22 @@
-package com.github.blindpirate.gogradle.core.dependency.produce
+package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.resolve.ModuleDependencyVistor
-import java.util.Optional
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import org.junit.Before
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asOptional
 import static org.mockito.Mockito.when
 
 abstract class DependencyProduceStrategyTest {
     @Mock
-    GolangPackageModule module
+    ResolvedDependency resolvedDependency
     @Mock
-    ModuleDependencyVistor visitor
+    File rootDir
+    @Mock
+    DependencyVisitor visitor
 
     @Mock
     GolangDependency a1
@@ -42,18 +42,18 @@ abstract class DependencyProduceStrategyTest {
     }
 
     void vendorDependencies(GolangDependency... dependencies) {
-        Optional<GolangDependencySet> result = asOptional(dependencies)
-        when(visitor.visitVendorDependencies(module)).thenReturn(result)
+        GolangDependencySet result = asGolangDependencySet(dependencies)
+        when(visitor.visitVendorDependencies(resolvedDependency, rootDir)).thenReturn(result)
     }
 
     void externalDependencies(GolangDependency... dependencies) {
-        Optional<GolangDependencySet> set = asOptional(dependencies)
-        when(visitor.visitExternalDependencies(module)).thenReturn(set)
+        GolangDependencySet set = asGolangDependencySet(dependencies)
+        when(visitor.visitExternalDependencies(resolvedDependency, rootDir)).thenReturn(set)
     }
 
     void sourceCodeDependencies(GolangDependency... dependencies) {
         GolangDependencySet set = asGolangDependencySet(dependencies)
-        when(visitor.visitSourceCodeDependencies(module)).thenReturn(set)
+        when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir)).thenReturn(set)
     }
 
 

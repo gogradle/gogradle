@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.produce
+package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import org.junit.Test
@@ -18,10 +18,10 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
 
         // when
-        strategy.produce(module, visitor)
+        strategy.produce(resolvedDependency, rootDir, visitor)
 
         //then
-        verify(visitor).visitSourceCodeDependencies(module)
+        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir)
     }
 
     @Test
@@ -31,13 +31,13 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         externalDependencies(a2, c2)
 
         // when
-        def result = strategy.produce(module, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor)
         // then
         assert result.any { it.is(a1) }
         assert result.any { it.is(b1) }
         assert result.any { it.is(c2) }
         assert !result.any { it.is(a2) }
-        verify(visitor, times(0)).visitSourceCodeDependencies(module)
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir)
     }
 
     @Test
@@ -46,11 +46,11 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies(a1)
         externalDependencies()
         // when
-        def result = strategy.produce(module, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor)
         // then
         assert result.size() == 1
         assert result.any { it.is(a1) }
-        verify(visitor, times(0)).visitSourceCodeDependencies(module)
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir)
     }
 
     @Test
@@ -59,11 +59,11 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
         externalDependencies(a2)
         // when
-        def result = strategy.produce(module, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor)
         // then
         assert result.size() == 1
         assert result.any { it.is(a2) }
-        verify(visitor, times(0)).visitSourceCodeDependencies(module)
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir)
     }
 
 }
