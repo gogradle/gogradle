@@ -11,6 +11,9 @@ import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 
 import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
 
@@ -95,7 +98,7 @@ public class IOUtils {
 
     private static String realFileName(String fileNameWithSlash) {
         Path path = Paths.get(fileNameWithSlash);
-        return path.getName(path.getNameCount() - 1).toString();
+        return path.getFileName().toString();
     }
 
     private static Path realBaseDir(Path basePath, String fileNameWithSlash) {
@@ -118,6 +121,15 @@ public class IOUtils {
         } catch (IOException e) {
             handleIOException(e);
             return null;
+        }
+    }
+
+    public static List<String> getLines(File file) {
+        String content = toString(file);
+        if (StringUtils.isEmpty(content)) {
+            return Collections.emptyList();
+        } else {
+            return Arrays.asList(content.split("\n"));
         }
     }
 }
