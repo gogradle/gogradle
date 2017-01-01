@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.external.glide;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.glide;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -39,7 +39,7 @@ public class GlideDotLockModel {
         public Map<String, Object> toNotation() {
             Assert.isNotBlank(name);
             Assert.isNotBlank(version);
-            return ImmutableMap.of("name", name, "revision", version);
+            return ImmutableMap.of("name", name, "version", version);
         }
     }
 }

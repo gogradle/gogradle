@@ -1,6 +1,6 @@
-package com.github.blindpirate.gogradle.core.dependency.external.glide;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.glide;
 
-import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
 import javax.inject.Singleton;
 import java.io.File;

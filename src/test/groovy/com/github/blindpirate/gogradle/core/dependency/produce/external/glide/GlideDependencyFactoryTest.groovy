@@ -1,15 +1,11 @@
-package com.github.blindpirate.gogradle.core.dependency.external.glide
+package com.github.blindpirate.gogradle.core.dependency.produce.external.glide
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.dependency.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
-
-import static org.mockito.ArgumentMatchers.eq
-import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
 class GlideDependencyFactoryTest extends ExternalDependencyFactoryTest {
@@ -19,7 +15,7 @@ class GlideDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without glide.lock should be rejected'() {
-        assert !factory.produce(module).isPresent()
+        assert !factory.produce(resource).isPresent()
     }
 
     String glideDotLock = '''
@@ -43,12 +39,12 @@ testImports: []
         prepareGlideDotLock(glideDotLock)
 
         // when
-        factory.produce(module)
+        factory.produce(resource)
         // then
-        verifyMapParsed([name: 'github.com/codegangsta/cli', revision: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])
-        verifyMapParsed([name: 'github.com/Masterminds/semver', revision: '8d0431362b544d1a3536cca26684828866a7de09'])
-        verifyMapParsed([name: 'github.com/Masterminds/vcs', revision: 'fbe9fb6ad5b5f35b3e82a7c21123cfc526cbf895'])
-        verifyMapParsed([name: 'gopkg.in/yaml.v2', revision: 'e4d366fc3c7938e2958e662b4258c7a89e1f0e3e'])
+        verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])
+        verifyMapParsed([name: 'github.com/Masterminds/semver', version: '8d0431362b544d1a3536cca26684828866a7de09'])
+        verifyMapParsed([name: 'github.com/Masterminds/vcs', version: 'fbe9fb6ad5b5f35b3e82a7c21123cfc526cbf895'])
+        verifyMapParsed([name: 'gopkg.in/yaml.v2', version: 'e4d366fc3c7938e2958e662b4258c7a89e1f0e3e'])
     }
 
     String glideDotLockWithMissingNameAndVersion = '''
@@ -67,7 +63,7 @@ testImports: []
         // given
         prepareGlideDotLock(glideDotLockWithMissingNameAndVersion)
         // then
-        factory.produce(module)
+        factory.produce(resource)
     }
 
     String glideDotLockWithExtraAndMissingProperties = '''
@@ -83,12 +79,11 @@ imports:
         // given
         prepareGlideDotLock(glideDotLockWithExtraAndMissingProperties)
         // when
-        factory.produce(module)
+        factory.produce(resource)
         // then
 
-        verifyMapParsed([name: 'github.com/codegangsta/cli', revision: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])
+        verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])
     }
-
 
 
     void prepareGlideDotLock(String glideDotLock) {
