@@ -79,7 +79,7 @@ public class GitAccessor implements VcsAccessor {
             String commitId = headRef.getObjectId().name();
             return findCommit(repository, commitId);
         } catch (IOException e) {
-            throw new GitInteractionException("Cannot resolve HEAD of " + repository + ":" + branch);
+            throw new GitInteractionException("Cannot produce HEAD of " + repository + ":" + branch);
         }
     }
 

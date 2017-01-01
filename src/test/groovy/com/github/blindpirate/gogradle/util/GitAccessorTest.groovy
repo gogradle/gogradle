@@ -6,7 +6,6 @@ import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -25,48 +24,48 @@ class GitAccessorTest {
     Repository repository
 
     @Before
-    public void setUp() {
+    void setUp() {
         repository = gitAccessor.getRepository(resource.toPath())
     }
 
     @Test
-    public void 'getting head commit of master branch should success'() {
+    void 'getting head commit of master branch should success'() {
         assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
 
     @Test
-    public void 'getting remote urls of repository should success'() {
+    void 'getting remote urls of repository should success'() {
         assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
     }
 
     @Test
-    public void 'getting remote url of repository should success'() {
+    void 'getting remote url of repository should success'() {
         assert gitAccessor.getRemoteUrl(repository) == "https://github.com/blindpirate/test-for-gogradle.git"
     }
 
     @Test
-    public void 'finding initial commit should success'() {
+    void 'finding initial commit should success'() {
         assert gitAccessor.findCommit(repository, INITIAL_COMMIT).isPresent()
     }
 
     @Test
-    public void 'finding inexistent commit should fail'() {
+    void 'finding inexistent commit should fail'() {
         assert !gitAccessor.findCommit(repository, 'nonexistence').isPresent()
     }
 
     @Test
-    public void 'getting a tag should success'() {
+    void 'getting a tag should success'() {
         assert gitAccessor.findCommitByTag(repository, '1.0.0').get().name() == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
     @Test
-    public void 'getting an inexistent tag should fail'() {
+    void 'getting an inexistent tag should fail'() {
         assert !gitAccessor.findCommitByTag(repository, 'nonexistence').isPresent()
     }
 
     @Test
     @AccessWeb
-    public void 'clone with https should success'() {
+    void 'clone with https should success'() {
         File tmpDir = new File("build/tmp/nonexistent-${UUID.randomUUID()}")
 
         gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", tmpDir.toPath());
@@ -76,7 +75,7 @@ class GitAccessorTest {
     }
 
     @Test
-    public void 'reset to initial commit should success'() {
+    void 'reset to initial commit should success'() {
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
 
         gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
@@ -85,13 +84,13 @@ class GitAccessorTest {
     }
 
     @Test
-    public void 'finding commit by sem version should success'() {
+    void 'finding commit by sem version should success'() {
         String commidId = gitAccessor.findCommitBySemVersion(repository, '1.0.0').get().name()
         assert commidId == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
     @Test
-    public void 'finding commid by sem version expression should success'() {
+    void 'finding commid by sem version expression should success'() {
         //3.0.0
         assert semVersionMatch('3.x', '4a06b73b6464f06d64efc53ae9b497f6b9a1ef4f')
         // NOT 1.0.0
@@ -109,7 +108,7 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     @WithResource('out-of-date-git-repo.zip')
-    public void 'git reset --hard HEAD && git pull should success'() {
+    void 'git reset --hard HEAD && git pull should success'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()
         gitAccessor.hardResetAndUpdate(repository)
 
