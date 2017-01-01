@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 
 import java.util.List;
 import java.util.Map;
@@ -34,9 +32,9 @@ public class GlideDotLockModel {
     @JsonIgnoreProperties(ignoreUnknown = true)
     public static class ImportBean {
         @JsonProperty("name")
-        String name;
+        private String name;
         @JsonProperty("version")
-        String version;
+        private String version;
 
         public Map<String, Object> toNotation() {
             Assert.isNotBlank(name);

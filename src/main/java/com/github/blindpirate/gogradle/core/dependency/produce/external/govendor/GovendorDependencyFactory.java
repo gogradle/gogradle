@@ -7,7 +7,7 @@ import java.io.File;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.util.DataExchange.*;
+import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
 
 /**
  * Converts vendor/vendor.json in repos managed by govendor to gogradle map notations.

@@ -40,9 +40,9 @@ public class VendorDotConfParser {
     }
 
     private Map<String, Object> toNotation(String line) {
-        // github.com/Microsoft/go-winio	0.3.6
-        // github.com/davecgh/go-spew	v1.0.0-9-g346938d
-        // github.com/docker/docker	3a68292
+        // github.com/Microsoft/go-winio 0.3.6
+        // github.com/davecgh/go-spew v1.0.0-9-g346938d
+        // github.com/docker/docker 3a68292
         // github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://github.com/cpuguy83/check.git
         Map<String, Object> ret = new HashedMap();
         String[] array = StringUtils.splitAndTrim(line, "\\s");
@@ -67,21 +67,5 @@ public class VendorDotConfParser {
 
     private boolean isNotCommentLine(String line) {
         return !line.trim().startsWith("#");
-    }
-
-    private static class LineInfo {
-        String packagePath;
-        String version;
-        String url;
-
-        LineInfo(String line) {
-            String[] array = StringUtils.splitAndTrim(line, "\\s");
-            Assert.isTrue(array.length > 1);
-            packagePath = array[0];
-            version = array[1];
-            if (array.length > 2) {
-                url = array[2];
-            }
-        }
     }
 }

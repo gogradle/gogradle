@@ -1,24 +1,23 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 
 @Singleton
 public class DefaultDependencyRegistry implements DependencyRegistry {
-    private Map<String, GolangPackageModule> packages = new HashMap<>();
+    private Map<String, ResolvedDependency> packages = new HashMap<>();
 
     @Override
-    public boolean register(GolangPackageModule module) {
+    public boolean register(ResolvedDependency resolvedDependency) {
         synchronized (packages) {
-            GolangPackageModule existingModule = packages.get(module.getName());
-            if (existingModule != null && theyAreAllFirstLevel(existingModule, module)) {
-                throw new IllegalStateException("First-level package " + module.getName() + " conflict!");
-            } else if (module.isFirstLevel()
-                    || existingModuleIsOutOfDate(existingModule, module)) {
-                packages.put(module.getName(), module);
+            ResolvedDependency existent = packages.get(resolvedDependency.getName());
+            if (existent != null && theyAreAllFirstLevel(existent, resolvedDependency)) {
+                throw new IllegalStateException("First-level package " + resolvedDependency.getName()
+                        + " conflict!");
+            } else if (resolvedDependency.isFirstLevel()
+                    || existingModuleIsOutOfDate(existent, resolvedDependency)) {
+                packages.put(resolvedDependency.getName(), resolvedDependency);
                 return true;
             } else {
                 return false;
@@ -26,14 +25,20 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         }
     }
 
-    private boolean existingModuleIsOutOfDate(GolangPackageModule existingModule, GolangPackageModule module) {
+    @Override
+    public ResolvedDependency retrive(String name) {
+        return packages.get(name);
+    }
+
+    private boolean existingModuleIsOutOfDate(ResolvedDependency existingModule,
+                                              ResolvedDependency resolvedDependency) {
         if (existingModule == null) {
             return true;
         }
-        return existingModule.getUpdateTime() < module.getUpdateTime();
+        return existingModule.getUpdateTime() < resolvedDependency.getUpdateTime();
     }
 
-    private boolean theyAreAllFirstLevel(GolangPackageModule existedModule, GolangPackageModule module) {
-        return existedModule.isFirstLevel() && module.isFirstLevel();
+    private boolean theyAreAllFirstLevel(ResolvedDependency existedModule, ResolvedDependency resolvedDependency) {
+        return existedModule.isFirstLevel() && resolvedDependency.isFirstLevel();
     }
 }
