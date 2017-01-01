@@ -3,16 +3,14 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbve
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.ImmutableMap;
+import com.github.blindpirate.gogradle.util.MapUtils;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
+import static com.github.blindpirate.gogradle.util.StringUtils.removeEnd;
 
 /**
  * Model of vendor/manifest in repos managed by gvt or gbvendor.
@@ -50,7 +48,7 @@ public class ManifestModel {
 
         public Map<String, Object> toNotation() {
             Assert.isNotBlank(importpath);
-            return ImmutableMap.of("vcs", vcs,
+            return MapUtils.asMapWithoutNull("vcs", vcs,
                     "name", determineName(),
                     "version", revision);
         }
