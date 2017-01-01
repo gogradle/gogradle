@@ -1,6 +1,5 @@
-package com.github.blindpirate.gogradle.core.dependency.provider
+package com.github.blindpirate.gogradle.core.dependency.parse
 
-import com.github.blindpirate.gogradle.core.dependency.parse.GitNotationConverter
 import org.junit.Test
 
 class GitNotationConverterTest {
@@ -8,12 +7,12 @@ class GitNotationConverterTest {
     GitNotationConverter converter = new GitNotationConverter()
 
     @Test
-    public void 'package with only name should be parsed correctly'() {
+    void 'package with only name should be parsed correctly'() {
         assert converter.convert('github.com/a/b') == [name: 'github.com/a/b']
     }
 
     @Test
-    public void 'package with tag should be parsed correctly'() {
+    void 'package with tag should be parsed correctly'() {
         assertWithTag('github.com/a/b@v1.0.0', 'v1.0.0')
         assertWithTag('github.com/a/b@v1.0.0-prerelease', 'v1.0.0-prerelease')
         assertWithTag('github.com/a/b@tag-with@', 'tag-with@')
@@ -24,13 +23,13 @@ class GitNotationConverterTest {
     }
 
     @Test
-    public void 'package with commit should be parsed correctly'() {
+    void 'package with commit should be parsed correctly'() {
         assert converter.convert('github.com/a/b#commitId') == [name: 'github.com/a/b', commit: 'commitId']
     }
 
     // https://github.com/zafarkhaja/jsemver
     @Test
-    public void 'package with sem version should be parsed correctly'() {
+    void 'package with sem version should be parsed correctly'() {
         assertWithTag('github.com/a/b@1.*', '1.*')
         assertWithTag('github.com/a/b@1.x', '1.x')
         assertWithTag('github.com/a/b@~1.5', '~1.5')
@@ -44,7 +43,4 @@ class GitNotationConverterTest {
     void assertWithTag(String notation, String tag) {
         assert converter.convert(notation) == [name: 'github.com/a/b', tag: tag]
     }
-
-
-
 }

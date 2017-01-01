@@ -6,8 +6,8 @@ import com.github.blindpirate.gogradle.util.MapUtils;
 import javax.inject.Singleton;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.core.dependency.GitDependency.COMMIT_KEY;
-import static com.github.blindpirate.gogradle.core.dependency.GitDependency.TAG_KEY;
+import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
 
@@ -55,7 +55,7 @@ public class GitNotationConverter implements NotationConverter {
         String name = array[0];
         String commit = array[1];
 
-        return MapUtils.<String, Object>asMap(
+        return MapUtils.asMap(
                 NAME_KEY, name,
                 COMMIT_KEY, commit);
     }
@@ -66,7 +66,7 @@ public class GitNotationConverter implements NotationConverter {
         String name = notation.substring(0, indexOfAt);
         String tag = notation.substring(indexOfAt + 1);
 
-        return MapUtils.<String, Object>asMap(
+        return MapUtils.asMap(
                 NAME_KEY, name,
                 TAG_KEY, tag);
     }
