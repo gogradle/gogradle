@@ -1,17 +1,15 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
-import com.github.blindpirate.gogradle.core.pack.PackageInfo;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.core.pack.PackageResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-import java.util.Optional;
-
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
+import java.util.Optional;
 
 @Singleton
 public class DefaultNotationConverter implements NotationConverter {
@@ -31,10 +29,7 @@ public class DefaultNotationConverter implements NotationConverter {
 
     private VcsType extractVcs(String notation) {
         String packagePath = extractPackagePath(notation);
-        Optional<PackageInfo> info = packagePathResolver.produce(packagePath);
-        if (!info.isPresent()) {
-            throw PackageResolutionException.cannotResolvePath(packagePath);
-        }
+        Optional<GolangPackage> info = packagePathResolver.produce(packagePath);
         Assert.isTrue(!info.get().isStandard(), "Cannot convert a standard package!");
         return info.get().getVcsType();
     }
