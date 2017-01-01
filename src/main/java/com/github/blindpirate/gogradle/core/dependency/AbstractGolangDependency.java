@@ -16,7 +16,7 @@ public abstract class AbstractGolangDependency implements GolangDependency {
     /**
      * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.
      */
-    protected Set<Spec<GolangDependency>> transitiveDepExclusions = new HashSet<>();
+    private Set<Spec<GolangDependency>> transitiveDepExclusions = new HashSet<>();
 
     protected boolean shouldNotBeExcluded(GolangDependency dependency) {
         return transitiveDepExclusions.stream().noneMatch(spec -> spec.isSatisfiedBy(dependency));
@@ -24,6 +24,14 @@ public abstract class AbstractGolangDependency implements GolangDependency {
 
     public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
         return new HashSet<>(transitiveDepExclusions);
+    }
+
+    protected void addTransitiveDepExclusion(Spec<GolangDependency> spec) {
+        transitiveDepExclusions.add(spec);
+    }
+
+    protected void remoteTransitiveDepExclusion(Spec<GolangDependency> spec) {
+        transitiveDepExclusions.remove(spec);
     }
 
     @Override
@@ -73,11 +81,11 @@ public abstract class AbstractGolangDependency implements GolangDependency {
         }
     }
 
-    public static class PropertiesExcludeSpec implements Spec<GolangDependency> {
+    public static class PropertiesExclusionSpec implements Spec<GolangDependency> {
         private Map<String, Object> properties;
 
-        public static PropertiesExcludeSpec of(Map<String, Object> properties) {
-            PropertiesExcludeSpec ret = new PropertiesExcludeSpec();
+        public static PropertiesExclusionSpec of(Map<String, Object> properties) {
+            PropertiesExclusionSpec ret = new PropertiesExclusionSpec();
             ret.properties = Assert.isNotNull(properties);
             return ret;
         }
@@ -89,10 +97,13 @@ public abstract class AbstractGolangDependency implements GolangDependency {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
-
-            PropertiesExcludeSpec that = (PropertiesExcludeSpec) o;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            PropertiesExclusionSpec that = (PropertiesExclusionSpec) o;
 
             return properties.equals(that.properties);
         }

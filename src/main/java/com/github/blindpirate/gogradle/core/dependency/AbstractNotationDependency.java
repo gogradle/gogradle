@@ -19,14 +19,14 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     protected abstract Class<? extends DependencyResolver> resolverClass();
 
     public void exclude(Map<String, Object> map) {
-        transitiveDepExclusions.add(PropertiesExcludeSpec.of(map));
+        addTransitiveDepExclusion(PropertiesExclusionSpec.of(map));
     }
 
     public void setTransitive(boolean transitive) {
         if (transitive) {
-            transitiveDepExclusions.remove(NO_TRANSITIVE_DEP_SPEC);
+            remoteTransitiveDepExclusion(NO_TRANSITIVE_DEP_SPEC);
         } else {
-            transitiveDepExclusions.add(NO_TRANSITIVE_DEP_SPEC);
+            addTransitiveDepExclusion(NO_TRANSITIVE_DEP_SPEC);
         }
     }
 
