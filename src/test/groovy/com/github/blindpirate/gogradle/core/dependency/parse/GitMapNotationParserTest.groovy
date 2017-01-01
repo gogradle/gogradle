@@ -1,8 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GitDependency
-import com.github.blindpirate.gogradle.core.pack.PackageInfo
+import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import com.github.blindpirate.gogradle.core.GolangPackage
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,9 +13,8 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 class GitMapNotationParserTest {
-
     @Mock
-    PackageInfo packageInfo
+    GolangPackage packageInfo
     @Mock
     List<String> urls
 
@@ -25,12 +25,12 @@ class GitMapNotationParserTest {
         when(packageInfo.getUrls()).thenReturn(urls)
     }
 
-    void assertWithNameAndUrls(GitDependency dependency) {
+    void assertWithNameAndUrls(GitNotationDependency dependency) {
         assert dependency.name == 'github.com/a/b'
         assert dependency.urls == urls
     }
 
-    void assertEmpty(GitDependency dependency, String... properties) {
+    void assertEmpty(GitNotationDependency dependency, String... properties) {
         properties.each {
             assert !dependency[it]
         }
@@ -39,7 +39,7 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with tag should be parsed correctly'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', info: packageInfo])
         // then
         assertWithNameAndUrls(dependency)
         assertEmpty(dependency, 'commit', 'url')
@@ -47,44 +47,47 @@ class GitMapNotationParserTest {
     }
 
     @Test
-    void 'url in map notation should not be overwrited'() {
+    void 'url in map notation should not be overwritten'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b', url: 'url', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'url', info: packageInfo])
         // then
         assertWithNameAndUrls(dependency)
-        assertEmpty(dependency, 'tag', 'version')
+        assertEmpty(dependency, 'tag',)
         assert dependency.url == 'url'
+        assert dependency.commit == GitNotationDependency.NEWEST_COMMIT
     }
 
     @Test
     void 'map notation with version should be parsed correctly'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b', version: '1.0.0', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', version: '1fc81', info: packageInfo])
         // then
         assertWithNameAndUrls(dependency)
-        assertEmpty(dependency, 'commit', 'url')
-        assert dependency.tag == '1.0.0'
-        assert dependency.version == '1.0.0'
+        assertEmpty(dependency, 'tag', 'url')
+        assert dependency.commit == '1fc81'
+        assert dependency.version == '1fc81'
     }
 
     @Test
     void 'map notation with commit should be parsed correctly'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', info: packageInfo])
         // then
         assertWithNameAndUrls(dependency)
-        assertEmpty(dependency, 'tag', 'version')
+        assertEmpty(dependency, 'tag')
         assert dependency.commit == 'commitId'
+        assert dependency.version == 'commitId'
     }
 
     @Test
     void 'map notation without version should be filled with NEWEST_VERSION'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b'])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b'])
 
         // then
-        assertEmpty(dependency, 'tag', 'version', 'url', 'urls')
-        assert dependency.commit == GitDependency.NEWEST_COMMIT
+        assertEmpty(dependency, 'tag', 'url', 'urls')
+        assert dependency.commit == GitNotationDependency.NEWEST_COMMIT
+        assert dependency.version == GitNotationDependency.NEWEST_COMMIT
     }
 
     @Test
@@ -95,7 +98,7 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with unexpected properties should not cause an exception'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, info: packageInfo])
 
         // then
         assertWithNameAndUrls(dependency)
@@ -104,9 +107,9 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with extra properties should be set'() {
         // when
-        GitDependency dependency = parser.parse([name: 'github.com/a/b', transitive: false])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', transitive: false])
 
         // then
-        assert !dependency.transitive
+        assert !ReflectionUtils.getField(dependency, 'transitiveDepExclusions').isEmpty()
     }
 }

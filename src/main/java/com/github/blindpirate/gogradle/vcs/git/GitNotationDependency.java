@@ -1,12 +1,12 @@
-package com.github.blindpirate.gogradle.core.dependency;
+package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.core.pack.DependencyResolver;
-import com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver;
+import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
 import java.util.List;
 
 // TODO what about branch?
-public class GitDependency extends AbstractNotationDependency {
+public class GitNotationDependency extends AbstractNotationDependency {
 
     public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
 
@@ -16,12 +16,11 @@ public class GitDependency extends AbstractNotationDependency {
     // not implemented yet
     public static final String BRANCH_KEY = "branch";
     public static final String TAG_KEY = "tag";
-    public static final String VERSION_KEY = "version";
     private String commit;
     private String tag;
     // url specified by user
     private String url;
-    // urls in PackageInfo e.g https:// and git+ssh://
+    // urls in GolangPackage e.g https:// and git+ssh://
     private List<String> urls;
 
     public String getCommit() {
@@ -57,12 +56,12 @@ public class GitDependency extends AbstractNotationDependency {
     }
 
     public void setVersion(String version) {
-        this.tag = version;
+        this.commit = version;
     }
 
     @Override
     public String getVersion() {
-        return tag;
+        return commit;
     }
 
     @Override
