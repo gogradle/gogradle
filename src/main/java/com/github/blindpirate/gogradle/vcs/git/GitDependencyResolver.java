@@ -38,6 +38,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
                                                                   RevCommit commit) {
 
         return GitResolvedDependency.builder()
+                .withNotationDependency(dependency)
                 .withName(dependency.getName())
                 .withCommitId(commit.getName())
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))

@@ -1,8 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import org.gradle.api.specs.Spec;
 
 import java.util.Map;
+import java.util.Set;
 
 import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 
@@ -19,15 +21,20 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     protected abstract Class<? extends DependencyResolver> resolverClass();
 
     public void exclude(Map<String, Object> map) {
-        addTransitiveDepExclusion(PropertiesExclusionSpec.of(map));
+        transitiveDepExclusions.add(PropertiesExclusionSpec.of(map));
     }
 
     public void setTransitive(boolean transitive) {
         if (transitive) {
-            remoteTransitiveDepExclusion(NO_TRANSITIVE_DEP_SPEC);
+            transitiveDepExclusions.remove(NO_TRANSITIVE_DEP_SPEC);
         } else {
-            addTransitiveDepExclusion(NO_TRANSITIVE_DEP_SPEC);
+            transitiveDepExclusions.add(NO_TRANSITIVE_DEP_SPEC);
         }
+    }
+
+    @Override
+    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
+        return transitiveDepExclusions;
     }
 
 

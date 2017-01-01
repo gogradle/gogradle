@@ -16,22 +16,10 @@ public abstract class AbstractGolangDependency implements GolangDependency {
     /**
      * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.
      */
-    private Set<Spec<GolangDependency>> transitiveDepExclusions = new HashSet<>();
+    protected Set<Spec<GolangDependency>> transitiveDepExclusions = new HashSet<>();
 
     protected boolean shouldNotBeExcluded(GolangDependency dependency) {
         return transitiveDepExclusions.stream().noneMatch(spec -> spec.isSatisfiedBy(dependency));
-    }
-
-    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
-        return new HashSet<>(transitiveDepExclusions);
-    }
-
-    protected void addTransitiveDepExclusion(Spec<GolangDependency> spec) {
-        transitiveDepExclusions.add(spec);
-    }
-
-    protected void remoteTransitiveDepExclusion(Spec<GolangDependency> spec) {
-        transitiveDepExclusions.remove(spec);
     }
 
     @Override
