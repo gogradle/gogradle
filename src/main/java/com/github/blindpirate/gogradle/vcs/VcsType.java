@@ -14,20 +14,25 @@ public enum VcsType {
     Svn("svn", ".svn", Svn.class),
     Bazaar("bzr", ".bzr", Bazaar.class);
 
-    private String suffix;
+    private String name;
 
     private String repo;
     private Class<? extends Annotation> annoClass;
 
-    VcsType(String suffix, String repo, Class annoClass) {
-        this.suffix = suffix;
+    VcsType(String name, String repo, Class annoClass) {
+        this.name = name;
         this.repo = repo;
         this.annoClass = annoClass;
     }
 
+    public String getName() {
+        return name;
+    }
+
     public static Optional<VcsType> of(String name) {
         return Arrays.stream(values())
-                .filter(type -> type.toString().equals(name) || type.suffix.equals(name))
+                .filter(type -> type.toString().equalsIgnoreCase(name)
+                        || type.getName().equalsIgnoreCase(name))
                 .findFirst();
     }
 
