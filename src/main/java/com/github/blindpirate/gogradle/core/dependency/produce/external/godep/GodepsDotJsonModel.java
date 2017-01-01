@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.godep;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.MapUtils;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.List;
@@ -42,8 +43,7 @@ public class GodepsDotJsonModel {
 
         public Map<String, Object> toNotation() {
             Assert.isNotBlank(ImportPath, "ImportPath cannot be blank!");
-            Assert.isNotBlank(Rev, "Rev cannot be blank!");
-            return ImmutableMap.of(
+            return MapUtils.asMapWithoutNull(
                     "name", ImportPath,
                     "version", Rev);
         }

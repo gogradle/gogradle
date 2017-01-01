@@ -58,16 +58,31 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         godepDependencyFactory.produce(resource)
     }
 
-    @Test(expected = RuntimeException)
-    void 'blank ImportPath or Rev should cause an exception'() {
+    @Test(expected = IllegalStateException)
+    void 'blank ImportPath should cause an exception'() {
         // given
         prepareGodepsDotJson('''
 {
-    "Deps":[{"ImportPath":"  ","Rev":"a"},{"ImportPath":"a"}]
+    "Deps":[{"ImportPath":"  "}]
 }
 ''')
         // then
         godepDependencyFactory.produce(resource)
+    }
+
+    @Test
+    void 'missing Rev should not cause an exception'() {
+        // given
+        prepareGodepsDotJson('''
+{
+    "Deps":[{"ImportPath":"a"}]
+}
+''')
+        // when
+        godepDependencyFactory.produce(resource)
+        // then
+        verifyMapParsed([name: 'a'])
+
     }
 
     void prepareGodepsDotJson(String GodepsDotJson) {
