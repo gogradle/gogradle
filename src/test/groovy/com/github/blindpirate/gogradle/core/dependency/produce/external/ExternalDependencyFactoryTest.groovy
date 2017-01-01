@@ -1,8 +1,8 @@
-package com.github.blindpirate.gogradle.core.dependency.external
+package com.github.blindpirate.gogradle.core.dependency.produce.external
 
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.GolangPackageModule
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
 import org.junit.Before
 import org.mockito.Mock
@@ -19,15 +19,14 @@ class ExternalDependencyFactoryTest {
     @Mock
     MapNotationParser mapNotationParser
     @Mock
-    GolangDependency dependency
+    NotationDependency dependency
     @Mock
-    GolangPackageModule module
+    AbstractResolvedDependency module
 
     @Before
     void superSetUp() {
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
         when(dependency.getName()).thenReturn('name')
-        when(module.getRootDir()).thenReturn(resource.toPath())
     }
 
     void verifyMapParsed(Map map) {
