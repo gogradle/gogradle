@@ -1,12 +1,10 @@
-package com.github.blindpirate.gogradle.core.dependency.resolve;
+package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.core.pack.PackageInfo;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.logging.Logger;
@@ -14,8 +12,8 @@ import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -28,14 +26,14 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DIRECTORY_WALK_DEPTH;
-import static com.github.blindpirate.gogradle.core.dependency.resolve.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 
 /**
  * Scans all .go code to generate dependencies.
  */
 @Singleton
-public class SourceCodeDependencyFactory implements DependencyFactory {
+public class SourceCodeDependencyFactory {
 
     private static final String TESTDATA_DIRECTORY = "testdata";
     private static final Logger LOGGER = Logging.getLogger(SourceCodeDependencyFactory.class);
@@ -53,18 +51,17 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
         this.goImportExtractor = extractor;
     }
 
-    @Override
-    public Optional<GolangDependencySet> produce(GolangPackageModule module) {
+    public GolangDependencySet produce(File rootDir) {
         SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor();
         try {
-            Files.walkFileTree(module.getRootDir(),
-                    Collections.<FileVisitOption>emptySet(),
+            Files.walkFileTree(rootDir.toPath(),
+                    Collections.emptySet(),
                     MAX_DIRECTORY_WALK_DEPTH,
                     visitor);
         } catch (IOException e) {
-            throw DependencyResolutionException.sourceCodeParsingFailed(module, e);
+            throw DependencyProductionException.sourceCodeParsingFailed(rootDir, e);
         }
-        return Optional.of(createDependencies(visitor.getImportPaths()));
+        return createDependencies(visitor.getImportPaths());
     }
 
     private GolangDependencySet createDependencies(Set<String> importPaths) {
@@ -92,7 +89,7 @@ public class SourceCodeDependencyFactory implements DependencyFactory {
             return Optional.empty();
         }
 
-        PackageInfo info = packagePathResolver.produce(importPath).get();
+        GolangPackage info = packagePathResolver.produce(importPath).get();
         if (info.isStandard()) {
             return Optional.empty();
         }

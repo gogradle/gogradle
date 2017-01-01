@@ -2,9 +2,10 @@ package com.github.blindpirate.gogradle.intergration
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.GolangPackageModule
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.resolve.SourceCodeDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory
 import com.github.blindpirate.gogradle.core.infrastructure.GogradleModuleSupport
 import org.junit.Before
 import org.junit.Test
@@ -21,7 +22,7 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     File resource
 
     @Mock
-    GolangPackageModule module
+    ResolvedDependency resolvedDependency
 
     @Before
     void setUp() {
@@ -31,10 +32,8 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     @WithResource('golang-example-master.zip')
     @Test
     void 'imports should be parsed correctly'() {
-        // given
-        when(module.getRootDir()).thenReturn(resource.toPath())
         // when
-        GolangDependencySet result = factory.produce(module).get()
+        GolangDependencySet result = factory.produce(resource)
 
         // then
         def expectation = ['golang.org/x/tools', 'github.com/golang/example'] as Set
