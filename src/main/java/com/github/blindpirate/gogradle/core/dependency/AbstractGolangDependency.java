@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractGolangDependency implements GolangDependency {
-    protected static final Spec<GolangDependency> NO_TRANSITIVE_DEP_SPEC = new NoTransitiveSpec();
+    protected static final Spec<GolangDependency> NO_TRANSITIVE_DEP_SPEC = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
     private String name;
     private boolean firstLevel;
     /**
@@ -20,6 +20,10 @@ public abstract class AbstractGolangDependency implements GolangDependency {
 
     protected boolean shouldNotBeExcluded(GolangDependency dependency) {
         return transitiveDepExclusions.stream().noneMatch(spec -> spec.isSatisfiedBy(dependency));
+    }
+
+    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
+        return new HashSet<>(transitiveDepExclusions);
     }
 
     @Override
@@ -60,12 +64,9 @@ public abstract class AbstractGolangDependency implements GolangDependency {
         throw new UnsupportedOperationException();
     }
 
-    public void addTransitiveSpec(Spec<GolangDependency> spec) {
-        this.transitiveDepExclusions.add(spec);
-    }
+    private enum NoTransitiveSpec implements Spec<GolangDependency> {
+        NO_TRANSITIVE_SPEC;
 
-
-    private static class NoTransitiveSpec implements Spec<GolangDependency> {
         @Override
         public boolean isSatisfiedBy(GolangDependency dependency) {
             return true;

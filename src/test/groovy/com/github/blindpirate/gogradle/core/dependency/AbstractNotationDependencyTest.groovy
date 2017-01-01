@@ -1,15 +1,12 @@
 package com.github.blindpirate.gogradle.core.dependency
 
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.specs.Spec
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
 
 import static org.mockito.Mockito.*
 
-@RunWith(GogradleRunner)
 class AbstractNotationDependencyTest {
     AbstractNotationDependency abstractNotationDependency = mock(AbstractNotationDependency, CALLS_REAL_METHODS)
 

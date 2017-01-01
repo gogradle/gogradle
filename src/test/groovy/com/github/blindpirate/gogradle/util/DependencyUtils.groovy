@@ -8,23 +8,12 @@ import org.gradle.api.artifacts.DependencySet
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when;
 
-public class DependencyUtils {
+class DependencyUtils {
     static GolangDependencySet asGolangDependencySet(GolangDependency... dependencies) {
         return dependencies.inject(new GolangDependencySet(), { ret, dependency ->
             ret.add(dependency)
             return ret
         })
-    }
-
-    static Optional<GolangDependencySet> asOptional(GolangDependency... dependencies) {
-        if (dependencies.size() == 0) {
-            return Optional.empty()
-        }
-        return Optional.of(asGolangDependencySet(dependencies))
-    }
-
-    static DependencySet asDependencySet(GolangDependency... dependencies) {
-        return asGolangDependencySet(dependencies).toDependencySet()
     }
 
     static GolangDependency mockDependency(String name) {
