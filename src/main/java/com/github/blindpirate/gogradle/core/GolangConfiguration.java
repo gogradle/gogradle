@@ -1,5 +1,6 @@
-package com.github.blindpirate.gogradle.core.dependency;
+package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import org.gradle.api.Action;

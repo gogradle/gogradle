@@ -1,7 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyProduceStrategy;
 import org.gradle.api.artifacts.Dependency;
 
 /**
@@ -10,36 +8,26 @@ import org.gradle.api.artifacts.Dependency;
  */
 public interface GolangDependency extends Dependency {
     /**
-     * Get the package, it may be a package existing on disk or just a proxy.
+     * The dependency's import path, e.g., golang.org/x/crypto/cmd.
+     * <p>
+     * However, currently we support golang.org/x/crypto (the root path) only.
      *
-     * @return The package specified by this dependency
+     * @return dependency's import path
      */
-    GolangPackageModule getPackage();
+    @Override
+    String getName();
 
     /**
-     * Indicates how to produce dependencies of a package, by scanning its code or using its vendor?
+     * A unique identifier to locate a dependency, e.g., git commit id.
      *
-     * @return
+     * @return the version string
      */
-    DependencyProduceStrategy getProduceStrategy();
+    @Override
+    String getVersion();
 
-    /**
-     * Dependencies in root project (including vendor or build.gradle)
-     * have higher priority than transitive dependencies.
-     *
-     * @return
-     */
+    ResolvedDependency resolve();
+
     boolean isFirstLevel();
-
-
-    /**
-     * An identifier used to identify a unique version in various VCS.
-     * For example, commit id in Git.
-     *
-     * @return the revision
-     */
-    //String getRevision();
-
 
     final class Namer implements org.gradle.api.Namer<GolangDependency> {
 

@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency;
+package com.github.blindpirate.gogradle.core;
 
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;

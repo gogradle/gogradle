@@ -14,7 +14,6 @@ import org.gradle.internal.reflect.Instantiator;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Set;
 
 public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDependency> {
@@ -31,7 +30,7 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
         super(type, instantiator, GolangDependency.Namer.INSTANCE);
     }
 
-    public static GolangDependencySet merge(List<GolangDependencySet> sets) {
+    public static GolangDependencySet merge(GolangDependencySet... sets) {
         GolangDependencySet result = new GolangDependencySet();
         for (GolangDependencySet set : sets) {
             for (GolangDependency dependency : set) {
@@ -45,6 +44,10 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
 
     public DependencySet toDependencySet() {
         return new DependencySetFacade();
+    }
+
+    public static GolangDependencySet empty() {
+        return new GolangDependencySet();
     }
 
     public class DependencySetFacade implements DependencySet {
