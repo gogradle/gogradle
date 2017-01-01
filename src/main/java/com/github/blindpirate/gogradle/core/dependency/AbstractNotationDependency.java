@@ -1,47 +1,34 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.pack.DependencyResolver;
-import org.omg.CORBA.Object;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
-import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 
-public abstract class AbstractNotationDependency extends AbstractGolangDependency {
+public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
 
-    private boolean transitive = true;
-
-    private Map<String, Object> excludes = new HashMap<>();
+    public static final String VERSION_KEY = "version";
 
     @Override
-    public GolangPackageModule getPackage() {
+    public ResolvedDependency resolve() {
         DependencyResolver resolver = INJECTOR_INSTANCE.getInstance(this.resolverClass());
         return resolver.resolve(this);
     }
 
     protected abstract Class<? extends DependencyResolver> resolverClass();
 
-    public boolean isTransitive() {
-        return transitive;
-    }
-
-    public Map<String, Object> getExcludes() {
-        return excludes;
-    }
-
     public void exclude(Map<String, Object> map) {
-        this.excludes.putAll(map);
+        addTransitiveSpec(PropertiesExcludeSpec.of(map));
     }
 
     public void setTransitive(boolean transitive) {
-        this.transitive = transitive;
+        if (transitive) {
+            transitiveDepExclusions.remove(NO_TRANSITIVE_DEP_SPEC);
+        } else {
+            addTransitiveSpec(NO_TRANSITIVE_DEP_SPEC);
+        }
     }
 
-    @Override
-    public String getVersion() {
-        throw new UnsupportedOperationException();
-    }
 
 }

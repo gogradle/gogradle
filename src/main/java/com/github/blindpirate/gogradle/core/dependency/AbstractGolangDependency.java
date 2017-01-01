@@ -46,6 +46,11 @@ public abstract class AbstractGolangDependency implements GolangDependency {
     }
 
     @Override
+    public String getVersion() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public boolean contentEquals(Dependency dependency) {
         throw new UnsupportedOperationException();
     }
