@@ -1,14 +1,19 @@
 package com.github.blindpirate.gogradle.util;
 
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Stream;
 
 public class StringUtils {
     public static String join(List<?> list, String seperator) {
         return org.apache.commons.lang3.StringUtils.join(list, seperator);
+    }
+
+    public static String removeEnd(String s, String suffix) {
+        return org.apache.commons.lang3.StringUtils.removeEnd(s, suffix);
     }
 
     public static String trimToNull(String s) {
@@ -16,15 +21,12 @@ public class StringUtils {
     }
 
 
-    public static String[] splitAndTrim(String str, String seperator) {
-        String[] array = org.apache.commons.lang3.StringUtils.split(str, seperator);
-        List<String> result = new ArrayList<>();
-        for (String s : array) {
-            if (StringUtils.isNotBlank(s)) {
-                result.add(s.trim());
-            }
-        }
-        return result.toArray(new String[result.size()]);
+    public static String[] splitAndTrim(String str, String regex) {
+        String[] array = str.split(regex);
+        return Stream.of(array)
+                .map(org.apache.commons.lang3.StringUtils::trimToNull)
+                .filter(Objects::nonNull)
+                .toArray(String[]::new);
     }
 
     public static boolean isNotBlank(String s) {
@@ -45,5 +47,9 @@ public class StringUtils {
             return Collections.emptyList();
         }
         return Arrays.asList(s.split("\n"));
+    }
+
+    public static boolean isEmpty(String s) {
+        return org.apache.commons.lang3.StringUtils.isEmpty(s);
     }
 }
