@@ -26,8 +26,13 @@ public class Assert {
         isTrue(!identityFiles.isEmpty(), message);
     }
 
-    public static String isNotBlank(String name) {
-        isTrue(StringUtils.isNotBlank(name));
-        return name;
+    public static String isNotBlank(String s) {
+        isTrue(StringUtils.isNotBlank(s));
+        return s;
+    }
+
+    public static String isNotBlank(String s, String message) {
+        isTrue(StringUtils.isNotBlank(s), message);
+        return s;
     }
 }
