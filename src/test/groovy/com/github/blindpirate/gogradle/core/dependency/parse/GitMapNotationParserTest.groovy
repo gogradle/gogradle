@@ -1,15 +1,16 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static org.mockito.Mockito.*
+import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GitMapNotationParserTest {
@@ -110,6 +111,6 @@ class GitMapNotationParserTest {
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', transitive: false])
 
         // then
-        assert !ReflectionUtils.getField(dependency, 'transitiveDepExclusions').isEmpty()
+        assert !getExclusionSpecs(dependency).isEmpty()
     }
 }

@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency
 
-import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.gradle.api.specs.Spec
 import org.junit.Before
 import org.junit.Test
@@ -12,11 +12,11 @@ class AbstractNotationDependencyTest {
 
     @Before
     void setUp() {
-        ReflectionUtils.setField(abstractNotationDependency, 'transitiveDepExclusions', [] as Set)
+        DependencyUtils.setExclusionSpecs(abstractNotationDependency, [] as Set)
     }
 
     Set<Spec> getSpecs() {
-        return ReflectionUtils.getField(abstractNotationDependency, 'transitiveDepExclusions')
+        return DependencyUtils.getExclusionSpecs(abstractNotationDependency)
     }
 
     @Test

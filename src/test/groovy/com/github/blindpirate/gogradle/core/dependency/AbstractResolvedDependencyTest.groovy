@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency
 
-import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.gradle.api.specs.Spec
 import org.junit.Before
 import org.junit.Test
@@ -24,7 +24,7 @@ class AbstractResolvedDependencyTest {
     }
 
     void setSpec(Spec... exclusions) {
-        ReflectionUtils.setField(dependency, 'transitiveDepExclusions', exclusions as Set)
+        DependencyUtils.setExclusionSpecs(dependency, exclusions as Set)
     }
 
     @Test
@@ -45,7 +45,7 @@ class AbstractResolvedDependencyTest {
     @Test
     void 'specific dependencies should be excluded'() {
         // given
-        setSpec(PropertiesExcludeSpec.of([name: 'a']))
+        setSpec(PropertiesExclusionSpec.of([name: 'a']))
         // then
         assert dependency.getDependencies().size() == 2
         assert dependency.getDependencies().any { it.is(b) }
@@ -53,11 +53,12 @@ class AbstractResolvedDependencyTest {
     }
 
     @Test
-    void 'multiple specs should take affect'() {
+    void 'multiple specs should tgake affect'() {
         // given
-        setSpec(PropertiesExcludeSpec.of([name: 'a']),
-                PropertiesExcludeSpec.of([name: 'b']),
-                PropertiesExcludeSpec.of([name: 'c', unknown: 'c']))
+        setSpec(PropertiesExclusionSpec.of([name: 'a']),
+                PropertiesExclusionSpec.of([name: 'b']),
+                PropertiesExclusionSpec.of([name: 1]),
+                PropertiesExclusionSpec.of([name: 'c', unknown: 'c']))
         // then
         assert dependency.getDependencies().size() == 1
         assert dependency.getDependencies().first().is(c)
