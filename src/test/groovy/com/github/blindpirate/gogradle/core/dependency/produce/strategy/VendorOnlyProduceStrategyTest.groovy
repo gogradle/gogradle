@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.produce
+package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
@@ -17,9 +17,9 @@ class VendorOnlyProduceStrategyTest extends DependencyProduceStrategyTest {
         sourceCodeDependencies(c1)
 
         // when
-        GolangDependencySet result = strategy.produce(module, visitor)
+        GolangDependencySet result = strategy.produce(resolvedDependency, rootDir, visitor)
 
-        // thwn
+        // then
         assert result.size() == 1
         assert result.contains(b1)
     }

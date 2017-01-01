@@ -1,12 +1,11 @@
-package com.github.blindpirate.gogradle.core.dependency.produce
+package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.core.dependency.GolangConfiguration
+import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.LockedDependencyManager
-import java.util.Optional
+import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.junit.Before
 import org.junit.Test
@@ -16,7 +15,6 @@ import org.mockito.Mock
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Develop
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asOptional
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
@@ -53,7 +51,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     }
 
     void lockedDependencies(GolangDependency... dependencies) {
-        Optional<GolangDependencySet> result = asOptional(dependencies)
+        GolangDependencySet result = asGolangDependencySet(dependencies)
         when(lockedDependencyManager.getLockedDependencies()).thenReturn(result)
     }
 
@@ -66,7 +64,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies(b2)
 
         // when
-        def resultDependencies = strategy.produce(module, visitor)
+        def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor)
 
         // then
         assert resultDependencies.any { it.is(a1) }
@@ -85,7 +83,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        def result = strategy.produce(module, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor)
 
         // then
         assert result.any { it.is(a2) }
@@ -103,7 +101,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        def result = strategy.produce(module, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor)
 
         // then
         assert result.any { it.is(a2) }
@@ -121,10 +119,10 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        strategy.produce(module, visitor)
+        strategy.produce(resolvedDependency, rootDir, visitor)
 
         // then
-        verify(visitor).visitSourceCodeDependencies(module)
+        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir)
     }
 
     @Test
@@ -139,7 +137,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        def result = strategy.produce(module, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor)
 
         // then
         assert result.any { it.is(a1) }

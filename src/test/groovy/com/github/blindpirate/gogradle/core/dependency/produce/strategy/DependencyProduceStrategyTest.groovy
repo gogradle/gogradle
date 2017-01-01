@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
+import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -19,17 +20,17 @@ abstract class DependencyProduceStrategyTest {
     DependencyVisitor visitor
 
     @Mock
-    GolangDependency a1
+    AbstractGolangDependency a1
     @Mock
-    GolangDependency b1
+    AbstractGolangDependency b1
     @Mock
-    GolangDependency c1
+    AbstractGolangDependency c1
     @Mock
-    GolangDependency a2
+    AbstractGolangDependency a2
     @Mock
-    GolangDependency b2
+    AbstractGolangDependency b2
     @Mock
-    GolangDependency c2
+    AbstractGolangDependency c2
 
     @Before
     void superSetup() {
