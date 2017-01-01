@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.tree
 
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import org.junit.Test
 
 import static org.mockito.Mockito.mock
