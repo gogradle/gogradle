@@ -1,12 +1,11 @@
 package com.github.blindpirate.gogradle.util
 
+import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import java.util.Optional
-import org.gradle.api.artifacts.DependencySet
 
 import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.when
 
 class DependencyUtils {
     static GolangDependencySet asGolangDependencySet(GolangDependency... dependencies) {
@@ -20,5 +19,13 @@ class DependencyUtils {
         GolangDependency ret = mock(GolangDependency);
         when(ret.getName()).thenReturn(name)
         return ret
+    }
+
+    static Set getExclusionSpecs(AbstractGolangDependency target) {
+        return ReflectionUtils.getField(target, 'transitiveDepExclusions')
+    }
+
+    static void setExclusionSpecs(AbstractGolangDependency target, Set specs) {
+        ReflectionUtils.setField(target, 'transitiveDepExclusions', specs)
     }
 }
