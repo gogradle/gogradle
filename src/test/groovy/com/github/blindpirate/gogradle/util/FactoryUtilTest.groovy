@@ -21,7 +21,7 @@ class FactoryUtilTest {
     Object product
 
     @Test
-    public void 'production with PickyFactory should success'() {
+    void 'production with PickyFactory should success'() {
         // given:
         when(factory1.produce(material)).thenReturn(Optional.empty())
         when(factory2.produce(material)).thenReturn(Optional.of(product))
@@ -34,7 +34,7 @@ class FactoryUtilTest {
     }
 
     @Test
-    public void 'production when not accepted should fail'() {
+    void 'production when not accepted should fail'() {
         // given:
         when(factory1.produce(material)).thenReturn(Optional.empty())
         when(factory2.produce(material)).thenReturn(Optional.empty())
