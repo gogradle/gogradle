@@ -47,23 +47,38 @@ testImports: []
         verifyMapParsed([name: 'gopkg.in/yaml.v2', version: 'e4d366fc3c7938e2958e662b4258c7a89e1f0e3e'])
     }
 
-    String glideDotLockWithMissingNameAndVersion = '''
+    String glideDotLockMissingName = '''
 hash: 67c5571c33bfcb663d32d2b40b9ce1f2a05a3fa2e9f442077277c2782195729c
 updated: 2016-08-11T14:22:17.773372627-04:00
 imports:
 - version: 1efa31f08b9333f1bd4882d61f9d668a70cd902e
-- name: github.com/Masterminds/semver
-- name: github.com/Masterminds/vcs
-  version: fbe9fb6ad5b5f35b3e82a7c21123cfc526cbf895
 testImports: []
 '''
 
-    @Test(expected = RuntimeException)
-    void 'missing name or version should cause an exception'() {
+    @Test(expected = IllegalStateException)
+    void 'missing name should cause an exception'() {
         // given
-        prepareGlideDotLock(glideDotLockWithMissingNameAndVersion)
+        prepareGlideDotLock(glideDotLockMissingName)
         // then
         factory.produce(resource)
+    }
+
+    String glideDotLockMissingVersion = '''
+hash: 67c5571c33bfcb663d32d2b40b9ce1f2a05a3fa2e9f442077277c2782195729c
+updated: 2016-08-11T14:22:17.773372627-04:00
+imports:
+- name: github.com/codegangsta/cli
+testImports: []
+'''
+
+    @Test
+    void 'missing version should not cause an exception'() {
+        // given
+        prepareGlideDotLock(glideDotLockMissingVersion)
+        // when
+        factory.produce(resource)
+        // then
+        verifyMapParsed([name: 'github.com/codegangsta/cli'])
     }
 
     String glideDotLockWithExtraAndMissingProperties = '''

@@ -33,7 +33,25 @@ public class MapUtils {
         return ret;
     }
 
+    public static <K, V> Map<K, V> asMapWithoutNull(K k, V v) {
+        return asMapWithoutNull(Pair.of(k, v));
+    }
+
+    public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2) {
+        return asMapWithoutNull(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
+    }
+
+    private static <K, V> Map<K, V> asMapWithoutNull(Pair<K, V>... entries) {
+        Map<K, V> ret = new HashMap<>();
+        for (Pair<K, V> entry : entries) {
+            if (entry.getLeft() != null && entry.getRight() != null) {
+                ret.put(entry.getLeft(), entry.getRight());
+            }
+        }
+        return ret;
+    }
+
     public static <K, V> Map<K, V> asMap(K k, V v) {
-        return asMap(Pair.of(k, v));
+        return asMapWithoutNull(Pair.of(k, v));
     }
 }
