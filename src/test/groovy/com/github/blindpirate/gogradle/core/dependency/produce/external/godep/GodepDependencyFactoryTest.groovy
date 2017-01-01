@@ -1,13 +1,11 @@
-package com.github.blindpirate.gogradle.core.dependency.external.godep
+package com.github.blindpirate.gogradle.core.dependency.produce.external.godep
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
-
-import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
@@ -17,7 +15,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @Test
     void 'package with Godeps/Godeps.json should be rejected'() {
         // then:
-        assert !godepDependencyFactory.produce(module).isPresent()
+        assert !godepDependencyFactory.produce(resource).isPresent()
     }
 
     String GodepsDotJson = '''
@@ -45,11 +43,11 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         prepareGodepsDotJson(GodepsDotJson)
 
         // when:
-        godepDependencyFactory.produce(module)
+        godepDependencyFactory.produce(resource)
         // then:
-        verifyMapParsed([name: "github.com/kr/fs", revision: '2788f0dbd16903de03cb8186e5c7d97b69ad387b'])
-        verifyMapParsed([name    : "github.com/kr/pretty",
-                         revision: 'f31442d60e51465c69811e2107ae978868dbea5c'])
+        verifyMapParsed([name: "github.com/kr/fs", version: '2788f0dbd16903de03cb8186e5c7d97b69ad387b'])
+        verifyMapParsed([name   : "github.com/kr/pretty",
+                         version: 'f31442d60e51465c69811e2107ae978868dbea5c'])
     }
 
     @Test(expected = RuntimeException)
@@ -57,7 +55,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareGodepsDotJson('This is a corrupted Godeps.json')
         // then
-        godepDependencyFactory.produce(module)
+        godepDependencyFactory.produce(resource)
     }
 
     @Test(expected = RuntimeException)
@@ -69,12 +67,11 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
 }
 ''')
         // then
-        godepDependencyFactory.produce(module)
+        godepDependencyFactory.produce(resource)
     }
 
     void prepareGodepsDotJson(String GodepsDotJson) {
         IOUtils.write(resource, 'Godeps/Godeps.json', GodepsDotJson);
-        when(module.getRootDir()).thenReturn(resource.toPath())
     }
 
     String GodepsDotJsonWithExtraAndMissingProperties = '''
@@ -90,9 +87,9 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareGodepsDotJson(GodepsDotJsonWithExtraAndMissingProperties)
         // when
-        godepDependencyFactory.produce(module)
+        godepDependencyFactory.produce(resource)
         // then
-        verifyMapParsed([name: 'a', revision: 'b'])
+        verifyMapParsed([name: 'a', version: 'b'])
     }
 
 }

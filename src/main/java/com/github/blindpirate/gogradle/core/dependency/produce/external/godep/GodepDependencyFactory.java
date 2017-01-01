@@ -1,6 +1,6 @@
-package com.github.blindpirate.gogradle.core.dependency.external.godep;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.godep;
 
-import com.github.blindpirate.gogradle.core.dependency.resolve.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
 import javax.inject.Singleton;
 import java.io.File;

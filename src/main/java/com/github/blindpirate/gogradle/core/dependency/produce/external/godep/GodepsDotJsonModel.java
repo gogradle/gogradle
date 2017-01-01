@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.dependency.external.godep;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.godep;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -41,11 +41,11 @@ public class GodepsDotJsonModel {
         private String Comment;
 
         public Map<String, Object> toNotation() {
-            Assert.isNotBlank(ImportPath,"ImportPath cannot be blank!");
-            Assert.isNotBlank(Rev,"Rev cannot be blank!");
+            Assert.isNotBlank(ImportPath, "ImportPath cannot be blank!");
+            Assert.isNotBlank(Rev, "Rev cannot be blank!");
             return ImmutableMap.of(
                     "name", ImportPath,
-                    "revision", Rev);
+                    "version", Rev);
         }
     }
 }
