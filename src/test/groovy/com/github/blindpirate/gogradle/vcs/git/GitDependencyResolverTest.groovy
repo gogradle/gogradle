@@ -2,12 +2,9 @@ package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.GolangPackageModule
 import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.github.blindpirate.gogradle.core.cache.CacheManager
-import com.github.blindpirate.gogradle.core.dependency.GitDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
@@ -34,7 +31,7 @@ import static org.mockito.Mockito.*
 class GitDependencyResolverTest {
 
     @Mock
-    GitDependency dependency
+    GitNotationDependency dependency
     @Mock
     CacheManager cacheManager
     @Mock
@@ -44,24 +41,19 @@ class GitDependencyResolverTest {
     @Mock
     Injector injector
     @Mock
-    DependencyFactory factory
-    @Mock
     RevCommit revCommit
     @Mock
     GolangDependencySet dependencySet
     @InjectMocks
     GitDependencyResolver resolver
 
-    // injected by GogradleRunner
     File resource
     Path repositoryPath
 
     @Before
-    public void setUp() {
+    void setUp() {
         repositoryPath = resource.toPath()
 
-        when(injector.getInstance(DependencyFactory)).thenReturn(factory)
-        when(factory.produce(any(GolangPackageModule))).thenReturn(of(dependencySet))
         when(cacheManager.getGlobalCachePath(anyString())).thenReturn(repositoryPath)
         when(gitAccessor.getRepository(repositoryPath)).thenReturn(repository)
         when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
@@ -73,7 +65,7 @@ class GitDependencyResolverTest {
 
         InjectionHelper.INJECTOR_INSTANCE = injector
 
-        when(cacheManager.runWithGlobalCacheLock(any(GitDependency), any(Callable)))
+        when(cacheManager.runWithGlobalCacheLock(any(GitNotationDependency), any(Callable)))
                 .thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocationOnMock) throws Throwable {
@@ -81,6 +73,9 @@ class GitDependencyResolverTest {
             }
         })
     }
+
+    // TODO we need an integration test to test
+    // both GitDependencyResolver and GitAccessor
 
     @Test
     void 'nonexistent repo should be cloned when user specify a url'() {
@@ -163,7 +158,7 @@ class GitDependencyResolverTest {
     @Test(expected = DependencyResolutionException)
     void 'exception in locked block should not be swallowed'() {
         // given
-        when(cacheManager.runWithGlobalCacheLock(any(GitDependency), any(Callable)))
+        when(cacheManager.runWithGlobalCacheLock(any(GitNotationDependency), any(Callable)))
                 .thenThrow(new IOException())
         // when
         resolver.resolve(dependency)

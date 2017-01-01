@@ -1,8 +1,8 @@
-package com.github.blindpirate.gogradle.core.pack;
+package com.github.blindpirate.gogradle.core.dependency.resolve;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
@@ -16,35 +16,34 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
     private CacheManager cacheManager;
 
     @Override
-    public GolangPackageModule resolve(final GolangDependency dependency) {
+    public ResolvedDependency resolve(final NotationDependency dependency) {
         try {
-            GolangPackageModule module = cacheManager.runWithGlobalCacheLock(dependency, () -> {
+            return cacheManager.runWithGlobalCacheLock(dependency, () -> {
                 Path path = cacheManager.getGlobalCachePath(dependency.getName());
                 return doResolve(dependency, path);
             });
-            return module;
         } catch (Exception e) {
-            throw DependencyResolutionException.cannotResolveToPackage(dependency, e);
+            throw DependencyResolutionException.cannotResolveDependency(dependency, e);
         }
     }
 
-    private GolangPackageModule doResolve(GolangDependency dependency, Path path) {
+    private ResolvedDependency doResolve(NotationDependency dependency, Path path) {
         REPOSITORY repository = resolveToGlobalCache(dependency, path);
         VERSION version = determineVersion(repository, dependency);
         resetToSpecificVersion(repository, version);
-        return createModule(dependency, path, repository, version);
+        return createResolvedDependency(dependency, path, repository, version);
     }
 
-    protected abstract GolangPackageModule createModule(GolangDependency dependency,
-                                                        Path path,
-                                                        REPOSITORY repository,
-                                                        VERSION version);
+    protected abstract ResolvedDependency createResolvedDependency(NotationDependency dependency,
+                                                                   Path path,
+                                                                   REPOSITORY repository,
+                                                                   VERSION version);
 
     protected abstract void resetToSpecificVersion(REPOSITORY repository, VERSION version);
 
-    protected abstract VERSION determineVersion(REPOSITORY repository, GolangDependency dependency);
+    protected abstract VERSION determineVersion(REPOSITORY repository, NotationDependency dependency);
 
-    private REPOSITORY resolveToGlobalCache(GolangDependency dependency, Path path) {
+    private REPOSITORY resolveToGlobalCache(NotationDependency dependency, Path path) {
         Optional<REPOSITORY> repositoryInGlobalCache = ensureGlobalCacheEmptyOrMatch(dependency, path);
         if (!repositoryInGlobalCache.isPresent()) {
             return initRepository(dependency, path);
@@ -55,10 +54,10 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
 
     protected abstract REPOSITORY updateRepository(REPOSITORY repository, Path path);
 
-    protected abstract REPOSITORY initRepository(GolangDependency dependency, Path path);
+    protected abstract REPOSITORY initRepository(NotationDependency dependency, Path path);
 
 
-    private Optional<REPOSITORY> ensureGlobalCacheEmptyOrMatch(GolangDependency dependency, Path path) {
+    private Optional<REPOSITORY> ensureGlobalCacheEmptyOrMatch(NotationDependency dependency, Path path) {
         if (IOUtils.dirIsEmpty(path)) {
             return Optional.empty();
         } else {
@@ -81,5 +80,5 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
      * @param dependency the dependency
      * @return
      */
-    protected abstract Optional<REPOSITORY> repositoryMatch(Path repoPath, GolangDependency dependency);
+    protected abstract Optional<REPOSITORY> repositoryMatch(Path repoPath, NotationDependency dependency);
 }
