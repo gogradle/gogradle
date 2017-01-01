@@ -1,6 +1,8 @@
-package com.github.blindpirate.gogradle.core.dependency.produce
+package com.github.blindpirate.gogradle.core.dependency.tree
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import org.junit.Test
 
 import static org.mockito.Mockito.mock
@@ -26,7 +28,7 @@ class DependencyTreeNodeTest {
         _3.addChild(_3_1).addChild(_3_2)
 
         // then
-        assert root.print() == '''\
+        assert root.output() == '''\
 └── a
     ├── b
     ├── c
@@ -39,8 +41,8 @@ class DependencyTreeNodeTest {
     }
 
     DependencyTreeNode node(String name) {
-        GolangDependency dependency = mock(GolangDependency)
+        ResolvedDependency dependency = mock(ResolvedDependency)
         when(dependency.getName()).thenReturn(name)
-        return new DependencyTreeNode(dependency)
+        return DependencyTreeNode.withOrignalAndFinal(dependency, dependency)
     }
 }

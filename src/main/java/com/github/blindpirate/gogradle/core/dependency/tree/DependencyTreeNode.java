@@ -1,30 +1,33 @@
-package com.github.blindpirate.gogradle.core.dependency.produce;
+package com.github.blindpirate.gogradle.core.dependency.tree;
 
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 public class DependencyTreeNode {
-    private GolangDependency value;
-
+    private String name;
+    private ResolvedDependency originalDependency;
+    private ResolvedDependency finalDependency;
     private List<DependencyTreeNode> children = new ArrayList<>();
 
-    public DependencyTreeNode(GolangDependency dependency) {
-        this.value = dependency;
+    private DependencyTreeNode(ResolvedDependency originalDependency, ResolvedDependency finalDependency) {
+        this.originalDependency = originalDependency;
+        this.finalDependency = finalDependency;
+        this.name = originalDependency.getName();
     }
+
+    public static DependencyTreeNode withOrignalAndFinal(ResolvedDependency original, ResolvedDependency finalResult) {
+        return new DependencyTreeNode(original, finalResult);
+    }
+
 
     public DependencyTreeNode addChild(DependencyTreeNode child) {
         children.add(child);
         return this;
     }
 
-    public GolangDependency getValue() {
-        return value;
-    }
-
-    public String print() {
+    public String output() {
         return print("", true);
     }
 
@@ -33,7 +36,7 @@ public class DependencyTreeNode {
         StringBuilder sb = new StringBuilder();
         sb.append(prefix)
                 .append(isTail ? "└── " : "├── ")
-                .append(value.getName())
+                .append(format())
                 .append("\n");
 
         String prefixOfChildren = prefix + (isTail ? "    " : "│   ");
@@ -48,7 +51,8 @@ public class DependencyTreeNode {
         return sb.toString();
     }
 
-    public List<DependencyTreeNode> getGetChildren() {
-        return Collections.unmodifiableList(children);
+    private String format() {
+        return name;
     }
+
 }
