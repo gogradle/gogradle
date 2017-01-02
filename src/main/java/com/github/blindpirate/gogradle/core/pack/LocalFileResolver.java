@@ -1,16 +1,27 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 
-import java.nio.file.Paths;
+import java.io.File;
+
+import static com.github.blindpirate.gogradle.util.Assert.isNotNull;
 
 public class LocalFileResolver implements DependencyResolver {
     @Override
-    public GolangPackageModule resolve(GolangDependency dependency) {
-        LocalDirectoryDependency directoryDependency = (LocalDirectoryDependency) dependency;
-        return new LocalFileSystemModule(directoryDependency.getName(),
-                Paths.get(directoryDependency.getDir()));
+    public ResolvedDependency resolve(NotationDependency dependency) {
+        LocalDirectoryNotationDependency directoryDependency = (LocalDirectoryNotationDependency) dependency;
+        File rootDir = new File(isNotNull(directoryDependency.getDir()));
+        if (invalid(rootDir)) {
+            throw DependencyResolutionException.directoryIsInvalid(rootDir);
+        }
+        return LocalFileSystemDependency.fromLocal(directoryDependency.getName(), rootDir);
+    }
+
+    private boolean invalid(File rootDir) {
+        return !rootDir.exists() || !rootDir.isDirectory();
     }
 }
