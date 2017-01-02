@@ -3,18 +3,14 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
-
-import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DIRECTORY_WALK_DEPTH;
 
 
 /**
@@ -46,11 +42,7 @@ public class VendorDependencyFactory {
     private GolangDependencySet resolveVendor(ResolvedDependency dependency, File rootDir) {
         Path vendorPath = vendorPath(rootDir);
         VendorDirectoryVisitor visitor = new VendorDirectoryVisitor(dependency, vendorPath, packagePathResolver);
-        try {
-            Files.walkFileTree(vendorPath, Collections.emptySet(), MAX_DIRECTORY_WALK_DEPTH, visitor);
-        } catch (IOException e) {
-            throw DependencyResolutionException.cannotResolveVendor(dependency, e);
-        }
+        IOUtils.walkFileTreeSafely(vendorPath, visitor);
         return visitor.getDependencies();
     }
 

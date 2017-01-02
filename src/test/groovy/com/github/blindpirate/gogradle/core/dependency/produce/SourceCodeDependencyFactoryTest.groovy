@@ -168,11 +168,6 @@ func main(){}
         assert factory.produce(resource).isEmpty()
     }
 
-    @Test(expected = DependencyProductionException)
-    void 'IOException should be reported'() {
-        factory.produce(new File('inexistent'))
-    }
-
     String mainDotGo = '''
 package main
 import (

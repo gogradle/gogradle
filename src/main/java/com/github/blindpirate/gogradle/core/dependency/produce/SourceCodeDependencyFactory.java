@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.logging.Logger;
@@ -15,17 +14,14 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DIRECTORY_WALK_DEPTH;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 
@@ -53,14 +49,7 @@ public class SourceCodeDependencyFactory {
 
     public GolangDependencySet produce(File rootDir) {
         SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor();
-        try {
-            Files.walkFileTree(rootDir.toPath(),
-                    Collections.emptySet(),
-                    MAX_DIRECTORY_WALK_DEPTH,
-                    visitor);
-        } catch (IOException e) {
-            throw DependencyProductionException.sourceCodeParsingFailed(rootDir, e);
-        }
+        IOUtils.walkFileTreeSafely(rootDir.toPath(), visitor);
         return createDependencies(visitor.getImportPaths());
     }
 

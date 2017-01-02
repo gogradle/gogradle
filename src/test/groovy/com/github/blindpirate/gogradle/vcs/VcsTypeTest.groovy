@@ -18,7 +18,7 @@ class VcsTypeTest {
 
     @Test
     void 'test valueOf'() {
-        assert VcsType.valueOf('Git') == Git
+        assert VcsType.valueOf('Git') == VcsType.Git
     }
 
 }

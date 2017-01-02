@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorDependency
+import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
@@ -19,6 +20,7 @@ import org.mockito.Mock
 
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.calls
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -62,5 +64,11 @@ class VendorDependencyFactoryTest extends MockInjectorSupport {
         assert dependency instanceof VendorDependency
         assert ReflectionUtils.getField(dependency, 'hostDependency').is(resolvedDependency)
         assert ReflectionUtils.getField(dependency, 'rootPathToHost').toString() == 'vendor/root/package'
+    }
+
+    @Test
+//(expected = DependencyProductionException)
+    void 'IOException should be reported'() {
+        factory.produce(resolvedDependency, new File('inexistence'))
     }
 }

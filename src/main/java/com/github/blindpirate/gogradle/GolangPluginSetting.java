@@ -21,7 +21,6 @@ public class GolangPluginSetting {
     // indicate the global GOPATH (in system environment variables)
     private boolean useGlobalGopath = false;
     public static final String DEFAULT_CHARSET = "UTF-8";
-    public static final int MAX_DIRECTORY_WALK_DEPTH = 100;
     private String globalGopath;
     private BuildMode buildMode = Reproducible;
     private String packagePath;

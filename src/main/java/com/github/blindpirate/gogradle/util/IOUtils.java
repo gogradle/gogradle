@@ -8,11 +8,14 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.DirectoryStream;
+import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.EnumSet;
 import java.util.List;
 
 import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
@@ -22,6 +25,8 @@ import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSE
  * it never throws checked exceptions.
  */
 public class IOUtils {
+    public static final int MAX_DIRECTORY_WALK_DEPTH = 100;
+
     public static void forceMkdir(final File directory) {
         try {
             FileUtils.forceMkdir(directory);
@@ -130,6 +135,14 @@ public class IOUtils {
             return Collections.emptyList();
         } else {
             return Arrays.asList(content.split("\n"));
+        }
+    }
+
+    public static void walkFileTreeSafely(Path path, FileVisitor<? super Path> visitor) {
+        try {
+            Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DIRECTORY_WALK_DEPTH, visitor);
+        } catch (IOException e) {
+            handleIOException(e);
         }
     }
 }
