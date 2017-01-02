@@ -151,10 +151,7 @@ public class SourceCodeDependencyFactory {
             if (fileName.startsWith(".") || fileName.startsWith("_")) {
                 return false;
             }
-            if (fileName.endsWith("_test.go")) {
-                return false;
-            }
-            return true;
+            return !fileName.endsWith("_test.go");
         }
 
 

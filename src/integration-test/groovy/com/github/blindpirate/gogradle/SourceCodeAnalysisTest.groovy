@@ -1,18 +1,12 @@
-package com.github.blindpirate.gogradle.intergration
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory
-import com.github.blindpirate.gogradle.core.infrastructure.GogradleModuleSupport
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-
-import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class SourceCodeAnalysisTest extends GogradleModuleSupport {

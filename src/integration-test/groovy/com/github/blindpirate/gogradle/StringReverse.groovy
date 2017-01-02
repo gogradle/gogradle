@@ -1,12 +1,7 @@
-package com.github.blindpirate.gogradle.intergration
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.AccessWeb
-import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithProject
-import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -27,7 +22,6 @@ class StringReverse extends IntegrationTestSupport {
 
     @Test
     @AccessWeb
-//    @Ignore
     void 'a simple test with real go code'() {
         newBuild { build ->
             build.forTasks('dependencies')

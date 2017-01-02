@@ -1,13 +1,10 @@
-package com.github.blindpirate.gogradle.intergration
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 import org.junit.Before
-
-import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank
 
 
 class IntegrationTestSupport {

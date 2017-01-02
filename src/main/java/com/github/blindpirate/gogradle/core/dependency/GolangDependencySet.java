@@ -64,7 +64,7 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
         @Override
         public <S extends Dependency> DomainObjectCollection<S> withType(Class<S> type,
                                                                          Action<? super S> configureAction) {
-            return (DomainObjectSet) GolangDependencySet.this.withType((Class) type, (Action) configureAction);
+            return (DomainObjectSet) GolangDependencySet.this.withType((Class) type, configureAction);
         }
 
         @Override

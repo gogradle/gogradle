@@ -1,8 +1,6 @@
-package com.github.blindpirate.gogradle.core.pack
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.infrastructure.GogradleModuleSupport
+import com.github.blindpirate.gogradle.core.pack.LocalFileSystemDependency
 import org.junit.Test
 import org.junit.runner.RunWith
 

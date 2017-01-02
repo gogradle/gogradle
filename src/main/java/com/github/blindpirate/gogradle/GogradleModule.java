@@ -41,6 +41,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.internal.reflect.Instantiator;
 
@@ -53,14 +54,17 @@ import java.util.List;
  * Provides configurations for Guice dependency injection.
  */
 public class GogradleModule extends AbstractModule {
+    private final Project project;
     private final Instantiator instantiator;
 
-    public GogradleModule(Instantiator instantiator) {
+    public GogradleModule(Project project, Instantiator instantiator) {
+        this.project = project;
         this.instantiator = instantiator;
     }
 
     @Override
     protected void configure() {
+        bind(Project.class).toInstance(project);
         bind(Instantiator.class).toInstance(instantiator);
 
         bind(NotationParser.class).to(DefaultNotationParser.class);

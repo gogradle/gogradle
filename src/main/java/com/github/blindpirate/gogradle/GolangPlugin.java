@@ -45,8 +45,9 @@ public class GolangPlugin implements Plugin<Project> {
     // injected by gradle
     private final Instantiator instantiator;
 
-    private final Injector injector;
-    private final GolangPluginSetting settings;
+    private Injector injector;
+    private GolangPluginSetting settings;
+    private Project project;
     private Action<? super Task> dependencyInjectionAction = new Action<Task>() {
         @Override
         public void execute(Task task) {
@@ -58,22 +59,27 @@ public class GolangPlugin implements Plugin<Project> {
     @Inject
     public GolangPlugin(Instantiator instantiator) {
         this.instantiator = instantiator;
-        this.injector = initGuice();
-        this.settings = injector.getInstance(GolangPluginSetting.class);
     }
 
     private Injector initGuice() {
-        return Guice.createInjector(new GogradleModule(instantiator));
+        return Guice.createInjector(new GogradleModule(project, instantiator));
     }
 
     @Override
     public void apply(Project project) {
+        init(project);
         customizeProjectInternalServices(project);
         configureSettings(project);
         configureConfigurations(project);
         configureTasks(project);
         configureGlobalInjector();
         addHookToProject(project);
+    }
+
+    private void init(Project project) {
+        this.project = project;
+        this.injector = initGuice();
+        this.settings = injector.getInstance(GolangPluginSetting.class);
     }
 
     private void configureGlobalInjector() {

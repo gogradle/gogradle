@@ -42,7 +42,7 @@ public class MapUtils {
     }
 
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2, K k3, V v3) {
-        return asMapWithoutNull(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3)});
+        return asMapWithoutNull(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3));
     }
 
     private static <K, V> Map<K, V> asMapWithoutNull(Pair<K, V>... entries) {

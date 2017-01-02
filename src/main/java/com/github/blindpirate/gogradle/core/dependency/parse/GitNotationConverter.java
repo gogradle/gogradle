@@ -44,7 +44,7 @@ public class GitNotationConverter implements NotationConverter {
 
 
     private Map<String, Object> buildByName(String notation) {
-        return MapUtils.<String, Object>asMap(NAME_KEY, notation);
+        return MapUtils.asMap(NAME_KEY, notation);
     }
 
     private Map<String, Object> buildByCommit(String notation) {
