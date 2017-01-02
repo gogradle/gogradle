@@ -2,13 +2,11 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.core.DefaultBuildConstraintManager;
+import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.cache.DefaultCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
-import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
-import com.github.blindpirate.gogradle.core.dependency.external.godep.GodepDependencyFactory;
-import com.github.blindpirate.gogradle.core.dependency.external.gopm.GopmDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
@@ -17,9 +15,11 @@ import com.github.blindpirate.gogradle.core.dependency.parse.GitNotationConverte
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DefaultDependencyFactory;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyFactory;
-import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
+import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
+import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.godep.GodepDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.GopmDependencyFactory;
+import com.github.blindpirate.gogradle.core.pack.ErrorReportingPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
@@ -59,11 +59,10 @@ public class GogradleModule extends AbstractModule {
 
         bind(NotationParser.class).to(DefaultNotationParser.class);
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
-        bind(DependencyFactory.class).to(DefaultDependencyFactory.class);
         bind(CacheManager.class).to(DefaultCacheManager.class);
         bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
-        bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
+        bind(PackagePathResolver.class).to(ErrorReportingPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
 
@@ -86,11 +85,11 @@ public class GogradleModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    @DefaultDependencyFactory.ExternalDependencyFactories
-    public List<DependencyFactory> externalDependencyFactories(
+    @DefaultDependencyVisitor.ExternalDependencyFactories
+    public List<ExternalDependencyFactory> externalDependencyFactories(
             GodepDependencyFactory godepDependencyFactory,
             GopmDependencyFactory gopmDependencyFactory) {
-        return CollectionUtils.<DependencyFactory>immutableList(
+        return CollectionUtils.immutableList(
                 godepDependencyFactory,
                 gopmDependencyFactory);
     }
@@ -98,7 +97,7 @@ public class GogradleModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    @DefaultPackagePathResolver.PackagePathResolvers
+    @ErrorReportingPackagePathResolver.PackagePathResolvers
     public List<PackagePathResolver> packagePathResolvers(
             GithubPackagePathResolver githubPackagePathResolver,
             StandardPackagePathResolver standardPackagePathResolver,
