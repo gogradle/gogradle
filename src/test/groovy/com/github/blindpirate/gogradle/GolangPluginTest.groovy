@@ -1,12 +1,15 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.InjectionHelper
-import com.github.blindpirate.gogradle.core.dependency.GitDependency
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+
+import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.*
+import static com.github.blindpirate.gogradle.util.DependencyUtils.*
 
 @RunWith(GogradleRunner)
 @WithProject
@@ -49,15 +52,15 @@ class GolangPluginTest {
     @Test
     void 'adding a dependency in form of map should success'() {
         project.dependencies {
-            build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: '1.0.0', vcs: 'git'
+            build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: 'commitId', vcs: 'git'
         }
 
         assert project.configurations.build.dependencies.size() == 1;
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
         assert dependency.commit == 'commitId'
-        assert dependency.version == '1.0.0'
-        assert dependency instanceof GitDependency
+        assert dependency.version == 'commitId'
+        assert dependency instanceof GitNotationDependency
     }
 
     def findFirstInDependencies() {
@@ -84,7 +87,7 @@ class GolangPluginTest {
 
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0'
-        assert ab.version == '1.0.0'
+        assert !ab.version
 
         def cd = findFirstInDependencies('github.com/c/d')
         assert cd.commit == '2.0.0'
@@ -104,7 +107,7 @@ class GolangPluginTest {
 
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
-        assert dependency instanceof LocalDirectoryDependency
+        assert dependency instanceof LocalDirectoryNotationDependency
     }
 
     @Test
@@ -116,8 +119,8 @@ class GolangPluginTest {
         }
 
         def dependency = findFirstInDependencies()
-        assert dependency instanceof LocalDirectoryDependency
-        assert !dependency.transitive
+        assert dependency instanceof LocalDirectoryNotationDependency
+        assert !getExclusionSpecs(dependency).isEmpty()
 
     }
 
@@ -126,8 +129,6 @@ class GolangPluginTest {
         project.dependencies {
             build('github.com/a/b@1.0.0-RELEASE') {
                 transitive = true
-                // TODO should we support this feature?
-                // excludeVendor = true
                 exclude module: 'github.com/c/d'
             }
 
@@ -138,16 +139,13 @@ class GolangPluginTest {
 
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0-RELEASE'
-        assert ab.transitive
-        //assert ab.excludeVendor
-        assert ab.excludes.containsValue('github.com/c/d')
+        assert getExclusionSpecs(ab).size() == 1
+        assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionSpec
 
         def cd = findFirstInDependencies('github.com/c/d')
         assert cd.url == 'git@github.com:a/b.git'
-        assert !cd.transitive
+        assert !getExclusionSpecs(cd).isEmpty()
         // assert !cd.excludeVendor // default value
-
-
     }
 
     @Test
@@ -156,7 +154,7 @@ class GolangPluginTest {
             build name: 'github.com/a/b', transitive: false
         }
 
-        assert !(findFirstInDependencies().transitive)
+        assert !getExclusionSpecs(findFirstInDependencies()).isEmpty()
     }
 
 }
