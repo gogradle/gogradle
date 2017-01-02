@@ -18,7 +18,7 @@ public abstract class AutoConfigureMapNotationParser implements MapNotationParse
             postConfigure(notationMap, ret);
             return ret;
         } catch (InstantiationException | IllegalAccessException e) {
-            throw new IllegalStateException("Dependency class must have a default constructor!");
+            throw new IllegalStateException("Dependency class must have an accessible default constructor!");
         }
     }
 
