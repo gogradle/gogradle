@@ -2,9 +2,9 @@ package com.github.blindpirate.gogradle.core.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.core.GolangPackageModule
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyTreeFactory
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
+import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.internal.project.ProjectInternal
@@ -50,7 +50,7 @@ class ResolveTaskTest {
         when(setting.getPackagePath()).thenReturn("package")
         when(project.getRootDir()).thenReturn(rootDir)
         when(rootDir.lastModified()).thenReturn(1L)
-        when(factory.getTree(any(GolangPackageModule))).thenReturn(tree)
+        when(factory.getTree(any(AbstractResolvedDependency))).thenReturn(tree)
 
         // when
         task.resolve()

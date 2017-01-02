@@ -2,10 +2,10 @@ package com.github.blindpirate.gogradle.core.task;
 
 import com.github.blindpirate.gogradle.GolangPlugin;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyTreeFactory;
-import com.github.blindpirate.gogradle.core.pack.LocalFileSystemModule;
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
+import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory;
+import com.github.blindpirate.gogradle.core.pack.LocalFileSystemDependency;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -28,7 +28,7 @@ public class ResolveTask extends DefaultTask {
     @TaskAction
     public void resolve() {
         File rootDir = getProject().getRootDir();
-        GolangPackageModule projectModule = LocalFileSystemModule.fromFileSystem(
+        AbstractResolvedDependency projectModule = LocalFileSystemDependency.fromLocal(
                 setting.getPackagePath(),
                 rootDir);
         tree = dependencyTreeFactory.getTree(projectModule);
