@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.util.logging.DebugLog;
 
 import javax.inject.Singleton;
 import java.io.File;
-import java.util.Optional;
 
 @Singleton
 public class VendorOnlyProduceStrategy implements DependencyProduceStrategy {

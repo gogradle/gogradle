@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.InjectionHelper;
-import com.github.blindpirate.gogradle.core.dependency.GolangConfigurationContainer;
+import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.core.task.BuildTask;
@@ -26,7 +26,7 @@ public class GolangPlugin implements Plugin<Project> {
 
     // prepare everything
     public static final String PREPARE_TASK_NAME = "prepare";
-    // resolve all dependencies by analyzing build.gradle
+    // produce all dependencies by analyzing build.gradle
     public static final String RESOLVE_TASK_NAME = "resolve";
     // show dependencies tree
     public static final String DEPENDENCIES_TASK_NAME = "dependencies";

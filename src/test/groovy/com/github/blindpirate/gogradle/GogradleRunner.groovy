@@ -46,12 +46,12 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     // At the end of that method, these resource will be  destroyed
     File resourceDir
 
-    public GogradleRunner(Class<?> klass) throws InitializationError {
+    GogradleRunner(Class<?> klass) throws InitializationError {
         super(klass);
     }
 
     @Override
-    public Object createTest() throws Exception {
+    Object createTest() throws Exception {
         currentInstance = super.createTest()
         MockitoAnnotations.initMocks(currentInstance)
         injectProjectAndResourceIfNecessary()
@@ -126,10 +126,9 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        // TODO not valid yet
         if (System.getProperty("TEST_ARE_OFFLINE")
                 && findAnnoOnMethod(method, AccessWeb)) {
-            notifier.fireTestIgnored(description)
+            notifier.fireTestIgnored(describeChild(method))
             return
         }
 

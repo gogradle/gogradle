@@ -5,8 +5,8 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.DependencySetFacade;
-import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import org.gradle.api.artifacts.ConfigurationContainer;
@@ -15,7 +15,7 @@ import javax.inject.Singleton;
 import java.io.File;
 
 import static com.github.blindpirate.gogradle.GolangPlugin.BUILD_CONFIGURATION_NAME;
-import static com.github.blindpirate.gogradle.util.Cast.*;
+import static com.github.blindpirate.gogradle.util.Cast.cast;
 
 /**
  * In {@code Develop} mode, dependencies in build.gradle have top priority.
