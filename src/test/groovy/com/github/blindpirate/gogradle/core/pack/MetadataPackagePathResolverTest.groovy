@@ -47,20 +47,42 @@ class MetadataPackagePathResolverTest {
 
     @Test
     void 'http should be tried when https failed'() {
-        // TODO
         // given
         String packagePath = 'example.org/pkg/foo'
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
         String realHttpUrl = 'http://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git https://code.org/r/p/exproj">'
         when(httpUtils.get(realHttpsUrl)).thenThrow(new IOException())
-        when(httpUtils.get(realHttpUrl)).thenReturn(metaTag)
+        when(httpUtils.get(realHttpUrl)).thenReturn(tagInHtml(metaTag))
 
         // when
         resolver.produce(packagePath).get()
 
         // then
         verify(httpUtils).get(realHttpUrl)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'missing meta tag should result in an exception'() {
+        // given
+        String packagePath = 'example.org/pkg/foo'
+        String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
+        when(httpUtils.get(realHttpsUrl)).thenReturn(tagInHtml(''))
+
+        // then
+        resolver.produce(packagePath)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'invalid meta tag should result in an exception'() {
+        // given
+        String packagePath = 'example.org/pkg/foo'
+        String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
+        String metaTag = '<meta name="go-import" content="example.org git">'
+        when(httpUtils.get(realHttpsUrl)).thenReturn(tagInHtml(metaTag))
+
+        // then
+        resolver.produce(packagePath).isPresent()
     }
 
     String tagInHtml(String s) {

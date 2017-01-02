@@ -6,7 +6,9 @@ import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
+
 import java.util.Optional;
+
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -46,17 +48,14 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
             Document document = Jsoup.parse(html);
             Elements elements = document.select("meta[name=go-import]");
-            if (elements.isEmpty()) {
-                LOGGER.info("Missing meta in response of {}", url);
-                return Optional.empty();
-            } else {
-                String content = elements.get(0).attr("content");
-                // TODO According to https://golang.org/cmd/go/#hdr-Remote_import_paths
-                // we should verify it
-                //String importPath = matcher.group(1);
-                LOGGER.info("Meta tag of url {} is:{}", url, content);
-                return Optional.of(buildPackageInfo(packagePath, content));
-            }
+            Assert.isTrue(!elements.isEmpty(), "Missing meta in response of " + url);
+
+            String content = elements.get(0).attr("content");
+            // TODO According to https://golang.org/cmd/go/#hdr-Remote_import_paths
+            // we should verify it
+            //String importPath = matcher.group(1);
+            LOGGER.info("Meta tag of url {} is:{}", url, content);
+            return Optional.of(buildPackageInfo(packagePath, content));
         } catch (IOException e) {
             LOGGER.warn("Exception in accessing {}", url, e);
             return Optional.empty();

@@ -14,7 +14,7 @@ public class LocalFileSystemDependency extends AbstractResolvedDependency {
         this.rootDir = rootDir;
     }
 
-    public static AbstractResolvedDependency fromLocal(String name, File rootDir) {
+    public static LocalFileSystemDependency fromLocal(String name, File rootDir) {
         long lastModifiedTime = rootDir.lastModified();
         Instant time = Instant.ofEpochMilli(lastModifiedTime);
         return new LocalFileSystemDependency(name, time.toString(), lastModifiedTime, rootDir);
