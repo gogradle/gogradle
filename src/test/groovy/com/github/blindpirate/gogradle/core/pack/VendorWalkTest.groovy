@@ -14,7 +14,7 @@ class VendorWalkTest extends GogradleModuleSupport {
 
     @Test
     void 'create cascading vendor package should success'() {
-        LocalFileSystemModule module = LocalFileSystemModule.fromFileSystem('testpackage', resource);
+        LocalFileSystemDependency module = LocalFileSystemDependency.fromLocal('testpackage', resource);
 
         assert module.dependencies.any {
             it.package.name == 'github.com/e/f'
