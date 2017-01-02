@@ -20,7 +20,7 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    public Map<String, String> toLockedNotation() {
+    public Map<String, Object> toLockedNotation() {
         return ImmutableMap.of(
                 NAME_KEY, getName(),
                 VCS_KEY, Git.getName(),

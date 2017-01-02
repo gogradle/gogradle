@@ -68,7 +68,7 @@ public class VendorDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    public Map<String, String> toLockedNotation() {
+    public Map<String, Object> toLockedNotation() {
         // TODO both this dependency and its host dependency should be locked
         throw new UnsupportedOperationException();
     }

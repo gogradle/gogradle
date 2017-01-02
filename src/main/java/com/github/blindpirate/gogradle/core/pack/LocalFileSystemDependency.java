@@ -21,7 +21,7 @@ public class LocalFileSystemDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    public Map<String, String> toLockedNotation() {
+    public Map<String, Object> toLockedNotation() {
         throw new UnsupportedOperationException();
     }
 

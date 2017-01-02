@@ -20,6 +20,6 @@ public interface ResolvedDependency extends GolangDependency {
     GolangDependencySet getDependencies();
 
 
-    Map<String, String> toLockedNotation();
+    Map<String, Object> toLockedNotation();
 
 }

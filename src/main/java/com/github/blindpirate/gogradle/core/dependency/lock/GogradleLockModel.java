@@ -10,9 +10,9 @@ public class GogradleLockModel {
     @JsonProperty("apiVersion")
     private String apiVersion;
     @JsonProperty("dependencies")
-    private List<Map<String, String>> dependencies;
+    private List<Map<String, Object>> dependencies;
 
-    public static GogradleLockModel of(List<Map<String, String>> notations) {
+    public static GogradleLockModel of(List<Map<String, Object>> notations) {
         GogradleLockModel ret = new GogradleLockModel();
         ret.apiVersion = GolangPluginSetting.GOGRADLE_VERSION;
         ret.dependencies = notations;
@@ -23,7 +23,7 @@ public class GogradleLockModel {
         return apiVersion;
     }
 
-    public List<Map<String, String>> getDependencies() {
+    public List<Map<String, Object>> getDependencies() {
         return dependencies;
     }
 }
