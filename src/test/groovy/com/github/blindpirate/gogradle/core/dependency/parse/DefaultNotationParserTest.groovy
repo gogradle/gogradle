@@ -28,12 +28,12 @@ class DefaultNotationParserTest {
     }
 
     @Test(expected = DependencyResolutionException)
-    public void 'parsing unrecognized class should fail'() {
+    void 'parsing unrecognized class should fail'() {
         parser.parse({})
     }
 
     @Test
-    public void 'string should be converted to map before parsing'() {
+    void 'string should be converted to map before parsing'() {
         // given
         String stringNotation = 'notation'
         Map mapNotation = [name: 'notation']
@@ -46,9 +46,9 @@ class DefaultNotationParserTest {
     }
 
     @Test
-    public void 'map parsing should be delegated to MapNotationParser'(){
+    void 'map parsing should be delegated to MapNotationParser'() {
         // given
-        Map notation=[name:'notation']
+        Map notation = [name: 'notation']
 
         // when
         parser.parse(notation)
