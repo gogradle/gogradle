@@ -1,5 +1,12 @@
 package com.github.blindpirate.gogradle.core
 
-class DefaultBuildConstraintManagerTest {
+import org.junit.Test
 
+class DefaultBuildConstraintManagerTest {
+    DefaultBuildConstraintManager manager = new DefaultBuildConstraintManager()
+
+    @Test
+    void 'getting ctx should success'() {
+        manager.getCtx()
+    }
 }
