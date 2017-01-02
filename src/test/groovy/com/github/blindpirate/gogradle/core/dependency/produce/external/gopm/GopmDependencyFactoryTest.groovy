@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
+import org.mockito.Mockito
 import org.mockito.Spy
 
 import static org.mockito.Matchers.eq
@@ -47,6 +48,66 @@ include = public|scripts|templates'''
         verify(mapNotationParser).parse(eq([name: 'golang.org/i/j', branch: 'master']))
         verify(mapNotationParser).parse(eq([name: 'golang.org/k/l', tag: 'v0.9.0']))
         verify(mapNotationParser).parse(eq([name: 'gopkg.in/redis.v2', commit: 'e617904']))
+    }
+
+    @Test
+    void 'missing [deps] should result in empty list'() {
+        // given
+        IOUtils.write(resource, '.gopmfile', '[target]\npath = github.com/gogits/gogs')
+        // then
+        assert factory.produce(resource).get().isEmpty()
+    }
+
+    @Test
+    void 'empty [deps] should result in empty list'() {
+        // given
+        IOUtils.write(resource, '.gopmfile', '''[target]
+path = github.com/gogits/gogs
+[deps]
+''')
+        // then
+        assert factory.produce(resource).get().isEmpty()
+    }
+
+    String misorderedDotGompfile1 = '''
+[deps]
+github.com/c/d
+
+[target]
+path = github.com/gogits/gogs
+
+[res]
+include = public|scripts|templates'''
+
+    String misorderedDotGompfile2 = '''
+[target]
+path = github.com/gogits/gogs
+
+[res]
+include = public|scripts|templates
+
+[deps]
+github.com/c/d
+'''
+
+
+    @Test
+    void 'misordered section should not affect result - 1'() {
+        misorderTest(misorderedDotGompfile1)
+    }
+
+    @Test
+    void 'misordered section should not affect result - 2'() {
+        misorderTest(misorderedDotGompfile1)
+    }
+
+    void misorderTest(String dotGopmfile) {
+        // given
+        IOUtils.write(resource, '.gopmfile', dotGopmfile)
+        // when
+        factory.produce(resource)
+        // then
+        verifyMapParsed([name: 'github.com/c/d'])
     }
 
 }

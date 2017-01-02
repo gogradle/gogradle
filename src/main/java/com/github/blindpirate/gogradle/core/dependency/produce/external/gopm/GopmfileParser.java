@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.gopm;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 
@@ -39,7 +40,10 @@ public class GopmfileParser {
 
     public List<Map<String, Object>> parse(File file) {
 
-        List<String> lines = IOUtils.getLines(file);
+        List<String> lines = IOUtils.getLines(file)
+                .stream()
+                .filter(StringUtils::isNotBlank)
+                .collect(Collectors.toList());
 
         int targetLineIndex = findKeyworkIndex(lines, TARGET_SECTION);
         int depsLineIndex = findKeyworkIndex(lines, DEPS_SECTION);

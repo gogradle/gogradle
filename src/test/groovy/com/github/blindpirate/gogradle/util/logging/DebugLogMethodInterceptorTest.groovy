@@ -38,28 +38,28 @@ class DebugLogMethodInterceptorTest {
 
     static class LogTest {
         @DebugLog
-        public void doNothing() {}
+        void doNothing(int i) {}
 
         @DebugLog
         protected void doProtectedNothing() {}
 
         @DebugLog
-        public Object returnNull() { return null }
+        Object returnNull() { return null }
 
         @DebugLog
         protected Object returnString() { '' }
 
         @DebugLog
-        public void longTime() {
+        void longTime() {
             Thread.sleep(100)
         }
 
         @DebugLog
-        public Object throwException() {
+        Object throwException() {
             throw new IllegalStateException()
         }
 
-        public void withoutAnnotation() {}
+        void withoutAnnotation() {}
     }
 
     @Before
@@ -81,11 +81,12 @@ class DebugLogMethodInterceptorTest {
     @Test
     void 'doNothing should print debug log'() {
         // when
-        injector.getInstance(LogTest).doNothing()
+        injector.getInstance(LogTest).doNothing(42)
         // then
         verifyDebugLogTwoTimes()
         assertEnterAndExit()
         assert argumentsCaptor.allValues[0] == 'doNothing'
+        assert argumentsCaptor.allValues[2] == '[42]' // argument
         assert argumentsCaptor.allValues[3] == 'doNothing'
         assert argumentsCaptor.allValues[5].toDouble() < 10
         assert argumentsCaptor.allValues[6] == null

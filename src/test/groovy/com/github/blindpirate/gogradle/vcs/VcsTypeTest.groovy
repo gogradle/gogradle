@@ -16,4 +16,9 @@ class VcsTypeTest {
         assert !of('a').isPresent()
     }
 
+    @Test
+    void 'test valueOf'() {
+        assert VcsType.valueOf('Git') == Git
+    }
+
 }
