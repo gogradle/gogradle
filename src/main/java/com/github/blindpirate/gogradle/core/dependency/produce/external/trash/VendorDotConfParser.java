@@ -47,8 +47,6 @@ public class VendorDotConfParser {
         Map<String, Object> ret = new HashedMap();
         String[] array = StringUtils.splitAndTrim(line, "\\s");
 
-        Assert.isTrue(array.length > 1);
-
         ret.put("name", array[0]);
         determineVersionAndPutIntoMap(ret, array[1]);
         if (array.length > 2) {
