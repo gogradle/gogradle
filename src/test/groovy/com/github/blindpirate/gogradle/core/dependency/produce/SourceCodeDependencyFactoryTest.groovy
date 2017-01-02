@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
+import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
@@ -165,6 +166,11 @@ func main(){}
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         // then
         assert factory.produce(resource).isEmpty()
+    }
+
+    @Test(expected = DependencyProductionException)
+    void 'IOException should be reported'() {
+        factory.produce(new File('inexistent'))
     }
 
     String mainDotGo = '''

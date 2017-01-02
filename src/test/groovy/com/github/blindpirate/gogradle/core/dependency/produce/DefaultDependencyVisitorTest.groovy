@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
@@ -29,12 +30,13 @@ class DefaultDependencyVisitorTest {
     DependencyProduceStrategy strategy
     @Mock
     File rootDir
+    File resource
 
-    DefaultDependencyVisitor factory
+    DefaultDependencyVisitor visitor
 
     @Before
     void setUp() {
-        factory = new DefaultDependencyVisitor(
+        visitor = new DefaultDependencyVisitor(
                 [external1, external2],
                 sourceCodeDependencyFactory,
                 vendorDependencyFactory
@@ -48,7 +50,7 @@ class DefaultDependencyVisitorTest {
         when(external2.produce(rootDir)).thenReturn(Optional.of(dependencySet))
 
         // then:
-        assert factory.visitExternalDependencies(resolvedDependency, rootDir) == dependencySet
+        assert visitor.visitExternalDependencies(resolvedDependency, rootDir) == dependencySet
     }
 
     @Test
@@ -56,7 +58,7 @@ class DefaultDependencyVisitorTest {
         // given:
         when(sourceCodeDependencyFactory.produce(rootDir)).thenReturn(dependencySet)
         // then:
-        assert factory.visitSourceCodeDependencies(resolvedDependency, rootDir) == dependencySet
+        assert visitor.visitSourceCodeDependencies(resolvedDependency, rootDir) == dependencySet
     }
 
     @Test
@@ -64,14 +66,18 @@ class DefaultDependencyVisitorTest {
         // given:
         when(vendorDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(GolangDependencySet.empty())
         // then:
-        assert factory.visitVendorDependencies(resolvedDependency, rootDir).isEmpty()
+        assert visitor.visitVendorDependencies(resolvedDependency, rootDir).isEmpty()
 
         //given:
         when(vendorDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(dependencySet)
         // then:
-        assert factory.visitVendorDependencies(resolvedDependency, rootDir) == dependencySet
+        assert visitor.visitVendorDependencies(resolvedDependency, rootDir) == dependencySet
     }
 
-
+    @Test
+    @WithResource('')
+    void 'empty set should be returned when no external dependencies exist'() {
+        assert visitor.visitExternalDependencies(resolvedDependency, resource).isEmpty()
+    }
 
 }
