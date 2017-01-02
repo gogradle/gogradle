@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangPackageModule
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,9 +11,9 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 class DefaultDependencyRegistryTest {
     @Mock
-    GolangPackageModule module1
+    AbstractResolvedDependency module1
     @Mock
-    GolangPackageModule module2
+    AbstractResolvedDependency module2
 
     DefaultDependencyRegistry registry = new DefaultDependencyRegistry()
 
