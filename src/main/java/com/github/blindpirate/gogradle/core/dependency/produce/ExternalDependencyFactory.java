@@ -13,7 +13,7 @@ import java.util.Optional;
 
 public abstract class ExternalDependencyFactory {
     @Inject
-    protected MapNotationParser mapNotationParser;
+    private MapNotationParser mapNotationParser;
 
     /**
      * Relative paths of identity files.
