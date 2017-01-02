@@ -16,6 +16,8 @@ import static com.github.blindpirate.gogradle.util.StringUtils.trimToNull;
 
 @Singleton
 public class GolangPluginSetting {
+    public static final String GOGRADLE_VERSION = "0.1.0";
+
     // indicate the global GOPATH (in system environment variables)
     private boolean useGlobalGopath = false;
     public static final String DEFAULT_CHARSET = "UTF-8";
