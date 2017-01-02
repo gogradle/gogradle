@@ -32,10 +32,6 @@ public class DefaultCacheManager implements CacheManager {
     }
 
     @Override
-    public void ensureProjectBuildCacheExist() {
-    }
-
-    @Override
     public Path getGlobalCachePath(String packagePath) {
         return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packagePath);
     }

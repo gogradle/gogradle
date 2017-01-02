@@ -16,7 +16,7 @@ import java.util.concurrent.Callable;
 public interface CacheManager {
     void ensureGlobalCacheExistAndWritable();
 
-    void ensureProjectBuildCacheExist();
+//    void ensureProjectBuildCacheExist();
 
     Path getGlobalCachePath(String packagePath);
 

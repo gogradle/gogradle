@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.github.blindpirate.gogradle.core.cache.CacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
@@ -162,6 +163,17 @@ class GitDependencyResolverTest {
                 .thenThrow(new IOException())
         // when
         resolver.resolve(dependency)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'mismatched repository should cause an exception'() {
+        // given
+        when(dependency.getUrls()).thenReturn(['anotherUrl'])
+        IOUtils.write(resource, 'some file', 'file content')
+
+        // when
+        resolver.resolve(dependency)
+
     }
 
 }
