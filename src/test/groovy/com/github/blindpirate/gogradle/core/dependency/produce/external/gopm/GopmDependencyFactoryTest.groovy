@@ -89,6 +89,16 @@ include = public|scripts|templates
 [deps]
 github.com/c/d
 '''
+    String misorderedDotGompfile3 = '''
+[res]
+include = public|scripts|templates
+
+[deps]
+github.com/c/d
+
+[target]
+path = github.com/gogits/gogs
+'''
 
 
     @Test
@@ -98,7 +108,12 @@ github.com/c/d
 
     @Test
     void 'misordered section should not affect result - 2'() {
-        misorderTest(misorderedDotGompfile1)
+        misorderTest(misorderedDotGompfile2)
+    }
+
+    @Test
+    void 'misordered section should not affect result - 3'() {
+        misorderTest(misorderedDotGompfile3)
     }
 
     void misorderTest(String dotGopmfile) {

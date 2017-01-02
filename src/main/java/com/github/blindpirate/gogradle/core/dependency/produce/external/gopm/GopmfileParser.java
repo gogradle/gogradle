@@ -89,9 +89,6 @@ public class GopmfileParser {
     }
 
     private Pair<String, String> parseLine(String line) {
-        if (isBlank(line)) {
-            return null;
-        }
         String[] nameAndValue = splitAndTrim(line, "=");
         String name = nameAndValue[0];
         String value = nameAndValue.length > 1 ? nameAndValue[1] : "";
