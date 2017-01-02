@@ -40,6 +40,11 @@ class GitNotationConverterTest {
         assertWithTag('github.com/a/b@~1.3 | (1.4.* & !=1.4.5) | ~2', '~1.3 | (1.4.* & !=1.4.5) | ~2')
     }
 
+    @Test(expected = IllegalStateException)
+    void 'invalid notation should cause an exception'() {
+        converter.convert('github.com/a/b#')
+    }
+
     void assertWithTag(String notation, String tag) {
         assert converter.convert(notation) == [name: 'github.com/a/b', tag: tag]
     }
