@@ -154,6 +154,16 @@ balabalabala
         assert evaluateBuildTags(buildTags, ['darwin', '386'])
     }
 
+    @Test(expected = IllegalStateException)
+    void '!!term should cause an exception'() {
+        // given
+        String buildTags = '''
+// +build !!term
+'''
+        // then
+        evaluateBuildTags(buildTags, [])
+    }
+
     boolean evaluateBuildTags(String buildTags, List ctx) {
         when(manager.getCtx()).thenReturn(ctx as Set)
         String code = buildTags + '''

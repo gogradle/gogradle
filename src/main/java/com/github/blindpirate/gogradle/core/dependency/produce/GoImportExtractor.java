@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.antlr.GolangBuildInfoBaseListener;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoLexer;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
-import com.github.blindpirate.gogradle.util.Assert;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -122,7 +121,6 @@ public class GoImportExtractor {
         }
 
         BuildTag getLastBuildTag() {
-            Assert.isTrue(!buildTags.isEmpty());
             return buildTags.get(buildTags.size() - 1);
         }
 
@@ -147,7 +145,6 @@ public class GoImportExtractor {
         }
 
         BuildOption getLastBuildOption() {
-            Assert.isTrue(!buildOptions.isEmpty());
             return buildOptions.get(buildOptions.size() - 1);
         }
     }
