@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.cache.CacheManager;
 import com.github.blindpirate.gogradle.core.cache.DefaultCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
+import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
@@ -17,8 +18,13 @@ import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.glide.GlideDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.glock.GlockDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.godep.GodepDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.GopmDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor.GovendorDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory;
 import com.github.blindpirate.gogradle.core.pack.ErrorReportingPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
@@ -82,16 +88,30 @@ public class GogradleModule extends AbstractModule {
     }
 
 
+    // The order is based on https://github.com/blindpirate/report-of-go-package-management-tool
     @Inject
     @Provides
     @Singleton
     @DefaultDependencyVisitor.ExternalDependencyFactories
     public List<ExternalDependencyFactory> externalDependencyFactories(
+            DefaultLockedDependencyManager lockedDependencyManager,
             GodepDependencyFactory godepDependencyFactory,
+            GlideDependencyFactory glideDependencyFactory,
+            GovendorDependencyFactory govendorDependencyFactory,
+            GvtGbvendorDependencyFactory gvtGbvendorDependencyFactory,
+            TrashDependencyFactory trashDependencyFactory,
+            GlockDependencyFactory glockDependencyFactory,
             GopmDependencyFactory gopmDependencyFactory) {
         return CollectionUtils.immutableList(
+                lockedDependencyManager,
                 godepDependencyFactory,
+                glideDependencyFactory,
+                govendorDependencyFactory,
+                gvtGbvendorDependencyFactory,
+                trashDependencyFactory,
+                glockDependencyFactory,
                 gopmDependencyFactory);
+
     }
 
     @Inject
