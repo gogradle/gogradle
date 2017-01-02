@@ -69,7 +69,7 @@ public class GitAccessor implements VcsAccessor {
                     .setDirectory(location.toFile())
                     .call();
         } catch (GitAPIException e) {
-            throw new GitInteractionException("Exception in git operation", e);
+            throw new IllegalStateException("Exception in git operation", e);
         }
     }
 
@@ -79,7 +79,7 @@ public class GitAccessor implements VcsAccessor {
             String commitId = headRef.getObjectId().name();
             return findCommit(repository, commitId);
         } catch (IOException e) {
-            throw new GitInteractionException("Cannot produce HEAD of " + repository + ":" + branch);
+            throw new IllegalArgumentException("Cannot produce HEAD of " + repository + ":" + branch);
         }
     }
 
@@ -180,7 +180,7 @@ public class GitAccessor implements VcsAccessor {
             git.pull().call();
             return repository;
         } catch (GitAPIException e) {
-            throw new GitInteractionException("Exception in git operation", e);
+            throw new IllegalStateException("Exception in git operation", e);
         }
     }
 

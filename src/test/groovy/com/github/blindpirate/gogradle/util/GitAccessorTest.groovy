@@ -8,8 +8,12 @@ import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
+
+import java.nio.file.Path
 
 import static IOUtils.forceDelete
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")
@@ -36,6 +40,7 @@ class GitAccessorTest {
     @Test
     void 'getting remote urls of repository should success'() {
         assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
+        assert gitAccessor.getRemoteUrls(resource.toPath()).contains('https://github.com/blindpirate/test-for-gogradle.git')
     }
 
     @Test
@@ -107,7 +112,6 @@ class GitAccessorTest {
 
     @Test
     @AccessWeb
-    @WithResource('out-of-date-git-repo.zip')
     void 'git reset --hard HEAD && git pull should success'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()
         gitAccessor.hardResetAndUpdate(repository)

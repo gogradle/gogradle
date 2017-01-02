@@ -22,6 +22,7 @@ import java.nio.file.Path
 import java.util.concurrent.Callable
 
 import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.DEFAULT_BRANCH
+import static java.util.Optional.empty
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
@@ -42,11 +43,11 @@ class GitDependencyResolverTest {
     @Mock
     Injector injector
     @Mock
-    RevCommit revCommit
-    @Mock
     GolangDependencySet dependencySet
     @InjectMocks
     GitDependencyResolver resolver
+    // this is a fake commit. We cannot mock RevCommit directly because RevCommit.getName() is final
+    RevCommit revCommit = RevCommit.parse([48] * 64 as byte[])
 
     File resource
     Path repositoryPath
@@ -107,7 +108,6 @@ class GitDependencyResolverTest {
         resolver.resolve(dependency)
         // then:
         verify(gitAccessor, times(0)).cloneWithUrl('url2', repositoryPath)
-
     }
 
     @Test
@@ -121,6 +121,49 @@ class GitDependencyResolverTest {
         resolver.resolve(dependency)
         // then:
         verify(gitAccessor).hardResetAndUpdate(repository)
+    }
+
+    @Test
+    void 'dependency with tag should be resolved successfully'() {
+        // given
+        when(dependency.getTag()).thenReturn('tag')
+        when(gitAccessor.findCommitByTag(repository, 'tag')).thenReturn(of(revCommit))
+        // when
+        resolver.resolve(dependency)
+        // then
+        verify(gitAccessor).resetToCommit(repository, revCommit.getName())
+    }
+
+    @Test
+    void 'tag should be interpreted as sem version if commit not found'() {
+        // given
+        when(dependency.getTag()).thenReturn('semversion')
+        when(gitAccessor.findCommitByTag(repository, 'semversion')).thenReturn(empty())
+        when(gitAccessor.findCommitBySemVersion(repository, 'semversion')).thenReturn(of(revCommit))
+        // when
+        resolver.resolve(dependency)
+        // then
+        verify(gitAccessor).resetToCommit(repository, revCommit.getName())
+    }
+
+    @Test
+    void 'commit will be searched if tag cannot be recognized'() {
+        // given
+        when(dependency.getTag()).thenReturn('tag')
+        // when
+        resolver.resolve(dependency)
+        // then
+        verify(gitAccessor).headCommitOfBranch(repository, 'master')
+    }
+
+    @Test
+    void 'NEWEST_COMMIT should be recognized properly'() {
+        // given
+        when(dependency.getCommit()).thenReturn(GitNotationDependency.NEWEST_COMMIT)
+        // when
+        resolver.resolve(dependency)
+        // then
+        verify(gitAccessor).headCommitOfBranch(repository, 'master')
     }
 
     @Test(expected = DependencyResolutionException)
@@ -138,7 +181,6 @@ class GitDependencyResolverTest {
     @Test
     void 'resetting to a commit should success'() {
         // given
-        revCommit = RevCommit.parse([48] * 64 as byte[])
         when(dependency.getCommit()).thenReturn(revCommit.name)
         when(gitAccessor.findCommit(repository, revCommit.name)).thenReturn(of(revCommit))
         // when
@@ -165,7 +207,7 @@ class GitDependencyResolverTest {
         resolver.resolve(dependency)
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = DependencyResolutionException)
     void 'mismatched repository should cause an exception'() {
         // given
         when(dependency.getUrls()).thenReturn(['anotherUrl'])
