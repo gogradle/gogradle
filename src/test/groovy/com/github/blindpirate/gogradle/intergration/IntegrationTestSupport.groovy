@@ -25,10 +25,6 @@ buildscript {
 }
 apply plugin: 'com.github.blindpirate.gogradle'
 '''
-    String gradleDotProperties = '''
-org.gradle.daemon=true
-org.gradle.jvmargs=-XX:MaxPermSize=4g -XX:+HeapDumpOnOutOfMemoryError -Xmx4g -agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=5005 -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080
-'''
 
     @Before
     void baseSetUp() {
@@ -42,9 +38,8 @@ org.gradle.jvmargs=-XX:MaxPermSize=4g -XX:+HeapDumpOnOutOfMemoryError -Xmx4g -ag
                 .forProjectDirectory(resource)
                 .useGradleUserHomeDir(userhome)
 
-        if (isNotBlank(System.getenv('GRADLE_HOME'))) {
-            connector.useInstallation(new File(System.getenv('GRADLE_HOME')))
-        }
+        // That's not appropriate since it's not affected by gradle wrapper
+        connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
 
         ProjectConnection connection = connector.connect()
         try {
