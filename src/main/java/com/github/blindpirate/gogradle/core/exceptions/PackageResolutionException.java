@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.pack;
+package com.github.blindpirate.gogradle.core.exceptions;
 
 public final class PackageResolutionException extends RuntimeException {
     private PackageResolutionException(String message) {
@@ -6,6 +6,6 @@ public final class PackageResolutionException extends RuntimeException {
     }
 
     public static PackageResolutionException cannotResolvePath(String packagePath) {
-        return new PackageResolutionException("Cannot resolve package:" + packagePath);
+        return new PackageResolutionException("Cannot produce package:" + packagePath);
     }
 }
