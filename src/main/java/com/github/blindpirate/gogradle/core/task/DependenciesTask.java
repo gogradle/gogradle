@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.task;
 
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyTreeNode;
+import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -24,6 +24,6 @@ public class DependenciesTask extends DefaultTask {
     }
 
     private void display(DependencyTreeNode tree) {
-        System.out.println(tree.print());
+        System.out.println(tree.output());
     }
 }
