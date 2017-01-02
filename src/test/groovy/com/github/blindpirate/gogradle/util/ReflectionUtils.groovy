@@ -3,18 +3,18 @@ package com.github.blindpirate.gogradle.util
 import java.lang.reflect.Field
 import java.lang.reflect.Modifier
 
-public class ReflectionUtils {
-    public static void setField(Object object, String field, Object value) {
+class ReflectionUtils {
+    static void setField(Object object, String field, Object value) {
         org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
                 .setVariableValueInObject(object, field, value);
     }
 
-    public static Object getField(Object target, String field) {
+    static Object getField(Object target, String field) {
         return org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
                 .getValueIncludingSuperclasses(field, target);
     }
 
-    public static void setStaticFinalField(Object object, String fieldName, Object value) {
+    static void setStaticFinalField(Object object, String fieldName, Object value) {
         Field field = org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
                 .getFieldByNameIncludingSuperclasses(fieldName, object.getClass());
 
@@ -25,7 +25,13 @@ public class ReflectionUtils {
         field.set(object, value)
     }
 
-    public static boolean allFieldsEquals(Object actual, Object expected, List<String> fieldNames) {
+    static Object getStaticField(Class target, String fieldName) {
+        Field field = target.getField(fieldName)
+        field.setAccessible(true)
+        return field.get(null)
+    }
+
+    static boolean allFieldsEquals(Object actual, Object expected, List<String> fieldNames) {
         return fieldNames.every { actual[it] == expected[it] }
     }
 }
