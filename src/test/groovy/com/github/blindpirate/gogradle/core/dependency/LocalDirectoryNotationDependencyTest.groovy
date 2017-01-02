@@ -24,7 +24,6 @@ class LocalDirectoryNotationDependencyTest extends MockInjectorSupport {
         // when
         dependency.resolve()
         // then
-        verify(localFileResolver.resolve(dependency))
-
+        verify(localFileResolver).resolve(dependency)
     }
 }

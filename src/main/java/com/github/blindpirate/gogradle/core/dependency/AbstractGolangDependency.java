@@ -10,7 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 public abstract class AbstractGolangDependency implements GolangDependency {
-    protected static final Spec<GolangDependency> NO_TRANSITIVE_DEP_SPEC = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
+    public static final Spec<GolangDependency> NO_TRANSITIVE_DEP_SPEC = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
     private String name;
     private boolean firstLevel;
     /**
@@ -60,7 +60,7 @@ public abstract class AbstractGolangDependency implements GolangDependency {
         throw new UnsupportedOperationException();
     }
 
-    private enum NoTransitiveSpec implements Spec<GolangDependency> {
+    public enum NoTransitiveSpec implements Spec<GolangDependency> {
         NO_TRANSITIVE_SPEC;
 
         @Override
