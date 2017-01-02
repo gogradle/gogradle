@@ -100,10 +100,13 @@ tasks.withType(FindBugs) {
     }
 }
 
-/************** COVERAGE **************/
+/************** coverage **************/
 
 jacoco {
     toolVersion = "0.7.7.201606060606"
+}
+coverage {
+    excludePackages = ['com/github/blindpirate/gogradle/antlr/**']
 }
 
 check.dependsOn 'coverageCheck'
