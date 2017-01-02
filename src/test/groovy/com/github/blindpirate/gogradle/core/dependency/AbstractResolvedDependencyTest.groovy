@@ -63,4 +63,9 @@ class AbstractResolvedDependencyTest {
         assert dependency.getDependencies().size() == 1
         assert dependency.getDependencies().first().is(c)
     }
+
+    @Test
+    void 'resolved dependency should be resolved to itself'() {
+        assert dependency.resolve().is(dependency)
+    }
 }

@@ -33,6 +33,11 @@ class GitResolvedDependencyTest {
     }
 
     @Test
+    void 'updateTime should be read correctly'() {
+        assert newResolvedDependency().getUpdateTime() == 42L
+    }
+
+    @Test
     void 'a resolved dependency should be converted to notation successfully'() {
         // given
         GitResolvedDependency dependency = newResolvedDependency()
