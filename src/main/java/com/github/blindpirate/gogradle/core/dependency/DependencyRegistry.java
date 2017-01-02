@@ -1,7 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackageModule;
-
 /**
  * Manages global dependency register.
  * When a dependency is resolved, its repo information will be registered here.
@@ -14,5 +12,7 @@ public interface DependencyRegistry {
      * @param dependency
      * @return true if the dependency is newer than existing dependency with same name.
      */
-    boolean register(GolangPackageModule dependency);
+    boolean register(ResolvedDependency dependency);
+
+    ResolvedDependency retrive(String name);
 }
