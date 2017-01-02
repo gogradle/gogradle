@@ -29,10 +29,6 @@ public final class DependencyResolutionException extends GradleException {
         return new DependencyResolutionException("Parsing source code of " + module.getName() + " failed.", e);
     }
 
-    public static DependencyResolutionException cannotResolveVendor(ResolvedDependency module, IOException e) {
-        return new DependencyResolutionException("Resolving vendor of " + module.getName() + " failed.", e);
-    }
-
     public static DependencyResolutionException cannotCloneRepository(GolangDependency dependency, Throwable e) {
         return new DependencyResolutionException("Cloning repository of " + dependency.getName() + " failed.", e);
     }

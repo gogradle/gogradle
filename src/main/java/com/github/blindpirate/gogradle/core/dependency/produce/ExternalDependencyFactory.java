@@ -12,8 +12,11 @@ import java.util.Map;
 import java.util.Optional;
 
 public abstract class ExternalDependencyFactory {
-    @Inject
-    private MapNotationParser mapNotationParser;
+    protected final MapNotationParser mapNotationParser;
+
+    public ExternalDependencyFactory(MapNotationParser mapNotationParser) {
+        this.mapNotationParser = mapNotationParser;
+    }
 
     /**
      * Relative paths of identity files.

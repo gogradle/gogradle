@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.trash;
 
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
@@ -15,6 +17,11 @@ import java.util.Map;
 @Singleton
 public class TrashDependencyFactory extends ExternalDependencyFactory {
     private VendorDotConfParser parser = new VendorDotConfParser();
+
+    @Inject
+    public TrashDependencyFactory(MapNotationParser mapNotationParser) {
+        super(mapNotationParser);
+    }
 
     @Override
     protected String identityFileName() {

@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.godep;
 
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
@@ -16,6 +18,11 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
  */
 @Singleton
 public class GodepDependencyFactory extends ExternalDependencyFactory {
+
+    @Inject
+    public GodepDependencyFactory(MapNotationParser mapNotationParser) {
+        super(mapNotationParser);
+    }
 
     protected String identityFileName() {
         return "Godeps/Godeps.json";
