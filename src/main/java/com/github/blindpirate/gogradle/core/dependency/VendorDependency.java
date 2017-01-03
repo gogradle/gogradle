@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
@@ -69,7 +70,8 @@ public class VendorDependency extends AbstractResolvedDependency {
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        // TODO both this dependency and its host dependency should be locked
-        throw new UnsupportedOperationException();
+        Map<String, Object> ret = new HashMap<>(hostDependency.toLockedNotation());
+        ret.put(VendorNotationDependency.VENDOR_PATH_KEY, rootPathToHost.toString());
+        return ret;
     }
 }
