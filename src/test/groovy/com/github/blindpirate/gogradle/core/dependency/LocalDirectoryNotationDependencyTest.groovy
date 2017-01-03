@@ -18,7 +18,7 @@ class LocalDirectoryNotationDependencyTest extends MockInjectorSupport {
     LocalFileResolver localFileResolver
 
     @Test
-    void 'LocalDirectoryNotationDependency should be resolved by LocalFileResolver'() {
+    void 'a LocalDirectoryNotationDependency should be resolved by LocalFileResolver'() {
         // given
         when(injector.getInstance(LocalFileResolver)).thenReturn(localFileResolver)
         // when

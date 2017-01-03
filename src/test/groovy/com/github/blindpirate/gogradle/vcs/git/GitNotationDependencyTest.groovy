@@ -18,7 +18,7 @@ class GitNotationDependencyTest extends MockInjectorSupport {
     GitDependencyResolver resolver
 
     @Test
-    void 'GitNotationDependency should be resolved by GitDependencyResolver'() {
+    void 'a GitNotationDependency should be resolved by GitDependencyResolver'() {
         // given
         when(injector.getInstance(GitDependencyResolver)).thenReturn(resolver)
         // when
