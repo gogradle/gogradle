@@ -1,5 +1,6 @@
-package com.github.blindpirate.gogradle
+package com.github.blindpirate.gogradle.support
 
+import com.github.blindpirate.gogradle.GogradleModule
 import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.google.inject.Guice
 import com.google.inject.Injector

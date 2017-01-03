@@ -1,5 +1,6 @@
-package com.github.blindpirate.gogradle
+package com.github.blindpirate.gogradle.support
 
+import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
