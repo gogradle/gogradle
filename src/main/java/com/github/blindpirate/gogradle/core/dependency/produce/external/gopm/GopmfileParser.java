@@ -12,14 +12,13 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.DIR_KEY;
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
+import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
+import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.BRANCH_KEY;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMMIT_KEY;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_KEY;
-import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.DIR_KEY;
-import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
-import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
-import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
-import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
 
 /**
  * Parses .gopmfile and generates gogradle map notations.

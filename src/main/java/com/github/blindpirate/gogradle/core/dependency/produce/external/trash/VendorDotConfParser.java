@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.trash;
 
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.base.CharMatcher;

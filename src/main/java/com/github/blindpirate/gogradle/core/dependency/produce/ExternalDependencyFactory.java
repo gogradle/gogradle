@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.util.List;
 import java.util.Map;
