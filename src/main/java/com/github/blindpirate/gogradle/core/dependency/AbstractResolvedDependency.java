@@ -15,9 +15,9 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
         this.updateTime = updateTime;
     }
 
-    private GolangDependencySet dependencies;
+    private GolangDependencySet dependencies = GolangDependencySet.empty();
 
-    protected void setDependencies(GolangDependencySet dependencies) {
+    public void setDependencies(GolangDependencySet dependencies) {
         this.dependencies = dependencies;
     }
 

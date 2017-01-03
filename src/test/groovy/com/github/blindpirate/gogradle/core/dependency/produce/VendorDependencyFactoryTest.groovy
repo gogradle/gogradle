@@ -63,7 +63,7 @@ class VendorDependencyFactoryTest extends MockInjectorSupport {
         GolangDependency dependency = set.first()
         assert dependency instanceof VendorDependency
         assert ReflectionUtils.getField(dependency, 'hostDependency').is(resolvedDependency)
-        assert ReflectionUtils.getField(dependency, 'rootPathToHost').toString() == 'vendor/root/package'
+        assert ReflectionUtils.getField(dependency, 'relativePathToHost').toString() == 'vendor/root/package'
     }
 
     @Test

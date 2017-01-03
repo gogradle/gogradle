@@ -17,7 +17,7 @@ public class VendorDependency extends AbstractResolvedDependency {
 
     private ResolvedDependency hostDependency;
 
-    private Path rootPathToHost;
+    private Path relativePathToHost;
 
     public static VendorDependency basedOnParent(String name,
                                                  ResolvedDependency parent,
@@ -39,16 +39,16 @@ public class VendorDependency extends AbstractResolvedDependency {
                              String version,
                              long updateTime,
                              ResolvedDependency hostDependency,
-                             Path rootPathToHost) {
+                             Path relativePathToHost) {
         super(name, version, updateTime);
 
         this.hostDependency = hostDependency;
-        this.rootPathToHost = rootPathToHost;
+        this.relativePathToHost = relativePathToHost;
     }
 
     private static Path caculateRootPathToHost(ResolvedDependency parent, String packagePath) {
         if (parent instanceof VendorDependency) {
-            return cast(VendorDependency.class, parent).rootPathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
+            return cast(VendorDependency.class, parent).relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
         } else {
             return Paths.get(VENDOR_DIRECTORY).resolve(packagePath);
         }
@@ -71,7 +71,7 @@ public class VendorDependency extends AbstractResolvedDependency {
     @Override
     public Map<String, Object> toLockedNotation() {
         Map<String, Object> ret = new HashMap<>(hostDependency.toLockedNotation());
-        ret.put(VendorNotationDependency.VENDOR_PATH_KEY, rootPathToHost.toString());
+        ret.put(VendorNotationDependency.VENDOR_PATH_KEY, relativePathToHost.toString());
         return ret;
     }
 }

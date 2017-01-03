@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependenc
 
 import java.io.File;
 import java.time.Instant;
+import java.time.LocalTime;
 import java.util.Map;
 
 public class LocalFileSystemDependency extends AbstractResolvedDependency {
@@ -25,8 +26,9 @@ public class LocalFileSystemDependency extends AbstractResolvedDependency {
         throw new UnsupportedOperationException();
     }
 
+    // version of local directory is its timestamp
     @Override
     public String getVersion() {
-        throw new UnsupportedOperationException();
+        return Instant.ofEpochMilli(getUpdateTime()).toString();
     }
 }

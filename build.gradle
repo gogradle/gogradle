@@ -68,8 +68,8 @@ task integrationTest(type: Test) {
 project.tasks.withType(Test) {
     if (gradle.startParameter.isOffline()) {
         it.systemProperty("TEST_ARE_OFFLINE", 'true')
-        it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
     }
+    it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
 }
 
 check.dependsOn integrationTest

@@ -17,6 +17,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.glide.GlideDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.glock.GlockDependencyFactory;
@@ -75,6 +76,7 @@ public class GogradleModule extends AbstractModule {
         bind(PackagePathResolver.class).to(ErrorReportingPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
+        bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
