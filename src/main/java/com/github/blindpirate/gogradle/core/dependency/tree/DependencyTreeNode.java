@@ -17,6 +17,14 @@ public class DependencyTreeNode {
         this.name = originalDependency.getName();
     }
 
+    public ResolvedDependency getOriginalDependency() {
+        return originalDependency;
+    }
+
+    public ResolvedDependency getFinalDependency() {
+        return finalDependency;
+    }
+
     public static DependencyTreeNode withOrignalAndFinal(ResolvedDependency original, ResolvedDependency finalResult) {
         return new DependencyTreeNode(original, finalResult);
     }
@@ -28,31 +36,59 @@ public class DependencyTreeNode {
     }
 
     public String output() {
-        return print("", true);
+        return print("", true, true);
     }
 
 
-    private String print(String prefix, boolean isTail) {
+    private String print(String prefix, boolean isTail, boolean isRoot) {
         StringBuilder sb = new StringBuilder();
         sb.append(prefix)
-                .append(isTail ? "└── " : "├── ")
-                .append(format())
+                .append(branch(isRoot, isTail))
+                .append(format(isRoot))
                 .append("\n");
 
-        String prefixOfChildren = prefix + (isTail ? "    " : "│   ");
+        String prefixOfChildren = padding(isRoot, isTail) + prefix;
 
         for (int i = 0; i < children.size() - 1; i++) {
-            sb.append(children.get(i).print(prefixOfChildren, false));
+            sb.append(children.get(i).print(prefixOfChildren, false, false));
         }
         if (children.size() > 0) {
             sb.append(children.get(children.size() - 1)
-                    .print(prefixOfChildren, true));
+                    .print(prefixOfChildren, true, false));
         }
         return sb.toString();
     }
 
-    private String format() {
-        return name;
+    private String padding(boolean isRoot, boolean isTail) {
+        if (isRoot) {
+            return "";
+        }
+        return isTail ? "    " : "│   ";
+    }
+
+    private String branch(boolean isRoot, boolean isTail) {
+        if (isRoot) {
+            return "";
+        }
+        return isTail ? "└── " : "├── ";
+    }
+
+    private String format(boolean isRoot) {
+        if (isRoot) {
+            return name;
+        } else if (originalDependency == finalDependency) {
+            return withCheckMark();
+        } else {
+            return withArrow();
+        }
+    }
+
+    private String withArrow() {
+        return originalDependency.toString() + " -> " + finalDependency.toString();
+    }
+
+    private String withCheckMark() {
+        return name + " √";
     }
 
 }

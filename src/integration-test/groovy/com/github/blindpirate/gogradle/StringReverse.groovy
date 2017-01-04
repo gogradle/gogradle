@@ -27,6 +27,12 @@ class StringReverse extends IntegrationTestSupport {
         newBuild { build ->
             build.forTasks('dependencies')
         }
+
+        assert stdout.toString().contains('''
+sample
+└── github.com/golang/example √
+    └── golang.org/x/tools √
+''')
     }
 
     String helloDotGo = '''

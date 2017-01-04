@@ -25,15 +25,16 @@ class DependencyTreeNodeTest {
         _2.addChild(_2_1)
         _3.addChild(_3_1).addChild(_3_2)
 
+        println(root.output())
         // then
         assert root.output() == '''\
-└── a
-    ├── b
-    ├── c
-    │   └── e
-    └── d
-        ├── f
-        └── g
+a
+├── b √
+├── c √
+│   └── e √
+└── d √
+    ├── f √
+    └── g √
 '''
 
     }

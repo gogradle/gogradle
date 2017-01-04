@@ -14,6 +14,11 @@ class IntegrationTestSupport {
 
     File userhome
 
+    ByteArrayOutputStream stdout = new ByteArrayOutputStream()
+    PrintStream stdoutPs = new PrintStream(stdout)
+    ByteArrayOutputStream stderr = new ByteArrayOutputStream()
+    PrintStream stderrPs = new PrintStream(stderr)
+
     String buildDotGradleBase = '''
 buildscript {
     dependencies {
@@ -28,7 +33,6 @@ apply plugin: 'com.github.blindpirate.gogradle'
     void baseSetUp() {
         IOUtils.touch(resource.toPath().resolve('settings.gradle').toFile())
         System.setProperty('gradle.user.home', userhome.absolutePath)
-        //IOUtils.write(userhome, 'gradle.properties', gradleDotProperties)
     }
 
     BuildLauncher newBuild(Closure closure) {
@@ -36,15 +40,16 @@ apply plugin: 'com.github.blindpirate.gogradle'
                 .forProjectDirectory(resource)
                 .useGradleUserHomeDir(userhome)
 
-        // That's not appropriate since it's not affected by gradle wrapper
-        connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
+        if (System.getProperty('GRADLE_DIST_HOME') != null) {
+            connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
+        }
 
         ProjectConnection connection = connector.connect()
         try {
             BuildLauncher build = connection.newBuild()
 
-            build.setStandardOutput(System.out)
-            build.setStandardError(System.err)
+            build.setStandardOutput(stdoutPs)
+            build.setStandardError(stderrPs)
 
             String jarPath = new File("build/libs/gradle-golang-plugin-0.0.1-SNAPSHOT.jar").absolutePath
 
