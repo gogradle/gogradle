@@ -18,7 +18,7 @@ import static IOUtils.forceDelete
 
 /**
  * <ul>
- *  <li>1.Check the usage of {@link WithProject} and create {@link Project} currentInstance if necessary.</li>
+ *  <li>1.Check the usage of {@link WithProject} and create {@link Project} instance if necessary.</li>
  *  <li>2.Check the usage of {@link WithResource} and copy (or unzip) resources to temp directory if necessary.</li>
  *  <li>3.Inject the project currentInstance and resource directory into the test class currentInstance.</li>
  *  <li>4.Inject fields annotated with{@link @Mock} and {@link @InjectMocks}.</li>
@@ -47,7 +47,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     File resourceDir
 
     GogradleRunner(Class<?> klass) throws InitializationError {
-        super(klass);
+        super(klass)
     }
 
     @Override
@@ -55,7 +55,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         currentInstance = super.createTest()
         MockitoAnnotations.initMocks(currentInstance)
         injectProjectAndResourceIfNecessary()
-        return currentInstance;
+        return currentInstance
     }
 
     def injectProjectAndResourceIfNecessary() {
@@ -92,7 +92,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     }
 
     File setUpResource(String resourceName) {
-        File destDir = tmpRandomDirectory("resource");
+        File destDir = tmpRandomDirectory("resource")
         // when resource path is empty, the new created empty dir will be used
         if (resourceName.endsWith('zip')) {
             unzipResourceToDir(resourceName, destDir)
@@ -134,9 +134,9 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
 
         beforeOneTest(method)
         try {
-            super.runChild(method, notifier);
+            super.runChild(method, notifier)
         } finally {
-            afterOneTest(method);
+            afterOneTest(method)
         }
     }
 
@@ -153,7 +153,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
 
 
     def beforeOneTest(FrameworkMethod method) {
-        WithResource withResource = findWithResource(method);
+        WithResource withResource = findWithResource(method)
         if (withResource) {
             setUpResource(withResource.value())
         }
