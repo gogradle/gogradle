@@ -1,16 +1,20 @@
-group 'com.github.blindpirate'
-version '0.0.1-SNAPSHOT'
-
 /************** plugins **************/
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'idea'
-apply plugin: 'findbugs'
-apply plugin: 'checkstyle'
-apply plugin: 'jacoco'
-apply plugin: 'antlr'
+
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'idea'
+    id 'findbugs'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'antlr'
+    id 'com.github.kt3k.coveralls' version '2.7.1'
+}
 
 apply from: 'config/scripts/coverage.gradle'
+
+group 'com.github.blindpirate'
+version '0.0.1-SNAPSHOT'
 
 /************** sourcesets **************/
 sourceSets {
@@ -105,10 +109,16 @@ tasks.withType(FindBugs) {
 jacoco {
     toolVersion = "0.7.7.201606060606"
 }
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
 coverage {
     excludePackages = ['com/github/blindpirate/gogradle/antlr/**']
 }
-
+jacocoTestReport.dependsOn 'test', 'integrationTest'
 //check.dependsOn 'coverageCheck'
 
 /************** antlr **************/

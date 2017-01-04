@@ -34,8 +34,6 @@ task coverageCheck(dependsOn: test) {
                 }
             }
 
-            html(destdir: "$buildDir/reports/jacoco")
-
             check(failOnViolation: true) {
                 rule(element: 'PACKAGE') {
                     limit(counter: "LINE", value: "COVEREDRATIO", minimum: "1.0")

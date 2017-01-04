@@ -1,4 +1,8 @@
 # Gogradle - a full-featured build tool for golang
+[![Build Status](https://travis-ci.org/blindpirate/gogradle.svg?branch=master)](https://travis-ci.org/blindpirate/gogradle)
+[![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
+[![Apache License 2](https://img.shields.io/badge/license-APL2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 Don't use me. I'm under development.
 My final goal is building complicated golang system such as Kubernetes.
 
@@ -16,6 +20,7 @@ However, you can turn it on easily, with configuration as follows:
 
 ```
 golang {
+    buildTags=['appengine','xxx']
     useGlobalGopath = true
     globalGopath = '/the/GOPATH'  // Only needed if GOPATH environment variable isn't set 
 }
@@ -101,6 +106,14 @@ dependencies {
     // build(dir('${GOPATH}/a/b')).asPackage('github.com/a/b',{})
 }
 ```
+
+## About Version
+A GolangDependency:
+
+- group: rootPath
+- name: path
+- version: unique identifier to locate a version of code, e.g. Git's commit
+
 The default produce strategy is:
 
 - If external module detected (e.g gopm/govendor/glide, including gogradle itself), it will be used.
@@ -148,7 +161,7 @@ TODOLIST:
 ```
 golang {
     mode=Develop // Repoducible
-    packageName='github.com/user/project'
+    packagePath='github.com/user/project'
     goVersion='1.7'
 }
 ```
@@ -170,7 +183,7 @@ ext{
 executable to an output file named after the first source file 
 ('go build ed.go rx.go' writes 'ed' or 'ed.exe') or the source code directory
  ('go build unix/sam' writes 'sam' or 'sam.exe'). 
- The '.exe' suffix is added when writing a Windows executable.
+ The '.exe' name is added when writing a Windows executable.
 ...
 When compiling multiple packages or a single non-main package,
  build compiles the packages but discards the resulting object,
