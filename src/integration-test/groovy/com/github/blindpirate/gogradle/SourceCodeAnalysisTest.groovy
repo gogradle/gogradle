@@ -9,6 +9,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 
 @RunWith(GogradleRunner)
 class SourceCodeAnalysisTest extends GogradleModuleSupport {
@@ -24,8 +25,10 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     @WithResource('golang-example-master.zip')
     @Test
     void 'imports should be parsed correctly'() {
+        // given
+        Mockito.when(resolvedDependency.getName()).thenReturn("name")
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
 
         // then
         def expectation = ['golang.org/x/tools', 'github.com/golang/example'] as Set

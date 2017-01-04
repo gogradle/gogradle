@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -47,15 +48,16 @@ public class SourceCodeDependencyFactory {
         this.goImportExtractor = extractor;
     }
 
-    public GolangDependencySet produce(File rootDir) {
+    public GolangDependencySet produce(ResolvedDependency resolvedDependency, File rootDir) {
         SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor();
         IOUtils.walkFileTreeSafely(rootDir.toPath(), visitor);
-        return createDependencies(visitor.getImportPaths());
+        return createDependencies(resolvedDependency, visitor.getImportPaths());
     }
 
-    private GolangDependencySet createDependencies(Set<String> importPaths) {
+    private GolangDependencySet createDependencies(ResolvedDependency resolvedDependency, Set<String> importPaths) {
         Set<String> rootPackagePaths =
                 importPaths.stream()
+                        .filter(path -> !path.startsWith(resolvedDependency.getName()))
                         .map(this::importPathToDependency)
                         .filter(Optional::isPresent)
                         .map(Optional::get)

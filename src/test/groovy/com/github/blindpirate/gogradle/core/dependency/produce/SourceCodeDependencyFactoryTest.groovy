@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
@@ -46,6 +45,7 @@ class SourceCodeDependencyFactoryTest {
     void setUp() {
         extractor = new GoImportExtractor(buildConstraintManager)
         factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor)
+        when(resolvedDependency.getName()).thenReturn('resolvedDependency')
         when(buildConstraintManager.getCtx()).thenReturn([] as Set)
         when(notationParser.parse('github.com/a/b')).thenReturn(dependency)
         when(dependency.getName()).thenReturn('github.com/a/b')
@@ -67,7 +67,7 @@ class SourceCodeDependencyFactoryTest {
     @Test
     void 'empty dependency set should be produced when no go code exists'() {
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         // then
         assert result.isEmpty()
     }
@@ -95,7 +95,7 @@ import (
 func main(){}
 ''')
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         assert result.isEmpty()
     }
 
@@ -104,7 +104,7 @@ func main(){}
         // given
         IOUtils.write(resource, 'main.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         // then
         assert result.size() == 1
         assert result.any { it.is(dependency) }
@@ -120,7 +120,7 @@ func main(){}
         IOUtils.write(subsub, 'main.go', mainDotGo)
         IOUtils.write(subsub, 'garbage', 'This is unused')
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         // then
         assert result.size() == 1
         assert result.any { it.is(dependency) }
@@ -132,7 +132,7 @@ func main(){}
         IOUtils.write(resource, '_.go', mainDotGo)
         IOUtils.write(resource, '.should_be_ignored.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         // then
         assert result.isEmpty()
     }
@@ -143,7 +143,7 @@ func main(){}
         IOUtils.write(resource, 'a_test.go', mainDotGo)
         IOUtils.write(resource, '_test.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         // then
         assert result.isEmpty()
     }
@@ -155,7 +155,7 @@ func main(){}
         IOUtils.forceMkdir(vendorDir)
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         // then
-        assert factory.produce(resource).isEmpty()
+        assert factory.produce(resolvedDependency, resource).isEmpty()
     }
 
     @Test
@@ -165,7 +165,16 @@ func main(){}
         IOUtils.forceMkdir(vendorDir)
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         // then
-        assert factory.produce(resource).isEmpty()
+        assert factory.produce(resolvedDependency, resource).isEmpty()
+    }
+
+    @Test
+    void 'self dependency should be excluded'() {
+        // given
+        IOUtils.write(resource, 'main.go', mainDotGo)
+        when(resolvedDependency.getName()).thenReturn('github.com/a/b')
+        // then
+        assert factory.produce(resolvedDependency, resource).isEmpty()
     }
 
     String mainDotGo = '''
