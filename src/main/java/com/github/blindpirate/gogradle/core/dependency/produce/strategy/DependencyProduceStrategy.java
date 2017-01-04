@@ -15,5 +15,8 @@ import java.io.File;
 // GogradleReproducible: vendor>external
 
 public interface DependencyProduceStrategy {
-    GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor vistor);
+
+    DependencyProduceStrategy DEFAULT_STRATEGY = new DefaultDependencyProduceStrategy();
+
+    GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor);
 }

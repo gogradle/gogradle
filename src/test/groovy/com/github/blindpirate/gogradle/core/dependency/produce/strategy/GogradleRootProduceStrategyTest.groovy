@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
+import org.gradle.api.Project
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.junit.Before
 import org.junit.Test
@@ -31,16 +32,18 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     ConfigurationContainer configurationContainer
     @Mock
     GolangConfiguration configuration
+    @Mock
+    Project project
 
 
     @Before
     void setUp() {
+        when(project.getConfigurations()).thenReturn(configurationContainer)
+
         strategy = new GogradleRootProduceStrategy(
                 golangPluginSetting,
-                configurationContainer,
+                project,
                 lockedDependencyManager)
-
-
         when(configurationContainer.getByName(anyString()))
                 .thenReturn(configuration)
     }

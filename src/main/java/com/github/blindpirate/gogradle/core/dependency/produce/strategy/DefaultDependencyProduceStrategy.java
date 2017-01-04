@@ -19,17 +19,17 @@ import java.io.File;
 public class DefaultDependencyProduceStrategy implements DependencyProduceStrategy {
     @Override
     @DebugLog
-    public GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor vistor) {
-        GolangDependencySet externalDependencies = vistor.visitExternalDependencies(dependency, rootDir);
+    public GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor) {
+        GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency, rootDir);
 
-        GolangDependencySet vendorDependencies = vistor.visitVendorDependencies(dependency, rootDir);
+        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
 
-        GolangDependencySet candicate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
+        GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
 
-        if (candicate.isEmpty()) {
-            return vistor.visitSourceCodeDependencies(dependency, rootDir);
+        if (candidate.isEmpty()) {
+            return visitor.visitSourceCodeDependencies(dependency, rootDir);
         } else {
-            return candicate;
+            return candidate;
         }
 
     }

@@ -9,8 +9,10 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 
@@ -32,11 +34,12 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     private final LockedDependencyManager lockedDependenciesManager;
 
 
+    @Inject
     public GogradleRootProduceStrategy(GolangPluginSetting settings,
-                                       ConfigurationContainer configurationContainer,
+                                       Project project,
                                        LockedDependencyManager lockedDependenciesManager) {
         this.settings = settings;
-        this.configurationContainer = configurationContainer;
+        this.configurationContainer = project.getConfigurations();
         this.lockedDependenciesManager = lockedDependenciesManager;
     }
 
