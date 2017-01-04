@@ -103,7 +103,7 @@ public class IOUtils {
 
     private static String realFileName(String fileNameWithSlash) {
         Path path = Paths.get(fileNameWithSlash);
-        return path.getFileName().toString();
+        return String.valueOf(path.getFileName());
     }
 
     private static Path realBaseDir(Path basePath, String fileNameWithSlash) {
