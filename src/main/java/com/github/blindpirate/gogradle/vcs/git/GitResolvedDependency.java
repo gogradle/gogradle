@@ -70,10 +70,11 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
         }
 
         public GitResolvedDependency build() {
-            GitResolvedDependency gitResolvedDependency = new GitResolvedDependency(name, commitId, commitTime);
-            gitResolvedDependency.repoUrl = this.repoUrl;
-            gitResolvedDependency.transitiveDepExclusions = notationDependency.getTransitiveDepExclusions();
-            return gitResolvedDependency;
+            GitResolvedDependency ret = new GitResolvedDependency(name, commitId, commitTime);
+            ret.repoUrl = this.repoUrl;
+            ret.setFirstLevel(notationDependency.isFirstLevel());
+            ret.transitiveDepExclusions = notationDependency.getTransitiveDepExclusions();
+            return ret;
         }
     }
 }
