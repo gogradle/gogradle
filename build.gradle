@@ -109,7 +109,7 @@ coverage {
     excludePackages = ['com/github/blindpirate/gogradle/antlr/**']
 }
 
-check.dependsOn 'coverageCheck'
+//check.dependsOn 'coverageCheck'
 
 /************** antlr **************/
 generateGrammarSource {
