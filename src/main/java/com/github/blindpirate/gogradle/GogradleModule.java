@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.core.cache.DefaultCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager;
+import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
@@ -77,6 +78,7 @@ public class GogradleModule extends AbstractModule {
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
+        bind(LockedDependencyManager.class).to(DefaultLockedDependencyManager.class);
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
