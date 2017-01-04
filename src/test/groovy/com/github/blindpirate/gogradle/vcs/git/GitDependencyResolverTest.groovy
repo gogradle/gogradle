@@ -5,6 +5,9 @@ import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.github.blindpirate.gogradle.core.cache.CacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
+import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.google.inject.Injector
@@ -44,6 +47,8 @@ class GitDependencyResolverTest {
     Injector injector
     @Mock
     GolangDependencySet dependencySet
+    @Mock
+    DependencyProduceStrategy strategy
     @InjectMocks
     GitDependencyResolver resolver
     // this is a fake commit. We cannot mock RevCommit directly because RevCommit.getName() is final
@@ -64,6 +69,9 @@ class GitDependencyResolverTest {
 
         when(gitAccessor.getRemoteUrl(repository)).thenReturn("url")
         when(dependency.getName()).thenReturn("path")
+        when(dependency.getStrategy()).thenReturn(strategy)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor)))
+                .thenReturn(GolangDependencySet.empty())
 
         InjectionHelper.INJECTOR_INSTANCE = injector
 

@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Cast;
@@ -31,19 +33,25 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     @Inject
     private GitAccessor gitAccessor;
 
+    @Inject
+    private DependencyVisitor visitor;
+
     @Override
     protected AbstractResolvedDependency createResolvedDependency(NotationDependency dependency,
                                                                   Path path,
                                                                   Repository repository,
                                                                   RevCommit commit) {
 
-        return GitResolvedDependency.builder()
+        GitResolvedDependency ret = GitResolvedDependency.builder()
                 .withNotationDependency(dependency)
                 .withName(dependency.getName())
                 .withCommitId(commit.getName())
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
+        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, path.toFile(), visitor);
+        ret.setDependencies(dependencies);
+        return ret;
     }
 
     @Override
