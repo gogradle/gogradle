@@ -16,7 +16,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
                 throw new IllegalStateException("First-level package " + resolvedDependency.getName()
                         + " conflict!");
             } else if (resolvedDependency.isFirstLevel()
-                    || existingModuleIsOutOfDate(existent, resolvedDependency)) {
+                    || existingDependencyIsOutOfDate(existent, resolvedDependency)) {
                 packages.put(resolvedDependency.getName(), resolvedDependency);
                 return true;
             } else {
@@ -30,8 +30,8 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         return packages.get(name);
     }
 
-    private boolean existingModuleIsOutOfDate(ResolvedDependency existingModule,
-                                              ResolvedDependency resolvedDependency) {
+    private boolean existingDependencyIsOutOfDate(ResolvedDependency existingModule,
+                                                  ResolvedDependency resolvedDependency) {
         if (existingModule == null) {
             return true;
         }
