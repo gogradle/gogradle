@@ -4,11 +4,14 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependenc
 
 import java.io.File;
 import java.time.Instant;
-import java.time.LocalTime;
 import java.util.Map;
 
 public class LocalFileSystemDependency extends AbstractResolvedDependency {
     private File rootDir;
+
+    public File getRootDir() {
+        return rootDir;
+    }
 
     private LocalFileSystemDependency(String name, String version, long updateTime, File rootDir) {
         super(name, version, updateTime);

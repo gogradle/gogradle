@@ -6,6 +6,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import java.time.Instant
+
 @RunWith(GogradleRunner)
 @WithResource('')
 class LocalFileSystemDependencyTest {
@@ -23,9 +25,9 @@ class LocalFileSystemDependencyTest {
         dependency.toLockedNotation()
     }
 
-    @Test(expected = UnsupportedOperationException)
-    void 'getting version of a local dependency should cause an exception'() {
-        dependency.getVersion()
+    @Test
+    void 'version of a local dependency should be its timestamp'() {
+        assert Instant.parse(dependency.getVersion()) > Instant.now().minusSeconds(60)
     }
 
 }
