@@ -48,7 +48,8 @@ public class VendorDependency extends AbstractResolvedDependency {
 
     private static Path caculateRootPathToHost(ResolvedDependency parent, String packagePath) {
         if (parent instanceof VendorDependency) {
-            return cast(VendorDependency.class, parent).relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
+            VendorDependency parentVendorDependency = (VendorDependency) parent;
+            return parentVendorDependency.relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
         } else {
             return Paths.get(VENDOR_DIRECTORY).resolve(packagePath);
         }

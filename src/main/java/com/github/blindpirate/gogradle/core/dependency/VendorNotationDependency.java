@@ -10,6 +10,15 @@ public class VendorNotationDependency extends AbstractNotationDependency {
 
     private String vendorPath;
 
+    public String getVendorPath() {
+        return vendorPath;
+    }
+
+    public VendorNotationDependency(AbstractNotationDependency hostNotationDependency, String vendorPath) {
+        this.hostNotationDependency = hostNotationDependency;
+        this.vendorPath = vendorPath;
+    }
+
     @Override
     protected Class<? extends DependencyResolver> resolverClass() {
         return hostNotationDependency.resolverClass();
