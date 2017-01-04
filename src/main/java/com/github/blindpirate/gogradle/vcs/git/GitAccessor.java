@@ -66,6 +66,7 @@ public class GitAccessor implements VcsAccessor {
         try {
             Git.cloneRepository()
                     .setURI(gitUrl)
+                    .setProgressMonitor(new LoggerProgressMonitor())
                     .setDirectory(location.toFile())
                     .call();
         } catch (GitAPIException e) {
