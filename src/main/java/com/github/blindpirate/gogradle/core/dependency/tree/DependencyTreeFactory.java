@@ -18,6 +18,7 @@ public class DependencyTreeFactory {
 
     public DependencyTreeNode getTree(ResolvedDependency rootProject) {
         resolve(rootProject);
+
         return getSubTree(rootProject);
     }
 
@@ -33,12 +34,13 @@ public class DependencyTreeFactory {
     }
 
     private void resolve(ResolvedDependency resolvedDependency) {
-        for (GolangDependency unresolvedDependency : resolvedDependency.getDependencies()) {
-            ResolvedDependency dependency = unresolvedDependency.resolve();
-            if (registry.register(dependency)) {
-                // current dependency is the newest
-                resolve(dependency);
-            }
+        if (!registry.register(resolvedDependency)) {
+            // current dependency is older
+            return;
+        }
+        for (GolangDependency unresolvedChild : resolvedDependency.getDependencies()) {
+            ResolvedDependency resolvedChild = unresolvedChild.resolve();
+            resolve(resolvedChild);
         }
     }
 }
