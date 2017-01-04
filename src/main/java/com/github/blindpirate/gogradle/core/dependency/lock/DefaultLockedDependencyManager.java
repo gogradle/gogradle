@@ -40,6 +40,9 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     @Override
     public GolangDependencySet getLockedDependencies() {
         File lockFile = project.getRootDir().toPath().resolve(LOCK_FILE).toFile();
+        if (!lockFile.exists()) {
+            return GolangDependencySet.empty();
+        }
         GogradleLockModel model = parseYaml(lockFile, GogradleLockModel.class);
         return InjectionHelper.parseMany(model.getDependencies(), mapNotationParser);
     }
