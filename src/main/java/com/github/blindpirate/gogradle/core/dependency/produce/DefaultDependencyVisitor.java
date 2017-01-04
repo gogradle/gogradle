@@ -61,7 +61,7 @@ public class DefaultDependencyVisitor implements DependencyVisitor {
     @DebugLog
     public GolangDependencySet visitSourceCodeDependencies(ResolvedDependency dependency,
                                                            File rootDir) {
-        return sourceCodeDependencyFactory.produce(rootDir);
+        return sourceCodeDependencyFactory.produce(dependency, rootDir);
     }
 
 

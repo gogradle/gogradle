@@ -56,7 +56,7 @@ class DefaultDependencyVisitorTest {
     @Test
     void 'visiting source dependencies should success'() {
         // given:
-        when(sourceCodeDependencyFactory.produce(rootDir)).thenReturn(dependencySet)
+        when(sourceCodeDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(dependencySet)
         // then:
         assert visitor.visitSourceCodeDependencies(resolvedDependency, rootDir) == dependencySet
     }
