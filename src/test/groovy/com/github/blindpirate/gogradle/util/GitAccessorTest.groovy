@@ -70,6 +70,7 @@ class GitAccessorTest {
 
     @Test
     @AccessWeb
+    @WithResource('')
     void 'clone with https should success'() {
         gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource.toPath());
         assert resource.toPath().resolve('.git').toFile().exists()
