@@ -8,4 +8,9 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     public String binaryPath() {
         return "go";
     }
+
+    @Override
+    public GoBinary getGoBinary() {
+        return null;
+    }
 }
