@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.task;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.core.cache.CacheManager;
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.google.inject.Injector;
 import org.gradle.api.DefaultTask;
@@ -18,7 +18,7 @@ public class PrepareTask extends DefaultTask {
     private GoBinaryManager binaryManager;
 
     @Inject
-    private CacheManager cacheManager;
+    private GlobalCacheManager globalCacheManager;
 
     @Inject
     private GolangPluginSetting setting;

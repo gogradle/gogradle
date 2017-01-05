@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.task;
 
-import com.github.blindpirate.gogradle.GolangPlugin;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -13,6 +12,8 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
+
+import static com.github.blindpirate.gogradle.core.GolangTaskContainer.PREPARE_TASK_NAME;
 
 public class ResolveTask extends DefaultTask {
     @Inject
@@ -30,7 +31,7 @@ public class ResolveTask extends DefaultTask {
     private DependencyTreeNode tree;
 
     public ResolveTask() {
-        dependsOn(GolangPlugin.PREPARE_TASK_NAME);
+        dependsOn(PREPARE_TASK_NAME);
     }
 
     @TaskAction
