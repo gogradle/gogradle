@@ -55,14 +55,11 @@ class GitDependencyResolverTest {
     RevCommit revCommit = RevCommit.parse([48] * 64 as byte[])
 
     File resource
-    Path repositoryPath
 
     @Before
     void setUp() {
-        repositoryPath = resource.toPath()
-
-        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(repositoryPath)
-        when(gitAccessor.getRepository(repositoryPath)).thenReturn(repository)
+        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(resource.toPath())
+        when(gitAccessor.getRepository(resource)).thenReturn(repository)
         when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
         when(gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(of(revCommit))
@@ -94,18 +91,18 @@ class GitDependencyResolverTest {
         // when:
         resolver.resolve(dependency)
         // then:
-        verify(gitAccessor).cloneWithUrl('url', repositoryPath)
+        verify(gitAccessor).cloneWithUrl('url', resource)
     }
 
     @Test
     void 'multiple urls should be tried to clone the repo'() {
         // given:
         when(dependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(gitAccessor.cloneWithUrl('url1', repositoryPath)).thenThrow(new IllegalStateException())
+        when(gitAccessor.cloneWithUrl('url1', resource)).thenThrow(new IllegalStateException())
         // when:
         resolver.resolve(dependency)
         // then:
-        verify(gitAccessor).cloneWithUrl('url2', repositoryPath)
+        verify(gitAccessor).cloneWithUrl('url2', resource)
     }
 
     @Test
@@ -115,12 +112,12 @@ class GitDependencyResolverTest {
         // when:
         resolver.resolve(dependency)
         // then:
-        verify(gitAccessor, times(0)).cloneWithUrl('url2', repositoryPath)
+        verify(gitAccessor, times(0)).cloneWithUrl('url2', resource)
     }
 
     @Test
     void 'existed repository should be updated'() {
-        repositoryPath.resolve('placeholder').toFile().createNewFile()
+        IOUtils.write(resource, 'placeholder', '')
 
         // given:
         when(gitAccessor.getRemoteUrls(repository)).thenReturn(['url'] as Set)
@@ -179,7 +176,7 @@ class GitDependencyResolverTest {
         // given
         when(dependency.getUrls()).thenReturn(['url1', 'url2'])
         ['url1', 'url2'].each {
-            when(gitAccessor.cloneWithUrl(it, repositoryPath)).thenThrow(new IllegalStateException())
+            when(gitAccessor.cloneWithUrl(it, resource)).thenThrow(new IllegalStateException())
         }
 
         // when

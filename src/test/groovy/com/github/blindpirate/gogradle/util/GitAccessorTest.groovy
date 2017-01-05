@@ -29,7 +29,7 @@ class GitAccessorTest {
 
     @Before
     void setUp() {
-        repository = gitAccessor.getRepository(resource.toPath())
+        repository = gitAccessor.getRepository(resource)
     }
 
     @Test
@@ -40,7 +40,7 @@ class GitAccessorTest {
     @Test
     void 'getting remote urls of repository should success'() {
         assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
-        assert gitAccessor.getRemoteUrls(resource.toPath()).contains('https://github.com/blindpirate/test-for-gogradle.git')
+        assert gitAccessor.getRemoteUrls(resource).contains('https://github.com/blindpirate/test-for-gogradle.git')
     }
 
     @Test
@@ -72,7 +72,7 @@ class GitAccessorTest {
     @AccessWeb
     @WithResource('')
     void 'clone with https should success'() {
-        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource.toPath());
+        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource);
         assert resource.toPath().resolve('.git').toFile().exists()
     }
 

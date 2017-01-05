@@ -46,18 +46,19 @@ class GlobalCachePackagePathResolverTest {
         when(cacheManager.getGlobalCachePath(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                String packagePath = invocation.getArgument(0);
+                String packagePath = invocation.getArgument(0)
                 return resource.toPath().resolve(packagePath)
             }
         })
 
 
-        when(gitAccessor.getRepository(resource.toPath().resolve('github.com/a/b')))
+        when(gitAccessor.getRepository(resource.toPath().resolve('github.com/a/b').toFile()))
                 .thenReturn(repository)
-        when(gitAccessor.getRemoteUrls(any(Path))).thenAnswer(new Answer<Object>() {
+        when(gitAccessor.getRemoteUrls((File) any(File))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                if (invocation.getArgument(0).toString().endsWith('github.com/a/b')) {
+                File file = invocation.getArgument(0)
+                if (file.absolutePath.endsWith('github.com/a/b')) {
                     return ['url']
                 } else {
                     throw new IllegalArgumentException()

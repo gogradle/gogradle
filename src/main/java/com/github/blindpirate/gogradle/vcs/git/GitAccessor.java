@@ -22,8 +22,8 @@ import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 
 import javax.inject.Singleton;
+import java.io.File;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -35,22 +35,22 @@ import java.util.stream.Collectors;
 @Singleton
 public class GitAccessor implements VcsAccessor {
     @Override
-    public List<String> getRemoteUrls(Path repoRoot) {
-        Repository repository = getRepository(repoRoot);
+    public List<String> getRemoteUrls(File directory) {
+        Repository repository = getRepository(directory);
         return new ArrayList<>(getRemoteUrls(repository));
     }
 
-    public Repository getRepository(Path path) {
+    public Repository getRepository(File directory) {
         try {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
 
             return builder
-                    .setGitDir(path.resolve(".git").toFile())
+                    .setGitDir(directory.toPath().resolve(".git").toFile())
                     .readEnvironment()
                     .findGitDir()
                     .build();
         } catch (IOException e) {
-            throw new IllegalStateException("Cannot get repository from path:" + path.toString());
+            throw new IllegalStateException("Cannot get repository from path:" + directory.getAbsolutePath());
         }
     }
 
@@ -62,12 +62,12 @@ public class GitAccessor implements VcsAccessor {
                 .collect(Collectors.toSet());
     }
 
-    public void cloneWithUrl(String gitUrl, Path location) {
+    public void cloneWithUrl(String gitUrl, File directory) {
         try {
             Git.cloneRepository()
                     .setURI(gitUrl)
                     .setProgressMonitor(new LoggerProgressMonitor())
-                    .setDirectory(location.toFile())
+                    .setDirectory(directory)
                     .call();
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);

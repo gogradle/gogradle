@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.DirectoryStream;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -47,13 +46,9 @@ public class IOUtils {
         }
     }
 
-    public static boolean dirIsEmpty(Path dir) {
-        try (DirectoryStream<Path> dirStream = Files.newDirectoryStream(dir)) {
-            return !dirStream.iterator().hasNext();
-        } catch (IOException e) {
-            handleIOException(e);
-            return false;
-        }
+    public static boolean dirIsEmpty(File directory) {
+        String[] files = Assert.isNotNull(directory.list());
+        return files.length == 0;
     }
 
     public static void ensureDirExistAndWritable(Path path) {

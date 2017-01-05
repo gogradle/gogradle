@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -14,6 +15,7 @@ import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,8 +39,13 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     private DependencyVisitor visitor;
 
     @Override
+    protected void doReset(ResolvedDependency dependency, Path globalCachePath, File targetDirectory) {
+
+    }
+
+    @Override
     protected AbstractResolvedDependency createResolvedDependency(NotationDependency dependency,
-                                                                  Path path,
+                                                                  File directory,
                                                                   Repository repository,
                                                                   RevCommit commit) {
 
@@ -49,7 +56,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
-        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, path.toFile(), visitor);
+        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor);
         ret.setDependencies(dependencies);
         return ret;
     }
@@ -93,15 +100,15 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     }
 
     @Override
-    protected Repository updateRepository(Repository repository, Path path) {
+    protected Repository updateRepository(Repository repository, File directory) {
         return gitAccessor.hardResetAndUpdate(repository);
     }
 
     @Override
-    protected Repository initRepository(NotationDependency dependency, Path path) {
+    protected Repository initRepository(NotationDependency dependency, File directory) {
         List<String> urls = determineUrls(dependency);
-        tryCloneWithUrls(dependency, urls, path);
-        return gitAccessor.getRepository(path);
+        tryCloneWithUrls(dependency, urls, directory);
+        return gitAccessor.getRepository(directory);
     }
 
     private List<String> determineUrls(NotationDependency dependency) {
@@ -113,11 +120,11 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
         }
     }
 
-    private void tryCloneWithUrls(NotationDependency dependency, List<String> urls, Path path) {
+    private void tryCloneWithUrls(NotationDependency dependency, List<String> urls, File directory) {
         for (int i = 0; i < urls.size(); ++i) {
             String url = urls.get(i);
             try {
-                gitAccessor.cloneWithUrl(url, path);
+                gitAccessor.cloneWithUrl(url, directory);
                 return;
             } catch (Throwable e) {
                 LOGGER.warn("Clone {} with url {} failed", dependency.getName(), url, e);
@@ -129,8 +136,8 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     }
 
     @Override
-    protected Optional<Repository> repositoryMatch(Path repoPath, NotationDependency dependency) {
-        Repository repository = gitAccessor.getRepository(repoPath);
+    protected Optional<Repository> repositoryMatch(File repoRootDir, NotationDependency dependency) {
+        Repository repository = gitAccessor.getRepository(repoRootDir);
         List<String> urls = determineUrls(dependency);
         Set<String> remoteUrls = gitAccessor.getRemoteUrls(repository);
 

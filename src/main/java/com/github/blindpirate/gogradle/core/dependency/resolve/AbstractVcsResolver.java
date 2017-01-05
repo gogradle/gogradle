@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -20,22 +21,37 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
         try {
             return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
                 Path path = globalCacheManager.getGlobalCachePath(dependency.getName());
-                return doResolve(dependency, path);
+                return doResolve(dependency, path.toFile());
             });
         } catch (Exception e) {
             throw DependencyResolutionException.cannotResolveDependency(dependency, e);
         }
     }
 
-    private ResolvedDependency doResolve(NotationDependency dependency, Path path) {
-        REPOSITORY repository = resolveToGlobalCache(dependency, path);
+    @Override
+    public void reset(ResolvedDependency dependency, File targetDirectory) {
+        try {
+            globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
+                Path globalCachePath = globalCacheManager.getGlobalCachePath(dependency.getName());
+                doReset(dependency, globalCachePath, targetDirectory);
+                return null;
+            });
+        } catch (Exception e) {
+            throw DependencyResolutionException.cannotResolveDependency(dependency, e);
+        }
+    }
+
+    protected abstract void doReset(ResolvedDependency dependency, Path globalCachePath, File targetDirectory);
+
+    private ResolvedDependency doResolve(NotationDependency dependency, File targetDirectory) {
+        REPOSITORY repository = resolveToGlobalCache(dependency, targetDirectory);
         VERSION version = determineVersion(repository, dependency);
         resetToSpecificVersion(repository, version);
-        return createResolvedDependency(dependency, path, repository, version);
+        return createResolvedDependency(dependency, targetDirectory, repository, version);
     }
 
     protected abstract ResolvedDependency createResolvedDependency(NotationDependency dependency,
-                                                                   Path path,
+                                                                   File directory,
                                                                    REPOSITORY repository,
                                                                    VERSION version);
 
@@ -43,30 +59,30 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
 
     protected abstract VERSION determineVersion(REPOSITORY repository, NotationDependency dependency);
 
-    private REPOSITORY resolveToGlobalCache(NotationDependency dependency, Path path) {
-        Optional<REPOSITORY> repositoryInGlobalCache = ensureGlobalCacheEmptyOrMatch(dependency, path);
+    private REPOSITORY resolveToGlobalCache(NotationDependency dependency, File targetDirectory) {
+        Optional<REPOSITORY> repositoryInGlobalCache = ensureGlobalCacheEmptyOrMatch(dependency, targetDirectory);
         if (!repositoryInGlobalCache.isPresent()) {
-            return initRepository(dependency, path);
+            return initRepository(dependency, targetDirectory);
         } else {
-            return updateRepository(repositoryInGlobalCache.get(), path);
+            return updateRepository(repositoryInGlobalCache.get(), targetDirectory);
         }
     }
 
-    protected abstract REPOSITORY updateRepository(REPOSITORY repository, Path path);
+    protected abstract REPOSITORY updateRepository(REPOSITORY repository, File directory);
 
-    protected abstract REPOSITORY initRepository(NotationDependency dependency, Path path);
+    protected abstract REPOSITORY initRepository(NotationDependency dependency, File directory);
 
 
-    private Optional<REPOSITORY> ensureGlobalCacheEmptyOrMatch(NotationDependency dependency, Path path) {
-        if (IOUtils.dirIsEmpty(path)) {
+    private Optional<REPOSITORY> ensureGlobalCacheEmptyOrMatch(NotationDependency dependency, File directory) {
+        if (IOUtils.dirIsEmpty(directory)) {
             return Optional.empty();
         } else {
-            Optional<REPOSITORY> ret = repositoryMatch(path, dependency);
+            Optional<REPOSITORY> ret = repositoryMatch(directory, dependency);
             if (ret.isPresent()) {
                 return ret;
             } else {
                 throw new IllegalStateException("Existing cache directory "
-                        + path.toAbsolutePath().toString()
+                        + directory.getAbsolutePath()
                         + " does not match the dependency "
                         + dependency.getName());
             }
@@ -76,9 +92,9 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
     /**
      * Checks if a non-empty directory matches the dependency.
      *
-     * @param repoPath   the directory
+     * @param directory  the directory
      * @param dependency the dependency
      * @return
      */
-    protected abstract Optional<REPOSITORY> repositoryMatch(Path repoPath, NotationDependency dependency);
+    protected abstract Optional<REPOSITORY> repositoryMatch(File directory, NotationDependency dependency);
 }

@@ -15,20 +15,20 @@ class IOUtilsTest {
 
     @Test
     void 'checking empty directory should success'() {
-        assert IOUtils.dirIsEmpty(resource.toPath())
+        assert IOUtils.dirIsEmpty(resource)
     }
 
     @Test
     void 'checking non-empty directory should success'() {
         resource.toPath().resolve('file').toFile().createNewFile()
-        assert !IOUtils.dirIsEmpty(resource.toPath())
+        assert !IOUtils.dirIsEmpty(resource)
     }
 
     @Test(expected = IllegalStateException)
     void 'checking a file should throw s exception'() {
         Path filePath = resource.toPath().resolve('file')
         filePath.toFile().createNewFile()
-        IOUtils.dirIsEmpty(filePath)
+        IOUtils.dirIsEmpty(filePath.toFile())
     }
 
     @Test

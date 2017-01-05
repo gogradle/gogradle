@@ -40,7 +40,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
 
     private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
         Path realPath = globalCacheManager.getGlobalCachePath(repoRootPath.toString());
-        List<String> urls = vcsType.getAccessor().getRemoteUrls(realPath);
+        List<String> urls = vcsType.getAccessor().getRemoteUrls(realPath.toFile());
         return GolangPackage.builder()
                 .withPath(packagePath)
                 .withRootPath(repoRootPath.toString())
