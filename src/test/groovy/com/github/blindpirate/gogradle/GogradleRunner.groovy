@@ -15,6 +15,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 
 import static IOUtils.forceDelete
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
 
 /**
  * <ul>
@@ -70,13 +71,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         }
     }
 
-    def setFieldSafely(Object instance, String fieldName, Object value) {
-        try {
-            ReflectionUtils.setField(instance, fieldName, value)
-        } catch (Throwable e) {
-            // ignore
-        }
-    }
+
 
     void cleanUpResource() {
         forceDelete(resourceDir)

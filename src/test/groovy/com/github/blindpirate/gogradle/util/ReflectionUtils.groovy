@@ -9,6 +9,14 @@ class ReflectionUtils {
                 .setVariableValueInObject(object, field, value);
     }
 
+    static void setFieldSafely(Object instance, String fieldName, Object value) {
+        try {
+            setField(instance, fieldName, value)
+        } catch (Throwable e) {
+            // ignore
+        }
+    }
+
     static Object getField(Object target, String field) {
         return org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
                 .getValueIncludingSuperclasses(field, target);
