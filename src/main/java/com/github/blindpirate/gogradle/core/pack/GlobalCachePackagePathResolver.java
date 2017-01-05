@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
-import com.github.blindpirate.gogradle.core.cache.CacheManager;
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
@@ -17,11 +17,11 @@ import static java.nio.file.Files.exists;
 
 @Singleton
 public class GlobalCachePackagePathResolver implements PackagePathResolver {
-    private final CacheManager cacheManager;
+    private final GlobalCacheManager globalCacheManager;
 
     @Inject
-    public GlobalCachePackagePathResolver(CacheManager cacheManager) {
-        this.cacheManager = cacheManager;
+    public GlobalCachePackagePathResolver(GlobalCacheManager globalCacheManager) {
+        this.globalCacheManager = globalCacheManager;
     }
 
     @Override
@@ -39,7 +39,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     }
 
     private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
-        Path realPath = cacheManager.getGlobalCachePath(repoRootPath.toString());
+        Path realPath = globalCacheManager.getGlobalCachePath(repoRootPath.toString());
         List<String> urls = vcsType.getAccessor().getRemoteUrls(realPath);
         return GolangPackage.builder()
                 .withPath(packagePath)
@@ -51,7 +51,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     }
 
     private Optional<VcsType> findVcsRepo(Path path) {
-        Path realPath = cacheManager.getGlobalCachePath(path.toString());
+        Path realPath = globalCacheManager.getGlobalCachePath(path.toString());
         return Arrays.stream(VcsType.values())
                 .filter(vcs -> exists(realPath.resolve(vcs.getRepo())))
                 .findFirst();

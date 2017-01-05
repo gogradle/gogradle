@@ -9,14 +9,8 @@ import java.util.concurrent.Callable;
 // + ~/.gradle/go
 //   - gopath
 //   - binary
-// the project-specific directory is located in ${projectRoot}/build/go
-// + ${projectRoot}
-//   - build
-//     - gopath
-public interface CacheManager {
+public interface GlobalCacheManager {
     void ensureGlobalCacheExistAndWritable();
-
-//    void ensureProjectBuildCacheExist();
 
     Path getGlobalCachePath(String packagePath);
 
@@ -29,5 +23,4 @@ public interface CacheManager {
      * @return
      */
     <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable) throws Exception;
-
 }

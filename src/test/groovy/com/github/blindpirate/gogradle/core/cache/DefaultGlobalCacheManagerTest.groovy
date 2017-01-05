@@ -2,9 +2,10 @@ package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import org.apache.commons.io.FileUtils
+import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,24 +17,30 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.*
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-public class DefaultCacheManagerTest {
+class DefaultGlobalCacheManagerTest {
 
     File resource
 
     @InjectMocks
-    DefaultCacheManager cacheManager
+    DefaultGlobalCacheManager cacheManager
     @Mock
-    GolangDependency dependency
+    NotationDependency notationDependency
+    @Mock
+    ResolvedDependency resolvedDependency
+    @Mock
+    Project project
+
     ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
     @Before
     void setUp() {
-        when(dependency.getName()).thenReturn("concurrenttest")
-        ReflectionUtils.setField(cacheManager, "gradleHome", resource.getAbsoluteFile().toPath())
+        when(notationDependency.getName()).thenReturn("concurrenttest")
+        setField(cacheManager, "gradleHome", resource.getAbsoluteFile().toPath())
     }
 
     @Test
@@ -41,9 +48,9 @@ public class DefaultCacheManagerTest {
         // when
         cacheManager.ensureGlobalCacheExistAndWritable();
         // then
-        assert resource.toPath().resolve(DefaultCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
-        assert resource.toPath().resolve(DefaultCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
-        assert resource.toPath().resolve(DefaultCacheManager.GO_LOCKFILES_PATH).toFile().exists()
+        assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
+        assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
+        assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_LOCKFILES_PATH).toFile().exists()
     }
 
     @Test
@@ -51,7 +58,7 @@ public class DefaultCacheManagerTest {
         // when
         int i = 0
         Callable thread = {
-            cacheManager.runWithGlobalCacheLock(dependency, { 1000.times { i++ } })
+            cacheManager.runWithGlobalCacheLock(notationDependency, { 1000.times { i++ } })
         }
         List futures = (1..10).collect { threadPool.submit(thread as Callable) }
 
@@ -66,7 +73,7 @@ public class DefaultCacheManagerTest {
         String filePath = resource.toPath().resolve('shared').toAbsolutePath().toString()
 
         Callable runOneProcess = {
-            cacheManager.runWithGlobalCacheLock(dependency, {
+            cacheManager.runWithGlobalCacheLock(notationDependency, {
                 runProcessWithCurrentClasspath(CounterProcess, [filePath], [:])
             })
         }

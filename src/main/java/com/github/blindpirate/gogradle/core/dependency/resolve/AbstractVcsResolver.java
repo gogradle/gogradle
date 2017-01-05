@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
-import com.github.blindpirate.gogradle.core.cache.CacheManager;
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -13,13 +13,13 @@ import java.util.Optional;
 public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements DependencyResolver {
 
     @Inject
-    private CacheManager cacheManager;
+    private GlobalCacheManager globalCacheManager;
 
     @Override
     public ResolvedDependency resolve(final NotationDependency dependency) {
         try {
-            return cacheManager.runWithGlobalCacheLock(dependency, () -> {
-                Path path = cacheManager.getGlobalCachePath(dependency.getName());
+            return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
+                Path path = globalCacheManager.getGlobalCachePath(dependency.getName());
                 return doResolve(dependency, path);
             });
         } catch (Exception e) {

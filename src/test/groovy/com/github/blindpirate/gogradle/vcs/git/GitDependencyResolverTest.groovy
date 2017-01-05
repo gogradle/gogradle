@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.vcs.git
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.InjectionHelper
-import com.github.blindpirate.gogradle.core.cache.CacheManager
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -38,7 +38,7 @@ class GitDependencyResolverTest {
     @Mock
     GitNotationDependency dependency
     @Mock
-    CacheManager cacheManager
+    GlobalCacheManager cacheManager
     @Mock
     GitAccessor gitAccessor
     @Mock

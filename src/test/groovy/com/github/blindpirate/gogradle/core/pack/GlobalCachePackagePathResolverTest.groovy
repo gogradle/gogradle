@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.cache.CacheManager
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
@@ -28,7 +28,7 @@ import static org.mockito.Mockito.when
 @WithResource('global-cache-test.zip')
 class GlobalCachePackagePathResolverTest {
     @Mock
-    CacheManager cacheManager
+    GlobalCacheManager cacheManager
     @Mock
     GitAccessor gitAccessor
     @Mock

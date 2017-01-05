@@ -18,7 +18,7 @@ import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSE
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 
 @Singleton
-public class DefaultCacheManager implements CacheManager {
+public class DefaultGlobalCacheManager implements GlobalCacheManager {
     public static final String GOPATH_CACHE_PATH = "go/gopath";
     public static final String GO_BINARAY_CACHE_PATH = "go/binary";
     public static final String GO_LOCKFILES_PATH = "go/lockfiles";
