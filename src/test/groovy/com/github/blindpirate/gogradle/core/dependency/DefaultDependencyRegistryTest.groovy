@@ -11,63 +11,63 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 class DefaultDependencyRegistryTest {
     @Mock
-    AbstractResolvedDependency module1
+    AbstractResolvedDependency resolvedDependency1
     @Mock
-    AbstractResolvedDependency module2
+    AbstractResolvedDependency resolvedDependency2
 
     DefaultDependencyRegistry registry = new DefaultDependencyRegistry()
 
     @Before
     void setUp() {
-        when(module1.getName()).thenReturn("dependency")
-        when(module2.getName()).thenReturn("dependency")
-        when(module1.isFirstLevel()).thenReturn(false)
-        when(module2.isFirstLevel()).thenReturn(false)
+        when(resolvedDependency1.getName()).thenReturn("resolvedDependency")
+        when(resolvedDependency2.getName()).thenReturn("resolvedDependency")
+        when(resolvedDependency1.isFirstLevel()).thenReturn(false)
+        when(resolvedDependency2.isFirstLevel()).thenReturn(false)
     }
 
     @Test
     void 'dependency should be put at the first time'() {
-        assert registry.register(module1)
+        assert registry.register(resolvedDependency1)
     }
 
     @Test
     void 'newer dependency should be put'() {
         // given
-        when(module1.getUpdateTime()).thenReturn(1L)
-        when(module2.getUpdateTime()).thenReturn(2L)
+        when(resolvedDependency1.getUpdateTime()).thenReturn(1L)
+        when(resolvedDependency2.getUpdateTime()).thenReturn(2L)
 
         // when
-        registry.register(module1)
+        registry.register(resolvedDependency1)
 
         // then
-        assert registry.register(module2)
+        assert registry.register(resolvedDependency2)
     }
 
     @Test
     void 'older dependency should not be put'() {
         // given
-        when(module1.getUpdateTime()).thenReturn(2L)
-        when(module2.getUpdateTime()).thenReturn(1L)
+        when(resolvedDependency1.getUpdateTime()).thenReturn(2L)
+        when(resolvedDependency2.getUpdateTime()).thenReturn(1L)
 
         // when
-        registry.register(module1)
+        registry.register(resolvedDependency1)
 
         // then
-        assert !registry.register(module2)
+        assert !registry.register(resolvedDependency2)
     }
 
     @Test
     void 'first level dependency always win'() {
         // given
-        when(module1.getUpdateTime()).thenReturn(2L)
-        when(module2.getUpdateTime()).thenReturn(1L)
-        // module2 is old but first level
-        when(module2.isFirstLevel()).thenReturn(true)
+        when(resolvedDependency1.getUpdateTime()).thenReturn(2L)
+        when(resolvedDependency2.getUpdateTime()).thenReturn(1L)
+        // resolvedDependency2 is old but first level
+        when(resolvedDependency2.isFirstLevel()).thenReturn(true)
 
         // when
-        registry.register(module1)
+        registry.register(resolvedDependency1)
 
         // then
-        assert registry.register(module2)
+        assert registry.register(resolvedDependency2)
     }
 }
