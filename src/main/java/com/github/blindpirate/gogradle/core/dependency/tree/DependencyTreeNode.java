@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.tree;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import java.util.ArrayList;
@@ -91,4 +92,17 @@ public class DependencyTreeNode {
         return name + " √";
     }
 
+    public GolangDependencySet flatten() {
+        GolangDependencySet result = new GolangDependencySet();
+        dfs(result);
+        return result;
+    }
+
+    // TODO max depth
+    private void dfs(GolangDependencySet result) {
+        for (DependencyTreeNode child : children) {
+            result.add(child.finalDependency);
+            child.dfs(result);
+        }
+    }
 }

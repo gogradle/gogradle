@@ -1,6 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.tree
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import org.junit.Before
 import org.junit.Test
 
 import static org.mockito.Mockito.mock
@@ -8,10 +10,11 @@ import static org.mockito.Mockito.when
 
 class DependencyTreeNodeTest {
 
-    @Test
-    void 'tree building should success'() {
-        // given
-        def root = node('a')
+    DependencyTreeNode root
+
+    @Before
+    void setUp() {
+        root = node('a')
 
         def _1 = node('b')
         def _2 = node('c')
@@ -24,8 +27,10 @@ class DependencyTreeNodeTest {
         root.addChild(_1).addChild(_2).addChild(_3)
         _2.addChild(_2_1)
         _3.addChild(_3_1).addChild(_3_2)
+    }
 
-        println(root.output())
+    @Test
+    void 'tree building should success'() {
         // then
         assert root.output() == '''\
 a
@@ -36,7 +41,14 @@ a
     ├── f √
     └── g √
 '''
+    }
 
+    @Test
+    void 'flattening a tree should success'() {
+        // when
+        GolangDependencySet result = root.flatten()
+        assert result.size() == 6
+        assert ('b'..'g').intersect(result.collect({ it.name })) == ('b'..'g')
     }
 
     DependencyTreeNode node(String name) {
