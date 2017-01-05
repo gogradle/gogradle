@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.task;
+package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.tasks.TaskAction;

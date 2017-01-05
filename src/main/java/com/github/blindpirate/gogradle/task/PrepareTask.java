@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core.task;
+package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;

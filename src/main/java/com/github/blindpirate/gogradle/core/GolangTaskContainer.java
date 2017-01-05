@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.core.task.BuildTask;
-import com.github.blindpirate.gogradle.core.task.DependenciesTask;
-import com.github.blindpirate.gogradle.core.task.PrepareTask;
-import com.github.blindpirate.gogradle.core.task.ResolveTask;
-import com.github.blindpirate.gogradle.core.task.TestTask;
+import com.github.blindpirate.gogradle.task.BuildTask;
+import com.github.blindpirate.gogradle.task.DependenciesTask;
+import com.github.blindpirate.gogradle.task.PrepareTask;
+import com.github.blindpirate.gogradle.task.ResolveTask;
+import com.github.blindpirate.gogradle.task.TestTask;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Task;
 
