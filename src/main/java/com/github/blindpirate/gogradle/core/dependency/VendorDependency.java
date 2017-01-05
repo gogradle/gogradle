@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -74,5 +75,10 @@ public class VendorDependency extends AbstractResolvedDependency {
         Map<String, Object> ret = new HashMap<>(hostDependency.toLockedNotation());
         ret.put(VendorNotationDependency.VENDOR_PATH_KEY, relativePathToHost.toString());
         return ret;
+    }
+
+    @Override
+    public Class<? extends DependencyResolver> getResolverClass() {
+        return null;
     }
 }

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
@@ -26,6 +27,11 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
                 VCS_KEY, Git.getName(),
                 URL_KEY, repoUrl,
                 COMMIT_KEY, getVersion());
+    }
+
+    @Override
+    public Class<? extends DependencyResolver> getResolverClass() {
+        return GitDependencyResolver.class;
     }
 
     public static GitResolvedDependencyBuilder builder() {

@@ -21,6 +21,11 @@ public class LocalFileResolver implements DependencyResolver {
         return LocalFileSystemDependency.fromLocal(directoryDependency.getName(), rootDir);
     }
 
+    @Override
+    public void reset(ResolvedDependency dependency, File targetLocation) {
+
+    }
+
     private boolean invalid(File rootDir) {
         return !rootDir.exists() || !rootDir.isDirectory();
     }

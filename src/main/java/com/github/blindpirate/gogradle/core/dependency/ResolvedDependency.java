@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+
 import java.util.Map;
 
 public interface ResolvedDependency extends GolangDependency {
@@ -22,4 +24,6 @@ public interface ResolvedDependency extends GolangDependency {
 
 
     Map<String, Object> toLockedNotation();
+
+    Class<? extends DependencyResolver> getResolverClass();
 }

@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
 import java.io.File;
 import java.time.Instant;
@@ -27,6 +28,11 @@ public class LocalFileSystemDependency extends AbstractResolvedDependency {
     @Override
     public Map<String, Object> toLockedNotation() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public Class<? extends DependencyResolver> getResolverClass() {
+        return LocalFileResolver.class;
     }
 
     // version of local directory is its timestamp
