@@ -1,15 +1,10 @@
 package com.github.blindpirate.gogradle;
 
-import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
+import com.github.blindpirate.gogradle.core.GolangTaskContainer;
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
-import com.github.blindpirate.gogradle.core.task.BuildTask;
-import com.github.blindpirate.gogradle.core.task.CleanTask;
-import com.github.blindpirate.gogradle.core.task.DependenciesTask;
-import com.github.blindpirate.gogradle.core.task.InstallTask;
-import com.github.blindpirate.gogradle.core.task.PrepareTask;
-import com.github.blindpirate.gogradle.core.task.ResolveTask;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -22,31 +17,19 @@ import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
 
+import static com.github.blindpirate.gogradle.core.GolangTaskContainer.TASKS;
+
 public class GolangPlugin implements Plugin<Project> {
-
-    // prepare everything
-    public static final String PREPARE_TASK_NAME = "prepare";
-    // produce all dependencies by analyzing build.gradle
-    public static final String RESOLVE_TASK_NAME = "resolve";
-    // show dependencies tree
-    public static final String DEPENDENCIES_TASK_NAME = "dependencies";
-
-    public static final String CHECK_TASK_NAME = "check";
-    public static final String BUILD_TASK_NAME = "build";
-    public static final String CLEAN_TASK_NAME = "clean";
-    public static final String INSTALL_TASK_NAME = "install";
-    public static final String TEST_TASK_NAME = "test";
-    public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
     public static final String BUILD_CONFIGURATION_NAME = "build";
     private static final String TEST_CONFIGURATION_NAME = "test";
-
 
     // injected by gradle
     private final Instantiator instantiator;
 
     private Injector injector;
     private GolangPluginSetting settings;
+    private GolangTaskContainer golangTaskContainer;
     private Project project;
     private Action<? super Task> dependencyInjectionAction = new Action<Task>() {
         @Override
@@ -80,6 +63,7 @@ public class GolangPlugin implements Plugin<Project> {
         this.project = project;
         this.injector = initGuice();
         this.settings = injector.getInstance(GolangPluginSetting.class);
+        this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
     }
 
     private void configureGlobalInjector() {
@@ -92,12 +76,10 @@ public class GolangPlugin implements Plugin<Project> {
 
     private void configureTasks(Project project) {
         TaskContainer taskContainer = project.getTasks();
-        taskContainer.create(PREPARE_TASK_NAME, PrepareTask.class, dependencyInjectionAction);
-        taskContainer.create(RESOLVE_TASK_NAME, ResolveTask.class, dependencyInjectionAction);
-        taskContainer.create(DEPENDENCIES_TASK_NAME, DependenciesTask.class, dependencyInjectionAction);
-        taskContainer.create(CLEAN_TASK_NAME, CleanTask.class, dependencyInjectionAction);
-        taskContainer.create(INSTALL_TASK_NAME, InstallTask.class, dependencyInjectionAction);
-        taskContainer.create(BUILD_TASK_NAME, BuildTask.class, dependencyInjectionAction);
+        TASKS.entrySet().forEach(entry -> {
+            Task task = taskContainer.create(entry.getKey(), entry.getValue(), dependencyInjectionAction);
+            golangTaskContainer.put((Class) entry.getValue(), task);
+        });
     }
 
     /**
