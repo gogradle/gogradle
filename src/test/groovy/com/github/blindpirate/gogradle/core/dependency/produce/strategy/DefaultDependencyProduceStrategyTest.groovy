@@ -9,7 +9,7 @@ import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
 class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest {
-    DefaultDependencyProduceStrategy strategy = new DefaultDependencyProduceStrategy();
+    DefaultDependencyProduceStrategy strategy = new DefaultDependencyProduceStrategy()
 
     @Test
     void 'source code will be scanned when external and vendor dependencies are all empty'() {

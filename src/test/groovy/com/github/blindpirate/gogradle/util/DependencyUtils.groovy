@@ -17,13 +17,13 @@ class DependencyUtils {
     }
 
     static GolangDependency mockDependency(String name) {
-        GolangDependency ret = mock(GolangDependency);
+        GolangDependency ret = mock(GolangDependency)
         when(ret.getName()).thenReturn(name)
         return ret
     }
 
     static ResolvedDependency mockResolvedDependency(String name) {
-        ResolvedDependency ret = mock(ResolvedDependency);
+        ResolvedDependency ret = mock(ResolvedDependency)
         when(ret.getName()).thenReturn(name)
         when(ret.resolve()).thenReturn(ret)
         return ret

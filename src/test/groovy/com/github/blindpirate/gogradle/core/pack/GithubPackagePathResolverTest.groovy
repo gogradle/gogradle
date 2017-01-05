@@ -6,7 +6,7 @@ import org.junit.Test
 
 class GithubPackagePathResolverTest {
 
-    GithubPackagePathResolver resolver = new GithubPackagePathResolver();
+    GithubPackagePathResolver resolver = new GithubPackagePathResolver()
 
     @Test
     void 'resolving name should success'() {

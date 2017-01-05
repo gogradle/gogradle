@@ -16,7 +16,7 @@ class LocalFileResolverTest {
 
     File resource
 
-    LocalFileResolver resolver = new LocalFileResolver();
+    LocalFileResolver resolver = new LocalFileResolver()
 
     @Mock
     LocalDirectoryNotationDependency dependency

@@ -52,12 +52,12 @@ class SourceCodeDependencyFactoryTest {
         when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                String name = invocation.getArgument(0);
+                String name = invocation.getArgument(0)
                 if (name.startsWith('github.com')) {
                     GolangPackage ret = GolangPackage.builder().withPath(name).withRootPath('github.com/a/b').build()
                     return Optional.of(ret)
                 } else {
-                    GolangPackage standardPackage = GolangPackage.standardPackage(name);
+                    GolangPackage standardPackage = GolangPackage.standardPackage(name)
                     return Optional.of(standardPackage)
                 }
             }

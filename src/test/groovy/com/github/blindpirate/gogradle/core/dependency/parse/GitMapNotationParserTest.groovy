@@ -19,7 +19,7 @@ class GitMapNotationParserTest {
     @Mock
     List<String> urls
 
-    GitMapNotationParser parser = new GitMapNotationParser();
+    GitMapNotationParser parser = new GitMapNotationParser()
 
     @Before
     void setUp() {

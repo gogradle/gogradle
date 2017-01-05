@@ -32,7 +32,7 @@ class DebugLogMethodInterceptorTest {
         protected void configure() {
             bindInterceptor(Matchers.any(),
                     Matchers.annotatedWith(DebugLog.class),
-                    new DebugLogMethodInterceptor());
+                    new DebugLogMethodInterceptor())
         }
     })
 

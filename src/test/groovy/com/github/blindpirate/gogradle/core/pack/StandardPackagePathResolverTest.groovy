@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import org.junit.Test
 
 class StandardPackagePathResolverTest {
-    StandardPackagePathResolver resolver = new StandardPackagePathResolver();
+    StandardPackagePathResolver resolver = new StandardPackagePathResolver()
 
     @Test
     void 'resolving first-level standard package should success'() {

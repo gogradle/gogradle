@@ -46,24 +46,24 @@ class GolangPluginSettingTest {
 
 
     public static class GopathTest {
-        public static final int SUCCESS_CODE = 0;
-        public static final int FAILURE_CODE = 1;
+        public static final int SUCCESS_CODE = 0
+        public static final int FAILURE_CODE = 1
 
         public static void main(String[] args) {
             try {
-                GolangPluginSetting setting = newInstance();
-                setting.verify();
-                System.exit(SUCCESS_CODE);
+                GolangPluginSetting setting = newInstance()
+                setting.verify()
+                System.exit(SUCCESS_CODE)
             } catch (IllegalStateException e) {
-                System.exit(FAILURE_CODE);
+                System.exit(FAILURE_CODE)
             }
         }
 
         private static GolangPluginSetting newInstance() {
-            GolangPluginSetting ret = new GolangPluginSetting();
-            ret.packagePath = "path";
-            ret.useGlobalGopath = true;
-            return ret;
+            GolangPluginSetting ret = new GolangPluginSetting()
+            ret.packagePath = "path"
+            ret.useGlobalGopath = true
+            return ret
         }
     }
 }

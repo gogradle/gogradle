@@ -46,7 +46,7 @@ class DefaultGlobalCacheManagerTest {
     @Test
     void "validation of global cache directory should success"() {
         // when
-        cacheManager.ensureGlobalCacheExistAndWritable();
+        cacheManager.ensureGlobalCacheExistAndWritable()
         // then
         assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
         assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
@@ -97,7 +97,7 @@ class DefaultGlobalCacheManagerTest {
                 fail()
             } else {
                 FileUtils.touch(file)
-                Thread.sleep(5);
+                Thread.sleep(5)
                 FileUtils.forceDelete(file)
                 success()
             }

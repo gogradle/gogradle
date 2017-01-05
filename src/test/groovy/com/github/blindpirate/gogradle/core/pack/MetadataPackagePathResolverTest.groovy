@@ -86,6 +86,6 @@ class MetadataPackagePathResolverTest {
     }
 
     String tagInHtml(String s) {
-        return "<html><header>" + s + "</header><body></body></html>";
+        return "<html><header>${s}</header><body></body></html>"
     }
 }

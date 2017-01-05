@@ -86,7 +86,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
     }
 
     void prepareGodepsDotJson(String GodepsDotJson) {
-        IOUtils.write(resource, 'Godeps/Godeps.json', GodepsDotJson);
+        IOUtils.write(resource, 'Godeps/Godeps.json', GodepsDotJson)
     }
 
     String GodepsDotJsonWithExtraAndMissingProperties = '''

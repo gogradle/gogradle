@@ -24,7 +24,7 @@ class GitAccessorTest {
     // injected by GogradleRunner
     File resource
 
-    GitAccessor gitAccessor = new GitAccessor();
+    GitAccessor gitAccessor = new GitAccessor()
     Repository repository
 
     @Before
@@ -72,7 +72,7 @@ class GitAccessorTest {
     @AccessWeb
     @WithResource('')
     void 'clone with https should success'() {
-        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource);
+        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource)
         assert resource.toPath().resolve('.git').toFile().exists()
     }
 

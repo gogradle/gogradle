@@ -55,7 +55,7 @@ class GolangPluginTest {
             build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: 'commitId', vcs: 'git'
         }
 
-        assert project.configurations.build.dependencies.size() == 1;
+        assert project.configurations.build.dependencies.size() == 1
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
         assert dependency.commit == 'commitId'
@@ -64,7 +64,7 @@ class GolangPluginTest {
     }
 
     def findFirstInDependencies() {
-        return project.configurations.build.dependencies.find { true };
+        return project.configurations.build.dependencies.find { true }
     }
 
     def findFirstInDependencies(String name) {

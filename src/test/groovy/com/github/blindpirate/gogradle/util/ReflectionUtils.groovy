@@ -6,7 +6,7 @@ import java.lang.reflect.Modifier
 class ReflectionUtils {
     static void setField(Object object, String field, Object value) {
         org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
-                .setVariableValueInObject(object, field, value);
+                .setVariableValueInObject(object, field, value)
     }
 
     static void setFieldSafely(Object instance, String fieldName, Object value) {
@@ -19,12 +19,12 @@ class ReflectionUtils {
 
     static Object getField(Object target, String field) {
         return org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
-                .getValueIncludingSuperclasses(field, target);
+                .getValueIncludingSuperclasses(field, target)
     }
 
     static void setStaticFinalField(Object object, String fieldName, Object value) {
         Field field = org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
-                .getFieldByNameIncludingSuperclasses(fieldName, object.getClass());
+                .getFieldByNameIncludingSuperclasses(fieldName, object.getClass())
 
         field.setAccessible(true)
         Field modifiersField = Field.class.getDeclaredField('modifiers')

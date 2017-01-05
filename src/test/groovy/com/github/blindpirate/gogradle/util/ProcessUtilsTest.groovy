@@ -10,7 +10,7 @@ class ProcessUtilsTest {
         static void main(String[] args) {
             System.out.print('out')
             System.err.print('err')
-            System.exit(42);
+            System.exit(42)
         }
     }
 
