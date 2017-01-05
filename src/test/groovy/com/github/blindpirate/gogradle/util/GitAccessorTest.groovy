@@ -71,12 +71,8 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     void 'clone with https should success'() {
-        File tmpDir = new File("build/tmp/nonexistent-${UUID.randomUUID()}")
-
-        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", tmpDir.toPath());
-
-        assert tmpDir.toPath().resolve('.git').toFile().exists()
-        forceDelete(tmpDir)
+        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource.toPath());
+        assert resource.toPath().resolve('.git').toFile().exists()
     }
 
     @Test
