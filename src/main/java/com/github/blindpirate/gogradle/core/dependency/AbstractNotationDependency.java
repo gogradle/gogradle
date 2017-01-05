@@ -30,13 +30,11 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     @Override
     public ResolvedDependency resolve() {
         if (resolvedDependency == null) {
-            DependencyResolver resolver = INJECTOR_INSTANCE.getInstance(this.resolverClass());
+            DependencyResolver resolver = INJECTOR_INSTANCE.getInstance(this.getResolverClass());
             resolvedDependency = resolver.resolve(this);
         }
         return resolvedDependency;
     }
-
-    protected abstract Class<? extends DependencyResolver> resolverClass();
 
     public void exclude(Map<String, Object> map) {
         transitiveDepExclusions.add(PropertiesExclusionSpec.of(map));

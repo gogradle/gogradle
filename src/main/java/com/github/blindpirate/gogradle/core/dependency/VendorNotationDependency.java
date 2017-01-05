@@ -20,7 +20,7 @@ public class VendorNotationDependency extends AbstractNotationDependency {
     }
 
     @Override
-    protected Class<? extends DependencyResolver> resolverClass() {
-        return hostNotationDependency.resolverClass();
+    public Class<? extends DependencyResolver> getResolverClass() {
+        return hostNotationDependency.getResolverClass();
     }
 }

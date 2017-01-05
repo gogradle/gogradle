@@ -15,7 +15,7 @@ public class LocalDirectoryNotationDependency extends AbstractNotationDependency
     }
 
     @Override
-    protected Class<? extends DependencyResolver> resolverClass() {
+    public Class<? extends DependencyResolver> getResolverClass() {
         return LocalFileResolver.class;
     }
 

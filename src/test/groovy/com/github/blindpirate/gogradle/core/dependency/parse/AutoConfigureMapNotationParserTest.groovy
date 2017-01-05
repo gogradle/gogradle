@@ -13,7 +13,7 @@ class AutoConfigureMapNotationParserTest {
         }
 
         @Override
-        protected Class<? extends DependencyResolver> resolverClass() {
+        Class<? extends DependencyResolver> getResolverClass() {
             return null
         }
     }
