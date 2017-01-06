@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.task.BuildTask;
 import com.github.blindpirate.gogradle.task.DependenciesTask;
+import com.github.blindpirate.gogradle.task.InstallDependenciesTask;
 import com.github.blindpirate.gogradle.task.PrepareTask;
 import com.github.blindpirate.gogradle.task.ResolveTask;
 import com.github.blindpirate.gogradle.task.TestTask;
@@ -24,7 +25,7 @@ public class GolangTaskContainer {
     public static final String CHECK_TASK_NAME = "check";
     public static final String BUILD_TASK_NAME = "build";
     public static final String CLEAN_TASK_NAME = "clean";
-    public static final String INSTALL_TASK_NAME = "install";
+    public static final String INSTALL_DEPENDENCIES_TASK_NAME = "install";
     public static final String TEST_TASK_NAME = "test";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
@@ -34,6 +35,7 @@ public class GolangTaskContainer {
             .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
             .put(BUILD_TASK_NAME, BuildTask.class)
             .put(TEST_TASK_NAME, TestTask.class)
+            .put(INSTALL_DEPENDENCIES_TASK_NAME, InstallDependenciesTask.class)
             .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
