@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.build.BuildManager;
+import com.github.blindpirate.gogradle.build.DefaultBuildManager;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.core.DefaultBuildConstraintManager;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
@@ -33,6 +35,8 @@ import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
+import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
+import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
@@ -70,6 +74,8 @@ public class GogradleModule extends AbstractModule {
         bind(Instantiator.class).toInstance(instantiator);
 
         bind(NotationParser.class).to(DefaultNotationParser.class);
+        bind(BuildManager.class).to(DefaultBuildManager.class);
+        bind(GoBinaryManager.class).to(DefaultGoBinaryManager.class);
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
         bind(GlobalCacheManager.class).to(DefaultGlobalCacheManager.class);
         bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
