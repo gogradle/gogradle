@@ -10,14 +10,14 @@ import java.time.Instant
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class LocalFileSystemDependencyTest {
+class LocalDirectoryDependencyTest {
     File resource
 
-    LocalFileSystemDependency dependency
+    LocalDirectoryDependency dependency
 
     @Before
     void setUp() {
-        dependency = LocalFileSystemDependency.fromLocal('name', resource)
+        dependency = LocalDirectoryDependency.fromLocal('name', resource)
     }
 
     @Test(expected = UnsupportedOperationException)

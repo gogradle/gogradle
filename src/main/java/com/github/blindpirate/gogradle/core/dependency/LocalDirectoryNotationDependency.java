@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
-import com.github.blindpirate.gogradle.core.pack.LocalFileResolver;
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryResolver;
 
 public class LocalDirectoryNotationDependency extends AbstractNotationDependency {
     private String dir;
@@ -16,7 +16,7 @@ public class LocalDirectoryNotationDependency extends AbstractNotationDependency
 
     @Override
     public Class<? extends DependencyResolver> getResolverClass() {
-        return LocalFileResolver.class;
+        return LocalDirectoryResolver.class;
     }
 
 }

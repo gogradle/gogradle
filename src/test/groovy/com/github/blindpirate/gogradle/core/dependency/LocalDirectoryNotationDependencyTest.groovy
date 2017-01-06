@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
-import com.github.blindpirate.gogradle.core.pack.LocalFileResolver
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryResolver
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -15,12 +15,12 @@ class LocalDirectoryNotationDependencyTest extends MockInjectorSupport {
     LocalDirectoryNotationDependency dependency = new LocalDirectoryNotationDependency()
 
     @Mock
-    LocalFileResolver localFileResolver
+    LocalDirectoryResolver localFileResolver
 
     @Test
     void 'a LocalDirectoryNotationDependency should be resolved by LocalFileResolver'() {
         // given
-        when(injector.getInstance(LocalFileResolver)).thenReturn(localFileResolver)
+        when(injector.getInstance(LocalDirectoryResolver)).thenReturn(localFileResolver)
         // when
         dependency.resolve()
         // then

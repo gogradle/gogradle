@@ -12,11 +12,11 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class LocalFileResolverTest {
+class LocalDirectoryResolverTest {
 
     File resource
 
-    LocalFileResolver resolver = new LocalFileResolver()
+    LocalDirectoryResolver resolver = new LocalDirectoryResolver()
 
     @Mock
     LocalDirectoryNotationDependency dependency
@@ -39,6 +39,6 @@ class LocalFileResolverTest {
         // given
         when(dependency.getDir()).thenReturn(resource.absolutePath)
         // then
-        assert resolver.resolve(dependency) instanceof LocalFileSystemDependency
+        assert resolver.resolve(dependency) instanceof LocalDirectoryDependency
     }
 }

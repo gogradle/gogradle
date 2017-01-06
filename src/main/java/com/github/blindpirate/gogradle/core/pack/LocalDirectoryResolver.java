@@ -10,7 +10,7 @@ import java.io.File;
 
 import static com.github.blindpirate.gogradle.util.Assert.isNotNull;
 
-public class LocalFileResolver implements DependencyResolver {
+public class LocalDirectoryResolver implements DependencyResolver {
     @Override
     public ResolvedDependency resolve(NotationDependency dependency) {
         LocalDirectoryNotationDependency directoryDependency = (LocalDirectoryNotationDependency) dependency;
@@ -18,7 +18,7 @@ public class LocalFileResolver implements DependencyResolver {
         if (invalid(rootDir)) {
             throw DependencyResolutionException.directoryIsInvalid(rootDir);
         }
-        return LocalFileSystemDependency.fromLocal(directoryDependency.getName(), rootDir);
+        return LocalDirectoryDependency.fromLocal(directoryDependency.getName(), rootDir);
     }
 
     @Override

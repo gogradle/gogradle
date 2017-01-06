@@ -6,7 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
-import com.github.blindpirate.gogradle.core.pack.LocalFileSystemDependency;
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
@@ -37,7 +37,7 @@ public class ResolveTask extends DefaultTask {
     @TaskAction
     public void resolve() {
         File rootDir = getProject().getRootDir();
-        LocalFileSystemDependency rootProject = LocalFileSystemDependency.fromLocal(
+        LocalDirectoryDependency rootProject = LocalDirectoryDependency.fromLocal(
                 setting.getPackagePath(),
                 rootDir);
 
