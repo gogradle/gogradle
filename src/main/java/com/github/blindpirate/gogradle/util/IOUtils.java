@@ -34,6 +34,12 @@ public class IOUtils {
         }
     }
 
+    public static File mkdir(File baseDir, String newDirName) {
+        File ret = baseDir.toPath().resolve(newDirName).toFile();
+        forceMkdir(ret);
+        return ret;
+    }
+
     private static void handleIOException(IOException e) {
         throw new IllegalStateException(e);
     }
@@ -140,4 +146,5 @@ public class IOUtils {
             handleIOException(e);
         }
     }
+
 }

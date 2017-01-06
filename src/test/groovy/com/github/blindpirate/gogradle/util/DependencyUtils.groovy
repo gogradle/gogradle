@@ -22,6 +22,12 @@ class DependencyUtils {
         return ret
     }
 
+    static mockWithName(Class clazz, String name) {
+        def ret = mock(clazz)
+        when(ret.getName()).thenReturn(name)
+        return ret
+    }
+
     static ResolvedDependency mockResolvedDependency(String name) {
         ResolvedDependency ret = mock(ResolvedDependency)
         when(ret.getName()).thenReturn(name)

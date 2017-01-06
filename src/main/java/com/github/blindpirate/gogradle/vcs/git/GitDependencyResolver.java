@@ -39,8 +39,11 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     private DependencyVisitor visitor;
 
     @Override
-    protected void doReset(ResolvedDependency dependency, Path globalCachePath, File targetDirectory) {
+    protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
+        GitResolvedDependency gitResolvedDependency = (GitResolvedDependency) dependency;
+        Repository repository = gitAccessor.getRepository(globalCachePath.toFile());
 
+        resetToSpecificCommit(repository, gitResolvedDependency.getVersion());
     }
 
     @Override
@@ -63,7 +66,11 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
 
     @Override
     protected void resetToSpecificVersion(Repository repository, RevCommit commit) {
-        gitAccessor.resetToCommit(repository, commit.getName());
+        resetToSpecificCommit(repository, commit.getName());
+    }
+
+    private void resetToSpecificCommit(Repository repository, String commitId) {
+        gitAccessor.resetToCommit(repository, commitId);
     }
 
     @Override

@@ -33,15 +33,16 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
         try {
             globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
                 Path globalCachePath = globalCacheManager.getGlobalCachePath(dependency.getName());
-                doReset(dependency, globalCachePath, targetDirectory);
+                doReset(dependency, globalCachePath);
+                IOUtils.copyDirectory(globalCachePath.toFile(), targetDirectory);
                 return null;
             });
         } catch (Exception e) {
-            throw DependencyResolutionException.cannotResolveDependency(dependency, e);
+            throw DependencyResolutionException.cannotResetResolvedDependency(dependency, e);
         }
     }
 
-    protected abstract void doReset(ResolvedDependency dependency, Path globalCachePath, File targetDirectory);
+    protected abstract void doReset(ResolvedDependency dependency, Path globalCachePath);
 
     private ResolvedDependency doResolve(NotationDependency dependency, File targetDirectory) {
         REPOSITORY repository = resolveToGlobalCache(dependency, targetDirectory);
