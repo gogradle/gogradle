@@ -44,7 +44,7 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     String mockGoBin = '''\
 #!/usr/bin/env sh
 
-if [ "-o" == "$1" -a "" != "$2" ]; then
+if [ "-o" = "$1" -a "" != "$2" ]; then
     echo $PWD > $2
 else
     echo "Usage: go -o <path>"
