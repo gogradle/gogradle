@@ -57,15 +57,16 @@ public class IOUtils {
         return files.length == 0;
     }
 
-    public static void ensureDirExistAndWritable(Path path) {
+    public static Path ensureDirExistAndWritable(Path path) {
         Assert.isTrue(path.isAbsolute(), "path must be absolute!");
         File dir = path.toFile();
         IOUtils.forceMkdir(dir);
         Assert.isTrue(Files.isWritable(dir.toPath()), "Cannot write to directory:" + path);
+        return path;
     }
 
-    public static void ensureDirExistAndWritable(Path base, String relativePath) {
-        ensureDirExistAndWritable(base.resolve(Paths.get(relativePath)));
+    public static Path ensureDirExistAndWritable(Path base, String relativePath) {
+        return ensureDirExistAndWritable(base.resolve(Paths.get(relativePath)));
     }
 
     public static void copyDirectory(File src, File dest) {
