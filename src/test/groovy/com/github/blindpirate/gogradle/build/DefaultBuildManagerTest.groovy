@@ -73,7 +73,7 @@ fi
         Arch hostArch = Arch.getHostArch()
 
         Path outputFilePath = resource.toPath().resolve(GOGRADLE_BUILD_DIR).resolve("${hostOs}_${hostArch}_package")
-        String outputFileContent = IOUtils.toString(outputFilePath.toFile())
+        String outputFileContent = outputFilePath.toFile().getText()
         assert outputFileContent.trim() == resource.toPath().toString()
     }
 

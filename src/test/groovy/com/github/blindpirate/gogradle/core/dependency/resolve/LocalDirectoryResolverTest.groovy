@@ -57,7 +57,7 @@ class LocalDirectoryResolverTest {
         // when
         resolver.reset(resolvedDependency, dest)
         // then
-        assert IOUtils.toString(dest.toPath().resolve('main.go').toFile()) == 'This is main.go'
+        assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
 
     }
 }

@@ -23,6 +23,7 @@ import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfac
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.when
 
+// TODO what if gogradle.lock already exists?
 @RunWith(GogradleRunner)
 @WithProject
 class DefaultLockedDependencyManagerTest {
@@ -90,10 +91,11 @@ dependencies:
         // when
         manager.lock([dependency1, dependency2])
         // then
-        assert IOUtils.toString(project.getRootDir().toPath().resolve(LOCK_FILE_NAME).toFile()) == gogradleDotLock
+        assert project.getRootDir().toPath().resolve(LOCK_FILE_NAME).toFile().getText() == gogradleDotLock
     }
+
     @Test
-    void 'empty dependencies should be returned if gogradle.lock does not exist'(){
+    void 'empty dependencies should be returned if gogradle.lock does not exist'() {
         assert manager.getLockedDependencies().isEmpty()
     }
 }
