@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GolangPluginSetting
+import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.GolangTaskContainer
 import com.github.blindpirate.gogradle.core.dependency.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -29,13 +30,18 @@ abstract class TaskTest {
     DependencyTreeFactory dependencyTreeFactory
     @Mock
     DependencyInstaller dependencyInstaller
+    @Mock
+    BuildManager buildManager
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
     @Before
     void superSetUp() {
+        for(Map.Entry entry in GolangTaskContainer.TASKS.entrySet())
         GolangTaskContainer.TASKS.each { taskName, taskClass ->
+            long t0 = System.currentTimeMillis()
             golangTaskContainer.put(taskClass, Mockito.mock(taskClass))
+            println(System.currentTimeMillis() - t0)
         }
     }
 
@@ -46,6 +52,7 @@ abstract class TaskTest {
         setFieldSafely(task, 'visitor', visitor)
         setFieldSafely(task, 'dependencyInstaller', dependencyInstaller)
         setFieldSafely(task, 'golangTaskContainer', golangTaskContainer)
+        setFieldSafely(task, 'buildManager', buildManager)
     }
 
     protected <T> T buildTask(Class<T> taskClass) {
