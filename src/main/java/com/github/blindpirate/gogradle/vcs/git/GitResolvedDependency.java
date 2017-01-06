@@ -9,7 +9,7 @@ import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VCS_KEY;
-import static com.github.blindpirate.gogradle.vcs.VcsType.Git;
+import static com.github.blindpirate.gogradle.vcs.VcsType.GIT;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMMIT_KEY;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.URL_KEY;
 
@@ -24,7 +24,7 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
     public Map<String, Object> toLockedNotation() {
         return ImmutableMap.of(
                 NAME_KEY, getName(),
-                VCS_KEY, Git.getName(),
+                VCS_KEY, GIT.getName(),
                 URL_KEY, repoUrl,
                 COMMIT_KEY, getVersion());
     }

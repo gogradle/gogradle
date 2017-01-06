@@ -13,8 +13,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.Develop
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.verify
@@ -61,7 +61,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Test
     void 'dependencies in build.gradle should have top priority when in Develop mode'() {
         // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(Develop)
+        when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
         dependenciesInBuildDotGradle(a1, b1)
         lockedDependencies(a2)
         vendorDependencies(b2)
@@ -80,7 +80,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Test
     void 'dependencis in vendor should have top priority when in Reproducible mode'() {
         // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(Reproducible)
+        when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
         dependenciesInBuildDotGradle(a1)
         lockedDependencies(a2, b2)
         vendorDependencies()
@@ -98,7 +98,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Test
     void 'locked dependencies should have priority than build.gradle in Reproducible mode'() {
         // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(Reproducible)
+        when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
         dependenciesInBuildDotGradle(a1, b1)
         lockedDependencies(a2)
         vendorDependencies()
@@ -115,7 +115,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Test
     void 'source code should be scanned when no dependencies exist'() {
         // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(Develop)
+        when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
         externalDependencies()
         dependenciesInBuildDotGradle()
         lockedDependencies()
@@ -131,7 +131,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Test
     void 'external tools should be scanned when no dependencies exist in build.gradle'() {
         // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(Develop)
+        when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
 
 
         externalDependencies(a1)

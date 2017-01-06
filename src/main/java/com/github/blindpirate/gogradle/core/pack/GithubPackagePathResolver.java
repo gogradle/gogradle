@@ -44,7 +44,7 @@ public class GithubPackagePathResolver implements PackagePathResolver {
 
         GolangPackage info = GolangPackage.builder()
                 .withPath(packagePath)
-                .withVcsType(VcsType.Git)
+                .withVcsType(VcsType.GIT)
                 .withRootPath(rootPackagePath)
                 .withUrls(asList(httpsUrl, sshUrl))
                 .build();

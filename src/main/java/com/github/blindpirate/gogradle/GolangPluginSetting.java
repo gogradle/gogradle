@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 
 import java.util.List;
 
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.Reproducible;
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.valueOf;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.trimToNull;
@@ -22,7 +22,7 @@ public class GolangPluginSetting {
     private boolean useGlobalGopath = false;
     public static final String DEFAULT_CHARSET = "UTF-8";
     private String globalGopath;
-    private BuildMode buildMode = Reproducible;
+    private BuildMode buildMode = REPRODUCIBLE;
     private String packagePath;
     private List<String> buildTags;
     private Arch hostArch;

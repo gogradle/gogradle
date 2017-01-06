@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import static com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.merge;
 
 public enum BuildMode {
-    Develop {
+    DEVELOP {
         @Override
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet vendorDependencies,
@@ -13,7 +13,7 @@ public enum BuildMode {
             return merge(declaredDependencies, vendorDependencies, lockedDependencies);
         }
     },
-    Reproducible {
+    REPRODUCIBLE {
         @Override
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet vendorDependencies,

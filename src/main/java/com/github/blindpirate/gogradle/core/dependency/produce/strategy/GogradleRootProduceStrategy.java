@@ -20,8 +20,8 @@ import static com.github.blindpirate.gogradle.GolangPlugin.BUILD_CONFIGURATION_N
 import static com.github.blindpirate.gogradle.util.Cast.cast;
 
 /**
- * In {@code Develop} mode, dependencies in build.gradle have top priority.
- * In {@code Reproducible} mode, dependencies in vendor (or settings.gradle) have top priority.
+ * In {@code DEVELOP} mode, dependencies in build.gradle have top priority.
+ * In {@code REPRODUCIBLE} mode, dependencies in vendor (or settings.gradle) have top priority.
  * <p>
  * Additionally, if there aren't any dependencies in build.gradle,
  * a scan for external dependency management tools will be performed.

@@ -9,10 +9,10 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum VcsType {
-    Git("git", ".git", Git.class),
-    Mercurial("hg", ".hg", Mercurial.class),
-    Svn("svn", ".svn", Svn.class),
-    Bazaar("bzr", ".bzr", Bazaar.class);
+    GIT("git", ".git", Git.class),
+    MERCURIAL("hg", ".hg", Mercurial.class),
+    SVN("svn", ".svn", Svn.class),
+    BAZAAR("bzr", ".bzr", Bazaar.class);
 
     private String name;
 

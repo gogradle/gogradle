@@ -61,7 +61,7 @@ class DefaultMapNotationParserTest {
         // given
         Map notation = [name: 'path']
         when(packagePathResolver.produce('path')).thenReturn(Optional.of(packageInfo))
-        when(packageInfo.getVcsType()).thenReturn(VcsType.Git)
+        when(packageInfo.getVcsType()).thenReturn(VcsType.GIT)
         MockUtils.mockVcsService(injector, MapNotationParser, Git, vcsMapNotationParser)
 
         // when

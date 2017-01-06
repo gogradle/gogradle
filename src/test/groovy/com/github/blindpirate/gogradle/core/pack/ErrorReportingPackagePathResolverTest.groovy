@@ -26,7 +26,7 @@ class ErrorReportingPackagePathResolverTest {
 
     GolangPackage packageInfo = GolangPackage.builder().withPath('root/package')
             .withRootPath('root')
-            .withVcsType(VcsType.Git)
+            .withVcsType(VcsType.GIT)
             .withUrls(['url'])
             .build()
 
@@ -62,7 +62,7 @@ class ErrorReportingPackagePathResolverTest {
         GolangPackage info = GolangPackage.builder()
                 .withPath('github.com/a/b/c')
                 .withRootPath('github.com/a/b')
-                .withVcsType(VcsType.Git)
+                .withVcsType(VcsType.GIT)
                 .withUrls([])
                 .build()
         when(resolver1.produce('github.com/a/b/c')).thenReturn(of(info))
@@ -97,7 +97,7 @@ class ErrorReportingPackagePathResolverTest {
         GolangPackage rootInfo = GolangPackage.builder()
                 .withPath('github.com/a/b')
                 .withRootPath('github.com/a/b')
-                .withVcsType(VcsType.Git)
+                .withVcsType(VcsType.GIT)
                 .withUrls([])
                 .build()
         getField(resolver, 'cache').put('github.com', GolangPackage.INCOMPLETE)

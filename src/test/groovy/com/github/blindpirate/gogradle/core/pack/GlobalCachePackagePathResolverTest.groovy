@@ -18,8 +18,6 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import java.nio.file.Path
-
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
@@ -79,7 +77,7 @@ class GlobalCachePackagePathResolverTest {
         GolangPackage info = resolver.produce('github.com/a/b').get()
 
         // then
-        assert info.vcsType == VcsType.Git
+        assert info.vcsType == VcsType.GIT
         assert info.path == 'github.com/a/b'
         assert info.rootPath == 'github.com/a/b'
         assert info.urls.contains('url')
@@ -90,7 +88,7 @@ class GlobalCachePackagePathResolverTest {
         // when
         GolangPackage info = resolver.produce('github.com/a/b/c').get()
         // then
-        assert info.vcsType == VcsType.Git
+        assert info.vcsType == VcsType.GIT
         assert info.path == 'github.com/a/b/c'
         assert info.rootPath == 'github.com/a/b'
         assert info.urls.contains('url')

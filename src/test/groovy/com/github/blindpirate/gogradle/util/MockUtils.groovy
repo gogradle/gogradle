@@ -28,7 +28,7 @@ class MockUtils {
                 .withPath('root/package')
                 .withRootPath('root')
                 .withStandard(false)
-                .withVcsType(VcsType.Git)
+                .withVcsType(VcsType.GIT)
                 .build()
     }
 
@@ -36,7 +36,7 @@ class MockUtils {
         return GolangPackage.builder()
                 .withPath('standard')
                 .withRootPath('standard')
-                .withVcsType(VcsType.Git)
+                .withVcsType(VcsType.GIT)
                 .withStandard(true)
                 .build()
     }

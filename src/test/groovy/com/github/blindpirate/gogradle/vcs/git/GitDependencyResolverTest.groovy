@@ -9,6 +9,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
+import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.google.inject.Injector
@@ -236,4 +237,11 @@ class GitDependencyResolverTest {
         verify(gitAccessor).resetToCommit(repository, revCommit.getName())
     }
 
+    @Test(expected = DependencyInstallationException)
+    void 'exception in reset process should be wrapped'() {
+        // given
+        when(cacheManager.getGlobalCachePath(anyString())).thenThrow(new IllegalStateException())
+        // then
+        resolver.reset(resolvedDependency, resource)
+    }
 }

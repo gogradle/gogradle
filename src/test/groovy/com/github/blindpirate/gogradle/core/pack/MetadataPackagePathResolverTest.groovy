@@ -40,7 +40,7 @@ class MetadataPackagePathResolverTest {
 
         // then
         assert info.urls.contains('https://code.org/r/p/exproj')
-        assert info.vcsType == VcsType.Git
+        assert info.vcsType == VcsType.GIT
         assert info.path == packagePath
         assert info.rootPath == 'example.org'
     }

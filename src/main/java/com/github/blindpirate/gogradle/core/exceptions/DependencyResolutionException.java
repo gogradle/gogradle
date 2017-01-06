@@ -62,8 +62,5 @@ public final class DependencyResolutionException extends GradleException {
         return new DependencyResolutionException("Directory is invalid:" + rootDir.getPath());
     }
 
-    public static DependencyResolutionException cannotResetResolvedDependency(ResolvedDependency dependency,
-                                                                              Exception e) {
-        return new DependencyResolutionException("Cannot reset dependency: " + dependency, e);
-    }
+
 }
