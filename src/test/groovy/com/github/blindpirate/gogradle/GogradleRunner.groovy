@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import net.lingala.zip4j.core.ZipFile
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -70,7 +69,6 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             setFieldSafely(currentInstance, RESOURC_FIELD, resourceDir)
         }
     }
-
 
 
     void cleanUpResource() {
