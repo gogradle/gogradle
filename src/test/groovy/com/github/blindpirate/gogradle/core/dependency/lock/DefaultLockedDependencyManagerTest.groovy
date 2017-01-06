@@ -92,4 +92,9 @@ dependencies:
         // then
         assert IOUtils.toString(project.getRootDir().toPath().resolve(LOCK_FILE_NAME).toFile()) == gogradleDotLock
     }
+    @Test
+    void 'empty dependencies should be returned if gogradle.lock does not exist'(){
+        assert manager.getLockedDependencies().isEmpty()
+    }
 }
+
