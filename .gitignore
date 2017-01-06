@@ -1,6 +1,8 @@
 .gradle
 .idea
-./build/
+build/
+!src/main/java/com/github/blindpirate/gogradle/build
+!src/test/groovy/com/github/blindpirate/gogradle/build
 classes/
 *.iml
 
