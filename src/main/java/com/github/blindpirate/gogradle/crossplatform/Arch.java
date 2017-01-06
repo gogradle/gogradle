@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.core;
+package com.github.blindpirate.gogradle.crossplatform;
 
 //https://github.com/golang/go/blob/master/src/go/build/syslist.go
 public enum Arch {
