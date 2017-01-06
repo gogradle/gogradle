@@ -8,6 +8,7 @@ import java.io.File;
 import java.time.Instant;
 import java.util.Map;
 
+// TODO this class can be merged with LocalDirectoryNotationDependency
 public class LocalDirectoryDependency extends AbstractResolvedDependency {
     private File rootDir;
 
