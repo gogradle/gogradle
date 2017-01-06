@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
@@ -38,7 +39,7 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
                 return null;
             });
         } catch (Exception e) {
-            throw DependencyResolutionException.cannotResetResolvedDependency(dependency, e);
+            throw DependencyInstallationException.cannotResetResolvedDependency(dependency, e);
         }
     }
 
