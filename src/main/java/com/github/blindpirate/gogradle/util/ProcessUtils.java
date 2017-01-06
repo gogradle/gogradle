@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.util;
 
 import com.google.common.collect.Lists;
 
+import java.io.File;
 import java.io.IOException;
 import java.util.List;
 import java.util.Map;
@@ -32,12 +33,22 @@ public class ProcessUtils {
         }
     }
 
-    public static ProcessResult run(List<String> args, Map<String, String> envs)
-            throws IOException, InterruptedException {
-        ProcessBuilder pb = new ProcessBuilder().command(args);
-        pb.environment().putAll(envs);
-        Process process = pb.start();
-        return new ProcessResult(process);
+    public static ProcessResult run(List<String> args, Map<String, String> envs) {
+        return run(args, envs, null);
+    }
+
+    public static ProcessResult run(List<String> args, Map<String, String> envs, File workingDirectory) {
+        try {
+            ProcessBuilder pb = new ProcessBuilder().command(args);
+            pb.environment().putAll(envs);
+            if (workingDirectory != null) {
+                pb.directory(workingDirectory);
+            }
+            Process process = pb.start();
+            return new ProcessResult(process);
+        } catch (IOException | InterruptedException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 
 
@@ -48,10 +59,6 @@ public class ProcessUtils {
 
         List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());
         cmds.addAll(args);
-        try {
-            return run(cmds, envs);
-        } catch (IOException | InterruptedException e) {
-            throw new IllegalStateException(e);
-        }
+        return run(cmds, envs);
     }
 }
