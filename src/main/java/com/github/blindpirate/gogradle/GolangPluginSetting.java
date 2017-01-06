@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle;
 
-import com.github.blindpirate.gogradle.core.Arch;
-import com.github.blindpirate.gogradle.core.Os;
+import com.github.blindpirate.gogradle.crossplatform.Arch;
+import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.util.Assert;
 
