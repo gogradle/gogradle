@@ -1,9 +1,10 @@
-package com.github.blindpirate.gogradle.core.pack
+package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith

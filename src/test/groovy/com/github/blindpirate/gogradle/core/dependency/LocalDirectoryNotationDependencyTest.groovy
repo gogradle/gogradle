@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryResolver
+import com.github.blindpirate.gogradle.core.dependency.resolve.LocalDirectoryResolver
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock

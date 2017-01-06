@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import com.github.blindpirate.gogradle.core.dependency.resolve.LocalDirectoryResolver;
 
 import java.io.File;
 import java.time.Instant;

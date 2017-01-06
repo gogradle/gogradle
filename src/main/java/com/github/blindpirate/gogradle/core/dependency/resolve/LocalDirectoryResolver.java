@@ -1,10 +1,10 @@
-package com.github.blindpirate.gogradle.core.pack;
+package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import java.io.File;
