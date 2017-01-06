@@ -49,7 +49,8 @@ public class DefaultBuildManager implements BuildManager {
         List<String> args = asList(goBinary, "-o", outputFilePath);
         Map<String, String> envs = ImmutableMap.of("GOPATH", projectGopath);
 
-        ProcessUtils.run(args, envs, project.getRootDir());
+        ProcessUtils.ProcessResult result = ProcessUtils.run(args, envs, project.getRootDir());
+        System.out.println(result.getStderr());
     }
 
     @Override
