@@ -36,7 +36,7 @@ class InstallDependenciesTaskTest extends TaskTest {
         // when
         task.installDependencies()
         // then
-        verify(dependencyInstaller).installDependency(resolvedDependency)
+        verify(buildManager).installDependency(resolvedDependency)
     }
 
 }

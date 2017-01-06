@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.core.dependency.DependencyInstaller;
+import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.tasks.TaskAction;
@@ -11,7 +11,7 @@ import static com.github.blindpirate.gogradle.core.GolangTaskContainer.RESOLVE_T
 
 public class InstallDependenciesTask extends AbstractGolangTask {
     @Inject
-    private DependencyInstaller dependencyInstaller;
+    private BuildManager buildManager;
 
     public InstallDependenciesTask() {
         dependsOn(RESOLVE_TASK_NAME);
@@ -23,6 +23,6 @@ public class InstallDependenciesTask extends AbstractGolangTask {
         rootNode.flatten()
                 .stream()
                 .map(GolangDependency::resolve)
-                .forEach(dependencyInstaller::installDependency);
+                .forEach(buildManager::installDependency);
     }
 }
