@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.IOUtils;
 
 import java.io.File;
 
@@ -23,7 +24,8 @@ public class LocalDirectoryResolver implements DependencyResolver {
 
     @Override
     public void reset(ResolvedDependency dependency, File targetLocation) {
-
+        LocalDirectoryDependency localDirectoryDependency = (LocalDirectoryDependency) dependency;
+        IOUtils.copyDirectory(localDirectoryDependency.getRootDir(), targetLocation);
     }
 
     private boolean invalid(File rootDir) {

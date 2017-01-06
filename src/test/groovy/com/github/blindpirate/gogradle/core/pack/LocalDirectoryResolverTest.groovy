@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -19,26 +20,43 @@ class LocalDirectoryResolverTest {
     LocalDirectoryResolver resolver = new LocalDirectoryResolver()
 
     @Mock
-    LocalDirectoryNotationDependency dependency
+    LocalDirectoryNotationDependency notationDependency
+    @Mock
+    LocalDirectoryDependency resolvedDependency
 
     @Test(expected = IllegalStateException)
     void 'notation with null dir should cause an exception'() {
-        resolver.resolve(dependency)
+        resolver.resolve(notationDependency)
     }
 
     @Test(expected = DependencyResolutionException)
     void 'notation with invalid dir should cause an exception'() {
         // given
-        when(dependency.getDir()).thenReturn("inexistence")
+        when(notationDependency.getDir()).thenReturn("inexistence")
         // then
-        resolver.resolve(dependency)
+        resolver.resolve(notationDependency)
     }
 
     @Test
     void 'notation with valid dir should be resolved successfully'() {
         // given
-        when(dependency.getDir()).thenReturn(resource.absolutePath)
+        when(notationDependency.getDir()).thenReturn(resource.absolutePath)
         // then
-        assert resolver.resolve(dependency) instanceof LocalDirectoryDependency
+        assert resolver.resolve(notationDependency) instanceof LocalDirectoryDependency
+    }
+
+    @Test
+    void 'resetting should succeed'() {
+        // given
+        File src = IOUtils.mkdir(resource, 'src')
+        File dest = IOUtils.mkdir(resource, 'dest')
+
+        when(resolvedDependency.getRootDir()).thenReturn(src)
+        IOUtils.write(src, 'main.go', 'This is main.go')
+        // when
+        resolver.reset(resolvedDependency, dest)
+        // then
+        assert IOUtils.toString(dest.toPath().resolve('main.go').toFile()) == 'This is main.go'
+
     }
 }
