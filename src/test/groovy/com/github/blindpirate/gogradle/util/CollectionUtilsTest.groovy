@@ -6,7 +6,7 @@ import static java.util.Optional.*
 
 class CollectionUtilsTest {
     @Test
-    void 'building immutable list should success'() {
+    void 'building immutable list should succeed'() {
         assert CollectionUtils.immutableList(1, 2, 3) == [1, 2, 3]
     }
 
@@ -16,12 +16,12 @@ class CollectionUtilsTest {
     }
 
     @Test
-    void 'optional collect should success'() {
+    void 'optional collect should succeed'() {
         CollectionUtils.collectOptional(empty(), of(1), empty(), of(2)) == [1, 2]
     }
 
     @Test
-    void 'flattening a list should success'() {
+    void 'flattening a list should succeed'() {
         assert [1, 2, 3, 4, 5] == CollectionUtils.flatten([1, [2, 3], [[4]], [], 5])
     }
 

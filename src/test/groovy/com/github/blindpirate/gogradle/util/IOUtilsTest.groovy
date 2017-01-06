@@ -14,12 +14,12 @@ class IOUtilsTest {
     File resource
 
     @Test
-    void 'checking empty directory should success'() {
+    void 'checking empty directory should succeed'() {
         assert IOUtils.dirIsEmpty(resource)
     }
 
     @Test
-    void 'checking non-empty directory should success'() {
+    void 'checking non-empty directory should succeed'() {
         resource.toPath().resolve('file').toFile().createNewFile()
         assert !IOUtils.dirIsEmpty(resource)
     }
@@ -32,7 +32,7 @@ class IOUtilsTest {
     }
 
     @Test
-    void 'checking existance and writability of absolute path should success'() {
+    void 'checking existance and writability of absolute path should succeed'() {
         // given
         Path path = resource.toPath().resolve('a')
         // when
@@ -43,7 +43,7 @@ class IOUtilsTest {
     }
 
     @Test
-    void 'checking existance and writability of base path and path should success'() {
+    void 'checking existance and writability of base path and path should succeed'() {
         // when
         IOUtils.ensureDirExistAndWritable(resource.toPath(), "a")
         IOUtils.ensureDirExistAndWritable(resource.toPath(), "a")
@@ -57,7 +57,7 @@ class IOUtilsTest {
     }
 
     @Test
-    void 'write file with complex file name should success'() {
+    void 'write file with complex file name should succeed'() {
         // when
         IOUtils.write(resource, 'a/b/c', 'content')
         // then

@@ -28,7 +28,7 @@ code.google.com/p/go-uuid 7dda39b2e7d5
 '''
 
     @Test
-    void 'parsing GLOCKFILE should success'() {
+    void 'parsing GLOCKFILE should succeed'() {
         // given
         prepareGlockfile(GLOCKFILE)
         // when

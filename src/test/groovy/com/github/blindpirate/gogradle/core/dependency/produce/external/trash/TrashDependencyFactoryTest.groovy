@@ -14,7 +14,7 @@ class TrashDependencyFactoryTest extends ExternalDependencyFactoryTest {
     TrashDependencyFactory factory
 
     @Test
-    void 'parsing vendor.conf should success'() {
+    void 'parsing vendor.conf should succeed'() {
         // given
         IOUtils.write(resource, 'vendor.conf', '''
 # package

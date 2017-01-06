@@ -14,7 +14,7 @@ class ConfigureUtilsTest {
     Bean bean = new Bean()
 
     @Test
-    void 'setting an value dynamically should success'() {
+    void 'setting an value dynamically should succeed'() {
         // when
         ConfigureUtils.configureByMapQuietly([a: 'a', b: 1, c: []], bean)
         // then

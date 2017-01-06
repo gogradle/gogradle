@@ -30,7 +30,7 @@ class GolangPluginSettingTest {
     }
 
     @Test
-    void 'verification should success if useGlobalGopath==true and GOPATH found'() {
+    void 'verification should succeed if useGlobalGopath==true and GOPATH found'() {
         // when
         ProcessResult result = runProcessWithCurrentClasspath(GopathTest, [], [GOPATH: 'xxx'])
         // then
@@ -38,7 +38,7 @@ class GolangPluginSettingTest {
     }
 
     @Test
-    void 'setting build tags should success'() {
+    void 'setting build tags should succeed'() {
         // when
         setting.buildTags = ['a', 'b']
         assert setting.buildTags == ['a', 'b']

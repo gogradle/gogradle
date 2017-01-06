@@ -28,7 +28,7 @@ class MetadataPackagePathResolverTest {
     }
 
     @Test
-    void 'get package info from go-import meta tag should success'() {
+    void 'get package info from go-import meta tag should succeed'() {
         // given
         String packagePath = 'example.org/pkg/foo'
         String realUrl = 'https://example.org/pkg/foo?go-get=1'

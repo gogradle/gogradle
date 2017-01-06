@@ -30,7 +30,7 @@ class DependencyTreeNodeTest {
     }
 
     @Test
-    void 'tree building should success'() {
+    void 'tree building should succeed'() {
         // then
         assert root.output() == '''\
 a
@@ -44,7 +44,7 @@ a
     }
 
     @Test
-    void 'flattening a tree should success'() {
+    void 'flattening a tree should succeed'() {
         // when
         GolangDependencySet result = root.flatten()
         assert result.size() == 6

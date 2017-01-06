@@ -38,7 +38,7 @@ class DefaultNotationConverterTest extends MockInjectorSupport {
     }
 
     @Test
-    void 'converting a correct notation should success'() {
+    void 'converting a correct notation should succeed'() {
         // when
         converter.convert('root/package')
         // then
@@ -46,7 +46,7 @@ class DefaultNotationConverterTest extends MockInjectorSupport {
     }
 
     @Test
-    void 'converting notation with separator should success'() {
+    void 'converting notation with separator should succeed'() {
         // when
         converter.convert('root/package#1.0.0')
         // then

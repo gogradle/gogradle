@@ -15,7 +15,7 @@ class AbstractNotationDependencyTest {
     }
 
     @Test
-    void 'setting transitive should success'() {
+    void 'setting transitive should succeed'() {
         // when
         depedency.setTransitive(false)
         // then
@@ -24,7 +24,7 @@ class AbstractNotationDependencyTest {
     }
 
     @Test
-    void 'exclude some properties should success'() {
+    void 'exclude some properties should succeed'() {
         // given
         GolangDependency dependency = mock(GolangDependency)
         when(dependency.getName()).thenReturn('a')

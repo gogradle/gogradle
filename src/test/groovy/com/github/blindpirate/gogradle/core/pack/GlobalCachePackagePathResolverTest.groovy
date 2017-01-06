@@ -74,7 +74,7 @@ class GlobalCachePackagePathResolverTest {
     }
 
     @Test
-    void 'resolving root package name should success'() {
+    void 'resolving root package name should succeed'() {
         // when
         GolangPackage info = resolver.produce('github.com/a/b').get()
 
@@ -86,7 +86,7 @@ class GlobalCachePackagePathResolverTest {
     }
 
     @Test
-    void 'resolving sub package name should success'() {
+    void 'resolving sub package name should succeed'() {
         // when
         GolangPackage info = resolver.produce('github.com/a/b/c').get()
         // then

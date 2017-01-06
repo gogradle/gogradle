@@ -4,7 +4,7 @@ import org.junit.Test
 
 class StringUtilsTest {
     @Test
-    void 'splitting and trimming should success'() {
+    void 'splitting and trimming should succeed'() {
         assertEquals(' a b c \t\nd  ', ' ', ['a', 'b', 'c', 'd'])
         assertEquals(' a b c \t\nd  ', '', ['a', 'b', 'c', 'd'])
         assertEquals(' a = b= c \t=\nd  ', '=', ['a', 'b', 'c', 'd'])

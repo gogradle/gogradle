@@ -59,7 +59,7 @@ dependencies:
     }
 
     @Test
-    void 'reading from gogradle.lock should success'() {
+    void 'reading from gogradle.lock should succeed'() {
         // given
         prepareGogradleDotLock()
         // when
@@ -71,7 +71,7 @@ dependencies:
 
     @Test
     @WithResource('')
-    void 'reading other gogradle project\'s dependencies should success'() {
+    void 'reading other gogradle project\'s dependencies should succeed'() {
         // given
         prepareGogradleDotLock()
         // when
@@ -82,7 +82,7 @@ dependencies:
     }
 
     @Test
-    void 'writing to gogradle.lock should success'() {
+    void 'writing to gogradle.lock should succeed'() {
         // given
         when(dependency1.toLockedNotation()).thenReturn([name: 'a', version: 'v1'])
         when(dependency2.toLockedNotation()).thenReturn([name: 'b', version: 'v2'])

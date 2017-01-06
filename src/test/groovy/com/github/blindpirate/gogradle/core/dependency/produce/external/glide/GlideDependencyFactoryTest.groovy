@@ -34,7 +34,7 @@ testImports: []
 '''
 
     @Test
-    void 'parsing glide.lock should success'() {
+    void 'parsing glide.lock should succeed'() {
         // given
         prepareGlideDotLock(glideDotLock)
 

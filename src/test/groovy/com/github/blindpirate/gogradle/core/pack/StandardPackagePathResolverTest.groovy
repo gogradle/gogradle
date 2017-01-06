@@ -7,7 +7,7 @@ class StandardPackagePathResolverTest {
     StandardPackagePathResolver resolver = new StandardPackagePathResolver()
 
     @Test
-    void 'resolving first-level standard package should success'() {
+    void 'resolving first-level standard package should succeed'() {
         GolangPackage info = resolver.produce("fmt").get()
         assert info.isStandard()
         assert info.path == 'fmt'
@@ -15,7 +15,7 @@ class StandardPackagePathResolverTest {
     }
 
     @Test
-    void 'resolving second-level standard package should success'() {
+    void 'resolving second-level standard package should succeed'() {
         GolangPackage info = resolver.produce('archive/zip').get()
         assert info.isStandard()
         assert info.path == 'archive/zip'
@@ -23,7 +23,7 @@ class StandardPackagePathResolverTest {
     }
 
     @Test
-    void 'resolving third-level standard package should success'() {
+    void 'resolving third-level standard package should succeed'() {
         GolangPackage info = resolver.produce('net/http/cgi').get()
         assert info.isStandard()
         assert info.path == 'net/http/cgi'

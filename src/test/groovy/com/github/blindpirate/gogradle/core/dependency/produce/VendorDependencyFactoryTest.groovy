@@ -48,7 +48,7 @@ class VendorDependencyFactoryTest extends MockInjectorSupport {
     }
 
     @Test
-    void 'producing a vendor dependency should success'() {
+    void 'producing a vendor dependency should succeed'() {
         // given
         when(resolver.produce('root')).thenReturn(of(GolangPackage.INCOMPLETE))
         when(resolver.produce('root/package')).thenReturn(of(golangPackage))

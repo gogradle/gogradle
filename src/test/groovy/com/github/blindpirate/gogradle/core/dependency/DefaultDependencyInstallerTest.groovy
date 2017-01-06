@@ -38,7 +38,7 @@ class DefaultDependencyInstallerTest extends MockInjectorSupport {
     }
 
     @Test
-    void 'copying a dependency from global cache to project cache should success'() {
+    void 'copying a dependency from global cache to project cache should succeed'() {
         // when
         installer.installDependency(resolvedDependency)
         // then

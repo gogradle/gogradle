@@ -38,7 +38,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
             '''
 
     @Test
-    void 'reading vendor/manifest should success'() {
+    void 'reading vendor/manifest should succeed'() {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifest)
         // when

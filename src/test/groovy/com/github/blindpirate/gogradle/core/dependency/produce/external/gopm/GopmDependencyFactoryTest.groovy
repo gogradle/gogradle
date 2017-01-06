@@ -34,7 +34,7 @@ gopkg.in/redis.v2 = commit:e617904
 include = public|scripts|templates'''
 
     @Test
-    void 'parsing .gopmfile should success'() {
+    void 'parsing .gopmfile should succeed'() {
         // given
         IOUtils.write(resource, '.gopmfile', dotGopmfile)
         // when

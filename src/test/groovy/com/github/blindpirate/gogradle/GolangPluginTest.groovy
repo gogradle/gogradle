@@ -23,7 +23,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'smoke test should success'() {
+    void 'smoke test should succeed'() {
     }
 
     @Test
@@ -38,7 +38,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'adding a dependency to configuration should success'() {
+    void 'adding a dependency to configuration should succeed'() {
         project.dependencies {
             build 'github.com/a/b'
         }
@@ -50,7 +50,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'adding a dependency in form of map should success'() {
+    void 'adding a dependency in form of map should succeed'() {
         project.dependencies {
             build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: 'commitId', vcs: 'git'
         }
@@ -72,7 +72,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'adding some dependencies should success'() {
+    void 'adding some dependencies should succeed'() {
         project.dependencies {
             build 'github.com/a/b@1.0.0',
                     'github.com/c/d#2.0.0'
@@ -100,7 +100,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'adding a directory dependency should success'() {
+    void 'adding a directory dependency should succeed'() {
         project.dependencies {
             build name: 'github.com/a/b', dir: '${GOPATH}/a/b'
         }
@@ -111,7 +111,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'adding and configuring a directory dependency should success'() {
+    void 'adding and configuring a directory dependency should succeed'() {
         project.dependencies {
             build(name: 'github.com/a/b', dir: '${GOPATH}/a/b') {
                 transitive = false
@@ -125,7 +125,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'configuring a dependency should success'() {
+    void 'configuring a dependency should succeed'() {
         project.dependencies {
             build('github.com/a/b@1.0.0-RELEASE') {
                 transitive = true
@@ -149,7 +149,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'configuring via params should success'() {
+    void 'configuring via params should succeed'() {
         project.dependencies {
             build name: 'github.com/a/b', transitive: false
         }

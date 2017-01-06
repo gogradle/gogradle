@@ -44,7 +44,7 @@ class DefaultDependencyVisitorTest {
     }
 
     @Test
-    void 'visiting external dependencies should success'() {
+    void 'visiting external dependencies should succeed'() {
         // given:
         when(external1.produce(rootDir)).thenReturn(Optional.empty())
         when(external2.produce(rootDir)).thenReturn(Optional.of(dependencySet))
@@ -54,7 +54,7 @@ class DefaultDependencyVisitorTest {
     }
 
     @Test
-    void 'visiting source dependencies should success'() {
+    void 'visiting source dependencies should succeed'() {
         // given:
         when(sourceCodeDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(dependencySet)
         // then:
@@ -62,7 +62,7 @@ class DefaultDependencyVisitorTest {
     }
 
     @Test
-    void 'visiting vendor dependencies should success'() {
+    void 'visiting vendor dependencies should succeed'() {
         // given:
         when(vendorDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(GolangDependencySet.empty())
         // then:

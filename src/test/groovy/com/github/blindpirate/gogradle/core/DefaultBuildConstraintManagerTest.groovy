@@ -6,7 +6,7 @@ class DefaultBuildConstraintManagerTest {
     DefaultBuildConstraintManager manager = new DefaultBuildConstraintManager()
 
     @Test
-    void 'getting ctx should success'() {
+    void 'getting ctx should succeed'() {
         manager.getCtx()
     }
 }

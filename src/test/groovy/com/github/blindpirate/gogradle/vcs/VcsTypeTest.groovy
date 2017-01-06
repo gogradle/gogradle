@@ -7,7 +7,7 @@ import static com.github.blindpirate.gogradle.vcs.VcsType.*
 class VcsTypeTest {
 
     @Test
-    void 'get vcs type by name should success'() {
+    void 'get vcs type by name should succeed'() {
         assert of('git').get() == VcsType.Git
         assert of('hg').get() == VcsType.Mercurial
         assert of('svn').get() == VcsType.Svn

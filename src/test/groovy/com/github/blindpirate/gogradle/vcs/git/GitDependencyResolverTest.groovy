@@ -184,7 +184,7 @@ class GitDependencyResolverTest {
     }
 
     @Test
-    void 'resetting to a commit should success'() {
+    void 'resetting to a commit should succeed'() {
         // given
         when(notationDependency.getCommit()).thenReturn(revCommit.name)
         when(gitAccessor.findCommit(repository, revCommit.name)).thenReturn(of(revCommit))
@@ -223,7 +223,7 @@ class GitDependencyResolverTest {
     }
 
     @Test
-    void 'resetting a resolved dependency should success'() {
+    void 'resetting a resolved dependency should succeed'() {
         // given
         File globalCache = IOUtils.mkdir(resource, 'globalCache')
         File projectGopath = IOUtils.mkdir(resource, 'projectGopath')

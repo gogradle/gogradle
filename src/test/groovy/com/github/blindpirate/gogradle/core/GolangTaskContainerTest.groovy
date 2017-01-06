@@ -7,7 +7,7 @@ class GolangTaskContainerTest {
     GolangTaskContainer taskContainer = new GolangTaskContainer()
 
     @Test
-    void 'getting task instance after putting into container should success'() {
+    void 'getting task instance after putting into container should succeed'() {
         GolangTaskContainer.TASKS.each { name, clazz ->
             def mock = Mockito.mock(clazz)
             taskContainer.put(clazz, mock)

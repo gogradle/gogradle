@@ -27,7 +27,7 @@ class InstallDependenciesTaskTest extends TaskTest {
     }
 
     @Test
-    void 'installing dependencies should success'() {
+    void 'installing dependencies should succeed'() {
         // given
         when(golangTaskContainer.get(ResolveTask).getDependencyTree()).thenReturn(rootNode)
         ResolvedDependency resolvedDependency = mockResolvedDependency('notationDependency')

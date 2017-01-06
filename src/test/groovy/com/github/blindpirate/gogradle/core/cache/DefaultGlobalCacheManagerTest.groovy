@@ -44,7 +44,7 @@ class DefaultGlobalCacheManagerTest {
     }
 
     @Test
-    void "validation of global cache directory should success"() {
+    void "validation of global cache directory should succeed"() {
         // when
         cacheManager.ensureGlobalCacheExistAndWritable()
         // then

@@ -33,23 +33,23 @@ class GitAccessorTest {
     }
 
     @Test
-    void 'getting head commit of master branch should success'() {
+    void 'getting head commit of master branch should succeed'() {
         assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
 
     @Test
-    void 'getting remote urls of repository should success'() {
+    void 'getting remote urls of repository should succeed'() {
         assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
         assert gitAccessor.getRemoteUrls(resource).contains('https://github.com/blindpirate/test-for-gogradle.git')
     }
 
     @Test
-    void 'getting remote url of repository should success'() {
+    void 'getting remote url of repository should succeed'() {
         assert gitAccessor.getRemoteUrl(repository) == "https://github.com/blindpirate/test-for-gogradle.git"
     }
 
     @Test
-    void 'finding initial commit should success'() {
+    void 'finding initial commit should succeed'() {
         assert gitAccessor.findCommit(repository, INITIAL_COMMIT).isPresent()
     }
 
@@ -59,7 +59,7 @@ class GitAccessorTest {
     }
 
     @Test
-    void 'getting a tag should success'() {
+    void 'getting a tag should succeed'() {
         assert gitAccessor.findCommitByTag(repository, '1.0.0').get().name() == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
@@ -71,13 +71,13 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     @WithResource('')
-    void 'clone with https should success'() {
+    void 'clone with https should succeed'() {
         gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource)
         assert resource.toPath().resolve('.git').toFile().exists()
     }
 
     @Test
-    void 'reset to initial commit should success'() {
+    void 'reset to initial commit should succeed'() {
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
 
         gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
@@ -86,13 +86,13 @@ class GitAccessorTest {
     }
 
     @Test
-    void 'finding commit by sem version should success'() {
+    void 'finding commit by sem version should succeed'() {
         String commidId = gitAccessor.findCommitBySemVersion(repository, '1.0.0').get().name()
         assert commidId == 'ce46284fa7c4ff721e1c43346bf19919fa22d5b7'
     }
 
     @Test
-    void 'finding commid by sem version expression should success'() {
+    void 'finding commid by sem version expression should succeed'() {
         //3.0.0
         assert semVersionMatch('3.x', '4a06b73b6464f06d64efc53ae9b497f6b9a1ef4f')
         // NOT 1.0.0
@@ -109,7 +109,7 @@ class GitAccessorTest {
 
     @Test
     @AccessWeb
-    void 'git reset --hard HEAD && git pull should success'() {
+    void 'git reset --hard HEAD && git pull should succeed'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()
         gitAccessor.hardResetAndUpdate(repository)
 

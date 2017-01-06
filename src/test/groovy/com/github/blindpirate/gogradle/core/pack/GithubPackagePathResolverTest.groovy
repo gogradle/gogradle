@@ -9,7 +9,7 @@ class GithubPackagePathResolverTest {
     GithubPackagePathResolver resolver = new GithubPackagePathResolver()
 
     @Test
-    void 'resolving name should success'() {
+    void 'resolving name should succeed'() {
         // when
         GolangPackage result = resolver.produce('github.com/a/b').get()
 
@@ -19,7 +19,7 @@ class GithubPackagePathResolverTest {
     }
 
     @Test
-    void 'resolving an incomplete name should success'() {
+    void 'resolving an incomplete name should succeed'() {
         // when
         GolangPackage result = resolver.produce('github.com/a').get()
         // then
@@ -28,7 +28,7 @@ class GithubPackagePathResolverTest {
 
 
     @Test
-    void 'resolving a long name should success'() {
+    void 'resolving a long name should succeed'() {
         // when
         GolangPackage info = resolver.produce('github.com/a/b/c').get()
 
@@ -38,7 +38,7 @@ class GithubPackagePathResolverTest {
     }
 
     @Test
-    void 'resolving a long long name should success'() {
+    void 'resolving a long long name should succeed'() {
         // when
         String wtf = 'github.com/a/b/c/d/e/f/g/h/i/j/k/l/m/n/o/p/q/r/s/t/u/v/w/x/y/z'
         GolangPackage info = resolver.produce(wtf).get()

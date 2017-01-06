@@ -43,7 +43,7 @@ class ErrorReportingPackagePathResolverTest {
 
 
     @Test
-    void 'resolving a package should success'() {
+    void 'resolving a package should succeed'() {
         assert resolver.produce(packagePath).get() == packageInfo
     }
 

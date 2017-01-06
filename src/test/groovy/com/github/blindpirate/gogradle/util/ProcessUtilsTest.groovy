@@ -15,7 +15,7 @@ class ProcessUtilsTest {
     }
 
     @Test
-    void 'getting result of child process should success'() {
+    void 'getting result of child process should succeed'() {
         // when
         ProcessResult result = runProcessWithCurrentClasspath(Child, [], [:])
         // then

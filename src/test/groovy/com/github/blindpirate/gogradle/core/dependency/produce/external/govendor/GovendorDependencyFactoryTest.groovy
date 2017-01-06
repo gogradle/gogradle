@@ -39,7 +39,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
     }
 
     @Test
-    void 'reading vendor/vendor.json should success'() {
+    void 'reading vendor/vendor.json should succeed'() {
         // given
         prepareVendorDotJson(vendorDotJson)
         // when
