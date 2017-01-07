@@ -3,16 +3,20 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
-public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements DependencyResolver {
+public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements DependencyResolver, DependencyInstaller {
 
     @Inject
     private GlobalCacheManager globalCacheManager;
@@ -30,18 +34,43 @@ public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements Depend
     }
 
     @Override
-    public void reset(ResolvedDependency dependency, File targetDirectory) {
+    public void install(ResolvedDependency dependency, File targetDirectory) {
         try {
             globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
-                Path globalCachePath = globalCacheManager.getGlobalCachePath(dependency.getName());
-                doReset(dependency, globalCachePath);
-                IOUtils.copyDirectory(globalCachePath.toFile(), targetDirectory);
+                installUnderLock(dependency, targetDirectory);
                 return null;
             });
         } catch (Exception e) {
             throw DependencyInstallationException.cannotResetResolvedDependency(dependency, e);
         }
     }
+
+
+    private void installUnderLock(ResolvedDependency dependency, File targetDirectory) {
+        ResolvedDependency realDependency = determineDependency(dependency);
+        Path globalCachePath = globalCacheManager.getGlobalCachePath(realDependency.getName());
+        doReset(realDependency, globalCachePath);
+
+        Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
+        IOUtils.copyDirectory(srcPath.toFile(), targetDirectory);
+    }
+
+    private ResolvedDependency determineDependency(ResolvedDependency dependency) {
+        if (dependency instanceof VendorResolvedDependency) {
+            return Cast.cast(VendorResolvedDependency.class, dependency).getHostDependency();
+        } else {
+            return dependency;
+        }
+    }
+
+    private Path determineRelativePath(ResolvedDependency dependency) {
+        if (dependency instanceof VendorResolvedDependency) {
+            return Cast.cast(VendorResolvedDependency.class, dependency).getRelativePathToHost();
+        } else {
+            return Paths.get(".");
+        }
+    }
+
 
     protected abstract void doReset(ResolvedDependency dependency, Path globalCachePath);
 
