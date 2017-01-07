@@ -232,7 +232,7 @@ class GitDependencyResolverTest {
         when(resolvedDependency.getVersion()).thenReturn(revCommit.getName())
         when(gitAccessor.getRepository(globalCache)).thenReturn(repository)
         // when
-        resolver.reset(resolvedDependency, projectGopath)
+        resolver.install(resolvedDependency, projectGopath)
         // then
         verify(gitAccessor).resetToCommit(repository, revCommit.getName())
     }
@@ -242,6 +242,6 @@ class GitDependencyResolverTest {
         // given
         when(cacheManager.getGlobalCachePath(anyString())).thenThrow(new IllegalStateException())
         // then
-        resolver.reset(resolvedDependency, resource)
+        resolver.install(resolvedDependency, resource)
     }
 }
