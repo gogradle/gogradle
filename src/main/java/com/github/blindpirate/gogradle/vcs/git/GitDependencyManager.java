@@ -13,6 +13,7 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
@@ -35,6 +36,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     private final DependencyVisitor visitor;
 
+    @Inject
     public GitDependencyManager(GlobalCacheManager cacheManager, GitAccessor gitAccessor, DependencyVisitor visitor) {
         super(cacheManager);
         this.gitAccessor = gitAccessor;
