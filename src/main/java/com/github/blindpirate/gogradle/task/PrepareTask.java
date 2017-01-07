@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.task;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
-import com.google.inject.Injector;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
 
