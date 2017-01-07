@@ -50,7 +50,7 @@ abstract class TaskTest {
     }
 
     protected <T> T buildTask(Class<T> taskClass) {
-        T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
+        T ret = AbstractTask.injectIntoNewInstance(project, 'prepare', taskClass, { taskClass.newInstance() })
         injectTaskMembers(ret)
         return ret
     }

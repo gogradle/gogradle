@@ -14,8 +14,8 @@ import javax.inject.Inject;
  */
 public class PrepareTask extends DefaultTask {
 
-    //@Inject
-    private GoBinaryManager binaryManager;
+    @Inject
+    private GoBinaryManager goBinaryManager;
 
     @Inject
     private GlobalCacheManager globalCacheManager;
@@ -23,13 +23,8 @@ public class PrepareTask extends DefaultTask {
     @Inject
     private GolangPluginSetting setting;
 
-    @Inject
-    private Injector injector;
-
     @TaskAction
-    public void task() {
-        //make sure the go binary is properly installed
-//        binaryManager.binaryPath();
+    public void prepare() {
     }
 
 }
