@@ -57,7 +57,7 @@ class DefaultDependencyRegistryTest {
     }
 
     @Test
-    void 'first level dependency always win'() {
+    void 'first level dependency should always win'() {
         // given
         when(resolvedDependency1.getUpdateTime()).thenReturn(2L)
         when(resolvedDependency2.getUpdateTime()).thenReturn(1L)
@@ -70,4 +70,17 @@ class DefaultDependencyRegistryTest {
         // then
         assert registry.register(resolvedDependency2)
     }
+
+    @Test
+    void 'same dependency should not be put'() {
+        // given
+        when(resolvedDependency1.getUpdateTime()).thenReturn(1L)
+
+        // when
+        registry.register(resolvedDependency1)
+
+        // then
+        assert !registry.register(resolvedDependency1)
+    }
+
 }

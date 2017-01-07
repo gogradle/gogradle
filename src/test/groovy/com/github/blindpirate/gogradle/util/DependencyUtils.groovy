@@ -31,6 +31,7 @@ class DependencyUtils {
     static ResolvedDependency mockResolvedDependency(String name) {
         ResolvedDependency ret = mock(ResolvedDependency)
         when(ret.getName()).thenReturn(name)
+        when(ret.toString()).thenReturn(name)
         when(ret.resolve()).thenReturn(ret)
         return ret
     }

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.tree
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
 
@@ -16,12 +17,12 @@ class DependencyTreeNodeTest {
     void setUp() {
         root = node('a')
 
-        def _1 = node('b')
-        def _2 = node('c')
+        def _1 = node('b', 'b', true)
+        def _2 = node('c', 'c', false)
         def _3 = node('d')
 
         def _2_1 = node('e')
-        def _3_1 = node('f')
+        def _3_1 = node('f', 'f', true)
         def _3_2 = node('g')
 
         root.addChild(_1).addChild(_2).addChild(_3)
@@ -30,15 +31,15 @@ class DependencyTreeNodeTest {
     }
 
     @Test
-    void 'tree building should succeed'() {
+    void 'tree building whth check mark should succeed'() {
         // then
         assert root.output() == '''\
 a
-├── b √
-├── c √
+├── b -> b (*)
+├── c -> c
 │   └── e √
 └── d √
-    ├── f √
+    ├── f -> f (*)
     └── g √
 '''
     }
@@ -51,9 +52,15 @@ a
         assert ('b'..'g').intersect(result.collect({ it.name })) == ('b'..'g')
     }
 
+
+    DependencyTreeNode node(String originalName, String finalName, boolean star) {
+        ResolvedDependency original = DependencyUtils.mockResolvedDependency(originalName)
+        ResolvedDependency _final = DependencyUtils.mockResolvedDependency(finalName)
+        return DependencyTreeNode.withOrignalAndFinal(original, _final, star)
+    }
+
     DependencyTreeNode node(String name) {
-        ResolvedDependency dependency = mock(ResolvedDependency)
-        when(dependency.getName()).thenReturn(name)
-        return DependencyTreeNode.withOrignalAndFinal(dependency, dependency)
+        ResolvedDependency dependency = DependencyUtils.mockResolvedDependency(name)
+        return DependencyTreeNode.withOrignalAndFinal(dependency, dependency, false)
     }
 }

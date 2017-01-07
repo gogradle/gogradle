@@ -30,12 +30,12 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         return packages.get(name);
     }
 
-    private boolean existingDependencyIsOutOfDate(ResolvedDependency existingModule,
+    private boolean existingDependencyIsOutOfDate(ResolvedDependency existingDependency,
                                                   ResolvedDependency resolvedDependency) {
-        if (existingModule == null) {
+        if (existingDependency == null) {
             return true;
         }
-        return existingModule.getUpdateTime() < resolvedDependency.getUpdateTime();
+        return existingDependency.getUpdateTime() < resolvedDependency.getUpdateTime();
     }
 
     private boolean theyAreAllFirstLevel(ResolvedDependency existedModule, ResolvedDependency resolvedDependency) {

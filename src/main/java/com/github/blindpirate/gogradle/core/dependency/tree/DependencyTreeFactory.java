@@ -6,6 +6,8 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Resolve all dependencies including transitive ones of a package and build a tree.
@@ -17,18 +19,28 @@ public class DependencyTreeFactory {
     private DependencyRegistry registry;
 
     public DependencyTreeNode getTree(ResolvedDependency rootProject) {
+
         resolve(rootProject);
 
-        return getSubTree(rootProject);
+        return getSubTree(rootProject, new HashSet<>());
     }
 
-    private DependencyTreeNode getSubTree(ResolvedDependency resolvedDependency) {
+    private DependencyTreeNode getSubTree(ResolvedDependency resolvedDependency,
+                                          Set<ResolvedDependency> existedDependenciesInTree) {
+
         ResolvedDependency finalDependency = registry.retrive(resolvedDependency.getName());
 
-        DependencyTreeNode node = DependencyTreeNode.withOrignalAndFinal(resolvedDependency, finalDependency);
+        boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 
-        for (GolangDependency dependency : finalDependency.getDependencies()) {
-            node.addChild(getSubTree(dependency.resolve()));
+        DependencyTreeNode node = DependencyTreeNode.withOrignalAndFinal(resolvedDependency,
+                finalDependency,
+                hasExistedInTree);
+
+        if (!hasExistedInTree) {
+            existedDependenciesInTree.add(finalDependency);
+            for (GolangDependency dependency : finalDependency.getDependencies()) {
+                node.addChild(getSubTree(dependency.resolve(), existedDependenciesInTree));
+            }
         }
         return node;
     }

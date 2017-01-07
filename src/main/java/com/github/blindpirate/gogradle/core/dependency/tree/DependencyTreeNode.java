@@ -8,26 +8,22 @@ import java.util.List;
 
 public class DependencyTreeNode {
     private String name;
+    private boolean star;
     private ResolvedDependency originalDependency;
     private ResolvedDependency finalDependency;
     private List<DependencyTreeNode> children = new ArrayList<>();
 
-    private DependencyTreeNode(ResolvedDependency originalDependency, ResolvedDependency finalDependency) {
+    private DependencyTreeNode(ResolvedDependency originalDependency, ResolvedDependency finalDependency, boolean star) {
         this.originalDependency = originalDependency;
         this.finalDependency = finalDependency;
         this.name = originalDependency.getName();
+        this.star = star;
     }
 
-    public ResolvedDependency getOriginalDependency() {
-        return originalDependency;
-    }
-
-    public ResolvedDependency getFinalDependency() {
-        return finalDependency;
-    }
-
-    public static DependencyTreeNode withOrignalAndFinal(ResolvedDependency original, ResolvedDependency finalResult) {
-        return new DependencyTreeNode(original, finalResult);
+    public static DependencyTreeNode withOrignalAndFinal(ResolvedDependency original,
+                                                         ResolvedDependency finalResult,
+                                                         boolean star) {
+        return new DependencyTreeNode(original, finalResult, star);
     }
 
 
@@ -78,10 +74,14 @@ public class DependencyTreeNode {
         if (isRoot) {
             return name;
         } else if (originalDependency == finalDependency) {
-            return withCheckMark();
+            return withCheckMark() + star();
         } else {
-            return withArrow();
+            return withArrow() + star();
         }
+    }
+
+    private String star() {
+        return star ? " (*)" : "";
     }
 
     private String withArrow() {

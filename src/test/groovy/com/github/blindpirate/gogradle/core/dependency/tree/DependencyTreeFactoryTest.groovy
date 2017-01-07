@@ -12,6 +12,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -30,21 +31,21 @@ class DependencyTreeFactoryTest {
     @Mock
     ResolvedDependency a2
     @Mock
+    ResolvedDependency a3
+    @Mock
     ResolvedDependency b
     @Mock
     ResolvedDependency c
     @Mock
     ResolvedDependency d
 
-
     @Before
     void setUp() {
-        [a1, a2, b, c, d].each {
+        [rootProject, a1, a2, a3, b, c, d].each {
             when(it.resolve()).thenReturn(it)
             when(it.getDependencies()).thenReturn(GolangDependencySet.empty())
             when(registry.register(it)).thenReturn(true)
         }
-
 
         DependencyTreeNode.metaClass.getChildren = {
             return ReflectionUtils.getField(delegate, 'children')
@@ -67,15 +68,29 @@ class DependencyTreeFactoryTest {
     @Test
     void 'dependency conflict should be resolved'() {
         /*
-        └── a1
+        rootProject
             ├── a1 -> a2
             │   └── c
             └── b
                 └── a2
                     └── d
+                        └── a3 -> a2
+
+       the result is:
+
+       rootProject
+            ├── a2
+            │   └── d
+            │       └── a2 (*)
+            └── b
+                └── a2 (*)
          */
         // given
+        // a2 is newer than a1 and a3
         when(a1.getName()).thenReturn('a')
+        when(a3.getName()).thenReturn('a')
+        when(registry.register(a3)).thenReturn(false)
+
         bind(rootProject, 'rootProject')
         bind(a2, 'a')
         bind(b, 'b')
@@ -86,12 +101,14 @@ class DependencyTreeFactoryTest {
         bindDependencies(a1, c)
         bindDependencies(b, a2)
         bindDependencies(a2, d)
+        bindDependencies(d, a3)
         // when
         DependencyTreeNode rootNode = factory.getTree(rootProject)
         // then
         assertChildrenOfNodeAre(rootNode, a2, b)
-        assertChildrenOfNodeAre(rootNode.getChildren()[0], d)
-        assertChildrenOfNodeAre(rootNode.getChildren()[1], a2)
+        assertChildrenOfNodeAre(rootNode.children[0], d)
+        assertChildrenOfNodeAre(rootNode.children[1], a2)
+        assertChildrenOfNodeAre(rootNode.children[0].children[0], a2)
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {
