@@ -38,7 +38,7 @@ public final class DependencyResolutionException extends GradleException {
     }
 
     public static DependencyResolutionException cannotResetToCommit(String commitId, GitAPIException e) {
-        return new DependencyResolutionException("Cannot reset to specified commit:" + commitId, e);
+        return new DependencyResolutionException("Cannot install to specified commit:" + commitId, e);
     }
 
     public static DependencyResolutionException cannotParseGodepsDotJson(ResolvedDependency module, IOException e) {

@@ -13,7 +13,7 @@ public class DependencyInstallationException extends RuntimeException {
 
     public static DependencyInstallationException cannotResetResolvedDependency(ResolvedDependency dependency,
                                                                                 Exception e) {
-        return new DependencyInstallationException("Cannot reset dependency: " + dependency, e);
+        return new DependencyInstallationException("Cannot install dependency: " + dependency, e);
     }
 
 }
