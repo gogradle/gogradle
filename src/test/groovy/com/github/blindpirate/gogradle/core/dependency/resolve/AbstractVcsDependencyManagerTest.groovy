@@ -25,7 +25,7 @@ import static org.mockito.Mockito.when
 @WithResource('')
 class AbstractVcsDependencyManagerTest {
 
-    public static Answer callCallableAnswer = new Answer() {
+    public static final Answer callCallableAnswer = new Answer() {
         @Override
         Object answer(InvocationOnMock invocation) throws Throwable {
             return invocation.getArgument(1).call()
