@@ -122,6 +122,10 @@ public class IOUtils {
         }
     }
 
+    public static boolean isValidDirectory(File dir) {
+        return dir.isDirectory() && dir.exists();
+    }
+
     public static String toString(InputStream inputStream) {
         try {
             return org.apache.commons.io.IOUtils.toString(inputStream, DEFAULT_CHARSET);
