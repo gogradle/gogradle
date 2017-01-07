@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -47,7 +46,7 @@ public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCo
     }
 
     @Override
-    protected AbstractResolvedDependency createResolvedDependency(NotationDependency dependency,
+    protected GitResolvedDependency createResolvedDependency(NotationDependency dependency,
                                                                   File directory,
                                                                   Repository repository,
                                                                   RevCommit commit) {
