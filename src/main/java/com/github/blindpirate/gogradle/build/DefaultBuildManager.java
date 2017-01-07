@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.build;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
@@ -18,7 +17,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static java.util.Arrays.asList;
@@ -58,8 +56,7 @@ public class DefaultBuildManager implements BuildManager {
         Path targetLocation = ensureProjectGopathWritable().resolve(dependency.getName());
         forceMkdir(targetLocation.toFile());
 
-        DependencyResolver resolver = INJECTOR_INSTANCE.getInstance(dependency.getResolverClass());
-        resolver.reset(dependency, targetLocation.toFile());
+        dependency.installTo(targetLocation.toFile());
     }
 
     private Path ensureProjectGopathWritable() {

@@ -1,5 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.InjectionHelper;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+
+import java.io.File;
 import java.util.stream.Collectors;
 
 /**
@@ -43,5 +47,12 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
                 .filter(super::shouldNotBeExcluded)
                 .collect(Collectors.toCollection(GolangDependencySet::new));
     }
+
+    @Override
+    public void installTo(File targetDirectory) {
+        InjectionHelper.INJECTOR_INSTANCE.getInstance(getInstallerClass()).install(this, targetDirectory);
+    }
+
+    protected abstract Class<? extends DependencyInstaller> getInstallerClass();
 
 }

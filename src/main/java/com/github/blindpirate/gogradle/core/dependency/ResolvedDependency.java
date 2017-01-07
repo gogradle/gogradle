@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
-
+import java.io.File;
 import java.util.Map;
 
 public interface ResolvedDependency extends GolangDependency {
@@ -16,14 +15,18 @@ public interface ResolvedDependency extends GolangDependency {
     long getUpdateTime();
 
     /**
-     * Get transitive dependencies of this package .
+     * Get transitive dependencies of this package.
      *
      * @return the transitive dependencies
      */
     GolangDependencySet getDependencies();
 
-
     Map<String, Object> toLockedNotation();
 
-    Class<? extends DependencyResolver> getResolverClass();
+    void installTo(File targetDirectory);
+
+    @Override
+    default ResolvedDependency resolve() {
+        return this;
+    }
 }

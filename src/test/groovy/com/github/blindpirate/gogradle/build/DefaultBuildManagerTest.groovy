@@ -81,13 +81,11 @@ fi
     void 'copying a dependency from global cache to project cache should succeed'() {
         // given
         when(resolvedDependency.getName()).thenReturn('root/package')
-        when(resolvedDependency.getResolverClass()).thenReturn(GitDependencyResolver)
-        when(injector.getInstance(GitDependencyResolver)).thenReturn(resolver)
         // when
         manager.installDependency(resolvedDependency)
         // then
         Path gopath = resource.toPath().resolve('.gogradle/build_gopath/root/package')
         assert gopath.toFile().exists()
-        verify(resolver).reset(resolvedDependency, gopath.toFile())
+        verify(resolvedDependency).installTo(gopath.toFile())
     }
 }
