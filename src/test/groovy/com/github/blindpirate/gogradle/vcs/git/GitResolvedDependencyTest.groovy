@@ -51,4 +51,9 @@ class GitResolvedDependencyTest {
         GitResolvedDependency dependency = newResolvedDependency()
         assert DependencyUtils.getExclusionSpecs(dependency).contains(exclusionSpec)
     }
+
+    @Test
+    void 'getInstallerClass() should succeed'() {
+        assert newResolvedDependency().installerClass == GitDependencyManager
+    }
 }

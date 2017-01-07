@@ -13,7 +13,9 @@ public class DependencyTreeNode {
     private ResolvedDependency finalDependency;
     private List<DependencyTreeNode> children = new ArrayList<>();
 
-    private DependencyTreeNode(ResolvedDependency originalDependency, ResolvedDependency finalDependency, boolean star) {
+    private DependencyTreeNode(ResolvedDependency originalDependency,
+                               ResolvedDependency finalDependency,
+                               boolean star) {
         this.originalDependency = originalDependency;
         this.finalDependency = finalDependency;
         this.name = originalDependency.getName();
