@@ -16,7 +16,7 @@ class ArchTest {
             String arch = System.getProperty('os.arch')
             try {
                 System.setProperty('os.arch', 'invalid arch')
-                ReflectionUtils.setStaticFinalField(Arch.I386, 'hostArch', null)
+                ReflectionUtils.setStaticFinalField(Arch, 'hostArch', null)
                 Arch.getHostArch()
             } finally {
                 System.setProperty('os.arch', arch)
