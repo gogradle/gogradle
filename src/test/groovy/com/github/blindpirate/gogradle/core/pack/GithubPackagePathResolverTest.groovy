@@ -48,6 +48,11 @@ class GithubPackagePathResolverTest {
         assertVcsTypeUrlsAndRootPath(info)
     }
 
+    @Test
+    void 'empty result should be returned if it does not host on github'() {
+        assert !resolver.produce('golang.org/x/tool').isPresent()
+    }
+
     void assertVcsTypeUrlsAndRootPath(GolangPackage info) {
         assert info.vcsType == VcsType.GIT
         assert info.vcsType == VcsType.GIT
