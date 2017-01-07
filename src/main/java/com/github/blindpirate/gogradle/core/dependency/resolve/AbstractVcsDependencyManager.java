@@ -10,7 +10,6 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
-import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -19,8 +18,11 @@ import java.util.Optional;
 public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         implements DependencyResolver, DependencyInstaller {
 
-    @Inject
-    private GlobalCacheManager globalCacheManager;
+    private final GlobalCacheManager globalCacheManager;
+
+    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
+        this.globalCacheManager = cacheManager;
+    }
 
     @Override
     public ResolvedDependency resolve(final NotationDependency dependency) {

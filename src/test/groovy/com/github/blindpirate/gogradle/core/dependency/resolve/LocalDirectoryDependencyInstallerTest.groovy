@@ -2,12 +2,16 @@ package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.util.IOUtils
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+
+import java.nio.file.Paths
 
 import static org.mockito.Mockito.when
 
@@ -21,19 +25,37 @@ class LocalDirectoryDependencyInstallerTest {
 
     @Mock
     LocalDirectoryDependency dependency
+    @Mock
+    VendorResolvedDependency vendorResolvedDependency
 
+    File src
+    File dest
+
+    @Before
+    void setUp() {
+        src = IOUtils.mkdir(resource, 'src')
+        dest = IOUtils.mkdir(resource, 'dest')
+        when(dependency.getRootDir()).thenReturn(src)
+    }
 
     @Test
-    void 'resetting should succeed'() {
+    void 'installing a local dependency should succeed'() {
         // given
-        File src = IOUtils.mkdir(resource, 'src')
-        File dest = IOUtils.mkdir(resource, 'dest')
-
-        when(dependency.getRootDir()).thenReturn(src)
         IOUtils.write(src, 'main.go', 'This is main.go')
         // when
         installer.install(dependency, dest)
         // then
+        assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
+    }
+
+    @Test
+    void 'installing a dependency hosting in local dependency should succeed'() {
+        // given
+        when(vendorResolvedDependency.getHostDependency()).thenReturn(dependency)
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
+        IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
+        // when
+        installer.install(vendorResolvedDependency, dest)
         assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
     }
 }

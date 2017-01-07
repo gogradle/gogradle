@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -12,7 +13,6 @@ import org.eclipse.jgit.revwalk.RevCommit;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
@@ -31,11 +31,15 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     public static final String DEFAULT_BRANCH = "master";
     private static final Logger LOGGER = Logging.getLogger(GitDependencyManager.class);
 
-    @Inject
-    private GitAccessor gitAccessor;
+    private final GitAccessor gitAccessor;
 
-    @Inject
-    private DependencyVisitor visitor;
+    private final DependencyVisitor visitor;
+
+    public GitDependencyManager(GlobalCacheManager cacheManager, GitAccessor gitAccessor, DependencyVisitor visitor) {
+        super(cacheManager);
+        this.gitAccessor = gitAccessor;
+        this.visitor = visitor;
+    }
 
     @Override
     protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
@@ -47,9 +51,9 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     @Override
     protected GitResolvedDependency createResolvedDependency(NotationDependency dependency,
-                                                                  File directory,
-                                                                  Repository repository,
-                                                                  RevCommit commit) {
+                                                             File directory,
+                                                             Repository repository,
+                                                             RevCommit commit) {
 
         GitResolvedDependency ret = GitResolvedDependency.builder()
                 .withNotationDependency(dependency)

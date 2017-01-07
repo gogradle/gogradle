@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.InjectionHelper
+import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
@@ -12,21 +12,18 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.Dependen
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 
 import java.util.concurrent.Callable
 
-import static com.github.blindpirate.gogradle.vcs.git.GitDependencyManager.DEFAULT_BRANCH
+import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.callCallableAnswer
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockWithName
+import static com.github.blindpirate.gogradle.vcs.git.GitDependencyManager.DEFAULT_BRANCH
 import static java.util.Optional.empty
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
@@ -35,10 +32,11 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class GitDependencyManagerTest {
+class GitDependencyManagerTest extends MockInjectorSupport {
 
     GitNotationDependency notationDependency = mockWithName(GitNotationDependency, 'name')
     GitResolvedDependency resolvedDependency = mockWithName(GitResolvedDependency, 'name')
+
     @Mock
     GlobalCacheManager cacheManager
     @Mock
@@ -46,12 +44,10 @@ class GitDependencyManagerTest {
     @Mock
     Repository repository
     @Mock
-    Injector injector
-    @Mock
     GolangDependencySet dependencySet
     @Mock
     DependencyProduceStrategy strategy
-    @InjectMocks
+
     GitDependencyManager gitDependencyManager
     // this is a fake commit. We cannot mock RevCommit directly because RevCommit.getName() is final
     RevCommit revCommit = RevCommit.parse([48] * 64 as byte[])
@@ -60,6 +56,9 @@ class GitDependencyManagerTest {
 
     @Before
     void setUp() {
+        gitDependencyManager = new GitDependencyManager(cacheManager, gitAccessor, null)
+
+        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalCachePath(anyString())).thenReturn(resource.toPath())
         when(gitAccessor.getRepository(resource)).thenReturn(repository)
         when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
@@ -70,16 +69,6 @@ class GitDependencyManagerTest {
         when(notationDependency.getStrategy()).thenReturn(strategy)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor)))
                 .thenReturn(GolangDependencySet.empty())
-
-        InjectionHelper.INJECTOR_INSTANCE = injector
-
-        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable)))
-                .thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocationOnMock) throws Throwable {
-                invocationOnMock.arguments[1].call()
-            }
-        })
     }
 
     // TODO we need an integration test to test
@@ -224,7 +213,7 @@ class GitDependencyManagerTest {
     }
 
     @Test
-    void 'resetting a resolved dependency should succeed'() {
+    void 'installing a resolved dependency should succeed'() {
         // given
         File globalCache = IOUtils.mkdir(resource, 'globalCache')
         File projectGopath = IOUtils.mkdir(resource, 'projectGopath')
@@ -238,10 +227,11 @@ class GitDependencyManagerTest {
     }
 
     @Test(expected = DependencyInstallationException)
-    void 'exception in reset process should be wrapped'() {
+    void 'exception in install process should be wrapped'() {
         // given
         when(cacheManager.getGlobalCachePath(anyString())).thenThrow(new IllegalStateException())
         // then
         gitDependencyManager.install(resolvedDependency, resource)
     }
+
 }
