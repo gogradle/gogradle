@@ -12,8 +12,15 @@ class ArchTest {
 
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when auto-detected fails'() {
-        ReflectionUtils.setStaticFinalField(Arch.I386, 'ARCH_DETECTION_MAP', [:])
-        ReflectionUtils.setStaticFinalField(Arch.I386, 'hostArch', null)
-        Arch.getHostArch()
+        synchronized (Arch) {
+            String arch = System.getProperty('os.arch')
+            try {
+                System.setProperty('os.arch', 'invalid arch')
+                ReflectionUtils.setStaticFinalField(Arch.I386, 'hostArch', null)
+                Arch.getHostArch()
+            } finally {
+                System.setProperty('os.arch', arch)
+            }
+        }
     }
 }

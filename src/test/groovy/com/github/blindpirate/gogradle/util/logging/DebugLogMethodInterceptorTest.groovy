@@ -65,7 +65,7 @@ class DebugLogMethodInterceptorTest {
     @Before
     void setUp() {
         when(logger.isDebugEnabled()).thenReturn(true)
-        ReflectionUtils.setStaticFinalField(new DebugLogMethodInterceptor(), 'LOGGER', logger)
+        ReflectionUtils.setStaticFinalField(DebugLogMethodInterceptor, 'LOGGER', logger)
     }
 
     void verifyDebugLogTwoTimes() {

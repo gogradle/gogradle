@@ -22,21 +22,26 @@ class ReflectionUtils {
                 .getValueIncludingSuperclasses(field, target)
     }
 
-    static void setStaticFinalField(Object object, String fieldName, Object value) {
+    // WARNING: do not set a static final field after getting it first
+    // it will cause issues
+    static void setStaticFinalField(Class targetClass, String fieldName, Object value) {
         Field field = org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
-                .getFieldByNameIncludingSuperclasses(fieldName, object.getClass())
-
+                .getFieldByNameIncludingSuperclasses(fieldName, targetClass)
         field.setAccessible(true)
         Field modifiersField = Field.class.getDeclaredField('modifiers')
         modifiersField.setAccessible(true)
         modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
-        field.set(object, value)
+        field.set(null, value)
     }
 
     static Object getStaticField(Class target, String fieldName) {
-        Field field = target.getField(fieldName)
+        Field field = org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
+                .getFieldByNameIncludingSuperclasses(fieldName, target)
+
+        // Field.get() has side effect since it will cache FieldAccessor in overrideFieldAccessor
         field.setAccessible(true)
-        return field.get(null)
+        Object result = field.get(null)
+        return result
     }
 
     static boolean allFieldsEquals(Object actual, Object expected, List<String> fieldNames) {
