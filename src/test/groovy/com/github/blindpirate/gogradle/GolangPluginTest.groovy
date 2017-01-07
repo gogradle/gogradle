@@ -1,15 +1,15 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.InjectionHelper
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryNotationDependency
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.*
-import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.PropertiesExclusionSpec
+import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
 
 @RunWith(GogradleRunner)
 @WithProject
@@ -102,24 +102,24 @@ class GolangPluginTest {
     @Test
     void 'adding a directory dependency should succeed'() {
         project.dependencies {
-            build name: 'github.com/a/b', dir: '${GOPATH}/a/b'
+            build name: 'github.com/a/b', dir: project.rootDir.absolutePath
         }
 
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
-        assert dependency instanceof LocalDirectoryNotationDependency
+        assert dependency instanceof LocalDirectoryDependency
     }
 
     @Test
     void 'adding and configuring a directory dependency should succeed'() {
         project.dependencies {
-            build(name: 'github.com/a/b', dir: '${GOPATH}/a/b') {
+            build(name: 'github.com/a/b', dir: project.rootDir.absolutePath) {
                 transitive = false
             }
         }
 
         def dependency = findFirstInDependencies()
-        assert dependency instanceof LocalDirectoryNotationDependency
+        assert dependency instanceof LocalDirectoryDependency
         assert !getExclusionSpecs(dependency).isEmpty()
 
     }
