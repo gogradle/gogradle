@@ -57,7 +57,7 @@ class VendorDependencyResolverTest {
 //        File dest = IOUtils.mkdir(resource, 'dest')
 //        IOUtils.write(src, 'main.go', 'This is main.go')
 //        // when
-//        resolver.reset(vendorResolvedDependency, dest)
+//        gitDependencyManager.reset(vendorResolvedDependency, dest)
 //        // then
 //        assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
 //    }

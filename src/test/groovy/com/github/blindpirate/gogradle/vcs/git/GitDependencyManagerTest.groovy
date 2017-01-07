@@ -25,8 +25,8 @@ import org.mockito.stubbing.Answer
 
 import java.util.concurrent.Callable
 
+import static com.github.blindpirate.gogradle.vcs.git.GitDependencyManager.DEFAULT_BRANCH
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockWithName
-import static com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver.DEFAULT_BRANCH
 import static java.util.Optional.empty
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
@@ -35,7 +35,7 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class GitDependencyResolverTest {
+class GitDependencyManagerTest {
 
     GitNotationDependency notationDependency = mockWithName(GitNotationDependency, 'name')
     GitResolvedDependency resolvedDependency = mockWithName(GitResolvedDependency, 'name')
@@ -52,7 +52,7 @@ class GitDependencyResolverTest {
     @Mock
     DependencyProduceStrategy strategy
     @InjectMocks
-    GitDependencyResolver resolver
+    GitDependencyManager gitDependencyManager
     // this is a fake commit. We cannot mock RevCommit directly because RevCommit.getName() is final
     RevCommit revCommit = RevCommit.parse([48] * 64 as byte[])
 
@@ -83,14 +83,14 @@ class GitDependencyResolverTest {
     }
 
     // TODO we need an integration test to test
-    // both GitDependencyResolver and GitAccessor
+    // both GitDependencyDependencyManager and GitAccessor
 
     @Test
     void 'nonexistent repo should be cloned when user specify a url'() {
         // given:
         when(notationDependency.getUrl()).thenReturn("url")
         // when:
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then:
         verify(gitAccessor).cloneWithUrl('url', resource)
     }
@@ -101,7 +101,7 @@ class GitDependencyResolverTest {
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
         when(gitAccessor.cloneWithUrl('url1', resource)).thenThrow(new IllegalStateException())
         // when:
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then:
         verify(gitAccessor).cloneWithUrl('url2', resource)
     }
@@ -111,7 +111,7 @@ class GitDependencyResolverTest {
         // given:
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
         // when:
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then:
         verify(gitAccessor, times(0)).cloneWithUrl('url2', resource)
     }
@@ -124,7 +124,7 @@ class GitDependencyResolverTest {
         when(gitAccessor.getRemoteUrls(repository)).thenReturn(['url'] as Set)
         when(notationDependency.getUrl()).thenReturn('url')
         // when:
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then:
         verify(gitAccessor).hardResetAndUpdate(repository)
     }
@@ -135,7 +135,7 @@ class GitDependencyResolverTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(gitAccessor.findCommitByTag(repository, 'tag')).thenReturn(of(revCommit))
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then
         verify(gitAccessor).resetToCommit(repository, revCommit.getName())
     }
@@ -147,7 +147,7 @@ class GitDependencyResolverTest {
         when(gitAccessor.findCommitByTag(repository, 'semversion')).thenReturn(empty())
         when(gitAccessor.findCommitBySemVersion(repository, 'semversion')).thenReturn(of(revCommit))
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then
         verify(gitAccessor).resetToCommit(repository, revCommit.getName())
     }
@@ -157,7 +157,7 @@ class GitDependencyResolverTest {
         // given
         when(notationDependency.getTag()).thenReturn('tag')
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then
         verify(gitAccessor).headCommitOfBranch(repository, 'master')
     }
@@ -167,7 +167,7 @@ class GitDependencyResolverTest {
         // given
         when(notationDependency.getCommit()).thenReturn(GitNotationDependency.NEWEST_COMMIT)
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then
         verify(gitAccessor).headCommitOfBranch(repository, 'master')
     }
@@ -181,7 +181,7 @@ class GitDependencyResolverTest {
         }
 
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
     }
 
     @Test
@@ -190,7 +190,7 @@ class GitDependencyResolverTest {
         when(notationDependency.getCommit()).thenReturn(revCommit.name)
         when(gitAccessor.findCommit(repository, revCommit.name)).thenReturn(of(revCommit))
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
         // then
         verify(gitAccessor).resetToCommit(repository, revCommit.name)
     }
@@ -201,7 +201,7 @@ class GitDependencyResolverTest {
         revCommit = RevCommit.parse([48] * 64 as byte[])
         when(notationDependency.getCommit()).thenReturn(revCommit.name)
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -210,7 +210,7 @@ class GitDependencyResolverTest {
         when(cacheManager.runWithGlobalCacheLock(any(GitNotationDependency), any(Callable)))
                 .thenThrow(new IOException())
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -220,7 +220,7 @@ class GitDependencyResolverTest {
         IOUtils.write(resource, 'some file', 'file content')
 
         // when
-        resolver.resolve(notationDependency)
+        gitDependencyManager.resolve(notationDependency)
     }
 
     @Test
@@ -232,7 +232,7 @@ class GitDependencyResolverTest {
         when(resolvedDependency.getVersion()).thenReturn(revCommit.getName())
         when(gitAccessor.getRepository(globalCache)).thenReturn(repository)
         // when
-        resolver.install(resolvedDependency, projectGopath)
+        gitDependencyManager.install(resolvedDependency, projectGopath)
         // then
         verify(gitAccessor).resetToCommit(repository, revCommit.getName())
     }
@@ -242,6 +242,6 @@ class GitDependencyResolverTest {
         // given
         when(cacheManager.getGlobalCachePath(anyString())).thenThrow(new IllegalStateException())
         // then
-        resolver.install(resolvedDependency, resource)
+        gitDependencyManager.install(resolvedDependency, resource)
     }
 }

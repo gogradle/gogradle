@@ -9,7 +9,7 @@ import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.vcs.git.GitDependencyResolver
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
@@ -39,7 +39,7 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     @Mock
     ResolvedDependency resolvedDependency
     @Mock
-    GitDependencyResolver resolver
+    GitDependencyManager gitDependencyManager
 
     String mockGoBin = '''\
 #!/usr/bin/env sh

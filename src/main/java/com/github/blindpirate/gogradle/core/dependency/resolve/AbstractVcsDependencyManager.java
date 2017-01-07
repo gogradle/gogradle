@@ -16,7 +16,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-public abstract class AbstractVcsResolver<REPOSITORY, VERSION> implements DependencyResolver, DependencyInstaller {
+public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
+        implements DependencyResolver, DependencyInstaller {
 
     @Inject
     private GlobalCacheManager globalCacheManager;

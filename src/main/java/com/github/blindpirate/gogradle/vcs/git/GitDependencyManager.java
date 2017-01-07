@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
-import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsResolver;
+import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Cast;
 import org.eclipse.jgit.lib.Repository;
@@ -26,10 +26,10 @@ import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.NEWEST_COMMIT;
 
 @Singleton
-public class GitDependencyResolver extends AbstractVcsResolver<Repository, RevCommit> {
+public class GitDependencyManager extends AbstractVcsDependencyManager<Repository, RevCommit> {
 
     public static final String DEFAULT_BRANCH = "master";
-    private static final Logger LOGGER = Logging.getLogger(GitDependencyResolver.class);
+    private static final Logger LOGGER = Logging.getLogger(GitDependencyManager.class);
 
     @Inject
     private GitAccessor gitAccessor;

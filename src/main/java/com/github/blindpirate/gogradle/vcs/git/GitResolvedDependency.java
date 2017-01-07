@@ -22,7 +22,7 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     protected Class<? extends DependencyInstaller> getInstallerClass() {
-        return GitDependencyResolver.class;
+        return GitDependencyManager.class;
     }
 
     @Override

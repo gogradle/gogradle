@@ -66,7 +66,7 @@ public class GitNotationDependency extends AbstractNotationDependency {
 
     @Override
     public Class<? extends DependencyResolver> getResolverClass() {
-        return GitDependencyResolver.class;
+        return GitDependencyManager.class;
     }
 
 
