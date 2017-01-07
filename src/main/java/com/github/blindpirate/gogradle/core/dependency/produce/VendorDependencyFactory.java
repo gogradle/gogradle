@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -15,7 +16,7 @@ import java.nio.file.Path;
 
 /**
  * A {@link VendorDependencyFactory is a factory that reads vendor directory and resolves them to
- * {@link com.github.blindpirate.gogradle.core.dependency.VendorDependency }
+ * {@link VendorResolvedDependency }
  */
 @Singleton
 public class VendorDependencyFactory {

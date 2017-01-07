@@ -7,8 +7,7 @@ import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorDependency
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
@@ -20,7 +19,6 @@ import org.mockito.Mock
 
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
-import static org.mockito.Mockito.calls
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -61,7 +59,7 @@ class VendorDependencyFactoryTest extends MockInjectorSupport {
         GolangDependencySet set = factory.produce(resolvedDependency, resource)
         // then
         GolangDependency dependency = set.first()
-        assert dependency instanceof VendorDependency
+        assert dependency instanceof VendorResolvedDependency
         assert ReflectionUtils.getField(dependency, 'hostDependency').is(resolvedDependency)
         assert ReflectionUtils.getField(dependency, 'relativePathToHost').toString() == 'vendor/root/package'
     }

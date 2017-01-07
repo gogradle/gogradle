@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.VendorDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -66,6 +66,6 @@ public class VendorDirectoryVisitor extends SimpleFileVisitor<Path> {
 
 
     private GolangDependency createDependency(String packagePath, Path rootPath) {
-        return VendorDependency.basedOnParent(packagePath, parent, rootPath.toFile());
+        return VendorResolvedDependency.fromParent(packagePath, parent, rootPath.toFile());
     }
 }

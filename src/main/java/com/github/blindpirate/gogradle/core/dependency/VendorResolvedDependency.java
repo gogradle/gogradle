@@ -1,8 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.InjectionHelper;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import com.github.blindpirate.gogradle.util.Cast;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -14,17 +15,17 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_ONLY_PRODUCE_STRATEGY;
 import static com.github.blindpirate.gogradle.util.Cast.cast;
 
-public class VendorDependency extends AbstractResolvedDependency {
+public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     private ResolvedDependency hostDependency;
 
     private Path relativePathToHost;
 
-    public static VendorDependency basedOnParent(String name,
-                                                 ResolvedDependency parent,
-                                                 File rootDir) {
+    public static VendorResolvedDependency fromParent(String name,
+                                                      ResolvedDependency parent,
+                                                      File rootDir) {
         ResolvedDependency hostDependency = determineHostDependency(parent);
-        VendorDependency ret = new VendorDependency(name,
+        VendorResolvedDependency ret = new VendorResolvedDependency(name,
                 hostDependency.getVersion(),
                 hostDependency.getUpdateTime(),
                 hostDependency,
@@ -36,11 +37,21 @@ public class VendorDependency extends AbstractResolvedDependency {
         return ret;
     }
 
-    private VendorDependency(String name,
-                             String version,
-                             long updateTime,
-                             ResolvedDependency hostDependency,
-                             Path relativePathToHost) {
+    public static VendorResolvedDependency fromHost(String name,
+                                                    ResolvedDependency hostDependency,
+                                                    String relativePathToHost) {
+        return new VendorResolvedDependency(name,
+                hostDependency.getVersion(),
+                hostDependency.getUpdateTime(),
+                hostDependency,
+                Paths.get(relativePathToHost));
+    }
+
+    private VendorResolvedDependency(String name,
+                                     String version,
+                                     long updateTime,
+                                     ResolvedDependency hostDependency,
+                                     Path relativePathToHost) {
         super(name, version, updateTime);
 
         this.hostDependency = hostDependency;
@@ -48,26 +59,38 @@ public class VendorDependency extends AbstractResolvedDependency {
     }
 
     private static Path caculateRootPathToHost(ResolvedDependency parent, String packagePath) {
-        if (parent instanceof VendorDependency) {
-            VendorDependency parentVendorDependency = (VendorDependency) parent;
-            return parentVendorDependency.relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
+        if (parent instanceof VendorResolvedDependency) {
+            VendorResolvedDependency parentVendorResolvedDependency = (VendorResolvedDependency) parent;
+            return parentVendorResolvedDependency.relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
         } else {
             return Paths.get(VENDOR_DIRECTORY).resolve(packagePath);
         }
     }
 
     private static ResolvedDependency determineHostDependency(ResolvedDependency parent) {
-        if (parent instanceof VendorDependency) {
-            return cast(VendorDependency.class, parent).hostDependency;
+        if (parent instanceof VendorResolvedDependency) {
+            return cast(VendorResolvedDependency.class, parent).hostDependency;
         } else {
             return parent;
         }
     }
 
+    public ResolvedDependency getHostDependency() {
+        return hostDependency;
+    }
+
+    public Path getRelativePathToHost() {
+        return relativePathToHost;
+    }
 
     @Override
     public ResolvedDependency resolve() {
         return this;
+    }
+
+    @Override
+    protected Class<? extends DependencyInstaller> getInstallerClass() {
+        return Cast.cast(AbstractResolvedDependency.class, hostDependency).getInstallerClass();
     }
 
     @Override
@@ -77,8 +100,4 @@ public class VendorDependency extends AbstractResolvedDependency {
         return ret;
     }
 
-    @Override
-    public Class<? extends DependencyResolver> getResolverClass() {
-        return null;
-    }
 }
