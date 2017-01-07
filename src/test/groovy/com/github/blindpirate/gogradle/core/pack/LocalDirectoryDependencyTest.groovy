@@ -2,19 +2,26 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.MockInjectorSupport
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import java.time.Instant
 
+import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class LocalDirectoryDependencyTest {
+class LocalDirectoryDependencyTest extends MockInjectorSupport {
     File resource
 
     LocalDirectoryDependency dependency
@@ -48,6 +55,38 @@ class LocalDirectoryDependencyTest {
     @Test
     void 'notation with valid dir should be resolved successfully'() {
         LocalDirectoryDependency.fromLocal('', resource)
+    }
+
+    @Test
+    void 'transitive dependency exclusion should take effect'() {
+        // given
+        dependency.exclude(name: 'a')
+        GolangDependency a = mockDependency('a')
+        GolangDependency b = mockDependency('b')
+
+        // when
+        dependency.setDependencies(asGolangDependencySet(a, b))
+
+        // then
+        assert dependency.dependencies.size() == 1
+        assert dependency.dependencies.first().name == 'b'
+    }
+
+    @Test
+    void 'local dependency should be installed successfully'() {
+        // given
+        LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
+        File targetDirectory = mock(File)
+        when(injector.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
+        // when
+        dependency.installTo(targetDirectory)
+        // then
+        verify(installer).install(dependency, targetDirectory)
+    }
+
+    @Test(expected = UnsupportedOperationException)
+    void 'local dependency does not support getResolverClass()'(){
+        dependency.getResolverClass()
     }
 
 }

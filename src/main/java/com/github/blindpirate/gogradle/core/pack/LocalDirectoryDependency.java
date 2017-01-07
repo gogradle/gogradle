@@ -78,7 +78,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
-    public Class<? extends DependencyResolver> getResolverClass() {
+    protected Class<? extends DependencyResolver> getResolverClass() {
         throw new UnsupportedOperationException();
     }
 
