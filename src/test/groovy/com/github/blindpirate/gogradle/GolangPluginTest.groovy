@@ -129,7 +129,7 @@ class GolangPluginTest {
         project.dependencies {
             build('github.com/a/b@1.0.0-RELEASE') {
                 transitive = true
-                exclude module: 'github.com/c/d'
+                exclude name: 'github.com/c/d'
             }
 
             build(name: 'github.com/c/d', url: 'git@github.com:a/b.git') {
