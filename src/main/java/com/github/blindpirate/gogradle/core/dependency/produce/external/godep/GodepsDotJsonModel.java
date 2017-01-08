@@ -14,6 +14,7 @@ import java.util.stream.Collectors;
  *
  * @see <a href="https://github.com/tools/godep/blob/master/Godeps/Godeps.json">Godeps.json</a>.
  */
+// NOTE: dependency in Godeps.json may be not the root package
 // Godeps/Godeps.json
 @SuppressWarnings({"checkstyle:membername", "checkstyle:parametername"})
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -18,6 +18,7 @@ import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
+// TODO cache decorator for factories
 @Singleton
 public class DefaultDependencyVisitor implements DependencyVisitor {
 
