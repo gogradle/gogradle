@@ -33,6 +33,7 @@ import com.github.blindpirate.gogradle.core.pack.ErrorReportingPackagePathResolv
 import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.OptionalPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
@@ -131,7 +132,7 @@ public class GogradleModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    @ErrorReportingPackagePathResolver.PackagePathResolvers
+    @OptionalPackagePathResolver.PackagePathResolvers
     public List<PackagePathResolver> packagePathResolvers(
             GithubPackagePathResolver githubPackagePathResolver,
             StandardPackagePathResolver standardPackagePathResolver,

@@ -51,7 +51,7 @@ public final class DependencyResolutionException extends GradleException {
     }
 
     public static DependencyResolutionException cannotResolveDependency(GolangDependency dependency, Exception e) {
-        return new DependencyResolutionException("Cannot produce dependency to go code:" + dependency, e);
+        return new DependencyResolutionException("Cannot resolve dependency of go code:" + dependency, e);
     }
 
     public static DependencyResolutionException cannotResolveDependency(GolangDependency dependency) {
