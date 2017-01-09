@@ -6,9 +6,6 @@ import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
 
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
-
 class DependencyTreeNodeTest {
 
     DependencyTreeNode root

@@ -5,7 +5,7 @@ import org.gradle.api.specs.Spec
 import org.junit.Before
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.PropertiesExclusionSpec
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
 import static org.mockito.Mockito.CALLS_REAL_METHODS

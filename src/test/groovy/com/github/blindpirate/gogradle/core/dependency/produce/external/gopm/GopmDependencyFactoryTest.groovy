@@ -6,8 +6,6 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
-import org.mockito.Mockito
-import org.mockito.Spy
 
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.verify

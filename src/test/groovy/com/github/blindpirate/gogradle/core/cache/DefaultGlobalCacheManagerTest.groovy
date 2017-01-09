@@ -17,7 +17,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
-import static com.github.blindpirate.gogradle.util.ReflectionUtils.*
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.setField
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

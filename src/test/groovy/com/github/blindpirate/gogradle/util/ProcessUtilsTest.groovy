@@ -2,7 +2,8 @@ package com.github.blindpirate.gogradle.util
 
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.*
+import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
+import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
 
 class ProcessUtilsTest {
 

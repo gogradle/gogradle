@@ -1,10 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency
-import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency
 import org.junit.Before

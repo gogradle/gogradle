@@ -50,7 +50,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
 
     GitDependencyManager gitDependencyManager
     // this is a fake commit. We cannot mock RevCommit directly because RevCommit.getName() is final
-    RevCommit revCommit = RevCommit.parse([48] * 64 as byte[])
+    RevCommit revCommit = RevCommitUtils.aCommit()
 
     File resource
 
@@ -187,7 +187,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyResolutionException)
     void 'trying to resolve an inexistent commit should result in an exception'() {
         // given
-        revCommit = RevCommit.parse([48] * 64 as byte[])
+        revCommit = RevCommitUtils.aCommit()
         when(notationDependency.getCommit()).thenReturn(revCommit.name)
         // when
         gitDependencyManager.resolve(notationDependency)

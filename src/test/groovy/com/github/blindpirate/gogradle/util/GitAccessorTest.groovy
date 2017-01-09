@@ -8,12 +8,6 @@ import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-
-import java.nio.file.Path
-
-import static IOUtils.forceDelete
-import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")

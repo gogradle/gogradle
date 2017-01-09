@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git

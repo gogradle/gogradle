@@ -9,14 +9,12 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
-import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfaces

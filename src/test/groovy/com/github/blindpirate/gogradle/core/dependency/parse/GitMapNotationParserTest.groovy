@@ -2,14 +2,13 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

@@ -6,18 +6,15 @@ import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import java.time.Instant
 
-import static com.github.blindpirate.gogradle.util.DependencyUtils.*
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
-import static org.mockito.Mockito.when
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')

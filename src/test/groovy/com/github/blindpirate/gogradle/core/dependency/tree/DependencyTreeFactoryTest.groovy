@@ -12,7 +12,6 @@ import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
-import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

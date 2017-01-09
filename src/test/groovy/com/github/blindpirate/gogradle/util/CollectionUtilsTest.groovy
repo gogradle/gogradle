@@ -2,7 +2,8 @@ package com.github.blindpirate.gogradle.util
 
 import org.junit.Test
 
-import static java.util.Optional.*
+import static java.util.Optional.empty
+import static java.util.Optional.of
 
 class CollectionUtilsTest {
     @Test

@@ -3,8 +3,6 @@ package com.github.blindpirate.gogradle.core.dependency
 import org.junit.Test
 import org.mockito.Mockito
 
-import java.util.concurrent.ConcurrentHashMap
-
 import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.*
 
 class AbstractGolangDependencyTest {

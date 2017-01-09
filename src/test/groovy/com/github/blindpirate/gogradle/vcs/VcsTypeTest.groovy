@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.vcs
 
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.vcs.VcsType.*
+import static com.github.blindpirate.gogradle.vcs.VcsType.of
 
 class VcsTypeTest {
 

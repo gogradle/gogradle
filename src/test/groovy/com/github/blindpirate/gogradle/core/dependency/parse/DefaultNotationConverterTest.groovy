@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.exceptions.PackageResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
-import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import org.junit.Before
 import org.junit.Test
