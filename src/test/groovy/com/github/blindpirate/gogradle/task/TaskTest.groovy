@@ -2,18 +2,14 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.build.BuildManager
-import com.github.blindpirate.gogradle.core.GolangTaskContainer
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
-import org.gradle.api.Task
-import org.gradle.api.internal.AbstractTask
+import com.github.blindpirate.gogradle.support.TaskTestSupport
 import org.gradle.api.internal.project.ProjectInternal
 import org.junit.Before
 import org.mockito.Mock
 import org.mockito.Mockito
-
-import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
 
 abstract class TaskTest {
 
@@ -40,19 +36,14 @@ abstract class TaskTest {
             }
     }
 
-    protected void injectTaskMembers(Task task) {
-        setFieldSafely(task, 'setting', setting)
-        setFieldSafely(task, 'dependencyTreeFactory', dependencyTreeFactory)
-        setFieldSafely(task, 'strategy', strategy)
-        setFieldSafely(task, 'visitor', visitor)
-        setFieldSafely(task, 'golangTaskContainer', golangTaskContainer)
-        setFieldSafely(task, 'buildManager', buildManager)
-    }
-
     protected <T> T buildTask(Class<T> taskClass) {
-        T ret = AbstractTask.injectIntoNewInstance(project, 'prepare', taskClass, { taskClass.newInstance() })
-        injectTaskMembers(ret)
-        return ret
+        Map fields = [setting              : setting,
+                      dependencyTreeFactory: dependencyTreeFactory,
+                      strategy             : strategy,
+                      visitor              : visitor,
+                      golangTaskContainer  : golangTaskContainer,
+                      buildManager         : buildManager]
+        return TaskTestSupport.buildTask(project, taskClass, fields)
     }
 
 }
