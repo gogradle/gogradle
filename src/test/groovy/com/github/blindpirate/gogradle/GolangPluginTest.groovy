@@ -143,7 +143,7 @@ class GolangPluginTest {
         assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionSpec
 
         def cd = findFirstInDependencies('github.com/c/d')
-        assert cd.url == 'git@github.com:a/b.git'
+        assert cd.url == 'git@github.com:c/d.git'
         assert !getExclusionSpecs(cd).isEmpty()
         // assert !cd.excludeVendor // default value
     }
