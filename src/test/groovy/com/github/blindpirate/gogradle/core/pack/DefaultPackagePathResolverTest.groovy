@@ -26,11 +26,11 @@ class DefaultPackagePathResolverTest {
     @Mock
     PackagePathResolver resolver2
 
-    GolangPackage packageInfo = MockUtils.mockPackage()
+    GolangPackage packageInfo = MockUtils.mockVcsPackage()
 
     DefaultPackagePathResolver resolver
 
-    String packagePath = 'packagePath'
+    String packagePath = 'github.com/user/package/a'
 
     @Before
     void setUp() {

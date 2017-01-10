@@ -48,7 +48,7 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
         Path path = Paths.get(packagePath);
         for (int i = path.getNameCount(); i > 0; --i) {
             Path current = path.subpath(0, i);
-            cache.put(current.toString(), golangPackage.cloneWithPath(current.toString()).get());
+            cache.put(current.toString(), golangPackage.resolve(current.toString()).get());
         }
     }
 
@@ -59,7 +59,7 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
             GolangPackage existentPackage = cache.get(current.toString());
 
             if (existentPackage != null) {
-                return existentPackage.cloneWithPath(packagePath);
+                return existentPackage.resolve(packagePath);
             }
         }
         return Optional.empty();

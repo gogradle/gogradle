@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import java.util.Optional;
@@ -21,7 +22,8 @@ public abstract class GolangPackage {
 
     public abstract String getUrl();
 
-    public Optional<GolangPackage> cloneWithPath(String packagePath) {
+    public Optional<GolangPackage> resolve(String packagePath) {
+        Assert.isTrue(packagePath.startsWith(path) || path.startsWith(packagePath));
         if (path.equals(packagePath)) {
             return Optional.of(this);
         } else if (path.startsWith(packagePath)) {
