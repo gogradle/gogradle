@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -81,7 +82,7 @@ public class SourceCodeDependencyFactory {
         }
 
         GolangPackage info = packagePathResolver.produce(importPath).get();
-        if (info.isStandard()) {
+        if (info instanceof StandardGolangPackage) {
             return Optional.empty();
         }
 

@@ -4,6 +4,8 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.StandardGolangPackage
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -54,10 +56,10 @@ class SourceCodeDependencyFactoryTest {
             Object answer(InvocationOnMock invocation) throws Throwable {
                 String name = invocation.getArgument(0)
                 if (name.startsWith('github.com')) {
-                    GolangPackage ret = GolangPackage.builder().withPath(name).withRootPath('github.com/a/b').build()
+                    GolangPackage ret = VcsGolangPackage.builder().withPath(name).withRootPath('github.com/a/b').build()
                     return Optional.of(ret)
                 } else {
-                    GolangPackage standardPackage = GolangPackage.standardPackage(name)
+                    GolangPackage standardPackage = StandardGolangPackage.of(name)
                     return Optional.of(standardPackage)
                 }
             }

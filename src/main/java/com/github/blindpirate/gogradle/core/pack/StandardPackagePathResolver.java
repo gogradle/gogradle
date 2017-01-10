@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.common.collect.Sets;
 
@@ -18,7 +19,7 @@ public class StandardPackagePathResolver implements PackagePathResolver {
     public Optional<GolangPackage> produce(String packagePath) {
         Path path = Paths.get(packagePath);
         if (isStandardPackage(path)) {
-            return Optional.of(GolangPackage.standardPackage(packagePath));
+            return Optional.of(StandardGolangPackage.of(packagePath));
         } else {
             return Optional.empty();
         }

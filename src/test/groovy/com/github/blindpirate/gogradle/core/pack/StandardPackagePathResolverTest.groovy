@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import org.junit.Test
 
 class StandardPackagePathResolverTest {
@@ -9,7 +10,7 @@ class StandardPackagePathResolverTest {
     @Test
     void 'resolving first-level standard package should succeed'() {
         GolangPackage info = resolver.produce("fmt").get()
-        assert info.isStandard()
+        assert info instanceof StandardGolangPackage
         assert info.path == 'fmt'
         assert info.rootPath == 'fmt'
     }
@@ -17,23 +18,23 @@ class StandardPackagePathResolverTest {
     @Test
     void 'resolving second-level standard package should succeed'() {
         GolangPackage info = resolver.produce('archive/zip').get()
-        assert info.isStandard()
+        assert info instanceof StandardGolangPackage
         assert info.path == 'archive/zip'
-        assert info.rootPath == 'archive'
+        assert info.rootPath == 'archive/zip'
     }
 
     @Test
     void 'resolving third-level standard package should succeed'() {
         GolangPackage info = resolver.produce('net/http/cgi').get()
-        assert info.isStandard()
+        assert info instanceof StandardGolangPackage
         assert info.path == 'net/http/cgi'
-        assert info.rootPath == 'net'
+        assert info.rootPath == 'net/http/cgi'
     }
 
     @Test
-    void 'resolving pseudo package "C" should succss'() {
+    void 'resolving pseudo package "C" should succeed'() {
         GolangPackage info = resolver.produce('C').get()
-        assert info.isStandard()
+        assert info instanceof StandardGolangPackage
         assert info.path == 'C'
         assert info.rootPath == 'C'
     }
