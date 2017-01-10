@@ -1,14 +1,14 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import java.util.Optional;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
-import static java.util.Arrays.asList;
+import java.util.Optional;
 
 // github.com/user/project -> git@github.com:user/project.git
 // github.com/user/project -> https://github.com/user/project.git
@@ -22,7 +22,7 @@ public class GithubPackagePathResolver implements PackagePathResolver {
         if (isNotGithubPackage(packagePath)) {
             return Optional.empty();
         } else if (isIncomplete(packagePath)) {
-            return Optional.of(GolangPackage.INCOMPLETE);
+            return Optional.of(IncompleteGolangPackage.of(packagePath));
         } else {
             return doProduce(packagePath);
         }
@@ -36,17 +36,16 @@ public class GithubPackagePathResolver implements PackagePathResolver {
         return !packagePath.startsWith(GITHUB_HOST);
     }
 
-    public Optional<GolangPackage> doProduce(String packagePath) {
+    private Optional<GolangPackage> doProduce(String packagePath) {
         Path path = toPath(packagePath);
-        String httpsUrl = HTTPS + path.subpath(0, 3) + ".git";
-        String sshUrl = String.format("git@github.com:%s", path.subpath(1, 3));
+        String sshUrl = String.format("git@github.com:%s.git", path.subpath(1, 3));
         String rootPackagePath = path.subpath(0, 3).toString();
 
-        GolangPackage info = GolangPackage.builder()
+        GolangPackage info = VcsGolangPackage.builder()
                 .withPath(packagePath)
                 .withVcsType(VcsType.GIT)
                 .withRootPath(rootPackagePath)
-                .withUrls(asList(httpsUrl, sshUrl))
+                .withUrl(sshUrl)
                 .build();
         return Optional.of(info);
     }

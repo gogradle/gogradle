@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
@@ -23,7 +24,7 @@ class GithubPackagePathResolverTest {
         // when
         GolangPackage result = resolver.produce('github.com/a').get()
         // then
-        assert result == GolangPackage.INCOMPLETE
+        assert result instanceof IncompleteGolangPackage
     }
 
 
@@ -56,8 +57,7 @@ class GithubPackagePathResolverTest {
     void assertVcsTypeUrlsAndRootPath(GolangPackage info) {
         assert info.vcsType == VcsType.GIT
         assert info.vcsType == VcsType.GIT
-        assert info.urls.contains('https://github.com/a/b.git')
-        assert info.urls.contains('git@github.com:a/b')
+        assert info.url == 'git@github.com:a/b.git'
         assert info.rootPath == 'github.com/a/b'
     }
 }
