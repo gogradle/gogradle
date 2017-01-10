@@ -2,6 +2,9 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
@@ -17,25 +20,21 @@ import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class OptionalPackagePathResolverTest {
+class DefaultPackagePathResolverTest {
     @Mock
     PackagePathResolver resolver1
     @Mock
     PackagePathResolver resolver2
 
-    GolangPackage packageInfo = GolangPackage.builder().withPath('root/package')
-            .withRootPath('root')
-            .withVcsType(VcsType.GIT)
-            .withUrls(['url'])
-            .build()
+    GolangPackage packageInfo = MockUtils.mockPackage()
 
-    OptionalPackagePathResolver resolver
+    DefaultPackagePathResolver resolver
 
     String packagePath = 'packagePath'
 
     @Before
     void setUp() {
-        resolver = new OptionalPackagePathResolver([resolver1, resolver2])
+        resolver = new DefaultPackagePathResolver([resolver1, resolver2])
         when(resolver1.produce(packagePath)).thenReturn(empty())
         when(resolver2.produce(packagePath)).thenReturn(of(packageInfo))
     }
@@ -56,44 +55,41 @@ class OptionalPackagePathResolverTest {
     }
 
     @Test
-    void 'package and its root package should be put into cache after successful resolution'() {
+    void 'package and its ancestor package should be put into cache after successful resolution'() {
         // given
-        GolangPackage info = GolangPackage.builder()
+        GolangPackage info = VcsGolangPackage.builder()
                 .withPath('github.com/a/b/c')
                 .withRootPath('github.com/a/b')
                 .withVcsType(VcsType.GIT)
-                .withUrls([])
                 .build()
         when(resolver1.produce('github.com/a/b/c')).thenReturn(of(info))
         // when
         resolver.produce('github.com/a/b/c')
         // then
-        assert ReflectionUtils.getField(resolver, 'cache').size() == 2
+        assert ReflectionUtils.getField(resolver, 'cache').size() == 4
     }
 
     @Test
     void 'root of an incomplete package should not be put into cache after resolution'() {
         // given
-        when(resolver1.produce('gihub.com/a')).thenReturn(of(GolangPackage.INCOMPLETE))
+        when(resolver1.produce('github.com/a')).thenReturn(of(IncompleteGolangPackage.of('github.com/a')))
         // when
-        resolver.produce('gihub.com/a')
+        resolver.produce('github.com/a')
         // then
-        assert ReflectionUtils.getField(resolver, 'cache').size() == 1
+        assert ReflectionUtils.getField(resolver, 'cache').size() == 2
     }
-
 
 
     @Test
     void 'root package result should be leveraged when resolving children package'() {
         // given
-        GolangPackage rootInfo = GolangPackage.builder()
+        GolangPackage rootInfo = VcsGolangPackage.builder()
                 .withPath('github.com/a/b')
                 .withRootPath('github.com/a/b')
                 .withVcsType(VcsType.GIT)
-                .withUrls([])
                 .build()
-        getField(resolver, 'cache').put('github.com', GolangPackage.INCOMPLETE)
-        getField(resolver, 'cache').put('github.com/a', GolangPackage.INCOMPLETE)
+        getField(resolver, 'cache').put('github.com', IncompleteGolangPackage.of('github.com'))
+        getField(resolver, 'cache').put('github.com/a', IncompleteGolangPackage.of('github.com/a'))
         getField(resolver, 'cache').put('github.com/a/b', rootInfo)
 
         // when
@@ -106,7 +102,7 @@ class OptionalPackagePathResolverTest {
         assert result1 == rootInfo
         assert result2.path == 'github.com/a/b/c'
         assert result3.path == 'github.com/a/b/c/d'
-        assert allFieldsEquals(result2, rootInfo, ['vcsType', 'urls', 'rootPath'])
-        assert allFieldsEquals(result3, rootInfo, ['vcsType', 'urls', 'rootPath'])
+        assert allFieldsEquals(result2, rootInfo, ['vcsType', 'url', 'rootPath'])
+        assert allFieldsEquals(result3, rootInfo, ['vcsType', 'url', 'rootPath'])
     }
 }

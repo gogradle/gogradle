@@ -22,13 +22,13 @@ import static java.lang.annotation.ElementType.PARAMETER;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Singleton
-public class OptionalPackagePathResolver implements PackagePathResolver {
+public class DefaultPackagePathResolver implements PackagePathResolver {
     private Map<String, GolangPackage> cache = new ConcurrentHashMap<>();
 
     private final List<PackagePathResolver> delegates;
 
     @Inject
-    public OptionalPackagePathResolver(@PackagePathResolvers List<PackagePathResolver> delegates) {
+    public DefaultPackagePathResolver(@PackagePathResolvers List<PackagePathResolver> delegates) {
         this.delegates = delegates;
     }
 
@@ -45,32 +45,24 @@ public class OptionalPackagePathResolver implements PackagePathResolver {
     }
 
     private void updateCache(String packagePath, GolangPackage golangPackage) {
-        cache.put(packagePath, golangPackage);
-        if (golangPackage != GolangPackage.INCOMPLETE) {
-            cache.put(golangPackage.getRootPath(), golangPackage.cloneWithSameRoot(golangPackage.getRootPath()));
+        Path path = Paths.get(packagePath);
+        for (int i = path.getNameCount(); i > 0; --i) {
+            Path current = path.subpath(0, i);
+            cache.put(current.toString(), golangPackage.cloneWithPath(current.toString()).get());
         }
     }
 
     private Optional<GolangPackage> tryToFetchFromCache(String packagePath) {
-        GolangPackage exactMatch = cache.get(packagePath);
-        if (exactMatch != null) {
-            return Optional.of(exactMatch);
-        }
-
         Path path = Paths.get(packagePath);
-        for (int i = 1; i < path.getNameCount(); ++i) {
+        for (int i = path.getNameCount(); i > 0; --i) {
             Path current = path.subpath(0, i);
-            GolangPackage existingPackage = cache.get(current.toString());
-            if (isValid(existingPackage)) {
-                GolangPackage result = existingPackage.cloneWithSameRoot(packagePath);
-                return Optional.of(result);
+            GolangPackage existentPackage = cache.get(current.toString());
+
+            if (existentPackage != null) {
+                return existentPackage.cloneWithPath(packagePath);
             }
         }
         return Optional.empty();
-    }
-
-    private boolean isValid(GolangPackage existingPackage) {
-        return existingPackage != null && existingPackage != GolangPackage.INCOMPLETE;
     }
 
     @BindingAnnotation
