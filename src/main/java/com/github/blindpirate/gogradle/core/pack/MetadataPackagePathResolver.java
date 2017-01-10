@@ -1,14 +1,12 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-
-import java.util.Optional;
-
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -19,6 +17,7 @@ import org.jsoup.select.Elements;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.util.Optional;
 
 @Singleton
 public class MetadataPackagePathResolver implements PackagePathResolver {
@@ -70,7 +69,7 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
         VcsType vcs = VcsType.of(array[1]).get();
         String url = array[2];
 
-        return GolangPackage.builder()
+        return VcsGolangPackage.builder()
                 .withPath(packagePath)
                 .withVcsType(vcs)
                 .withRootPath(rootPath)
