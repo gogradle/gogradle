@@ -5,8 +5,8 @@ import com.github.blindpirate.gogradle.build.DefaultBuildManager;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.core.DefaultBuildConstraintManager;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
-import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager;
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager;
@@ -29,13 +29,13 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.Gop
 import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor.GovendorDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory;
-import com.github.blindpirate.gogradle.core.pack.ErrorReportingPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
-import com.github.blindpirate.gogradle.core.pack.OptionalPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver;
 import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
@@ -81,7 +81,7 @@ public class GogradleModule extends AbstractModule {
         bind(GlobalCacheManager.class).to(DefaultGlobalCacheManager.class);
         bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
-        bind(PackagePathResolver.class).to(ErrorReportingPackagePathResolver.class);
+        bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
@@ -132,17 +132,20 @@ public class GogradleModule extends AbstractModule {
     @Inject
     @Provides
     @Singleton
-    @OptionalPackagePathResolver.PackagePathResolvers
+    @DefaultPackagePathResolver.PackagePathResolvers
     public List<PackagePathResolver> packagePathResolvers(
             GithubPackagePathResolver githubPackagePathResolver,
             StandardPackagePathResolver standardPackagePathResolver,
             GlobalCachePackagePathResolver globalCachePackagePathResolver,
-            MetadataPackagePathResolver metadataPackagePathResolver) {
+            MetadataPackagePathResolver metadataPackagePathResolver,
+            UnrecognizedPackagePathResolver unrecognizedPackagePathResolver) {
         return CollectionUtils.immutableList(
                 standardPackagePathResolver,
                 githubPackagePathResolver,
                 globalCachePackagePathResolver,
-                metadataPackagePathResolver);
+                metadataPackagePathResolver,
+                unrecognizedPackagePathResolver
+        );
     }
 
 
