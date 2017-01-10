@@ -13,7 +13,7 @@ import org.gradle.api.tasks.TaskAction;
 import javax.inject.Inject;
 import java.io.File;
 
-import static com.github.blindpirate.gogradle.core.GolangTaskContainer.PREPARE_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 
 public class ResolveTask extends DefaultTask {
     @Inject

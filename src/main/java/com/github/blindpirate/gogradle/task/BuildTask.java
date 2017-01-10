@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.core.GolangTaskContainer;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;

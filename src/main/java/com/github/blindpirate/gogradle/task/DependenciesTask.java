@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.task;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.tasks.TaskAction;
 
-import static com.github.blindpirate.gogradle.core.GolangTaskContainer.RESOLVE_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TASK_NAME;
 
 /**
  * Prints the dependencies tree.
