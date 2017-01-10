@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
+import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.exceptions.PackageResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.vcs.Git
@@ -30,7 +31,7 @@ class DefaultNotationConverterTest extends MockInjectorSupport {
 
     @Before
     void setUp() {
-        GolangPackage mockedPackage = mockPackage()
+        GolangPackage mockedPackage = mockVcsPackage()
         converter = new DefaultNotationConverter(resolver)
         when(resolver.produce('root/package')).thenReturn(of(mockedPackage))
         mockVcsService(injector, NotationConverter, Git, gitConverter)
@@ -63,7 +64,7 @@ class DefaultNotationConverterTest extends MockInjectorSupport {
     @Test(expected = IllegalStateException)
     void 'converting a standard package should result in an exception'() {
         // given
-        when(resolver.produce(eq('standard'))).thenReturn(of(mockStandard()))
+        when(resolver.produce(eq('standard'))).thenReturn(of(StandardGolangPackage.of('standard')))
         // then
         converter.convert('standard')
     }
