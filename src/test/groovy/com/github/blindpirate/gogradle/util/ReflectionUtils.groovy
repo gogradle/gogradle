@@ -9,6 +9,17 @@ class ReflectionUtils {
                 .setVariableValueInObject(object, field, value)
     }
 
+    static void setFinalField(Object target, String fieldName, Object value) {
+        Field field = org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
+                .getFieldByNameIncludingSuperclasses(fieldName, target.getClass())
+
+        field.setAccessible(true)
+        Field modifiersField = Field.class.getDeclaredField('modifiers')
+        modifiersField.setAccessible(true)
+        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
+        field.set(target, value)
+    }
+
     static void setFieldSafely(Object instance, String fieldName, Object value) {
         try {
             setField(instance, fieldName, value)
