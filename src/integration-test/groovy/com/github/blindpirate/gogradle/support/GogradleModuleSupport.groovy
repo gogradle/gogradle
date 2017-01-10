@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.GogradleModule
 import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.google.inject.Guice
 import com.google.inject.Injector
-import org.gradle.api.Project
+import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.internal.reflect.Instantiator
 import org.junit.Before
 import org.mockito.Mock
@@ -13,7 +13,7 @@ abstract class GogradleModuleSupport {
     @Mock
     Instantiator instantiator
     @Mock
-    Project project
+    ProjectInternal project
 
     Injector injector
 
