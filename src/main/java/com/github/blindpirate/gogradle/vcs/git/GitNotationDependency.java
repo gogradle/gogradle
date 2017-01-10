@@ -11,7 +11,6 @@ public class GitNotationDependency extends AbstractNotationDependency {
     public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
 
     public static final String URL_KEY = "url";
-    public static final String URLS_KEY = "urls";
     public static final String COMMIT_KEY = "commit";
     // not implemented yet
     public static final String BRANCH_KEY = "branch";
@@ -39,13 +38,13 @@ public class GitNotationDependency extends AbstractNotationDependency {
         this.tag = tag;
     }
 
-    public List<String> getUrls() {
-        return urls;
-    }
-
-    public void setUrls(List<String> urls) {
-        this.urls = urls;
-    }
+//    public List<String> getUrls() {
+//        return urls;
+//    }
+//
+//    public void setUrls(List<String> urls) {
+//        this.urls = urls;
+//    }
 
     public String getUrl() {
         return url;

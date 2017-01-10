@@ -35,9 +35,11 @@ import java.util.stream.Collectors;
 @Singleton
 public class GitAccessor implements VcsAccessor {
     @Override
-    public List<String> getRemoteUrls(File directory) {
+    public String getRemoteUrl(File directory) {
         Repository repository = getRepository(directory);
-        return new ArrayList<>(getRemoteUrls(repository));
+        Set<String> urls = getRemoteUrls(repository);
+        Assert.isNotEmpty(urls, "Cannot get remote url of git repo " + directory.getAbsolutePath());
+        return urls.stream().findFirst().get();
     }
 
     public Repository getRepository(File directory) {

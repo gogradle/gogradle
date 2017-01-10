@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.util.Cast;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gradle.api.logging.Logger;
@@ -23,6 +22,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
+import static com.github.blindpirate.gogradle.util.Cast.cast;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.NEWEST_COMMIT;
 
@@ -124,11 +124,11 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     }
 
     private List<String> determineUrls(NotationDependency dependency) {
-        String urlSpecifiedByUser = Cast.cast(GitNotationDependency.class, dependency).getUrl();
+        String urlSpecifiedByUser = cast(GitNotationDependency.class, dependency).getUrl();
         if (urlSpecifiedByUser != null) {
             return Arrays.asList(urlSpecifiedByUser);
         } else {
-            return Cast.cast(GitNotationDependency.class, dependency).getUrls();
+            return Arrays.asList(cast(GitNotationDependency.class, dependency).getUrl());
         }
     }
 

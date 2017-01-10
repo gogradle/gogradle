@@ -15,19 +15,17 @@ import static org.mockito.Mockito.when
 class GitMapNotationParserTest {
     @Mock
     GolangPackage packageInfo
-    @Mock
-    List<String> urls
 
     GitMapNotationParser parser = new GitMapNotationParser()
 
     @Before
     void setUp() {
-        when(packageInfo.getUrls()).thenReturn(urls)
+        when(packageInfo.getUrl()).thenReturn('url')
     }
 
-    void assertWithNameAndUrls(GitNotationDependency dependency) {
+    void assertWithNameAndUrl(GitNotationDependency dependency) {
         assert dependency.name == 'github.com/a/b'
-        assert dependency.urls == urls
+        assert dependency.url == 'url'
     }
 
     void assertEmpty(GitNotationDependency dependency, String... properties) {
@@ -41,8 +39,8 @@ class GitMapNotationParserTest {
         // when
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', info: packageInfo])
         // then
-        assertWithNameAndUrls(dependency)
-        assertEmpty(dependency, 'commit', 'url')
+        assertWithNameAndUrl(dependency)
+        assertEmpty(dependency, 'commit')
         assert dependency.tag == 'v1.0.0'
     }
 
@@ -51,7 +49,7 @@ class GitMapNotationParserTest {
         // when
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'url', info: packageInfo])
         // then
-        assertWithNameAndUrls(dependency)
+        assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag',)
         assert dependency.url == 'url'
         assert dependency.commit == GitNotationDependency.NEWEST_COMMIT
@@ -62,8 +60,8 @@ class GitMapNotationParserTest {
         // when
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', version: '1fc81', info: packageInfo])
         // then
-        assertWithNameAndUrls(dependency)
-        assertEmpty(dependency, 'tag', 'url')
+        assertWithNameAndUrl(dependency)
+        assertEmpty(dependency, 'tag')
         assert dependency.commit == '1fc81'
         assert dependency.version == '1fc81'
     }
@@ -73,7 +71,7 @@ class GitMapNotationParserTest {
         // when
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', info: packageInfo])
         // then
-        assertWithNameAndUrls(dependency)
+        assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag')
         assert dependency.commit == 'commitId'
         assert dependency.version == 'commitId'
@@ -85,7 +83,7 @@ class GitMapNotationParserTest {
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b'])
 
         // then
-        assertEmpty(dependency, 'tag', 'url', 'urls')
+        assertEmpty(dependency, 'tag', 'url')
         assert dependency.commit == GitNotationDependency.NEWEST_COMMIT
         assert dependency.version == GitNotationDependency.NEWEST_COMMIT
     }
@@ -101,7 +99,7 @@ class GitMapNotationParserTest {
         GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, info: packageInfo])
 
         // then
-        assertWithNameAndUrls(dependency)
+        assertWithNameAndUrl(dependency)
     }
 
     @Test

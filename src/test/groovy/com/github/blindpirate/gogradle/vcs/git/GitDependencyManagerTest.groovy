@@ -28,7 +28,8 @@ import static java.util.Optional.empty
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -83,27 +84,27 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // then:
         verify(gitAccessor).cloneWithUrl('url', resource)
     }
+//
+//    @Test
+//    void 'multiple urls should be tried to clone the repo'() {
+//        // given:
+//        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
+//        when(gitAccessor.cloneWithUrl('url1', resource)).thenThrow(new IllegalStateException())
+//        // when:
+//        gitDependencyManager.resolve(notationDependency)
+//        // then:
+//        verify(gitAccessor).cloneWithUrl('url2', resource)
+//    }
 
-    @Test
-    void 'multiple urls should be tried to clone the repo'() {
-        // given:
-        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(gitAccessor.cloneWithUrl('url1', resource)).thenThrow(new IllegalStateException())
-        // when:
-        gitDependencyManager.resolve(notationDependency)
-        // then:
-        verify(gitAccessor).cloneWithUrl('url2', resource)
-    }
-
-    @Test
-    void 'subsequent url should be ignored if cloning succeed'() {
-        // given:
-        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        // when:
-        gitDependencyManager.resolve(notationDependency)
-        // then:
-        verify(gitAccessor, times(0)).cloneWithUrl('url2', resource)
-    }
+//    @Test
+//    void 'subsequent url should be ignored if cloning succeed'() {
+//        // given:
+//        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
+//        // when:
+//        gitDependencyManager.resolve(notationDependency)
+//        // then:
+//        verify(gitAccessor, times(0)).cloneWithUrl('url2', resource)
+//    }
 
     @Test
     void 'existed repository should be updated'() {
@@ -164,10 +165,8 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown when every url has been tried'() {
         // given
-        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        ['url1', 'url2'].each {
-            when(gitAccessor.cloneWithUrl(it, resource)).thenThrow(new IllegalStateException())
-        }
+        when(notationDependency.getUrl()).thenReturn('url')
+        when(gitAccessor.cloneWithUrl('url', resource)).thenThrow(new IllegalStateException())
 
         // when
         gitDependencyManager.resolve(notationDependency)
@@ -205,7 +204,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyResolutionException)
     void 'mismatched repository should cause an exception'() {
         // given
-        when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
+        when(notationDependency.getUrl()).thenReturn('anotherUrl')
         IOUtils.write(resource, 'some file', 'file content')
 
         // when

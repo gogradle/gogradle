@@ -34,7 +34,7 @@ class GitAccessorTest {
     @Test
     void 'getting remote urls of repository should succeed'() {
         assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
-        assert gitAccessor.getRemoteUrls(resource).contains('https://github.com/blindpirate/test-for-gogradle.git')
+        assert gitAccessor.getRemoteUrl(resource).contains('https://github.com/blindpirate/test-for-gogradle.git')
     }
 
     @Test
