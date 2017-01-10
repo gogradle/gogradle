@@ -1,11 +1,5 @@
-package com.github.blindpirate.gogradle.core;
+package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.task.BuildTask;
-import com.github.blindpirate.gogradle.task.DependenciesTask;
-import com.github.blindpirate.gogradle.task.InstallDependenciesTask;
-import com.github.blindpirate.gogradle.task.PrepareTask;
-import com.github.blindpirate.gogradle.task.ResolveTask;
-import com.github.blindpirate.gogradle.task.TestTask;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Task;
 
@@ -25,7 +19,7 @@ public class GolangTaskContainer {
     public static final String CHECK_TASK_NAME = "check";
     public static final String BUILD_TASK_NAME = "build";
     public static final String CLEAN_TASK_NAME = "clean";
-    public static final String INSTALL_DEPENDENCIES_TASK_NAME = "install";
+    public static final String INSTALL_DEPENDENCIES_TASK_NAME = "installDependencies";
     public static final String TEST_TASK_NAME = "test";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 

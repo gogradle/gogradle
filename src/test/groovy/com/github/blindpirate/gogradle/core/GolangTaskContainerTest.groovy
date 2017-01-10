@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core
 
+import com.github.blindpirate.gogradle.task.GolangTaskContainer
 import org.junit.Test
 import org.mockito.Mockito
 

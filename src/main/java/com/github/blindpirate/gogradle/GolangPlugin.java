@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
-import com.github.blindpirate.gogradle.core.GolangTaskContainer;
+import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
@@ -17,7 +17,8 @@ import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
 
-import static com.github.blindpirate.gogradle.core.GolangTaskContainer.TASKS;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
+
 
 public class GolangPlugin implements Plugin<Project> {
 
