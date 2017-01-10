@@ -19,8 +19,6 @@ public class GitNotationDependency extends AbstractNotationDependency {
     private String tag;
     // url specified by user
     private String url;
-    // urls in GolangPackage e.g https:// and git+ssh://
-    private List<String> urls;
 
     public String getCommit() {
         return commit;
@@ -37,14 +35,6 @@ public class GitNotationDependency extends AbstractNotationDependency {
     public void setTag(String tag) {
         this.tag = tag;
     }
-
-//    public List<String> getUrls() {
-//        return urls;
-//    }
-//
-//    public void setUrls(List<String> urls) {
-//        this.urls = urls;
-//    }
 
     public String getUrl() {
         return url;

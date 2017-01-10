@@ -52,12 +52,12 @@ class GlobalCachePackagePathResolverTest {
 
         when(gitAccessor.getRepository(resource.toPath().resolve('github.com/a/b').toFile()))
                 .thenReturn(repository)
-        when(gitAccessor.getRemoteUrls((File) any(File))).thenAnswer(new Answer<Object>() {
+        when(gitAccessor.getRemoteUrl((File) any(File))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 File file = invocation.getArgument(0)
                 if (file.absolutePath.endsWith('github.com/a/b')) {
-                    return ['url']
+                    return 'url'
                 } else {
                     throw new IllegalArgumentException()
                 }
@@ -80,7 +80,7 @@ class GlobalCachePackagePathResolverTest {
         assert info.vcsType == VcsType.GIT
         assert info.path == 'github.com/a/b'
         assert info.rootPath == 'github.com/a/b'
-        assert info.urls.contains('url')
+        assert info.url == 'url'
     }
 
     @Test
@@ -91,7 +91,7 @@ class GlobalCachePackagePathResolverTest {
         assert info.vcsType == VcsType.GIT
         assert info.path == 'github.com/a/b/c'
         assert info.rootPath == 'github.com/a/b'
-        assert info.urls.contains('url')
+        assert info.url == 'url'
     }
 
     @Test

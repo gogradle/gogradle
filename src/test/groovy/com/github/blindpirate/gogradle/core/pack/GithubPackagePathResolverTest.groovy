@@ -16,7 +16,7 @@ class GithubPackagePathResolverTest {
 
         // then
         assert result.path == 'github.com/a/b'
-        assertVcsTypeUrlsAndRootPath(result)
+        assertVcsTypeUrlAndRootPath(result)
     }
 
     @Test
@@ -35,7 +35,7 @@ class GithubPackagePathResolverTest {
 
         // then
         assert info.path == 'github.com/a/b/c'
-        assertVcsTypeUrlsAndRootPath(info)
+        assertVcsTypeUrlAndRootPath(info)
     }
 
     @Test
@@ -46,7 +46,7 @@ class GithubPackagePathResolverTest {
 
         // then
         assert info.path == wtf
-        assertVcsTypeUrlsAndRootPath(info)
+        assertVcsTypeUrlAndRootPath(info)
     }
 
     @Test
@@ -54,7 +54,7 @@ class GithubPackagePathResolverTest {
         assert !resolver.produce('golang.org/x/tool').isPresent()
     }
 
-    void assertVcsTypeUrlsAndRootPath(GolangPackage info) {
+    void assertVcsTypeUrlAndRootPath(GolangPackage info) {
         assert info.vcsType == VcsType.GIT
         assert info.vcsType == VcsType.GIT
         assert info.url == 'git@github.com:a/b.git'
