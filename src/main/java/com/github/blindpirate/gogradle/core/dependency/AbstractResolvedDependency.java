@@ -19,7 +19,7 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
         this.updateTime = updateTime;
     }
 
-    private GolangDependencySet dependencies;
+    private GolangDependencySet dependencies = GolangDependencySet.empty();
 
     public void setDependencies(GolangDependencySet dependencies) {
         this.dependencies = dependencies;
@@ -54,5 +54,10 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
     }
 
     protected abstract Class<? extends DependencyInstaller> getInstallerClass();
+
+    @Override
+    public String toString() {
+        return getName() + ":" + formatVersion();
+    }
 
 }
