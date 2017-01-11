@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.vcs.git
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.specs.Spec
 import org.junit.Before
 import org.junit.Test
@@ -55,5 +56,20 @@ class GitResolvedDependencyTest {
     @Test
     void 'getInstallerClass() should succeed'() {
         assert newResolvedDependency().installerClass == GitDependencyManager
+    }
+
+    @Test
+    void 'formatting should succeed'() {
+        assert newResolvedDependency().formatVersion() == 'commi'
+    }
+
+    @Test
+    void 'formatting with tag should succeed'() {
+        // given
+        GitResolvedDependency dependency = newResolvedDependency()
+        ReflectionUtils.setField(dependency, 'tag', 'tag')
+
+        // then
+        assert dependency.formatVersion() == 'tag(commi)'
     }
 }

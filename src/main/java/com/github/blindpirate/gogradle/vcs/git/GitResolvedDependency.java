@@ -14,6 +14,7 @@ import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMM
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.URL_KEY;
 
 public class GitResolvedDependency extends AbstractResolvedDependency {
+    private String tag;
     private String repoUrl;
 
     private GitResolvedDependency(String name, String commitId, long commitTime) {
@@ -34,6 +35,15 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
                 COMMIT_KEY, getVersion());
     }
 
+    @Override
+    public String formatVersion() {
+        if (tag != null) {
+            return tag + "(" + getVersion().substring(0, 5) + ")";
+        } else {
+            return getVersion().substring(0, 5);
+        }
+    }
+
     public static GitResolvedDependencyBuilder builder() {
         return new GitResolvedDependencyBuilder();
     }
@@ -42,6 +52,7 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
     public static final class GitResolvedDependencyBuilder {
         private NotationDependency notationDependency;
         private String repoUrl;
+        private String tag;
         private String commitId;
         private long commitTime;
         private String name;
@@ -65,6 +76,11 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
             return this;
         }
 
+        public GitResolvedDependencyBuilder withTag(String tag) {
+            this.tag = tag;
+            return this;
+        }
+
         public GitResolvedDependencyBuilder withCommitTime(long commitTime) {
             this.commitTime = commitTime;
             return this;
@@ -78,6 +94,7 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
         public GitResolvedDependency build() {
             GitResolvedDependency ret = new GitResolvedDependency(name, commitId, commitTime);
             ret.repoUrl = this.repoUrl;
+            ret.tag = this.tag;
             ret.setFirstLevel(notationDependency.isFirstLevel());
             ret.transitiveDepExclusions = notationDependency.getTransitiveDepExclusions();
             return ret;

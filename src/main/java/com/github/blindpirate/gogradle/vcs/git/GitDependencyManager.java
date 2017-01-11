@@ -61,6 +61,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 .withNotationDependency(dependency)
                 .withName(dependency.getName())
                 .withCommitId(commit.getName())
+                .withTag(cast(GitNotationDependency.class, dependency).getTag())
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
