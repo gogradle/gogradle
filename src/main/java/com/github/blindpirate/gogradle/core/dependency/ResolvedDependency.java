@@ -25,6 +25,8 @@ public interface ResolvedDependency extends GolangDependency {
 
     void installTo(File targetDirectory);
 
+    String formatVersion();
+
     @Override
     default ResolvedDependency resolve() {
         return this;
