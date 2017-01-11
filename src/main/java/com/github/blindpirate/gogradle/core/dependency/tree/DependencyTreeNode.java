@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import java.util.ArrayList;
 import java.util.List;
 
+// TODO add root field
 public class DependencyTreeNode {
     private String name;
     private boolean star;
@@ -46,7 +47,7 @@ public class DependencyTreeNode {
                 .append(format(isRoot))
                 .append("\n");
 
-        String prefixOfChildren = padding(isRoot, isTail) + prefix;
+        String prefixOfChildren = prefix + padding(isRoot, isTail);
 
         for (int i = 0; i < children.size() - 1; i++) {
             sb.append(children.get(i).print(prefixOfChildren, false, false));
@@ -87,11 +88,12 @@ public class DependencyTreeNode {
     }
 
     private String withArrow() {
-        return originalDependency.toString() + " -> " + finalDependency.toString();
+        return finalDependency.getName() + ":"
+                + originalDependency.formatVersion() + " -> " + finalDependency.formatVersion();
     }
 
     private String withCheckMark() {
-        return name + " √";
+        return finalDependency.getName() + ":" + finalDependency.formatVersion() + " √";
     }
 
     public GolangDependencySet flatten() {
