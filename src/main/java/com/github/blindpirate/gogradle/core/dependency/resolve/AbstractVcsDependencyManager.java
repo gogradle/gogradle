@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
@@ -28,12 +29,40 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
     public ResolvedDependency resolve(final NotationDependency dependency) {
         try {
             return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
-                Path path = globalCacheManager.getGlobalCachePath(dependency.getName());
-                return doResolve(dependency, path.toFile());
+                File vcsRoot = globalCacheManager.getGlobalCachePath(dependency.getName()).toFile();
+                ResolvedDependency vcsResolvedDependency = resolveVcs(dependency, vcsRoot);
+                return extractVendorDependencyIfNecessary(dependency, vcsResolvedDependency);
             });
         } catch (Exception e) {
             throw DependencyResolutionException.cannotResolveDependency(dependency, e);
         }
+    }
+
+    private ResolvedDependency extractVendorDependencyIfNecessary(NotationDependency dependency,
+                                                                  ResolvedDependency resolvedDependency) {
+        if (dependency instanceof VendorNotationDependency) {
+            VendorNotationDependency vendorNotationDependency = (VendorNotationDependency) dependency;
+            Optional<VendorResolvedDependency> result = resolvedDependency.getDependencies().flatten()
+                    .stream()
+                    .filter(d -> d instanceof VendorResolvedDependency)
+                    .map(d -> (VendorResolvedDependency) d)
+                    .filter(d -> d.getRelativePathToHost().toString().equals(vendorNotationDependency.getVendorPath()))
+                    .findFirst();
+            if (result.isPresent()) {
+                return result.get();
+            } else {
+                throw DependencyResolutionException.vendorNotExist(vendorNotationDependency, resolvedDependency);
+            }
+        } else {
+            return resolvedDependency;
+        }
+    }
+
+    private ResolvedDependency resolveVcs(NotationDependency dependency, File vcsRoot) {
+        REPOSITORY repository = resolveToGlobalCache(dependency, vcsRoot);
+        VERSION version = determineVersion(repository, dependency);
+        resetToSpecificVersion(repository, version);
+        return createResolvedDependency(dependency, vcsRoot, repository, version);
     }
 
     @Override
@@ -50,7 +79,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
 
     private void installUnderLock(ResolvedDependency dependency, File targetDirectory) {
-        ResolvedDependency realDependency = determineDependency(dependency);
+        ResolvedDependency realDependency = determineResolvedDependency(dependency);
         Path globalCachePath = globalCacheManager.getGlobalCachePath(realDependency.getName());
         doReset(realDependency, globalCachePath);
 
@@ -58,7 +87,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         IOUtils.copyDirectory(srcPath.toFile(), targetDirectory);
     }
 
-    private ResolvedDependency determineDependency(ResolvedDependency dependency) {
+    private ResolvedDependency determineResolvedDependency(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
             return Cast.cast(VendorResolvedDependency.class, dependency).getHostDependency();
         } else {
@@ -77,12 +106,6 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
     protected abstract void doReset(ResolvedDependency dependency, Path globalCachePath);
 
-    private ResolvedDependency doResolve(NotationDependency dependency, File targetDirectory) {
-        REPOSITORY repository = resolveToGlobalCache(dependency, targetDirectory);
-        VERSION version = determineVersion(repository, dependency);
-        resetToSpecificVersion(repository, version);
-        return createResolvedDependency(dependency, targetDirectory, repository, version);
-    }
 
     protected abstract ResolvedDependency createResolvedDependency(NotationDependency dependency,
                                                                    File directory,

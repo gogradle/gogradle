@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.exceptions;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.gradle.api.GradleException;
@@ -63,4 +64,9 @@ public final class DependencyResolutionException extends GradleException {
     }
 
 
+    public static DependencyResolutionException vendorNotExist(VendorNotationDependency vendorNotationDependency,
+                                                               ResolvedDependency resolvedDependency) {
+        return new DependencyResolutionException("vendor dependency " + vendorNotationDependency.toString()
+                + " does not exist in transitive dependencies in " + resolvedDependency);
+    }
 }
