@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.github.blindpirate.gogradle.GolangPluginSetting;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -18,13 +17,13 @@ import java.util.EnumSet;
 import java.util.List;
 
 import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
+import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DFS_DEPTH;
 
 /**
  * Encapsulation of {@link FileUtils} and {@link org.apache.commons.io.IOUtils},
  * it never throws checked exceptions.
  */
 public class IOUtils {
-    public static final int MAX_DIRECTORY_WALK_DEPTH = 100;
 
     public static void forceMkdir(final File directory) {
         try {
@@ -87,7 +86,7 @@ public class IOUtils {
 
     public static void write(File file, CharSequence data) {
         try {
-            org.apache.commons.io.FileUtils.write(file, data, GolangPluginSetting.DEFAULT_CHARSET);
+            org.apache.commons.io.FileUtils.write(file, data, DEFAULT_CHARSET);
         } catch (IOException e) {
             handleIOException(e);
         }
@@ -151,7 +150,7 @@ public class IOUtils {
 
     public static void walkFileTreeSafely(Path path, FileVisitor<? super Path> visitor) {
         try {
-            Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DIRECTORY_WALK_DEPTH, visitor);
+            Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DFS_DEPTH, visitor);
         } catch (IOException e) {
             handleIOException(e);
         }

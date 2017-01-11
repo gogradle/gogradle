@@ -17,10 +17,11 @@ import static com.github.blindpirate.gogradle.util.StringUtils.trimToNull;
 @Singleton
 public class GolangPluginSetting {
     public static final String GOGRADLE_VERSION = "0.1.0";
+    public static final String DEFAULT_CHARSET = "UTF-8";
+    public static final int MAX_DFS_DEPTH = 100;
 
     // indicate the global GOPATH (in system environment variables)
     private boolean useGlobalGopath = false;
-    public static final String DEFAULT_CHARSET = "UTF-8";
     private String globalGopath;
     private BuildMode buildMode = REPRODUCIBLE;
     private String packagePath;
