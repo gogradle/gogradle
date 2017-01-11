@@ -36,7 +36,8 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         return resolvedDependency;
     }
 
-    protected abstract <T extends DependencyResolver> Class<T> getResolverClass();
+    protected abstract Class<? extends DependencyResolver> getResolverClass();
+
 
     public void exclude(Map<String, Object> map) {
         transitiveDepExclusions.add(PropertiesExclusionSpec.of(map));
