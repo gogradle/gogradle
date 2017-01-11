@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.util.Assert;
 import groovy.lang.Closure;
 import org.gradle.api.Action;
 import org.gradle.api.DomainObjectCollection;
@@ -9,11 +11,14 @@ import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.internal.DefaultNamedDomainObjectSet;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.TaskDependency;
+import org.gradle.internal.Cast;
 import org.gradle.internal.reflect.DirectInstantiator;
 import org.gradle.internal.reflect.Instantiator;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 
 public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDependency> {
@@ -40,6 +45,21 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
             }
         }
         return result;
+    }
+
+    public List<GolangDependency> flatten() {
+        List<GolangDependency> result = new ArrayList<>();
+        this.forEach(dependency -> dfs(dependency, result, 0));
+        return result;
+    }
+
+    private void dfs(GolangDependency dependency, List<GolangDependency> result, int depth) {
+        Assert.isTrue(depth < GolangPluginSetting.MAX_DFS_DEPTH);
+        result.add(dependency);
+        if (dependency instanceof ResolvedDependency) {
+            Cast.cast(ResolvedDependency.class, dependency).getDependencies()
+                    .forEach(subDependency -> dfs(subDependency, result, depth + 1));
+        }
     }
 
     public DependencySet toDependencySet() {
