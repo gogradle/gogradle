@@ -82,8 +82,12 @@ class LocalDirectoryDependencyTest extends MockInjectorSupport {
     }
 
     @Test(expected = UnsupportedOperationException)
-    void 'local dependency does not support getResolverClass()'(){
+    void 'local dependency does not support getResolverClass()'() {
         dependency.getResolverClass()
+    }
+
+    void 'formatting should succeed'() {
+        assert dependency.formatVersion() == resource.absolutePath
     }
 
 }

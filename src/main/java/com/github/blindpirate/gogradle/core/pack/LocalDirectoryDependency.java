@@ -20,7 +20,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     private File rootDir;
 
-    private GolangDependencySet dependencies;
+    private GolangDependencySet dependencies = GolangDependencySet.empty();
 
     public static LocalDirectoryDependency fromLocal(String name, File rootDir) {
         LocalDirectoryDependency ret = new LocalDirectoryDependency();
@@ -75,6 +75,11 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public void installTo(File targetDirectory) {
         INJECTOR_INSTANCE.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
+    }
+
+    @Override
+    public String formatVersion() {
+        return rootDir.getAbsolutePath();
     }
 
     @Override
