@@ -11,12 +11,14 @@ import org.gradle.api.Project;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static java.util.Arrays.asList;
@@ -53,10 +55,11 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void installDependency(ResolvedDependency dependency) {
-        Path targetLocation = ensureProjectGopathWritable().resolve(dependency.getName());
-        forceMkdir(targetLocation.toFile());
-
-        dependency.installTo(targetLocation.toFile());
+        File targetDir = ensureProjectGopathWritable().resolve(dependency.getName()).toFile();
+        forceMkdir(targetDir);
+        // TODO it is disputable whether clearing target directory should be done
+        clearDirectory(targetDir);
+        dependency.installTo(targetDir);
     }
 
     private Path ensureProjectGopathWritable() {

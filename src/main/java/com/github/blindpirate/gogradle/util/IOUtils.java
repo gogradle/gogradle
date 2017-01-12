@@ -156,4 +156,12 @@ public class IOUtils {
         }
     }
 
+    public static void clearDirectory(File dir) {
+        try {
+            FileUtils.cleanDirectory(dir);
+        } catch (IOException e) {
+            handleIOException(e);
+        }
+    }
+
 }

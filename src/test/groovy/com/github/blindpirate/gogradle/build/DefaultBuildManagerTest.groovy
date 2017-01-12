@@ -88,4 +88,15 @@ fi
         assert gopath.toFile().exists()
         verify(resolvedDependency).installTo(gopath.toFile())
     }
+
+    @Test
+    void 'target directory should be cleared before installing'() {
+        // given
+        when(resolvedDependency.getName()).thenReturn('root/package')
+        IOUtils.write(resource, '.gogradle/build_gopath/root/package/oldbuildremains.go', '')
+        // when
+        manager.installDependency(resolvedDependency)
+        // then
+        assert !resource.toPath().resolve('.gogradle/build_gopath/root/package/oldbuildremains.go').toFile().exists()
+    }
 }
