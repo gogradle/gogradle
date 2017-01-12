@@ -1,12 +1,11 @@
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.Os;
-import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.util.Assert;
 
 import javax.inject.Singleton;
-
 import java.util.List;
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;

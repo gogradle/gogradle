@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
-import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
+import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;

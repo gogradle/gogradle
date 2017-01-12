@@ -13,7 +13,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.core.exceptions.PackageResolutionException.cannotResolvePath
-import static com.github.blindpirate.gogradle.util.MockUtils.*
+import static com.github.blindpirate.gogradle.util.MockUtils.mockVcsPackage
+import static com.github.blindpirate.gogradle.util.MockUtils.mockVcsService
 import static java.util.Optional.of
 import static org.mockito.AdditionalMatchers.not
 import static org.mockito.ArgumentMatchers.eq

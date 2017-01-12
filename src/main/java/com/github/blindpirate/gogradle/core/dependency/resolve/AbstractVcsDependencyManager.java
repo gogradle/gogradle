@@ -28,6 +28,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
     @Override
     public ResolvedDependency resolve(final NotationDependency dependency) {
         try {
+
             return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
                 File vcsRoot = globalCacheManager.getGlobalCachePath(dependency.getName()).toFile();
                 ResolvedDependency vcsResolvedDependency = resolveVcs(dependency, vcsRoot);

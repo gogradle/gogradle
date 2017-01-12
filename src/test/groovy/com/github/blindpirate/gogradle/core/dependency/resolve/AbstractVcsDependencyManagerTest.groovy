@@ -3,12 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
