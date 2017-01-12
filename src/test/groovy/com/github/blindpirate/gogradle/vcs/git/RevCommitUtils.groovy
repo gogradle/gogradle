@@ -11,6 +11,10 @@ class RevCommitUtils {
     }
 
     static RevCommit of(String sha1) {
+        return of(sha1, null)
+    }
+
+    static RevCommit of(String sha1, Integer commitTimeUnixSecond) {
         RevCommit ret = RevCommit.parse([48] * 64 as byte[])
         Assert.isTrue(sha1.size() == 40)
         byte[] bytes = sha1.decodeHex()
@@ -19,6 +23,9 @@ class RevCommitUtils {
         ReflectionUtils.setField(ret, 'w3', toInt(bytes[8..11]))
         ReflectionUtils.setField(ret, 'w4', toInt(bytes[12..15]))
         ReflectionUtils.setField(ret, 'w5', toInt(bytes[16..19]))
+        if (commitTimeUnixSecond != null) {
+            ReflectionUtils.setField(ret, 'commitTime', commitTimeUnixSecond)
+        }
         return ret
     }
 
