@@ -5,12 +5,12 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
-import org.junit.Before
 
-
-class IntegrationTestSupport {
+abstract class IntegrationTestSupport {
 
     File resource
+
+    File projectRoot
 
     File userhome
 
@@ -29,7 +29,6 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 '''
 
-    @Before
     void baseSetUp() {
         IOUtils.touch(resource.toPath().resolve('settings.gradle').toFile())
         System.setProperty('gradle.user.home', userhome.absolutePath)
@@ -37,8 +36,8 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
     BuildLauncher newBuild(Closure closure) {
         GradleConnector connector = GradleConnector.newConnector()
-                .forProjectDirectory(resource)
-                .useGradleUserHomeDir(userhome)
+                .forProjectDirectory(projectRoot)
+        .useGradleUserHomeDir(userhome)
 
         if (System.getProperty('GRADLE_DIST_HOME') != null) {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
@@ -51,19 +50,27 @@ apply plugin: 'com.github.blindpirate.gogradle'
             build.setStandardOutput(stdoutPs)
             build.setStandardError(stderrPs)
 
-            String jarPath = new File("build/libs/gradle-golang-plugin-0.0.1-SNAPSHOT.jar").absolutePath
-
-            build.withArguments(
-                    //"--debug",
-                    "-PjarPath=${jarPath}",
-                    "-PpluginRootProject=${getMainClasspath()}",
-                    "-Pclasspath=${getClasspath()}")
+            setBuildArguments(build)
 
             closure(build)
             build.run()
         } finally {
             connection.close()
         }
+    }
+
+    void setBuildArguments(BuildLauncher buildLauncher) {
+        buildLauncher.withArguments(buildArguments() as String[])
+    }
+
+    List<String> buildArguments() {
+        String jarPath = new File("build/libs/gradle-golang-plugin-0.0.1-SNAPSHOT.jar").absolutePath
+
+        return [
+                //"--debug",
+                "-PjarPath=${jarPath}",
+                "-PpluginRootProject=${getMainClasspath()}",
+                "-Pclasspath=${getClasspath()}"]
     }
 
     String getClasspath() {
