@@ -37,7 +37,7 @@ apply plugin: 'com.github.blindpirate.gogradle'
     BuildLauncher newBuild(Closure closure) {
         GradleConnector connector = GradleConnector.newConnector()
                 .forProjectDirectory(projectRoot)
-        .useGradleUserHomeDir(userhome)
+                .useGradleUserHomeDir(userhome)
 
         if (System.getProperty('GRADLE_DIST_HOME') != null) {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
