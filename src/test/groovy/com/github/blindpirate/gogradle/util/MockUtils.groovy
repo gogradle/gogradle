@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.util
 
-import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.InjectionHelper
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Injector
 import com.google.inject.Key
@@ -23,21 +23,12 @@ class MockUtils {
         }
     }
 
-    static GolangPackage mockPackage() {
-        return GolangPackage.builder()
-                .withPath('root/package')
-                .withRootPath('root')
-                .withStandard(false)
+    static VcsGolangPackage mockVcsPackage() {
+        return VcsGolangPackage.builder()
+                .withPath('github.com/user/package/a')
+                .withRootPath('github.com/user/package')
+                .withUrl('git@github.com:user/package.git')
                 .withVcsType(VcsType.GIT)
-                .build()
-    }
-
-    static GolangPackage mockStandard() {
-        return GolangPackage.builder()
-                .withPath('standard')
-                .withRootPath('standard')
-                .withVcsType(VcsType.GIT)
-                .withStandard(true)
                 .build()
     }
 }
