@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -59,7 +60,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
         GitResolvedDependency ret = GitResolvedDependency.builder()
                 .withNotationDependency(dependency)
-                .withName(dependency.getName())
+                .withName(dependency.getPackage().getRootPath())
                 .withCommitId(commit.getName())
                 .withTag(cast(GitNotationDependency.class, dependency).getTag())
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
@@ -67,7 +68,19 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 .build();
         GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor);
         ret.setDependencies(dependencies);
+
+        setVendorUpdateTimeIfNecessary(repository, dependencies);
         return ret;
+    }
+
+    private void setVendorUpdateTimeIfNecessary(Repository repository, GolangDependencySet dependencies) {
+        dependencies.flatten().stream()
+                .filter(dependency -> dependency instanceof VendorResolvedDependency)
+                .map(dependency -> (VendorResolvedDependency) dependency)
+                .forEach(dependency -> {
+                    String relativePath = dependency.getRelativePathToHost().toString();
+                    dependency.setUpdateTime(gitAccessor.lastCommitTimeOfPath(repository, relativePath));
+                });
     }
 
     @Override
@@ -129,7 +142,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
         if (urlSpecifiedByUser != null) {
             return Arrays.asList(urlSpecifiedByUser);
         } else {
-            return Arrays.asList(cast(GitNotationDependency.class, dependency).getUrl());
+            return Arrays.asList(cast(GitNotationDependency.class, dependency).getPackage().getUrl());
         }
     }
 
