@@ -38,9 +38,11 @@ public class VendorDependencyFactory {
 
     private GolangDependencySet resolveVendor(ResolvedDependency dependency, File rootDir) {
         Path vendorPath = vendorPath(rootDir);
-        FirstPassVendorDirectoryVisitor firstPassVistor = new FirstPassVendorDirectoryVisitor(vendorPath, packagePathResolver);
+        FirstPassVendorDirectoryVisitor firstPassVistor =
+                new FirstPassVendorDirectoryVisitor(vendorPath, packagePathResolver);
         IOUtils.walkFileTreeSafely(vendorPath, firstPassVistor);
-        SecondPassVendorDirectoryVisitor secondPassVisitor = new SecondPassVendorDirectoryVisitor(dependency, vendorPath, packagePathResolver);
+        SecondPassVendorDirectoryVisitor secondPassVisitor =
+                new SecondPassVendorDirectoryVisitor(dependency, vendorPath, packagePathResolver);
         IOUtils.walkFileTreeSafely(vendorPath, secondPassVisitor);
         return secondPassVisitor.getDependencies();
     }

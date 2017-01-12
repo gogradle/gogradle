@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
@@ -12,6 +11,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.Cast.cast;
 
@@ -33,8 +33,8 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                 hostDependency,
                 caculateRootPathToHost(parent, name));
 
-        DependencyVisitor visitor = InjectionHelper.INJECTOR_INSTANCE.getInstance(DependencyVisitor.class);
-        VendorOnlyProduceStrategy strategy = InjectionHelper.INJECTOR_INSTANCE.getInstance(VendorOnlyProduceStrategy.class);
+        DependencyVisitor visitor = INJECTOR_INSTANCE.getInstance(DependencyVisitor.class);
+        VendorOnlyProduceStrategy strategy = INJECTOR_INSTANCE.getInstance(VendorOnlyProduceStrategy.class);
         GolangDependencySet dependencies = strategy.produce(ret, rootDir, visitor);
         ret.setDependencies(dependencies);
         return ret;

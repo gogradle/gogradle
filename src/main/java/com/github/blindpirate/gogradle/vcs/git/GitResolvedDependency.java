@@ -14,6 +14,7 @@ import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMM
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.URL_KEY;
 
 public class GitResolvedDependency extends AbstractResolvedDependency {
+    private static final int COMMIT_PREFIX_LENGTH = 7;
     private String tag;
     private String repoUrl;
 
@@ -38,9 +39,9 @@ public class GitResolvedDependency extends AbstractResolvedDependency {
     @Override
     public String formatVersion() {
         if (tag != null) {
-            return tag + "(" + getVersion().substring(0, 5) + ")";
+            return tag + "(" + getVersion().substring(0, COMMIT_PREFIX_LENGTH) + ")";
         } else {
-            return getVersion().substring(0, 5);
+            return getVersion().substring(0, COMMIT_PREFIX_LENGTH);
         }
     }
 

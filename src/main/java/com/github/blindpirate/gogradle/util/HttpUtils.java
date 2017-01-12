@@ -304,7 +304,8 @@ public class HttpUtils {
         is.close();
 
         // handle redirects
-        if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+        if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
+                || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
             String location = conn.getHeaderField("Location");
             return fetch(method, location, body, headers);
         }

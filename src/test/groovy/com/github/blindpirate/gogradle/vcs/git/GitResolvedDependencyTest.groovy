@@ -60,7 +60,7 @@ class GitResolvedDependencyTest {
 
     @Test
     void 'formatting should succeed'() {
-        assert newResolvedDependency().formatVersion() == 'commi'
+        assert newResolvedDependency().formatVersion() == 'commitI'
     }
 
     @Test
@@ -70,6 +70,6 @@ class GitResolvedDependencyTest {
         ReflectionUtils.setField(dependency, 'tag', 'tag')
 
         // then
-        assert dependency.formatVersion() == 'tag(commi)'
+        assert dependency.formatVersion() == 'tag(commitI)'
     }
 }

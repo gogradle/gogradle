@@ -100,11 +100,11 @@ public class VcsGolangPackage extends GolangPackage {
 
     @Override
     public String toString() {
-        return "VcsGolangPackage{" +
-                "path='" + getPath() + '\'' +
-                "rootPath='" + rootPath + '\'' +
-                ", vcsType=" + vcsType +
-                ", url='" + url + '\'' +
-                '}';
+        return "VcsGolangPackage{"
+                + "path='" + getPath() + '\''
+                + "rootPath='" + rootPath + '\''
+                + ", vcsType=" + vcsType
+                + ", url='" + url + '\''
+                + '}';
     }
 }
