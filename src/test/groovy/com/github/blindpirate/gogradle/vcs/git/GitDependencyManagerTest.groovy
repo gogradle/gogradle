@@ -2,16 +2,22 @@ package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
 import org.junit.Before
@@ -19,6 +25,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.file.Paths
 import java.util.concurrent.Callable
 
 import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.callCallableAnswer
@@ -28,8 +35,7 @@ import static java.util.Optional.empty
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
 import static org.mockito.Matchers.anyString
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -48,35 +54,52 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     GolangDependencySet dependencySet
     @Mock
     DependencyProduceStrategy strategy
+    @Mock
+    Set exclusionSpecs
 
     GitDependencyManager gitDependencyManager
-    // this is a fake commit. We cannot mock RevCommit directly because RevCommit.getName() is final
-    RevCommit revCommit = RevCommitUtils.aCommit()
+
+    String commitId = '1' * 40
+    RevCommit revCommit = RevCommitUtils.of(commitId, 123)
+    String repoUrl = 'git@github.com:a/b.git'
+    GolangPackage thePackage = VcsGolangPackage.builder()
+            .withPath('github.com/a/b')
+            .withRootPath('github.com/a/b')
+            .withVcsType(VcsType.GIT)
+            .withUrl(repoUrl)
+            .build()
 
     File resource
 
     @Before
     void setUp() {
-        gitDependencyManager = new GitDependencyManager(cacheManager, gitAccessor, null)
+        gitDependencyManager = new GitDependencyManager(cacheManager, gitAccessor, mock(DependencyVisitor))
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalCachePath(anyString())).thenReturn(resource.toPath())
         when(gitAccessor.getRepository(resource)).thenReturn(repository)
         when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
+        when(gitAccessor.findCommit(repository, commitId)).thenReturn(of(revCommit))
         when(gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(of(revCommit))
 
-        when(gitAccessor.getRemoteUrl(repository)).thenReturn("url")
+        when(gitAccessor.getRemoteUrl(repository)).thenReturn("git@github.com:a/b.git")
         when(notationDependency.getStrategy()).thenReturn(strategy)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor)))
-                .thenReturn(GolangDependencySet.empty())
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
+
+        when(notationDependency.getTransitiveDepExclusions()).thenReturn(exclusionSpecs)
+
+        when(notationDependency.getUrl()).thenReturn(repoUrl)
+        when(notationDependency.getCommit()).thenReturn(revCommit.name)
+        when(notationDependency.getName()).thenReturn('github.com/a/b')
+        when(notationDependency.getPackage()).thenReturn(thePackage)
     }
 
-    // TODO we need an integration test to test
+    // TODO we need an integration test to test all
     // both GitDependencyDependencyManager and GitAccessor
 
     @Test
-    void 'nonexistent repo should be cloned when user specify a url'() {
+    void 'nonexistent repo should be cloned when url specified'() {
         // given:
         when(notationDependency.getUrl()).thenReturn("url")
         // when:
@@ -84,35 +107,73 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // then:
         verify(gitAccessor).cloneWithUrl('url', resource)
     }
-//
-//    @Test
-//    void 'multiple urls should be tried to clone the repo'() {
-//        // given:
-//        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-//        when(gitAccessor.cloneWithUrl('url1', resource)).thenThrow(new IllegalStateException())
-//        // when:
-//        gitDependencyManager.resolve(notationDependency)
-//        // then:
-//        verify(gitAccessor).cloneWithUrl('url2', resource)
-//    }
 
-//    @Test
-//    void 'subsequent url should be ignored if cloning succeed'() {
-//        // given:
-//        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-//        // when:
-//        gitDependencyManager.resolve(notationDependency)
-//        // then:
-//        verify(gitAccessor, times(0)).cloneWithUrl('url2', resource)
-//    }
+    @Test
+    void 'nonexistent repo should be cloned with auto-recognized url when url not specified'() {
+        // given
+        when(notationDependency.getUrl()).thenReturn(null)
+        // when:
+        gitDependencyManager.resolve(notationDependency)
+        // then:
+        verify(gitAccessor).cloneWithUrl(repoUrl, resource)
+    }
+
+    @Test
+    void 'git notation dependency should be resolved successfully'() {
+        // given
+        when(notationDependency.getTag()).thenReturn('tag')
+        when(notationDependency.isFirstLevel()).thenReturn(true)
+        // when
+        GitResolvedDependency result = gitDependencyManager.resolve(notationDependency)
+        // then
+        assertResolvedDependency(result)
+    }
+
+    void assertResolvedDependency(GitResolvedDependency result) {
+        assert result.name == 'github.com/a/b'
+        assert result.dependencies.isEmpty()
+        assert result.repoUrl == repoUrl
+        assert result.tag == 'tag'
+        assert result.version == commitId
+        assert result.updateTime == 123000L
+        assert result.firstLevel
+        assert ReflectionUtils.getField(result, 'transitiveDepExclusions').is(exclusionSpecs)
+    }
+
+    @Test
+    void 'git notation dependency with non-root name should be resolved successfully'() {
+        // given
+        when(notationDependency.getName()).thenReturn('github.com/a/b/c')
+        when(notationDependency.getPackage()).thenReturn(thePackage.resolve('github.com/a/b/c').get())
+        when(notationDependency.getTag()).thenReturn('tag')
+        when(notationDependency.isFirstLevel()).thenReturn(true)
+        // when
+        GitResolvedDependency result = gitDependencyManager.resolve(notationDependency)
+        // then
+        assertResolvedDependency(result)
+    }
+
+    @Test
+    void 'update time of vendor dependency should be set to last commit time of that directory'() {
+        // given
+        VendorResolvedDependency vendorResolvedDependency = mockWithName(VendorResolvedDependency, 'vendorResolvedDependency')
+        GolangDependencySet dependencies = DependencyUtils.asGolangDependencySet(vendorResolvedDependency)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencies)
+        when(vendorResolvedDependency.getHostDependency()).thenReturn(resolvedDependency)
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/path/to/vendor'))
+        when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
+        when(gitAccessor.lastCommitTimeOfPath(repository, 'vendor/path/to/vendor')).thenReturn(456L)
+        // when
+        gitDependencyManager.resolve(notationDependency)
+        // then
+        verify(vendorResolvedDependency).setUpdateTime(456L)
+    }
 
     @Test
     void 'existed repository should be updated'() {
         IOUtils.write(resource, 'placeholder', '')
-
         // given:
-        when(gitAccessor.getRemoteUrls(repository)).thenReturn(['url'] as Set)
-        when(notationDependency.getUrl()).thenReturn('url')
+        when(gitAccessor.getRemoteUrls(repository)).thenReturn([repoUrl] as Set)
         // when:
         gitDependencyManager.resolve(notationDependency)
         // then:
@@ -145,6 +206,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test
     void 'commit will be searched if tag cannot be recognized'() {
         // given
+        when(notationDependency.getCommit()).thenReturn(null)
         when(notationDependency.getTag()).thenReturn('tag')
         // when
         gitDependencyManager.resolve(notationDependency)
@@ -165,8 +227,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown when every url has been tried'() {
         // given
-        when(notationDependency.getUrl()).thenReturn('url')
-        when(gitAccessor.cloneWithUrl('url', resource)).thenThrow(new IllegalStateException())
+        when(gitAccessor.cloneWithUrl(repoUrl, resource)).thenThrow(new IllegalStateException())
 
         // when
         gitDependencyManager.resolve(notationDependency)
@@ -174,9 +235,6 @@ class GitDependencyManagerTest extends MockInjectorSupport {
 
     @Test
     void 'resetting to a commit should succeed'() {
-        // given
-        when(notationDependency.getCommit()).thenReturn(revCommit.name)
-        when(gitAccessor.findCommit(repository, revCommit.name)).thenReturn(of(revCommit))
         // when
         gitDependencyManager.resolve(notationDependency)
         // then
@@ -186,8 +244,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyResolutionException)
     void 'trying to resolve an inexistent commit should result in an exception'() {
         // given
-        revCommit = RevCommitUtils.aCommit()
-        when(notationDependency.getCommit()).thenReturn(revCommit.name)
+        when(notationDependency.getCommit()).thenReturn('inexistent')
         // when
         gitDependencyManager.resolve(notationDependency)
     }

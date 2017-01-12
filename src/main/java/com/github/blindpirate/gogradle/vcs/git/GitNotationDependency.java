@@ -3,8 +3,6 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
-import java.util.List;
-
 // TODO what about branch?
 public class GitNotationDependency extends AbstractNotationDependency {
 
@@ -57,6 +55,5 @@ public class GitNotationDependency extends AbstractNotationDependency {
     public Class<? extends DependencyResolver> getResolverClass() {
         return GitDependencyManager.class;
     }
-
 
 }
