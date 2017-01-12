@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
-import com.github.blindpirate.gogradle.core.dependency.resolve.VendorDependencyResolver;
+import org.gradle.internal.Cast;
 
 public class VendorNotationDependency extends AbstractNotationDependency {
 
@@ -15,7 +15,7 @@ public class VendorNotationDependency extends AbstractNotationDependency {
         return vendorPath;
     }
 
-    public NotationDependency getHostNotationDependency() {
+    public NotationDependency getHostDependency() {
         return hostNotationDependency;
     }
 
@@ -26,6 +26,6 @@ public class VendorNotationDependency extends AbstractNotationDependency {
 
     @Override
     public Class<? extends DependencyResolver> getResolverClass() {
-        return VendorDependencyResolver.class;
+        return Cast.cast(AbstractNotationDependency.class, hostNotationDependency).getResolverClass();
     }
 }

@@ -3,15 +3,18 @@ package com.github.blindpirate.gogradle.core.dependency.produce
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
@@ -38,7 +41,12 @@ class VendorDependencyFactoryTest extends MockInjectorSupport {
     @Mock
     ResolvedDependency resolvedDependency
 
-    GolangPackage golangPackage = MockUtils.mockPackage()
+    GolangPackage golangPackage = MockUtils.mockVcsPackage()
+
+    @Before
+    void setUp(){
+        when(injector.getInstance(VendorOnlyProduceStrategy)).thenReturn(new VendorOnlyProduceStrategy())
+    }
 
     @Test
     void 'directory without vendor should produce an empty dependency set'() {
@@ -48,7 +56,7 @@ class VendorDependencyFactoryTest extends MockInjectorSupport {
     @Test
     void 'producing a vendor dependency should succeed'() {
         // given
-        when(resolver.produce('root')).thenReturn(of(GolangPackage.INCOMPLETE))
+        when(resolver.produce('root')).thenReturn(of(IncompleteGolangPackage.of('root')))
         when(resolver.produce('root/package')).thenReturn(of(golangPackage))
         when(injector.getInstance(DependencyVisitor)).thenReturn(visitor)
         when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File)))

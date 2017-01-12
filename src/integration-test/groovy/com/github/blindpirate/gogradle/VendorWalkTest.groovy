@@ -23,19 +23,23 @@ class VendorWalkTest extends GogradleModuleSupport {
 
     @Test
     void 'create cascading vendor package should succeed'() {
+        // when
         LocalDirectoryDependency localPackage = LocalDirectoryDependency.fromLocal('testpackage', resource);
-
         GolangDependencySet dependencies = factory.produce(localPackage, resource)
-
-        assert dependencies.size() == 2
+        // then
+        assert dependencies.size() == 3
         dependencies.each { assert it instanceof VendorResolvedDependency }
+        dependencies.each { assert getHostDependency(it) == localPackage }
+
         assert dependencies.any {
             it.name == 'github.com/e/f' && getRelativePathToHost(it) == 'vendor/github.com/e/f'
         }
         assert dependencies.any {
             it.name == 'github.com/e/g' && getRelativePathToHost(it) == 'vendor/github.com/e/g'
         }
-        dependencies.each { assert getHostDependency(it) == localPackage }
+        assert dependencies.any {
+            it.name == 'unrecognized/a' && getRelativePathToHost(it) == 'vendor/unrecognized/a'
+        }
 
         VendorResolvedDependency github_e_f = dependencies.find { it.name == 'github.com/e/f' }
         assert github_e_f.dependencies.size() == 1
@@ -44,6 +48,9 @@ class VendorWalkTest extends GogradleModuleSupport {
         assert github_j_k.name == 'github.com/j/k'
         assert getRelativePathToHost(github_j_k) == 'vendor/github.com/e/f/vendor/github.com/j/k'
         assert getHostDependency(github_j_k) == localPackage
+
+        VendorResolvedDependency unrecognized_a = dependencies.find { it.name == 'unrecognized/a' }
+        assert unrecognized_a.dependencies.isEmpty()
     }
 
 

@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
+import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.util.Cast;
 
 import java.io.File;
@@ -12,10 +13,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
-import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_ONLY_PRODUCE_STRATEGY;
 import static com.github.blindpirate.gogradle.util.Cast.cast;
 
 public class VendorResolvedDependency extends AbstractResolvedDependency {
+
+    public static final long UNKNOWN_UPDATE_TIME = -1;
 
     private ResolvedDependency hostDependency;
 
@@ -27,24 +29,15 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         ResolvedDependency hostDependency = determineHostDependency(parent);
         VendorResolvedDependency ret = new VendorResolvedDependency(name,
                 hostDependency.getVersion(),
-                hostDependency.getUpdateTime(),
+                UNKNOWN_UPDATE_TIME,
                 hostDependency,
                 caculateRootPathToHost(parent, name));
 
         DependencyVisitor visitor = InjectionHelper.INJECTOR_INSTANCE.getInstance(DependencyVisitor.class);
-        GolangDependencySet dependencies = VENDOR_ONLY_PRODUCE_STRATEGY.produce(ret, rootDir, visitor);
+        VendorOnlyProduceStrategy strategy = InjectionHelper.INJECTOR_INSTANCE.getInstance(VendorOnlyProduceStrategy.class);
+        GolangDependencySet dependencies = strategy.produce(ret, rootDir, visitor);
         ret.setDependencies(dependencies);
         return ret;
-    }
-
-    public static VendorResolvedDependency fromHost(String name,
-                                                    ResolvedDependency hostDependency,
-                                                    String relativePathToHost) {
-        return new VendorResolvedDependency(name,
-                hostDependency.getVersion(),
-                hostDependency.getUpdateTime(),
-                hostDependency,
-                Paths.get(relativePathToHost));
     }
 
     private VendorResolvedDependency(String name,
@@ -84,11 +77,6 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    public ResolvedDependency resolve() {
-        return this;
-    }
-
-    @Override
     protected Class<? extends DependencyInstaller> getInstallerClass() {
         return Cast.cast(AbstractResolvedDependency.class, hostDependency).getInstallerClass();
     }
@@ -98,6 +86,12 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         Map<String, Object> ret = new HashMap<>(hostDependency.toLockedNotation());
         ret.put(VendorNotationDependency.VENDOR_PATH_KEY, relativePathToHost.toString());
         return ret;
+    }
+
+    @Override
+    public String formatVersion() {
+        return hostDependency.getName() + "#" + hostDependency.formatVersion()
+                + "/" + relativePathToHost;
     }
 
 }

@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
@@ -22,9 +21,6 @@ import java.nio.file.Path;
 public class VendorDependencyFactory {
     public static final String VENDOR_DIRECTORY = "vendor";
 
-    public static final VendorOnlyProduceStrategy VENDOR_ONLY_PRODUCE_STRATEGY
-            = new VendorOnlyProduceStrategy();
-
     private final PackagePathResolver packagePathResolver;
 
     @Inject
@@ -42,9 +38,11 @@ public class VendorDependencyFactory {
 
     private GolangDependencySet resolveVendor(ResolvedDependency dependency, File rootDir) {
         Path vendorPath = vendorPath(rootDir);
-        VendorDirectoryVisitor visitor = new VendorDirectoryVisitor(dependency, vendorPath, packagePathResolver);
-        IOUtils.walkFileTreeSafely(vendorPath, visitor);
-        return visitor.getDependencies();
+        FirstPassVendorDirectoryVisitor firstPassVistor = new FirstPassVendorDirectoryVisitor(vendorPath, packagePathResolver);
+        IOUtils.walkFileTreeSafely(vendorPath, firstPassVistor);
+        SecondPassVendorDirectoryVisitor secondPassVisitor = new SecondPassVendorDirectoryVisitor(dependency, vendorPath, packagePathResolver);
+        IOUtils.walkFileTreeSafely(vendorPath, secondPassVisitor);
+        return secondPassVisitor.getDependencies();
     }
 
     private boolean vendorDirExist(File rootDir) {
