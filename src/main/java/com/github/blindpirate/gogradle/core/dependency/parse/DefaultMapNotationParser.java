@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -40,7 +40,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
     private NotationDependency parseWithVcs(Map<String, Object> notation) {
         String packagePath = MapUtils.getString(notation, NAME_KEY);
         GolangPackage golangPackage = packagePathResolver.produce(packagePath).get();
-        notation.put(INFO_KEY, golangPackage);
+        notation.put(PACKAGE_KEY, golangPackage);
 
         verifyVcsIfNecessary(notation, golangPackage);
 

@@ -68,7 +68,7 @@ class DefaultMapNotationParserTest {
         parser.parse(notation)
 
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'path', 'info': packageInfo]))
+        verify(vcsMapNotationParser).parse(eq([name: 'path', 'package': packageInfo]))
 
     }
 
