@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.DateUtils;
+import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
 import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.UnexpectedCharacterException;
@@ -191,5 +193,26 @@ public class GitAccessor implements VcsAccessor {
         Set<String> urls = getRemoteUrls(repository);
         Assert.isTrue(!urls.isEmpty(), "Cannot get remote urls of repository:" + repository.getDirectory());
         return urls.stream().findFirst().get();
+    }
+
+    public long lastCommitTimeOfPath(Repository repository, String path) {
+        try {
+            Iterable<RevCommit> logs = new Git(repository).log().addPath(path).call();
+            // Can I assume the result is time desc?
+            for (RevCommit commit : logs) {
+                return DateUtils.toMilliseconds(commit.getCommitTime());
+            }
+            throw new IllegalStateException("Cannot find " + path + " in repo " + repository
+                    + " at commit" + getCurrentCommit(repository).getName() + ", is it force-pushed?");
+        } catch (GitAPIException | IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    private RevCommit getCurrentCommit(Repository repository) throws IOException, GitAPIException {
+        for (RevCommit commit : new Git(repository).log().all().call()) {
+            return commit;
+        }
+        throw new IllegalStateException("A initial repository " + repository + "? You must be kidding me!");
     }
 }

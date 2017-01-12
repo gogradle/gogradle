@@ -13,6 +13,65 @@ import org.junit.runner.RunWith
 @WithResource("test-for-gogradle.zip")
 class GitAccessorTest {
 
+//    format
+//    blindpirate committed on Dec 4, 2016
+//    a8d7650
+//    ----------
+//    3.0.0
+//    blindpirate committed on Dec 4, 2016
+//    4a06b73
+//    ----------
+//    2.1.2
+//    blindpirate committed on Dec 4, 2016
+//    06325a9
+//    ----------
+//    2.1.1
+//    blindpirate committed on Dec 4, 2016
+//    0e1c5fb
+//    ----------
+//    2.1.0
+//    blindpirate committed on Dec 4, 2016
+//    d968503
+//    ----------
+//    2.0
+//    blindpirate committed on Dec 4, 2016
+//    eb20df6
+//    ----------
+//    1.2.0
+//    blindpirate committed on Dec 4, 2016
+//    bf90017
+//    ----------
+//    1.0.0
+//    blindpirate committed on Dec 4, 2016
+//    ce46284
+//    ----------
+//    unknown tag
+//    blindpirate committed on Dec 4, 2016
+//    eef7c7d
+//    ----------
+//    0.0.3-prerelease
+//    blindpirate committed on Dec 4, 2016
+//    9390132
+//    ----------
+//    v0.0.2
+//    blindpirate committed on Dec 4, 2016
+//    1002ec6
+//    ----------
+//    0.0.1
+//    blindpirate committed on Dec 4, 2016
+//    396856c
+//    ----------
+//    helloworld.go
+//    blindpirate committed on Dec 4, 2016
+//    a16f45a
+//    ----------
+//    Update README.md
+//    blindpirate committed on GitHub on Dec 4, 2016
+//    8492cf3
+//    ----------
+//    Initial commit
+//    blindpirate committed on Dec 4, 2016
+
     private static final String INITIAL_COMMIT = "b12418e026113005c55a5f52887f3d314f8e5fb1"
 
     // injected by GogradleRunner
@@ -109,6 +168,27 @@ class GitAccessorTest {
 
         assert !resource.toPath().resolve('tmpfile').toFile().exists()
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
+    }
+
+    @Test
+    void 'getting commit time of path should succeed'() {
+        // 2016/12/4 23:17:38 UTC+8
+        assert gitAccessor.lastCommitTimeOfPath(repository, 'helloworld.go') == 1480864658000L
+    }
+
+    @Test
+    void 'commit time should be the nearest time to current repo snapshot'() {
+        long t0 = gitAccessor.lastCommitTimeOfPath(repository, 'README.md')
+        gitAccessor.resetToCommit(repository, '1002ec6')
+        long t1 = gitAccessor.lastCommitTimeOfPath(repository, 'README.md')
+        assert t0 > t1
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'getting path at a commit when it does not exist should throw an exception'() {
+        // helloworld.go didn't exist in initial commit
+        gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
+        gitAccessor.lastCommitTimeOfPath(repository, 'helloworld.go')
     }
 
     def semVersionMatch(String semVersion, String resultCommit) {
