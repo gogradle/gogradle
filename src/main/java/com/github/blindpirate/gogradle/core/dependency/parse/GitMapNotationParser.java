@@ -24,7 +24,7 @@ public class GitMapNotationParser extends AutoConfigureMapNotationParser {
         String tag = getString(notation, TAG_KEY);
         String commit = getString(notation, COMMIT_KEY);
 
-        GolangPackage info = MapUtils.getValue(notation, INFO_KEY, GolangPackage.class);
+        GolangPackage info = MapUtils.getValue(notation, PACKAGE_KEY, GolangPackage.class);
         if (info != null) {
             notation.put(URL_KEY, info.getUrl());
         }

@@ -37,7 +37,7 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with tag should be parsed correctly'() {
         // when
-        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', package: packageInfo])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'commit')
@@ -47,7 +47,7 @@ class GitMapNotationParserTest {
     @Test
     void 'url in map notation should not be overwritten'() {
         // when
-        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'url', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'url', package: packageInfo])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag',)
@@ -58,7 +58,7 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with version should be parsed correctly'() {
         // when
-        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', version: '1fc81', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', version: '1fc81', package: packageInfo])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag')
@@ -69,7 +69,7 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with commit should be parsed correctly'() {
         // when
-        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', package: packageInfo])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag')
@@ -96,7 +96,7 @@ class GitMapNotationParserTest {
     @Test
     void 'map notation with unexpected properties should not cause an exception'() {
         // when
-        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, info: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, package: packageInfo])
 
         // then
         assertWithNameAndUrl(dependency)

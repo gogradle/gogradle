@@ -7,7 +7,7 @@ import java.util.Map;
 public interface MapNotationParser extends NotationParser<Map<String, Object>> {
     String NAME_KEY = "name";
     String DIR_KEY = "dir";
-    String INFO_KEY = "info";
+    String PACKAGE_KEY = "package";
     String VCS_KEY = "vcs";
 
     @Override
