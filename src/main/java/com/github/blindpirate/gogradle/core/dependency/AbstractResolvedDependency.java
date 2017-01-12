@@ -35,6 +35,10 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
         return updateTime;
     }
 
+    public void setUpdateTime(long updateTime) {
+        this.updateTime = updateTime;
+    }
+
     @Override
     public String getVersion() {
         return version;
