@@ -15,6 +15,7 @@ import org.junit.runner.RunWith
 @WithProject
 class StringReverse extends IntegrationTestSupport {
 
+
     @Before
     void setUp() {
         IOUtils.write(resource, 'hello.go', helloDotGo)
@@ -24,11 +25,13 @@ class StringReverse extends IntegrationTestSupport {
     @Test
     @AccessWeb
     void 'a simple test with real go code'() {
+        projectRoot = resource
         newBuild { build ->
             build.forTasks('dependencies')
         }
 
-        assert stdout.toString().contains('''
+        // "golang.org/x/tools:0d047c8 √" -> "golang.org/x/tools √"
+        assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/,'').contains('''
 sample
 └── github.com/golang/example √
     └── golang.org/x/tools √
