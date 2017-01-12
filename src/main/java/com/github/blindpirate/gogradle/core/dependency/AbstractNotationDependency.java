@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import org.gradle.api.specs.Spec;
@@ -17,6 +18,16 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     private DependencyProduceStrategy strategy = DEFAULT_STRATEGY;
 
     private ResolvedDependency resolvedDependency;
+
+    private GolangPackage golangPackage;
+
+    public GolangPackage getPackage() {
+        return golangPackage;
+    }
+
+    public void setPackage(GolangPackage golangPackage) {
+        this.golangPackage = golangPackage;
+    }
 
     @Override
     public DependencyProduceStrategy getStrategy() {
