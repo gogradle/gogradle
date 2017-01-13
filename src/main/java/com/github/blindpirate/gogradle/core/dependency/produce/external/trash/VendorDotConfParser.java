@@ -16,9 +16,6 @@ import java.util.stream.Collectors;
  * @see <a href="https://github.com/rancher/trash/blob/master/vendor.conf">vendor.conf</a>
  */
 
-// TODO
-// # exclude
-// -golang.org/x/net/context
 // https://github.com/ethereum/go-ethereum/blob/master/vendor.conf
 public class VendorDotConfParser {
 

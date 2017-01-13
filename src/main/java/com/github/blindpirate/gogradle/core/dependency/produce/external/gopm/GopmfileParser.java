@@ -26,9 +26,6 @@ import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_
  *
  * @see <a href="https://github.com/gpmgo/docs/blob/master/en-US/gopmfile.md" >.gopmfile</a>
  */
-// TODO
-// FileBasedConfig in JGit can't parse this since it sees the key 'github/x/y' as invalid key (unfortunately, it is)
-// current parser is simple, we should use ANTLR to do the parsing.
 public class GopmfileParser {
     private static final String DEPS_SECTION = "[deps]";
     private static final String BRANCH_KEYWORD = "branch:";

@@ -36,7 +36,6 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packagePath);
     }
 
-    // TODO in case of package a/b/c and package a/b accessed concurrently, we should lock its root package
     @Override
     public synchronized <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable)
             throws Exception {

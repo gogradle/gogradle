@@ -95,9 +95,6 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         when(notationDependency.getPackage()).thenReturn(thePackage)
     }
 
-    // TODO we need an integration test to test all
-    // both GitDependencyDependencyManager and GitAccessor
-
     @Test
     void 'nonexistent repo should be cloned when url specified'() {
         // given:

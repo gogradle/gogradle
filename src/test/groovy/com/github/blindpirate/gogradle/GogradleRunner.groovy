@@ -25,7 +25,6 @@ import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafel
  *  <li>5.Clean up temp directories whenever necessary.</li>
  * <ul>
  */
-// TODO: ignore @AccessWeb when offline
 class GogradleRunner extends BlockJUnit4ClassRunner {
 
     private static final String PROJECT_FEILD = 'project'

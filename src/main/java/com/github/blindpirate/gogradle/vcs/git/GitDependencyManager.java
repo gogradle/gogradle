@@ -117,7 +117,6 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
         }
 
         // use HEAD of master branch
-        // TODO the default branch may not be master
         return gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH).get();
     }
 

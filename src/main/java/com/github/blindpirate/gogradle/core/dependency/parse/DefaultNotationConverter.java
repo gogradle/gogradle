@@ -38,7 +38,6 @@ public class DefaultNotationConverter implements NotationConverter {
     private String extractPackagePath(String notation) {
         for (int i = 0; i < notation.length(); ++i) {
             char c = notation.charAt(i);
-            // TODO not accurate
             if (c == '#' || c == '@') {
                 return notation.substring(0, i);
             }

@@ -57,7 +57,6 @@ public class DefaultBuildManager implements BuildManager {
     public void installDependency(ResolvedDependency dependency) {
         File targetDir = ensureProjectGopathWritable().resolve(dependency.getName()).toFile();
         forceMkdir(targetDir);
-        // TODO it is disputable whether clearing target directory should be done
         clearDirectory(targetDir);
         dependency.installTo(targetDir);
     }

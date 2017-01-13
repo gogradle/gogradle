@@ -9,7 +9,6 @@ import javax.inject.Inject;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TASK_NAME;
 
-// TODO old dependencies should be deleted before installation
 public class InstallDependenciesTask extends AbstractGolangTask {
     @Inject
     private BuildManager buildManager;

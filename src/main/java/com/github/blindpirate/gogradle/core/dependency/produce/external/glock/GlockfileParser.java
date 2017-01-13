@@ -15,7 +15,6 @@ import java.util.stream.Collectors;
  *
  * @see <a href="https://github.com/robfig/glock">glock</a>
  */
-// TODO currently cmd dependencies are ignored
 public class GlockfileParser {
     public List<Map<String, Object>> parse(File file) {
         return IOUtils.getLines(file)

@@ -50,9 +50,6 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
             Assert.isTrue(!elements.isEmpty(), "Missing meta in response of " + url);
 
             String content = elements.get(0).attr("content");
-            // TODO According to https://golang.org/cmd/go/#hdr-Remote_import_paths
-            // we should verify it
-            //String importPath = matcher.group(1);
             LOGGER.info("Meta tag of url {} is:{}", url, content);
             return Optional.of(buildPackageInfo(packagePath, content));
         } catch (IOException e) {

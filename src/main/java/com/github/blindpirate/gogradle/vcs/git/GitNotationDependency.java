@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
-// TODO what about branch?
 public class GitNotationDependency extends AbstractNotationDependency {
 
     public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
