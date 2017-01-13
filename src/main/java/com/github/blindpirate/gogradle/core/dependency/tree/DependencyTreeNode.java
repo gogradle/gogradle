@@ -1,12 +1,13 @@
 package com.github.blindpirate.gogradle.core.dependency.tree;
 
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.util.Assert;
 
 import java.util.ArrayList;
 import java.util.List;
 
-// TODO add root field
 public class DependencyTreeNode {
     private String name;
     private boolean star;
@@ -98,15 +99,15 @@ public class DependencyTreeNode {
 
     public GolangDependencySet flatten() {
         GolangDependencySet result = new GolangDependencySet();
-        dfs(result);
+        dfs(result, 0);
         return result;
     }
 
-    // TODO max depth
-    private void dfs(GolangDependencySet result) {
+    private void dfs(GolangDependencySet result, int depth) {
+        Assert.isTrue(depth < GolangPluginSetting.MAX_DFS_DEPTH);
         for (DependencyTreeNode child : children) {
             result.add(child.finalDependency);
-            child.dfs(result);
+            child.dfs(result, depth + 1);
         }
     }
 }

@@ -53,6 +53,13 @@ a
         assert ('b'..'g').intersect(result.collect({ it.name })) == ('b'..'g')
     }
 
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if max def depth reached'() {
+        DependencyTreeNode node = node('a')
+        node.addChild(node)
+        node.flatten()
+    }
+
 
     DependencyTreeNode node(String originalName, String finalName, boolean star) {
         ResolvedDependency original = DependencyUtils.mockResolvedDependency(originalName)
