@@ -39,9 +39,10 @@ class MockGitAccessor extends GitAccessor {
         return dirName.replaceAll('_', '/')
     }
 
-    // git@github.com:a/b.git -> github.com/a/b
+    // https://github.com/a/b.git -> github.com/a/b
     static urlToPackageName(String gitUrl) {
-        return gitUrl[4..-5].replace(":", "/")
+//        return gitUrl[4..-5].replace(":", "/")
+        return gitUrl[8..-5]
     }
 
     String getLatestCommit(String packageName) {
@@ -103,10 +104,10 @@ class MockGitAccessor extends GitAccessor {
         IOUtils.copyDirectory(directoryOfThatCommit, repository.root)
     }
 
-    //github.com/a/b -> git@github.com:a/b.git
+    //github.com/a/b -> https://github.com/a/b.git
     String getRemoteUrl(Repository repository) {
-        String tmp = repository.packageName.replaceFirst("/", ":")
-        return "git@${tmp}.git"
+        String tmp = repository.packageName  //.replaceFirst("/", ":")
+        return "https://${tmp}.git"
     }
 
     Optional<RevCommit> findCommit(Repository repository, String commitX) {

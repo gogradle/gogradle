@@ -38,7 +38,7 @@ public class GithubPackagePathResolver implements PackagePathResolver {
 
     private Optional<GolangPackage> doProduce(String packagePath) {
         Path path = toPath(packagePath);
-        String sshUrl = String.format("git@github.com:%s.git", path.subpath(1, 3));
+        String sshUrl = String.format("https://%s.git", path.subpath(0, 3));
         String rootPackagePath = path.subpath(0, 3).toString();
 
         GolangPackage info = VcsGolangPackage.builder()

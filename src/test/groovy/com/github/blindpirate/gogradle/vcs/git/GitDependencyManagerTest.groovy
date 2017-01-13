@@ -61,7 +61,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
 
     String commitId = '1' * 40
     RevCommit revCommit = RevCommitUtils.of(commitId, 123)
-    String repoUrl = 'git@github.com:a/b.git'
+    String repoUrl = 'https://github.com/a/b.git'
     GolangPackage thePackage = VcsGolangPackage.builder()
             .withPath('github.com/a/b')
             .withRootPath('github.com/a/b')
@@ -83,7 +83,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         when(gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(of(revCommit))
 
-        when(gitAccessor.getRemoteUrl(repository)).thenReturn("git@github.com:a/b.git")
+        when(gitAccessor.getRemoteUrl(repository)).thenReturn("https://github.com/a/b.git")
         when(notationDependency.getStrategy()).thenReturn(strategy)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
 

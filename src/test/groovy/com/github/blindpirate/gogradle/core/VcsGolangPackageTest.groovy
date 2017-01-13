@@ -12,7 +12,7 @@ class VcsGolangPackageTest {
         String s = vcsGolangPackage.toString()
         assert s.contains("path='github.com/user/package/a'")
         assert s.contains('vcsType=GIT')
-        assert s.contains('git@github.com:user/package.git')
+        assert s.contains('https://github.com/user/package.git')
         assert s.contains("rootPath='github.com/user/package'")
     }
 
@@ -44,6 +44,6 @@ class VcsGolangPackageTest {
         assert golangPackage instanceof VcsGolangPackage
         assert golangPackage.rootPath == 'github.com/user/package'
         assert golangPackage.vcsType == VcsType.GIT
-        assert golangPackage.url == 'git@github.com:user/package.git'
+        assert golangPackage.url == 'https://github.com/user/package.git'
     }
 }

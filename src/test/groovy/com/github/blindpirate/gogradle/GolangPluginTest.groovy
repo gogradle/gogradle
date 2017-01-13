@@ -132,7 +132,7 @@ class GolangPluginTest {
                 exclude name: 'github.com/c/d'
             }
 
-            build(name: 'github.com/c/d', url: 'git@github.com:a/b.git') {
+            build(name: 'github.com/c/d', url: 'https://github.com/a/b.git') {
                 transitive = false
             }
         }
@@ -143,7 +143,7 @@ class GolangPluginTest {
         assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionSpec
 
         def cd = findFirstInDependencies('github.com/c/d')
-        assert cd.url == 'git@github.com:c/d.git'
+        assert cd.url == 'https://github.com/c/d.git'
         assert !getExclusionSpecs(cd).isEmpty()
         // assert !cd.excludeVendor // default value
     }

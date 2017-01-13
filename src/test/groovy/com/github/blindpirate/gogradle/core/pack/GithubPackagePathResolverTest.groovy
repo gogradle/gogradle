@@ -57,7 +57,7 @@ class GithubPackagePathResolverTest {
     void assertVcsTypeUrlAndRootPath(GolangPackage info) {
         assert info.vcsType == VcsType.GIT
         assert info.vcsType == VcsType.GIT
-        assert info.url == 'git@github.com:a/b.git'
+        assert info.url == 'https://github.com/a/b.git'
         assert info.rootPath == 'github.com/a/b'
     }
 }
