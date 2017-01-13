@@ -21,7 +21,6 @@ import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfac
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.when
 
-// TODO what if gogradle.lock already exists?
 @RunWith(GogradleRunner)
 @WithProject
 class DefaultLockedDependencyManagerTest {
@@ -90,6 +89,12 @@ dependencies:
         manager.lock([dependency1, dependency2])
         // then
         assert project.getRootDir().toPath().resolve(LOCK_FILE_NAME).toFile().getText() == gogradleDotLock
+    }
+
+    @Test
+    void 'existent gogradle.lock should be overwritten'() {
+        IOUtils.write(project.getRootDir(), LOCK_FILE_NAME, 'old file content')
+        'writing to gogradle.lock should succeed'()
     }
 
     @Test
