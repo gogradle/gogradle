@@ -124,9 +124,10 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     @WithResource('')
-    void 'clone with https should succeed'() {
+    void 'cloning with https should succeed'() {
         gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource)
         assert resource.toPath().resolve('.git').toFile().exists()
+        assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
 
     @Test
@@ -189,6 +190,15 @@ class GitAccessorTest {
         // helloworld.go didn't exist in initial commit
         gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
         gitAccessor.lastCommitTimeOfPath(repository, 'helloworld.go')
+    }
+
+//    @Test
+    @AccessWeb
+    @WithResource('')
+    void 'cloning and pulling a proxy repository should succeed'() {
+        gitAccessor.cloneWithUrl('https://gopkg.in/ini.v1', resource)
+        assert resource.toPath().resolve('README.md').toFile().exists()
+        assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
 
     def semVersionMatch(String semVersion, String resultCommit) {
