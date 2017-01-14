@@ -76,7 +76,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         gitDependencyManager = new GitDependencyManager(cacheManager, gitAccessor, mock(DependencyVisitor))
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
-        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(resource.toPath())
+        when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
         when(gitAccessor.getRepository(resource)).thenReturn(repository)
         when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
         when(gitAccessor.findCommit(repository, commitId)).thenReturn(of(revCommit))
@@ -255,14 +255,15 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         gitDependencyManager.resolve(notationDependency)
     }
 
-    @Test(expected = DependencyResolutionException)
-    void 'mismatched repository should cause an exception'() {
+    @Test
+    void 'mismatched repository should be cleared'() {
         // given
         when(notationDependency.getUrl()).thenReturn('anotherUrl')
         IOUtils.write(resource, 'some file', 'file content')
-
         // when
         gitDependencyManager.resolve(notationDependency)
+        // then
+        assert IOUtils.dirIsEmpty(resource)
     }
 
     @Test
@@ -270,7 +271,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // given
         File globalCache = IOUtils.mkdir(resource, 'globalCache')
         File projectGopath = IOUtils.mkdir(resource, 'projectGopath')
-        when(cacheManager.getGlobalCachePath(anyString())).thenReturn(globalCache.toPath())
+        when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(globalCache.toPath())
         when(resolvedDependency.getVersion()).thenReturn(revCommit.getName())
         when(gitAccessor.getRepository(globalCache)).thenReturn(repository)
         // when
@@ -282,7 +283,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyInstallationException)
     void 'exception in install process should be wrapped'() {
         // given
-        when(cacheManager.getGlobalCachePath(anyString())).thenThrow(new IllegalStateException())
+        when(cacheManager.getGlobalPackageCachePath(anyString())).thenThrow(new IllegalStateException())
         // then
         gitDependencyManager.install(resolvedDependency, resource)
     }

@@ -10,6 +10,8 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationExc
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -19,6 +21,7 @@ import java.util.Optional;
 public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         implements DependencyResolver, DependencyInstaller {
 
+    private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
     private final GlobalCacheManager globalCacheManager;
 
     public AbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
@@ -30,7 +33,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         try {
 
             return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
-                File vcsRoot = globalCacheManager.getGlobalCachePath(dependency.getName()).toFile();
+                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
                 ResolvedDependency vcsResolvedDependency = resolveVcs(dependency, vcsRoot);
                 return extractVendorDependencyIfNecessary(dependency, vcsResolvedDependency);
             });
@@ -81,7 +84,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
     private void installUnderLock(ResolvedDependency dependency, File targetDirectory) {
         ResolvedDependency realDependency = determineResolvedDependency(dependency);
-        Path globalCachePath = globalCacheManager.getGlobalCachePath(realDependency.getName());
+        Path globalCachePath = globalCacheManager.getGlobalPackageCachePath(realDependency.getName());
         doReset(realDependency, globalCachePath);
 
         Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
@@ -139,10 +142,10 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
             if (ret.isPresent()) {
                 return ret;
             } else {
-                throw new IllegalStateException("Existing cache directory "
-                        + directory.getAbsolutePath()
-                        + " does not match the dependency "
-                        + dependency.getName());
+                LOGGER.warn("Repo " + directory.getAbsolutePath()
+                        + "doesn't match url declared in dependency, it will be cleared.");
+                IOUtils.clearDirectory(directory);
+                return Optional.empty();
             }
         }
     }
