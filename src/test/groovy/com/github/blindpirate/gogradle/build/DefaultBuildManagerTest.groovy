@@ -9,8 +9,10 @@ import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,6 +23,7 @@ import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.build.BuildManager.GOGRADLE_BUILD_DIR
 import static java.nio.file.attribute.PosixFilePermissions.fromString
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -44,6 +47,9 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     String mockGoBin = '''\
 #!/usr/bin/env sh
 
+echo "build started"
+echo "some error occurred" >&2
+
 if [ "-o" = "$1" -a "" != "$2" ]; then
     echo $PWD > $2
 else
@@ -55,17 +61,21 @@ fi
     void setUp() {
         manager = new DefaultBuildManager(project, binaryManager, setting)
         when(project.getRootDir()).thenReturn(resource)
+    }
 
+    void prepareMockGoBin() {
+        when(setting.getPackagePath()).thenReturn('root/package')
+        IOUtils.write(resource, 'go', mockGoBin)
+        Path mockGoBinPath = resource.toPath().resolve('go')
+        Files.setPosixFilePermissions(mockGoBinPath, fromString('rwx------'))
+        when(binaryManager.getBinaryPath()).thenReturn(mockGoBinPath.toString())
+        when(binaryManager.getGorootEnv()).thenReturn('')
     }
 
     @Test
     void 'build should succeed'() {
         // given
-        IOUtils.write(resource, 'go', mockGoBin)
-        Path mockGoBinPath = resource.toPath().resolve('go')
-        Files.setPosixFilePermissions(mockGoBinPath, fromString('rwx------'))
-        when(binaryManager.binaryPath()).thenReturn(mockGoBinPath.toString())
-        when(setting.getPackagePath()).thenReturn('root/package')
+        prepareMockGoBin()
         // when
         manager.build()
         // then
@@ -75,6 +85,19 @@ fi
         Path outputFilePath = resource.toPath().resolve(GOGRADLE_BUILD_DIR).resolve("${hostOs}_${hostArch}_package")
         String outputFileContent = outputFilePath.toFile().getText()
         assert outputFileContent.trim() == resource.toPath().toString()
+    }
+
+    @Test
+    void 'build stdout and stderr should be redirected to current process'() {
+        // given
+        Logger mockLogger = mock(Logger)
+        ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', mockLogger)
+        prepareMockGoBin()
+        // when
+        manager.build()
+        // then
+        verify(mockLogger).quiet('build started')
+        verify(mockLogger).error('some error occurred')
     }
 
     @Test
