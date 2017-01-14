@@ -29,13 +29,13 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
     void baseSetUp() {
         IOUtils.touch(getProjectRoot().toPath().resolve('settings.gradle').toFile())
-//        System.setProperty('gradle.user.home', userhome.absolutePath)
+        System.setProperty('gradle.user.home', userhome.absolutePath)
     }
 
     BuildLauncher newBuild(Closure closure) {
         GradleConnector connector = GradleConnector.newConnector()
                 .forProjectDirectory(getProjectRoot())
-//                .useGradleUserHomeDir(userhome)
+                .useGradleUserHomeDir(userhome)
 
         if (System.getProperty('GRADLE_DIST_HOME') != null) {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
