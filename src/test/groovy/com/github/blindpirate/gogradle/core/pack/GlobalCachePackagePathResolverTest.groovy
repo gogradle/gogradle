@@ -41,7 +41,7 @@ class GlobalCachePackagePathResolverTest {
     @Before
     void setUp() {
         resolver = new GlobalCachePackagePathResolver(cacheManager)
-        when(cacheManager.getGlobalCachePath(anyString())).thenAnswer(new Answer<Object>() {
+        when(cacheManager.getGlobalPackageCachePath(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 String packagePath = invocation.getArgument(0)

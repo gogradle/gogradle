@@ -12,7 +12,9 @@ import java.util.concurrent.Callable;
 public interface GlobalCacheManager {
     void ensureGlobalCacheExistAndWritable();
 
-    Path getGlobalCachePath(String packagePath);
+    Path getGlobalPackageCachePath(String packagePath);
+
+    Path getGlobalGoBinCache(String relativePath);
 
     /**
      * Locks global cache directory of {@code dependency}, and call the {@code callable}

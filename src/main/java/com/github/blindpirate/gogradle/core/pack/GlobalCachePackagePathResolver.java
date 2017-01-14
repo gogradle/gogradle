@@ -39,7 +39,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     }
 
     private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
-        Path realPath = globalCacheManager.getGlobalCachePath(repoRootPath.toString());
+        Path realPath = globalCacheManager.getGlobalPackageCachePath(repoRootPath.toString());
         String url = vcsType.getAccessor().getRemoteUrl(realPath.toFile());
         return VcsGolangPackage.builder()
                 .withPath(packagePath)
@@ -51,7 +51,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     }
 
     private Optional<VcsType> findVcsRepo(Path path) {
-        Path realPath = globalCacheManager.getGlobalCachePath(path.toString());
+        Path realPath = globalCacheManager.getGlobalPackageCachePath(path.toString());
         return Arrays.stream(VcsType.values())
                 .filter(vcs -> exists(realPath.resolve(vcs.getRepo())))
                 .findFirst();

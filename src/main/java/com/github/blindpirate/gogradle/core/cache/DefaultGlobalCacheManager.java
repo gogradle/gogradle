@@ -32,8 +32,13 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public Path getGlobalCachePath(String packagePath) {
+    public Path getGlobalPackageCachePath(String packagePath) {
         return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packagePath);
+    }
+
+    @Override
+    public Path getGlobalGoBinCache(String relativePath) {
+        return gradleHome.resolve(GO_BINARAY_CACHE_PATH).resolve(relativePath);
     }
 
     @Override
@@ -68,7 +73,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     private void createPackageDirectoryIfNeccessary(GolangDependency dependency) {
-        Path path = getGlobalCachePath(dependency.getName());
+        Path path = getGlobalPackageCachePath(dependency.getName());
         IOUtils.ensureDirExistAndWritable(path);
     }
 }

@@ -57,7 +57,7 @@ class AbstractVcsDependencyManagerTest {
 
         when(vendorNotationDependency.getName()).thenReturn('thisisvendor')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')
-        when(cacheManager.getGlobalCachePath('thisisvendor')).thenReturn(resource.toPath())
+        when(cacheManager.getGlobalPackageCachePath('thisisvendor')).thenReturn(resource.toPath())
     }
 
     @Test
@@ -67,7 +67,7 @@ class AbstractVcsDependencyManagerTest {
         dest = IOUtils.mkdir(resource, 'dest')
         IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
         when(hostResolvedDependency.getName()).thenReturn('host')
-        when(cacheManager.getGlobalCachePath('host')).thenReturn(src.toPath())
+        when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(src.toPath())
         // when
         manager.install(vendorResolvedDependency, dest)
         // then
