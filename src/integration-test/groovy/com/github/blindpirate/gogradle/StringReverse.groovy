@@ -25,13 +25,12 @@ class StringReverse extends IntegrationTestSupport {
     @Test
     @AccessWeb
     void 'a simple test with real go code'() {
-        projectRoot = resource
         newBuild { build ->
             build.forTasks('dependencies')
         }
 
         // "golang.org/x/tools:0d047c8 √" -> "golang.org/x/tools √"
-        assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/,'').contains('''
+        assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/, '').contains('''
 sample
 └── github.com/golang/example √
     └── golang.org/x/tools √
@@ -60,4 +59,9 @@ dependencies {
     build 'github.com/golang/example'
 }
 """
+
+    @Override
+    File getProjectRoot() {
+        return resource
+    }
 }

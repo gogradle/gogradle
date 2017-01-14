@@ -10,8 +10,6 @@ abstract class IntegrationTestSupport {
 
     File resource
 
-    File projectRoot
-
     File userhome
 
     ByteArrayOutputStream stdout = new ByteArrayOutputStream()
@@ -30,14 +28,14 @@ apply plugin: 'com.github.blindpirate.gogradle'
 '''
 
     void baseSetUp() {
-        IOUtils.touch(resource.toPath().resolve('settings.gradle').toFile())
-        System.setProperty('gradle.user.home', userhome.absolutePath)
+        IOUtils.touch(getProjectRoot().toPath().resolve('settings.gradle').toFile())
+//        System.setProperty('gradle.user.home', userhome.absolutePath)
     }
 
     BuildLauncher newBuild(Closure closure) {
         GradleConnector connector = GradleConnector.newConnector()
-                .forProjectDirectory(projectRoot)
-                .useGradleUserHomeDir(userhome)
+                .forProjectDirectory(getProjectRoot())
+//                .useGradleUserHomeDir(userhome)
 
         if (System.getProperty('GRADLE_DIST_HOME') != null) {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
@@ -72,6 +70,8 @@ apply plugin: 'com.github.blindpirate.gogradle'
                 "-PpluginRootProject=${getMainClasspath()}",
                 "-Pclasspath=${getClasspath()}"]
     }
+
+    abstract File getProjectRoot();
 
     String getClasspath() {
         return System.getProperty('java.class.path')

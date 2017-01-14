@@ -24,6 +24,8 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
 
     File mockGitRepo
 
+    File projectRoot
+
     @Before
     void setUp() {
 //        resource = new File(getClass().getClassLoader().getResource('build-with-mock-git').toURI())
@@ -81,6 +83,11 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
         return super.buildArguments() + ["-PmockFsRoot=${fsRoot.absolutePath}",
                                          "-PmockGitRepo=${mockGitRepo.absolutePath}",
                                          "-Puserhome=${userhome.absolutePath}"]
+    }
+
+    @Override
+    File getProjectRoot() {
+        return projectRoot
     }
 
     void assertDependenciesAre(Map<String, String> finalDependencies) {
