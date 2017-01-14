@@ -55,4 +55,14 @@ public class GitNotationDependency extends AbstractNotationDependency {
         return GitDependencyManager.class;
     }
 
+
+    @Override
+    public String toString() {
+        return "GitNotationDependency{"
+                + "name='" + getName() + '\''
+                + ", commit='" + commit + '\''
+                + ", tag='" + tag + '\''
+                + ", url='" + url + '\''
+                + '}';
+    }
 }
