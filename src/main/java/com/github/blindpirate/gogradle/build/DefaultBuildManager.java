@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
-import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -25,6 +24,7 @@ import java.util.concurrent.CountDownLatch;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
+import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
 import static java.util.Arrays.asList;
 
 @Singleton
@@ -54,9 +54,11 @@ public class DefaultBuildManager implements BuildManager {
         String projectGopath = ensureProjectGopathWritable().toString();
 
         List<String> args = asList(goBinary, "-o", outputFilePath);
-        Map<String, String> envs = ImmutableMap.of(
-                "GOPATH", projectGopath,
-                "GOROOT", gorootEnv);
+
+        Map<String, String> envs = asMap("GOPATH", projectGopath);
+        if (gorootEnv != null) {
+            envs.put("GOROOT", gorootEnv);
+        }
 
         startBuild(args, envs);
     }

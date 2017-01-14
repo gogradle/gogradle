@@ -82,6 +82,15 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         if (resolved) {
             return;
         }
+        if (setting.getGoExecutable() != null) {
+            binaryPath = setting.getGoExecutable();
+        } else {
+            determineGoBinary();
+        }
+        resolved = true;
+    }
+
+    void determineGoBinary() {
         Optional<String> versionOnHost = goVersionOnHost();
 
         if (setting.getGoVersion() != null) {
@@ -97,8 +106,6 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
                 fetchNewestStableVersion();
             }
         }
-
-        resolved = true;
     }
 
     private boolean specificVersionIsHostVersion(Optional<String> versionOnHost) {

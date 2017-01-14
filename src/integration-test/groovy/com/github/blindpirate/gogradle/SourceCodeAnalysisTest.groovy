@@ -24,6 +24,7 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
 
     @WithResource('golang-example-master.zip')
     @Test
+    @AccessWeb
     void 'imports should be parsed correctly'() {
         // given
         Mockito.when(resolvedDependency.getName()).thenReturn("name")
@@ -32,10 +33,6 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
 
         // then
         def expectation = ['golang.org/x/tools', 'github.com/golang/example'] as Set
-        assert result.size() == expectation.size()
-        result.each {
-            assert expectation.contains(it.name)
-        }
-
+        assert result.collect { it.name } as Set == expectation
     }
 }

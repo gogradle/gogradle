@@ -83,6 +83,15 @@ class DefaultGoBinaryManagerTest {
     }
 
     @Test
+    void 'user-specified go binary should be returned if it exists'() {
+        // given
+        when(setting.getGoExecutable()).thenReturn('/bin/go')
+        // then
+        assert manager.getBinaryPath() == '/bin/go'
+        assert manager.getGorootEnv() == null
+    }
+
+    @Test
     void 'local go binary should be returned if it exists and no version specified'() {
         // given
         turnOnMockGo()
