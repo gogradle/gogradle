@@ -25,11 +25,29 @@ public enum Os {
     OPENBSD,
     PLAN9,
     SOLARIS,
-    WINDOWS,
+    WINDOWS {
+        @Override
+        public String exeExtension() {
+            return ".exe";
+        }
+
+        @Override
+        public String archiveExtension() {
+            return ".zip";
+        }
+    },
     ZOS;
 
     public String toString() {
         return name().toLowerCase();
+    }
+
+    public String exeExtension() {
+        return "";
+    }
+
+    public String archiveExtension() {
+        return ".tar.gz";
     }
 
     private static Os hostOs;
