@@ -1,16 +1,17 @@
 package com.github.blindpirate.gogradle.util;
 
-import org.apache.http.util.Asserts;
 
 import java.util.Collection;
 
 public class Assert {
     public static void isTrue(boolean value) {
-        Asserts.check(value, "This value cannot be false!");
+        isTrue(value, "This value cannot be false!");
     }
 
     public static void isTrue(boolean value, String s) {
-        Asserts.check(value, s);
+        if (!value) {
+            throw new IllegalStateException(s);
+        }
     }
 
     public static <T> T isNotNull(T obj, String s) {
