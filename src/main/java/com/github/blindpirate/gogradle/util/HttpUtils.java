@@ -8,7 +8,9 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,6 +21,8 @@ import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSE
  * To support mocking, it does not use public static method intentionally.
  */
 public class HttpUtils {
+    public static final String GET_METHOD = "GET";
+    public static final String POST_METHOD = "POST";
     private static final int TEN_SECONDS = 10000;
     private static final int FOUR_KB = 4096;
 
@@ -43,7 +47,7 @@ public class HttpUtils {
      */
     public String get(String url,
                       Map<String, String> headers) throws IOException {
-        return fetch("GET", url, null, headers);
+        return fetch(GET_METHOD, url, null, headers);
     }
 
     /**
@@ -269,8 +273,15 @@ public class HttpUtils {
      * @return response   Response as string
      * @throws IOException
      */
-    public String fetch(String method, String url, String body,
-                        Map<String, String> headers) throws IOException {
+    private String fetch(String method, String url, String body,
+                         Map<String, String> headers) throws IOException {
+        try (InputStream is = fetchAsInputStream(method, url, body, headers)) {
+            return IOUtils.toString(is);
+        }
+    }
+
+    private InputStream fetchAsInputStream(String method, String url, String body,
+                                           Map<String, String> headers) throws IOException {
         // connection
         URL u = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) u.openConnection();
@@ -298,40 +309,24 @@ public class HttpUtils {
             os.close();
         }
 
-        // response
-        InputStream is = conn.getInputStream();
-        String response = streamToString(is);
-        is.close();
 
         // handle redirects
         if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
                 || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
             String location = conn.getHeaderField("Location");
-            return fetch(method, location, body, headers);
+            return fetchAsInputStream(method, location, body, headers);
+        }
+        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
+            throw new IllegalStateException("Error in accessing " + url
+                    + ", http response code: " + conn.getResponseCode());
         }
 
-        return response;
+        // response
+        return conn.getInputStream();
     }
 
-    /**
-     * Read an input stream into a string
-     *
-     * @param in
-     * @return
-     * @throws IOException
-     */
-    public String streamToString(InputStream in) throws IOException {
-        StringBuilder out = new StringBuilder();
-        byte[] b = new byte[FOUR_KB];
-        int n;
-        while (true) {
-            n = in.read(b);
-            if (n == -1) {
-                break;
-            }
-            out.append(new String(b, 0, n, Charset.forName(DEFAULT_CHARSET)));
-        }
-        return out.toString();
+    public void download(String url, Path filePath) throws IOException {
+        InputStream is = fetchAsInputStream(GET_METHOD, url, null, null);
+        Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
     }
-
 }
