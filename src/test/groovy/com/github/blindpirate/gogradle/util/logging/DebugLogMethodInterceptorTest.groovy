@@ -7,6 +7,8 @@ import com.google.inject.Guice
 import com.google.inject.Injector
 import com.google.inject.matcher.Matchers
 import org.gradle.api.logging.Logger
+import org.gradle.api.logging.Logging
+import org.gradle.internal.impldep.org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -66,6 +68,11 @@ class DebugLogMethodInterceptorTest {
     void setUp() {
         when(logger.isDebugEnabled()).thenReturn(true)
         ReflectionUtils.setStaticFinalField(DebugLogMethodInterceptor, 'LOGGER', logger)
+    }
+
+    @After
+    void cleanUp() {
+        ReflectionUtils.setStaticFinalField(DebugLogMethodInterceptor, 'LOGGER', Logging.getLogger(DebugLogMethodInterceptor))
     }
 
     void verifyDebugLogTwoTimes() {
