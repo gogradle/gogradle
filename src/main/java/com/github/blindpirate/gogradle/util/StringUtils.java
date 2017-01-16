@@ -55,11 +55,19 @@ public class StringUtils {
     }
 
     public static boolean fileNameStartsWithAny(File file, String... prefix) {
-        return Stream.of(prefix).anyMatch(file.getName()::startsWith);
+        return startsWithAny(file.getName(), prefix);
+    }
+
+    public static boolean startsWithAny(String str, String... prefix) {
+        return Stream.of(prefix).anyMatch(str::startsWith);
     }
 
     public static boolean fileNameEndsWithAny(File file, String... suffix) {
-        return Stream.of(suffix).anyMatch(file.getName()::endsWith);
+        return endsWithAny(file.getName(), suffix);
+    }
+
+    public static boolean endsWithAny(String str, String... suffix) {
+        return Stream.of(suffix).anyMatch(str::endsWith);
     }
 
     public static boolean fileNameEqualsAny(File file, String... name) {

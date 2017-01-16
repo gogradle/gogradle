@@ -18,7 +18,7 @@ public class LocalDirectoryDependencyInstaller implements DependencyInstaller {
         LocalDirectoryDependency realDependency = (LocalDirectoryDependency) determineDependency(dependency);
         Path realPath = realDependency.getRootDir().toPath().resolve(determineRelativePath(dependency));
 
-        IOUtils.copyDirectory(realPath.toFile(), targetDirectory);
+        IOUtils.copyDirectory(realPath.toFile(), targetDirectory, DependencyInstallFileFilter.INSTANCE);
     }
 
     // TODO duplicated code

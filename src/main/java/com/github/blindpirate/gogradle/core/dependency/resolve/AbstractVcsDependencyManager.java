@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -88,7 +89,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         doReset(realDependency, globalCachePath);
 
         Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
-        IOUtils.copyDirectory(srcPath.toFile(), targetDirectory);
+        IOUtils.copyDirectory(srcPath.toFile(), targetDirectory, DependencyInstallFileFilter.INSTANCE);
     }
 
     private ResolvedDependency determineResolvedDependency(ResolvedDependency dependency) {
