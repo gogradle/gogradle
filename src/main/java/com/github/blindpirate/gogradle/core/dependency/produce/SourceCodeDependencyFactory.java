@@ -25,6 +25,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 
 /**
@@ -113,25 +115,15 @@ public class SourceCodeDependencyFactory {
         }
 
         private boolean dirShouldBeIncluded(Path dir) {
-            if (isTestdataDirectory(dir)) {
+            if (fileNameEqualsAny(dir.toFile(), TESTDATA_DIRECTORY, VENDOR_DIRECTORY)) {
                 return false;
             }
-            if (isVendorDirectory(dir)) {
-                return false;
-            }
-            if (startsWithDotOrUnderscore(dir)) {
+            if (fileNameStartsWithAny(dir.toFile(), "_", ".")) {
                 return false;
             }
             return true;
         }
 
-        private boolean isTestdataDirectory(Path dir) {
-            return directoryNameEquals(dir, TESTDATA_DIRECTORY);
-        }
-
-        private boolean directoryNameEquals(Path dir, String name) {
-            return name.equals(String.valueOf(dir.getFileName()));
-        }
 
         @Override
         public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
@@ -148,25 +140,15 @@ public class SourceCodeDependencyFactory {
             return FileVisitResult.CONTINUE;
         }
 
-        private boolean startsWithDotOrUnderscore(Path file) {
-            String fileName = String.valueOf(file.getFileName());
-            return fileName.startsWith(".") || fileName.startsWith("_");
-        }
-
         private boolean fileShouldBeIncluded(Path file) {
             String fileName = String.valueOf(file.getFileName());
-            if (!fileName.endsWith(".go")) {
+            if (fileName.endsWith("_test.go")) {
                 return false;
             }
-            if (startsWithDotOrUnderscore(file)) {
+            if (fileNameStartsWithAny(file.toFile(), ".", "_")) {
                 return false;
             }
-            return !fileName.endsWith("_test.go");
-        }
-
-
-        private boolean isVendorDirectory(Path dir) {
-            return directoryNameEquals(dir, VENDOR_DIRECTORY);
+            return fileName.endsWith(".go");
         }
 
     }

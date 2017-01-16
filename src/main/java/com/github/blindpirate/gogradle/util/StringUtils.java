@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -51,5 +52,17 @@ public class StringUtils {
 
     public static boolean isEmpty(String s) {
         return org.apache.commons.lang3.StringUtils.isEmpty(s);
+    }
+
+    public static boolean fileNameStartsWithAny(File file, String... prefix) {
+        return Stream.of(prefix).anyMatch(file.getName()::startsWith);
+    }
+
+    public static boolean fileNameEndsWithAny(File file, String... suffix) {
+        return Stream.of(suffix).anyMatch(file.getName()::endsWith);
+    }
+
+    public static boolean fileNameEqualsAny(File file, String... name) {
+        return Stream.of(name).anyMatch(file.getName()::equals);
     }
 }
