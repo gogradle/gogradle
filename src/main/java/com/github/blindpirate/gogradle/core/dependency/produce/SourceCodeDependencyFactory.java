@@ -104,12 +104,25 @@ public class SourceCodeDependencyFactory {
         public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
                 throws IOException {
             super.preVisitDirectory(dir, attrs);
-            if (isVendorDirectory(dir) || isTestdataDirectory(dir)) {
+            if (dirShouldBeIncluded(dir)) {
+                return FileVisitResult.CONTINUE;
+            } else {
                 LOGGER.debug("Ignored directory {}", dir);
                 return FileVisitResult.SKIP_SUBTREE;
-            } else {
-                return FileVisitResult.CONTINUE;
             }
+        }
+
+        private boolean dirShouldBeIncluded(Path dir) {
+            if (isTestdataDirectory(dir)) {
+                return false;
+            }
+            if (isVendorDirectory(dir)) {
+                return false;
+            }
+            if (startsWithDotOrUnderscore(dir)) {
+                return false;
+            }
+            return true;
         }
 
         private boolean isTestdataDirectory(Path dir) {
@@ -135,12 +148,17 @@ public class SourceCodeDependencyFactory {
             return FileVisitResult.CONTINUE;
         }
 
+        private boolean startsWithDotOrUnderscore(Path file) {
+            String fileName = String.valueOf(file.getFileName());
+            return fileName.startsWith(".") || fileName.startsWith("_");
+        }
+
         private boolean fileShouldBeIncluded(Path file) {
             String fileName = String.valueOf(file.getFileName());
             if (!fileName.endsWith(".go")) {
                 return false;
             }
-            if (fileName.startsWith(".") || fileName.startsWith("_")) {
+            if (startsWithDotOrUnderscore(file)) {
                 return false;
             }
             return !fileName.endsWith("_test.go");

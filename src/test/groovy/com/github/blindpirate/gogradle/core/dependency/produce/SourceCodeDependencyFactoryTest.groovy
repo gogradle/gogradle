@@ -140,6 +140,17 @@ func main(){}
     }
 
     @Test
+    void 'directories starting with `_` and `dot` should be ignored'() {
+        // given
+        IOUtils.write(resource, '_/main.go', mainDotGo)
+        IOUtils.write(resource, '.should_be_ignored/main.go', mainDotGo)
+        // when
+        GolangDependencySet result = factory.produce(resolvedDependency, resource)
+        // then
+        assert result.isEmpty()
+    }
+
+    @Test
     void 'files ending with `_test` should be ignored'() {
         // given
         IOUtils.write(resource, 'a_test.go', mainDotGo)
