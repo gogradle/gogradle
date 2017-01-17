@@ -22,7 +22,6 @@ import org.mockito.Mock
 import java.nio.file.Files
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.build.BuildManager.GOGRADLE_BUILD_DIR
 import static java.nio.file.attribute.PosixFilePermissions.fromString
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
@@ -53,6 +52,7 @@ echo "some error occurred" >&2
 
 if [ "-o" = "$1" -a "" != "$2" ]; then
     echo $PWD > $2
+    echo $GOPATH >> $2
 else
     echo "Usage: go -o <path>"
 fi
@@ -62,15 +62,31 @@ fi
     void setUp() {
         manager = new DefaultBuildManager(project, binaryManager, setting)
         when(project.getRootDir()).thenReturn(resource)
+        when(setting.getPackagePath()).thenReturn('root/package')
     }
 
     void prepareMockGoBin() {
-        when(setting.getPackagePath()).thenReturn('root/package')
+        IOUtils.forceMkdir(resource.toPath().resolve('.gogradle').toFile())
         IOUtils.write(resource, 'go', mockGoBin)
         Path mockGoBinPath = resource.toPath().resolve('go')
         Files.setPosixFilePermissions(mockGoBinPath, fromString('rwx------'))
         when(binaryManager.getBinaryPath()).thenReturn(mockGoBinPath.toString())
         when(binaryManager.getGorootEnv()).thenReturn('')
+    }
+
+    @Test
+    void 'symbolic links should be created properly in preparation'() {
+        // when
+        manager.prepareForBuild()
+        // then
+        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+    }
+
+    void assertSymbolicLinkLinkToTarget(String link, String target) {
+        Path linkPath = resource.toPath().resolve(link)
+        Path targetPath = resource.toPath().resolve(target)
+        Path relativePathOfLink = Files.readSymbolicLink(linkPath)
+        assert linkPath.getParent().resolve(relativePathOfLink).normalize() == targetPath.normalize()
     }
 
     @Test
@@ -83,9 +99,10 @@ fi
         Os hostOs = Os.getHostOs()
         Arch hostArch = Arch.getHostArch()
 
-        Path outputFilePath = resource.toPath().resolve(GOGRADLE_BUILD_DIR).resolve("${hostOs}_${hostArch}_package")
-        String outputFileContent = outputFilePath.toFile().getText()
-        assert outputFileContent.trim() == resource.toPath().toString()
+        Path outputFilePath = resource.toPath().resolve(".gogradle/${hostOs}_${hostArch}_package")
+        List<String> lines = IOUtils.getLines(outputFilePath.toFile())
+        assert lines[0].trim() == resource.toPath().toString()
+        assert lines[1].trim() == "" + resource.toPath().resolve('.gogradle/project_gopath') + File.pathSeparator + resource.toPath().resolve('.gogradle/build_gopath')
     }
 
     @Test
@@ -109,7 +126,7 @@ fi
         // when
         manager.installDependency(resolvedDependency)
         // then
-        Path gopath = resource.toPath().resolve('.gogradle/build_gopath/root/package')
+        Path gopath = resource.toPath().resolve('.gogradle/build_gopath/src/root/package')
         assert gopath.toFile().exists()
         verify(resolvedDependency).installTo(gopath.toFile())
     }
@@ -118,10 +135,10 @@ fi
     void 'target directory should be cleared before installing'() {
         // given
         when(resolvedDependency.getName()).thenReturn('root/package')
-        IOUtils.write(resource, '.gogradle/build_gopath/root/package/oldbuildremains.go', '')
+        IOUtils.write(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go', '')
         // when
         manager.installDependency(resolvedDependency)
         // then
-        assert !resource.toPath().resolve('.gogradle/build_gopath/root/package/oldbuildremains.go').toFile().exists()
+        assert !resource.toPath().resolve('.gogradle/build_gopath/src/root/package/oldbuildremains.go').toFile().exists()
     }
 }

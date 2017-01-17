@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.build;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.exceptions.BuildException;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
@@ -14,6 +15,8 @@ import org.gradle.api.logging.Logging;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -22,13 +25,32 @@ import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
-import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
 import static java.util.Arrays.asList;
 
+// ${projectRoot}
+// └── .gogradle
+//     ├── project_gopath
+//     │   └── src
+//     │       └── github.com/user/project -> ../../../../../..
+//     ├── build_gopath
+//     │   └── src
+//     │       └── <the dependencies>
+//     ├── test_gopath
+//     │   └── src
+//     │       └── <the dependencies>
+//     └── ${os}_${arch}_${outputName}
+//
+
 @Singleton
 public class DefaultBuildManager implements BuildManager {
+    private static final String GOGRADLE_BUILD_DIR = ".gogradle";
+    private static final String BUILD_GOPATH = "build_gopath";
+    private static final String TEST_GOPATH = "test_gopath";
+    private static final String PROJECT_GOPATH = "project_gopath";
+    private static final String SRC = "src";
+
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
 
     private static final String OUTPUT_FILE_NAME = "%s_%s_%s";
@@ -36,6 +58,44 @@ public class DefaultBuildManager implements BuildManager {
     private final Project project;
     private final GoBinaryManager goBinaryManager;
     private final GolangPluginSetting setting;
+
+    @Override
+    public void prepareForBuild() {
+        createProjectSymbolicLinkIfNotExist();
+    }
+
+    private void createProjectSymbolicLinkIfNotExist() {
+        Path link = getGogradleBuildDir()
+                .resolve(PROJECT_GOPATH)
+                .resolve(SRC)
+                .resolve(setting.getPackagePath());
+        if (!link.toFile().exists()) {
+            forceMkdir(link.getParent().toFile());
+            Path targetPath = project.getRootDir().toPath();
+            createSymbolicLink(link, link.getParent().relativize(targetPath));
+        }
+    }
+
+    private void createSymbolicLink(Path link, Path target) {
+        try {
+            Files.createSymbolicLink(link, target);
+        } catch (IOException e) {
+            throw BuildException.cannotCreateSymbolicLink(link, e);
+        }
+    }
+
+    private Path getTestGopathDir() {
+        return getGogradleBuildDir().resolve(TEST_GOPATH);
+    }
+
+    private Path getBuildGopathDir() {
+        return getGogradleBuildDir().resolve(BUILD_GOPATH);
+    }
+
+    private Path getGogradleBuildDir() {
+        return project.getRootDir().toPath()
+                .resolve(GOGRADLE_BUILD_DIR);
+    }
 
     @Inject
     public DefaultBuildManager(Project project,
@@ -51,16 +111,29 @@ public class DefaultBuildManager implements BuildManager {
         String goBinary = goBinaryManager.getBinaryPath();
         String gorootEnv = goBinaryManager.getGorootEnv();
         String outputFilePath = getOutputFilePath();
-        String projectGopath = ensureProjectGopathWritable().toString();
+        String gopathForBuild = getGopathForBuild();
 
         List<String> args = asList(goBinary, "-o", outputFilePath);
 
-        Map<String, String> envs = asMap("GOPATH", projectGopath);
+        Map<String, String> envs = asMap("GOPATH", gopathForBuild);
         if (gorootEnv != null) {
             envs.put("GOROOT", gorootEnv);
         }
 
         startBuild(args, envs);
+    }
+
+    private String getGopathForBuild() {
+        String projectGopath = getGogradleBuildDir()
+                .resolve(PROJECT_GOPATH)
+                .toAbsolutePath()
+                .toString();
+        String buildGopath = getGogradleBuildDir()
+                .resolve(BUILD_GOPATH)
+                .toAbsolutePath()
+                .toString();
+
+        return projectGopath + File.pathSeparator + buildGopath;
     }
 
     private void startBuild(List<String> args, Map<String, String> envs) {
@@ -78,19 +151,17 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
+
     @Override
     public void installDependency(ResolvedDependency dependency) {
-        File targetDir = ensureProjectGopathWritable().resolve(dependency.getName()).toFile();
+        File targetDir = getBuildGopathDir()
+                .resolve(SRC)
+                .resolve(dependency.getName())
+                .toFile();
+
         forceMkdir(targetDir);
         clearDirectory(targetDir);
         dependency.installTo(targetDir);
-    }
-
-    private Path ensureProjectGopathWritable() {
-        Path ret = project.getRootDir().toPath()
-                .resolve(GOGRADLE_BUILD_DIR)
-                .resolve(BUILD_GOPATH);
-        return ensureDirExistAndWritable(ret);
     }
 
     private String getOutputFilePath() {
