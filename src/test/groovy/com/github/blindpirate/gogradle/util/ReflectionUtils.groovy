@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.util
 
 import java.lang.reflect.Field
+import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
 class ReflectionUtils {
@@ -57,5 +58,10 @@ class ReflectionUtils {
 
     static boolean allFieldsEquals(Object actual, Object expected, List<String> fieldNames) {
         return fieldNames.every { actual[it] == expected[it] }
+    }
+
+    static Object callStaticMethod(Class clazz, String methodName, Object... args) {
+        Method method = clazz.getDeclaredMethod(methodName, args.collect { it.class } as Class[])
+        method.invoke(null, args)
     }
 }

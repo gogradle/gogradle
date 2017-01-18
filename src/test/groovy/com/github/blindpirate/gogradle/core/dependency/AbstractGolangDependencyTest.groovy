@@ -28,11 +28,6 @@ class AbstractGolangDependencyTest {
         dependency.contentEquals(null)
     }
 
-    @Test
-    void 'useless enum test'() {
-        assert NoTransitiveSpec.valueOf('NO_TRANSITIVE_SPEC') == NO_TRANSITIVE_DEP_SPEC
-        assert NoTransitiveSpec.values().length == 1
-    }
 
     @Test
     void 'multiple PropertiesExclusionSpec should be compared properly'() {

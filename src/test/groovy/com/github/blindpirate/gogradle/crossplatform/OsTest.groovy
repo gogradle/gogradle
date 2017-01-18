@@ -7,12 +7,6 @@ import static com.github.blindpirate.gogradle.crossplatform.Os.*
 import static org.apache.commons.lang3.SystemUtils.*
 
 class OsTest {
-    @Test
-    void 'useless test'() {
-        values()
-        valueOf('WINDOWS')
-    }
-
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when auto-detect fails'() {
         synchronized (Os) {
