@@ -50,9 +50,9 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
 echo "build started"
 echo "some error occurred" >&2
 
-if [ "-o" = "$1" -a "" != "$2" ]; then
-    echo $PWD > $2
-    echo $GOPATH >> $2
+if [ "build" = "$1" -a "-o" = "$2" ] && [ ""!="$3" ]; then
+    echo $PWD > $3
+    echo $GOPATH >> $3
 else
     echo "Usage: go -o <path>"
 fi

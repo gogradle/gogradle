@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -64,6 +65,7 @@ public class DefaultBuildManager implements BuildManager {
         createProjectSymbolicLinkIfNotExist();
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private void createProjectSymbolicLinkIfNotExist() {
         Path link = getGogradleBuildDir()
                 .resolve(PROJECT_GOPATH)
@@ -113,7 +115,7 @@ public class DefaultBuildManager implements BuildManager {
         String outputFilePath = getOutputFilePath();
         String gopathForBuild = getGopathForBuild();
 
-        List<String> args = asList(goBinary, "-o", outputFilePath);
+        List<String> args = asList(goBinary, "build", "-o", outputFilePath);
 
         Map<String, String> envs = asMap("GOPATH", gopathForBuild);
         if (gorootEnv != null) {
