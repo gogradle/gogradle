@@ -11,6 +11,8 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 class DefaultDependencyRegistryTest {
     @Mock
+    NotationDependency notationDependency
+    @Mock
     AbstractResolvedDependency resolvedDependency1
     @Mock
     AbstractResolvedDependency resolvedDependency2
@@ -81,6 +83,14 @@ class DefaultDependencyRegistryTest {
 
         // then
         assert !registry.register(resolvedDependency1)
+    }
+
+    @Test
+    void 'resolved dependency should be put into cache'() {
+        // when
+        registry.putIntoCache(notationDependency, resolvedDependency1)
+        // then
+        assert registry.getFromCache(notationDependency).get().is(resolvedDependency1)
     }
 
 }
