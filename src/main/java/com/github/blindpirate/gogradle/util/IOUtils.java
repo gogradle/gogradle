@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.util;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -72,6 +73,15 @@ public class IOUtils {
     public static void copyDirectory(File src, File dest) {
         try {
             org.apache.commons.io.FileUtils.copyDirectory(src, dest);
+        } catch (IOException e) {
+            handleIOException(e);
+        }
+    }
+
+    public static void copyDirectory(final File srcDir, final File destDir,
+                                     final FileFilter filter) {
+        try {
+            FileUtils.copyDirectory(srcDir, destDir, filter);
         } catch (IOException e) {
             handleIOException(e);
         }
