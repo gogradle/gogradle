@@ -3,6 +3,8 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
+import java.util.Objects;
+
 public class GitNotationDependency extends AbstractNotationDependency {
 
     public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
@@ -64,5 +66,23 @@ public class GitNotationDependency extends AbstractNotationDependency {
                 + ", tag='" + tag + '\''
                 + ", url='" + url + '\''
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GitNotationDependency that = (GitNotationDependency) o;
+        return Objects.equals(commit, that.commit)
+                && Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(commit, getName());
     }
 }
