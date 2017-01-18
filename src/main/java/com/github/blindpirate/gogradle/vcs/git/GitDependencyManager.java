@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -38,8 +39,11 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     private final DependencyVisitor visitor;
 
     @Inject
-    public GitDependencyManager(GlobalCacheManager cacheManager, GitAccessor gitAccessor, DependencyVisitor visitor) {
-        super(cacheManager);
+    public GitDependencyManager(GlobalCacheManager cacheManager,
+                                GitAccessor gitAccessor,
+                                DependencyVisitor visitor,
+                                DependencyRegistry dependencyRegistry) {
+        super(cacheManager, dependencyRegistry);
         this.gitAccessor = gitAccessor;
         this.visitor = visitor;
     }

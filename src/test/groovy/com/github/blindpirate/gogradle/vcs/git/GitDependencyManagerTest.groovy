@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
+import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -73,7 +74,10 @@ class GitDependencyManagerTest extends MockInjectorSupport {
 
     @Before
     void setUp() {
-        gitDependencyManager = new GitDependencyManager(cacheManager, gitAccessor, mock(DependencyVisitor))
+        gitDependencyManager = new GitDependencyManager(cacheManager,
+                gitAccessor,
+                mock(DependencyVisitor),
+                mock(DependencyRegistry))
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
