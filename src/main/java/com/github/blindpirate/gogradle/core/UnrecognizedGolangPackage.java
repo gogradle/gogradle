@@ -16,7 +16,7 @@ public class UnrecognizedGolangPackage extends GolangPackage {
 
     @Override
     public VcsType getVcsType() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(getPath() + " is unrecognized!");
     }
 
     @Override
