@@ -41,9 +41,21 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
+import com.github.blindpirate.gogradle.vcs.Bazaar;
 import com.github.blindpirate.gogradle.vcs.Git;
+import com.github.blindpirate.gogradle.vcs.Mercurial;
+import com.github.blindpirate.gogradle.vcs.Svn;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
+import com.github.blindpirate.gogradle.vcs.bazaar.BazaarAccessor;
+import com.github.blindpirate.gogradle.vcs.bazaar.BazaarMapNotationParser;
+import com.github.blindpirate.gogradle.vcs.bazaar.BazaarNotationConverter;
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor;
+import com.github.blindpirate.gogradle.vcs.mercurial.MercurialAccessor;
+import com.github.blindpirate.gogradle.vcs.mercurial.MercurialMapNotationParser;
+import com.github.blindpirate.gogradle.vcs.mercurial.MercurialNotationConverter;
+import com.github.blindpirate.gogradle.vcs.svn.SvnAccessor;
+import com.github.blindpirate.gogradle.vcs.svn.SvnMapNotationParser;
+import com.github.blindpirate.gogradle.vcs.svn.SvnNotationConverter;
 import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.matcher.AbstractMatcher;
@@ -90,6 +102,18 @@ public class GogradleModule extends AbstractModule {
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
         bind(VcsAccessor.class).annotatedWith(Git.class).to(GitAccessor.class);
+
+        bind(MapNotationParser.class).annotatedWith(Mercurial.class).to(MercurialMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Mercurial.class).to(MercurialNotationConverter.class);
+        bind(VcsAccessor.class).annotatedWith(Mercurial.class).to(MercurialAccessor.class);
+
+        bind(MapNotationParser.class).annotatedWith(Svn.class).to(SvnMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Svn.class).to(SvnNotationConverter.class);
+        bind(VcsAccessor.class).annotatedWith(Svn.class).to(SvnAccessor.class);
+
+        bind(MapNotationParser.class).annotatedWith(Bazaar.class).to(BazaarMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Bazaar.class).to(BazaarNotationConverter.class);
+        bind(VcsAccessor.class).annotatedWith(Bazaar.class).to(BazaarAccessor.class);
 
         bindInterceptor(Matchers.any(), new AbstractMatcher<Method>() {
             @Override
