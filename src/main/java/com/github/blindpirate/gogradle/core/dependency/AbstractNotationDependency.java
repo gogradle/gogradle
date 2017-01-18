@@ -11,6 +11,9 @@ import java.util.Set;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 
+/**
+ * All implementations must override equals() and hashCode()
+ */
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
 
     public static final String VERSION_KEY = "version";
