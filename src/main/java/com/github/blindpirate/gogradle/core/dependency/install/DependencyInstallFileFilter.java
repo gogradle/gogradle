@@ -1,18 +1,17 @@
 package com.github.blindpirate.gogradle.core.dependency.install;
 
-import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory;
-import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory.*;
-import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.*;
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory.TESTDATA_DIRECTORY;
+import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.StringUtils.endsWithAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 
 public enum DependencyInstallFileFilter implements FileFilter {
 
@@ -39,7 +38,7 @@ public enum DependencyInstallFileFilter implements FileFilter {
             return false;
         }
 
-        return name.endsWith(".go");
+        return endsWithAny(name, ".go", ".asm", ".s");
     }
 
     private boolean acceptDirectory(File dir) {

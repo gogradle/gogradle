@@ -45,8 +45,8 @@ class DependencyInstallFileFilterTest {
     }
 
     @Test
-    void 'only file with .go extensioin can be accepted'() {
-        allNamesAccepted('1.go', 'main.go')
+    void 'file with .go/.asm/.s extensioin can be accepted'() {
+        allNamesAccepted('1.go', 'main.go', '1.s', '1.asm')
         allNamesRejected('1', 'main', '1.jpg', 'main.java')
     }
 
