@@ -91,7 +91,7 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
     }
 
     void assertDependenciesAre(Map<String, String> finalDependencies) {
-        Path projectGopath = projectRoot.toPath().resolve(GOGRADLE_BUILD_DIR).resolve(BUILD_GOPATH)
+        Path projectGopath = projectRoot.toPath().resolve('.gogradle/build_gopath/src')
 
         finalDependencies.each { packageName, commit ->
             assert projectGopath.resolve(packageName).resolve(commit + '.go').toFile().exists()
