@@ -1,9 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.DependencySetUtils;
 
 import java.io.File;
 import java.util.List;
@@ -29,7 +29,7 @@ public abstract class ExternalDependencyFactory {
         File identityFile = identityFile(rootDir);
         if (identityFile.exists()) {
             List<Map<String, Object>> mapNotations = adapt(identityFile);
-            return Optional.of(InjectionHelper.parseMany(mapNotations, mapNotationParser));
+            return Optional.of(DependencySetUtils.parseMany(mapNotations, mapNotationParser));
         } else {
             return Optional.empty();
         }

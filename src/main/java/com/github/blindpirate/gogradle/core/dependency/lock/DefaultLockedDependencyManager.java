@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
-import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -8,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DataExchange;
+import com.github.blindpirate.gogradle.util.DependencySetUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.Project;
 
@@ -44,7 +44,7 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
             return GolangDependencySet.empty();
         }
         GogradleLockModel model = parseYaml(lockFile, GogradleLockModel.class);
-        return InjectionHelper.parseMany(model.getDependencies(), mapNotationParser);
+        return DependencySetUtils.parseMany(model.getDependencies(), mapNotationParser);
     }
 
     @Override
