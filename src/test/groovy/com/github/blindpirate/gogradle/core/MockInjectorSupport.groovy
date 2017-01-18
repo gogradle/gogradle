@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.google.inject.Injector
 import org.junit.Before
 import org.mockito.Mock
@@ -10,6 +11,6 @@ class MockInjectorSupport {
 
     @Before
     void superSetup() {
-        InjectionHelper.INJECTOR_INSTANCE = injector
+        GogradleGlobal.INSTANCE.setInjector(injector)
     }
 }

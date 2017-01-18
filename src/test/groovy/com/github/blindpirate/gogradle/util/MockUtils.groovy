@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.util
 
-import com.github.blindpirate.gogradle.core.InjectionHelper
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Injector
@@ -10,7 +10,7 @@ import static org.mockito.Mockito.*
 
 class MockUtils {
     static void mockVcsService(Injector injector, Class serviceClass, Class annoClass, Object serviceInstance) {
-        InjectionHelper.INJECTOR_INSTANCE = injector
+        GogradleGlobal.INSTANCE.setInjector(injector)
         when(injector.getInstance(Key.get(serviceClass, annoClass))).thenReturn(serviceInstance)
     }
 

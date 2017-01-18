@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
-import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
@@ -68,7 +67,7 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void configureGlobalInjector() {
-        InjectionHelper.INJECTOR_INSTANCE = injector;
+        GogradleGlobal.INSTANCE.setInjector(injector);
     }
 
     private void addHookToProject(Project project) {

@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.vcs;
 
-import com.github.blindpirate.gogradle.core.InjectionHelper;
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.google.inject.Key;
 
@@ -37,7 +37,7 @@ public enum VcsType {
     }
 
     public <T> T getService(Class<T> serviceClass) {
-        return InjectionHelper.INJECTOR_INSTANCE.getInstance(Key.get(serviceClass, annoClass));
+        return GogradleGlobal.getInstance(Key.get(serviceClass, annoClass));
     }
 
     public String getRepo() {

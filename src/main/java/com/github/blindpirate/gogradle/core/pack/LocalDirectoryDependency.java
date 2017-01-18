@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -12,7 +13,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -74,7 +74,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public void installTo(File targetDirectory) {
-        INJECTOR_INSTANCE.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
+        GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
     }
 
     @Override

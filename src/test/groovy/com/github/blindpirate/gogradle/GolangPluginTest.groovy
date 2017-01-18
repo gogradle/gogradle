@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.core.InjectionHelper
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.gradle.api.Project
@@ -28,7 +27,7 @@ class GolangPluginTest {
 
     @Test
     void 'InjectionHelper.INJECTOR_INSTANCE should be assigned'() {
-        assert InjectionHelper.INJECTOR_INSTANCE != null
+        assert GogradleGlobal.INSTANCE.getInjector() != null
     }
 
     @Test

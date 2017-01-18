@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.core.InjectionHelper;
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
@@ -72,7 +72,7 @@ public class GitAccessor implements VcsAccessor {
     }
 
     public void cloneWithUrl(String gitUrl, File directory) {
-        if (InjectionHelper.isOffline()) {
+        if (GogradleGlobal.isOffline()) {
             LOGGER.debug("Cloning {} is skipped since it is offline now.", gitUrl);
             return;
         }
@@ -192,7 +192,7 @@ public class GitAccessor implements VcsAccessor {
             git.add().addFilepattern(".").call();
             git.reset().setMode(ResetCommand.ResetType.HARD).call();
 
-            if (InjectionHelper.isOffline()) {
+            if (GogradleGlobal.isOffline()) {
                 LOGGER.debug("Pulling {} is skipped since it is offline now.", getRemoteUrl(repository));
             } else {
                 git.pull().call();

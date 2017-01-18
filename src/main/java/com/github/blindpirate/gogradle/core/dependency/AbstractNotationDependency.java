@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
@@ -8,7 +9,6 @@ import org.gradle.api.specs.Spec;
 import java.util.Map;
 import java.util.Set;
 
-import static com.github.blindpirate.gogradle.core.InjectionHelper.INJECTOR_INSTANCE;
 import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
@@ -41,7 +41,7 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     @Override
     public ResolvedDependency resolve() {
         if (resolvedDependency == null) {
-            DependencyResolver resolver = INJECTOR_INSTANCE.getInstance(this.getResolverClass());
+            DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
             resolvedDependency = resolver.resolve(this);
         }
         return resolvedDependency;

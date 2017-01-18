@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GogradleModule
-import com.github.blindpirate.gogradle.core.InjectionHelper
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.google.inject.Guice
 import com.google.inject.Injector
 import org.gradle.api.internal.project.ProjectInternal
@@ -23,7 +23,7 @@ abstract class GogradleModuleSupport {
     @Before
     void initInjector() {
         injector = Guice.createInjector(new GogradleModule(project, instantiator))
-        InjectionHelper.INJECTOR_INSTANCE = injector
+        GogradleGlobal.INSTANCE.setInjector(injector)
         injector.injectMembers(this)
     }
 }
