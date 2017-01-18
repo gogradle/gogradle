@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
@@ -23,16 +24,31 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         implements DependencyResolver, DependencyInstaller {
 
     private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
+
     private final GlobalCacheManager globalCacheManager;
 
-    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
+    private final DependencyRegistry dependencyRegistry;
+
+    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager,
+                                        DependencyRegistry dependencyRegistry) {
         this.globalCacheManager = cacheManager;
+        this.dependencyRegistry = dependencyRegistry;
     }
 
     @Override
     public ResolvedDependency resolve(final NotationDependency dependency) {
-        try {
+        Optional<ResolvedDependency> resultInCache = dependencyRegistry.getFromCache(dependency);
+        if (resultInCache.isPresent()) {
+            return resultInCache.get();
+        }
+        ResolvedDependency ret = doResolve(dependency);
 
+        dependencyRegistry.putIntoCache(dependency, ret);
+        return ret;
+    }
+
+    private ResolvedDependency doResolve(NotationDependency dependency) {
+        try {
             return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
                 File vcsRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
                 ResolvedDependency vcsResolvedDependency = resolveVcs(dependency, vcsRoot);

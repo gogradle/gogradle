@@ -19,6 +19,8 @@ import java.nio.file.Paths
 import java.util.concurrent.Callable
 
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.times
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -41,6 +43,8 @@ class AbstractVcsDependencyManagerTest {
     VendorResolvedDependency vendorResolvedDependency
     @Mock
     VendorNotationDependency vendorNotationDependency
+    @Mock
+    DependencyRegistry dependencyRegistry
 
     File resource
     File src
@@ -50,7 +54,7 @@ class AbstractVcsDependencyManagerTest {
     @Before
     void setUp() {
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
-        manager = new TestAbstractVcsDependencyManager(cacheManager)
+        manager = new TestAbstractVcsDependencyManager(cacheManager, dependencyRegistry)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
@@ -83,9 +87,9 @@ class AbstractVcsDependencyManagerTest {
         when(vendorNotationDependency.getVendorPath()).thenReturn('vendor/root/package')
 
         // when
-        manager.resolve(vendorNotationDependency)
+        ResolvedDependency result = manager.resolve(vendorNotationDependency)
         // then
-        assert manager.resolve(vendorNotationDependency).is(vendorResolvedDependency)
+        assert result.is(vendorResolvedDependency)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -96,11 +100,28 @@ class AbstractVcsDependencyManagerTest {
         manager.resolve(vendorNotationDependency)
     }
 
+    @Test
+    void 'result in cache should be fetched'() {
+        // given
+        when(dependencyRegistry.getFromCache(vendorNotationDependency))
+                .thenReturn(Optional.of(vendorResolvedDependency))
+        // then
+        assert manager.resolve(vendorNotationDependency).is(vendorResolvedDependency)
+        verify(cacheManager, times(0)).runWithGlobalCacheLock(any(GolangDependency), any(Callable))
+    }
+
+    @Test
+    void 'result should be put into cache after resolving'() {
+        'resolving a vendor dependency hosting in vcs dependency should succeed'()
+        verify(dependencyRegistry).putIntoCache(vendorNotationDependency, vendorResolvedDependency)
+    }
+
 
     class TestAbstractVcsDependencyManager extends AbstractVcsDependencyManager {
 
-        TestAbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
-            super(cacheManager)
+        TestAbstractVcsDependencyManager(GlobalCacheManager cacheManager,
+                                         DependencyRegistry dependencyRegistry) {
+            super(cacheManager, dependencyRegistry)
         }
 
         @Override
