@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.HttpUtils;
@@ -33,6 +34,10 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
     @Override
     @DebugLog
     public Optional<GolangPackage> produce(String packagePath) {
+        if (InjectionHelper.isOffline()) {
+            LOGGER.debug("Fetching metadata of {} is skipped since it is offline now.", packagePath);
+            return Optional.empty();
+        }
         Optional<GolangPackage> httpsResult = fetchViaWeb(packagePath, HTTPS + packagePath);
         if (httpsResult.isPresent()) {
             return httpsResult;
