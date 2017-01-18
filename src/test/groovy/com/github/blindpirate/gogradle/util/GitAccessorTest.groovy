@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -192,10 +193,12 @@ class GitAccessorTest {
         gitAccessor.lastCommitTimeOfPath(repository, 'helloworld.go')
     }
 
-//    @Test
+    @Test
+    @Ignore
     @AccessWeb
     @WithResource('')
     void 'cloning and pulling a proxy repository should succeed'() {
+        // https://bugs.eclipse.org/bugs/show_bug.cgi?id=465167
         gitAccessor.cloneWithUrl('https://gopkg.in/ini.v1', resource)
         assert resource.toPath().resolve('README.md').toFile().exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master')
