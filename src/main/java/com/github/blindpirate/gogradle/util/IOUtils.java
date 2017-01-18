@@ -18,8 +18,8 @@ import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
-import static com.github.blindpirate.gogradle.GolangPluginSetting.MAX_DFS_DEPTH;
+import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
+import static com.github.blindpirate.gogradle.GogradleGlobal.MAX_DFS_DEPTH;
 
 /**
  * Encapsulation of {@link FileUtils} and {@link org.apache.commons.io.IOUtils},

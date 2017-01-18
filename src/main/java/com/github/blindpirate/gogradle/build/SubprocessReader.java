@@ -10,7 +10,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
+import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
 
 public class SubprocessReader extends Thread {
     private Supplier<InputStream> is;

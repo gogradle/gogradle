@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.GogradleGlobal;
 
 import java.util.List;
 import java.util.Map;
@@ -14,7 +14,7 @@ public class GogradleLockModel {
 
     public static GogradleLockModel of(List<Map<String, Object>> notations) {
         GogradleLockModel ret = new GogradleLockModel();
-        ret.apiVersion = GolangPluginSetting.GOGRADLE_VERSION;
+        ret.apiVersion = GogradleGlobal.GOGRADLE_VERSION;
         ret.dependencies = notations;
         return ret;
     }

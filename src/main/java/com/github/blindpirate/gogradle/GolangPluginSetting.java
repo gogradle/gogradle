@@ -12,9 +12,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 
 @Singleton
 public class GolangPluginSetting {
-    public static final String GOGRADLE_VERSION = "0.1.0";
-    public static final String DEFAULT_CHARSET = "UTF-8";
-    public static final int MAX_DFS_DEPTH = 100;
 
     private BuildMode buildMode = REPRODUCIBLE;
     private String packagePath;

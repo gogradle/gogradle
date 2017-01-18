@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.tree;
 
-import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -104,7 +104,7 @@ public class DependencyTreeNode {
     }
 
     private void dfs(GolangDependencySet result, int depth) {
-        Assert.isTrue(depth < GolangPluginSetting.MAX_DFS_DEPTH);
+        Assert.isTrue(depth < GogradleGlobal.MAX_DFS_DEPTH);
         for (DependencyTreeNode child : children) {
             result.add(child.finalDependency);
             child.dfs(result, depth + 1);

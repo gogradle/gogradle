@@ -14,7 +14,7 @@ import java.nio.file.StandardCopyOption;
 import java.util.HashMap;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
+import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
 
 /**
  * Utils for http access.

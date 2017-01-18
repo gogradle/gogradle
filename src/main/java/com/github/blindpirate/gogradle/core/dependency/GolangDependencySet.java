@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.util.Assert;
 import groovy.lang.Closure;
 import org.gradle.api.Action;
@@ -54,7 +54,7 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
     }
 
     private void dfs(GolangDependency dependency, List<GolangDependency> result, int depth) {
-        Assert.isTrue(depth < GolangPluginSetting.MAX_DFS_DEPTH);
+        Assert.isTrue(depth < GogradleGlobal.MAX_DFS_DEPTH);
         result.add(dependency);
         if (dependency instanceof ResolvedDependency) {
             Cast.cast(ResolvedDependency.class, dependency).getDependencies()

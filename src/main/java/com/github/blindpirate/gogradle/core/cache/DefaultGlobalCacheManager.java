@@ -14,7 +14,7 @@ import java.nio.channels.FileLock;
 import java.nio.file.Path;
 import java.util.concurrent.Callable;
 
-import static com.github.blindpirate.gogradle.GolangPluginSetting.DEFAULT_CHARSET;
+import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 
 @Singleton
