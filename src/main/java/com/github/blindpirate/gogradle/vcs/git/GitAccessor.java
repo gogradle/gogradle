@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
+import com.github.blindpirate.gogradle.core.InjectionHelper;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
@@ -22,6 +23,8 @@ import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.revwalk.RevWalk;
 import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.inject.Singleton;
 import java.io.File;
@@ -36,6 +39,8 @@ import java.util.stream.Collectors;
 
 @Singleton
 public class GitAccessor implements VcsAccessor {
+    private static final Logger LOGGER = Logging.getLogger(GitAccessor.class);
+
     @Override
     public String getRemoteUrl(File directory) {
         Repository repository = getRepository(directory);
@@ -67,6 +72,10 @@ public class GitAccessor implements VcsAccessor {
     }
 
     public void cloneWithUrl(String gitUrl, File directory) {
+        if (InjectionHelper.isOffline()) {
+            LOGGER.debug("Cloning {} is skipped since it is offline now.", gitUrl);
+            return;
+        }
         try {
             Git.cloneRepository()
                     .setURI(gitUrl)
@@ -182,7 +191,12 @@ public class GitAccessor implements VcsAccessor {
             // Add all unstaged files and then reset to clear them
             git.add().addFilepattern(".").call();
             git.reset().setMode(ResetCommand.ResetType.HARD).call();
-            git.pull().call();
+
+            if (InjectionHelper.isOffline()) {
+                LOGGER.debug("Pulling {} is skipped since it is offline now.", getRemoteUrl(repository));
+            } else {
+                git.pull().call();
+            }
             return repository;
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);
