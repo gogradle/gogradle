@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.vcs.git;
+package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import org.eclipse.jgit.lib.BatchingProgressMonitor;
 import org.gradle.api.logging.Logger;

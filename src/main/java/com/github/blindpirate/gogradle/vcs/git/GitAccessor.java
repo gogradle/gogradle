@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
