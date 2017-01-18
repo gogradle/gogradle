@@ -35,7 +35,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 @Singleton
 public class SourceCodeDependencyFactory {
 
-    private static final String TESTDATA_DIRECTORY = "testdata";
+    public static final String TESTDATA_DIRECTORY = "testdata";
     private static final Logger LOGGER = Logging.getLogger(SourceCodeDependencyFactory.class);
 
     private final GoImportExtractor goImportExtractor;
