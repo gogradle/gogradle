@@ -19,7 +19,7 @@
   - 支持依赖的扁平化 （受[glide](https://github.com/Masterminds/glide)启发）
   - 支持本地包重命名
   - 支持私有仓库
-  - 构建、测试的依赖分开管理
+  - 构建、测试依赖分别管理
   - 支持依赖树可视化
 - 支持构建、测试、单个/通配符测试、交叉编译  
 - 现代的、生产级别的自动化构建支持，添加自定义任务极其简单
@@ -38,7 +38,7 @@
 ## 入门指南
 
 Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用Groovy作为DSL的自动化构建工具，允许用户通过自定义的构建脚本来完成构建工作。
-大多数情况下，你无需了解Gradle本身，只需要遵循本文档即可。
+大多数情况下，你无需了解Gradle本身，只需要阅读本文档即可。
 
 ### 准备工作
 
@@ -51,6 +51,7 @@ golang {
     packagePath = 'your/package/path'
 }
 ```
+如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。在Gogradle进行过第一次构建后，它会在项目目录下生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以选择删除它们。详见 依赖锁定 一节
 
 ### 构建Go项目
 
@@ -72,6 +73,19 @@ gradlew build # Windows
 ./gradlew test # *nix
 
 gradlew test # Windows
+```
+
+测试部分文件/多个文件：
+
+```
+gradlew test main_test.go
+gradlew test *_test.go
+```
+
+若希望构建在测试完成之后进行，只需在`build.gradle`中添加
+
+```groovy
+build.dependsOn test
 ```
 
 ### 添加依赖
@@ -103,8 +117,8 @@ gradlew dependencies # Windows
 
 ```
 
-这是著名项目[gogs](https://github.com/gogits/gogs)某个版本的依赖树。其中，对号(√)代表该依赖包即最终的依赖包；
-箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点与之前的节点重复，因此忽略其后代。
+这是[gogs](https://github.com/gogits/gogs)项目某个版本的依赖树。其中，对号(√)代表该依赖包即最终的依赖包；
+箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点之前已经显示过，因此忽略其后代。
 
 ### 依赖锁定
 
@@ -114,10 +128,10 @@ gradlew dependencies # Windows
 gradlew lock # Windows 
 ```
 
-这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。
+这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。默认情况下，该任务会在构建和测试之前运行，你无需手动运行它。
+gogradle.lock是Gogradle推荐的依赖锁定方式。
 锁定依赖包版本是稳定构建（Reproducible build）的重要因素。与[其他包管理工具](https://github.com/golang/go/wiki/PackageManagementTools)类似，
 Gogradle能够锁定当前的所有依赖包版本。有所不同的是，Gogradle做的更加彻底，它甚至能够锁定`vendor`目录中的依赖包！更多信息详见[]()。
-
 
 Gogradle支持传递性依赖、依赖排除、自定义仓库URL等多种功能，详见[依赖文档](docs/dependency_cn.md)
 
@@ -160,8 +174,9 @@ golang {
     // 输出文件的格式
     outputPattern = '${os}_${arch}_${projectName}'
     // 交叉编译的输出选项
-    target = [['windows','amd64'],['linux','amd64'],['darwin','amd64']]
-    
+    // target = [['windows','amd64'],['linux','amd64'],['darwin','amd64']]
+    target = ['windows','linux']*['amd64'] + [['linux','386']]
+    target = 'windows-amd64, linux-amd64, linux-386'
 }
 ```
 
@@ -274,8 +289,7 @@ Gogradle将依赖包分为四种：
 Go语言本身没有依赖包的概念，一个包就是一个普通的文件夹。
 
 在Gogradle中，依赖包通常以被源代码管理系统所管理的仓库为最小单位，例如，一个被Git管理的仓库中的所有go文件属于同一个依赖包。
-Gogradle按照[Go语言默认的方式](https://golang.org/cmd/go/#hdr-Relative_import_paths)解析包的路径，将原本散乱的代码包看作
-一个个的依赖包。
+Gogradle按照[Go语言默认的方式](https://golang.org/cmd/go/#hdr-Relative_import_paths)解析包的路径，将原本散乱的代码包看作一个个的依赖包。
 
 ### 依赖解析
 
@@ -292,14 +306,14 @@ Gogradle的目标是采用纯Java方式支持Go语言原生支持的全部四种
 - 源代码中的`import`声明
 
 默认情况下，Gogradle会读取前两者作为传递性依赖。若这样得到的结果为空，Gogradle会扫描`.go`源代码中的`import`语句，
-提取这些代码包当作传递性依赖。
+提取其中的代码包当作传递性依赖。
 
 ### 依赖冲突
 
 由于传递性依赖的存在，在实际的构建中，依赖关系可能错综复杂。
 当一个项目依赖了同一个代码包的不同版本（无论它们位于何处），我们认为这些版本处于冲突状态，需要解决。例如，A依赖了B的版本1和C，
 C依赖了B的版本2，此时，B的版本1和版本2就存在冲突。Go语言的vendor机制允许这些版本同时存在，这是Gogradle所反对的。
-这样做迟早会带来[问题](https://github.com/blindpirate/golang-broken-vendor)。Gogradle会尝试解决所有的依赖冲突（扁平化），
+因为这样做迟早会带来[问题](https://github.com/blindpirate/golang-broken-vendor)。Gogradle会尝试解决所有的依赖冲突（扁平化），
 并将解决后的结果放在项目目录下的临时文件夹中，作为最终的构建环境。
 
 Gogradle解决依赖的策略是：
@@ -307,17 +321,190 @@ Gogradle解决依赖的策略是：
 - 一级依赖优先级最高：声明在待构建项目中的依赖（vendor目录/build.gradle/依赖锁定文件）具有最高的优先级
 - 越新的依赖包优先级越高：较新的代码包比较旧的代码包优先级高
 
-具体来说，Gogradle会识别每个依赖包的更新时间，并将这些更新时间作为解决冲突的依据。
+具体来说，Gogradle会识别每个依赖包的"更新时间"，并将这些更新时间作为解决冲突的依据。
 
-- 受源代码管理系统管理的代码包的更新时间
+- 受源代码管理系统管理的代码包的更新时间为特定版本的提交时间，如Git的commit time
+- 位于本地文件夹中的代码包的更新时间为该文件夹的最后修改时间
+- 上述二者的vendor目录中的代码包的更新时间为其"宿主"代码包的更新时间
 
+### 依赖锁定
 
+在完成构建之后，你可以通过
+```
+./gradlew lock # *nix
+gradlew lock # Windows
+```
+进行依赖的锁定。这会在项目目录下生成一个名为`gogradle.lock`的文件，记录了构建所需的全部依赖的详细版本，以便进行稳定的、可重现的构建。无论何时，此文件都不应被手动修改。
 
-在实际的构建中，依赖关系可能错综复杂，同一个依赖包可能会存在多个版本。对此，Gogradle的解决方案是：扁平化，并保证同一个依赖包在同一
+若希望在每次成功构建后自动锁定依赖，只需在`build.gradle`中加入：
 
+```
+build.dependsOn lock
+```
 
+### 依赖安装到vendor目录
 
+Go语言1.5之后支持vendor机制，Gogradle也提供了支持（尽管并不推荐）。欲将当前构建的依赖安装到vendor目录，可运行
+
+```
+./gradlew vendor # *nix
+gradlew vendor # Windows
+```
+
+这会将解析完成的`build`依赖拷贝到vendor目录中。注意，`test`依赖不会被拷贝。
+
+## Gogradle的任务
+
+在Gradle的构建模型中，一个独立执行的任务单元称为[Task](https://docs.gradle.org/current/userguide/more_about_tasks.html)。Gogradle预定义了以下任务：
+
+- prepare
+- resolveBuildDependencies
+- resolveTestDependencies
+- dependencies
+- installBuildDependencies
+- installTestDependencies
+- build
+- test
+- clean
+- check
+- lock
+- vendor
+
+下面将对这些任务进行介绍。
+
+### prepare
+
+进行一些准备工作，例如`build.gradle`中配置的合法性校验、指定Go语言版本的下载与安装。
+
+### resolveBuildDependencies/resolveTestDependencies
+
+分别解析`build`和`test`的依赖，生成依赖树。在这个过程中会解决相关依赖之间的冲突。
+
+### dependencies
+
+显示当前项目的依赖树。这对于包冲突的解决非常有用。
+
+### installBuildDependencies/installTestDependencies
+
+将解析完成的`build`和`test`进行扁平化，然后安装到项目目录的`.gogradle`文件夹中，以备构建使用。
+
+### build
+
+执行构建工作。这等价于：
+
+```
+cd <project path>
+export GOPATH=<build dependencies path>
+go build -o <output path> 
+```
+
+### test
+
+执行测试工作。这等价于：
+
+```
+cd <project path>
+export GOPATH=<build dependencies path>:<test dependencies path>
+go test
+```
+
+### check
+
+通常该任务被CI系统调用，用于执行代码检查，例如覆盖率、代码风格等。默认依赖test任务。
+
+### clean
+
+清除项目中的临时文件。
+
+### lock
+
+生成依赖锁定文件。详见
+
+### vendor
+
+将解析后的`build`依赖安装到vendor目录。
+
+## 构建输出与交叉编译
+
+默认情况下，Gogradle会将构建的输出放置在`${projectRoot}/.gogradle`目录下，命名为`${os}_${arch}_${projectName}(.exe)`。
+你可以通过相应配置改变输出位置和命名约定。
+
+Go1.x之后引入了方便的交叉编译，因此，Gogradle能够在一次构建中输出多个平台下的构建结果。
+
+上述配置指明，需要输出3份结果，其中，[]*[]是一个Gogradle定义的笛卡尔积操作。
 
 ## 仓库管理
+
+Gogradle支持私有仓库。你可以在`repositories`块中声明仓库的相关设置。
+
+默认情况下，Gogradlez在执行Git相关操作时会读取本机的ssh相关目录。如果你的ssh文件没有放在默认目录`~/.ssh`，则需要通过以下设置：
+
+```
+repositories {
+    git {
+        all()
+        credentials {
+            privateKeyFile '/path/to/private/key'
+        }
+    }
+}
+```
+
+你可能希望对某些Git仓库应用不同的身份验证信息，那么可以这样：
+```
+repositories{
+    git {
+        url 'http://my-repo.com/my/project.git'
+        credentials {
+            username ''
+            password ''
+        }
+
+    git {
+        name 'import/path/of/anotherpackage'
+        credentials {
+            privateKeyFile '/path/to/private/key'
+        }
+    }    
+}
+```
+
+其中，`name`和`url`中的参数并非只能是字符串，还可以是任何对象。Gogradle通过Groovy语言内建的Object.isCase()方法判定一个仓库声明是否生效。
+例如，你可以在其中使用正则：
+
+```
+    git {
+        url ~/.*github\.com.*/
+        credentials {
+            privateKeyFile '/path/to/private/key'
+        }
+    }
+```
+
+甚至闭包：
+
+```
+    git {
+        name {it->it.startsWith('github.com')}
+        credentials {
+            privateKeyFile '/path/to/private/key'
+        }
+    }
+```
+
+若一个仓库匹配某个仓库声明，那么该声明中的身份验证信息将会被用于拉取代码。Gogradle当前只支持Git仓库，身份验证信息可以是用户名/密码（http协议）或者ssh私钥（ssh协议）。
+
+对其他版本控制系统仓库的开发正在进行中，敬请期待。
+
+
+## IDE集成
+
+Go语言是一门静态类型语言，因此许多IDE对其提供了完善支持，如VSCode和IDEA。
+通常，这些IDE需要用户在使用之前手工设置`GOPATH`并在其中放入依赖的代码包。Gogradle有计划简化这个流程，希望能够让用户无需进行任何配置即可进行开发。
+对此的设计正在进行中。
+
+
 ## 向Gogradle贡献代码
+
+
 
