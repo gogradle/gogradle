@@ -77,7 +77,7 @@ public class DependencyTreeNode {
     private String format(boolean isRoot) {
         if (isRoot) {
             return name;
-        } else if (originalDependency == finalDependency) {
+        } else if (originalDependency.equals(finalDependency)) {
             return withCheckMark() + star();
         } else {
             return withArrow() + star();

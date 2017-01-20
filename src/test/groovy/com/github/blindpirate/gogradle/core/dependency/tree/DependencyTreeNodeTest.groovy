@@ -1,8 +1,11 @@
 package com.github.blindpirate.gogradle.core.dependency.tree
 
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 
@@ -31,8 +34,6 @@ class DependencyTreeNodeTest {
 
     @Test
     void 'tree building whth check mark should succeed'() {
-        // then
-//        println(root.output())
         assert root.output() == '''\
 a
 ├── b:version -> version (*)
@@ -51,6 +52,38 @@ a
         GolangDependencySet result = root.flatten()
         assert result.size() == 7
         assert ('b'..'g').intersect(result.collect({ it.name })) == ('b'..'g')
+    }
+
+    @Test
+    void 'two equal node should be marked as a same dependency'() {
+        // given
+        ResolvedDependency b1 = withNameAndVersion('b', 'version')
+        ResolvedDependency b2 = withNameAndVersion('b', 'version')
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b2, false)])
+        // then
+        assert root.output() == '''\
+a
+└── b:version √
+'''
+    }
+
+    ResolvedDependency withNameAndVersion(String name, String version) {
+        return new AbstractResolvedDependency(name, version, 0) {
+            @Override
+            protected Class<? extends DependencyInstaller> getInstallerClass() {
+                return null
+            }
+
+            @Override
+            Map<String, Object> toLockedNotation() {
+                return null
+            }
+
+            @Override
+            String formatVersion() {
+                return getVersion()
+            }
+        }
     }
 
     @Test(expected = IllegalStateException)
