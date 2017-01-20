@@ -11,6 +11,7 @@ public enum GogradleGlobal {
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final int MAX_DFS_DEPTH = 100;
 
+    private Boolean offline;
 
     private Injector injector;
 
@@ -27,8 +28,11 @@ public enum GogradleGlobal {
     }
 
     public static boolean isOffline() {
-        Project project = INSTANCE.getInstance(Project.class);
-        return project.getGradle().getStartParameter().isOffline();
+        if (INSTANCE.offline == null) {
+            Project project = INSTANCE.getInstance(Project.class);
+            INSTANCE.offline = project.getGradle().getStartParameter().isOffline();
+        }
+        return INSTANCE.offline;
     }
 
     public static <T> T getInstance(Key<T> key) {

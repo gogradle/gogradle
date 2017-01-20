@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import net.lingala.zip4j.core.ZipFile
 import org.gradle.api.Project
 import org.gradle.testfixtures.ProjectBuilder
@@ -54,7 +55,14 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         currentInstance = super.createTest()
         MockitoAnnotations.initMocks(currentInstance)
         injectProjectAndResourceIfNecessary()
+        injectOfflineIfNecessary()
         return currentInstance
+    }
+
+    def injectOfflineIfNecessary() {
+        if (ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline') == null) {
+            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
+        }
     }
 
     def injectProjectAndResourceIfNecessary() {
