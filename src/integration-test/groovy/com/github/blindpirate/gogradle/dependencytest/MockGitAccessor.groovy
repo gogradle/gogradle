@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.dependencytest
 
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.RevCommitUtils
 import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.lib.Repository
@@ -96,7 +97,11 @@ class MockGitAccessor extends GitAccessor {
         return RevCommitUtils.of(commitX[-1] + '0' * 39, x)
     }
 
-    void resetToCommit(Repository repository, String commitSha) {
+    void checkout(Repository repository, String commitSha) {
+        if (commitSha == GitDependencyManager.DEFAULT_BRANCH) {
+            return
+        }
+
         FileUtils.cleanDirectory(repository.root)
         // 100000..0 -> commit1
         String realCommitId = 'commit' + commitSha[0]
@@ -115,7 +120,7 @@ class MockGitAccessor extends GitAccessor {
         return commits.contains(commitX) ? Optional.of(commitXToCommitSha(repository, commitX)) : Optional.empty()
     }
 
-    Repository hardResetAndUpdate(Repository repository) {
+    Repository hardResetAndPull(Repository repository) {
         copyLatestCommitTo(repository.packageName, repository.root)
         return repository
     }

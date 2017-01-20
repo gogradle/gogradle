@@ -28,7 +28,6 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
 
     @Before
     void setUp() {
-//        resource = new File(getClass().getClassLoader().getResource('build-with-mock-git').toURI())
         globalCache = resource.toPath().resolve('global-cache').toFile()
         projectRoot = resource.toPath().resolve('project').toFile()
         fsRoot = resource.toPath().resolve('mock-fs-root').toFile()
@@ -43,10 +42,7 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
         // given
         newBuild { build ->
             build.forTasks('installDependencies')
-//            build.forTasks('dependencies')
         }
-
-//        println(stdout)
 
         // then
         assertDependenciesAre([
