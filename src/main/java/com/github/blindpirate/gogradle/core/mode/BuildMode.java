@@ -10,7 +10,7 @@ public enum BuildMode {
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet vendorDependencies,
                                              GolangDependencySet lockedDependencies) {
-            return merge(declaredDependencies, vendorDependencies, lockedDependencies);
+            return merge(declaredDependencies, lockedDependencies, vendorDependencies);
         }
     },
     REPRODUCIBLE {
