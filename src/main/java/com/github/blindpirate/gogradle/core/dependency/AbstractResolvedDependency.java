@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 
 import java.io.File;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 /**
@@ -64,4 +65,21 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
         return getName() + ":" + formatVersion();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AbstractResolvedDependency that = (AbstractResolvedDependency) o;
+        return Objects.equals(version, that.version)
+                && Objects.equals(getName(), that.getName());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(version, getName());
+    }
 }
