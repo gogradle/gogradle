@@ -1,11 +1,11 @@
 package com.github.blindpirate.gogradle.core.pack
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.util.HttpUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
-import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,14 +13,11 @@ import org.mockito.Mock
 
 import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.anyString
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS
-import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class MetadataPackagePathResolverTest extends MockInjectorSupport {
-    Project project = mock(Project, RETURNS_DEEP_STUBS)
+class MetadataPackagePathResolverTest {
 
     @Mock
     HttpUtils httpUtils
@@ -31,14 +28,13 @@ class MetadataPackagePathResolverTest extends MockInjectorSupport {
     void setUp() {
         resolver = new MetadataPackagePathResolver(httpUtils)
         when(httpUtils.appendQueryParams(anyString(), anyMap())).thenCallRealMethod()
-        when(injector.getInstance(Project)).thenReturn(project)
-        when(project.getGradle().getStartParameter().isOffline()).thenReturn(false)
+        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
     }
 
     @Test
     void 'empty result should be returned when offline'() {
         // given
-        when(project.getGradle().getStartParameter().isOffline()).thenReturn(true)
+        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', true)
         // then
         assert !resolver.produce('').isPresent()
     }
