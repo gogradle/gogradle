@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.lock
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.WithProject
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
@@ -35,7 +35,7 @@ class DefaultLockedDependencyManagerTest {
     String warning = ReflectionUtils.getStaticField(DefaultLockedDependencyManager, "WARNING")
     String gogradleDotLock =
             """${warning}---
-apiVersion: "${GolangPluginSetting.GOGRADLE_VERSION}"
+apiVersion: "${GogradleGlobal.GOGRADLE_VERSION}"
 dependencies:
 - name: "a"
   version: "v1"
