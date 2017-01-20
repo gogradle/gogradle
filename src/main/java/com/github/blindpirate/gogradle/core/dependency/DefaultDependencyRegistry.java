@@ -17,17 +17,26 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
     public boolean register(ResolvedDependency resolvedDependency) {
         synchronized (packages) {
             ResolvedDependency existent = packages.get(resolvedDependency.getName());
-            if (existent != null && theyAreAllFirstLevel(existent, resolvedDependency)) {
+            if (existent == null) {
+                return registerSucceed(resolvedDependency);
+            } else if (theyAreAllFirstLevel(existent, resolvedDependency)) {
                 throw new IllegalStateException("First-level package " + resolvedDependency.getName()
                         + " conflict!");
-            } else if (resolvedDependency.isFirstLevel()
-                    || existingDependencyIsOutOfDate(existent, resolvedDependency)) {
-                packages.put(resolvedDependency.getName(), resolvedDependency);
-                return true;
+            } else if (existent.isFirstLevel()) {
+                return false;
+            } else if (resolvedDependency.isFirstLevel()) {
+                return registerSucceed(resolvedDependency);
+            } else if (existentDependencyIsOutOfDate(existent, resolvedDependency)) {
+                return registerSucceed(resolvedDependency);
             } else {
                 return false;
             }
         }
+    }
+
+    private boolean registerSucceed(ResolvedDependency resolvedDependency) {
+        packages.put(resolvedDependency.getName(), resolvedDependency);
+        return true;
     }
 
     @Override
@@ -45,7 +54,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         cache.put(dependency, resolvedDependency);
     }
 
-    private boolean existingDependencyIsOutOfDate(ResolvedDependency existingDependency,
+    private boolean existentDependencyIsOutOfDate(ResolvedDependency existingDependency,
                                                   ResolvedDependency resolvedDependency) {
         if (existingDependency == null) {
             return true;

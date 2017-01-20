@@ -68,9 +68,9 @@ class DefaultDependencyRegistryTest {
 
         // when
         registry.register(resolvedDependency1)
-
         // then
         assert registry.register(resolvedDependency2)
+        assert !registry.register(resolvedDependency1)
     }
 
     @Test
