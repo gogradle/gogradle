@@ -1,4 +1,4 @@
-# Gogradle - a full-featured build tool for golang
+# Gogradle - a full-featured gradle plugin for building golang
 [![Build Status](https://travis-ci.org/blindpirate/gogradle.svg?branch=master)](https://travis-ci.org/blindpirate/gogradle)
 [![Coverage Status](https://coveralls.io/repos/github/blindpirate/gogradle/badge.svg?branch=master)](https://coveralls.io/github/blindpirate/gogradle?branch=master)
 [![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
@@ -45,25 +45,23 @@ For example, you can declare your dependencies with following statements.
 ```
 repositories{
     git {
-        repo 'github.com'
+        url 'github.com/user/project'
         credentials {
             username ''
             password ''
-            
         }
     }
-    
     git {
-        repo { it->
-            it.startWith('github.com/a/b')
-        } 
+        url {it->it.startsWith('github.com')}
         credentials {
-            privateKey ''
+            privateKeyFile '/path/to/private/key'
         }
     }
-    
-    svn {
-        
+    git {
+        url ~/github\.com.*/
+        credentials {
+            privateKeyFile '/path/to/private/key'
+        }
     }
 }
 
