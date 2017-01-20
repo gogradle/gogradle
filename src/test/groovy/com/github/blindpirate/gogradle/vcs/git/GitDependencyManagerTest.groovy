@@ -82,7 +82,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
         when(gitAccessor.getRepository(resource)).thenReturn(repository)
-        when(gitAccessor.hardResetAndUpdate(repository)).thenReturn(repository)
+        when(gitAccessor.hardResetAndPull(repository)).thenReturn(repository)
         when(gitAccessor.findCommit(repository, commitId)).thenReturn(of(revCommit))
         when(gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(of(revCommit))
@@ -178,7 +178,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // when:
         gitDependencyManager.resolve(notationDependency)
         // then:
-        verify(gitAccessor).hardResetAndUpdate(repository)
+        verify(gitAccessor).hardResetAndPull(repository)
     }
 
     @Test
@@ -189,7 +189,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // when
         gitDependencyManager.resolve(notationDependency)
         // then
-        verify(gitAccessor).resetToCommit(repository, revCommit.getName())
+        verify(gitAccessor).checkout(repository, revCommit.getName())
     }
 
     @Test
@@ -201,7 +201,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // when
         gitDependencyManager.resolve(notationDependency)
         // then
-        verify(gitAccessor).resetToCommit(repository, revCommit.getName())
+        verify(gitAccessor).checkout(repository, revCommit.getName())
     }
 
     @Test
@@ -239,7 +239,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // when
         gitDependencyManager.resolve(notationDependency)
         // then
-        verify(gitAccessor).resetToCommit(repository, revCommit.name)
+        verify(gitAccessor).checkout(repository, revCommit.name)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -281,7 +281,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // when
         gitDependencyManager.install(resolvedDependency, projectGopath)
         // then
-        verify(gitAccessor).resetToCommit(repository, revCommit.getName())
+        verify(gitAccessor).checkout(repository, revCommit.getName())
     }
 
     @Test(expected = DependencyInstallationException)

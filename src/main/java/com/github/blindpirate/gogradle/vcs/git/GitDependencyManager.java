@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -93,7 +94,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     }
 
     private void resetToSpecificCommit(Repository repository, String commitId) {
-        gitAccessor.resetToCommit(repository, commitId);
+        gitAccessor.checkout(repository, commitId);
     }
 
     @Override
@@ -130,7 +131,14 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     @Override
     protected Repository updateRepository(Repository repository, File directory) {
-        return gitAccessor.hardResetAndUpdate(repository);
+        gitAccessor.checkout(repository, DEFAULT_BRANCH);
+
+        if (GogradleGlobal.isOffline()) {
+            LOGGER.info("Cannot pull {} since it is offline now.", gitAccessor.getRemoteUrl(repository));
+        } else {
+            gitAccessor.hardResetAndPull(repository);
+        }
+        return repository;
     }
 
     @Override
