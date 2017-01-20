@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
@@ -144,17 +143,6 @@ public class GitAccessor implements VcsAccessor {
         }
     }
 
-    public void resetToCommit(Repository repository, String commitId) {
-        ResetCommand reset = new ResetCommand(repository);
-        reset.setMode(ResetCommand.ResetType.HARD);
-        reset.setRef(commitId);
-        try {
-            reset.call();
-        } catch (GitAPIException e) {
-            throw DependencyResolutionException.cannotResetToCommit(commitId, e);
-        }
-    }
-
     public Optional<RevCommit> findCommitBySemVersion(Repository repository, String semVersionExpression) {
         Map<String, Ref> tags = repository.getTags();
 
@@ -186,18 +174,14 @@ public class GitAccessor implements VcsAccessor {
         return Optional.of(satisfiedVersion.get(0).getLeft());
     }
 
-    public Repository hardResetAndUpdate(Repository repository) {
+    public Repository hardResetAndPull(Repository repository) {
         try {
             Git git = Git.wrap(repository);
             // Add all unstaged files and then reset to clear them
             git.add().addFilepattern(".").call();
             git.reset().setMode(ResetCommand.ResetType.HARD).call();
 
-            if (GogradleGlobal.isOffline()) {
-                LOGGER.debug("Pulling {} is skipped since it is offline now.", getRemoteUrl(repository));
-            } else {
-                git.pull().call();
-            }
+            git.pull().call();
             return repository;
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);
@@ -229,5 +213,14 @@ public class GitAccessor implements VcsAccessor {
             return commit;
         }
         throw new IllegalStateException("A initial repository " + repository + "? You must be kidding me!");
+    }
+
+    public void checkout(Repository repository, String commitOrBranch) {
+        try {
+            Git git = Git.wrap(repository);
+            git.checkout().setName(commitOrBranch).call();
+        } catch (GitAPIException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 }

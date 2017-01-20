@@ -1,9 +1,12 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.AccessWeb
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
+import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Ignore
@@ -88,7 +91,14 @@ class GitAccessorTest {
 
     @Test
     void 'getting head commit of master branch should succeed'() {
-        assert gitAccessor.headCommitOfBranch(repository, 'master')
+        assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
+    }
+
+    @Test
+    void 'getting head commit of master branch after checkout should succeed'() {
+        String head = gitAccessor.headCommitOfBranch(repository, 'master').get().getName()
+        gitAccessor.checkout(repository, '8492cf3')
+        assert head == gitAccessor.headCommitOfBranch(repository, 'master').get().getName()
     }
 
     @Test
@@ -128,14 +138,14 @@ class GitAccessorTest {
     void 'cloning with https should succeed'() {
         gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource)
         assert resource.toPath().resolve('.git').toFile().exists()
-        assert gitAccessor.headCommitOfBranch(repository, 'master')
+        assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
     }
 
     @Test
     void 'reset to initial commit should succeed'() {
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
 
-        gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
+        gitAccessor.checkout(repository, INITIAL_COMMIT)
 
         assert !resource.toPath().resolve('helloworld.go').toFile().exists()
     }
@@ -166,7 +176,7 @@ class GitAccessorTest {
     @AccessWeb
     void 'git reset --hard HEAD && git pull should succeed'() {
         resource.toPath().resolve('tmpfile').toFile().createNewFile()
-        gitAccessor.hardResetAndUpdate(repository)
+        gitAccessor.hardResetAndPull(repository)
 
         assert !resource.toPath().resolve('tmpfile').toFile().exists()
         assert resource.toPath().resolve('helloworld.go').toFile().exists()
@@ -181,7 +191,7 @@ class GitAccessorTest {
     @Test
     void 'commit time should be the nearest time to current repo snapshot'() {
         long t0 = gitAccessor.lastCommitTimeOfPath(repository, 'README.md')
-        gitAccessor.resetToCommit(repository, '1002ec6')
+        gitAccessor.checkout(repository, '1002ec6')
         long t1 = gitAccessor.lastCommitTimeOfPath(repository, 'README.md')
         assert t0 > t1
     }
@@ -189,7 +199,7 @@ class GitAccessorTest {
     @Test(expected = IllegalStateException)
     void 'getting path at a commit when it does not exist should throw an exception'() {
         // helloworld.go didn't exist in initial commit
-        gitAccessor.resetToCommit(repository, INITIAL_COMMIT)
+        gitAccessor.checkout(repository, INITIAL_COMMIT)
         gitAccessor.lastCommitTimeOfPath(repository, 'helloworld.go')
     }
 
