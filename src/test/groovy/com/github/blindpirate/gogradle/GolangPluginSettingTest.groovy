@@ -3,9 +3,6 @@ package com.github.blindpirate.gogradle
 import org.junit.Before
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
-import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
-
 class GolangPluginSettingTest {
     GolangPluginSetting setting = new GolangPluginSetting()
 
@@ -47,5 +44,22 @@ class GolangPluginSettingTest {
     void 'setting fuckGfw should succeed'() {
         setting.fuckGfw = true
         assert setting.fuckGfw
+    }
+
+    @Test
+    void 'pattern matching targetPlatform should be correct'() {
+        assert isValidTargetPlatform('a-b')
+        assert isValidTargetPlatform('\t a-b \n')
+        assert !isValidTargetPlatform(' a -b ')
+        assert !isValidTargetPlatform('\ta-b,\n')
+        assert !isValidTargetPlatform('a-b,')
+        assert !isValidTargetPlatform(' a-b, ')
+        assert !isValidTargetPlatform(',a-b,')
+        assert isValidTargetPlatform('a-b,1-a,c-d')
+        assert isValidTargetPlatform('\t\t\na-b\n ,\n 1-a\t\n , c-2d  ')
+    }
+
+    boolean isValidTargetPlatform(String value) {
+        return GolangPluginSetting.TARGET_PLATFORM_PATTERN.matcher(value).matches()
     }
 }
