@@ -5,14 +5,15 @@ import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
-import com.github.blindpirate.gogradle.support.TaskTestSupport
+import org.gradle.api.internal.AbstractTask
 import org.gradle.api.internal.project.ProjectInternal
 import org.junit.Before
 import org.mockito.Mock
 import org.mockito.Mockito
 
-abstract class TaskTest {
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
 
+abstract class TaskTest {
     @Mock
     ProjectInternal project
     @Mock
@@ -43,7 +44,14 @@ abstract class TaskTest {
                       visitor              : visitor,
                       golangTaskContainer  : golangTaskContainer,
                       buildManager         : buildManager]
-        return TaskTestSupport.buildTask(project, taskClass, fields)
+
+        T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
+
+        fields.each { fieldName, fieldInstance ->
+            setFieldSafely(ret, fieldName, fieldInstance)
+        }
+
+        return ret
     }
 
 }
