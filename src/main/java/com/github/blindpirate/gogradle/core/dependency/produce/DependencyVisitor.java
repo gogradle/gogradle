@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
@@ -14,7 +15,9 @@ public interface DependencyVisitor {
      * @param rootDir root directory of a package
      * @return Dependencies managed by external package management tools
      */
-    GolangDependencySet visitExternalDependencies(ResolvedDependency dependency, File rootDir);
+    GolangDependencySet visitExternalDependencies(ResolvedDependency dependency,
+                                                  File rootDir,
+                                                  Configuration configuration);
 
     /**
      * Visits dependencies in vendor and treats them as file dependencies.
@@ -30,5 +33,7 @@ public interface DependencyVisitor {
      * @param rootDir root directory of a package
      * @return All imported package.
      */
-    GolangDependencySet visitSourceCodeDependencies(ResolvedDependency dependency, File rootDir);
+    GolangDependencySet visitSourceCodeDependencies(ResolvedDependency dependency,
+                                                    File rootDir,
+                                                    Configuration configuration);
 }
