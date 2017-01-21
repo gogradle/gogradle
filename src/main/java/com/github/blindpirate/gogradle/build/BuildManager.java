@@ -6,7 +6,7 @@ public interface BuildManager {
 
     void prepareForBuild();
 
-    void installDependency(ResolvedDependency dependency);
+    void installDependency(ResolvedDependency dependency, Configuration configuration);
 
     void build();
 }

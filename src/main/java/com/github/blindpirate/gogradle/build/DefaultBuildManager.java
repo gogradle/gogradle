@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
@@ -47,8 +48,7 @@ import static java.util.Arrays.asList;
 @Singleton
 public class DefaultBuildManager implements BuildManager {
     private static final String GOGRADLE_BUILD_DIR = ".gogradle";
-    private static final String BUILD_GOPATH = "build_gopath";
-    private static final String TEST_GOPATH = "test_gopath";
+    private static final String GOPATH = "%s_gopath";
     private static final String PROJECT_GOPATH = "project_gopath";
     private static final String SRC = "src";
 
@@ -86,12 +86,9 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    private Path getTestGopathDir() {
-        return getGogradleBuildDir().resolve(TEST_GOPATH);
-    }
-
-    private Path getBuildGopathDir() {
-        return getGogradleBuildDir().resolve(BUILD_GOPATH);
+    private Path getGopathDir(Configuration configuration) {
+        String gopathDirName = String.format(GOPATH, configuration.getName());
+        return getGogradleBuildDir().resolve(gopathDirName);
     }
 
     private Path getGogradleBuildDir() {
@@ -130,8 +127,7 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(PROJECT_GOPATH)
                 .toAbsolutePath()
                 .toString();
-        String buildGopath = getGogradleBuildDir()
-                .resolve(BUILD_GOPATH)
+        String buildGopath = getGopathDir(BUILD)
                 .toAbsolutePath()
                 .toString();
 
@@ -155,8 +151,8 @@ public class DefaultBuildManager implements BuildManager {
 
 
     @Override
-    public void installDependency(ResolvedDependency dependency) {
-        File targetDir = getBuildGopathDir()
+    public void installDependency(ResolvedDependency dependency, Configuration configuration) {
+        File targetDir = getGopathDir(configuration)
                 .resolve(SRC)
                 .resolve(dependency.getName())
                 .toFile();

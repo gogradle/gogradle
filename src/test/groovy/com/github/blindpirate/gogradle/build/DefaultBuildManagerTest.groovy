@@ -124,7 +124,7 @@ fi
         // given
         when(resolvedDependency.getName()).thenReturn('root/package')
         // when
-        manager.installDependency(resolvedDependency)
+        manager.installDependency(resolvedDependency, Configuration.BUILD)
         // then
         Path gopath = resource.toPath().resolve('.gogradle/build_gopath/src/root/package')
         assert gopath.toFile().exists()
@@ -137,7 +137,7 @@ fi
         when(resolvedDependency.getName()).thenReturn('root/package')
         IOUtils.write(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go', '')
         // when
-        manager.installDependency(resolvedDependency)
+        manager.installDependency(resolvedDependency, Configuration.BUILD)
         // then
         assert !resource.toPath().resolve('.gogradle/build_gopath/src/root/package/oldbuildremains.go').toFile().exists()
     }
