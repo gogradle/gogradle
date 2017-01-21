@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
@@ -10,6 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.build.Configuration.*
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -46,19 +48,19 @@ class DefaultDependencyVisitorTest {
     @Test
     void 'visiting external dependencies should succeed'() {
         // given:
-        when(external1.produce(rootDir)).thenReturn(Optional.empty())
-        when(external2.produce(rootDir)).thenReturn(Optional.of(dependencySet))
+        when(external1.produce(rootDir, BUILD)).thenReturn(Optional.empty())
+        when(external2.produce(rootDir, BUILD)).thenReturn(Optional.of(dependencySet))
 
         // then:
-        assert visitor.visitExternalDependencies(resolvedDependency, rootDir) == dependencySet
+        assert visitor.visitExternalDependencies(resolvedDependency, rootDir, BUILD) == dependencySet
     }
 
     @Test
     void 'visiting source dependencies should succeed'() {
         // given:
-        when(sourceCodeDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(dependencySet)
+        when(sourceCodeDependencyFactory.produce(resolvedDependency, rootDir, BUILD)).thenReturn(dependencySet)
         // then:
-        assert visitor.visitSourceCodeDependencies(resolvedDependency, rootDir) == dependencySet
+        assert visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD) == dependencySet
     }
 
     @Test
@@ -77,7 +79,7 @@ class DefaultDependencyVisitorTest {
     @Test
     @WithResource('')
     void 'empty set should be returned when no external dependencies exist'() {
-        assert visitor.visitExternalDependencies(resolvedDependency, resource).isEmpty()
+        assert visitor.visitExternalDependencies(resolvedDependency, resource, BUILD).isEmpty()
     }
 
 }
