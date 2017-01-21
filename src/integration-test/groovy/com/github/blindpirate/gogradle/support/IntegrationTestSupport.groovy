@@ -17,6 +17,12 @@ abstract class IntegrationTestSupport {
     ByteArrayOutputStream stderr = new ByteArrayOutputStream()
     PrintStream stderrPs = new PrintStream(stderr)
 
+    String mockGoBin = '''
+#!/usr/bin/env sh
+echo 'go version go1.7.1 darwin/amd64'
+'''
+    String mockGoBinPath
+
     String buildDotGradleBase = '''
 buildscript {
     dependencies {
@@ -25,11 +31,22 @@ buildscript {
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
+
+golang {
+    goExecutable = "${mockGoBinPath}"
+}
 '''
 
     void baseSetUp() {
+        prepareMockGoBin()
         IOUtils.touch(getProjectRoot().toPath().resolve('settings.gradle').toFile())
         System.setProperty('gradle.user.home', userhome.absolutePath)
+    }
+
+    void prepareMockGoBin() {
+        IOUtils.write(getProjectRoot(), "mockGoBin", mockGoBin)
+        IOUtils.chmodAddX(getProjectRoot().toPath().resolve('mockGoBin'))
+        mockGoBinPath = getProjectRoot().toPath().resolve('mockGoBin')
     }
 
     BuildLauncher newBuild(Closure closure) {
@@ -66,6 +83,7 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
         return [
                 //"--debug",
+                "-PmockGoBinPath=${mockGoBinPath}",
                 "-PjarPath=${jarPath}",
                 "-PpluginRootProject=${getMainClasspath()}",
                 "-Pclasspath=${getClasspath()}"]
