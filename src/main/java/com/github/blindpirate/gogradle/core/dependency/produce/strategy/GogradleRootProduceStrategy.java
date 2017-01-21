@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -16,7 +17,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 
-import static com.github.blindpirate.gogradle.GolangPlugin.BUILD_CONFIGURATION_NAME;
 import static com.github.blindpirate.gogradle.util.Cast.cast;
 
 /**
@@ -27,7 +27,7 @@ import static com.github.blindpirate.gogradle.util.Cast.cast;
  * a scan for external dependency management tools will be performed.
  */
 @Singleton
-public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
+public class GogradleRootProduceStrategy {
 
     private final GolangPluginSetting settings;
     private final ConfigurationContainer configurationContainer;
@@ -43,23 +43,27 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
         this.lockedDependenciesManager = lockedDependenciesManager;
     }
 
-    @Override
     @DebugLog
-    public GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor) {
+    public GolangDependencySet produce(ResolvedDependency dependency,
+                                       File rootDir,
+                                       DependencyVisitor visitor,
+                                       Configuration configuration) {
         // Here we can just fetch them from internal container
-        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle();
-        GolangDependencySet lockedDependencies = getLockedDependencies(dependency, rootDir, visitor);
+        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
+        GolangDependencySet lockedDependencies = getLockedDependencies(dependency, rootDir, visitor, configuration);
         GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
 
 
-        GolangDependencySet result = settings.getBuildMode().determine(declaredDependencies,
-                vendorDependencies,
-                lockedDependencies);
+        GolangDependencySet result = settings
+                .getBuildMode()
+                .determine(declaredDependencies,
+                        vendorDependencies,
+                        lockedDependencies);
 
         setFirstLevel(result);
 
         if (result.isEmpty()) {
-            return visitor.visitSourceCodeDependencies(dependency, rootDir);
+            return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         } else {
             return result;
         }
@@ -73,20 +77,21 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     // locked by gogradle or external tools
     private GolangDependencySet getLockedDependencies(ResolvedDependency dependency,
                                                       File rootDir,
-                                                      DependencyVisitor visitor) {
-        GolangDependencySet lockedByGogradle = lockedDependenciesManager.getLockedDependencies();
+                                                      DependencyVisitor visitor,
+                                                      Configuration configuration) {
+        GolangDependencySet lockedByGogradle = lockedDependenciesManager.getLockedDependencies(configuration);
         if (lockedByGogradle.isEmpty()) {
-            return visitor.visitExternalDependencies(dependency, rootDir);
+            return visitor.visitExternalDependencies(dependency, rootDir, configuration);
         } else {
             return lockedByGogradle;
         }
     }
 
-    private GolangDependencySet getDependenciesInBuildDotGradle() {
-        GolangConfiguration configuration =
-                (GolangConfiguration) configurationContainer.getByName(BUILD_CONFIGURATION_NAME);
+    private GolangDependencySet getDependenciesInBuildDotGradle(Configuration configuration) {
+        GolangConfiguration golangConfiguration =
+                (GolangConfiguration) configurationContainer.getByName(configuration.getName());
 
-        return cast(DependencySetFacade.class, configuration.getDependencies()).toGolangDependencies();
+        return cast(DependencySetFacade.class, golangConfiguration.getDependencies()).toGolangDependencies();
     }
 
 }

@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
@@ -16,13 +17,12 @@ import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
 
+import java.util.stream.Stream;
+
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 
 
 public class GolangPlugin implements Plugin<Project> {
-
-    public static final String BUILD_CONFIGURATION_NAME = "build";
-    private static final String TEST_CONFIGURATION_NAME = "test";
 
     // injected by gradle
     private final Instantiator instantiator;
@@ -102,8 +102,7 @@ public class GolangPlugin implements Plugin<Project> {
 
     private void configureConfigurations(Project project) {
         ConfigurationContainer configurations = project.getConfigurations();
-        configurations.create(BUILD_CONFIGURATION_NAME);
-        configurations.create(TEST_CONFIGURATION_NAME);
+        Stream.of(Configuration.values()).map(Configuration::getName).forEach(configurations::create);
     }
 
     private void configureSettings(Project project) {
