@@ -2,9 +2,11 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.build.BuildManager
+import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
+import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.internal.project.ProjectInternal
 import org.junit.Before
@@ -26,6 +28,10 @@ abstract class TaskTest {
     DependencyTreeFactory dependencyTreeFactory
     @Mock
     BuildManager buildManager
+    @Mock
+    GoBinaryManager goBinaryManager
+    @Mock
+    BuildConstraintManager buildConstraintManager
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -38,12 +44,14 @@ abstract class TaskTest {
     }
 
     protected <T> T buildTask(Class<T> taskClass) {
-        Map fields = [setting              : setting,
-                      dependencyTreeFactory: dependencyTreeFactory,
-                      strategy             : strategy,
-                      visitor              : visitor,
-                      golangTaskContainer  : golangTaskContainer,
-                      buildManager         : buildManager]
+        Map fields = [setting               : setting,
+                      dependencyTreeFactory : dependencyTreeFactory,
+                      strategy              : strategy,
+                      visitor               : visitor,
+                      golangTaskContainer   : golangTaskContainer,
+                      buildManager          : buildManager,
+                      goBinaryManager       : goBinaryManager,
+                      buildConstraintManager: buildConstraintManager]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
