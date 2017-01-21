@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.tasks.TaskAction;
 
@@ -23,7 +23,7 @@ public class InstallBuildDependenciesTask extends AbstractGolangTask {
         DependencyTreeNode rootNode = getTask(ResolveBuildDependenciesTask.class).getDependencyTree();
         rootNode.flatten()
                 .stream()
-                .map(GolangDependency::resolve)
+                .map(dependency -> (ResolvedDependency) dependency)
                 .forEach((dependency) -> buildManager.installDependency(dependency, BUILD));
     }
 }
