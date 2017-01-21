@@ -154,11 +154,14 @@ golang {
     // 在REPRODUCIBLE模式下，这个顺序是vendor目录中的依赖包、被锁定的依赖包、build.gradle中声明的依赖包
     mode = REPRODUCIBLE
     
-    // 构建所需的Go版本。参阅 https://golang.org/dl/
-    // 若不指定此值，且go在本机的PATH中存在，则使用之；否则，使用最新的Stable版本
+    // 构建所需的Go版本。详见 https://golang.org/dl/
+    // 若不指定此值，且goExecutable存在，则使用之；否则，使用最新的Stable版本
     goVersion = '1.7.1'
     
-    // 即build constraint。参阅 https://golang.org/pkg/go/build/#hdr-Build_Constraints
+    // 默认为"go"。若go不在PATH中，可以使用此配置指定其位置
+    goExecutable = '/path/to/go/executable'
+    
+    // 即build constraint。详见 https://golang.org/pkg/go/build/#hdr-Build_Constraints
     buildTags = ['appengine','anothertag']
     
     // 由于Go语言的官方下载地址在墙外，
@@ -166,18 +169,17 @@ golang {
     // 默认为false
     fuckGfw = true
     
-    extraBuildArgs = ['','']
-    extraTestArgs = ['','']
+    // 在构建和测试时额外传递给go命令行的参数，默认均为空列表
+    extraBuildArgs = ['arg1','arg2']
+    extraTestArgs = []
 
     // 输出文件的位置，默认为./.gogradle
     // 可以为绝对路径或者相对项目目录的相对路径
     outputLocation = ''
-    // 输出文件的格式
-    outputPattern = '${os}_${arch}_${projectName}'
-    // 交叉编译的输出选项
-    // target = [['windows','amd64'],['linux','amd64'],['darwin','amd64']]
-    target = ['windows','linux']*['amd64'] + [['linux','386']]
-    target = 'windows-amd64, linux-amd64, linux-386'
+    // 输出文件的格式，这里必须使用单引号
+    outputPattern = '${os}_${arch}_${projectName}${extension}'
+    // 交叉编译的输出选项，注意，要求go 1.5+
+    targetPlatform = 'windows-amd64, linux-amd64, linux-386'
 }
 ```
 
@@ -440,7 +442,15 @@ go test
 
 Go1.5之后引入了方便的[交叉编译](https://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5)，因此，Gogradle能够在一次构建中输出多个平台下的构建结果。
 
-上述配置指明，需要输出3份结果，其中，[]*[]是一个Gogradle定义的笛卡尔积操作。
+```
+golang {
+    ...
+    targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+    ...
+}
+```
+
+上述配置指明，需要当前的构建输出3份结果。`targetPlatform`字符串必须遵循以上格式。
 
 ## 仓库管理
 
@@ -514,7 +524,15 @@ Go语言是一门静态类型语言，因此许多IDE对其提供了支持，如
 对此的设计正在进行中。
 
 
-## 向Gogradle贡献代码
+## 向Gogradle贡献提出建议或贡献代码
+
+若觉得不错，请Star。
+
+有问题和需求请直接提[issue](https://github.com/blindpirate/gogradle/issues/new)。
+
+欲和我一起改进Gogradle，请提交[PR](https://github.com/blindpirate/gogradle/pulls)。
+
+
 
 
 
