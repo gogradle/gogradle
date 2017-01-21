@@ -21,6 +21,8 @@ import org.mockito.stubbing.Answer
 import java.nio.file.Files
 import java.nio.file.Path
 
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -47,6 +49,7 @@ class DefaultGoBinaryManagerTest {
     void setUp() {
         ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', processUtilsDelegate)
         Process process = mock(Process)
+        when(setting.getGoExecutable()).thenReturn("go")
         when(processUtilsDelegate.run(['go', 'version'], null, null)).thenReturn(process)
         when(processUtilsDelegate.getResult(process)).thenReturn(processResult)
         turnOffMockGo()
@@ -83,12 +86,12 @@ class DefaultGoBinaryManagerTest {
     }
 
     @Test
-    void 'user-specified go binary should be returned if it exists'() {
+    void 'user-specified go binary should be ignored if it cannot be executed'() {
         // given
-        when(setting.getGoExecutable()).thenReturn('/bin/go')
+        when(processUtilsDelegate.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
+        when(setting.getGoExecutable()).thenReturn('/unexistent/go')
         // then
-        assert manager.getBinaryPath() == '/bin/go'
-        assert manager.getGorootEnv() == null
+        'the newest stable version will be used if local binary not exist and no version specified'()
     }
 
     @Test
@@ -97,6 +100,8 @@ class DefaultGoBinaryManagerTest {
         turnOnMockGo()
         // then
         assert manager.getBinaryPath() == 'go'
+        assert manager.getGoVersion() == '1.7.1'
+        assert manager.getGorootEnv() == null
     }
 
     @Test
@@ -106,17 +111,19 @@ class DefaultGoBinaryManagerTest {
         when(setting.getGoVersion()).thenReturn('1.7.1')
         // then
         assert manager.getBinaryPath() == 'go'
+        assert manager.getGoVersion() == '1.7.1'
+        assert manager.getGorootEnv() == null
     }
 
     @Test
     void 'the newest stable version will be used if local binary not exist and no version specified'() {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
-        // when
-        String binaryPath = manager.getBinaryPath()
         // then
+        assert manager.getBinaryPath() == resource.toPath().resolve('1.7.4/go/bin/go').toString()
+        assert manager.getGoVersion() == '1.7.4'
+        assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
         verify(httpUtils).download(anyString(), any(Path))
-        assert binaryPath == resource.toPath().resolve('1.7.4/go/bin/go').toString()
     }
 
     @Test
@@ -124,22 +131,22 @@ class DefaultGoBinaryManagerTest {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
         IOUtils.write(resource, '1.7.4/go/bin/go', 'mock go binary')
-        // when
-        String binaryPath = manager.getBinaryPath()
         // then
+        assert manager.getBinaryPath() == resource.toPath().resolve('1.7.4/go/bin/go').toString()
+        assert manager.getGoVersion() == '1.7.4'
+        assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
         verify(httpUtils, times(0)).download(anyString(), any(Path))
-        assert binaryPath == resource.toPath().resolve('1.7.4/go/bin/go').toString()
     }
 
     @Test
     void 'go binary with specified version should be downloaded'() {
         // given
         when(setting.getGoVersion()).thenReturn("1.7.4")
-        // when
-        String binaryPath = manager.getBinaryPath()
         // then
+        assert manager.getBinaryPath() == resource.toPath().resolve('1.7.4/go/bin/go').toString()
+        assert manager.getGoVersion() == '1.7.4'
+        assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
         verify(httpUtils).download(anyString(), any(Path))
-        assert binaryPath == resource.toPath().resolve('1.7.4/go/bin/go').toString()
     }
 
     @Test(expected = IllegalStateException)

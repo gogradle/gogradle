@@ -36,8 +36,6 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     private static final String FILENAME = "go${version}.${os}-${arch}${extension}";
 
-    private static final String GOBIN_RELATIVE = "go/bin/go";
-
     private static final String NEWEST_VERSION_URL
             = "http://gogradle.oss-cn-hongkong.aliyuncs.com/newest-stable-go-version.txt";
 
@@ -56,6 +54,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private boolean resolved = false;
     private String binaryPath;
     private String gorootEnv;
+    private String goVersion;
 
     @Inject
     public DefaultGoBinaryManager(GolangPluginSetting setting,
@@ -78,34 +77,41 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         return gorootEnv;
     }
 
+    @Override
+    public String getGoVersion() {
+        resolveIfNecessary();
+        return goVersion;
+    }
+
     private void resolveIfNecessary() {
         if (resolved) {
             return;
         }
-        if (setting.getGoExecutable() != null) {
-            binaryPath = setting.getGoExecutable();
-        } else {
-            determineGoBinary();
-        }
+        determineGoBinaryAndVersion();
         resolved = true;
     }
 
-    void determineGoBinary() {
-        Optional<String> versionOnHost = goVersionOnHost();
+    private void determineGoBinaryAndVersion() {
+        Optional<String> versionOnHost = goVersionOnHost(setting.getGoExecutable());
 
         if (setting.getGoVersion() != null) {
             if (specificVersionIsHostVersion(versionOnHost)) {
-                binaryPath = "go";
+                useGoExecutableOnHost(versionOnHost.get());
             } else {
                 fetchSpecifiedVersion(setting.getGoVersion());
             }
         } else {
             if (versionOnHost.isPresent()) {
-                binaryPath = "go";
+                useGoExecutableOnHost(versionOnHost.get());
             } else {
                 fetchNewestStableVersion();
             }
         }
+    }
+
+    private void useGoExecutableOnHost(String versionOnHost) {
+        binaryPath = setting.getGoExecutable();
+        goVersion = versionOnHost;
     }
 
     private boolean specificVersionIsHostVersion(Optional<String> versionOnHost) {
@@ -121,9 +127,9 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         }
     }
 
-    private Optional<String> goVersionOnHost() {
+    private Optional<String> goVersionOnHost(String goExePath) {
         try {
-            Process process = run("go", "version");
+            Process process = run(goExePath, "version");
             ProcessResult result = getResult(process);
             Matcher m = GO_VERSION_OUTPUT_REGEX.matcher(result.getStdout());
             if (m.find()) {
@@ -137,24 +143,22 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     private void fetchSpecifiedVersion(String version) {
-        Path goBinaryPath = globalCacheManager
-                .getGlobalGoBinCache(version)
-                .resolve(GOBIN_RELATIVE);
-        binaryPath = goBinaryPath.toAbsolutePath().toString();
-        if (!goBinaryPath.toFile().exists()) {
-            downloadSpecifiedVersion(version);
+        Path gorootPath = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
+        Path gobinPath = gorootPath.resolve("bin/go");
+        gorootEnv = gorootPath.toAbsolutePath().toString();
+        goVersion = version;
+        binaryPath = gobinPath.toAbsolutePath().toString();
+        if (!gobinPath.toFile().exists()) {
+            downloadSpecifiedVersion(gobinPath, version);
         }
     }
 
-    private void downloadSpecifiedVersion(String version) {
-        Path goRootPath = globalCacheManager.getGlobalGoBinCache(version);
-        Path goBinaryPath = goRootPath.resolve(GOBIN_RELATIVE);
+    private void downloadSpecifiedVersion(Path gobinPath, String version) {
         Path archivePath = downloadArchive(version);
-        CompressUtils.decompressZipOrTarGz(archivePath.toFile(), goRootPath.toFile());
+        CompressUtils.decompressZipOrTarGz(archivePath.toFile(),
+                globalCacheManager.getGlobalGoBinCache(version).toFile());
 
-        IOUtils.chmodAddX(goBinaryPath);
-
-        gorootEnv = goRootPath.toAbsolutePath().toString();
+        IOUtils.chmodAddX(gobinPath);
     }
 
     private Path downloadArchive(String version) {
