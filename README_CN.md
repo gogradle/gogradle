@@ -152,7 +152,7 @@ golang {
     // 在DEVELOP模式下，Gogradle会优先使用build.gradle中声明的依赖（这些依赖包可能是以模糊方式声明的）
     // 然后依次使用被锁定的依赖包（gogradle.lock或者其他的包管理工具）、vendor目录中的依赖包
     // 在REPRODUCIBLE模式下，这个顺序是vendor目录中的依赖包、被锁定的依赖包、build.gradle中声明的依赖包
-    mode = REPRODUCIBLE
+    mode = 'REPRODUCIBLE'
     
     // 构建所需的Go版本。详见 https://golang.org/dl/
     // 若不指定此值，且goExecutable存在，则使用之；否则，使用最新的Stable版本
@@ -177,7 +177,7 @@ golang {
     // 可以为绝对路径或者相对项目目录的相对路径
     outputLocation = ''
     // 输出文件的格式，这里必须使用单引号
-    outputPattern = '${os}_${arch}_${projectName}${extension}'
+    outputPattern = '${os}_${arch}_${packageName}'
     // 交叉编译的输出选项，注意，要求go 1.5+
     targetPlatform = 'windows-amd64, linux-amd64, linux-386'
 }
@@ -437,7 +437,7 @@ go test
 
 ## 构建输出与交叉编译
 
-默认情况下，Gogradle会将构建的输出放置在`${projectRoot}/.gogradle`目录下，命名为`${os}_${arch}_${projectName}(.exe)`。
+默认情况下，Gogradle会将构建的输出放置在`${projectRoot}/.gogradle`目录下，命名为`${os}_${arch}_${packageName}`。
 你可以通过相应配置改变输出位置和命名约定。
 
 Go1.5之后引入了方便的[交叉编译](https://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5)，因此，Gogradle能够在一次构建中输出多个平台下的构建结果。
