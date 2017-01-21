@@ -7,6 +7,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
+
 @RunWith(GogradleRunner)
 class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @InjectMocks
@@ -35,7 +37,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without vendor/vendor.json should be rejected'() {
-        assert !factory.produce(resource).isPresent()
+        assert !factory.produce(resource, BUILD).isPresent()
     }
 
     @Test
@@ -43,7 +45,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson(vendorDotJson)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'github.com/Bowery/prompt', version: 'd43c2707a6c5a152a344c64bb4fed657e2908a81'])
         verifyMapParsed([name: 'github.com/dchest/safefile', version: '855e8d98f1852d48dde521e0522408d1fe7e836a'])
@@ -54,7 +56,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson('This is corrupted')
         // then
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
     }
 
     @Test(expected = IllegalStateException)
@@ -62,7 +64,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson('{"package":[{}]}')
         // then
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
     }
 
     @Test
@@ -70,7 +72,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson('{"package":[{"path":"a"}]}')
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'a'])
     }
@@ -97,7 +99,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson(vendorDotJsonWithExtraProperties)
         // then
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
     }
 
     void prepareVendorDotJson(String s) {

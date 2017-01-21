@@ -7,6 +7,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
+
 @RunWith(GogradleRunner)
 class GlideDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
@@ -15,7 +17,7 @@ class GlideDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without glide.lock should be rejected'() {
-        assert !factory.produce(resource).isPresent()
+        assert !factory.produce(resource, BUILD).isPresent()
     }
 
     String glideDotLock = '''
@@ -39,7 +41,7 @@ testImports: []
         prepareGlideDotLock(glideDotLock)
 
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])
         verifyMapParsed([name: 'github.com/Masterminds/semver', version: '8d0431362b544d1a3536cca26684828866a7de09'])
@@ -60,7 +62,7 @@ testImports: []
         // given
         prepareGlideDotLock(glideDotLockMissingName)
         // then
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
     }
 
     String glideDotLockMissingVersion = '''
@@ -76,7 +78,7 @@ testImports: []
         // given
         prepareGlideDotLock(glideDotLockMissingVersion)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'github.com/codegangsta/cli'])
     }
@@ -94,7 +96,7 @@ imports:
         // given
         prepareGlideDotLock(glideDotLockWithExtraAndMissingProperties)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
 
         verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])

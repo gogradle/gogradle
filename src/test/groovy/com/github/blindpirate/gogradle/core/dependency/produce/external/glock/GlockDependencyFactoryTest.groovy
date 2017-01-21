@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.Mockito.times
 import static org.mockito.Mockito.verify
@@ -18,7 +19,7 @@ class GlockDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without GLOCKFILE should be rejected'() {
-        assert !factory.produce(resource).isPresent()
+        assert !factory.produce(resource, BUILD).isPresent()
     }
 
     String GLOCKFILE = '''
@@ -32,7 +33,7 @@ code.google.com/p/go-uuid 7dda39b2e7d5
         // given
         prepareGlockfile(GLOCKFILE)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'bitbucket.org/tebeka/selenium', version: '02df1758050f'])
         verifyMapParsed([name: 'code.google.com/p/cascadia', version: '4f03c71bc42b'])
@@ -53,7 +54,7 @@ code.google.com/p/go-uuid 7dda39b2e7d5
         // given
         prepareGlockfile(glockfileWithCmds)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verify(mapNotationParser, times(3)).parse(anyMap())
     }
@@ -67,7 +68,7 @@ This is a corrupted line
         // given
         prepareGlockfile(glockfileWithCorruptedLine)
         // then
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
     }
 
     void prepareGlockfile(String s) {

@@ -7,6 +7,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
+
 @RunWith(GogradleRunner)
 class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @InjectMocks
@@ -42,7 +44,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifest)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'github.com/wadey/gocovmerge', vcs: 'git', version: 'b5bfa59ec0adc420475f97f89b58045c721d761c'])
         verifyMapParsed([name: 'golang.org/x/tools', vcs: 'git', version: '8b84dae17391c154ca50b0162662aa1fc9ff84c2'])
@@ -50,7 +52,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'directory without vendor/manifest should be rejected'() {
-        assert !factory.produce(resource).isPresent()
+        assert !factory.produce(resource, BUILD).isPresent()
     }
 
     String manifestMissingImportpath = '''
@@ -73,7 +75,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifestMissingImportpath)
         // then
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
     }
 
     String manifestWithExtraProperties = '''
@@ -108,7 +110,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifestWithExtraProperties)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'github.com/wadey/gocovmerge', vcs: 'git', version: 'b5bfa59ec0adc420475f97f89b58045c721d761c'])
         verifyMapParsed([name: 'golang.org/x/tools', vcs: 'git', version: '8b84dae17391c154ca50b0162662aa1fc9ff84c2'])

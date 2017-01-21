@@ -7,6 +7,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
+
 @RunWith(GogradleRunner)
 class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @InjectMocks
@@ -15,7 +17,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @Test
     void 'package with Godeps/Godeps.json should be rejected'() {
         // then:
-        assert !godepDependencyFactory.produce(resource).isPresent()
+        assert !godepDependencyFactory.produce(resource, BUILD).isPresent()
     }
 
     String GodepsDotJson = '''
@@ -43,7 +45,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         prepareGodepsDotJson(GodepsDotJson)
 
         // when:
-        godepDependencyFactory.produce(resource)
+        godepDependencyFactory.produce(resource, BUILD)
         // then:
         verifyMapParsed([name: "github.com/kr/fs", version: '2788f0dbd16903de03cb8186e5c7d97b69ad387b'])
         verifyMapParsed([name   : "github.com/kr/pretty",
@@ -55,7 +57,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareGodepsDotJson('This is a corrupted Godeps.json')
         // then
-        godepDependencyFactory.produce(resource)
+        godepDependencyFactory.produce(resource, BUILD)
     }
 
     @Test(expected = IllegalStateException)
@@ -67,7 +69,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
 }
 ''')
         // then
-        godepDependencyFactory.produce(resource)
+        godepDependencyFactory.produce(resource, BUILD)
     }
 
     @Test
@@ -79,7 +81,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
 }
 ''')
         // when
-        godepDependencyFactory.produce(resource)
+        godepDependencyFactory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'a'])
 
@@ -102,7 +104,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareGodepsDotJson(GodepsDotJsonWithExtraAndMissingProperties)
         // when
-        godepDependencyFactory.produce(resource)
+        godepDependencyFactory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'a', version: 'b'])
     }

@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static org.mockito.Matchers.eq
 import static org.mockito.Mockito.verify
 
@@ -36,7 +37,7 @@ include = public|scripts|templates'''
         // given
         IOUtils.write(resource, '.gopmfile', dotGopmfile)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
 
         // then
         verifyMapParsed([name: 'github.com/a/b'])
@@ -53,7 +54,7 @@ include = public|scripts|templates'''
         // given
         IOUtils.write(resource, '.gopmfile', '[target]\npath = github.com/gogits/gogs')
         // then
-        assert factory.produce(resource).get().isEmpty()
+        assert factory.produce(resource, BUILD).get().isEmpty()
     }
 
     @Test
@@ -64,7 +65,7 @@ path = github.com/gogits/gogs
 [deps]
 ''')
         // then
-        assert factory.produce(resource).get().isEmpty()
+        assert factory.produce(resource, BUILD).get().isEmpty()
     }
 
     String misorderedDotGompfile1 = '''
@@ -118,7 +119,7 @@ path = github.com/gogits/gogs
         // given
         IOUtils.write(resource, '.gopmfile', dotGopmfile)
         // when
-        factory.produce(resource)
+        factory.produce(resource, BUILD)
         // then
         verifyMapParsed([name: 'github.com/c/d'])
     }
