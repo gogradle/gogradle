@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency
 import org.junit.Test
 import org.mockito.Mockito
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.PropertiesExclusionSpec
 
 class AbstractGolangDependencyTest {
     AbstractGolangDependency dependency = Mockito.mock(AbstractGolangDependency, Mockito.CALLS_REAL_METHODS)

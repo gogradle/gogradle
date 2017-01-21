@@ -1,12 +1,9 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.AccessWeb
-import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.WithResource
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
-import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Ignore

@@ -4,9 +4,8 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
 class PrepareTaskTest extends TaskTest {

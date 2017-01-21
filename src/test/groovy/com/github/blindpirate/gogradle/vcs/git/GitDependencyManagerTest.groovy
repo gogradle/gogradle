@@ -6,11 +6,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
-import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
