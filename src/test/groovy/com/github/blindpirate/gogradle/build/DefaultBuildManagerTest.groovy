@@ -9,11 +9,14 @@ import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ProcessUtils
+import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,10 +25,9 @@ import org.mockito.Mock
 import java.nio.file.Files
 import java.nio.file.Path
 
-import static java.nio.file.attribute.PosixFilePermissions.fromString
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
+import static org.mockito.ArgumentMatchers.*
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -41,37 +43,28 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     ResolvedDependency resolvedDependency
     @Mock
     GitDependencyManager gitDependencyManager
+    @Mock
+    ProcessUtilsDelegate delegate
+    @Mock
+    Process process
 
     GolangPluginSetting setting = new GolangPluginSetting()
-
-    String mockGoBin = '''\
-#!/usr/bin/env sh
-
-echo "build started"
-echo "some error occurred" >&2
-
-if [ "build" = "$1" -a "-o" = "$2" ] && [ ""!="$3" ]; then
-    echo $PWD > $3
-    echo $GOPATH >> $3
-else
-    echo "Usage: go -o <path>"
-fi
-'''
 
     @Before
     void setUp() {
         manager = new DefaultBuildManager(project, binaryManager, setting)
         when(project.getRootDir()).thenReturn(resource)
         setting.packagePath = 'root/package'
+
+        when(binaryManager.getBinaryPath()).thenReturn('go')
+
+        ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', delegate)
+        when(delegate.run(anyList(), anyMap(), any(File))).thenReturn(process)
     }
 
-    void prepareMockGoBin() {
-        IOUtils.forceMkdir(resource.toPath().resolve('.gogradle').toFile())
-        IOUtils.write(resource, 'go', mockGoBin)
-        Path mockGoBinPath = resource.toPath().resolve('go')
-        Files.setPosixFilePermissions(mockGoBinPath, fromString('rwx------'))
-        when(binaryManager.getBinaryPath()).thenReturn(mockGoBinPath.toString())
-        when(binaryManager.getGorootEnv()).thenReturn('')
+    @After
+    void cleanUp() {
+        ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', new ProcessUtils.ProcessUtilsDelegate())
     }
 
     @Test
@@ -92,30 +85,89 @@ fi
     @Test
     void 'build should succeed'() {
         // given
-        prepareMockGoBin()
+        setting.extraBuildArgs = ['a', 'b']
         // when
         manager.build()
         // then
-        Os hostOs = Os.getHostOs()
-        Arch hostArch = Arch.getHostArch()
 
-        Path outputFilePath = resource.toPath().resolve(".gogradle/${hostOs}_${hostArch}_package")
-        List<String> lines = IOUtils.getLines(outputFilePath.toFile())
-        assert lines[0].trim() == resource.toPath().toString()
-        assert lines[1].trim() == "" + resource.toPath().resolve('.gogradle/project_gopath') + File.pathSeparator + resource.toPath().resolve('.gogradle/build_gopath')
+        String expectedOutputPath = new File(resource, ".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_package")
+        verify(delegate).run(['go', 'build', '-o', expectedOutputPath, 'a', 'b'],
+                [GOPATH: getBuildGopath()],
+                resource
+        )
+    }
+
+    String getBuildGopath() {
+        return "" + new File(resource, '.gogradle/project_gopath') + File.pathSeparator + new File(resource, '.gogradle/build_gopath')
+    }
+
+    @Test
+    void 'test should succeed'() {
+        // given
+        setting.extraTestArgs = ['a', 'b']
+        // when
+        manager.test()
+        // then
+        verify(delegate).run(['go', 'test', 'a', 'b'],
+                [GOPATH: getTestGopath()],
+                resource
+        )
+    }
+
+    String getTestGopath() {
+        return "" + new File(resource, '.gogradle/project_gopath') +
+                File.pathSeparator + new File(resource, '.gogradle/build_gopath') +
+                File.pathSeparator + new File(resource, '.gogradle/test_gopath')
+
+    }
+
+    @Test
+    void 'settings should take effect'() {
+        // given
+        setting.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+        setting.outputPattern = 'myresult_${os}_${arch}'
+        setting.outputLocation = resource.absolutePath
+        // when
+        manager.build()
+        // then
+        assertOutputFile('myresult_windows_amd64')
+        assertOutputFile('myresult_linux_amd64')
+        assertOutputFile('myresult_linux_386')
+    }
+
+    void assertOutputFile(String fileName) {
+        verify(delegate).run(['go', 'build', '-o', new File(resource, fileName).toString()],
+                [GOPATH: getBuildGopath()],
+                resource
+        )
+    }
+
+    @Test
+    void 'relative path should take effect'() {
+        // given
+        setting.outputLocation = './a/b/c'
+        // when
+        manager.build()
+        // then
+        String expectedOutput = "a/b/c/${Os.getHostOs()}_${Arch.getHostArch()}_package"
+        verify(delegate).run(['go', 'build', '-o', new File(resource, expectedOutput).toString()],
+                [GOPATH: getBuildGopath()],
+                resource
+        )
     }
 
     @Test
     void 'build stdout and stderr should be redirected to current process'() {
         // given
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream('stdout'.getBytes(DEFAULT_CHARSET)))
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream('stderr'.getBytes(DEFAULT_CHARSET)))
         Logger mockLogger = mock(Logger)
         ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', mockLogger)
-        prepareMockGoBin()
         // when
         manager.build()
         // then
-        verify(mockLogger).quiet('build started')
-        verify(mockLogger).error('some error occurred')
+        verify(mockLogger).quiet('stdout')
+        verify(mockLogger).error('stderr')
         ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', Logging.getLogger(DefaultBuildManager))
     }
 
