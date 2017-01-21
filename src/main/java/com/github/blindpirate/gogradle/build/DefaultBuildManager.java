@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
-import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -33,9 +32,9 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.build.Configuration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
-import static com.github.blindpirate.gogradle.util.IOUtils.*;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
+import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
 
 // ${projectRoot}
