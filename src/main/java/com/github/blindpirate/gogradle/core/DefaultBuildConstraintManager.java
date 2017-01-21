@@ -7,12 +7,14 @@ import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+@Singleton
 public class DefaultBuildConstraintManager implements BuildConstraintManager {
     private static final Pattern GO_VERSION_REGEX = Pattern.compile("(\\d+)\\.(\\d+).*");
     private final GoBinaryManager goBinaryManager;

@@ -6,12 +6,14 @@ import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
 // github.com/user/project -> git@github.com:user/project.git
 // github.com/user/project -> https://github.com/user/project.git
+@Singleton
 public class GithubPackagePathResolver implements PackagePathResolver {
 
     private static final String GITHUB_HOST = "github.com";
