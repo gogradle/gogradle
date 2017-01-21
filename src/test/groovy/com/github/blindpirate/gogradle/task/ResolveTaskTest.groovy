@@ -17,7 +17,9 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 @WithResource('')
 class ResolveTaskTest extends TaskTest {
-    ResolveTask task
+    ResolveBuildDependenciesTask resolveBuildDependenciesTask
+    ResolveTestDependenciesTask resolveTestDependenciesTask
+
     File resource
     @Mock
     DependencyTreeNode tree
@@ -26,22 +28,27 @@ class ResolveTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(ResolveTask)
+        resolveBuildDependenciesTask = buildTask(ResolveBuildDependenciesTask)
+        resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
         when(rootPath.toFile()).thenReturn(resource)
-    }
-
-    @Test
-    void 'dependency resolution should succeed'() {
-        // given
         when(setting.getPackagePath()).thenReturn("package")
         when(project.getRootDir()).thenReturn(resource)
         when(dependencyTreeFactory.getTree(any(LocalDirectoryDependency))).thenReturn(tree)
+    }
 
+    @Test
+    void 'build dependency resolution should succeed'() {
         // when
-        task.resolve()
-
+        resolveBuildDependenciesTask.resolve()
         // then
-        assert task.dependencyTree.is(tree)
+        assert resolveBuildDependenciesTask.dependencyTree.is(tree)
+    }
+    @Test
+    void 'test dependency resolution should succeed'() {
+        // when
+        resolveTestDependenciesTask.resolve()
+        // then
+        assert resolveTestDependenciesTask.dependencyTree.is(tree)
     }
 
 
