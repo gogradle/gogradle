@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory
@@ -10,6 +11,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+
+import static com.github.blindpirate.gogradle.build.Configuration.*
 
 @RunWith(GogradleRunner)
 class SourceCodeAnalysisTest extends GogradleModuleSupport {
@@ -29,7 +32,7 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
         // given
         Mockito.when(resolvedDependency.getName()).thenReturn("name")
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, BUILD)
 
         // then
         def expectation = ['golang.org/x/tools', 'github.com/golang/example'] as Set
