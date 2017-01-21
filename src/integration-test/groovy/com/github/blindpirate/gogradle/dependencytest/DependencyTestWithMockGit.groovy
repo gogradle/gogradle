@@ -10,9 +10,6 @@ import org.junit.runner.RunWith
 
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.build.BuildManager.BUILD_GOPATH
-import static com.github.blindpirate.gogradle.build.BuildManager.GOGRADLE_BUILD_DIR
-
 @RunWith(GogradleRunner)
 @WithProject
 @WithResource('dependency-test-with-mock-git.zip')
