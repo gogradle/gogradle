@@ -19,7 +19,7 @@ class GoImportExtractorTest {
     @Before
     void setUp() {
         extractor = new GoImportExtractor(manager)
-        when(manager.getCtx()).thenReturn([] as Set)
+        when(manager.getAllConstraints()).thenReturn([] as Set)
     }
 
     @Test
@@ -165,7 +165,7 @@ balabalabala
     }
 
     boolean evaluateBuildTags(String buildTags, List ctx) {
-        when(manager.getCtx()).thenReturn(ctx as Set)
+        when(manager.getAllConstraints()).thenReturn(ctx as Set)
         String code = buildTags + '''
 package main
 import "fmt"

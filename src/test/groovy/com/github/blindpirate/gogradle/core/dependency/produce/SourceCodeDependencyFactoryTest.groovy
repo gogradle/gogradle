@@ -50,7 +50,7 @@ class SourceCodeDependencyFactoryTest {
         extractor = new GoImportExtractor(buildConstraintManager)
         factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor)
         when(resolvedDependency.getName()).thenReturn('resolvedDependency')
-        when(buildConstraintManager.getCtx()).thenReturn([] as Set)
+        when(buildConstraintManager.getAllConstraints()).thenReturn([] as Set)
         when(notationParser.parse('github.com/a/b')).thenReturn(dependency)
         when(dependency.getName()).thenReturn('github.com/a/b')
         when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {

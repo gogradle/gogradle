@@ -48,7 +48,7 @@ public class GoImportExtractor {
     }
 
     private boolean shouldBeIncluded(ImportListener listener) {
-        return listener.buildTags.eval(buildConstraintManager.getCtx());
+        return listener.buildTags.eval(buildConstraintManager.getAllConstraints());
     }
 
     private static class ImportListener extends GolangBuildInfoBaseListener {
