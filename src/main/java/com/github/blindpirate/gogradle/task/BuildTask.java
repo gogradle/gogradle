@@ -11,7 +11,7 @@ public class BuildTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public BuildTask() {
-        dependsOn(GolangTaskContainer.INSTALL_DEPENDENCIES_TASK_NAME);
+        dependsOn(GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
     @TaskAction
