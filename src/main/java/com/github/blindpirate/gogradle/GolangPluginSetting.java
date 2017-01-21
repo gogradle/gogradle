@@ -1,17 +1,26 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
+import com.github.blindpirate.gogradle.crossplatform.Arch;
+import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.valueOf;
+import static com.github.blindpirate.gogradle.crossplatform.Arch.getHostArch;
+import static com.github.blindpirate.gogradle.crossplatform.Os.getHostOs;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
+import static java.util.Arrays.asList;
+import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class GolangPluginSetting {
@@ -23,9 +32,9 @@ public class GolangPluginSetting {
     private List<String> buildTags = new ArrayList<>();
     private List<String> extraBuildArgs = new ArrayList<>();
     private List<String> extraTestArgs = new ArrayList<>();
-    private String outputLocation;
-    private String outputPattern = "${os}_${arch}_${projectName}${extension}";
-    private String targetPlatform;
+    private String outputLocation = "./.gogradle";
+    private String outputPattern = "${os}_${arch}_${packageName}";
+    private List<Pair<Os, Arch>> targetPlatforms = asList(Pair.of(getHostOs(), getHostArch()));
 
     // e.g 1.1/1.7/1.7.3/1.8beta1
     private String goVersion;
@@ -88,6 +97,7 @@ public class GolangPluginSetting {
     }
 
     public void setOutputLocation(String outputLocation) {
+        Assert.isNotBlank(outputLocation, "outputLocation cannot be blank!");
         this.outputLocation = outputLocation;
     }
 
@@ -96,15 +106,31 @@ public class GolangPluginSetting {
     }
 
     public void setOutputPattern(String outputPattern) {
+        Assert.isNotBlank(outputPattern, "outputPattern cannot be blank!");
         this.outputPattern = outputPattern;
     }
 
-    public String getTargetPlatform() {
-        return targetPlatform;
+    public List<Pair<Os, Arch>> getTargetPlatforms() {
+        return targetPlatforms;
     }
 
     public void setTargetPlatform(String targetPlatform) {
-        this.targetPlatform = targetPlatform;
+        Matcher matcher = TARGET_PLATFORM_PATTERN.matcher(targetPlatform);
+        Assert.isTrue(matcher.matches(),
+                "Illegal target platform:" + targetPlatform);
+        this.targetPlatforms = extractPlatforms(targetPlatform);
+    }
+
+    private List<Pair<Os, Arch>> extractPlatforms(String targetPlatform) {
+        String[] platforms = StringUtils.splitAndTrim(targetPlatform, ",");
+        return Stream.of(platforms).map(this::extractOne).collect(toList());
+    }
+
+    private Pair<Os, Arch> extractOne(String osAndArch) {
+        String[] osArch = StringUtils.splitAndTrim(osAndArch, "\\-");
+        Os os = Os.of(osArch[0]);
+        Arch arch = Arch.of(osArch[1]);
+        return Pair.of(os, arch);
     }
 
     public String getGoVersion() {
@@ -129,13 +155,6 @@ public class GolangPluginSetting {
 
     public void verify() {
         verifyPackagePath();
-        verifyTargetPlatform();
-    }
-
-    private void verifyTargetPlatform() {
-        if (StringUtils.isNotBlank(targetPlatform)) {
-            Assert.isTrue(TARGET_PLATFORM_PATTERN.matcher(targetPlatform).matches());
-        }
     }
 
     private void verifyPackagePath() {
