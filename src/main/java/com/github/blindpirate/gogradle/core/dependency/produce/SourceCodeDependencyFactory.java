@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
@@ -8,25 +9,14 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.FileVisitResult;
-import java.nio.file.Path;
-import java.nio.file.SimpleFileVisitor;
-import java.nio.file.attribute.BasicFileAttributes;
-import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
-import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
-import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 
 /**
@@ -36,7 +26,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 public class SourceCodeDependencyFactory {
 
     public static final String TESTDATA_DIRECTORY = "testdata";
-    private static final Logger LOGGER = Logging.getLogger(SourceCodeDependencyFactory.class);
 
     private final GoImportExtractor goImportExtractor;
     private final PackagePathResolver packagePathResolver;
@@ -51,8 +40,10 @@ public class SourceCodeDependencyFactory {
         this.goImportExtractor = extractor;
     }
 
-    public GolangDependencySet produce(ResolvedDependency resolvedDependency, File rootDir) {
-        SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor();
+    public GolangDependencySet produce(ResolvedDependency resolvedDependency,
+                                       File rootDir,
+                                       Configuration configuration) {
+        SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor(configuration, goImportExtractor);
         IOUtils.walkFileTreeSafely(rootDir.toPath(), visitor);
         return createDependencies(resolvedDependency, visitor.getImportPaths());
     }
@@ -95,62 +86,5 @@ public class SourceCodeDependencyFactory {
         return importPath.startsWith(".");
     }
 
-    private class SourceCodeDirectoryVisitor extends SimpleFileVisitor<Path> {
-        private Set<String> importPaths = new HashSet<>();
-
-        public Set<String> getImportPaths() {
-            return importPaths;
-        }
-
-        @Override
-        public FileVisitResult preVisitDirectory(Path dir, BasicFileAttributes attrs)
-                throws IOException {
-            super.preVisitDirectory(dir, attrs);
-            if (dirShouldBeIncluded(dir)) {
-                return FileVisitResult.CONTINUE;
-            } else {
-                LOGGER.debug("Ignored directory {}", dir);
-                return FileVisitResult.SKIP_SUBTREE;
-            }
-        }
-
-        private boolean dirShouldBeIncluded(Path dir) {
-            if (fileNameEqualsAny(dir.toFile(), TESTDATA_DIRECTORY, VENDOR_DIRECTORY)) {
-                return false;
-            }
-            if (fileNameStartsWithAny(dir.toFile(), "_", ".")) {
-                return false;
-            }
-            return true;
-        }
-
-
-        @Override
-        public FileVisitResult visitFile(Path file, BasicFileAttributes attrs)
-                throws IOException {
-            super.visitFile(file, attrs);
-
-            if (fileShouldBeIncluded(file)) {
-                String fileContent = IOUtils.toString(file.toFile());
-                importPaths.addAll(goImportExtractor.extract(fileContent));
-            } else {
-                LOGGER.debug("Ignored file {}" + file);
-            }
-
-            return FileVisitResult.CONTINUE;
-        }
-
-        private boolean fileShouldBeIncluded(Path file) {
-            String fileName = String.valueOf(file.getFileName());
-            if (fileName.endsWith("_test.go")) {
-                return false;
-            }
-            if (fileNameStartsWithAny(file.toFile(), ".", "_")) {
-                return false;
-            }
-            return fileName.endsWith(".go");
-        }
-
-    }
 
 }

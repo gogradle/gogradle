@@ -19,6 +19,8 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD
+import static com.github.blindpirate.gogradle.build.Configuration.TEST
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
 
@@ -68,10 +70,8 @@ class SourceCodeDependencyFactoryTest {
 
     @Test
     void 'empty dependency set should be produced when no go code exists'() {
-        // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
-        // then
-        assert result.isEmpty()
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
     }
 
     @Test
@@ -96,9 +96,8 @@ import (
     )
 func main(){}
 ''')
-        // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
-        assert result.isEmpty()
+        // then
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
     }
 
     @Test
@@ -106,7 +105,18 @@ func main(){}
         // given
         IOUtils.write(resource, 'main.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, BUILD)
+        // then
+        assert result.size() == 1
+        assert result.any { it.is(dependency) }
+    }
+
+    @Test
+    void 'import paths should be processed correctly in test'() {
+        // given
+        IOUtils.write(resource, 'main_test.go', mainDotGo)
+        // when
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, TEST)
         // then
         assert result.size() == 1
         assert result.any { it.is(dependency) }
@@ -120,12 +130,16 @@ func main(){}
         IOUtils.forceMkdir(sub)
         IOUtils.forceMkdir(sub)
         IOUtils.write(subsub, 'main.go', mainDotGo)
+        IOUtils.write(subsub, 'main_test.go', mainDotGo)
         IOUtils.write(subsub, 'garbage', 'This is unused')
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
+        GolangDependencySet buildResult = factory.produce(resolvedDependency, resource, BUILD)
+        GolangDependencySet testResult = factory.produce(resolvedDependency, resource, TEST)
         // then
-        assert result.size() == 1
-        assert result.any { it.is(dependency) }
+        assert buildResult.size() == 1
+        assert buildResult.any { it.is(dependency) }
+        assert testResult.size() == 1
+        assert testResult.any { it.is(dependency) }
     }
 
     @Test
@@ -133,10 +147,9 @@ func main(){}
         // given
         IOUtils.write(resource, '_.go', mainDotGo)
         IOUtils.write(resource, '.should_be_ignored.go', mainDotGo)
-        // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
         // then
-        assert result.isEmpty()
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
     }
 
     @Test
@@ -144,19 +157,29 @@ func main(){}
         // given
         IOUtils.write(resource, '_/main.go', mainDotGo)
         IOUtils.write(resource, '.should_be_ignored/main.go', mainDotGo)
+        // then
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+    }
+
+    @Test
+    void 'files ending with `_test` should be ignored in build dependencies'() {
+        // given
+        IOUtils.write(resource, 'a_test.go', mainDotGo)
+        IOUtils.write(resource, '_test.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, BUILD)
         // then
         assert result.isEmpty()
     }
 
     @Test
-    void 'files ending with `_test` should be ignored'() {
+    void 'files not ending with `_test` should be ignored in test dependencies'() {
         // given
-        IOUtils.write(resource, 'a_test.go', mainDotGo)
-        IOUtils.write(resource, '_test.go', mainDotGo)
+        IOUtils.write(resource, 'main1.go', mainDotGo)
+        IOUtils.write(resource, 'main2.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, TEST)
         // then
         assert result.isEmpty()
     }
@@ -167,8 +190,10 @@ func main(){}
         File vendorDir = resource.toPath().resolve('vendor').toFile()
         IOUtils.forceMkdir(vendorDir)
         IOUtils.write(vendorDir, "main.go", mainDotGo)
+        IOUtils.write(vendorDir, "main_test.go", mainDotGo)
         // then
-        assert factory.produce(resolvedDependency, resource).isEmpty()
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
     }
 
     @Test
@@ -177,17 +202,21 @@ func main(){}
         File vendorDir = resource.toPath().resolve('testdata').toFile()
         IOUtils.forceMkdir(vendorDir)
         IOUtils.write(vendorDir, "main.go", mainDotGo)
+        IOUtils.write(vendorDir, "main_test.go", mainDotGo)
         // then
-        assert factory.produce(resolvedDependency, resource).isEmpty()
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
     }
 
     @Test
     void 'self dependency should be excluded'() {
         // given
         IOUtils.write(resource, 'main.go', mainDotGo)
+        IOUtils.write(resource, 'main_test.go', mainDotGo)
         when(resolvedDependency.getName()).thenReturn('github.com/a/b')
         // then
-        assert factory.produce(resolvedDependency, resource).isEmpty()
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
     }
 
     String mainDotGo = '''
