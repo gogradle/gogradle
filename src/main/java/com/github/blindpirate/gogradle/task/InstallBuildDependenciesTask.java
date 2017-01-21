@@ -7,22 +7,23 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TASK_NAME;
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 
-public class InstallDependenciesTask extends AbstractGolangTask {
+
+public class InstallBuildDependenciesTask extends AbstractGolangTask {
     @Inject
     private BuildManager buildManager;
 
-    public InstallDependenciesTask() {
-        dependsOn(RESOLVE_TASK_NAME);
+    public InstallBuildDependenciesTask() {
+        dependsOn(GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
     @TaskAction
     public void installDependencies() {
-        DependencyTreeNode rootNode = getTask(ResolveTask.class).getDependencyTree();
+        DependencyTreeNode rootNode = getTask(ResolveBuildDependenciesTask.class).getDependencyTree();
         rootNode.flatten()
                 .stream()
                 .map(GolangDependency::resolve)
-                .forEach(buildManager::installDependency);
+                .forEach((dependency) -> buildManager.installDependency(dependency, BUILD));
     }
 }

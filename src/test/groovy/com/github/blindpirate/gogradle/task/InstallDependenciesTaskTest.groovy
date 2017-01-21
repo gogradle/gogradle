@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
@@ -9,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.build.Configuration.*
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.verify
@@ -16,27 +18,41 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class InstallDependenciesTaskTest extends TaskTest {
-    InstallDependenciesTask task
+    InstallBuildDependenciesTask installBuildDependenciesTask
+    InstallTestDependenciesTask installTestDependenciesTask
+
     @Mock
     DependencyTreeNode rootNode
 
+    ResolvedDependency resolvedDependency = mockResolvedDependency('notationDependency')
 
     @Before
     void setUp() {
-        task = buildTask(InstallDependenciesTask)
+        installBuildDependenciesTask = buildTask(InstallBuildDependenciesTask)
+        installTestDependenciesTask = buildTask(InstallTestDependenciesTask)
+        GolangDependencySet dependencies = asGolangDependencySet(resolvedDependency)
+        when(rootNode.flatten()).thenReturn(dependencies)
     }
 
     @Test
-    void 'installing dependencies should succeed'() {
+    void 'installing build dependencies should succeed'() {
         // given
-        when(golangTaskContainer.get(ResolveTask).getDependencyTree()).thenReturn(rootNode)
-        ResolvedDependency resolvedDependency = mockResolvedDependency('notationDependency')
-        GolangDependencySet dependencies = asGolangDependencySet(resolvedDependency)
-        when(rootNode.flatten()).thenReturn(dependencies)
+        when(golangTaskContainer.get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(rootNode)
         // when
-        task.installDependencies()
+        installBuildDependenciesTask.installDependencies()
         // then
-        verify(buildManager).installDependency(resolvedDependency)
+        verify(buildManager).installDependency(resolvedDependency, BUILD)
     }
+
+    @Test
+    void 'installing test dependencies should succeed'() {
+        // given
+        when(golangTaskContainer.get(ResolveTestDependenciesTask).getDependencyTree()).thenReturn(rootNode)
+        // when
+        installTestDependenciesTask.installDependencies()
+        // then
+        verify(buildManager).installDependency(resolvedDependency, TEST)
+    }
+
 
 }
