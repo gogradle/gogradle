@@ -4,11 +4,13 @@ import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.util.Assert;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-public class DependencyTreeNode {
+public class DependencyTreeNode implements Comparable<DependencyTreeNode> {
     private String name;
     private boolean star;
     private ResolvedDependency originalDependency;
@@ -33,6 +35,7 @@ public class DependencyTreeNode {
 
     public DependencyTreeNode addChild(DependencyTreeNode child) {
         children.add(child);
+        Collections.sort(children);
         return this;
     }
 
@@ -109,5 +112,11 @@ public class DependencyTreeNode {
             result.add(child.finalDependency);
             child.dfs(result, depth + 1);
         }
+    }
+
+    @SuppressFBWarnings("EQ_COMPARETO_USE_OBJECT_EQUALS")
+    @Override
+    public int compareTo(DependencyTreeNode o) {
+        return this.name.compareTo(o.name);
     }
 }

@@ -26,7 +26,7 @@ class DependencyTreeNodeTest {
         def _3_1 = node('f', 'f', true)
         def _3_2 = node('g')
 
-        root.addChild(_1).addChild(_2).addChild(_3)
+        root.addChild(_3).addChild(_2).addChild(_1)
         _2.addChild(_2_1)
         _2_1.addChild(_2_1_1)
         _3.addChild(_3_1).addChild(_3_2)
