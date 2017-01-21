@@ -69,6 +69,15 @@ public enum Arch {
         return hostArch;
     }
 
+    public static Arch of(String lowercase) {
+        for (Arch a : values()) {
+            if (a.toString().equals(lowercase)) {
+                return a;
+            }
+        }
+        throw new IllegalArgumentException("Unrecognized arch: " + lowercase);
+    }
+
     private static Arch detectHostArch() {
         String arch = System.getProperty("os.arch");
         if (ARCH_DETECTION_MAP.containsKey(arch)) {

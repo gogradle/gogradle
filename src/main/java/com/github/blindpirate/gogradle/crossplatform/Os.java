@@ -59,6 +59,15 @@ public enum Os {
         return hostOs;
     }
 
+    public static Os of(String lowercase) {
+        for (Os os : values()) {
+            if (os.toString().equals(lowercase)) {
+                return os;
+            }
+        }
+        throw new IllegalArgumentException("Unrecognized os: " + lowercase);
+    }
+
     private static final Map<Os, Boolean> OS_DETECTION_MAP = ImmutableMap.<Os, Boolean>builder()
             .put(LINUX, IS_OS_LINUX)
             .put(WINDOWS, IS_OS_WINDOWS)
