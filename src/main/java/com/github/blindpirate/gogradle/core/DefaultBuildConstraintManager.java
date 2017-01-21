@@ -52,8 +52,8 @@ public class DefaultBuildConstraintManager implements BuildConstraintManager {
         Matcher m = GO_VERSION_REGEX.matcher(goVersion);
         Assert.isTrue(m.find(), "Unrecognized version:" + goVersion);
 
-        int major = Integer.valueOf(m.group(1));
-        int minor = Integer.valueOf(m.group(2));
+        int major = Integer.parseInt(m.group(1));
+        int minor = Integer.parseInt(m.group(2));
 
         Assert.isTrue(major == 1, "Only go1 is supported!");
         for (int i = 1; i <= minor; ++i) {
