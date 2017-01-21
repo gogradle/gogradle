@@ -1,11 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DataExchange;
 import com.github.blindpirate.gogradle.util.DependencySetUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -19,7 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.util.Cast.cast;
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
+import static com.github.blindpirate.gogradle.build.Configuration.TEST;
 import static com.github.blindpirate.gogradle.util.DataExchange.parseYaml;
 
 @Singleton
@@ -38,20 +38,22 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     private static final String LOCK_FILE = "gogradle.lock";
 
     @Override
-    public GolangDependencySet getLockedDependencies() {
+    public GolangDependencySet getLockedDependencies(Configuration configuration) {
         File lockFile = project.getRootDir().toPath().resolve(LOCK_FILE).toFile();
         if (!lockFile.exists()) {
             return GolangDependencySet.empty();
         }
         GogradleLockModel model = parseYaml(lockFile, GogradleLockModel.class);
-        return DependencySetUtils.parseMany(model.getDependencies(), mapNotationParser);
+        List<Map<String, Object>> notations = model.getDependencies(configuration.getName());
+        return DependencySetUtils.parseMany(notations, mapNotationParser);
     }
 
     @Override
-    public void lock(Collection<? extends GolangDependency> flatDependencies) {
-        List<Map<String, Object>> notations = flatDependencies
-                .stream().map(this::toNotation).collect(Collectors.toList());
-        GogradleLockModel model = GogradleLockModel.of(notations);
+    public void lock(Collection<? extends ResolvedDependency> flatBuildDependencies,
+                     Collection<? extends ResolvedDependency> flatTestDependencies) {
+        List<Map<String, Object>> buildNotations = toNotations(flatBuildDependencies);
+        List<Map<String, Object>> testNotations = toNotations(flatTestDependencies);
+        GogradleLockModel model = GogradleLockModel.of(buildNotations, testNotations);
         String content = DataExchange.toYaml(model);
         content = insertWarning(content);
         IOUtils.write(project.getRootDir(), LOCK_FILE, content);
@@ -61,9 +63,10 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         return WARNING + content;
     }
 
-    private Map<String, Object> toNotation(GolangDependency dependency) {
-        Assert.isTrue(dependency instanceof ResolvedDependency);
-        return cast(ResolvedDependency.class, dependency).toLockedNotation();
+    private List<Map<String, Object>> toNotations(Collection<? extends ResolvedDependency> flatDependencies) {
+        return flatDependencies.stream()
+                .map(ResolvedDependency::toLockedNotation)
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -75,6 +78,12 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     @SuppressWarnings("unchecked")
     protected List<Map<String, Object>> adapt(File file) {
         GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
-        return model.getDependencies();
+        return model.getDependencies(BUILD.getName());
+    }
+
+    @Override
+    protected List<Map<String, Object>> adaptTest(File file) {
+        GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
+        return model.getDependencies(TEST.getName());
     }
 }
