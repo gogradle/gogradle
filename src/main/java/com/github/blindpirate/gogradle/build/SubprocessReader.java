@@ -35,11 +35,11 @@ public class SubprocessReader extends Thread {
                 }
             } catch (IOException e) {
                 consumer.accept(ExceptionHandler.getStackTrace(e));
-            } finally {
-                latch.countDown();
             }
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
+        } finally {
+            latch.countDown();
         }
     }
 }
