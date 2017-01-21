@@ -21,6 +21,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -67,6 +69,12 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
         ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', new ProcessUtils.ProcessUtilsDelegate())
     }
 
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if .vendor exists before build'() {
+        IOUtils.mkdir(resource, '.vendor')
+        manager.ensureDotVendorDirNotExist()
+    }
+
     @Test
     void 'symbolic links should be created properly in preparation'() {
         // when
@@ -83,13 +91,31 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     }
 
     @Test
+    void 'vendor dir should be renamed to .vendor during build'() {
+        // given
+        IOUtils.mkdir(resource, 'vendor')
+        String dirDuringBuild = null
+        when(delegate.run(anyList(), anyMap(), any(File))).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                dirDuringBuild = IOUtils.safeList(resource).first()
+                return process
+            }
+        })
+        // when
+        manager.build()
+        // then
+        assert dirDuringBuild == '.vendor'
+        assert new File(resource, 'vendor').exists()
+    }
+
+    @Test
     void 'build should succeed'() {
         // given
         setting.extraBuildArgs = ['a', 'b']
         // when
         manager.build()
         // then
-
         String expectedOutputPath = new File(resource, ".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_package")
         verify(delegate).run(['go', 'build', '-o', expectedOutputPath, 'a', 'b'],
                 [GOPATH: getBuildGopath()],

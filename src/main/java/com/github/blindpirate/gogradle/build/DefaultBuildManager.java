@@ -6,7 +6,9 @@ import com.github.blindpirate.gogradle.core.exceptions.BuildException;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -30,6 +32,8 @@ import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.util.IOUtils.*;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
@@ -60,6 +64,12 @@ public class DefaultBuildManager implements BuildManager {
     private final Project project;
     private final GoBinaryManager goBinaryManager;
     private final GolangPluginSetting setting;
+
+    @Override
+    public void ensureDotVendorDirNotExist() {
+        Assert.isTrue(!new File(project.getRootDir(), "." + VENDOR_DIRECTORY).exists(),
+                "We need .vendor directory as temp directory, existent .vendor before build is not allowed.");
+    }
 
     @Override
     public void prepareSymbolicLinks() {
@@ -108,12 +118,29 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void build() {
-        String goBinary = goBinaryManager.getBinaryPath();
-        String gopath = getBuildGopath();
-        Map<String, String> envs = getEnvs(gopath);
-        determineOutputFilePaths().forEach(outputFilePath ->
-                buildOne(goBinary, outputFilePath, envs)
-        );
+        autoRecoverVendor(() -> {
+            String goBinary = goBinaryManager.getBinaryPath();
+            String gopath = getBuildGopath();
+            Map<String, String> envs = getEnvs(gopath);
+            determineOutputFilePaths().forEach(outputFilePath ->
+                    buildOne(goBinary, outputFilePath, envs)
+            );
+        });
+    }
+
+    private void autoRecoverVendor(Runnable runnable) {
+        File vendorDir = new File(project.getRootDir(), VENDOR_DIRECTORY);
+        File targetDir = new File(project.getRootDir(), "." + VENDOR_DIRECTORY);
+        try {
+            if (isValidDirectory(vendorDir) && !vendorDir.renameTo(targetDir)) {
+                throw BuildException.cannotRenameVendorDir(targetDir);
+            }
+            runnable.run();
+        } finally {
+            if (isValidDirectory(targetDir) && !targetDir.renameTo(vendorDir)) {
+                throw BuildException.cannotRenameVendorDir(vendorDir);
+            }
+        }
     }
 
     private Map<String, String> getEnvs(String gopath) {
@@ -135,14 +162,16 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void test() {
-        String goBinary = goBinaryManager.getBinaryPath();
-        String gopath = getTestGopath();
+        autoRecoverVendor(() -> {
+            String goBinary = goBinaryManager.getBinaryPath();
+            String gopath = getTestGopath();
 
-        Map<String, String> envs = getEnvs(gopath);
-        List<String> args = Lists.newArrayList(goBinary, "test");
-        args.addAll(setting.getExtraTestArgs());
+            Map<String, String> envs = getEnvs(gopath);
+            List<String> args = Lists.newArrayList(goBinary, "test");
+            args.addAll(setting.getExtraTestArgs());
 
-        startBuildOrTest(args, envs);
+            startBuildOrTest(args, envs);
+        });
     }
 
     private String getBuildGopath() {
