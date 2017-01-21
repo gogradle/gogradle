@@ -36,13 +36,13 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     @Mock
     Project project
     @Mock
-    GolangPluginSetting setting
-    @Mock
     GoBinaryManager binaryManager
     @Mock
     ResolvedDependency resolvedDependency
     @Mock
     GitDependencyManager gitDependencyManager
+
+    GolangPluginSetting setting = new GolangPluginSetting()
 
     String mockGoBin = '''\
 #!/usr/bin/env sh
@@ -62,7 +62,7 @@ fi
     void setUp() {
         manager = new DefaultBuildManager(project, binaryManager, setting)
         when(project.getRootDir()).thenReturn(resource)
-        when(setting.getPackagePath()).thenReturn('root/package')
+        setting.packagePath = 'root/package'
     }
 
     void prepareMockGoBin() {
@@ -77,7 +77,7 @@ fi
     @Test
     void 'symbolic links should be created properly in preparation'() {
         // when
-        manager.prepareForBuild()
+        manager.prepareSymbolicLinks()
         // then
         assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
     }
