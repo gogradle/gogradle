@@ -7,6 +7,9 @@ import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.common.collect.ImmutableMap;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -25,6 +28,7 @@ import static java.lang.Boolean.TRUE;
 
 @Singleton
 public class DefaultGoBinaryManager implements GoBinaryManager {
+    private static final Logger LOGGER = Logging.getLogger(DefaultGoBinaryManager.class);
     // https://storage.googleapis.com/golang/go1.7.4.windows-386.zip
     // https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz
     private static final String URL
@@ -110,6 +114,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     private void useGoExecutableOnHost(String versionOnHost) {
+        LOGGER.quiet("Found go {}, use it.", versionOnHost);
         binaryPath = setting.getGoExecutable();
         goVersion = versionOnHost;
     }
@@ -149,6 +154,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         goVersion = version;
         binaryPath = gobinPath.toAbsolutePath().toString();
         if (!gobinPath.toFile().exists()) {
+            LOGGER.quiet("Start downloading go {}.", version);
             downloadSpecifiedVersion(gobinPath, version);
         }
     }
@@ -161,11 +167,13 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         IOUtils.chmodAddX(gobinPath);
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private Path downloadArchive(String version) {
         String baseUrl = urls.get(setting.isFuckGfw());
         String url = injectVariables(baseUrl, version);
         String archiveFileName = injectVariables(FILENAME, version);
         Path goBinaryCachePath = globalCacheManager.getGlobalGoBinCache(archiveFileName);
+        IOUtils.forceMkdir(goBinaryCachePath.getParent().toFile());
         try {
             httpUtils.download(url, goBinaryCachePath);
         } catch (IOException e) {
