@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.build;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
@@ -57,7 +58,6 @@ import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class DefaultBuildManager implements BuildManager {
-    private static final String GOGRADLE_BUILD_DIR = ".gogradle";
     private static final String GOPATH = "%s_gopath";
     private static final String PROJECT_GOPATH = "project_gopath";
     private static final String SRC = "src";
@@ -107,7 +107,7 @@ public class DefaultBuildManager implements BuildManager {
 
     private Path getGogradleBuildDir() {
         return project.getRootDir().toPath()
-                .resolve(GOGRADLE_BUILD_DIR);
+                .resolve(GogradleGlobal.GOGRADLE_BUILD_DIR_NAME);
     }
 
     @Inject

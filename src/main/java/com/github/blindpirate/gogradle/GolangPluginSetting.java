@@ -32,7 +32,7 @@ public class GolangPluginSetting {
     private List<String> buildTags = new ArrayList<>();
     private List<String> extraBuildArgs = new ArrayList<>();
     private List<String> extraTestArgs = new ArrayList<>();
-    private String outputLocation = "./.gogradle";
+    private String outputLocation = GogradleGlobal.GOGRADLE_BUILD_DIR_NAME;
     private String outputPattern = "${os}_${arch}_${packageName}";
     private List<Pair<Os, Arch>> targetPlatforms = asList(Pair.of(getHostOs(), getHostArch()));
 
