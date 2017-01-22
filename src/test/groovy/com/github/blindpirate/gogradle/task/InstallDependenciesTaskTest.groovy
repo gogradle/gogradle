@@ -11,6 +11,7 @@ import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static com.github.blindpirate.gogradle.build.Configuration.TEST
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.verify
@@ -32,6 +33,12 @@ class InstallDependenciesTaskTest extends TaskTest {
         installTestDependenciesTask = buildTask(InstallTestDependenciesTask)
         GolangDependencySet dependencies = asGolangDependencySet(resolvedDependency)
         when(rootNode.flatten()).thenReturn(dependencies)
+    }
+
+    @Test
+    void 'install task should depend on resolve task'() {
+        assertTaskDependsOn(installBuildDependenciesTask, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(installTestDependenciesTask, RESOLVE_TEST_DEPENDENCIES_TASK_NAME)
     }
 
     @Test
