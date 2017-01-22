@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 
 import javax.inject.Singleton;
 import java.util.Map;
+
 @Singleton
 public class MercurialNotationConverter implements NotationConverter {
     @Override

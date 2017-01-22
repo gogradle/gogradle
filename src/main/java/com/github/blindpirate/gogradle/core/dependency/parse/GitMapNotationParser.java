@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency;
 
@@ -17,7 +16,7 @@ import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.URL_
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.VERSION_KEY;
 
 @Singleton
-public class GitMapNotationParser extends AutoConfigureMapNotationParser {
+public class GitMapNotationParser extends AutoConfigureMapNotationParser<GitNotationDependency> {
     @Override
     protected void preConfigure(Map<String, Object> notation) {
         String version = getString(notation, VERSION_KEY);
@@ -33,10 +32,4 @@ public class GitMapNotationParser extends AutoConfigureMapNotationParser {
             notation.put("commit", NEWEST_COMMIT);
         }
     }
-
-    @Override
-    protected Class<? extends NotationDependency> determineDependencyClass(Map<String, Object> notationMap) {
-        return GitNotationDependency.class;
-    }
-
 }

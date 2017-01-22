@@ -3,16 +3,16 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
 
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
 import java.util.Map;
 
-public abstract class AutoConfigureMapNotationParser implements MapNotationParser {
+public abstract class AutoConfigureMapNotationParser<T extends NotationDependency> implements MapNotationParser {
     @Override
     public NotationDependency parse(Map<String, Object> notationMap) {
         try {
             preConfigure(notationMap);
-
-            Class<? extends NotationDependency> resultClass = determineDependencyClass(notationMap);
-            NotationDependency ret = resultClass.newInstance();
+            NotationDependency ret = determineDependencyClass(notationMap).newInstance();
             ConfigureUtils.configureByMapQuietly(notationMap, ret);
 
             postConfigure(notationMap, ret);
@@ -28,5 +28,9 @@ public abstract class AutoConfigureMapNotationParser implements MapNotationParse
     protected void postConfigure(Map<String, Object> notationMap, NotationDependency ret) {
     }
 
-    protected abstract Class<? extends NotationDependency> determineDependencyClass(Map<String, Object> notationMap);
+    @SuppressWarnings("unchecked")
+    protected Class<? extends NotationDependency> determineDependencyClass(Map<String, Object> notationMap) {
+        Type superClass = getClass().getGenericSuperclass();
+        return (Class<T>) ((ParameterizedType) superClass).getActualTypeArguments()[0];
+    }
 }

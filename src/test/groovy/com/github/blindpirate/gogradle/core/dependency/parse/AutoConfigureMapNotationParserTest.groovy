@@ -1,32 +1,36 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver
 import org.junit.Test
 
 class AutoConfigureMapNotationParserTest {
 
-    class NotationDependencyWithoutDefaultConstructor extends AbstractNotationDependency {
-        private NotationDependencyWithoutDefaultConstructor() {
-
+    static class WithoutDefaultConstructor extends AbstractNotationDependency {
+        private WithoutDefaultConstructor() {
         }
-
         @Override
         Class<? extends DependencyResolver> getResolverClass() {
             return null
         }
     }
 
-    class Test1 extends AutoConfigureMapNotationParser {
+    static class WithDefaultConstructor extends AbstractNotationDependency {
         @Override
-        protected Class<? extends NotationDependency> determineDependencyClass(Map<String, Object> notationMap) {
-            return NotationDependencyWithoutDefaultConstructor
+        Class<? extends DependencyResolver> getResolverClass() {
+            return null
         }
     }
 
     @Test(expected = IllegalStateException)
     void 'implementation class should provide a class with default constructor'() {
-        new Test1().parse([:])
+        new AutoConfigureMapNotationParser<WithoutDefaultConstructor>() {
+        }.parse([:])
+    }
+
+    @Test
+    void ''() {
+        assert new AutoConfigureMapNotationParser<WithDefaultConstructor>() {
+        }.parse([:]) instanceof WithDefaultConstructor
     }
 }
