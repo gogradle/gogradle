@@ -11,6 +11,7 @@ import org.mockito.Mock
 
 import java.nio.file.Path
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static org.mockito.Matchers.any
 import static org.mockito.Mockito.when
 
@@ -43,6 +44,7 @@ class ResolveTaskTest extends TaskTest {
         // then
         assert resolveBuildDependenciesTask.dependencyTree.is(tree)
     }
+
     @Test
     void 'test dependency resolution should succeed'() {
         // when
@@ -51,5 +53,10 @@ class ResolveTaskTest extends TaskTest {
         assert resolveTestDependenciesTask.dependencyTree.is(tree)
     }
 
+    @Test
+    void 'resolve task should depend on preprare task'() {
+        assertTaskDependsOn(resolveBuildDependenciesTask, PREPARE_TASK_NAME)
+        assertTaskDependsOn(resolveTestDependenciesTask, PREPARE_TASK_NAME)
+    }
 
 }
