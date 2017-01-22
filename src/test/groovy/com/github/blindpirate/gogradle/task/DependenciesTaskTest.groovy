@@ -11,6 +11,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -40,6 +42,11 @@ class DependenciesTaskTest extends TaskTest {
         ReflectionUtils.setStaticFinalField(DependenciesTask, 'LOGGER', Logging.getLogger(DependenciesTask))
     }
 
+    @Test
+    void 'dependencies task should depends on resolve task'(){
+        assertTaskDependsOn(task,RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task,RESOLVE_TEST_DEPENDENCIES_TASK_NAME)
+    }
 
     @Test
     void 'dependency tree should be displayed correctly'() {
