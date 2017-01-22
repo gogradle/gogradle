@@ -7,6 +7,8 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
+import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.gradle.api.Task
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.internal.project.ProjectInternal
 import org.junit.Before
@@ -43,6 +45,12 @@ abstract class TaskTest {
             }
     }
 
+    void assertTaskDependsOn(Task task, Object dependency) {
+        def dependencies = ReflectionUtils.getField(task, 'dependencies')
+        Set<Object> values = ReflectionUtils.getField(dependencies, 'values')
+        assert values.contains(dependency)
+    }
+
     protected <T> T buildTask(Class<T> taskClass) {
         Map fields = [setting               : setting,
                       dependencyTreeFactory : dependencyTreeFactory,
@@ -51,7 +59,8 @@ abstract class TaskTest {
                       golangTaskContainer   : golangTaskContainer,
                       buildManager          : buildManager,
                       goBinaryManager       : goBinaryManager,
-                      buildConstraintManager: buildConstraintManager]
+                      buildConstraintManager: buildConstraintManager,
+                      project               : project]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
