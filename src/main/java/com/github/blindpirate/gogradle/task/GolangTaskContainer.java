@@ -34,6 +34,8 @@ public class GolangTaskContainer {
             .put(TEST_TASK_NAME, TestTask.class)
             .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
             .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
+            .put(CLEAN_TASK_NAME, CleanTask.class)
+            .put(CHECK_TASK_NAME, CheckTask.class)
             .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
