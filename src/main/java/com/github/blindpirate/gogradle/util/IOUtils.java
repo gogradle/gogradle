@@ -1,6 +1,8 @@
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -14,6 +16,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
@@ -165,6 +168,10 @@ public class IOUtils {
         } catch (IOException e) {
             handleIOException(e);
         }
+    }
+
+    public static Collection<File> filterTestsMatchingPatterns(File dir, List<String> namePattern) {
+        return FileUtils.listFiles(dir, new TestPatternFilter(namePattern), TrueFileFilter.INSTANCE);
     }
 
     public static void clearDirectory(File dir) {
