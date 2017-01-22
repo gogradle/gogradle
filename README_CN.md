@@ -55,7 +55,7 @@ golang {
     packagePath = 'your/package/path'
 }
 ```
-如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。在Gogradle进行过第一次构建后，它会在项目目录下生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以选择删除它们。详见[依赖锁定](#依赖锁定)一节
+如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。在Gogradle进行过第一次构建后，它会在项目目录下生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以选择删除它们。详见[依赖锁定](#依赖锁定)一节。
 
 ### 构建Go项目
 
@@ -69,7 +69,8 @@ gradlew build # Windows
 
 在下文中，`gradlew`命令将以统一的`gradlew <task>`形式给出，不再区分平台。
 
-以上命令等价于在当前项目目录下运行`go build`，区别在于，Gogradle自动完成了依赖解析、安装等一系列过程，稍后我们会详细解释。
+以上命令等价于在当前项目目录下运行`go build`，区别在于，Gogradle自动完成了依赖解析、安装等一系列过程。注意，Gogradle**不使用全局的`GOPATH`**，它会将所有的依赖安装在当前项目目录下并自动设置与构建相关的环境变量——这意味着构建是完全隔离的、可复现的。
+
 
 ### 测试Go项目
 
@@ -82,8 +83,9 @@ gradlew test
 测试指定文件：
 
 ```
-gradlew test --tests main_test.go
-gradlew test --tests *_test.go
+gradlew test --tests github.com/my/package/subpackage // 必须是当前构建项目的子目录或者后代目录
+gradlew test --tests main_test.go // 指定一个测试文件
+gradlew test --tests *_test.go // 通配符测试
 ```
 
 若希望构建在测试完成之后进行，只需在`build.gradle`中添加
@@ -113,9 +115,27 @@ dependencies {
 gradlew dependencies
 ```
 
-输出大概长这个样子：
+输出如下：
 
 ```
+build:
+
+github.com/gogits/gogs
+├── github.com/Unknwon/cae:c6aac99 √
+├── github.com/Unknwon/com:28b053d √
+├── github.com/Unknwon/i18n:39d6f27 √
+│   ├── github.com/Unknwon/com:28b053d √ (*)
+│   └── gopkg.in/ini.v1:766e555 -> 6f66b0e
+├── github.com/Unknwon/paginater:701c23f √
+├── github.com/bradfitz/gomemcache:2fafb84 √
+├── github.com/go-macaron/binding:4892016 √
+│   ├── github.com/Unknwon/com:28b053d √ (*)
+│   └── gopkg.in/macaron.v1:ddb19a9 √
+│       ├── github.com/Unknwon/com:28b053d √ (*)
+│       ├── github.com/go-macaron/inject:d8a0b86 -> c5ab7bf
+│       └── gopkg.in/ini.v1:766e555 -> 6f66b0e (*)
+... 
+
 ```
 
 这是[gogs](https://github.com/gogits/gogs)项目v0.9.113的依赖树。其中，对号(√)代表该依赖包即最终的依赖包；
@@ -249,6 +269,7 @@ dependencies {
 ```
 
 可以同时声明多个依赖：
+
 ```groovy
 dependencies {
     build 'github.com/a/b@1.0.0', 'github.com/c/d@2.0.0', 'github.com/e/f#commitId'
