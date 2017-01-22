@@ -25,7 +25,7 @@ public class LockTask extends AbstractGolangTask {
     @TaskAction
     void lock() {
         DependencyTreeNode buildDependencyTree = getTask(ResolveBuildDependenciesTask.class).getDependencyTree();
-        DependencyTreeNode testDependencyTree = getTask(ResolveBuildDependenciesTask.class).getDependencyTree();
+        DependencyTreeNode testDependencyTree = getTask(ResolveTestDependenciesTask.class).getDependencyTree();
 
         lockedDependencyManager.lock(toResolveDependencySet(buildDependencyTree),
                 toResolveDependencySet(testDependencyTree));
