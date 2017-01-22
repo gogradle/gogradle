@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.task
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
+import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
@@ -34,6 +35,8 @@ abstract class TaskTest {
     GoBinaryManager goBinaryManager
     @Mock
     BuildConstraintManager buildConstraintManager
+    @Mock
+    LockedDependencyManager lockedDependencyManager
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -52,15 +55,16 @@ abstract class TaskTest {
     }
 
     protected <T> T buildTask(Class<T> taskClass) {
-        Map fields = [setting               : setting,
-                      dependencyTreeFactory : dependencyTreeFactory,
-                      strategy              : strategy,
-                      visitor               : visitor,
-                      golangTaskContainer   : golangTaskContainer,
-                      buildManager          : buildManager,
-                      goBinaryManager       : goBinaryManager,
-                      buildConstraintManager: buildConstraintManager,
-                      project               : project]
+        Map fields = [setting                : setting,
+                      dependencyTreeFactory  : dependencyTreeFactory,
+                      strategy               : strategy,
+                      visitor                : visitor,
+                      golangTaskContainer    : golangTaskContainer,
+                      buildManager           : buildManager,
+                      goBinaryManager        : goBinaryManager,
+                      buildConstraintManager : buildConstraintManager,
+                      lockedDependencyManager: lockedDependencyManager,
+                      project                : project]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
