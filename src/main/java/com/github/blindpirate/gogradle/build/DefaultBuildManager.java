@@ -23,19 +23,23 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
-import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.build.Configuration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
+import static com.github.blindpirate.gogradle.util.IOUtils.filterTestsMatchingPatterns;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 // ${projectRoot}
 // └── .gogradle
@@ -161,16 +165,34 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void test() {
+        testWithTargets(Collections.emptyList());
+    }
+
+    private void testWithTargets(List<String> targets) {
         autoRecoverVendor(() -> {
             String goBinary = goBinaryManager.getBinaryPath();
             String gopath = getTestGopath();
 
             Map<String, String> envs = getEnvs(gopath);
             List<String> args = Lists.newArrayList(goBinary, "test");
+            args.addAll(targets);
             args.addAll(setting.getExtraTestArgs());
 
             startBuildOrTest(args, envs);
         });
+    }
+
+    @Override
+    public void testWithPatterns(List<String> testNamePattern) {
+        Collection<File> filesMatchingPatterns = filterTestsMatchingPatterns(project.getRootDir(), testNamePattern);
+        if (filesMatchingPatterns.isEmpty()) {
+            LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
+        } else {
+            LOGGER.quiet("Found " + filesMatchingPatterns.size() + " tests to run.");
+            List<String> fullPaths = filesMatchingPatterns.stream()
+                    .map(File::getAbsolutePath).collect(toList());
+            testWithTargets(fullPaths);
+        }
     }
 
     private String getBuildGopath() {
@@ -224,7 +246,7 @@ public class DefaultBuildManager implements BuildManager {
     private List<String> determineOutputFilePaths() {
         return setting.getTargetPlatforms().stream()
                 .map(this::determineOne)
-                .collect(Collectors.toList());
+                .collect(toList());
     }
 
     private String determineOne(Pair<Os, Arch> osAndArch) {
