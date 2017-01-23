@@ -9,7 +9,6 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 
