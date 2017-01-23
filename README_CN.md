@@ -140,7 +140,9 @@ github.com/gogits/gogs
 
 ```
 
-这是[gogs](https://github.com/gogits/gogs)项目v0.9.113的依赖树。其中，对号(√)代表该依赖包即最终的依赖包；
+这是[gogs](https://github.com/gogits/gogs)项目v0.9.113的依赖树。在其项目目录下存在`glide.lock`文件，这是[glide](https://github.com/Masterminds/glide)工具生成的，因此Gogradle自动导入了它。无需任何设置，就是这么简单。
+
+其中，对号(√)代表该依赖包即最终的依赖包；
 箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点之前已经显示过，因此忽略其后代。
 
 ### 依赖锁定
@@ -160,7 +162,7 @@ Gogradle支持传递性依赖、依赖排除、自定义仓库URL等多种功能
 
 ## 配置
 
-下面是完整的配置，位于`golang`中。
+下面是完整的配置，位于`build.gradle`文件的`golang`中。
 
 ```groovy
 golang {
@@ -475,7 +477,7 @@ golang {
 
 ## 仓库管理
 
-Gogradle支持私有仓库。你可以在`repositories`中声明仓库的相关设置。
+Gogradle支持私有仓库。你可以在`build.gradle`文件的`repositories`中声明仓库的相关设置。
 
 默认情况下，Gogradle在执行Git相关操作时会读取本机的ssh相关目录。如果你的ssh文件没有放在默认目录`~/.ssh`，则需要通过以下设置：
 
@@ -510,7 +512,7 @@ repositories{
 }
 ```
 
-其中，`name`和`url`中的参数并非只能是字符串，还可以是任何对象。Gogradle通过Groovy语言内建的`Object.isCase()`方法判定一个仓库声明是否生效。
+其中，`name`和`url`中的参数并非只能是字符串，还可以是任何对象。Gogradle通过Groovy语言内建的[`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html)方法判定一个仓库声明是否生效。
 例如，你可以在其中使用正则：
 
 ```
