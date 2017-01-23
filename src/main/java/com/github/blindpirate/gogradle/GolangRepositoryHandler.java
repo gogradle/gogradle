@@ -269,7 +269,8 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Repo
     }
 
     @Override
-    public ArtifactRepository getByName(String name, Action<? super ArtifactRepository> configureAction) throws UnknownRepositoryException {
+    public ArtifactRepository getByName(String name, Action<? super ArtifactRepository> configureAction)
+            throws UnknownRepositoryException {
         throw new UnsupportedOperationException();
     }
 
@@ -299,7 +300,8 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Repo
     }
 
     @Override
-    public <S extends ArtifactRepository> DomainObjectCollection<S> withType(Class<S> type, Action<? super S> configureAction) {
+    public <S extends ArtifactRepository> DomainObjectCollection<S> withType(Class<S> type,
+                                                                             Action<? super S> configureAction) {
         throw new UnsupportedOperationException();
     }
 
