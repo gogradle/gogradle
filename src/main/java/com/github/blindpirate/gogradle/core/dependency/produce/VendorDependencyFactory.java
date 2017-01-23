@@ -48,7 +48,7 @@ public class VendorDependencyFactory {
     }
 
     private boolean vendorDirExist(File rootDir) {
-        return Files.exists(rootDir.toPath().resolve(VENDOR_DIRECTORY));
+        return new File(rootDir, VENDOR_DIRECTORY).exists();
     }
 
     private Path vendorPath(File rootDir) {

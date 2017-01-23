@@ -125,8 +125,8 @@ func main(){}
     @Test
     void 'directory should be searched recursively'() {
         // given
-        File sub = resource.toPath().resolve('sub').toFile()
-        File subsub = sub.toPath().resolve('sub').toFile()
+        File sub = new File(resource, 'sub')
+        File subsub = new File(sub, 'sub')
         IOUtils.forceMkdir(sub)
         IOUtils.forceMkdir(sub)
         IOUtils.write(subsub, 'main.go', mainDotGo)
@@ -187,7 +187,7 @@ func main(){}
     @Test
     void 'files in vendor directory should be ignored'() {
         // given
-        File vendorDir = resource.toPath().resolve('vendor').toFile()
+        File vendorDir = new File(resource, 'vendor')
         IOUtils.forceMkdir(vendorDir)
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         IOUtils.write(vendorDir, "main_test.go", mainDotGo)
@@ -199,7 +199,7 @@ func main(){}
     @Test
     void 'files in testdata directory should be ignored'() {
         // given
-        File vendorDir = resource.toPath().resolve('testdata').toFile()
+        File vendorDir = new File(resource, 'testdata')
         IOUtils.forceMkdir(vendorDir)
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         IOUtils.write(vendorDir, "main_test.go", mainDotGo)
