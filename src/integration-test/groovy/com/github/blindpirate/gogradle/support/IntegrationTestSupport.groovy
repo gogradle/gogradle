@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.support
 import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.tooling.BuildLauncher
+import org.gradle.tooling.ConfigurableLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 
@@ -39,8 +40,10 @@ golang {
 
     void baseSetUp() {
         prepareMockGoBin()
-        IOUtils.touch(getProjectRoot().toPath().resolve('settings.gradle').toFile())
-        System.setProperty('gradle.user.home', userhome.absolutePath)
+        IOUtils.touch(new File(getProjectRoot(), 'settings.gradle'))
+        if (userhome != null) {
+            System.setProperty('gradle.user.home', userhome.absolutePath)
+        }
     }
 
     void prepareMockGoBin() {
@@ -50,22 +53,11 @@ golang {
     }
 
     BuildLauncher newBuild(Closure closure) {
-        GradleConnector connector = GradleConnector.newConnector()
-                .forProjectDirectory(getProjectRoot())
-                .useGradleUserHomeDir(userhome)
-
-        if (System.getProperty('GRADLE_DIST_HOME') != null) {
-            connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
-        }
-
-        ProjectConnection connection = connector.connect()
+        ProjectConnection connection = newProjectConnection()
         try {
-            BuildLauncher build = connection.newBuild()
+            BuildLauncher build = newProjectConnection().newBuild()
 
-            build.setStandardOutput(stdoutPs)
-            build.setStandardError(stderrPs)
-
-            setBuildArguments(build)
+            configure(build)
 
             closure(build)
             build.run()
@@ -74,8 +66,24 @@ golang {
         }
     }
 
-    void setBuildArguments(BuildLauncher buildLauncher) {
-        buildLauncher.withArguments(buildArguments() as String[])
+    void configure(ConfigurableLauncher build) {
+        build.setStandardOutput(stdoutPs)
+        build.setStandardError(stderrPs)
+        build.withArguments(buildArguments() as String[])
+    }
+
+    ProjectConnection newProjectConnection() {
+        GradleConnector connector = GradleConnector.newConnector()
+                .forProjectDirectory(getProjectRoot())
+
+        if (userhome != null) {
+            connector.useGradleUserHomeDir(userhome)
+        }
+
+        if (System.getProperty('GRADLE_DIST_HOME') != null) {
+            connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
+        }
+        return connector.connect()
     }
 
     List<String> buildArguments() {
