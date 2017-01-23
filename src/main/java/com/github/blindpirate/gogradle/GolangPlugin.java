@@ -12,11 +12,13 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.artifacts.dsl.RepositoryHandler;
+import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
+import org.gradle.internal.service.DefaultServiceRegistry;
 
 import javax.inject.Inject;
-
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
@@ -98,6 +100,20 @@ public class GolangPlugin implements Plugin<Project> {
                 instantiator.newInstance(GolangDependencyHandler.class,
                         configurationContainer,
                         parser));
+
+        //overwriteRepositoryHandler(project);
+    }
+
+    private void overwriteRepositoryHandler(Project project) {
+        DefaultProject defaultProject = (DefaultProject) project;
+        DefaultServiceRegistry serviceRegistry = (DefaultServiceRegistry) defaultProject.getServices();
+
+//        try {
+//            ReflectionUtils.setVariableValueInObject(serviceRegistry, "mutable", true);
+//        } catch (IllegalAccessException e) {
+//            throw ExceptionHandler.uncheckException(e);
+//        }
+        serviceRegistry.add(RepositoryHandler.class, injector.getInstance(GolangRepositoryHandler.class));
     }
 
     private void configureConfigurations(Project project) {

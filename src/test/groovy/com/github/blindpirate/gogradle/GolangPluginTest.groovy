@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.gradle.api.Project
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -156,4 +157,20 @@ class GolangPluginTest {
         assert !getExclusionSpecs(findFirstInDependencies()).isEmpty()
     }
 
+    @Test
+    @Ignore
+    void 'configuring repository should succeed'() {
+        project.repositories {
+            git {
+                url 'https://github.com/a/b.git'
+                credentials {
+                    username ''
+                    password ''
+                }
+            }
+        }
+        assert project.repositories instanceof GolangRepositoryHandler
+        assert project.repositories.findMatchedRepository('https://github.com/a/b.git', null).isPresent()
+
+    }
 }
