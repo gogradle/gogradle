@@ -204,9 +204,21 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
         // when
         manager.installDependency(resolvedDependency, Configuration.BUILD)
         // then
-        Path gopath = resource.toPath().resolve('.gogradle/build_gopath/src/root/package')
-        assert gopath.toFile().exists()
-        verify(resolvedDependency).installTo(gopath.toFile())
+        File targetDir = new File(resource, '.gogradle/build_gopath/src/root/package')
+        assert targetDir.exists()
+        verify(resolvedDependency).installTo(targetDir)
+    }
+
+    @Test
+    void 'installing a dependency to vendor should succeed'() {
+        // given
+        when(resolvedDependency.getName()).thenReturn('root/package')
+        // when
+        manager.installDependencyToVendor(resolvedDependency)
+        // then
+        File targetDir = new File(resource, 'vendor/root/package')
+        assert targetDir.exists()
+        verify(resolvedDependency).installTo(targetDir)
     }
 
     @Test

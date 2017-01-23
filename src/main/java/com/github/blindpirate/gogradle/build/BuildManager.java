@@ -12,6 +12,8 @@ public interface BuildManager {
 
     void installDependency(ResolvedDependency dependency, Configuration configuration);
 
+    void installDependencyToVendor(ResolvedDependency dependency);
+
     void build();
 
     void test();

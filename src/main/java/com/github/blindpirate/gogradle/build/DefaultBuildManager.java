@@ -237,10 +237,22 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(SRC)
                 .resolve(dependency.getName())
                 .toFile();
+        installTo(dependency, targetDir);
+    }
 
+    private void installTo(ResolvedDependency dependency, File targetDir) {
         forceMkdir(targetDir);
         clearDirectory(targetDir);
         dependency.installTo(targetDir);
+    }
+
+    @Override
+    public void installDependencyToVendor(ResolvedDependency dependency) {
+        File targetDir = project.getRootDir().toPath()
+                .resolve(VENDOR_DIRECTORY)
+                .resolve(dependency.getName())
+                .toFile();
+        installTo(dependency, targetDir);
     }
 
     private List<String> determineOutputFilePaths() {
