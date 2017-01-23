@@ -16,6 +16,7 @@ import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
+import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.*
 import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setField
 import static org.mockito.Mockito.when
@@ -48,9 +49,9 @@ class DefaultGlobalCacheManagerTest {
         // when
         cacheManager.ensureGlobalCacheExistAndWritable()
         // then
-        assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
-        assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH).toFile().exists()
-        assert resource.toPath().resolve(DefaultGlobalCacheManager.GO_LOCKFILES_PATH).toFile().exists()
+        assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
+        assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
+        assert new File(resource, GO_LOCKFILES_PATH).exists()
     }
 
     @Test
@@ -70,7 +71,7 @@ class DefaultGlobalCacheManagerTest {
     @Test
     void 'multi-process access should be serialized'() {
         // when
-        String filePath = resource.toPath().resolve('shared').toAbsolutePath().toString()
+        String filePath = new File(resource, 'shared').getAbsolutePath()
 
         Callable runOneProcess = {
             cacheManager.runWithGlobalCacheLock(notationDependency, {

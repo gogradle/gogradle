@@ -30,7 +30,7 @@ class MockRepository extends Repository {
     long getUpdateTime(String path) {
         try {
             // Unix second
-            return root.toPath().resolve("${path}/updateTime").toFile().getText().toInteger()
+            return new File(root, "${path}/updateTime").getText().toInteger()
         } catch (Exception e) {
             return 0
         }

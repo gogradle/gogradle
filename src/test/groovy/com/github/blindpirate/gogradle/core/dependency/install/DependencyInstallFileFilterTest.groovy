@@ -13,12 +13,12 @@ class DependencyInstallFileFilterTest {
 
     File touch(String name) {
         IOUtils.write(resource, name, '')
-        return resource.toPath().resolve(name).toFile()
+        return new File(resource, name)
     }
 
     File mkdir(String dirName) {
         IOUtils.mkdir(resource, dirName)
-        return resource.toPath().resolve(dirName).toFile()
+        return new File(resource, dirName)
     }
 
     void allNamesAccepted(String... names) {

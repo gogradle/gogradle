@@ -39,7 +39,7 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
 
     @Override
     public GolangDependencySet getLockedDependencies(Configuration configuration) {
-        File lockFile = project.getRootDir().toPath().resolve(LOCK_FILE).toFile();
+        File lockFile = new File(project.getRootDir(), LOCK_FILE);
         if (!lockFile.exists()) {
             return GolangDependencySet.empty();
         }

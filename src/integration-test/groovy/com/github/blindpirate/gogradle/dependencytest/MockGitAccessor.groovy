@@ -55,7 +55,7 @@ class MockGitAccessor extends GitAccessor {
     }
 
     File packageNameAndCommitToDir(String packageName, String commit) {
-        return mockGitRepo.toPath().resolve(packageName.replaceAll('/', '_') + "_${commit}").toFile()
+        return new File(mockGitRepo, packageName.replaceAll('/', '_') + "_${commit}")
     }
 
     @Override

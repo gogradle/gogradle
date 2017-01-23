@@ -90,8 +90,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.produce(project.rootDir,BUILD).get()
-        GolangDependencySet testResult = manager.produce(project.rootDir,TEST).get()
+        GolangDependencySet buildResult = manager.produce(project.rootDir, BUILD).get()
+        GolangDependencySet testResult = manager.produce(project.rootDir, TEST).get()
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }
@@ -110,7 +110,7 @@ dependencies:
         // when
         manager.lock([dependency1, dependency2], [dependency3, dependency4])
         // then
-        assert project.getRootDir().toPath().resolve(LOCK_FILE_NAME).toFile().getText() == gogradleDotLock
+        assert new File(project.getRootDir(), LOCK_FILE_NAME).getText() == gogradleDotLock
     }
 
     @Test

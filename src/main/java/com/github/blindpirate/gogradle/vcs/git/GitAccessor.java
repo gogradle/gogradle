@@ -54,7 +54,7 @@ public class GitAccessor implements VcsAccessor {
             FileRepositoryBuilder builder = new FileRepositoryBuilder();
 
             return builder
-                    .setGitDir(directory.toPath().resolve(".git").toFile())
+                    .setGitDir(new File(directory, ".git"))
                     .readEnvironment()
                     .findGitDir()
                     .build();

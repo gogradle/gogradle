@@ -47,7 +47,7 @@ class LockTaskTest extends TaskTest {
         when(golangTaskContainer.get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(buildTree)
         when(golangTaskContainer.get(ResolveTestDependenciesTask).getDependencyTree()).thenReturn(testTree)
         when(buildTree.flatten()).thenReturn(buildSet)
-        when(buildTree.flatten()).thenReturn(testSet)
+        when(testTree.flatten()).thenReturn(testSet)
         // when
         task.lock()
         // then

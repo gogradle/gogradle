@@ -134,17 +134,17 @@ class GitAccessorTest {
     @WithResource('')
     void 'cloning with https should succeed'() {
         gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource)
-        assert resource.toPath().resolve('.git').toFile().exists()
+        assert new File(resource, '.git').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
     }
 
     @Test
     void 'reset to initial commit should succeed'() {
-        assert resource.toPath().resolve('helloworld.go').toFile().exists()
+        assert new File(resource, 'helloworld.go').exists()
 
         gitAccessor.checkout(repository, INITIAL_COMMIT)
 
-        assert !resource.toPath().resolve('helloworld.go').toFile().exists()
+        assert !new File(resource, 'helloworld.go').exists()
     }
 
     @Test
@@ -172,11 +172,11 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     void 'git reset --hard HEAD && git pull should succeed'() {
-        resource.toPath().resolve('tmpfile').toFile().createNewFile()
+        new File(resource, 'tmpfile').createNewFile()
         gitAccessor.hardResetAndPull(repository)
 
-        assert !resource.toPath().resolve('tmpfile').toFile().exists()
-        assert resource.toPath().resolve('helloworld.go').toFile().exists()
+        assert !new File(resource, 'tmpfile').exists()
+        assert new File(resource, 'helloworld.go').exists()
     }
 
     @Test
@@ -207,7 +207,7 @@ class GitAccessorTest {
     void 'cloning and pulling a proxy repository should succeed'() {
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=465167
         gitAccessor.cloneWithUrl('https://gopkg.in/ini.v1', resource)
-        assert resource.toPath().resolve('README.md').toFile().exists()
+        assert new File(resource, 'README.md').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
 

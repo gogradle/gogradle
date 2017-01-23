@@ -50,7 +50,7 @@ class GlobalCachePackagePathResolverTest {
         })
 
 
-        when(gitAccessor.getRepository(resource.toPath().resolve('github.com/a/b').toFile()))
+        when(gitAccessor.getRepository(new File(resource, 'github.com/a/b')))
                 .thenReturn(repository)
         when(gitAccessor.getRemoteUrl((File) any(File))).thenAnswer(new Answer<Object>() {
             @Override

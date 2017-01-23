@@ -51,7 +51,7 @@ public enum DependencyInstallFileFilter implements FileFilter {
 
         List<String> files = IOUtils.safeList(dir);
         return files.stream()
-                .map(name -> dir.toPath().resolve(name).toFile())
+                .map(name -> new File(dir, name))
                 .anyMatch(this::accept);
     }
 }

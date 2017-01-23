@@ -45,7 +45,7 @@ class LocalDirectoryDependencyInstallerTest {
         // when
         installer.install(dependency, dest)
         // then
-        assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
+        assert new File(dest, 'main.go').getText() == 'This is main.go'
     }
 
     @Test
@@ -56,6 +56,6 @@ class LocalDirectoryDependencyInstallerTest {
         IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
         // when
         installer.install(vendorResolvedDependency, dest)
-        assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
+        assert new File(dest, 'main.go').getText() == 'This is main.go'
     }
 }

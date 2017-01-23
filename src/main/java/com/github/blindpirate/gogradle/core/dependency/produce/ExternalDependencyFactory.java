@@ -64,6 +64,6 @@ public abstract class ExternalDependencyFactory {
     private File identityFile(File rootDir) {
         String identityFile = identityFileName();
         Assert.isNotBlank(identityFile, "Identity file must not be empty!");
-        return rootDir.toPath().resolve(identityFile).toFile();
+        return new File(rootDir, identityFile);
     }
 }

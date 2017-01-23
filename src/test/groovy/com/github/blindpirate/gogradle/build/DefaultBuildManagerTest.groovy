@@ -229,6 +229,6 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
         // when
         manager.installDependency(resolvedDependency, Configuration.BUILD)
         // then
-        assert !resource.toPath().resolve('.gogradle/build_gopath/src/root/package/oldbuildremains.go').toFile().exists()
+        assert !new File(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go').exists()
     }
 }

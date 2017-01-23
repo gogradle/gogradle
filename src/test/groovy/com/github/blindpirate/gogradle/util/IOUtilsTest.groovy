@@ -20,15 +20,15 @@ class IOUtilsTest {
 
     @Test
     void 'checking non-empty directory should succeed'() {
-        resource.toPath().resolve('file').toFile().createNewFile()
+        new File(resource, 'file').createNewFile()
         assert !IOUtils.dirIsEmpty(resource)
     }
 
     @Test(expected = IllegalStateException)
     void 'checking a file should throw s exception'() {
-        Path filePath = resource.toPath().resolve('file')
-        filePath.toFile().createNewFile()
-        IOUtils.dirIsEmpty(filePath.toFile())
+        File file = new File(resource, 'file')
+        file.createNewFile()
+        IOUtils.dirIsEmpty(file)
     }
 
     @Test
@@ -48,7 +48,7 @@ class IOUtilsTest {
         IOUtils.ensureDirExistAndWritable(resource.toPath(), "a")
         IOUtils.ensureDirExistAndWritable(resource.toPath(), "a")
         // then
-        assert resource.toPath().resolve('a').toFile().exists()
+        assert new File(resource, 'a').exists()
     }
 
     @Test(expected = IllegalStateException)
@@ -61,8 +61,8 @@ class IOUtilsTest {
         // when
         IOUtils.write(resource, 'a/b/c', 'content')
         // then
-        assert resource.toPath().resolve('a').toFile().exists()
-        assert resource.toPath().resolve('a/b/c').toFile().getText() == 'content'
+        assert new File(resource, 'a').exists()
+        assert new File(resource, 'a/b/c').getText() == 'content'
     }
 
 

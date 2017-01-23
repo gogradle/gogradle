@@ -25,10 +25,10 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
 
     @Before
     void setUp() {
-        globalCache = resource.toPath().resolve('global-cache').toFile()
-        projectRoot = resource.toPath().resolve('project').toFile()
-        fsRoot = resource.toPath().resolve('mock-fs-root').toFile()
-        mockGitRepo = resource.toPath().resolve('mock-git-repo').toFile()
+        globalCache = new File(resource, 'global-cache')
+        projectRoot = new File(resource, 'project')
+        fsRoot = new File(resource, 'mock-fs-root')
+        mockGitRepo = new File(resource, 'mock-git-repo')
 
         baseSetUp()
     }
@@ -84,10 +84,8 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
     }
 
     void assertDependenciesAre(Map<String, String> finalDependencies) {
-        Path projectGopath = projectRoot.toPath().resolve('.gogradle/build_gopath/src')
-
         finalDependencies.each { packageName, commit ->
-            assert projectGopath.resolve(packageName).resolve(commit + '.go').toFile().exists()
+            assert new File(projectRoot, ".gogradle/build_gopath/src/${packageName}/${commit}.go").exists()
         }
     }
 }

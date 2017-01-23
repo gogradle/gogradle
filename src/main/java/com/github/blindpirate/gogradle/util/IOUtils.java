@@ -39,7 +39,7 @@ public class IOUtils {
     }
 
     public static File mkdir(File baseDir, String newDirName) {
-        File ret = baseDir.toPath().resolve(newDirName).toFile();
+        File ret = new File(baseDir, newDirName);
         forceMkdir(ret);
         return ret;
     }

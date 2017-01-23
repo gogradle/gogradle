@@ -73,7 +73,7 @@ class AbstractVcsDependencyManagerTest {
         // when
         manager.install(vendorResolvedDependency, dest)
         // then
-        assert dest.toPath().resolve('main.go').toFile().getText() == 'This is main.go'
+        assert new File(dest, 'main.go').getText() == 'This is main.go'
     }
 
     @Test
