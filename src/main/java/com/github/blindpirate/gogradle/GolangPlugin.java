@@ -21,10 +21,7 @@ import org.gradle.internal.reflect.Instantiator;
 import org.gradle.internal.service.DefaultServiceRegistry;
 
 import javax.inject.Inject;
-import java.lang.reflect.InvocationHandler;
-import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.lang.reflect.Type;
 import java.util.Map;
 import java.util.stream.Stream;
 
@@ -117,18 +114,20 @@ public class GolangPlugin implements Plugin<Project> {
 
         try {
             // 'cause it is package-private
-            Class serviceProviderClass = Class.forName("org.gradle.internal.service.DefaultServiceRegistry$ServiceProvider");
+            Class serviceProviderClass =
+                    Class.forName("org.gradle.internal.service.DefaultServiceRegistry$ServiceProvider");
 
-            Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{serviceProviderClass}, new InvocationHandler() {
-                @Override
-                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
-                    if ("get".equals(method.getName())) {
-                        return injector.getInstance(GolangRepositoryHandler.class);
-                    } else {
-                        return null;
-                    }
-                }
-            });
+            Object proxy = Proxy.newProxyInstance(
+                    serviceProviderClass.getClassLoader(),
+                    new Class[]{serviceProviderClass},
+                    (proxy1, method, args) -> {
+                        if ("get".equals(method.getName())) {
+                            return injector.getInstance(GolangRepositoryHandler.class);
+                        } else {
+                            return null;
+                        }
+                    });
+
             Map providerCache = (Map) ReflectionUtils.getValueIncludingSuperclasses("providerCache",
                     serviceRegistry);
             synchronized (serviceRegistry) {
