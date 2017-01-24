@@ -288,4 +288,14 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url2', resource)
     }
 
+    @Test(expected = DependencyResolutionException)
+    void 'exception should be thrown when all urls have been tried'() {
+        // given
+        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
+        when(gitAccessor.cloneWithUrl('github.com/a/b', 'url1', resource)).thenThrow(IOException)
+        when(gitAccessor.cloneWithUrl('github.com/a/b', 'url2', resource)).thenThrow(IOException)
+        // then
+        gitDependencyManager.resolve(notationDependency)
+    }
+
 }
