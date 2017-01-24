@@ -1,8 +1,19 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.StringUtils;
+import com.jcraft.jsch.JSch;
+import com.jcraft.jsch.JSchException;
+import com.jcraft.jsch.Session;
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerHelper;
+import org.eclipse.jgit.api.TransportCommand;
+import org.eclipse.jgit.transport.JschConfigSessionFactory;
+import org.eclipse.jgit.transport.OpenSshConfig;
+import org.eclipse.jgit.transport.SshSessionFactory;
+import org.eclipse.jgit.transport.SshTransport;
+import org.eclipse.jgit.transport.UsernamePasswordCredentialsProvider;
+import org.eclipse.jgit.util.FS;
 import org.gradle.util.ConfigureUtil;
 
 public class GitRepository {
@@ -75,5 +86,27 @@ public class GitRepository {
 
     public String getPassword() {
         return password;
+    }
+
+    public void configure(TransportCommand<?, ?> command) {
+        if (StringUtils.isNotBlank(privateKeyFilePath)) {
+            SshSessionFactory sshSessionFactory = new JschConfigSessionFactory() {
+                @Override
+                protected void configure(OpenSshConfig.Host host, Session session) {
+                    session.setConfig("StrictHostKeyChecking", "no");
+                }
+
+                @Override
+                protected JSch createDefaultJSch(FS fs) throws JSchException {
+                    JSch defaultJSch = super.createDefaultJSch(fs);
+                    defaultJSch.addIdentity(privateKeyFilePath);
+                    return defaultJSch;
+                }
+            };
+            command.setTransportConfigCallback(transport ->
+                    SshTransport.class.cast(transport).setSshSessionFactory(sshSessionFactory));
+        } else {
+            command.setCredentialsProvider(new UsernamePasswordCredentialsProvider(username, password));
+        }
     }
 }
