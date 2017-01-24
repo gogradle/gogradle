@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
@@ -10,9 +10,12 @@ import com.github.zafarkhaja.semver.ParseException;
 import com.github.zafarkhaja.semver.UnexpectedCharacterException;
 import com.github.zafarkhaja.semver.Version;
 import org.apache.commons.lang3.tuple.Pair;
+import org.eclipse.jgit.api.CloneCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
+import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
 import org.eclipse.jgit.errors.MissingObjectException;
@@ -26,6 +29,7 @@ import org.eclipse.jgit.storage.file.FileRepositoryBuilder;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
@@ -35,18 +39,22 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 @Singleton
 public class GitAccessor implements VcsAccessor {
     private static final Logger LOGGER = Logging.getLogger(GitAccessor.class);
 
+    private final GolangRepositoryHandler golangRepositoryHandler;
+
+    @Inject
+    public GitAccessor(GolangRepositoryHandler golangRepositoryHandler) {
+        this.golangRepositoryHandler = golangRepositoryHandler;
+    }
+
     @Override
     public String getRemoteUrl(File directory) {
         Repository repository = getRepository(directory);
-        Set<String> urls = getRemoteUrls(repository);
-        Assert.isNotEmpty(urls, "Cannot get remote url of git repo " + directory.getAbsolutePath());
-        return urls.stream().findFirst().get();
+        return getRemoteUrl(repository);
     }
 
     public Repository getRepository(File directory) {
@@ -63,27 +71,39 @@ public class GitAccessor implements VcsAccessor {
         }
     }
 
-    public Set<String> getRemoteUrls(Repository repository) {
+    public String getRemoteUrl(Repository repository) {
         Config config = repository.getConfig();
         Set<String> remotes = config.getSubsections("remote");
+        // Only use the first remote url
         return remotes.stream()
                 .map(remoteName -> config.getString("remote", remoteName, "url"))
-                .collect(Collectors.toSet());
+                .findFirst()
+                .get();
     }
 
-    public void cloneWithUrl(String gitUrl, File directory) {
+    public void cloneWithUrl(String rootPath, String gitUrl, File directory) {
         if (GogradleGlobal.isOffline()) {
             LOGGER.debug("Cloning {} is skipped since it is offline now.", gitUrl);
             return;
         }
         try {
-            Git.cloneRepository()
+            CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setProgressMonitor(new LoggerProgressMonitor())
-                    .setDirectory(directory)
-                    .call();
+                    .setDirectory(directory);
+
+            setCredentialsIfNecessary(command, rootPath, gitUrl);
+
+            command.call();
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);
+        }
+    }
+
+    private void setCredentialsIfNecessary(TransportCommand<?, ?> command, String name, String url) {
+        Optional<GitRepository> matched = golangRepositoryHandler.findMatchedRepository(name, url);
+        if (matched.isPresent()) {
+            matched.get().configure(command);
         }
     }
 
@@ -174,24 +194,20 @@ public class GitAccessor implements VcsAccessor {
         return Optional.of(satisfiedVersion.get(0).getLeft());
     }
 
-    public Repository hardResetAndPull(Repository repository) {
+    public Repository hardResetAndPull(String packageRoot, Repository repository) {
         try {
             Git git = Git.wrap(repository);
             // Add all unstaged files and then reset to clear them
             git.add().addFilepattern(".").call();
             git.reset().setMode(ResetCommand.ResetType.HARD).call();
 
-            git.pull().call();
+            PullCommand pullCommand = git.pull();
+            setCredentialsIfNecessary(pullCommand, packageRoot, getRemoteUrl(repository));
+            pullCommand.call();
             return repository;
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);
         }
-    }
-
-    public String getRemoteUrl(Repository repository) {
-        Set<String> urls = getRemoteUrls(repository);
-        Assert.isTrue(!urls.isEmpty(), "Cannot get remote urls of repository:" + repository.getDirectory());
-        return urls.stream().findFirst().get();
     }
 
     public long lastCommitTimeOfPath(Repository repository, String path) {

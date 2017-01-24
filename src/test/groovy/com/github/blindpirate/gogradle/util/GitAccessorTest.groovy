@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.AccessWeb
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
@@ -9,6 +10,7 @@ import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")
@@ -78,11 +80,15 @@ class GitAccessorTest {
     // injected by GogradleRunner
     File resource
 
-    GitAccessor gitAccessor = new GitAccessor()
+    GitAccessor gitAccessor
     Repository repository
+
+    @Mock
+    GolangRepositoryHandler golangRepositoryHandler
 
     @Before
     void setUp() {
+        gitAccessor = new GitAccessor(golangRepositoryHandler)
         repository = gitAccessor.getRepository(resource)
     }
 
@@ -100,7 +106,6 @@ class GitAccessorTest {
 
     @Test
     void 'getting remote urls of repository should succeed'() {
-        assert gitAccessor.getRemoteUrls(repository).contains("https://github.com/blindpirate/test-for-gogradle.git")
         assert gitAccessor.getRemoteUrl(resource).contains('https://github.com/blindpirate/test-for-gogradle.git')
     }
 
@@ -133,7 +138,7 @@ class GitAccessorTest {
     @AccessWeb
     @WithResource('')
     void 'cloning with https should succeed'() {
-        gitAccessor.cloneWithUrl("https://github.com/blindpirate/test-for-gogradle.git", resource)
+        gitAccessor.cloneWithUrl(null, "https://github.com/blindpirate/test-for-gogradle.git", resource)
         assert new File(resource, '.git').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
     }
@@ -173,7 +178,7 @@ class GitAccessorTest {
     @AccessWeb
     void 'git reset --hard HEAD && git pull should succeed'() {
         new File(resource, 'tmpfile').createNewFile()
-        gitAccessor.hardResetAndPull(repository)
+        gitAccessor.hardResetAndPull(null, repository)
 
         assert !new File(resource, 'tmpfile').exists()
         assert new File(resource, 'helloworld.go').exists()
