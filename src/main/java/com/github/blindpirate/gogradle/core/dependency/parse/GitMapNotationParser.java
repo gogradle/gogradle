@@ -12,7 +12,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMMIT_KEY;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.NEWEST_COMMIT;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_KEY;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.URL_KEY;
+import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.URLS_KEY;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.VERSION_KEY;
 
 @Singleton
@@ -25,7 +25,7 @@ public class GitMapNotationParser extends AutoConfigureMapNotationParser<GitNota
 
         GolangPackage info = MapUtils.getValue(notation, PACKAGE_KEY, GolangPackage.class);
         if (info != null) {
-            notation.put(URL_KEY, info.getUrl());
+            notation.put(URLS_KEY, info.getUrls());
         }
 
         if (allBlank(version, tag, commit)) {

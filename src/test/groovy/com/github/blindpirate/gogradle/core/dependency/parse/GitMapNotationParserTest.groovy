@@ -20,12 +20,12 @@ class GitMapNotationParserTest {
 
     @Before
     void setUp() {
-        when(packageInfo.getUrl()).thenReturn('url')
+        when(packageInfo.getUrls()).thenReturn(['url'])
     }
 
     void assertWithNameAndUrl(GitNotationDependency dependency) {
         assert dependency.name == 'github.com/a/b'
-        assert dependency.url == 'url'
+        assert dependency.urls == ['url']
     }
 
     void assertEmpty(GitNotationDependency dependency, String... properties) {
@@ -47,11 +47,11 @@ class GitMapNotationParserTest {
     @Test
     void 'url in map notation should not be overwritten'() {
         // when
-        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'url', package: packageInfo])
+        GitNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: packageInfo])
         // then
-        assertWithNameAndUrl(dependency)
+        assert dependency.name == 'github.com/a/b'
         assertEmpty(dependency, 'tag',)
-        assert dependency.url == 'url'
+        assert dependency.urls == ['specifiedUrl']
         assert dependency.commit == GitNotationDependency.NEWEST_COMMIT
     }
 
