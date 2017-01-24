@@ -9,6 +9,7 @@ import com.github.blindpirate.gogradle.vcs.VcsType;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Optional;
 
 // github.com/user/project -> git@github.com:user/project.git
@@ -40,14 +41,15 @@ public class GithubPackagePathResolver implements PackagePathResolver {
 
     private Optional<GolangPackage> doProduce(String packagePath) {
         Path path = toPath(packagePath);
-        String sshUrl = String.format("https://%s.git", path.subpath(0, 3));
+        String sshUrl = String.format("git@%s.git", path.subpath(0, 3).toString().replaceFirst("/", ":"));
+        String httpsUrl = String.format("https://%s.git", path.subpath(0, 3));
         String rootPackagePath = path.subpath(0, 3).toString();
 
         GolangPackage info = VcsGolangPackage.builder()
                 .withPath(packagePath)
                 .withVcsType(VcsType.GIT)
                 .withRootPath(rootPackagePath)
-                .withUrl(sshUrl)
+                .withUrls(Arrays.asList(sshUrl, httpsUrl))
                 .build();
         return Optional.of(info);
     }
