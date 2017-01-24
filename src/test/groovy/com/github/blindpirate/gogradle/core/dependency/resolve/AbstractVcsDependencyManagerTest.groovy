@@ -142,7 +142,7 @@ class AbstractVcsDependencyManagerTest {
         }
 
         @Override
-        protected Object updateRepository(Object o, File directory) {
+        protected Object updateRepository(NotationDependency dependency, Object o, File directory) {
             return null
         }
 

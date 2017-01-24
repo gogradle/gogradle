@@ -142,11 +142,13 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         if (!repositoryInGlobalCache.isPresent()) {
             return initRepository(dependency, targetDirectory);
         } else {
-            return updateRepository(repositoryInGlobalCache.get(), targetDirectory);
+            return updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
         }
     }
 
-    protected abstract REPOSITORY updateRepository(REPOSITORY repository, File directory);
+    protected abstract REPOSITORY updateRepository(NotationDependency dependency,
+                                                   REPOSITORY repository,
+                                                   File directory);
 
     protected abstract REPOSITORY initRepository(NotationDependency dependency, File directory);
 
