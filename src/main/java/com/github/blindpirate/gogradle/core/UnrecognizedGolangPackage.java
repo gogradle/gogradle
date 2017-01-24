@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.util.List;
 import java.util.Optional;
 
 public class UnrecognizedGolangPackage extends GolangPackage {
@@ -20,7 +21,7 @@ public class UnrecognizedGolangPackage extends GolangPackage {
     }
 
     @Override
-    public String getUrl() {
+    public List<String> getUrls() {
         throw new UnsupportedOperationException();
     }
 

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.util.List;
 import java.util.Optional;
 
 public class StandardGolangPackage extends GolangPackage {
@@ -21,7 +22,7 @@ public class StandardGolangPackage extends GolangPackage {
     }
 
     @Override
-    public String getUrl() {
+    public List<String> getUrls() {
         throw new UnsupportedOperationException();
     }
 

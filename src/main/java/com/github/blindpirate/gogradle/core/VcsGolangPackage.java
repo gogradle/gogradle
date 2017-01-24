@@ -2,12 +2,16 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
+
+import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 
 public class VcsGolangPackage extends GolangPackage {
     private String rootPath;
     private VcsType vcsType;
-    private String url;
+    private List<String> urls;
 
     private VcsGolangPackage(String path) {
         super(path);
@@ -24,9 +28,13 @@ public class VcsGolangPackage extends GolangPackage {
     }
 
 
-    @Override
     public String getUrl() {
-        return url;
+        return isEmpty(urls) ? null : urls.get(0);
+    }
+
+    @Override
+    public List<String> getUrls() {
+        return urls;
     }
 
     @Override
@@ -51,7 +59,7 @@ public class VcsGolangPackage extends GolangPackage {
         return builder().withPath(packagePath)
                 .withRootPath(rootPath)
                 .withVcsType(vcsType)
-                .withUrl(url)
+                .withUrls(urls)
                 .build();
     }
 
@@ -64,7 +72,7 @@ public class VcsGolangPackage extends GolangPackage {
         private String path;
         private String rootPath;
         private VcsType vcsType;
-        private String url;
+        private List<String> urls;
 
         private Builder() {
         }
@@ -85,14 +93,19 @@ public class VcsGolangPackage extends GolangPackage {
         }
 
         public Builder withUrl(String url) {
-            this.url = url;
+            this.urls = Arrays.asList(url);
+            return this;
+        }
+
+        public Builder withUrls(List<String> urls) {
+            this.urls = urls;
             return this;
         }
 
         public VcsGolangPackage build() {
             VcsGolangPackage vcsGolangPackage = new VcsGolangPackage(path);
             vcsGolangPackage.rootPath = this.rootPath;
-            vcsGolangPackage.url = this.url;
+            vcsGolangPackage.urls = this.urls;
             vcsGolangPackage.vcsType = this.vcsType;
             return vcsGolangPackage;
         }
@@ -104,7 +117,7 @@ public class VcsGolangPackage extends GolangPackage {
                 + "path='" + getPath() + '\''
                 + "rootPath='" + rootPath + '\''
                 + ", vcsType=" + vcsType
-                + ", url='" + url + '\''
+                + ", url='" + urls + '\''
                 + '}';
     }
 }
