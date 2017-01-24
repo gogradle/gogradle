@@ -19,11 +19,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 import static com.github.blindpirate.gogradle.util.Cast.cast;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
@@ -130,38 +127,30 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     }
 
     @Override
-    protected Repository updateRepository(Repository repository, File directory) {
+    protected Repository updateRepository(NotationDependency dependency, Repository repository, File directory) {
         gitAccessor.checkout(repository, DEFAULT_BRANCH);
 
         if (GogradleGlobal.isOffline()) {
             LOGGER.info("Cannot pull {} since it is offline now.", gitAccessor.getRemoteUrl(repository));
         } else {
-            gitAccessor.hardResetAndPull(repository);
+            gitAccessor.hardResetAndPull(dependency.getPackage().getRootPath(), repository);
         }
         return repository;
     }
 
     @Override
     protected Repository initRepository(NotationDependency dependency, File directory) {
-        List<String> urls = determineUrls(dependency);
+        List<String> urls = GitNotationDependency.class.cast(dependency).getUrls();
         tryCloneWithUrls(dependency, urls, directory);
         return gitAccessor.getRepository(directory);
-    }
-
-    private List<String> determineUrls(NotationDependency dependency) {
-        String urlSpecifiedByUser = cast(GitNotationDependency.class, dependency).getUrl();
-        if (urlSpecifiedByUser != null) {
-            return Arrays.asList(urlSpecifiedByUser);
-        } else {
-            return Arrays.asList(cast(GitNotationDependency.class, dependency).getPackage().getUrl());
-        }
     }
 
     private void tryCloneWithUrls(NotationDependency dependency, List<String> urls, File directory) {
         for (int i = 0; i < urls.size(); ++i) {
             String url = urls.get(i);
             try {
-                gitAccessor.cloneWithUrl(url, directory);
+                LOGGER.quiet("Cloning {} to {}", url, directory.getAbsolutePath());
+                gitAccessor.cloneWithUrl(dependency.getPackage().getRootPath(), url, directory);
                 return;
             } catch (Throwable e) {
                 LOGGER.warn("Clone {} with url {} failed", dependency.getName(), url, e);
@@ -175,13 +164,12 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     @Override
     protected Optional<Repository> repositoryMatch(File repoRootDir, NotationDependency dependency) {
         Repository repository = gitAccessor.getRepository(repoRootDir);
-        List<String> urls = determineUrls(dependency);
-        Set<String> remoteUrls = gitAccessor.getRemoteUrls(repository);
+        List<String> urls = GitNotationDependency.class.cast(dependency).getUrls();
 
-        if (Collections.disjoint(urls, remoteUrls)) {
-            return Optional.empty();
-        } else {
+        if (urls.contains(gitAccessor.getRemoteUrl(repository))) {
             return Optional.of(repository);
+        } else {
+            return Optional.empty();
         }
     }
 }

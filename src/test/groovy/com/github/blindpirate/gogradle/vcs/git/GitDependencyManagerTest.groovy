@@ -38,8 +38,8 @@ import static org.mockito.Mockito.*
 @WithResource('')
 class GitDependencyManagerTest extends MockInjectorSupport {
 
-    GitNotationDependency notationDependency = mockWithName(GitNotationDependency, 'name')
-    GitResolvedDependency resolvedDependency = mockWithName(GitResolvedDependency, 'name')
+    GitNotationDependency notationDependency = mockWithName(GitNotationDependency, 'github.com/a/b')
+    GitResolvedDependency resolvedDependency = mockWithName(GitResolvedDependency, 'github.com/a/b')
 
     @Mock
     GlobalCacheManager cacheManager
@@ -78,7 +78,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
         when(gitAccessor.getRepository(resource)).thenReturn(repository)
-        when(gitAccessor.hardResetAndPull(repository)).thenReturn(repository)
+        when(gitAccessor.hardResetAndPull(anyString(), any(Repository))).thenReturn(repository)
         when(gitAccessor.findCommit(repository, commitId)).thenReturn(of(revCommit))
         when(gitAccessor.headCommitOfBranch(repository, DEFAULT_BRANCH))
                 .thenReturn(of(revCommit))
@@ -89,30 +89,19 @@ class GitDependencyManagerTest extends MockInjectorSupport {
 
         when(notationDependency.getTransitiveDepExclusions()).thenReturn(exclusionSpecs)
 
-        when(notationDependency.getUrl()).thenReturn(repoUrl)
+        when(notationDependency.getUrls()).thenReturn([repoUrl])
         when(notationDependency.getCommit()).thenReturn(revCommit.name)
-        when(notationDependency.getName()).thenReturn('github.com/a/b')
         when(notationDependency.getPackage()).thenReturn(thePackage)
     }
 
     @Test
     void 'nonexistent repo should be cloned when url specified'() {
         // given:
-        when(notationDependency.getUrl()).thenReturn("url")
+        when(notationDependency.getUrls()).thenReturn(["url"])
         // when:
         gitDependencyManager.resolve(notationDependency)
         // then:
-        verify(gitAccessor).cloneWithUrl('url', resource)
-    }
-
-    @Test
-    void 'nonexistent repo should be cloned with auto-recognized url when url not specified'() {
-        // given
-        when(notationDependency.getUrl()).thenReturn(null)
-        // when:
-        gitDependencyManager.resolve(notationDependency)
-        // then:
-        verify(gitAccessor).cloneWithUrl(repoUrl, resource)
+        verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url', resource)
     }
 
     @Test
@@ -170,11 +159,11 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     void 'existed repository should be updated'() {
         IOUtils.write(resource, 'placeholder', '')
         // given:
-        when(gitAccessor.getRemoteUrls(repository)).thenReturn([repoUrl] as Set)
+        when(gitAccessor.getRemoteUrl(repository)).thenReturn(repoUrl)
         // when:
         gitDependencyManager.resolve(notationDependency)
         // then:
-        verify(gitAccessor).hardResetAndPull(repository)
+        verify(gitAccessor).hardResetAndPull('github.com/a/b', repository)
     }
 
     @Test
@@ -224,7 +213,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown when every url has been tried'() {
         // given
-        when(gitAccessor.cloneWithUrl(repoUrl, resource)).thenThrow(new IllegalStateException())
+        when(gitAccessor.cloneWithUrl('github.com/a/b', repoUrl, resource)).thenThrow(new IllegalStateException())
 
         // when
         gitDependencyManager.resolve(notationDependency)
@@ -258,7 +247,7 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     @Test
     void 'mismatched repository should be cleared'() {
         // given
-        when(notationDependency.getUrl()).thenReturn('anotherUrl')
+        when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
         IOUtils.write(resource, 'some file', 'file content')
         // when
         gitDependencyManager.resolve(notationDependency)
@@ -286,6 +275,17 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenThrow(new IllegalStateException())
         // then
         gitDependencyManager.install(resolvedDependency, resource)
+    }
+
+    @Test
+    void 'every url should be tried until success'() {
+        // given
+        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
+        when(gitAccessor.cloneWithUrl('github.com/a/b', 'url1', resource)).thenThrow(IOException)
+        // when
+        gitDependencyManager.resolve(notationDependency)
+        // then
+        verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url2', resource)
     }
 
 }
