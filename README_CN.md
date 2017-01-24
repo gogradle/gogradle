@@ -152,11 +152,11 @@ gradlew lock
 ```
 
 这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。默认情况下，该任务会在构建和测试之前运行，你无需手动运行它。
-gogradle.lock是Gogradle推荐的依赖锁定方式。
+`gogradle.lock`是Gogradle推荐的依赖锁定方式。
 锁定依赖包版本是稳定构建（Reproducible build）的重要因素。与[其他包管理工具](https://github.com/golang/go/wiki/PackageManagementTools)类似，
 Gogradle能够锁定当前的所有依赖包版本。有所不同的是，Gogradle做的更加彻底，它甚至能够锁定`vendor`目录中的依赖包！
 
-Gogradle支持传递性依赖、依赖排除、自定义仓库URL等多种功能，详见[依赖文档](#依赖管理)
+Gogradle支持传递性依赖、依赖排除、自定义仓库URL等多种功能，详见[依赖文档](#依赖管理)。
 
 目前，Gogradle仅支持Git依赖，对其他版本控制工具的支持正在开发中。
 
