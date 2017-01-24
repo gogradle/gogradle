@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.util.List;
 import java.util.Optional;
 
 public abstract class GolangPackage {
@@ -20,7 +21,7 @@ public abstract class GolangPackage {
 
     public abstract VcsType getVcsType();
 
-    public abstract String getUrl();
+    public abstract List<String> getUrls();
 
     public Optional<GolangPackage> resolve(String packagePath) {
         Assert.isTrue(packagePath.startsWith(path) || path.startsWith(packagePath));
