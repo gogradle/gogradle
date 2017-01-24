@@ -156,7 +156,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 gitAccessor.cloneWithUrl(dependency.getPackage().getRootPath(), url, directory);
                 return;
             } catch (Throwable e) {
-                LOGGER.warn("Clone {} with url {} failed", dependency.getName(), url, e);
+                LOGGER.quiet("Cloning with url {} failed, the cause is {}", url, e.getMessage());
                 if (i == urls.size() - 1) {
                     throw DependencyResolutionException.cannotCloneRepository(dependency, e);
                 }
