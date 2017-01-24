@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.dependencytest
 
+import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
@@ -7,6 +8,8 @@ import com.github.blindpirate.gogradle.vcs.git.RevCommitUtils
 import org.apache.commons.io.FileUtils
 import org.eclipse.jgit.lib.Repository
 import org.eclipse.jgit.revwalk.RevCommit
+
+import static org.mockito.Mockito.mock
 
 class MockGitAccessor extends GitAccessor {
 
@@ -17,6 +20,7 @@ class MockGitAccessor extends GitAccessor {
     Map tags = ['github.com/firstlevel/c@1.0.0': 'commit3']
 
     MockGitAccessor(String mockGitRepoPath) {
+        super(mock(GolangRepositoryHandler))
         this.mockGitRepo = new File(mockGitRepoPath)
         if (mockGitRepo.list() != null) {
             packages = mockGitRepo.list().collect {
@@ -40,10 +44,9 @@ class MockGitAccessor extends GitAccessor {
         return dirName.replaceAll('_', '/')
     }
 
-    // https://github.com/a/b.git -> github.com/a/b
+    // git@github.com:a/b.git -> github.com/a/b
     static urlToPackageName(String gitUrl) {
-//        return gitUrl[4..-5].replace(":", "/")
-        return gitUrl[8..-5]
+        return gitUrl[4..-5].replace(":", "/")
     }
 
     String getLatestCommit(String packageName) {
@@ -71,7 +74,7 @@ class MockGitAccessor extends GitAccessor {
         return [getRemoteUrl(repository)] as Set
     }
 
-    void cloneWithUrl(String url, File directory) {
+    void cloneWithUrl(String name, String url, File directory) {
         String packageName = urlToPackageName(url)
         copyLatestCommitTo(packageName, directory)
     }
@@ -111,8 +114,8 @@ class MockGitAccessor extends GitAccessor {
 
     //github.com/a/b -> https://github.com/a/b.git
     String getRemoteUrl(Repository repository) {
-        String tmp = repository.packageName  //.replaceFirst("/", ":")
-        return "https://${tmp}.git"
+        String tmp = repository.packageName.replaceFirst("/", ":")
+        return "git@${tmp}.git"
     }
 
     Optional<RevCommit> findCommit(Repository repository, String commitX) {
@@ -120,7 +123,7 @@ class MockGitAccessor extends GitAccessor {
         return commits.contains(commitX) ? Optional.of(commitXToCommitSha(repository, commitX)) : Optional.empty()
     }
 
-    Repository hardResetAndPull(Repository repository) {
+    Repository hardResetAndPull(String name, Repository repository) {
         copyLatestCommitTo(repository.packageName, repository.root)
         return repository
     }
