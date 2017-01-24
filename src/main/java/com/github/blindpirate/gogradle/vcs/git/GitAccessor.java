@@ -87,6 +87,7 @@ public class GitAccessor implements VcsAccessor {
             return;
         }
         try {
+            LOGGER.quiet("Cloing {} into {}.", gitUrl, directory);
             CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setProgressMonitor(new LoggerProgressMonitor())
