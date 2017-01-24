@@ -5,12 +5,12 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")
@@ -83,8 +83,7 @@ class GitAccessorTest {
     GitAccessor gitAccessor
     Repository repository
 
-    @Mock
-    GolangRepositoryHandler golangRepositoryHandler
+    GolangRepositoryHandler golangRepositoryHandler = new GolangRepositoryHandler()
 
     @Before
     void setUp() {
@@ -142,6 +141,7 @@ class GitAccessorTest {
         assert new File(resource, '.git').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
     }
+
 
     @Test
     void 'reset to initial commit should succeed'() {
@@ -218,5 +218,46 @@ class GitAccessorTest {
 
     def semVersionMatch(String semVersion, String resultCommit) {
         return gitAccessor.findCommitBySemVersion(repository, semVersion).get().name() == resultCommit
+    }
+
+    /**
+     * The following test uses my own private key and username/password to access a private repo,
+     * which will be ignored on other ci platform
+     */
+    @Test
+    @AccessWeb
+    @WithResource('')
+    void 'cloning with ssh private key should succeed'() {
+        if (System.getenv('MY_OWN_PRIVATE_KEY')) {
+            GitRepository gitRepo = new GitRepository()
+            gitRepo.all()
+            gitRepo.privateKeyFile(System.getenv('MY_OWN_PRIVATE_KEY'))
+            addOneRepo(gitRepo)
+
+            gitAccessor.cloneWithUrl('name', 'git@github.com:adieu/archon-ui-ruff.git', resource)
+            gitAccessor.hardResetAndPull('name', gitAccessor.getRepository(resource))
+            assert new File(resource, 'README.md').exists()
+        }
+    }
+
+    @Test
+    @AccessWeb
+    @WithResource('')
+    void 'cloning with username and password should succeed'() {
+        if (System.getenv('MY_GITHUB_PASSWORD')) {
+            GitRepository gitRepo = new GitRepository()
+            gitRepo.all()
+            gitRepo.username(System.getenv('MY_GITHUB_USERNAME'))
+            gitRepo.password(System.getenv('MY_GITHUB_PASSWORD'))
+            addOneRepo(gitRepo)
+
+            gitAccessor.cloneWithUrl('name', 'https://github.com/adieu/archon-ui-ruff.git', resource)
+            gitAccessor.hardResetAndPull('name', gitAccessor.getRepository(resource))
+            assert new File(resource, 'README.md').exists()
+        }
+    }
+
+    void addOneRepo(GitRepository repository) {
+        ReflectionUtils.getField(golangRepositoryHandler, 'gitRepositories').add(repository)
     }
 }
