@@ -163,7 +163,6 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
             } else {
                 LOGGER.warn("Repo " + directory.getAbsolutePath()
                         + "doesn't match url declared in dependency, it will be cleared.");
-                IOUtils.clearDirectory(directory);
                 return Optional.empty();
             }
         }

@@ -10,6 +10,7 @@ import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gradle.api.logging.Logger;
@@ -147,6 +148,8 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     private void tryCloneWithUrls(NotationDependency dependency, List<String> urls, File directory) {
         for (int i = 0; i < urls.size(); ++i) {
+            IOUtils.clearDirectory(directory);
+
             String url = urls.get(i);
             try {
                 LOGGER.quiet("Cloning {} to {}", url, directory.getAbsolutePath());
