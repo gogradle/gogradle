@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Ignore
@@ -158,19 +159,31 @@ class GolangPluginTest {
     }
 
     @Test
-    @Ignore
     void 'configuring repository should succeed'() {
         project.repositories {
             git {
                 url 'https://github.com/a/b.git'
                 credentials {
-                    username ''
-                    password ''
+                    username 'username'
+                    password 'password'
+                }
+            }
+
+            git {
+                name { it.endsWith('d') }
+                credentials {
+                    privateKeyFile 'path'
                 }
             }
         }
         assert project.repositories instanceof GolangRepositoryHandler
-        assert project.repositories.findMatchedRepository('https://github.com/a/b.git', null).isPresent()
 
+        GitRepository repository = project.repositories.findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
+
+        assert repository.username == 'username'
+        assert repository.password == 'password'
+
+        repository = project.repositories.findMatchedRepository('github.com/c/d', null).get()
+        assert repository.privateKeyFilePath == 'path'
     }
 }

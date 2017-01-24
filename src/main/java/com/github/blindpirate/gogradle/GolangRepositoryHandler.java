@@ -357,6 +357,8 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Repo
 
     @Override
     public ArtifactRepositoryContainer configure(Closure cl) {
-        throw new UnsupportedOperationException();
+        cl.setDelegate(this);
+        cl.call();
+        return null;
     }
 }

@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
+import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -15,10 +16,16 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.dsl.RepositoryHandler;
 import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.api.tasks.TaskContainer;
+import org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils;
 import org.gradle.internal.reflect.Instantiator;
 import org.gradle.internal.service.DefaultServiceRegistry;
 
 import javax.inject.Inject;
+import java.lang.reflect.InvocationHandler;
+import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
+import java.lang.reflect.Type;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
@@ -101,19 +108,36 @@ public class GolangPlugin implements Plugin<Project> {
                         configurationContainer,
                         parser));
 
-        //overwriteRepositoryHandler(project);
+        overwriteRepositoryHandler(project);
     }
 
     private void overwriteRepositoryHandler(Project project) {
         DefaultProject defaultProject = (DefaultProject) project;
         DefaultServiceRegistry serviceRegistry = (DefaultServiceRegistry) defaultProject.getServices();
 
-//        try {
-//            ReflectionUtils.setVariableValueInObject(serviceRegistry, "mutable", true);
-//        } catch (IllegalAccessException e) {
-//            throw ExceptionHandler.uncheckException(e);
-//        }
-        serviceRegistry.add(RepositoryHandler.class, injector.getInstance(GolangRepositoryHandler.class));
+        try {
+            // 'cause it is package-private
+            Class serviceProviderClass = Class.forName("org.gradle.internal.service.DefaultServiceRegistry$ServiceProvider");
+
+            Object proxy = Proxy.newProxyInstance(getClass().getClassLoader(), new Class[]{serviceProviderClass}, new InvocationHandler() {
+                @Override
+                public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
+                    if ("get".equals(method.getName())) {
+                        return injector.getInstance(GolangRepositoryHandler.class);
+                    } else {
+                        return null;
+                    }
+                }
+            });
+            Map providerCache = (Map) ReflectionUtils.getValueIncludingSuperclasses("providerCache",
+                    serviceRegistry);
+            synchronized (serviceRegistry) {
+                providerCache.put(RepositoryHandler.class, proxy);
+            }
+
+        } catch (IllegalAccessException | ClassNotFoundException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 
     private void configureConfigurations(Project project) {
