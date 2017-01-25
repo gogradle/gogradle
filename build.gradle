@@ -1,3 +1,5 @@
+import com.github.blindpirate.gogradle.top1000.TestTop1000Task
+
 /************** plugins **************/
 
 plugins {
@@ -9,6 +11,7 @@ plugins {
     id 'jacoco'
     id 'antlr'
     id 'com.github.kt3k.coveralls' version '2.7.1'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
 }
 
 apply from: 'config/scripts/coverage.gradle'
@@ -52,7 +55,7 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile 'com.google.guava:guava:20.0'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.0.201612231935-r'
+//    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.0.201612231935-r'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.5'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.5'
@@ -64,10 +67,9 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
 
-
-//    compile files('/Users/zhb/Projects/jgit/org.eclipse.jgit/target/org.eclipse.jgit-4.6.0.201612231935-r.jar')
-//    compile 'com.jcraft:jsch:0.1.53'
-//    compile 'com.googlecode.javaewah:JavaEWAH:1.1.6'
+    compile files('./org.eclipse.jgit-4.7.0-SNAPSHOT.jar')
+    compile 'com.jcraft:jsch:0.1.53'
+    compile 'com.googlecode.javaewah:JavaEWAH:1.1.6'
 }
 /************** test **************/
 // Define integration test task
@@ -85,7 +87,26 @@ project.tasks.withType(Test) {
 
 check.dependsOn integrationTest
 integrationTest.dependsOn test
-test.dependsOn 'jar'
+test.dependsOn 'shadowJar'
+
+/************** testTop1000 **************/
+
+def getPropertyOrNull(propertyName) {
+    try {
+        return property(propertyName)
+    }
+    catch (MissingPropertyException) {
+        return null
+    }
+}
+
+task testTop1000(type: TestTop1000Task) {
+    doLast {
+        doTest(getPropertyOrNull('projectToTest'))
+    }
+}
+
+testTop1000.dependsOn 'shadowJar'
 
 /************** checkstyle **************/
 
