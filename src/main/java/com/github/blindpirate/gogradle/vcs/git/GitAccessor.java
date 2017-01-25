@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
@@ -39,6 +40,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+
+import static com.github.blindpirate.gogradle.util.IOUtils.dirIsEmpty;
 
 @Singleton
 public class GitAccessor implements VcsAccessor {
@@ -109,6 +112,9 @@ public class GitAccessor implements VcsAccessor {
     }
 
     public Optional<RevCommit> headCommitOfBranch(Repository repository, String branch) {
+        Assert.isTrue(!dirIsEmpty(repository.getDirectory()),
+                "" + repository.getDirectory() + " is empty, are you offline now?");
+
         try {
             Ref headRef = repository.exactRef("refs/heads/" + branch);
             String commitId = headRef.getObjectId().name();
