@@ -152,7 +152,6 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
             String url = urls.get(i);
             try {
-                LOGGER.quiet("Cloning {} to {}", url, directory.getAbsolutePath());
                 gitAccessor.cloneWithUrl(dependency.getPackage().getRootPath(), url, directory);
                 return;
             } catch (Throwable e) {

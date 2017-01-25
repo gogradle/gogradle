@@ -64,8 +64,8 @@ build.dependsOn test
         Files.createSymbolicLink(gradleLink, getProject().getRootDir().toPath().resolve('gradle'))
         Files.createSymbolicLink(gradlewLink, getProject().getRootDir().toPath().resolve('gradlew'))
 
-        stdout.append("Start building ${projectImportPath}")
-        stderr.append("Start building ${projectImportPath}")
+        stdout.append("Start building ${projectImportPath}\n")
+        stderr.append("Start building ${projectImportPath}\n:")
 
         ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'build', '--stacktrace').directory(currentDir)
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
@@ -73,11 +73,11 @@ build.dependsOn test
 
 
         if (pb.start().waitFor() == 0) {
-            stderr.append("Building ${projectImportPath} succeed")
-            stdout.append("Building ${projectImportPath} succeed")
+            stderr.append("Building ${projectImportPath} succeed\n")
+            stdout.append("Building ${projectImportPath} succeed\n")
         } else {
-            stderr.append("Building ${projectImportPath} failed")
-            stdout.append("Building ${projectImportPath} failed")
+            stderr.append("Building ${projectImportPath} failed\n")
+            stdout.append("Building ${projectImportPath} failed\n")
         }
     }
 }
