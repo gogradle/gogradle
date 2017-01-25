@@ -97,7 +97,7 @@ golang {
                 "-Pclasspath=${getClasspath()}"]
     }
 
-    abstract File getProjectRoot();
+    abstract File getProjectRoot()
 
     String getClasspath() {
         return System.getProperty('java.class.path')
