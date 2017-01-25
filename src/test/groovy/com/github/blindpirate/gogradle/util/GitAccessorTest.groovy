@@ -206,12 +206,11 @@ class GitAccessorTest {
     }
 
     @Test
-    @Ignore
     @AccessWeb
     @WithResource('')
     void 'cloning and pulling a proxy repository should succeed'() {
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=465167
-        gitAccessor.cloneWithUrl('https://gopkg.in/ini.v1', resource)
+        gitAccessor.cloneWithUrl('gopkg.in/ini.v1', 'https://gopkg.in/ini.v1', resource)
         assert new File(resource, 'README.md').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
