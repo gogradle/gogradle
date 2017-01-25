@@ -5,6 +5,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
 import static org.mockito.Mockito.verify
 
@@ -20,6 +21,7 @@ class TestTaskTest extends TaskTest {
     @Test
     void 'test task should depend on install task'() {
         assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
     }
 
     @Test

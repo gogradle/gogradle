@@ -9,6 +9,9 @@ import org.gradle.api.tasks.TaskAction;
 import javax.inject.Inject;
 import java.util.List;
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
+
 public class TestTask extends AbstractGolangTask {
 
     private List<String> testNamePattern;
@@ -17,7 +20,8 @@ public class TestTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public TestTask() {
-        dependsOn(GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
+                INSTALL_TEST_DEPENDENCIES_TASK_NAME);
     }
 
     @Option(option = "tests", description = "Sets test class or method name to be included, '*' is supported.")
