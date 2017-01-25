@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -111,11 +110,6 @@ public class IOUtils {
         forceMkdir(targetFile.getParentFile());
         write(targetFile, data);
         return targetFile;
-    }
-
-    private static Path realBaseDir(Path basePath, String fileNameWithSlash) {
-        Path path = Paths.get(fileNameWithSlash);
-        return basePath.resolve(path.subpath(0, path.getNameCount() - 1));
     }
 
     public static String toString(File file) {
