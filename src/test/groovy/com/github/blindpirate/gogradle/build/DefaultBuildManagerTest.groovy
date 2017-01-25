@@ -134,10 +134,29 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
         // when
         manager.test()
         // then
-        verify(delegate).run(['go', 'test', 'a', 'b'],
+        verify(delegate).run(['go', 'test', './...', 'a', 'b'],
                 [GOPATH: getTestGopath()],
                 resource
         )
+    }
+
+    @Test
+    void 'test with specific patterns should succeed'() {
+        // given
+        File a1 = IOUtils.write(resource, 'a/a1_test.go', '')
+        File a2 = IOUtils.write(resource, 'a/a2_test.go', '')
+        File a3 = IOUtils.write(resource, 'a/a3.go', '')
+        File b1 = IOUtils.write(resource, 'b/b1_test.go', '')
+        File b2 = IOUtils.write(resource, 'b/b2.go', '')
+        // when
+        manager.testWithPatterns(['*_test*'])
+        // then
+        verify(delegate).run(['go', 'test', b1.absolutePath, b2.absolutePath],
+                [GOPATH: getTestGopath()],
+                resource)
+        verify(delegate).run(['go', 'test', a1.absolutePath, a2.absolutePath, a3.absolutePath],
+                [GOPATH: getTestGopath()],
+                resource)
     }
 
     String getTestGopath() {
@@ -185,7 +204,7 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
     @Test
     void 'build stdout and stderr should be redirected to current process'() {
         // given
-        when(process.getInputStream()).thenReturn(new ByteArrayInputStream('stdout'.getBytes(DEFAULT_CHARSET)))
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream('stdout\n[no test files]'.getBytes(DEFAULT_CHARSET)))
         when(process.getErrorStream()).thenReturn(new ByteArrayInputStream('stderr'.getBytes(DEFAULT_CHARSET)))
         Logger mockLogger = mock(Logger)
         ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', mockLogger)

@@ -9,7 +9,9 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.lang3.tuple.Pair;
@@ -24,12 +26,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.build.Configuration.TEST;
@@ -63,6 +67,9 @@ public class DefaultBuildManager implements BuildManager {
     private static final String SRC = "src";
 
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
+    // https://golang.org/cmd/go/#hdr-Description_of_package_lists
+    private static final String ALL_TEST = "./...";
+    private static final Predicate<String> NO_TEST_FILES_FILTER = line -> !line.contains("[no test files]");
 
     private final Project project;
     private final GoBinaryManager goBinaryManager;
@@ -165,7 +172,7 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void test() {
-        testWithTargets(Collections.emptyList());
+        testWithTargets(Arrays.asList(ALL_TEST));
     }
 
     private void testWithTargets(List<String> targets) {
@@ -189,10 +196,28 @@ public class DefaultBuildManager implements BuildManager {
             LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
         } else {
             LOGGER.quiet("Found " + filesMatchingPatterns.size() + " tests to run.");
-            List<String> fullPaths = filesMatchingPatterns.stream()
-                    .map(File::getAbsolutePath).collect(toList());
-            testWithTargets(fullPaths);
+
+            Map<File, List<File>> groupByParentDir = filesMatchingPatterns.stream()
+                    .collect(Collectors.groupingBy(File::getParentFile));
+
+            groupByParentDir.forEach((parentDir, tests) -> {
+                List<String> fullPaths = tests.stream()
+                        .map(File::getAbsolutePath).collect(toList());
+                fullPaths.addAll(getAllNonTestGoFiles(parentDir));
+                testWithTargets(fullPaths);
+            });
         }
+    }
+
+    private List<String> getAllNonTestGoFiles(File dir) {
+        List<String> names = IOUtils.safeList(dir);
+        return names.stream()
+                .filter(name -> name.endsWith(".go"))
+                .filter(name -> !StringUtils.startsWithAny(name, "_", "."))
+                .filter(name -> !name.endsWith("_test.go"))
+                .map(name -> new File(dir, name))
+                .map(File::getAbsolutePath)
+                .collect(toList());
     }
 
     private String getBuildGopath() {
@@ -220,7 +245,7 @@ public class DefaultBuildManager implements BuildManager {
 
         CountDownLatch latch = new CountDownLatch(2);
 
-        new SubprocessReader(process::getInputStream, LOGGER::quiet, latch).start();
+        new SubprocessReader(process::getInputStream, LOGGER::quiet, latch, NO_TEST_FILES_FILTER).start();
         new SubprocessReader(process::getErrorStream, LOGGER::error, latch).start();
 
         try {
