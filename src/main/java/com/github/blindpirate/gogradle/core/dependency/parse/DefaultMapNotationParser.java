@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
@@ -42,7 +43,9 @@ public class DefaultMapNotationParser implements MapNotationParser {
         GolangPackage golangPackage = packagePathResolver.produce(packagePath).get();
         notation.put(PACKAGE_KEY, golangPackage);
 
-        verifyVcsIfNecessary(notation, golangPackage);
+        normalize(notation, golangPackage);
+
+        verifyVcs(notation, golangPackage);
 
         MapNotationParser parser =
                 golangPackage.getVcsType().getService(MapNotationParser.class);
@@ -50,7 +53,16 @@ public class DefaultMapNotationParser implements MapNotationParser {
         return parser.parse(notation);
     }
 
-    private void verifyVcsIfNecessary(Map<String, Object> notation, GolangPackage golangPackage) {
+    private void normalize(Map<String, Object> notation, GolangPackage golangPackage) {
+        if (golangPackage instanceof VcsGolangPackage) {
+            VcsGolangPackage vcsGolangPackage = VcsGolangPackage.class.cast(golangPackage);
+            if (!vcsGolangPackage.isRoot()) {
+                notation.put(NAME_KEY, vcsGolangPackage.getRootPath());
+            }
+        }
+    }
+
+    private void verifyVcs(Map<String, Object> notation, GolangPackage golangPackage) {
         if (notation.containsKey(VCS_KEY)) {
             String declaredVcs = notation.get(VCS_KEY).toString();
             String actualVcs = golangPackage.getVcsType().getName();

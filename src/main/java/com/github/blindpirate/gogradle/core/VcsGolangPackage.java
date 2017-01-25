@@ -17,6 +17,10 @@ public class VcsGolangPackage extends GolangPackage {
         super(path);
     }
 
+    public boolean isRoot() {
+        return rootPath.equals(getPath());
+    }
+
     @Override
     public String getRootPath() {
         return rootPath;
