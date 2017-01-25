@@ -106,19 +106,11 @@ public class IOUtils {
         }
     }
 
-    public static void write(File baseDir, String fileName, CharSequence data) {
-        Path basePath = baseDir.toPath();
-        if (fileName.contains("/")) {
-            basePath = realBaseDir(basePath, fileName);
-            fileName = realFileName(fileName);
-            forceMkdir(basePath.toFile());
-        }
-        write(basePath.resolve(fileName).toFile(), data);
-    }
-
-    private static String realFileName(String fileNameWithSlash) {
-        Path path = Paths.get(fileNameWithSlash);
-        return String.valueOf(path.getFileName());
+    public static File write(File baseDir, String fileName, CharSequence data) {
+        File targetFile = new File(baseDir, fileName);
+        forceMkdir(targetFile.getParentFile());
+        write(targetFile, data);
+        return targetFile;
     }
 
     private static Path realBaseDir(Path basePath, String fileNameWithSlash) {
