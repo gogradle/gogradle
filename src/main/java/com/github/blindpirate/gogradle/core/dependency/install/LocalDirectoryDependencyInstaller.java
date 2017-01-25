@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.dependency.install;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
-import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Singleton;
@@ -24,7 +23,7 @@ public class LocalDirectoryDependencyInstaller implements DependencyInstaller {
     // TODO duplicated code
     private ResolvedDependency determineDependency(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
-            return Cast.cast(VendorResolvedDependency.class, dependency).getHostDependency();
+            return VendorResolvedDependency.class.cast(dependency).getHostDependency();
         } else {
             return dependency;
         }
@@ -32,7 +31,7 @@ public class LocalDirectoryDependencyInstaller implements DependencyInstaller {
 
     private Path determineRelativePath(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
-            return Cast.cast(VendorResolvedDependency.class, dependency).getRelativePathToHost();
+            return VendorResolvedDependency.class.cast(dependency).getRelativePathToHost();
         } else {
             return Paths.get(".");
         }

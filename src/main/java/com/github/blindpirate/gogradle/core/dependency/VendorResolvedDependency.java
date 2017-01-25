@@ -14,7 +14,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
-import static com.github.blindpirate.gogradle.util.Cast.cast;
 
 public class VendorResolvedDependency extends AbstractResolvedDependency {
 
@@ -63,7 +62,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     private static ResolvedDependency determineHostDependency(ResolvedDependency parent) {
         if (parent instanceof VendorResolvedDependency) {
-            return cast(VendorResolvedDependency.class, parent).hostDependency;
+            return VendorResolvedDependency.class.cast(parent).hostDependency;
         } else {
             return parent;
         }

@@ -17,8 +17,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 
-import static com.github.blindpirate.gogradle.util.Cast.cast;
-
 /**
  * In {@code DEVELOP} mode, dependencies in build.gradle have top priority.
  * In {@code REPRODUCIBLE} mode, dependencies in vendor (or settings.gradle) have top priority.
@@ -70,7 +68,7 @@ public class GogradleRootProduceStrategy {
     }
 
     private void setFirstLevel(GolangDependencySet set) {
-        set.forEach(dependency -> cast(AbstractGolangDependency.class, dependency).setFirstLevel(true));
+        set.forEach(dependency -> AbstractGolangDependency.class.cast(dependency).setFirstLevel(true));
     }
 
 
@@ -91,7 +89,7 @@ public class GogradleRootProduceStrategy {
         GolangConfiguration golangConfiguration =
                 (GolangConfiguration) configurationContainer.getByName(configuration.getName());
 
-        return cast(DependencySetFacade.class, golangConfiguration.getDependencies()).toGolangDependencies();
+        return DependencySetFacade.class.cast(golangConfiguration.getDependencies()).toGolangDependencies();
     }
 
 }

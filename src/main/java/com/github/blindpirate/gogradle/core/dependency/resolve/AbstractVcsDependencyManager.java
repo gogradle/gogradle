@@ -10,7 +10,6 @@ import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstall
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.util.Cast;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -111,7 +110,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
     private ResolvedDependency determineResolvedDependency(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
-            return Cast.cast(VendorResolvedDependency.class, dependency).getHostDependency();
+            return VendorResolvedDependency.class.cast(dependency).getHostDependency();
         } else {
             return dependency;
         }
@@ -119,7 +118,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
     private Path determineRelativePath(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
-            return Cast.cast(VendorResolvedDependency.class, dependency).getRelativePathToHost();
+            return VendorResolvedDependency.class.cast(dependency).getRelativePathToHost();
         } else {
             return Paths.get(".");
         }

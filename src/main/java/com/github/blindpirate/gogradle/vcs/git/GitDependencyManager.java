@@ -23,7 +23,6 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.blindpirate.gogradle.util.Cast.cast;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.NEWEST_COMMIT;
 
@@ -65,7 +64,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 .withNotationDependency(dependency)
                 .withName(dependency.getPackage().getRootPath())
                 .withCommitId(commit.getName())
-                .withTag(cast(GitNotationDependency.class, dependency).getTag())
+                .withTag(GitNotationDependency.class.cast(dependency).getTag())
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
