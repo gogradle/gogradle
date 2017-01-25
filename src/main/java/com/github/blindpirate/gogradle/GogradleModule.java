@@ -77,7 +77,7 @@ public class GogradleModule extends AbstractModule {
     private final Instantiator instantiator;
 
     public GogradleModule(Project project, Instantiator instantiator) {
-        this.project = project;
+        this.project = new ProjectDecorator(project);
         this.instantiator = instantiator;
     }
 
