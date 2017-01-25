@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import groovy.lang.Closure;
 import groovy.lang.MissingPropertyException;
 import org.gradle.api.Action;
@@ -53,6 +54,7 @@ import java.util.Set;
  * Because it is not annotated with @Inject, the method will not be injected.
  * To fix this, annotate the method with @Inject.
  */
+@SuppressFBWarnings("EQ_COMPARETO_USE_OBJECT_EQUALS")
 public class ProjectDecorator implements Project {
     private final Project project;
 
