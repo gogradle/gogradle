@@ -167,7 +167,10 @@ public class DefaultBuildManager implements BuildManager {
         List<String> args = Lists.newArrayList(goBinary, "build", "-o", outputFilePath);
         args.addAll(setting.getExtraBuildArgs());
 
-        startBuildOrTest(args, envs);
+        int retCode = startBuildOrTest(args, envs);
+        if (retCode != 0) {
+            throw BuildException.processReturnNonZero(retCode);
+        }
     }
 
     @Override
@@ -185,7 +188,10 @@ public class DefaultBuildManager implements BuildManager {
             args.addAll(targets);
             args.addAll(setting.getExtraTestArgs());
 
-            startBuildOrTest(args, envs);
+            int retCode = startBuildOrTest(args, envs);
+            if (retCode != 0) {
+                throw BuildException.processReturnNonZero(retCode);
+            }
         });
     }
 
@@ -240,7 +246,7 @@ public class DefaultBuildManager implements BuildManager {
         return getBuildGopath() + File.pathSeparator + testGopath;
     }
 
-    private void startBuildOrTest(List<String> args, Map<String, String> envs) {
+    private int startBuildOrTest(List<String> args, Map<String, String> envs) {
         Process process = ProcessUtils.run(args, envs, project.getRootDir());
 
         CountDownLatch latch = new CountDownLatch(2);
@@ -250,6 +256,12 @@ public class DefaultBuildManager implements BuildManager {
 
         try {
             latch.await();
+        } catch (InterruptedException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+
+        try {
+            return process.waitFor();
         } catch (InterruptedException e) {
             throw ExceptionHandler.uncheckException(e);
         }

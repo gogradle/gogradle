@@ -25,4 +25,8 @@ public class BuildException extends RuntimeException {
     public static BuildException cannotRenameVendorDir(File dotVendorDir) {
         return new BuildException("Renaming to " + dotVendorDir + " failed, cannot build or test");
     }
+
+    public static BuildException processReturnNonZero(int retCode) {
+        return new BuildException("Build failed due to non-zero return code of go process: " + retCode);
+    }
 }
