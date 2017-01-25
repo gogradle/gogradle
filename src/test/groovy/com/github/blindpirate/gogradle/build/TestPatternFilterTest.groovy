@@ -1,8 +1,36 @@
 package com.github.blindpirate.gogradle.build
 
+import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
+import org.junit.runner.RunWith
 
+@RunWith(GogradleRunner)
 class TestPatternFilterTest {
+    File resource
+
+    @Test
+    @WithResource('')
+    void 'file or directory starting with _ or . should be rejected'() {
+        IOUtils.mkdir(resource, '_dir')
+        IOUtils.mkdir(resource, '.dir')
+        IOUtils.write(resource, '_file', '')
+        IOUtils.write(resource, '.file', '')
+
+        assert !filter('').accept(new File(resource, '_dir'))
+        assert !filter('').accept(new File(resource, '.dir'))
+        assert !filter('').accept(new File(resource, '_file'))
+        assert !filter('').accept(new File(resource, '.file'))
+    }
+
+    @Test
+    @WithResource('')
+    void 'testdata directory should be rejected'() {
+        IOUtils.mkdir(resource, 'testdata')
+        assert !filter('').accept(new File(resource, 'testdata'))
+    }
+
     @Test
     void 'filtering with question mark should succeed'() {
         assert !filter('?').accept(null, 'main_test.go')

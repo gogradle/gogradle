@@ -171,7 +171,8 @@ public class IOUtils {
     }
 
     public static Collection<File> filterTestsMatchingPatterns(File dir, List<String> namePattern) {
-        return FileUtils.listFiles(dir, new TestPatternFilter(namePattern), TrueFileFilter.INSTANCE);
+        TestPatternFilter filter = new TestPatternFilter(namePattern);
+        return FileUtils.listFiles(dir, filter, filter);
     }
 
     public static void clearDirectory(File dir) {
