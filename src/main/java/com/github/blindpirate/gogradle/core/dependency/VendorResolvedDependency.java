@@ -2,9 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
-import com.github.blindpirate.gogradle.util.Cast;
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -78,7 +79,11 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     protected Class<? extends DependencyInstaller> getInstallerClass() {
-        return Cast.cast(AbstractResolvedDependency.class, hostDependency).getInstallerClass();
+        if (hostDependency instanceof LocalDirectoryDependency) {
+            return LocalDirectoryDependencyInstaller.class;
+        } else {
+            return AbstractResolvedDependency.class.cast(hostDependency).getInstallerClass();
+        }
     }
 
     @Override
