@@ -18,8 +18,8 @@ class TestTop1000Task extends DefaultTask {
     void doTest(String specificProject) {
         String now = new Date().format('yyyyMMdd-HHmmss')
         top1000Dir = new File(getProject().getRootDir(), 'build/top1000')
-        stdout = new File(getProject().getRootDir(), "build/top1000/stdout/${now}.stdout")
-        stdout = new File(getProject().getRootDir(), "build/top1000/stdout/${now}.stderr")
+        stdout = new File(getProject().getRootDir(), "build/${now}.stdout")
+        stderr = new File(getProject().getRootDir(), "build/${now}.stderr")
         FileUtils.forceMkdir(top1000Dir)
         GithubTopRankCrawler.cloneAllInto(top1000Dir, false)
 
