@@ -23,6 +23,7 @@ public class GolangTaskContainer {
     public static final String INSTALL_BUILD_DEPENDENCIES_TASK_NAME = "installBuildDependencies";
     public static final String INSTALL_TEST_DEPENDENCIES_TASK_NAME = "installTestDependencies";
     public static final String TEST_TASK_NAME = "test";
+    public static final String VENDOR_TASK_NAME = "vendor";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
@@ -32,6 +33,7 @@ public class GolangTaskContainer {
             .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
             .put(BUILD_TASK_NAME, BuildTask.class)
             .put(TEST_TASK_NAME, TestTask.class)
+            .put(VENDOR_TASK_NAME, VendorTask.class)
             .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
             .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
             .put(CLEAN_TASK_NAME, CleanTask.class)
