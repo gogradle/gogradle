@@ -12,9 +12,14 @@ class TestTop1000Task extends DefaultTask {
     private static final Logger LOGGER = Logging.getLogger(TestTop1000Task)
 
     File top1000Dir
+    File stdout
+    File stderr
 
     void doTest(String specificProject) {
+        String now = new Date().format('yyyyMMdd-HHmmss')
         top1000Dir = new File(getProject().getRootDir(), 'build/top1000')
+        stdout = new File(getProject().getRootDir(), "build/top1000/stdout/${now}.stdout")
+        stdout = new File(getProject().getRootDir(), "build/top1000/stdout/${now}.stderr")
         FileUtils.forceMkdir(top1000Dir)
         GithubTopRankCrawler.cloneAllInto(top1000Dir, false)
 
@@ -59,18 +64,20 @@ build.dependsOn test
         Files.createSymbolicLink(gradleLink, getProject().getRootDir().toPath().resolve('gradle'))
         Files.createSymbolicLink(gradlewLink, getProject().getRootDir().toPath().resolve('gradlew'))
 
-        File output = new File(top1000Dir, 'stdout')
+        stdout.append("Start building ${projectImportPath}")
+        stderr.append("Start building ${projectImportPath}")
 
         ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'build', '--stacktrace').directory(currentDir)
-        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(output))
-        pb.redirectError(ProcessBuilder.Redirect.appendTo(output))
+        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
+        pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 
-        output.append("Start building ${projectImportPath}")
 
         if (pb.start().waitFor() == 0) {
-            output.append("Building ${projectImportPath} succeed")
+            stderr.append("Building ${projectImportPath} succeed")
+            stdout.append("Building ${projectImportPath} succeed")
         } else {
-            output.append("Building ${projectImportPath} failed")
+            stderr.append("Building ${projectImportPath} failed")
+            stdout.append("Building ${projectImportPath} failed")
         }
     }
 }
