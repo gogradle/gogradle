@@ -78,8 +78,8 @@ public class GitNotationDependency extends AbstractNotationDependency {
         return "GitNotationDependency{"
                 + "name='" + getName() + '\''
                 + ", commit='" + commit + '\''
-                + ", tag='" + tag + '\''
-                + ", url='" + url + '\''
+                + (tag == null ? "" : ", tag='" + tag + '\'')
+                + (url == null ? "" : ", url='" + url + '\'')
                 + '}';
     }
 
