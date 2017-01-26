@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter
 import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
@@ -15,12 +16,13 @@ class UselessEnumTest {
          Os,
          Arch,
          AbstractGolangDependency.NoTransitiveSpec,
+         DependencyInstallFileFilter,
          GogradleGlobal].each(this.&doUselessTest)
     }
 
     void doUselessTest(Class<? extends Enum> enumClass) {
         callStaticMethod(enumClass, 'values').each {
-            Object value = Enum.valueOf(enumClass, it.name())
+            Object value = callStaticMethod(enumClass, 'valueOf', it.name())
             assert it.is(value)
         }
     }
