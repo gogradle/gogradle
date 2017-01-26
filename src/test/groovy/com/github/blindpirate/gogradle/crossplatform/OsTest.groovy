@@ -26,4 +26,26 @@ class OsTest {
             }
         }
     }
+
+    @Test
+    void 'executable extension should be empty string except on Windows'() {
+        values().each {
+            if (it == WINDOWS) {
+                assert it.exeExtension() == '.exe'
+            } else {
+                assert it.exeExtension() == ''
+            }
+        }
+    }
+
+    @Test
+    void 'archive extension should be .tar.gz except on Windows'() {
+        values().each {
+            if (it == WINDOWS) {
+                assert it.archiveExtension() == '.zip'
+            } else {
+                assert it.archiveExtension() == '.tar.gz'
+            }
+        }
+    }
 }

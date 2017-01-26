@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
 import org.junit.Before
@@ -17,6 +18,23 @@ class GolangPluginSettingTest {
     void 'verification should fail if package name not set'() {
         setting.packagePath = ''
         setting.verify()
+    }
+
+    @Test
+    void 'setting build mode should succeed'() {
+        setting.buildMode = 'DEVELOP'
+        assert setting.buildMode == BuildMode.DEVELOP
+
+        setting.buildMode = BuildMode.REPRODUCIBLE
+        assert setting.buildMode == BuildMode.REPRODUCIBLE
+    }
+
+    @Test
+    void 'setting go executable should succeed'() {
+        assert setting.goExecutable == 'go'
+
+        setting.goExecutable = '/path/to/go'
+        assert setting.goExecutable == '/path/to/go'
     }
 
     @Test

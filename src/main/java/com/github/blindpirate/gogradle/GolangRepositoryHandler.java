@@ -44,15 +44,6 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Repo
         return gitRepositories.stream().filter(repo -> repo.match(name, url)).findFirst();
     }
 
-    public Object methodMissing(String name, Object args) {
-        Object[] argsArray = (Object[]) args;
-
-        if (argsArray.length == 1 && argsArray[0] instanceof Closure) {
-            ConfigureUtil.configure((Closure) argsArray[0], this);
-        }
-        return null;
-    }
-
     @Override
     public FlatDirectoryArtifactRepository flatDir(Map<String, ?> args) {
         throw new UnsupportedOperationException();
@@ -255,7 +246,7 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Repo
 
     @Override
     public void addLast(ArtifactRepository repository) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override

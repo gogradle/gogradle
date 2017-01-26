@@ -160,10 +160,18 @@ class DefaultGoBinaryManagerTest {
     }
 
     @Test(expected = IllegalStateException)
-    void 'exception should be thrown when network is down'() {
+    void 'exception should be thrown when download fails'() {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
         when(httpUtils.download(anyString(), any(Path))).thenThrow(new IOException())
+        // then
+        manager.getBinaryPath()
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown when getting version fails'() {
+        // given
+        when(httpUtils.get(anyString())).thenThrow(new IOException())
         // then
         manager.getBinaryPath()
     }

@@ -18,4 +18,9 @@ class ArchTest {
             }
         }
     }
+
+    @Test(expected = IllegalArgumentException)
+    void 'exception should be thrown when encountering unrecognized arch'() {
+        Arch.of('unrecognized')
+    }
 }
