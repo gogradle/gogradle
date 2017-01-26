@@ -17,8 +17,6 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 
 public class VendorResolvedDependency extends AbstractResolvedDependency {
 
-    public static final long UNKNOWN_UPDATE_TIME = -1;
-
     private ResolvedDependency hostDependency;
 
     private Path relativePathToHost;
@@ -29,7 +27,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         ResolvedDependency hostDependency = determineHostDependency(parent);
         VendorResolvedDependency ret = new VendorResolvedDependency(name,
                 hostDependency.getVersion(),
-                UNKNOWN_UPDATE_TIME,
+                rootDir.lastModified(),
                 hostDependency,
                 caculateRootPathToHost(parent, name));
 
