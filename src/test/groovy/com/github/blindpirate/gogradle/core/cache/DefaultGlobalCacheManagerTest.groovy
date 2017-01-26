@@ -41,7 +41,12 @@ class DefaultGlobalCacheManagerTest {
     @Before
     void setUp() {
         when(notationDependency.getName()).thenReturn("concurrenttest")
-        setField(cacheManager, "gradleHome", resource.getAbsoluteFile().toPath())
+        setField(cacheManager, "gradleHome", resource.toPath())
+    }
+
+    @Test
+    void 'getting files in global binary cache directory should succeed'() {
+        assert cacheManager.getGlobalGoBinCache('1.7.1') == new File(resource, 'go/binary/1.7.1').toPath()
     }
 
     @Test
@@ -91,7 +96,7 @@ class DefaultGlobalCacheManagerTest {
         public static final int ERROR = 1
         public static final int SUCCESS = 0
 
-        public static void main(String[] args) {
+        static void main(String[] args) {
             // every process should not see other one's file
             File file = new File(args[0])
             if (file.exists()) {

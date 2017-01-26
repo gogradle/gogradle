@@ -32,6 +32,10 @@ class LocalDirectoryDependencyTest extends MockInjectorSupport {
     void 'local directory should be resolved to itself'() {
         assert dependency.resolve().is(dependency)
     }
+    @Test
+    void 'version format of local directory should be its absolute path'(){
+        assert dependency.formatVersion() == resource.absolutePath
+    }
 
     @Test(expected = UnsupportedOperationException)
     void 'locking a local dependency should cause an exception'() {
