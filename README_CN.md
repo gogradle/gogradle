@@ -1,13 +1,18 @@
 # Gogradle - 完善的Go语言构建工具
 
+[![Build Status](https://travis-ci.org/blindpirate/gogradle.svg?branch=master)](https://travis-ci.org/blindpirate/gogradle)
+[![Coverage Status](https://coveralls.io/repos/github/blindpirate/gogradle/badge.svg?branch=master)](https://coveralls.io/github/blindpirate/gogradle?branch=master)
+[![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
+[![Apache License 2](https://img.shields.io/badge/license-APL2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
+
 Gogradle是一个提供Go语言构建支持的Gradle插件。
 
 ## 功能特性
 
-- 除JDK 8+外无需预先安装任何东西（包括Go本身）
+- 除`JDK 8+`外无需预先安装任何东西（包括Go本身）
 - 支持所有版本的Go且允许多版本共存
-- 完美支持几乎所有平台（只要能够运行Java）
-- 项目级的依赖隔离，无需设置GOPATH
+- 完美支持几乎所有平台（只要能够运行`Java`）
+- 项目级的依赖隔离，无需设置`GOPATH`
 - 完善的包管理
   - 无需手工安装依赖包，只需指定版本
   - 无需安装即可支持Go语言默认支持的四种版本控制工具：Git/Svn/Mercurial/Bazzar （当前只实现了Git）
@@ -27,7 +32,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 现代的、生产级别的自动化构建支持，添加自定义任务极其简单
 - 原生的Gradle语法
 - 额外为中国大陆开发者提供的特性，你懂的
-- IDE插件支持（计划中）
+- IDE插件支持（规划中）
 
 ## 优势
 
@@ -45,7 +50,7 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 ### 准备工作
 
 - 安装[JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-- 将本项目中的`gradle`目录、`gradlew`（*nix）/`gradlew.bat`（Windows）文件拷贝到欲构建的Go语言项目目录下。
+- 将**本项目**中的`gradle`目录、`gradlew`（*nix）/`gradlew.bat`（Windows）文件拷贝到**欲构建的Go语言项目**目录下。
 - 在欲构建的Go语言项目下新建`build.gradle`构建脚本，内容如下：
 
 ```groovy
@@ -85,7 +90,6 @@ gradlew test
 测试指定文件：
 
 ```
-gradlew test --tests github.com/my/package/subpackage // 必须是当前构建项目的子目录或者后代目录
 gradlew test --tests main_test.go // 指定一个测试文件
 gradlew test --tests *_test.go // 通配符测试
 ```
@@ -180,7 +184,7 @@ golang {
     // 若不指定此值，且goExecutable存在，则使用之；否则，使用最新的Stable版本
     goVersion = '1.7.1'
     
-    // 默认为"go"。若go不在PATH中，可以使用此配置指定其位置
+    // 默认为"go"。若go不在$PATH中，可以使用此配置指定其位置
     goExecutable = '/path/to/go/executable'
     
     // 即build constraint。详见 https://golang.org/pkg/go/build/#hdr-Build_Constraints
@@ -461,7 +465,7 @@ go test
 ## 构建输出与交叉编译
 
 默认情况下，Gogradle会将构建的输出放置在`${projectRoot}/.gogradle`目录下，命名为`${os}_${arch}_${packageName}`。
-你可以通过相应配置改变输出位置和命名约定。
+你可以通过相应配置改变输出位置和命名约定，详见[配置](#配置)。
 
 Go1.5之后引入了方便的[交叉编译](https://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5)，因此，Gogradle能够在一次构建中输出多个平台下的构建结果。
 
@@ -538,7 +542,6 @@ repositories{
 若一个仓库匹配某个仓库声明，那么该声明中的身份验证信息将会被用于拉取代码。Gogradle当前只支持Git仓库，身份验证信息可以使用户名/密码（http协议）或者ssh私钥（ssh协议）。
 
 对其他版本控制系统仓库的开发正在进行中，敬请期待。
-
 
 ## IDE集成
 
