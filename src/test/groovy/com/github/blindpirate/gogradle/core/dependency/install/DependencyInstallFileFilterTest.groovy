@@ -28,13 +28,13 @@ class DependencyInstallFileFilterTest {
     }
 
     void allDirNamesRejected(String... dirNames) {
-        dirNames.every {
+        dirNames.each {
             assert !DependencyInstallFileFilter.INSTANCE.accept(mkdir(it))
         }
     }
 
     void allNamesRejected(String... names) {
-        names.every {
+        names.each {
             assert !DependencyInstallFileFilter.INSTANCE.accept(touch(it))
         }
     }
