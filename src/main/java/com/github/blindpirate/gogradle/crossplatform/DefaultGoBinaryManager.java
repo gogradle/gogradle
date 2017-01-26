@@ -8,12 +8,15 @@ import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
@@ -25,6 +28,7 @@ import static com.github.blindpirate.gogradle.util.ProcessUtils.getResult;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.run;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
+import static org.apache.commons.io.FileUtils.listFiles;
 
 @Singleton
 public class DefaultGoBinaryManager implements GoBinaryManager {
@@ -149,22 +153,29 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     private void fetchSpecifiedVersion(String version) {
         Path gorootPath = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
-        Path gobinPath = gorootPath.resolve("bin/go");
         gorootEnv = gorootPath.toAbsolutePath().toString();
         goVersion = version;
-        binaryPath = gobinPath.toAbsolutePath().toString();
-        if (!gobinPath.toFile().exists()) {
+
+        Path goExecutablePath = gorootPath.resolve("bin/go");
+        binaryPath = goExecutablePath.toString();
+        if (!Files.exists(goExecutablePath)) {
             LOGGER.quiet("Start downloading go {}.", version);
-            downloadSpecifiedVersion(gobinPath, version);
+            downloadSpecifiedVersion(version);
+            addXPermissionToAllDescendant(gorootPath.resolve("bin"));
+            addXPermissionToAllDescendant(gorootPath.resolve("pkg/tool"));
         }
     }
 
-    private void downloadSpecifiedVersion(Path gobinPath, String version) {
+    private void addXPermissionToAllDescendant(Path path) {
+        listFiles(path.toFile(), TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE).stream()
+                .map(File::toPath)
+                .forEach(IOUtils::chmodAddX);
+    }
+
+    private void downloadSpecifiedVersion(String version) {
         Path archivePath = downloadArchive(version);
         CompressUtils.decompressZipOrTarGz(archivePath.toFile(),
                 globalCacheManager.getGlobalGoBinCache(version).toFile());
-
-        IOUtils.chmodAddX(gobinPath);
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")

@@ -42,6 +42,7 @@ class DefaultGoBinaryManagerTest {
     File resource
 
     InputStream mockGoTarGz = getClass().classLoader.getResourceAsStream('mock-go-1.7.4.tar.gz')
+//    InputStream mockGoTarGz = getClass().classLoader.getResourceAsStream('go.tar.gz')
 
     DefaultGoBinaryManager manager
 
