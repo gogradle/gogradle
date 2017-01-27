@@ -15,4 +15,6 @@ class UnrecognizedPackagePathResolverTest {
         assert pkg instanceof UnrecognizedGolangPackage
         assert pkg.path == 'any'
     }
+
+
 }
