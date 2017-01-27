@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.exceptions.BuildException
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.crossplatform.Os
@@ -121,6 +122,40 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
                 [GOPATH: getBuildGopath()],
                 resource
         )
+    }
+
+    @Test
+    void 'setting GOROOT should succeed'() {
+        // given
+        when(binaryManager.gorootEnv).thenReturn('goroot')
+        // when
+        manager.build()
+        // then
+        String expectedOutputPath = new File(resource, ".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_package")
+        verify(delegate).run(['go', 'build', '-o', expectedOutputPath],
+                [GOPATH: getBuildGopath(), GOROOT: 'goroot'],
+                resource)
+    }
+
+    @Test(expected = BuildException)
+    void 'exception should be thrown if go build return non-zero'() {
+        // given
+        when(process.waitFor()).thenReturn(1)
+        // then
+        manager.build()
+    }
+
+    @Test(expected = BuildException)
+    void 'exception should be thrown if go test return non-zero'() {
+        // given
+        when(process.waitFor()).thenReturn(1)
+        // then
+        manager.test()
+    }
+
+    @Test
+    void 'nothing should happen if no matched tests found'() {
+        manager.testWithPatterns([])
     }
 
     String getBuildGopath() {
@@ -249,5 +284,29 @@ class DefaultBuildManagerTest extends MockInjectorSupport {
         manager.installDependency(resolvedDependency, Configuration.BUILD)
         // then
         assert !new File(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go').exists()
+    }
+
+    @Test(expected = BuildException)
+    void 'exception should be thrown if renaming vendor fails'() {
+        // given
+        IOUtils.mkdir(resource, 'vendor')
+        IOUtils.write(resource, '.vendor', '')
+        // then
+        manager.build()
+    }
+
+    @Test(expected = BuildException)
+    void 'exception should be thrown if renaming .vendor back fails'() {
+        // given
+        IOUtils.mkdir(resource, 'vendor')
+        when(binaryManager.getBinaryPath()).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                IOUtils.mkdir(resource, 'vendor')
+                return 'go'
+            }
+        })
+        // then
+        manager.build()
     }
 }

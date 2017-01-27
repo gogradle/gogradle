@@ -142,13 +142,17 @@ public class DefaultBuildManager implements BuildManager {
         File vendorDir = new File(project.getRootDir(), VENDOR_DIRECTORY);
         File targetDir = new File(project.getRootDir(), "." + VENDOR_DIRECTORY);
         try {
-            if (isValidDirectory(vendorDir) && !vendorDir.renameTo(targetDir)) {
-                throw BuildException.cannotRenameVendorDir(targetDir);
+            if (vendorDir.exists()) {
+                if (targetDir.exists() || !vendorDir.renameTo(targetDir)) {
+                    throw BuildException.cannotRenameVendorDir(targetDir);
+                }
             }
             runnable.run();
         } finally {
-            if (isValidDirectory(targetDir) && !targetDir.renameTo(vendorDir)) {
-                throw BuildException.cannotRenameVendorDir(vendorDir);
+            if (targetDir.exists()) {
+                if (vendorDir.exists() || !targetDir.renameTo(vendorDir)) {
+                    throw BuildException.cannotRenameVendorDir(vendorDir);
+                }
             }
         }
     }
