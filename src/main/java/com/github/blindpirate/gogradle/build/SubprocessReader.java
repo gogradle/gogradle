@@ -41,17 +41,13 @@ public class SubprocessReader extends Thread {
     public void run() {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is.get(), DEFAULT_CHARSET))) {
             String line;
-            try {
-                while ((line = br.readLine()) != null) {
-                    if (lineFilter.test(line)) {
-                        consumer.accept(line);
-                    }
+            while ((line = br.readLine()) != null) {
+                if (lineFilter.test(line)) {
+                    consumer.accept(line);
                 }
-            } catch (IOException e) {
-                consumer.accept(ExceptionHandler.getStackTrace(e));
             }
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            consumer.accept(ExceptionHandler.getStackTrace(e));
         } finally {
             latch.countDown();
         }
