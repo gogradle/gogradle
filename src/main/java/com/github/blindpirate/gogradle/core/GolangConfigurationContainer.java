@@ -30,6 +30,6 @@ public class GolangConfigurationContainer extends AbstractNamedDomainObjectConta
 
     @Override
     public GolangConfiguration detachedConfiguration(Dependency... dependencies) {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
