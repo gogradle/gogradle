@@ -21,7 +21,6 @@ public class DefaultBuildConstraintManager implements BuildConstraintManager {
     private final GolangPluginSetting setting;
 
     private Set<String> allConstraints;
-    private Set<String> extraConstraints;
 
     @Inject
     public DefaultBuildConstraintManager(GoBinaryManager goBinaryManager,
@@ -41,10 +40,7 @@ public class DefaultBuildConstraintManager implements BuildConstraintManager {
         tmpAllConstraints.addAll(allGoVersionConstraints());
         tmpAllConstraints.addAll(setting.getBuildTags());
 
-        Set<String> tmpExtraConstraints = new HashSet<>(setting.getBuildTags());
-
         allConstraints = Collections.unmodifiableSet(tmpAllConstraints);
-        extraConstraints = Collections.unmodifiableSet(tmpExtraConstraints);
     }
 
     private Set<String> allGoVersionConstraints() {
@@ -69,8 +65,4 @@ public class DefaultBuildConstraintManager implements BuildConstraintManager {
         return allConstraints;
     }
 
-    @Override
-    public Set<String> getExtraConstraints() {
-        return extraConstraints;
-    }
 }

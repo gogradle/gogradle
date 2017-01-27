@@ -7,5 +7,4 @@ public interface BuildConstraintManager {
 
     Set<String> getAllConstraints();
 
-    Set<String> getExtraConstraints();
 }

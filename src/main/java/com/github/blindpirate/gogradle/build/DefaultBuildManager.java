@@ -41,7 +41,6 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterTestsMatchingPatterns;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
-import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
