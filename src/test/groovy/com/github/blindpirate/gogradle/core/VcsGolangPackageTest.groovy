@@ -22,6 +22,11 @@ class VcsGolangPackageTest {
         assert vcsGolangPackage.resolve('github.com/user').get() instanceof IncompleteGolangPackage
     }
 
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if resolving an package without common prefix'() {
+        assert vcsGolangPackage.resolve('github.com/anotheruser')
+    }
+
     @Test
     void 'path longer than root should have have the same root'() {
         // when
