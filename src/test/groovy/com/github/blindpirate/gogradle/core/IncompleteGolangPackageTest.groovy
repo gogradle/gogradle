@@ -6,17 +6,17 @@ import static com.github.blindpirate.gogradle.core.IncompleteGolangPackage.of
 
 class IncompleteGolangPackageTest {
 
-    @Test(expected = RuntimeException)
+    @Test(expected = UnsupportedOperationException)
     void 'getVcsType should throw exception'() {
         of('incomplete').vcsType
     }
 
-    @Test(expected = RuntimeException)
+    @Test(expected = UnsupportedOperationException)
     void 'getUrl should throw exception'() {
-        of('incomplete').url
+        of('incomplete').urls
     }
 
-    @Test(expected = RuntimeException)
+    @Test(expected = UnsupportedOperationException)
     void 'getRootPath should throw exception'() {
         of('incomplete').rootPath
     }

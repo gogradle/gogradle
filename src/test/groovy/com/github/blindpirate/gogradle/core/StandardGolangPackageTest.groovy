@@ -7,14 +7,14 @@ import static com.github.blindpirate.gogradle.core.StandardGolangPackage.of
 class StandardGolangPackageTest {
     StandardGolangPackage standardGolangPackage = of('go/ast')
 
-    @Test(expected = RuntimeException)
+    @Test(expected = UnsupportedOperationException)
     void 'getVcsType should throw exception'() {
         of('incomplete').vcsType
     }
 
-    @Test(expected = RuntimeException)
+    @Test(expected = UnsupportedOperationException)
     void 'getUrl should throw exception'() {
-        of('incomplete').url
+        of('incomplete').urls
     }
 
     @Test
