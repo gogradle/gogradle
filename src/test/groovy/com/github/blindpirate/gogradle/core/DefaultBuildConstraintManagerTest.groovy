@@ -49,4 +49,10 @@ class DefaultBuildConstraintManagerTest {
         // then
         (1..100).each { assert manager.getAllConstraints().contains("go1." + it) }
     }
+
+    @Test(expected = IllegalStateException)
+    void 'only go1 is supported'() {
+        when(goBinaryManager.getGoVersion()).thenReturn('2.0.0')
+        manager.prepareConstraints()
+    }
 }
