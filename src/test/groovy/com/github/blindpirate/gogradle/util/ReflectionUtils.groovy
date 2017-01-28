@@ -1,6 +1,9 @@
 package com.github.blindpirate.gogradle.util
 
+import org.gradle.api.artifacts.dsl.RepositoryHandler
+
 import java.lang.reflect.Field
+import java.lang.reflect.InvocationTargetException
 import java.lang.reflect.Method
 import java.lang.reflect.Modifier
 
@@ -63,5 +66,38 @@ class ReflectionUtils {
     static Object callStaticMethod(Class clazz, String methodName, Object... args) {
         Method method = clazz.getDeclaredMethod(methodName, args.collect { it.class } as Class[])
         method.invoke(null, args)
+    }
+
+    static void testUnsupportedMethods(Object targetInstance, Class clazzToTest, List<String> exclusionNames) {
+        clazzToTest.methods.each {
+            if (it.getDeclaringClass() == Object) {
+                return
+            }
+            if (it.isDefault()) {
+                return
+            }
+            if (['equals', 'hashCode'].contains(it.name)) {
+                return
+            }
+            if (exclusionNames.contains(it.name)) {
+                return
+            }
+            try {
+                Object[] params = it.getParameterTypes().collect { clazz ->
+                    if (clazz == boolean.class) {
+                        return false
+                    } else if (clazz.isPrimitive()) {
+                        return 0
+                    } else {
+                        return null
+                    }
+                }
+                it.invoke(targetInstance, params)
+//                println(it)
+                assert false
+            } catch (InvocationTargetException e) {
+                assert e.cause instanceof UnsupportedOperationException
+            }
+        }
     }
 }
