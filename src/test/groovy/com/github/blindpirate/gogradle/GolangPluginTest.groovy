@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.gradle.api.Project
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -176,14 +175,13 @@ class GolangPluginTest {
                 }
             }
         }
-        assert project.repositories instanceof GolangRepositoryHandler
 
-        GitRepository repository = project.repositories.findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
+        GitRepository repository = GogradleGlobal.getInstance(GitRepositoryHandler).findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
 
         assert repository.username == 'username'
         assert repository.password == 'password'
 
-        repository = project.repositories.findMatchedRepository('github.com/c/d', null).get()
+        repository = GogradleGlobal.getInstance(GitRepositoryHandler).findMatchedRepository('github.com/c/d', null).get()
         assert repository.privateKeyFilePath == 'path'
     }
 }

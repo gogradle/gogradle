@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.dependencytest
 
-import com.github.blindpirate.gogradle.GolangRepositoryHandler
+import com.github.blindpirate.gogradle.GitRepositoryHandler
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
@@ -20,7 +20,7 @@ class MockGitAccessor extends GitAccessor {
     Map tags = ['github.com/firstlevel/c@1.0.0': 'commit3']
 
     MockGitAccessor(String mockGitRepoPath) {
-        super(mock(GolangRepositoryHandler))
+        super(mock(GitRepositoryHandler))
         this.mockGitRepo = new File(mockGitRepoPath)
         if (mockGitRepo.list() != null) {
             packages = mockGitRepo.list().collect {

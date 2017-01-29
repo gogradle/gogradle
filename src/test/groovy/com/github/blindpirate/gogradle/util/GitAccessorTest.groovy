@@ -2,13 +2,12 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.AccessWeb
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.GolangRepositoryHandler
+import com.github.blindpirate.gogradle.GitRepositoryHandler
 import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
-import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -83,7 +82,7 @@ class GitAccessorTest {
     GitAccessor gitAccessor
     Repository repository
 
-    GolangRepositoryHandler golangRepositoryHandler = new GolangRepositoryHandler()
+    GitRepositoryHandler golangRepositoryHandler = new GitRepositoryHandler()
 
     @Before
     void setUp() {

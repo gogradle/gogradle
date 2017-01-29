@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
+import com.github.blindpirate.gogradle.GitRepositoryHandler;
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
@@ -47,11 +47,11 @@ import static com.github.blindpirate.gogradle.util.IOUtils.dirIsEmpty;
 public class GitAccessor implements VcsAccessor {
     private static final Logger LOGGER = Logging.getLogger(GitAccessor.class);
 
-    private final GolangRepositoryHandler golangRepositoryHandler;
+    private final GitRepositoryHandler gitRepositoryHandler;
 
     @Inject
-    public GitAccessor(GolangRepositoryHandler golangRepositoryHandler) {
-        this.golangRepositoryHandler = golangRepositoryHandler;
+    public GitAccessor(GitRepositoryHandler gitRepositoryHandler) {
+        this.gitRepositoryHandler = gitRepositoryHandler;
     }
 
     @Override
@@ -105,7 +105,7 @@ public class GitAccessor implements VcsAccessor {
     }
 
     private void setCredentialsIfNecessary(TransportCommand<?, ?> command, String name, String url) {
-        Optional<GitRepository> matched = golangRepositoryHandler.findMatchedRepository(name, url);
+        Optional<GitRepository> matched = gitRepositoryHandler.findMatchedRepository(name, url);
         if (matched.isPresent()) {
             matched.get().configure(command);
         }

@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -13,16 +12,11 @@ import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.artifacts.ConfigurationContainer;
-import org.gradle.api.artifacts.dsl.RepositoryHandler;
-import org.gradle.api.internal.project.DefaultProject;
+import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
-import org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils;
 import org.gradle.internal.reflect.Instantiator;
-import org.gradle.internal.service.DefaultServiceRegistry;
 
 import javax.inject.Inject;
-import java.lang.reflect.Proxy;
-import java.util.Map;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
@@ -109,34 +103,39 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void overwriteRepositoryHandler(Project project) {
-        DefaultProject defaultProject = (DefaultProject) project;
-        DefaultServiceRegistry serviceRegistry = (DefaultServiceRegistry) defaultProject.getServices();
 
-        try {
-            // 'cause it is package-private
-            Class serviceProviderClass =
-                    Class.forName("org.gradle.internal.service.DefaultServiceRegistry$ServiceProvider");
+        GitRepositoryHandler repositoryHandler = injector.getInstance(GitRepositoryHandler.class);
 
-            Object proxy = Proxy.newProxyInstance(
-                    serviceProviderClass.getClassLoader(),
-                    new Class[]{serviceProviderClass},
-                    (proxy1, method, args) -> {
-                        if ("get".equals(method.getName())) {
-                            return injector.getInstance(GolangRepositoryHandler.class);
-                        } else {
-                            return null;
-                        }
-                    });
+        ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("git", repositoryHandler);
 
-            Map providerCache = (Map) ReflectionUtils.getValueIncludingSuperclasses("providerCache",
-                    serviceRegistry);
-            synchronized (serviceRegistry) {
-                providerCache.put(RepositoryHandler.class, proxy);
-            }
-
-        } catch (IllegalAccessException | ClassNotFoundException e) {
-            throw ExceptionHandler.uncheckException(e);
-        }
+//        DefaultProject defaultProject = (DefaultProject) project;
+//        DefaultServiceRegistry serviceRegistry = (DefaultServiceRegistry) defaultProject.getServices();
+//
+//        try {
+//            // 'cause it is package-private
+//            Class serviceProviderClass =
+//                    Class.forName("org.gradle.internal.service.DefaultServiceRegistry$ServiceProvider");
+//
+//            Object proxy = Proxy.newProxyInstance(
+//                    serviceProviderClass.getClassLoader(),
+//                    new Class[]{serviceProviderClass},
+//                    (proxy1, method, args) -> {
+//                        if ("get".equals(method.getName())) {
+//                            return injector.getInstance(GitRepositoryHandler.class);
+//                        } else {
+//                            return null;
+//                        }
+//                    });
+//
+//            Map providerCache = (Map) ReflectionUtils.getValueIncludingSuperclasses("providerCache",
+//                    serviceRegistry);
+//            synchronized (serviceRegistry) {
+//                providerCache.put(RepositoryHandler.class, proxy);
+//            }
+//
+//        } catch (IllegalAccessException | ClassNotFoundException e) {
+//            throw ExceptionHandler.uncheckException(e);
+//        }
     }
 
     private void configureConfigurations(Project project) {
