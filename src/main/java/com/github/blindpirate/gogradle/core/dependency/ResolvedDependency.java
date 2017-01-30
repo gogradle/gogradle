@@ -27,8 +27,4 @@ public interface ResolvedDependency extends GolangDependency {
 
     String formatVersion();
 
-    @Override
-    default ResolvedDependency resolve() {
-        return this;
-    }
 }
