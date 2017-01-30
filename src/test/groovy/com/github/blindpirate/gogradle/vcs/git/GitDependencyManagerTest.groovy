@@ -297,5 +297,9 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         // then
         gitDependencyManager.resolve(notationDependency)
     }
+    @Test
+    void 'pull should not be executed if offline'(){
+
+    }
 
 }

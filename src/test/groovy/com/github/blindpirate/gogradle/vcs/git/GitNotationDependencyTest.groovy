@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -16,6 +18,12 @@ class GitNotationDependencyTest extends MockInjectorSupport {
 
     @Mock
     GitDependencyManager gitDependencyManager
+
+    @Before
+    void setUp() {
+        dependency.name = 'github.com/a/b'
+        dependency.commit = 'commitId'
+    }
 
     @Test
     void 'a GitNotationDependency should be resolved by GitDependencyResolver'() {
@@ -48,6 +56,40 @@ class GitNotationDependencyTest extends MockInjectorSupport {
         GitNotationDependency dependency2 = withNameAndCommit('name', '12345')
         // then
         assert dependency1 != dependency2
+    }
+
+    @Test
+    void 'toString should succeed'() {
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId'}"
+        dependency.url = 'https://github.com/a/b.git'
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', url='https://github.com/a/b.git'}"
+        dependency.tag = '1.0.0'
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', tag='1.0.0', url='https://github.com/a/b.git'}"
+    }
+
+    @Test
+    void 'equals should succeed'() {
+        assert dependency.equals(dependency)
+        assert !dependency.equals(null)
+        assert dependency != new LocalDirectoryDependency()
+
+        GitNotationDependency dependency2 = new GitNotationDependency()
+        dependency2.name = 'github.com/a/b'
+        dependency2.commit = 'commitId'
+        assert dependency == dependency2
+
+        dependency2.name = 'github.com/a/c'
+        assert dependency != dependency2
+
+        dependency2.name = 'github.com/a/b'
+        dependency2.commit = 'anotherCommit'
+
+        assert dependency != dependency2
+    }
+
+    @Test
+    void 'hashCode should succeed'() {
+        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b')
     }
 
     GitNotationDependency withNameAndCommit(String name, String commit) {
