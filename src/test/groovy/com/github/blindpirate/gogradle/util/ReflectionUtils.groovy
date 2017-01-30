@@ -93,9 +93,12 @@ class ReflectionUtils {
                     }
                 }
                 it.invoke(targetInstance, params)
-//                println(it)
+                println(it)
                 assert false
             } catch (InvocationTargetException e) {
+                if (!(e.cause instanceof UnsupportedOperationException)) {
+                    println(it)
+                }
                 assert e.cause instanceof UnsupportedOperationException
             }
         }

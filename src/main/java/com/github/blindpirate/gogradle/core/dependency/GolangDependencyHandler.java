@@ -113,26 +113,26 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     @Override
     public ComponentMetadataHandler getComponents() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void components(Action<? super ComponentMetadataHandler> configureAction) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ComponentModuleMetadataHandler getModules() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public void modules(Action<? super ComponentModuleMetadataHandler> configureAction) {
-
+        throw new UnsupportedOperationException();
     }
 
     @Override
     public ArtifactResolutionQuery createArtifactResolutionQuery() {
-        return null;
+        throw new UnsupportedOperationException();
     }
 }
