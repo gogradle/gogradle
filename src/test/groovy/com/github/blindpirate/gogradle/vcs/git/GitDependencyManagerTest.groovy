@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
@@ -167,6 +168,18 @@ class GitDependencyManagerTest extends MockInjectorSupport {
     }
 
     @Test
+    @MockOffline
+    void 'pull should not be executed if offline'() {
+        IOUtils.write(resource, 'placeholder', '')
+        // given:
+        when(gitAccessor.getRemoteUrl(repository)).thenReturn(repoUrl)
+        // when:
+        gitDependencyManager.resolve(notationDependency)
+        // then:
+        verify(gitAccessor, times(0)).hardResetAndPull('github.com/a/b', repository)
+    }
+
+    @Test
     void 'dependency with tag should be resolved successfully'() {
         // given
         when(notationDependency.getTag()).thenReturn('tag')
@@ -296,10 +309,6 @@ class GitDependencyManagerTest extends MockInjectorSupport {
         when(gitAccessor.cloneWithUrl('github.com/a/b', 'url2', resource)).thenThrow(IOException)
         // then
         gitDependencyManager.resolve(notationDependency)
-    }
-    @Test
-    void 'pull should not be executed if offline'(){
-
     }
 
 }
