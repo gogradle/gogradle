@@ -61,10 +61,8 @@ public class GitRepository {
 
         if (urlPattern != null) {
             return urlMatch(url);
-        } else if (namePattern != null) {
-            return nameMatch(name);
         } else {
-            return urlMatch(url) && nameMatch(name);
+            return nameMatch(name);
         }
     }
 
