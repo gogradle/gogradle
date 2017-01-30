@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.gradle.api.Project

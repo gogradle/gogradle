@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import org.apache.commons.io.FileUtils

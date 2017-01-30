@@ -1,9 +1,9 @@
 package com.github.blindpirate.gogradle.util
 
-import com.github.blindpirate.gogradle.AccessWeb
+import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GitRepositoryHandler
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.eclipse.jgit.lib.Repository

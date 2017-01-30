@@ -21,7 +21,7 @@ class TestTop1000Task extends DefaultTask {
         stdout = new File(getProject().getRootDir(), "build/${now}.stdout")
         stderr = new File(getProject().getRootDir(), "build/${now}.stderr")
         FileUtils.forceMkdir(top1000Dir)
-        GithubTopRankCrawler.cloneAllInto(top1000Dir, false)
+//        GithubTopRankCrawler.cloneAllInto(top1000Dir, false)
 
         if (specificProject) {
             buildOne(specificProject)

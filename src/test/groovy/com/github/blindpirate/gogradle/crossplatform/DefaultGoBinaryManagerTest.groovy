@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.crossplatform
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.IOUtils

@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external
 
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser

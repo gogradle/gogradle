@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import org.junit.Before

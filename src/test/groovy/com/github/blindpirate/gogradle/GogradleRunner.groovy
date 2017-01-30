@@ -1,50 +1,29 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import net.lingala.zip4j.core.ZipFile
-import org.gradle.api.Project
-import org.gradle.testfixtures.ProjectBuilder
+import com.github.blindpirate.gogradle.support.*
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
 import org.mockito.MockitoAnnotations
 
-import java.nio.file.Path
-import java.nio.file.Paths
-
-import static IOUtils.forceDelete
-import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
-
 /**
- * <ul>
- *  <li>1.Check the usage of {@link WithProject} and create {@link Project} instance if necessary.</li>
- *  <li>2.Check the usage of {@link WithResource} and copy (or unzip) resources to temp directory if necessary.</li>
- *  <li>3.Inject the project currentInstance and resource directory into the test class currentInstance.</li>
- *  <li>4.Inject fields annotated with{@link @Mock} and {@link @InjectMocks}.</li>
- *  <li>5.Clean up temp directories whenever necessary.</li>
- * <ul>
+ * Check annotations on a test and do some staff if necessary.
  */
 class GogradleRunner extends BlockJUnit4ClassRunner {
 
-    private static final String PROJECT_FEILD = 'project'
-    private static final String PROJECT_DIR_FEILD = 'projectDir'
-    private static final String USERHOME_FIELD = 'userhome'
-    private static final String RESOURC_FIELD = 'resource'
+    private Map annoToProcessorMap = [
+            (AccessWeb)   : AccessWebProcessor,
+            (MockOffline) : MockOfflineProcessor,
+            (WithProject) : WithProjectProcessor,
+            (WithResource): WithResourceProcessor
+    ]
 
-    Object currentInstance
+    private List<GogradleRunnerProcessor> processors
 
-    // Every time we find a @WithProject, a new temp project folder,a new user home folder and
-    // a new project currentInstance will be created
-    // At the end of that method, these resources will be destroyed
-    File projectDir
-    File userhomeDir
-    Project project
+    Object testInstance
 
-    // Every time we find a @WithResource, that resource will be copyed(or unzipped) to a temp dir
-    // At the end of that method, these resource will be  destroyed
-    File resourceDir
+    FrameworkMethod testMethod
 
     GogradleRunner(Class<?> klass) throws InitializationError {
         super(klass)
@@ -52,138 +31,51 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
 
     @Override
     Object createTest() throws Exception {
-        currentInstance = super.createTest()
-        MockitoAnnotations.initMocks(currentInstance)
-        injectProjectAndResourceIfNecessary()
-        injectOfflineIfNecessary()
-        return currentInstance
+        testInstance = super.createTest()
+        MockitoAnnotations.initMocks(testInstance)
+        processors.each { it.beforeTest(testInstance, testMethod) }
+        return testInstance
     }
 
-    def injectOfflineIfNecessary() {
-        if (ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline') == null) {
-            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
-        }
-    }
-
-    def injectProjectAndResourceIfNecessary() {
-        if (project != null) {
-            setFieldSafely(currentInstance, PROJECT_FEILD, project)
-            setFieldSafely(currentInstance, PROJECT_DIR_FEILD, projectDir)
-            setFieldSafely(currentInstance, USERHOME_FIELD, userhomeDir)
-        }
-
-        if (resourceDir != null) {
-            setFieldSafely(currentInstance, RESOURC_FIELD, resourceDir)
-        }
-    }
-
-
-    void cleanUpResource() {
-        forceDelete(resourceDir)
-        resourceDir = null
-    }
-
-    Object cleanUpProject() {
-        forceDelete(projectDir)
-        forceDelete(userhomeDir)
-        projectDir = null
-        userhomeDir = null
-        project = null
-    }
-
-    File setUpResource(String resourceName) {
-        File destDir = tmpRandomDirectory("resource")
-        // when resource path is empty, the new created empty dir will be used
-        if (resourceName.endsWith('zip')) {
-            unzipResourceToDir(resourceName, destDir)
-        } else if (resourceName != '') {
-            copyResourceToDir(resourceName, destDir)
-        }
-
-        resourceDir = destDir
-    }
-
-    def copyResourceToDir(String resourceName, File destDir) {
-        Path source = Paths.get(this.class.classLoader.getResource(resourceName).toURI())
-        IOUtils.copyDirectory(source.toFile(), destDir)
-    }
-
-    def unzipResourceToDir(String resourceName, File destDir) {
-        URI uri = this.class.classLoader.getResource(resourceName).toURI()
-        ZipFile zipFile = new ZipFile(new File(uri))
-        zipFile.extractAll(destDir.toString())
-    }
-
-    def setUpProject() {
-        projectDir = tmpRandomDirectory('project')
-        userhomeDir = tmpRandomDirectory('userhome')
-        project = ProjectBuilder.builder()
-                .withGradleUserHomeDir(userhomeDir)
-                .withProjectDir(projectDir)
-                .withName('test')
-                .build()
-    }
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
-        if (System.getProperty("TEST_ARE_OFFLINE")
-                && findAnnoOnMethod(method, AccessWeb)) {
+        testMethod = method
+
+        processors = annoToProcessorMap.entrySet().findResults { entry ->
+            def anno = findAnno(method, entry.key)
+            if (anno) {
+                return entry.value.newInstance()
+            } else {
+                return null
+            }
+        }
+
+        if (processors.any { it.shouldIgnore(method) }) {
             notifier.fireTestIgnored(describeChild(method))
             return
         }
 
-        beforeOneTest(method)
         try {
             super.runChild(method, notifier)
         } finally {
-            afterOneTest(method)
+            processors.each { it.afterTest(testInstance, method) }
         }
     }
 
-    void afterOneTest(FrameworkMethod method) {
-        WithResource withResource = findWithResource(method)
-        if (withResource) {
-            cleanUpResource()
-        }
-        WithProject withProject = findWithProject(method)
-        if (withProject) {
-            cleanUpProject()
-        }
-    }
-
-
-    def beforeOneTest(FrameworkMethod method) {
-        WithResource withResource = findWithResource(method)
-        if (withResource) {
-            setUpResource(withResource.value())
-        }
-        WithProject withProject = findWithProject(method)
-        if (withProject) {
-            setUpProject()
-        }
-    }
-
-    WithProject findWithProject(FrameworkMethod method) {
-        WithProject annoOnMethod = findAnnoOnMethod(method, WithProject)
+    static findAnno(FrameworkMethod method, Class clazz) {
+        def annoOnMethod = findAnnoOnMethod(method, clazz)
         if (annoOnMethod) {
             return annoOnMethod
         }
-        return findAnnoOnClass(method, WithProject)
+        return findAnnoOnClass(method, clazz)
     }
 
-    WithResource findWithResource(FrameworkMethod method) {
-        WithResource annoOnMethod = findAnnoOnMethod(method, WithResource)
-        if (annoOnMethod) {
-            return annoOnMethod
-        }
-        return findAnnoOnClass(method, WithResource)
-    }
-
-    def findAnnoOnMethod(FrameworkMethod method, Class clazz) {
+    static findAnnoOnMethod(FrameworkMethod method, Class clazz) {
         return method.method.getAnnotation(clazz)
     }
 
-    def findAnnoOnClass(FrameworkMethod method, Class annoClass) {
+    static findAnnoOnClass(FrameworkMethod method, Class annoClass) {
         Class currentClass = method.method.declaringClass
         while (currentClass) {
             def ret = currentClass.getAnnotation(annoClass)
@@ -196,9 +88,9 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         return null
     }
 
-    def tmpRandomDirectory(String prefix) {
+    static File tmpRandomDirectory(String prefix) {
         File ret = new File("build/tmp/${prefix}-${UUID.randomUUID()}").absoluteFile
         ret.mkdir()
-        ret
+        return ret
     }
 }

@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle
+package com.github.blindpirate.gogradle.support
 
 import java.lang.annotation.ElementType
 import java.lang.annotation.Retention

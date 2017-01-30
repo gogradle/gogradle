@@ -1,11 +1,11 @@
 package com.github.blindpirate.gogradle.gogs
 
-import com.github.blindpirate.gogradle.AccessWeb
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
+import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
@@ -16,7 +16,6 @@ import org.junit.runner.RunWith
 import java.nio.file.Files
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
 import static com.github.blindpirate.gogradle.util.ProcessUtils.getResult
 import static com.github.blindpirate.gogradle.util.ProcessUtils.run
 import static java.nio.file.attribute.PosixFilePermissions.fromString
@@ -35,19 +34,19 @@ golang {
 }
 """
 
-    @Ignore
     @Test
     @AccessWeb
+    @Ignore
     void 'gogs should be built successfully'() {
 //        gitAccessor.cloneWithUrl('https://github.com/gogits/gogs.git', resource)
         Repository repository = gitAccessor.getRepository(resource)
         // v0.9.113
-        gitAccessor.resetToCommit(repository, '114c179e5a50e3313f7a5894100693805e64e440')
+        gitAccessor.checkout(repository, '114c179e5a50e3313f7a5894100693805e64e440')
 
         IOUtils.write(resource, 'build.gradle', buildDotGradle)
 
         newBuild {
-            it.forTasks('build')
+            it.forTasks('test')
 //            it.forTasks('dependencies')
         }
 
@@ -63,7 +62,7 @@ golang {
 
     @Override
     List<String> buildArguments() {
-        return ['--offline'] + super.buildArguments()
+        return super.buildArguments()
     }
 
     @Override

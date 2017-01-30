@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.build
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
@@ -29,7 +29,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

@@ -2,8 +2,8 @@ package com.github.blindpirate.gogradle.core.dependency.lock
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithProject
-import com.github.blindpirate.gogradle.WithResource
+import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
