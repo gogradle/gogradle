@@ -49,7 +49,9 @@ public class IOUtils {
 
     public static void forceDelete(final File file) {
         try {
-            FileUtils.forceDelete(file);
+            if (file != null) {
+                FileUtils.forceDelete(file);
+            }
         } catch (IOException e) {
             handleIOException(e);
         }
