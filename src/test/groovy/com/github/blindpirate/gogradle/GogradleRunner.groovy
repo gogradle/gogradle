@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.*
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
@@ -33,10 +34,16 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     Object createTest() throws Exception {
         testInstance = super.createTest()
         MockitoAnnotations.initMocks(testInstance)
+        setOfflineIfNecessary()
         processors.each { it.beforeTest(testInstance, testMethod) }
         return testInstance
     }
 
+    def setOfflineIfNecessary() {
+        if (ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline') == null) {
+            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
+        }
+    }
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
