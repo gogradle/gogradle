@@ -25,6 +25,7 @@ public class HttpUtils {
     public static final String POST_METHOD = "POST";
     private static final int TEN_SECONDS = 10000;
     private static final int FOUR_KB = 4096;
+    private static final int HTTP_INTERNAL_REDIRECTION = 307;
 
     /**
      * Send a get request
@@ -312,7 +313,8 @@ public class HttpUtils {
 
         // handle redirects
         if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
-                || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP) {
+                || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
+                || conn.getResponseCode() == HTTP_INTERNAL_REDIRECTION) {
             String location = conn.getHeaderField("Location");
             return fetchAsInputStream(method, location, body, headers);
         }
