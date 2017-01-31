@@ -1,10 +1,5 @@
 package com.github.blindpirate.gogradle.core.exceptions;
 
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-
-import java.io.File;
-import java.io.IOException;
-
 public class DependencyProductionException extends RuntimeException {
     private DependencyProductionException(Throwable cause) {
         super(cause);
@@ -14,11 +9,11 @@ public class DependencyProductionException extends RuntimeException {
         super(message, cause);
     }
 
-    public static DependencyProductionException sourceCodeParsingFailed(File rootDir, IOException e) {
-        return new DependencyProductionException(
-                "Exception thrown when parsing source code in " + rootDir.getAbsolutePath(), e);
+    private DependencyProductionException(String message) {
+        super(message);
     }
-    public static DependencyProductionException cannotResolveVendor(ResolvedDependency module, IOException e) {
-        return new DependencyProductionException("Resolving vendor of " + module.getName() + " failed.", e);
+
+    public static DependencyProductionException cannotRecognizePackage(String importPath) {
+        return new DependencyProductionException("Cannot recognized package:" + importPath);
     }
 }
