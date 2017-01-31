@@ -47,7 +47,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
     }
 
     private ResolvedDependency doResolve(NotationDependency dependency) {
-        LOGGER.quiet("\033[2K\rResolving {}", dependency);
+        LOGGER.quiet("Resolving {}", dependency);
         try {
             return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
                 File vcsRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
