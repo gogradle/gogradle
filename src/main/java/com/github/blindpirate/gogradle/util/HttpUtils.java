@@ -314,8 +314,6 @@ public class HttpUtils {
             os.close();
         }
 
-//        System.out.println(IOUtils.toString(conn.getErrorStream()));
-
         // handle redirects
         if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM
                 || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
