@@ -52,7 +52,7 @@ public class SourceCodeDependencyFactory {
         Set<String> rootPackagePaths =
                 importPaths.stream()
                         .filter(path -> !path.startsWith(resolvedDependency.getName()))
-                        .map(this::importPathToDependency)
+                        .map(importPath -> importPathToDependency(resolvedDependency, importPath))
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toSet());
@@ -66,11 +66,14 @@ public class SourceCodeDependencyFactory {
 
     }
 
-    private Optional<String> importPathToDependency(String importPath) {
+    private Optional<String> importPathToDependency(ResolvedDependency resolvedDependency, String importPath) {
         if (isBlank(importPath)) {
             return Optional.empty();
         }
         if (isRelativePath(importPath)) {
+            return Optional.empty();
+        }
+        if (isSelfDependency(resolvedDependency, importPath)) {
             return Optional.empty();
         }
 
@@ -80,6 +83,10 @@ public class SourceCodeDependencyFactory {
         }
 
         return Optional.of(info.getRootPath());
+    }
+
+    private boolean isSelfDependency(ResolvedDependency resolvedDependency, String importPath) {
+        return importPath.startsWith(resolvedDependency.getName());
     }
 
     private boolean isRelativePath(String importPath) {

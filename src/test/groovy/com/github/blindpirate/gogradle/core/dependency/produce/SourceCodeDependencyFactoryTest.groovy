@@ -22,6 +22,8 @@ import org.mockito.stubbing.Answer
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static com.github.blindpirate.gogradle.build.Configuration.TEST
 import static org.mockito.ArgumentMatchers.anyString
+import static org.mockito.Mockito.times
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -49,7 +51,7 @@ class SourceCodeDependencyFactoryTest {
     void setUp() {
         extractor = new GoImportExtractor(buildConstraintManager)
         factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor)
-        when(resolvedDependency.getName()).thenReturn('resolvedDependency')
+        when(resolvedDependency.getName()).thenReturn('root/package')
         when(buildConstraintManager.getAllConstraints()).thenReturn([] as Set)
         when(notationParser.parse('github.com/a/b')).thenReturn(dependency)
         when(dependency.getName()).thenReturn('github.com/a/b')
@@ -72,6 +74,23 @@ class SourceCodeDependencyFactoryTest {
     void 'empty dependency set should be produced when no go code exists'() {
         assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
         assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+    }
+
+    @Test
+    void 'self dependency should be ignored'() {
+        // given
+        IOUtils.write(resource, 'main.go', '''
+package main
+import (
+    "root/package/a"
+    "root/package/a/b"
+    "root/package/a/b/c"
+)
+func Whatever(){}
+''')
+        // then
+        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        verify(packagePathResolver, times(0)).produce(anyString())
     }
 
     @Test
