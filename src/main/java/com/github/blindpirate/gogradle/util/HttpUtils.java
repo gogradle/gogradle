@@ -23,6 +23,7 @@ import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
 public class HttpUtils {
     public static final String GET_METHOD = "GET";
     public static final String POST_METHOD = "POST";
+    public static final String USER_AGENT = "user-agent";
     private static final int TEN_SECONDS = 10000;
     private static final int FOUR_KB = 4096;
     private static final int HTTP_INTERNAL_REDIRECTION = 307;
@@ -283,6 +284,9 @@ public class HttpUtils {
 
     private InputStream fetchAsInputStream(String method, String url, String body,
                                            Map<String, String> headers) throws IOException {
+        if (headers != null && headers.containsKey(USER_AGENT)) {
+            System.setProperty("http.agent", headers.get(USER_AGENT));
+        }
         // connection
         URL u = new URL(url);
         HttpURLConnection conn = (HttpURLConnection) u.openConnection();
@@ -310,6 +314,7 @@ public class HttpUtils {
             os.close();
         }
 
+//        System.out.println(IOUtils.toString(conn.getErrorStream()));
 
         // handle redirects
         if (conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_PERM

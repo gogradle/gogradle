@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -11,6 +12,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver.*
+import static com.github.blindpirate.gogradle.util.HttpUtils.*
 import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.verify
@@ -45,7 +48,7 @@ class MetadataPackagePathResolverTest {
         String packagePath = 'example.org/pkg/foo'
         String realUrl = 'https://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git https://code.org/r/p/exproj">'
-        when(httpUtils.get(realUrl)).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.get(realUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
 
         // when
         GolangPackage info = resolver.produce(packagePath).get()
@@ -64,25 +67,27 @@ class MetadataPackagePathResolverTest {
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
         String realHttpUrl = 'http://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git https://code.org/r/p/exproj">'
-        when(httpUtils.get(realHttpsUrl)).thenThrow(new IOException())
-        when(httpUtils.get(realHttpUrl)).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenThrow(new IOException())
+        when(httpUtils.get(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
 
         // when
         resolver.produce(packagePath).get()
 
         // then
-        verify(httpUtils).get(realHttpUrl)
+        verify(httpUtils).get(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])
     }
 
-    @Test(expected = IllegalStateException)
-    void 'missing meta tag should result in an exception'() {
+    @Test
+    void 'missing meta tag should result in empty result'() {
         // given
         String packagePath = 'example.org/pkg/foo'
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
-        when(httpUtils.get(realHttpsUrl)).thenReturn(tagInHtml(''))
+        String realHttpUrl = 'http://example.org/pkg/foo?go-get=1'
+        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(''))
+        when(httpUtils.get(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(''))
 
         // then
-        resolver.produce(packagePath)
+        assert !resolver.produce(packagePath).isPresent()
     }
 
     @Test(expected = IllegalStateException)
@@ -91,7 +96,7 @@ class MetadataPackagePathResolverTest {
         String packagePath = 'example.org/pkg/foo'
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git">'
-        when(httpUtils.get(realHttpsUrl)).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
 
         // then
         resolver.produce(packagePath).isPresent()
