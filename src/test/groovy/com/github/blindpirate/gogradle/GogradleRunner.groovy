@@ -14,10 +14,11 @@ import org.mockito.MockitoAnnotations
 class GogradleRunner extends BlockJUnit4ClassRunner {
 
     private Map annoToProcessorMap = [
-            (AccessWeb)   : AccessWebProcessor,
-            (MockOffline) : MockOfflineProcessor,
-            (WithProject) : WithProjectProcessor,
-            (WithResource): WithResourceProcessor
+            (AccessWeb)       : AccessWebProcessor,
+            (MockOffline)     : MockOfflineProcessor,
+            (WithProject)     : WithProjectProcessor,
+            (WithResource)    : WithResourceProcessor,
+            (WithMockInjector): WithMockInjectorProcessor
     ]
 
     private List<GogradleRunnerProcessor> processors
