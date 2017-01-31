@@ -3,10 +3,12 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
@@ -80,6 +82,10 @@ public class SourceCodeDependencyFactory {
         GolangPackage info = packagePathResolver.produce(importPath).get();
         if (info instanceof StandardGolangPackage) {
             return Optional.empty();
+        }
+
+        if (info instanceof UnrecognizedGolangPackage) {
+            throw DependencyProductionException.cannotRecognizePackage(importPath);
         }
 
         return Optional.of(info.getRootPath());
