@@ -90,15 +90,17 @@ public class GitAccessor implements VcsAccessor {
             return;
         }
         try {
-            LOGGER.quiet("Cloing {} into {}.", gitUrl, directory);
+            LOGGER.quiet("Cloing {} into {}", gitUrl, directory);
+            LoggerProgressMonitor monitor = new LoggerProgressMonitor(gitUrl);
             CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
-                    .setProgressMonitor(new LoggerProgressMonitor())
+                    .setProgressMonitor(monitor)
                     .setDirectory(directory);
 
             setCredentialsIfNecessary(command, rootPath, gitUrl);
 
             command.call();
+            monitor.completed();
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);
         }

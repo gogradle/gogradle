@@ -62,7 +62,9 @@ import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.internal.reflect.Instantiator;
+import org.gradle.internal.service.ServiceRegistry;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -75,16 +77,19 @@ import java.util.List;
 public class GogradleModule extends AbstractModule {
     private final Project project;
     private final Instantiator instantiator;
+    private final ServiceRegistry serviceRegistry;
 
     public GogradleModule(Project project, Instantiator instantiator) {
         this.project = new ProjectDecorator(project);
         this.instantiator = instantiator;
+        this.serviceRegistry = DefaultProject.class.cast(project).getServices();
     }
 
     @Override
     protected void configure() {
         bind(Project.class).toInstance(project);
         bind(Instantiator.class).toInstance(instantiator);
+        bind(ServiceRegistry.class).toInstance(serviceRegistry);
 
         bind(NotationParser.class).to(DefaultNotationParser.class);
         bind(BuildManager.class).to(DefaultBuildManager.class);

@@ -1,23 +1,37 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import org.eclipse.jgit.lib.BatchingProgressMonitor;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
+import org.gradle.internal.logging.progress.ProgressLogger;
+import org.gradle.internal.logging.progress.ProgressLoggerFactory;
+import org.gradle.internal.service.ServiceRegistry;
 
 public class LoggerProgressMonitor extends BatchingProgressMonitor {
 
-    private static final Logger LOGGER = Logging.getLogger(LoggerProgressMonitor.class);
+    private ProgressLogger logger;
 
     private static final int MAGIC_25 = 25;
     private static final int MAGIC_10 = 10;
     private static final int MAGIC_100 = 100;
+    private static final int PADDING_SPACE_COUNT = 20;
 
+
+    public LoggerProgressMonitor(String url) {
+        ProgressLoggerFactory progressLoggerFactory =
+                GogradleGlobal.getInstance(ServiceRegistry.class).get(ProgressLoggerFactory.class);
+        logger = progressLoggerFactory.newOperation(this.getClass());
+        logger.start("Cloning " + url, "Cloning " + url);
+    }
+
+    public void completed() {
+        logger.completed();
+    }
 
     @Override
     protected void onUpdate(String taskName, int workCurr) {
         StringBuilder s = new StringBuilder();
         format(s, taskName, workCurr);
-        send(s);
+        logger.progress(s.toString());
     }
 
     @Override
@@ -25,7 +39,7 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
         StringBuilder s = new StringBuilder();
         format(s, taskName, workCurr);
         s.append("\n"); //$NON-NLS-1$
-        send(s);
+        logger.progress(s.toString());
     }
 
     private void format(StringBuilder s, String taskName, int workCurr) {
@@ -36,13 +50,16 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
             s.append(' ');
         }
         s.append(workCurr);
+        for (int i = 0; i < PADDING_SPACE_COUNT; ++i) {
+            s.append(" ");
+        }
     }
 
     @Override
     protected void onUpdate(String taskName, int cmp, int totalWork, int pcnt) {
         StringBuilder s = new StringBuilder();
         format(s, taskName, cmp, totalWork, pcnt);
-        send(s);
+        logger.progress(s.toString());
     }
 
     @Override
@@ -50,7 +67,7 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
         StringBuilder s = new StringBuilder();
         format(s, taskName, cmp, totalWork, pcnt);
         s.append("\n"); //$NON-NLS-1$
-        send(s);
+        logger.progress(s.toString());
     }
 
     private void format(StringBuilder s, String taskName, int cmp,
@@ -79,9 +96,9 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
         s.append("/"); //$NON-NLS-1$
         s.append(endStr);
         s.append(")"); //$NON-NLS-1$
-    }
 
-    private void send(StringBuilder s) {
-        LOGGER.quiet(s.toString());
+        for (int i = 0; i < PADDING_SPACE_COUNT; ++i) {
+            s.append(" ");
+        }
     }
 }

@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleModule
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.google.inject.Guice
 import com.google.inject.Injector
+import org.gradle.api.internal.project.DefaultProject
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.internal.reflect.Instantiator
 import org.junit.Before
@@ -16,7 +17,7 @@ abstract class GogradleModuleSupport {
     @Mock
     Instantiator instantiator
 
-    ProjectInternal project = mock(ProjectInternal, RETURNS_DEEP_STUBS)
+    ProjectInternal project = mock(DefaultProject, RETURNS_DEEP_STUBS)
 
     Injector injector
 
