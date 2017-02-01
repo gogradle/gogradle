@@ -28,12 +28,13 @@ class AbstractGolangDependencyTest {
         dependency.contentEquals(null)
     }
 
-
     @Test
     void 'multiple PropertiesExclusionSpec should be compared properly'() {
         PropertiesExclusionSpec spec1 = PropertiesExclusionSpec.of([name: 'name'])
         PropertiesExclusionSpec spec2 = PropertiesExclusionSpec.of([name: 'name'] as TreeMap)
         assert spec1.equals(spec2)
+        assert spec1.equals(spec1)
+        assert !spec1.equals(null)
         assert spec1.hashCode() == spec2.hashCode()
     }
 }
