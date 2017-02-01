@@ -56,8 +56,11 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
     private void dfs(GolangDependency dependency, List<GolangDependency> result, int depth) {
         Assert.isTrue(depth < GogradleGlobal.MAX_DFS_DEPTH);
         result.add(dependency);
-        Cast.cast(ResolvedDependency.class, dependency).getDependencies()
-                .forEach(subDependency -> dfs(subDependency, result, depth + 1));
+        if (dependency instanceof ResolvedDependency) {
+            ResolvedDependency.class.cast(dependency)
+                    .getDependencies()
+                    .forEach(subDependency -> dfs(subDependency, result, depth + 1));
+        }
     }
 
     public DependencySet toDependencySet() {

@@ -12,7 +12,6 @@ import org.gradle.api.artifacts.dsl.ComponentMetadataHandler;
 import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
-import org.gradle.internal.Cast;
 import org.gradle.util.CollectionUtils;
 import org.gradle.util.ConfigureUtil;
 
@@ -57,7 +56,7 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
     public Dependency create(Object dependencyNotation, Closure configureClosure) {
         // first level
         Dependency dependency = dependencyParser.parse(dependencyNotation);
-        Cast.cast(AbstractGolangDependency.class, dependency).setFirstLevel(true);
+        AbstractGolangDependency.class.cast(dependency).setFirstLevel(true);
         return ConfigureUtil.configure(configureClosure, dependency);
     }
 
