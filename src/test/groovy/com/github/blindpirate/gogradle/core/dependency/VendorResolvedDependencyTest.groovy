@@ -1,10 +1,14 @@
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,7 +18,8 @@ import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class VendorResolvedDependencyTest extends MockInjectorSupport {
+@WithMockInjector
+class VendorResolvedDependencyTest {
 
     @Mock
     AbstractResolvedDependency hostDependency
@@ -33,10 +38,10 @@ class VendorResolvedDependencyTest extends MockInjectorSupport {
     void setUp() {
         when(hostDependency.getName()).thenReturn('host')
         when(hostDependency.formatVersion()).thenReturn('version')
-        when(injector.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
-        when(injector.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
+        when(GogradleGlobal.INSTANCE.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
+        when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
         when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(GolangDependencySet.empty())
-        when(injector.getInstance(DependencyInstaller)).thenReturn(hostDependencyInstaller)
+        when(GogradleGlobal.INSTANCE.getInstance(DependencyInstaller)).thenReturn(hostDependencyInstaller)
         when(hostDependency.getInstallerClass()).thenReturn(DependencyInstaller)
 
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, rootDir)
@@ -85,4 +90,9 @@ class VendorResolvedDependencyTest extends MockInjectorSupport {
 
     }
 
+    @Test
+    void 'installer class of vendor dependency hosting in LocalDirectoryDependency should be LocalDirectoryDependencyInstaller'() {
+        ReflectionUtils.setField(dependency, 'hostDependency', mock(LocalDirectoryDependency))
+        assert dependency.getInstallerClass() == LocalDirectoryDependencyInstaller
+    }
 }

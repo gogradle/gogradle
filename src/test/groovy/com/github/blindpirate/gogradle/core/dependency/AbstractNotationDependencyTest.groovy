@@ -1,6 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver
 import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Before
 import org.junit.Test
 
@@ -32,5 +36,29 @@ class AbstractNotationDependencyTest {
         depedency.exclude([name: 'a'])
         // then
         assert depedency.getTransitiveDepExclusions().first().isSatisfiedBy(dependency)
+    }
+
+    @Test
+    void 'setting package should succeed'() {
+        def dependency = new NotationDependencyForTest()
+        GolangPackage pkg = MockUtils.mockVcsPackage()
+        dependency.package = pkg
+        assert dependency.package == pkg
+    }
+
+    @Test
+    void 'setting strategy should succeed'() {
+        def dependency = new NotationDependencyForTest()
+        DependencyProduceStrategy strategy = mock(DependencyProduceStrategy)
+
+        dependency.strategy = strategy
+        assert dependency.strategy == strategy
+    }
+
+    static class NotationDependencyForTest extends AbstractNotationDependency {
+        @Override
+        protected Class<? extends DependencyResolver> getResolverClass() {
+            return null
+        }
     }
 }
