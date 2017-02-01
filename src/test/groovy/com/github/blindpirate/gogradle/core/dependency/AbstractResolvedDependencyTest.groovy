@@ -75,6 +75,23 @@ class AbstractResolvedDependencyTest {
         assert withNameAndVersion('b', 'v1') != withNameAndVersion('a', 'v1')
     }
 
+    @Test
+    void 'equals should succeed'() {
+        assert dependency == dependency
+        assert dependency != null
+    }
+
+    @Test
+    void 'hashCode should succeed'() {
+        assert dependency.hashCode() == Objects.hash('', '')
+    }
+
+    @Test
+    void 'setting updateTime should succeed'() {
+        dependency.updateTime = 1L
+        assert dependency.updateTime == 1L
+    }
+
     AbstractResolvedDependency withNameAndVersion(String name, String version) {
         return new ResolvedDependencyForTest(name, version, 0)
     }
