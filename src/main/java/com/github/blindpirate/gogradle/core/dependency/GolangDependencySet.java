@@ -24,7 +24,7 @@ import java.util.Set;
 public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDependency> {
     public GolangDependencySet(Collection<? extends GolangDependency> dependencies) {
         this();
-        dependencies.forEach(d -> this.add(d));
+        addAll(dependencies);
     }
 
     public GolangDependencySet() {
@@ -56,10 +56,8 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
     private void dfs(GolangDependency dependency, List<GolangDependency> result, int depth) {
         Assert.isTrue(depth < GogradleGlobal.MAX_DFS_DEPTH);
         result.add(dependency);
-        if (dependency instanceof ResolvedDependency) {
-            Cast.cast(ResolvedDependency.class, dependency).getDependencies()
-                    .forEach(subDependency -> dfs(subDependency, result, depth + 1));
-        }
+        Cast.cast(ResolvedDependency.class, dependency).getDependencies()
+                .forEach(subDependency -> dfs(subDependency, result, depth + 1));
     }
 
     public DependencySet toDependencySet() {
@@ -70,6 +68,7 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
         return new GolangDependencySet();
     }
 
+    @SuppressWarnings("unchecked")
     public class DependencySetFacade implements DependencySet {
 
         public GolangDependencySet toGolangDependencies() {
@@ -184,7 +183,7 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
 
         @Override
         public boolean containsAll(Collection<?> c) {
-            return GolangDependencySet.this.contains(c);
+            return GolangDependencySet.this.containsAll(c);
         }
 
         @Override
