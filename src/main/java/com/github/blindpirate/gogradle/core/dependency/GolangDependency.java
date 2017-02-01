@@ -29,12 +29,9 @@ public interface GolangDependency extends Dependency {
 
     boolean isFirstLevel();
 
-    final class Namer implements org.gradle.api.Namer<GolangDependency> {
+    enum Namer implements org.gradle.api.Namer<GolangDependency> {
 
-        public static final Namer INSTANCE = new Namer();
-
-        private Namer() {
-        }
+        INSTANCE;
 
         @Override
         public String determineName(GolangDependency dependency) {
