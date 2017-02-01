@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDep
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
+import com.github.blindpirate.gogradle.util.MapUtils;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -13,6 +14,9 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.HOST_KEY;
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VENDOR_PATH_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 
 public class VendorResolvedDependency extends AbstractResolvedDependency {
@@ -85,8 +89,10 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        Map<String, Object> ret = new HashMap<>(hostDependency.toLockedNotation());
-        ret.put(VendorNotationDependency.VENDOR_PATH_KEY, relativePathToHost.toString());
+        Map<String, Object> ret = MapUtils.asMap(NAME_KEY, getName());
+        Map<String, Object> host = new HashMap<>(hostDependency.toLockedNotation());
+        ret.put(VENDOR_PATH_KEY, relativePathToHost.toString());
+        ret.put(HOST_KEY, host);
         return ret;
     }
 
