@@ -16,11 +16,12 @@ public class MapUtils {
                 .getBooleanValue(map, key, defaultValue);
     }
 
-
+    @SuppressWarnings("unchecked")
     public static <T> T getValue(Map<String, Object> map, String key, Class<T> clazz) {
         return (T) map.get(key);
     }
 
+    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2) {
         return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
     }
@@ -37,10 +38,12 @@ public class MapUtils {
         return asMapWithoutNull(Pair.of(k, v));
     }
 
+    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2) {
         return asMapWithoutNull(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
     }
 
+    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2, K k3, V v3) {
         return asMapWithoutNull(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3));
     }
