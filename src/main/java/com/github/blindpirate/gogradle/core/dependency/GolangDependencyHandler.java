@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import groovy.lang.MissingMethodException;
@@ -25,13 +25,13 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     private final ConfigurationContainer configurationContainer;
 
-    private final DefaultNotationParser dependencyParser;
+    private final NotationParser notationParser;
 
     @Inject
     public GolangDependencyHandler(ConfigurationContainer configurationContainer,
-                                   DefaultNotationParser dependencyParser) {
+                                   NotationParser notationParser) {
         this.configurationContainer = configurationContainer;
-        this.dependencyParser = dependencyParser;
+        this.notationParser = notationParser;
     }
 
     public Dependency add(String configurationName, Object dependencyNotation) {
@@ -55,7 +55,7 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
     @Override
     public Dependency create(Object dependencyNotation, Closure configureClosure) {
         // first level
-        Dependency dependency = dependencyParser.parse(dependencyNotation);
+        Dependency dependency = notationParser.parse(dependencyNotation);
         AbstractGolangDependency.class.cast(dependency).setFirstLevel(true);
         return ConfigureUtil.configure(configureClosure, dependency);
     }
