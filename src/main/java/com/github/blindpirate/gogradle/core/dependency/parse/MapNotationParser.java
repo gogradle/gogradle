@@ -9,6 +9,8 @@ public interface MapNotationParser extends NotationParser<Map<String, Object>> {
     String DIR_KEY = "dir";
     String PACKAGE_KEY = "package";
     String VCS_KEY = "vcs";
+    String HOST_KEY = "host";
+    String VENDOR_PATH_KEY = "vendorPath";
 
     @Override
     NotationDependency parse(Map<String, Object> notation);

@@ -19,12 +19,15 @@ import java.util.Map;
 @Singleton
 public class DefaultMapNotationParser implements MapNotationParser {
     private final DirMapNotationParser dirMapNotationParser;
+    private final VendorMapNotationParser vendorMapNotationParser;
     private final PackagePathResolver packagePathResolver;
 
     @Inject
     public DefaultMapNotationParser(DirMapNotationParser dirMapNotationParser,
+                                    VendorMapNotationParser vendorMapNotationParser,
                                     PackagePathResolver packagePathResolver) {
         this.dirMapNotationParser = dirMapNotationParser;
+        this.vendorMapNotationParser = vendorMapNotationParser;
         this.packagePathResolver = packagePathResolver;
     }
 
@@ -33,6 +36,8 @@ public class DefaultMapNotationParser implements MapNotationParser {
         Assert.isTrue(notation.containsKey(NAME_KEY), "Name must be specified!");
         if (notation.containsKey(DIR_KEY)) {
             return dirMapNotationParser.parse(notation);
+        } else if (notation.containsKey(VENDOR_PATH_KEY)) {
+            return vendorMapNotationParser.parse(notation);
         } else {
             return parseWithVcs(notation);
         }

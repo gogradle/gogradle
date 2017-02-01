@@ -24,6 +24,8 @@ class DefaultMapNotationParserTest {
     @Mock
     DirMapNotationParser dirMapNotationParser
     @Mock
+    VendorMapNotationParser vendorMapNotationParser
+    @Mock
     PackagePathResolver packagePathResolver
     @Mock
     MapNotationParser vcsMapNotationParser
@@ -32,7 +34,7 @@ class DefaultMapNotationParserTest {
 
     @Before
     void setUp() {
-        parser = new DefaultMapNotationParser(dirMapNotationParser, packagePathResolver)
+        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver)
     }
 
     @Test(expected = Exception)
@@ -40,16 +42,24 @@ class DefaultMapNotationParserTest {
         parser.parse([:])
     }
 
-
     @Test
-    void 'notation should be delegated to corresponding parser'() {
+    void 'notation with dir should be delegated to DirMapNotationParser'() {
         // given
         def notation = [name: 'path', dir: 'dir']
         // when
         parser.parse(notation)
-
         // then
         verify(dirMapNotationParser).parse(notation)
+    }
+
+    @Test
+    void 'notation with vendorPath should be delegated to VendorMapNotationParser'() {
+        // given
+        def notation = [name: 'path', vendorPath: '/vendor/github.com/a/b']
+        // when
+        parser.parse(notation)
+        // then
+        verify(vendorMapNotationParser).parse(notation)
     }
 
     @Test
