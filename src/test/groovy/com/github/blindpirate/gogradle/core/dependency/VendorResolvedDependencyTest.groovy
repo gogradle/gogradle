@@ -86,7 +86,7 @@ class VendorResolvedDependencyTest {
         // given
         when(hostDependency.toLockedNotation()).thenReturn([:])
         // then
-        assert dependency.toLockedNotation() == [vendorPath: 'vendor/github.com/a/b']
+        assert dependency.toLockedNotation() == [name: 'github.com/a/b', vendorPath: 'vendor/github.com/a/b', host: [:]]
 
     }
 
