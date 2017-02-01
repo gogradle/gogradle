@@ -11,7 +11,6 @@ import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.internal.DefaultNamedDomainObjectSet;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.TaskDependency;
-import org.gradle.internal.Cast;
 import org.gradle.internal.reflect.DirectInstantiator;
 import org.gradle.internal.reflect.Instantiator;
 

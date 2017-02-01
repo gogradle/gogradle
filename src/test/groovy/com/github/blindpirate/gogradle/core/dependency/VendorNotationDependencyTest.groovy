@@ -34,7 +34,7 @@ class VendorNotationDependencyTest {
     }
 
     @Test
-    void "VendorNotationDependency's resolver class should be its host's"() {
+    void "a VendorNotationDependency's resolver class should be its host's"() {
         dependency.hostNotationDependency = hostNotationDependency
         assert dependency.resolverClass == GitDependencyManager
     }
