@@ -1,11 +1,12 @@
 package com.github.blindpirate.gogradle.core.pack
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +19,8 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class LocalDirectoryDependencyTest extends MockInjectorSupport {
+@WithMockInjector
+class LocalDirectoryDependencyTest {
     File resource
 
     LocalDirectoryDependency dependency
@@ -32,8 +34,9 @@ class LocalDirectoryDependencyTest extends MockInjectorSupport {
     void 'local directory should be resolved to itself'() {
         assert dependency.resolve().is(dependency)
     }
+
     @Test
-    void 'version format of local directory should be its absolute path'(){
+    void 'version format of local directory should be its absolute path'() {
         assert dependency.formatVersion() == resource.absolutePath
     }
 
@@ -78,7 +81,7 @@ class LocalDirectoryDependencyTest extends MockInjectorSupport {
         // given
         LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
         File targetDirectory = mock(File)
-        when(injector.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
+        when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
         // when
         dependency.installTo(targetDirectory)
         // then

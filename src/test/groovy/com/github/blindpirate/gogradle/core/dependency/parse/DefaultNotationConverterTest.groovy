@@ -2,10 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.exceptions.PackageResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.vcs.Git
 import org.junit.Before
 import org.junit.Test
@@ -22,7 +22,8 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class DefaultNotationConverterTest extends MockInjectorSupport {
+@WithMockInjector
+class DefaultNotationConverterTest {
     @Mock
     PackagePathResolver resolver
     @Mock
@@ -35,7 +36,7 @@ class DefaultNotationConverterTest extends MockInjectorSupport {
         GolangPackage mockedPackage = mockVcsPackage()
         converter = new DefaultNotationConverter(resolver)
         when(resolver.produce('root/package')).thenReturn(of(mockedPackage))
-        mockVcsService(injector, NotationConverter, Git, gitConverter)
+        mockVcsService(NotationConverter, Git, gitConverter)
     }
 
     @Test

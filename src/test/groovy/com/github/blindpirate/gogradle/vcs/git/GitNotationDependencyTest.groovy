@@ -1,8 +1,9 @@
 package com.github.blindpirate.gogradle.vcs.git
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -12,7 +13,8 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class GitNotationDependencyTest extends MockInjectorSupport {
+@WithMockInjector
+class GitNotationDependencyTest {
 
     GitNotationDependency dependency = new GitNotationDependency()
 
@@ -28,7 +30,7 @@ class GitNotationDependencyTest extends MockInjectorSupport {
     @Test
     void 'a GitNotationDependency should be resolved by GitDependencyResolver'() {
         // given
-        when(injector.getInstance(GitDependencyManager)).thenReturn(gitDependencyManager)
+        when(GogradleGlobal.INSTANCE.getInstance(GitDependencyManager)).thenReturn(gitDependencyManager)
         // when
         dependency.resolve()
         // then

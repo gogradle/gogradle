@@ -2,13 +2,13 @@ package com.github.blindpirate.gogradle.build
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.crossplatform.Os
+import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
@@ -29,11 +29,13 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class DefaultBuildManagerTest extends MockInjectorSupport {
+@WithMockInjector
+class DefaultBuildManagerTest {
     DefaultBuildManager manager
 
     File resource

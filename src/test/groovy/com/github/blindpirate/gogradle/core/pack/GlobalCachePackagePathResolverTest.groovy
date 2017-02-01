@@ -1,9 +1,10 @@
 package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
+import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
@@ -24,6 +25,7 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('global-cache-test.zip')
+@WithMockInjector
 class GlobalCachePackagePathResolverTest {
     @Mock
     GlobalCacheManager cacheManager
@@ -63,7 +65,7 @@ class GlobalCachePackagePathResolverTest {
                 }
             }
         })
-        MockUtils.mockVcsService(injector, VcsAccessor, Git, gitAccessor)
+        MockUtils.mockVcsService(VcsAccessor, Git, gitAccessor)
     }
 
     @Test

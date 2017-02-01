@@ -3,15 +3,13 @@ package com.github.blindpirate.gogradle.util
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.google.inject.Injector
 import com.google.inject.Key
 
 import static org.mockito.Mockito.*
 
 class MockUtils {
-    static void mockVcsService(Injector injector, Class serviceClass, Class annoClass, Object serviceInstance) {
-        GogradleGlobal.INSTANCE.setInjector(injector)
-        when(injector.getInstance(Key.get(serviceClass, annoClass))).thenReturn(serviceInstance)
+    static void mockVcsService(Class serviceClass, Class annoClass, Object serviceInstance) {
+        when(GogradleGlobal.INSTANCE.getInstance(Key.get(serviceClass, annoClass))).thenReturn(serviceInstance)
     }
 
     static Object mockMutipleInterfaces(Class... interfaceClasses) {

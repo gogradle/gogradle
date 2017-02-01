@@ -1,14 +1,13 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.google.inject.Injector
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -30,8 +29,6 @@ class DefaultMapNotationParserTest {
     MapNotationParser vcsMapNotationParser
     @Mock
     GolangDependency dependency
-    @Mock
-    Injector injector
 
     @Before
     void setUp() {
@@ -56,6 +53,7 @@ class DefaultMapNotationParserTest {
     }
 
     @Test
+    @WithMockInjector
     void 'notation should be delegated to vcs parser'() {
         // given
         Map notation = [name: 'path']
@@ -65,7 +63,7 @@ class DefaultMapNotationParserTest {
                 .withVcsType(VcsType.GIT)
                 .build()
         when(packagePathResolver.produce('path')).thenReturn(Optional.of(vcsPackage))
-        MockUtils.mockVcsService(injector, MapNotationParser, Git, vcsMapNotationParser)
+        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
 
         // when
         parser.parse(notation)
@@ -75,6 +73,7 @@ class DefaultMapNotationParserTest {
     }
 
     @Test
+    @WithMockInjector
     void 'sub package declaration should be normalized'() {
         // given
         Map notation = [name: 'root/path']
@@ -84,7 +83,7 @@ class DefaultMapNotationParserTest {
                 .withVcsType(VcsType.GIT)
                 .build()
         when(packagePathResolver.produce('root/path')).thenReturn(Optional.of(vcsPackage))
-        MockUtils.mockVcsService(injector, MapNotationParser, Git, vcsMapNotationParser)
+        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
 
         // when
         parser.parse(notation)

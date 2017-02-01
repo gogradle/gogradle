@@ -1,10 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.MockOffline
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
@@ -12,6 +9,9 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.support.MockOffline
+import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -37,7 +37,8 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class GitDependencyManagerTest extends MockInjectorSupport {
+@WithMockInjector
+class GitDependencyManagerTest  {
 
     GitNotationDependency notationDependency = mockWithName(GitNotationDependency, 'github.com/a/b')
     GitResolvedDependency resolvedDependency = mockWithName(GitResolvedDependency, 'github.com/a/b')

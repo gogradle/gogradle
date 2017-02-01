@@ -1,13 +1,14 @@
 package com.github.blindpirate.gogradle.core.dependency.produce
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.core.MockInjectorSupport
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver
+import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
@@ -18,18 +19,22 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class SecondPassVendorDirectoryVisitorTest extends MockInjectorSupport {
+@WithMockInjector
+class SecondPassVendorDirectoryVisitorTest {
     PackagePathResolver packagePathResolver = new UnrecognizedPackagePathResolver()
     @Mock
     VendorOnlyProduceStrategy vendorOnlyProduceStrategy
     @Mock
     ResolvedDependency hostDependency
+    @Mock
+    DependencyVisitor dependencyVisitor
 
     File resource
 
     @Before
     void setUp() {
-        when(injector.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
+        when(GogradleGlobal.INSTANCE.injector.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
+        when(GogradleGlobal.INSTANCE.injector.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
         IOUtils.write(resource, 'vendor/a/main.go', '')
         IOUtils.write(resource, 'vendor/b/vendor/c/main.go', '')
     }
