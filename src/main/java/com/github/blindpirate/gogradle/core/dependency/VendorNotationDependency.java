@@ -4,8 +4,6 @@ import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolve
 
 public class VendorNotationDependency extends AbstractNotationDependency {
 
-    public static final String VENDOR_PATH_KEY = "vendorPath";
-
     private NotationDependency hostNotationDependency;
 
     private String vendorPath;
@@ -14,12 +12,15 @@ public class VendorNotationDependency extends AbstractNotationDependency {
         return vendorPath;
     }
 
-    public NotationDependency getHostDependency() {
+    public NotationDependency getHostNotationDependency() {
         return hostNotationDependency;
     }
 
-    public VendorNotationDependency(NotationDependency hostNotationDependency, String vendorPath) {
+    public void setHostNotationDependency(NotationDependency hostNotationDependency) {
         this.hostNotationDependency = hostNotationDependency;
+    }
+
+    public void setVendorPath(String vendorPath) {
         this.vendorPath = vendorPath;
     }
 
