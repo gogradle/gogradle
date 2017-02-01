@@ -77,8 +77,8 @@ class AbstractResolvedDependencyTest {
 
     @Test
     void 'equals should succeed'() {
-        assert dependency == dependency
-        assert dependency != null
+        assert dependency.equals(dependency)
+        assert !dependency.equals(null)
     }
 
     @Test
