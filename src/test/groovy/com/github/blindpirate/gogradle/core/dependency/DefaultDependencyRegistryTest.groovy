@@ -37,10 +37,8 @@ class DefaultDependencyRegistryTest {
         // given
         when(resolvedDependency1.getUpdateTime()).thenReturn(1L)
         when(resolvedDependency2.getUpdateTime()).thenReturn(2L)
-
         // when
         registry.register(resolvedDependency1)
-
         // then
         assert registry.register(resolvedDependency2)
     }
@@ -50,10 +48,8 @@ class DefaultDependencyRegistryTest {
         // given
         when(resolvedDependency1.getUpdateTime()).thenReturn(2L)
         when(resolvedDependency2.getUpdateTime()).thenReturn(1L)
-
         // when
         registry.register(resolvedDependency1)
-
         // then
         assert !registry.register(resolvedDependency2)
     }
@@ -65,7 +61,6 @@ class DefaultDependencyRegistryTest {
         when(resolvedDependency2.getUpdateTime()).thenReturn(1L)
         // resolvedDependency2 is old but first level
         when(resolvedDependency2.isFirstLevel()).thenReturn(true)
-
         // when
         registry.register(resolvedDependency1)
         // then
@@ -77,10 +72,8 @@ class DefaultDependencyRegistryTest {
     void 'same dependency should not be put'() {
         // given
         when(resolvedDependency1.getUpdateTime()).thenReturn(1L)
-
         // when
         registry.register(resolvedDependency1)
-
         // then
         assert !registry.register(resolvedDependency1)
     }
@@ -91,6 +84,24 @@ class DefaultDependencyRegistryTest {
         registry.putIntoCache(notationDependency, resolvedDependency1)
         // then
         assert registry.getFromCache(notationDependency).get().is(resolvedDependency1)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if first-level dependencies conflict'() {
+        // given
+        when(resolvedDependency1.isFirstLevel()).thenReturn(true)
+        when(resolvedDependency2.isFirstLevel()).thenReturn(true)
+        // then
+        registry.register(resolvedDependency1)
+        registry.register(resolvedDependency2)
+    }
+
+    @Test
+    void 'retriving should succeed'() {
+        // when
+        registry.register(resolvedDependency1)
+        // then
+        assert registry.retrive('resolvedDependency').is(resolvedDependency1)
     }
 
 }

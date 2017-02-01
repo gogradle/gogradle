@@ -56,9 +56,6 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
     private boolean existentDependencyIsOutOfDate(ResolvedDependency existingDependency,
                                                   ResolvedDependency resolvedDependency) {
-        if (existingDependency == null) {
-            return true;
-        }
         return existingDependency.getUpdateTime() < resolvedDependency.getUpdateTime();
     }
 
