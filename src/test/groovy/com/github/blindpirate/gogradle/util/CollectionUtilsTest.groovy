@@ -7,6 +7,12 @@ import static java.util.Optional.of
 
 class CollectionUtilsTest {
     @Test
+    void 'empty checking should succeed'() {
+        assert CollectionUtils.isEmpty([])
+        assert CollectionUtils.isEmpty(null)
+    }
+
+    @Test
     void 'building immutable list should succeed'() {
         assert CollectionUtils.immutableList(1, 2, 3) == [1, 2, 3]
     }

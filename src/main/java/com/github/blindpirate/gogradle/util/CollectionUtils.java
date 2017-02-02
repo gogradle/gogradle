@@ -7,16 +7,10 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-import java.util.function.BinaryOperator;
 
 import static java.util.Arrays.asList;
-import static java.util.Arrays.stream;
 
 public class CollectionUtils {
-
-    public static <T> BinaryOperator<T> returnFirstArg() {
-        return (t1, t2) -> t1;
-    }
 
     public static <T> boolean isEmpty(Collection<T> c) {
         return c == null || c.isEmpty();
@@ -27,15 +21,11 @@ public class CollectionUtils {
     }
 
     public static <T> List<T> collectOptional(Optional<T>... optionals) {
-        return stream(optionals)
-                .reduce(new ArrayList<>(),
-                        (list, optional) -> {
-                            if (optional.isPresent()) {
-                                list.add(optional.get());
-                            }
-                            return list;
-                        },
-                        returnFirstArg());
+        List<T> ret = new ArrayList<>();
+        for (Optional<T> optional : optionals) {
+            optional.ifPresent(ret::add);
+        }
+        return ret;
     }
 
     @SuppressWarnings("unchecked")
