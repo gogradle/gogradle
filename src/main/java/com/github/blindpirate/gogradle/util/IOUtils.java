@@ -27,13 +27,13 @@ import static com.github.blindpirate.gogradle.GogradleGlobal.MAX_DFS_DEPTH;
  * Encapsulation of {@link FileUtils} and {@link org.apache.commons.io.IOUtils},
  * it never throws checked exceptions.
  */
-public class IOUtils {
+public final class IOUtils {
 
     public static void forceMkdir(final File directory) {
         try {
             FileUtils.forceMkdir(directory);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -43,17 +43,13 @@ public class IOUtils {
         return ret;
     }
 
-    private static void handleIOException(IOException e) {
-        throw new IllegalStateException(e);
-    }
-
     public static void forceDelete(final File file) {
         try {
             if (file != null) {
                 FileUtils.forceDelete(file);
             }
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -78,7 +74,7 @@ public class IOUtils {
         try {
             org.apache.commons.io.FileUtils.copyDirectory(src, dest);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -87,7 +83,7 @@ public class IOUtils {
         try {
             FileUtils.copyDirectory(srcDir, destDir, filter);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -95,7 +91,7 @@ public class IOUtils {
         try {
             org.apache.commons.io.FileUtils.touch(file);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -103,7 +99,7 @@ public class IOUtils {
         try {
             org.apache.commons.io.FileUtils.write(file, data, DEFAULT_CHARSET);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -118,8 +114,7 @@ public class IOUtils {
         try {
             return org.apache.commons.io.IOUtils.toString(new FileInputStream(file), DEFAULT_CHARSET);
         } catch (IOException e) {
-            handleIOException(e);
-            return null;
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -129,15 +124,14 @@ public class IOUtils {
     }
 
     public static boolean isValidDirectory(File dir) {
-        return dir.isDirectory() && dir.exists();
+        return dir.exists() && dir.isDirectory();
     }
 
     public static String toString(InputStream inputStream) {
         try {
             return org.apache.commons.io.IOUtils.toString(inputStream, DEFAULT_CHARSET);
         } catch (IOException e) {
-            handleIOException(e);
-            return null;
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -154,7 +148,7 @@ public class IOUtils {
         try {
             Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DFS_DEPTH, visitor);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -167,7 +161,7 @@ public class IOUtils {
         try {
             FileUtils.cleanDirectory(dir);
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -175,7 +169,7 @@ public class IOUtils {
         try {
             Files.setPosixFilePermissions(filePath, PosixFilePermissions.fromString("rwx------"));
         } catch (IOException e) {
-            handleIOException(e);
+            throw ExceptionHandler.uncheckException(e);
         }
 
     }
