@@ -1,6 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
+import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.GolangPackage
@@ -236,6 +238,20 @@ func main(){}
         // then
         assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
         assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+    }
+
+    @Test(expected = DependencyProductionException)
+    void 'exception should be thrown if import package cannot be recognized'() {
+        // given
+        IOUtils.write(resource, 'main.go', mainDotGo)
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return Optional.of(UnrecognizedGolangPackage.of(invocation.getArgument(0)))
+            }
+        })
+        // then
+        factory.produce(resolvedDependency, resource, BUILD)
     }
 
     String mainDotGo = '''
