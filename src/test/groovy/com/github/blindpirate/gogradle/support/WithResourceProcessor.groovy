@@ -1,16 +1,15 @@
 package com.github.blindpirate.gogradle.support
 
-import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.util.CompressUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import net.lingala.zip4j.core.ZipFile
 import org.junit.runners.model.FrameworkMethod
 
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import static com.github.blindpirate.gogradle.GogradleRunner.*
 import static com.github.blindpirate.gogradle.GogradleRunner.findAnno
+import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
 import static com.github.blindpirate.gogradle.util.IOUtils.forceDelete
 
 // Every time we find a @WithResource, that resource will be copyed(or unzipped) to a temp dir
@@ -34,7 +33,7 @@ class WithResourceProcessor extends GogradleRunnerProcessor {
         File destDir = tmpRandomDirectory("resource")
         // when resource path is empty, the new created empty dir will be used
         if (resourceName.endsWith('zip')) {
-            unzipResourceToDir(resourceName, destDir)
+            decompressResourceToDir(resourceName, destDir)
         } else if (resourceName != '') {
             copyResourceToDir(resourceName, destDir)
         }
@@ -47,9 +46,8 @@ class WithResourceProcessor extends GogradleRunnerProcessor {
         IOUtils.copyDirectory(source.toFile(), destDir)
     }
 
-    def unzipResourceToDir(String resourceName, File destDir) {
-        URI uri = this.class.classLoader.getResource(resourceName).toURI()
-        ZipFile zipFile = new ZipFile(new File(uri))
-        zipFile.extractAll(destDir.toString())
+    def decompressResourceToDir(String resourceName, File destDir) {
+        File resource = new File(this.class.classLoader.getResource(resourceName).toURI())
+        CompressUtils.decompressZipOrTarGz(resource, destDir)
     }
 }
