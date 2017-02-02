@@ -11,11 +11,6 @@ public class MapUtils {
                 .getString(map, key);
     }
 
-    public static boolean getBooleanValue(Map<String, Object> map, String key, boolean defaultValue) {
-        return org.gradle.internal.impldep.org.apache.commons.collections.MapUtils
-                .getBooleanValue(map, key, defaultValue);
-    }
-
     @SuppressWarnings("unchecked")
     public static <T> T getValue(Map<String, Object> map, String key, Class<T> clazz) {
         return (T) map.get(key);
@@ -58,6 +53,7 @@ public class MapUtils {
         return ret;
     }
 
+    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k, V v) {
         return asMapWithoutNull(Pair.of(k, v));
     }

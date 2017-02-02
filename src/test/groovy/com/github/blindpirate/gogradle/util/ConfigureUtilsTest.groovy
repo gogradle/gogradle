@@ -33,6 +33,11 @@ class ConfigureUtilsTest {
         assert bean.c == null
     }
 
+    @Test
+    void 'empty properties should be considered unmatched'() {
+        assert !ConfigureUtils.match([:], bean)
+    }
+
     @Test(expected = GroovyCastException)
     void 'setting property with incompatible type should result in an exception'() {
         ConfigureUtils.configureByMapQuietly([a: 1, b: ''], bean)
