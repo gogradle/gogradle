@@ -7,11 +7,17 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.BinaryOperator;
 
 import static java.util.Arrays.asList;
 import static java.util.Arrays.stream;
 
 public class CollectionUtils {
+
+    public static <T> BinaryOperator<T> returnFirstArg() {
+        return (t1, t2) -> t1;
+    }
+
     public static <T> boolean isEmpty(Collection<T> c) {
         return c == null || c.isEmpty();
     }
@@ -29,7 +35,7 @@ public class CollectionUtils {
                             }
                             return list;
                         },
-                        Functions.returnFirstArg());
+                        returnFirstArg());
     }
 
     @SuppressWarnings("unchecked")
