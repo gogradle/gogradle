@@ -108,9 +108,7 @@ public class GitAccessor implements VcsAccessor {
 
     private void setCredentialsIfNecessary(TransportCommand<?, ?> command, String name, String url) {
         Optional<GitRepository> matched = gitRepositoryHandler.findMatchedRepository(name, url);
-        if (matched.isPresent()) {
-            matched.get().configure(command);
-        }
+        matched.ifPresent(gitRepository -> gitRepository.configure(command));
     }
 
     public Optional<RevCommit> headCommitOfBranch(Repository repository, String branch) {
