@@ -9,17 +9,13 @@ public class BuildException extends RuntimeException {
         super(msg);
     }
 
-    private BuildException(Throwable e) {
-        super(e);
-    }
-
     private BuildException(String msg, Throwable e) {
         super(msg, e);
     }
 
     public static BuildException cannotCreateSymbolicLink(Path path, IOException e) {
         return new BuildException("Create symbolic link at " + path.toString()
-                + " failed, does your system support it?", e);
+                + " failed", e);
     }
 
     public static BuildException cannotRenameVendorDir(File dotVendorDir) {

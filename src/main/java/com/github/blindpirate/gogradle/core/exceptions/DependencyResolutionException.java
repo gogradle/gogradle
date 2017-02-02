@@ -9,19 +9,12 @@ import org.gradle.api.GradleException;
 import java.io.File;
 
 public final class DependencyResolutionException extends GradleException {
-    private DependencyResolutionException() {
-    }
-
     private DependencyResolutionException(String message) {
         super(message);
     }
 
     private DependencyResolutionException(String message, Throwable cause) {
         super(message, cause);
-    }
-
-    private DependencyResolutionException(Throwable e) {
-        this("Dependency resolution failed, the cause is:" + e.getMessage());
     }
 
     public static DependencyResolutionException cannotCloneRepository(GolangDependency dependency, Throwable e) {
