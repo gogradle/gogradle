@@ -155,7 +155,7 @@ This command will let Gogradle generate a `gogradle.lock` file in project root d
 
 `gogradle.lock` is recommended by Gogradle. Locking dependencies play an important role in reproducible build. Similar to [other package management tools](https://github.com/golang/go/wiki/PackageManagementTools), Gogradle can lock the versions of all dependency packages. Moreover, Gogradle can lock dependency packages even when they are in `vendor`!
 
-Gogradle supports transitive dependency/dependency exclusion/customized url, see [Dependency Management](#Dependency Management).
+Gogradle supports transitive dependency/dependency exclusion/customized url, see [Dependency Management](#dependency-management).
 
 Currently, only Git dependencies are supported, support for other vcs is under development.
 
@@ -407,8 +407,6 @@ Do some preparation, for example, verifying `build.gradle` and installing golang
 
 ### resolveBuildDependencies/resolveTestDependencies
 
-# Resolve conflict or solve conflict??
-
 Resolve `build` and `test` dependencies to dependency trees. Conflicts will also be resolved in this task.
 
 ### dependencies
@@ -417,7 +415,7 @@ Display the dependency tree of current project. It's very useful when you need t
 
 ### installBuildDependencies/installTestDependencies
 
-Flatten resolved `build` and `test` dependencies and install them into `.gogradle` directory 分别地 so that the future build can use them.
+Flatten resolved `build` and `test` dependencies and install them into `.gogradle` directory respectively so that the future build can use them.
 
 ### build
 
@@ -470,7 +468,7 @@ golang {
 }
 ```
 
-The configuration above indicates that three results should be outputed?? by current build. 
+The configuration above indicates that three results should be outputted by current build. 
 
 ## Repository Management 
 
@@ -528,7 +526,7 @@ Support for other vcs repositories are under development.
 
 ## IDE Integration
 
-There are many IDEs supporting golang since it is static-type???, e.g., [VSCode](https://github.com/Microsoft/vscode-go)/[IDEA](https://github.com/go-lang-plugin-org/go-lang-idea-plugin)/[Gogland](https://www.jetbrains.com/go/).
+There are many IDEs supporting golang since it is static-type, e.g., [VSCode](https://github.com/Microsoft/vscode-go)/[IDEA](https://github.com/go-lang-plugin-org/go-lang-idea-plugin)/[Gogland](https://www.jetbrains.com/go/).
 
 Usually, these IDEs ask user to set `GOPATH` and prepare dependent package there before developing. Gogradle try to make it easier. Ideally, a user should be able to start development after checking out the code immediately, without understanding or setting anything.
 
