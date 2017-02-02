@@ -21,6 +21,11 @@ class GolangPluginSettingTest {
     }
 
     @Test
+    void 'verification should succeed if package name is set'() {
+        setting.verify()
+    }
+
+    @Test
     void 'setting build mode should succeed'() {
         setting.buildMode = 'DEVELOP'
         assert setting.buildMode == BuildMode.DEVELOP

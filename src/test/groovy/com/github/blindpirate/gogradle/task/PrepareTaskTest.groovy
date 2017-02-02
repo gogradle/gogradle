@@ -22,6 +22,7 @@ class PrepareTaskTest extends TaskTest {
         // when
         task.prepare()
         // then
+        verify(setting).verify()
         verify(goBinaryManager).getBinaryPath()
         verify(buildManager).ensureDotVendorDirNotExist()
         verify(buildManager).prepareSymbolicLinks()

@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
@@ -22,12 +23,16 @@ public class PrepareTask extends DefaultTask {
     @Inject
     private BuildConstraintManager buildConstraintManager;
 
+    @Inject
+    private GolangPluginSetting setting;
+
     @TaskAction
     public void prepare() {
         goBinaryManager.getBinaryPath();
         buildManager.ensureDotVendorDirNotExist();
         buildManager.prepareSymbolicLinks();
         buildConstraintManager.prepareConstraints();
+        setting.verify();
     }
 
 }

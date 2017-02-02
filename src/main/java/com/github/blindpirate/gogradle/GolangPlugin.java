@@ -56,7 +56,6 @@ public class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
         configureTasks(project);
         configureGlobalInjector();
-        addHookToProject(project);
     }
 
     private void init(Project project) {
@@ -68,10 +67,6 @@ public class GolangPlugin implements Plugin<Project> {
 
     private void configureGlobalInjector() {
         GogradleGlobal.INSTANCE.setInjector(injector);
-    }
-
-    private void addHookToProject(Project project) {
-        project.afterEvaluate(p -> settings.verify());
     }
 
     private void configureTasks(Project project) {
