@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
+import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
@@ -29,7 +30,7 @@ import static com.github.blindpirate.gogradle.GogradleGlobal.MAX_DFS_DEPTH;
  */
 public final class IOUtils {
 
-    public static void forceMkdir(final File directory) {
+    public static void forceMkdir(File directory) {
         try {
             FileUtils.forceMkdir(directory);
         } catch (IOException e) {
@@ -51,6 +52,10 @@ public final class IOUtils {
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
+    }
+
+    public static void deleteQuitely(final File file) {
+        FileUtils.deleteQuietly(file);
     }
 
     public static boolean dirIsEmpty(File directory) {
@@ -167,7 +172,9 @@ public final class IOUtils {
 
     public static void chmodAddX(Path filePath) {
         try {
-            Files.setPosixFilePermissions(filePath, PosixFilePermissions.fromString("rwx------"));
+            if (Os.getHostOs() != Os.WINDOWS) {
+                Files.setPosixFilePermissions(filePath, PosixFilePermissions.fromString("rwx------"));
+            }
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
