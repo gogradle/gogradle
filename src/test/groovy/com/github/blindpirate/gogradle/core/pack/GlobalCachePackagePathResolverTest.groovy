@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.MockUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -58,7 +59,7 @@ class GlobalCachePackagePathResolverTest {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 File file = invocation.getArgument(0)
-                if (file.absolutePath.endsWith('github.com/a/b')) {
+                if (StringUtils.toUnixString(file.toPath()).endsWith('github.com/a/b')) {
                     return 'url'
                 } else {
                     throw new IllegalArgumentException()

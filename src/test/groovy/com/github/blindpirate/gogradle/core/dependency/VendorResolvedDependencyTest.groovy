@@ -9,11 +9,13 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOn
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
@@ -53,7 +55,7 @@ class VendorResolvedDependencyTest {
         // then
         assert dependency.hostDependency == hostDependency
         assert dependency.dependencies.isEmpty()
-        assert dependency.relativePathToHost.toString() == 'vendor/github.com/a/b'
+        assert toUnixString(dependency.relativePathToHost) == 'vendor/github.com/a/b'
     }
 
     @Test
@@ -62,7 +64,7 @@ class VendorResolvedDependencyTest {
         VendorResolvedDependency subDependency = VendorResolvedDependency.fromParent('github.com/b/c', dependency, mock(File))
         // then
         assert subDependency.hostDependency == hostDependency
-        assert subDependency.relativePathToHost.toString() == 'vendor/github.com/a/b/vendor/github.com/b/c'
+        assert toUnixString(subDependency.relativePathToHost) == 'vendor/github.com/a/b/vendor/github.com/b/c'
     }
 
     @Test

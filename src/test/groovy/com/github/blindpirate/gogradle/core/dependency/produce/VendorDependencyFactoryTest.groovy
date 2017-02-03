@@ -15,12 +15,14 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
@@ -71,7 +73,7 @@ class VendorDependencyFactoryTest {
         GolangDependency dependency = set.first()
         assert dependency instanceof VendorResolvedDependency
         assert ReflectionUtils.getField(dependency, 'hostDependency').is(resolvedDependency)
-        assert ReflectionUtils.getField(dependency, 'relativePathToHost').toString() == 'vendor/root/package'
+        assert toUnixString(ReflectionUtils.getField(dependency, 'relativePathToHost')) == 'vendor/root/package'
     }
 
     @Test
