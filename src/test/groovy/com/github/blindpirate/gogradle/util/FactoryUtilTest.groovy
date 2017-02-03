@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.general.Factory
+import com.github.blindpirate.gogradle.common.Factory
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
