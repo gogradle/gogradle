@@ -1,0 +1,45 @@
+class CoverageExtension {
+    List<String> excludePackages;
+    List<String> excludeClasses;
+}
+
+project.extensions.create('coverage', CoverageExtension)
+
+task coverageCheck(dependsOn: test) {
+    doLast {
+        ant.taskdef(name: 'jacocoReport',
+                classname: 'org.jacoco.ant.ReportTask',
+                classpath: configurations.jacocoAnt.asPath)
+
+        ant.jacocoReport {
+            executiondata {
+                fileset(dir: "$buildDir/jacoco") {
+                    include name: 'test.exec'
+                }
+            }
+
+            structure(name: project.name) {
+                classfiles {
+                    fileset(dir: "$buildDir/classes/main") {
+                        coverage.excludePackages.each() {
+                            exclude name: "${it.replaceAll('\\.', '/') + '/*'}"
+                        }
+                        coverage.excludeClasses.each() {
+                            exclude name: "${it.replaceAll('\\.', '/') + '.class'}"
+                        }
+                    }
+                }
+                sourcefiles {
+                    fileset dir: "src/main/java"
+                }
+            }
+
+            check(failOnViolation: true) {
+                rule(element: 'PACKAGE') {
+                    limit(counter: "LINE", value: "COVEREDRATIO", minimum: "1.0")
+                    limit(counter: "CLASS", value: "COVEREDRATIO", minimum: "1.0")
+                }
+            }
+        }
+    }
+}

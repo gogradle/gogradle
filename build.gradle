@@ -1,25 +1,170 @@
+import com.github.blindpirate.gogradle.top1000.TestTop1000Task
+
+/************** plugins **************/
+
+plugins {
+    id 'java'
+    id 'groovy'
+    id 'idea'
+    id 'findbugs'
+    id 'checkstyle'
+    id 'jacoco'
+    id 'antlr'
+    id 'com.github.kt3k.coveralls' version '2.7.1'
+    id 'com.github.johnrengelman.shadow' version '1.2.4'
+}
+
+apply from: 'config/scripts/coverage.gradle'
+
 group 'com.github.blindpirate'
 version '0.0.1-SNAPSHOT'
 
-Thread.sleep(5000)
+/************** sourcesets **************/
+sourceSets {
+    // Note that just declaring this sourceset creates two configurations.
+    main {
+        java {
+            srcDirs += ['src/main/antlr']
+        }
+    }
+    integrationTest {
+        java.srcDir 'src/integration-test/java'
+        groovy.srcDir 'src/integration-test/groovy'
+        resources.srcDir 'src/integration-test/resources'
+    }
+}
 
-apply plugin: 'java'
-apply plugin: 'groovy'
-apply plugin: 'idea'
-
-sourceCompatibility = 1.6
-
+/************** dependencies **************/
 repositories {
-    mavenCentral()
     mavenLocal()
+    mavenCentral()
 }
-
 dependencies {
+    integrationTestCompile sourceSets.main.output
+    integrationTestCompile sourceSets.test.output
+    integrationTestCompile configurations.testCompile
+    integrationTestRuntime configurations.testRuntime
+
+    antlr "org.antlr:antlr4:4.6"
+
     compile gradleApi()
+    compile "org.antlr:antlr4:4.6"
+    compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
     compile 'org.codehaus.groovy:groovy-all:2.4.7'
+    compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
+    compile group: 'commons-io', name: 'commons-io', version: '2.5'
+    compile 'com.google.guava:guava:20.0'
+    compile 'com.github.zafarkhaja:java-semver:0.9.0'
+//    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.0.201612231935-r'
+    compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.5'
+    compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.5'
+    compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.8.5'
+//    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.13'
+    compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.3.2'
+
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
+
+    compile files('./org.eclipse.jgit-4.7.0-SNAPSHOT.jar')
+    compile 'com.jcraft:jsch:0.1.53'
+    compile 'com.googlecode.javaewah:JavaEWAH:1.1.6'
+}
+/************** test **************/
+// Define integration test task
+task integrationTest(type: Test) {
+    testClassesDir = sourceSets.integrationTest.output.classesDir
+    classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
+project.tasks.withType(Test) {
+    if (gradle.startParameter.isOffline()) {
+        it.systemProperty("TEST_ARE_OFFLINE", 'true')
+    }
+    it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
+}
+
+check.dependsOn integrationTest
+integrationTest.dependsOn test
+test.dependsOn 'shadowJar'
+
+/************** testTop1000 **************/
+
+def getPropertyOrNull(propertyName) {
+    try {
+        return property(propertyName)
+    }
+    catch (MissingPropertyException) {
+        return null
+    }
+}
+
+task testTop1000(type: TestTop1000Task) {
+    doLast {
+        doTest(getPropertyOrNull('projectToTest'))
+    }
+}
+
+testTop1000.dependsOn 'shadowJar'
+
+/************** checkstyle **************/
+
+checkstyle {
+    toolVersion = '6.7'
+}
+
+checkstyleTest {
+    enabled = false
+}
+
+/************** findbugs **************/
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled false
+        html.enabled true
+    }
+    def antlrDirPath = 'com/github/blindpirate/gogradle/antlr'
+    // FindBugs can't recognize groovy closure
+    classes = classes.filter {
+        !it.path.contains(antlrDirPath) && !(it.name ==~ /.*_closure\d+\.class/)
+    }
+}
+
+/************** coverage **************/
+
+jacoco {
+    toolVersion = "0.7.7.201606060606"
+}
+jacocoTestReport {
+    reports {
+        xml.enabled = true // coveralls plugin depends on xml format report
+        html.enabled = true
+    }
+}
+coverage {
+    excludePackages = ['com/github/blindpirate/gogradle/antlr/**',
+                       'com/github/blindpirate/gogradle/core/exceptions/**',
+                       'com/github/blindpirate/gogradle/vcs/bazaar/**',
+                       'com/github/blindpirate/gogradle/vcs/svn/**',
+                       'com/github/blindpirate/gogradle/vcs/mercurial/**']
+    excludeClasses = [
+            'com.github.blindpirate.gogradle.ProjectDecorator'
+    ]
+}
+jacocoTestReport.dependsOn 'test', 'integrationTest'
+//check.dependsOn 'coverageCheck'
+
+/************** antlr **************/
+generateGrammarSource {
+    // WARNING: DO NOT put source files here, every time this task executed, this directory will be overwritten
+    // Don't ask me how I know it.  T^T
+    outputDirectory = file('src/main/antlr/com/github/blindpirate/gogradle/antlr')
+    arguments += ['-package', 'com.github.blindpirate.gogradle.antlr']
+}
+
+/************** wrapper **************/
 
 task wrapper(type: Wrapper) {
     gradleVersion = '3.2'
