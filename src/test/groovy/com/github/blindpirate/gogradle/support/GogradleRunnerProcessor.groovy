@@ -7,7 +7,7 @@ abstract class GogradleRunnerProcessor {
         return false
     }
 
-    abstract void beforeTest(Object instance, FrameworkMethod method)
+    void beforeTest(Object instance, FrameworkMethod method) {}
 
-    abstract void afterTest(Object instance, FrameworkMethod method)
+    void afterTest(Object instance, FrameworkMethod method) {}
 }

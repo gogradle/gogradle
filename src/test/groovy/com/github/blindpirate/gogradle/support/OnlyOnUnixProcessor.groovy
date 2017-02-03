@@ -1,11 +1,11 @@
 package com.github.blindpirate.gogradle.support
 
+import com.github.blindpirate.gogradle.crossplatform.Os
 import org.junit.runners.model.FrameworkMethod
 
-class AccessWebProcessor extends GogradleRunnerProcessor {
-
+class OnlyOnUnixProcessor extends GogradleRunnerProcessor {
     @Override
     boolean shouldIgnore(FrameworkMethod method) {
-        return System.getProperty('TEST_ARE_OFFLINE') != null
+        return Os.getHostOs() == Os.WINDOWS
     }
 }
