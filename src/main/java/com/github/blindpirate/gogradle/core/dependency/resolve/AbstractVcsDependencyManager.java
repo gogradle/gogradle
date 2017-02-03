@@ -69,7 +69,8 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
                     .stream()
                     .filter(d -> d instanceof VendorResolvedDependency)
                     .map(d -> (VendorResolvedDependency) d)
-                    .filter(d -> toUnixString(d.getRelativePathToHost()).equals(vendorNotationDependency.getVendorPath()))
+                    .filter(d ->
+                            toUnixString(d.getRelativePathToHost()).equals(vendorNotationDependency.getVendorPath()))
                     .findFirst();
             if (result.isPresent()) {
                 return result.get();
