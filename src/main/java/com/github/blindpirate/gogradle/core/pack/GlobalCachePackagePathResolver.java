@@ -13,6 +13,7 @@ import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.nio.file.Files.exists;
 
 @Singleton
@@ -39,11 +40,11 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     }
 
     private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
-        Path realPath = globalCacheManager.getGlobalPackageCachePath(repoRootPath.toString());
+        Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(repoRootPath));
         String url = vcsType.getAccessor().getRemoteUrl(realPath.toFile());
         return VcsGolangPackage.builder()
                 .withPath(packagePath)
-                .withRootPath(repoRootPath.toString())
+                .withRootPath(toUnixString(repoRootPath))
                 .withVcsType(vcsType)
                 .withUrl(url)
                 .build();
@@ -51,7 +52,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     }
 
     private Optional<VcsType> findVcsRepo(Path path) {
-        Path realPath = globalCacheManager.getGlobalPackageCachePath(path.toString());
+        Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(path));
         return Arrays.stream(VcsType.values())
                 .filter(vcs -> exists(realPath.resolve(vcs.getRepo())))
                 .findFirst();

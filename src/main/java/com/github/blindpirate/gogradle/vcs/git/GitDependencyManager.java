@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.NEWEST_COMMIT;
 
 @Singleton
@@ -80,7 +81,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 .filter(dependency -> dependency instanceof VendorResolvedDependency)
                 .map(dependency -> (VendorResolvedDependency) dependency)
                 .forEach(dependency -> {
-                    String relativePath = dependency.getRelativePathToHost().toString();
+                    String relativePath = toUnixString(dependency.getRelativePathToHost());
                     dependency.setUpdateTime(gitAccessor.lastCommitTimeOfPath(repository, relativePath));
                 });
     }

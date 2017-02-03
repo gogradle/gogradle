@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.util;
 
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Objects;
 import java.util.stream.Stream;
@@ -49,5 +50,9 @@ public class StringUtils {
 
     public static boolean fileNameEqualsAny(File file, String... name) {
         return Stream.of(name).anyMatch(file.getName()::equals);
+    }
+
+    public static String toUnixString(Path path) {
+        return path.toString().replace("\\", "/");
     }
 }

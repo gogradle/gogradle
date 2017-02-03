@@ -20,6 +20,7 @@ import java.nio.file.attribute.BasicFileAttributes;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeList;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 /**
  * Analyze vendor directory to generate dependencies.
@@ -56,7 +57,7 @@ public class SecondPassVendorDirectoryVisitor extends SimpleFileVisitor<Path> {
         }
 
         // relative path, i.e "github.com/a/b"
-        String packagePath = parentVendor.relativize(currentPath).toString();
+        String packagePath = toUnixString(parentVendor.relativize(currentPath));
 
         GolangPackage golangPackage = resolver.produce(packagePath).get();
 

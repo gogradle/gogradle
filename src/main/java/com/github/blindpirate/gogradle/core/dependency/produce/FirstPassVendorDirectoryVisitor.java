@@ -9,6 +9,8 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+
 /**
  * First pass does not try to produce dependencies, it aims at analyzing package paths since
  * there may be some unrecognized paths in vendor directory.
@@ -31,7 +33,7 @@ public class FirstPassVendorDirectoryVisitor extends SimpleFileVisitor<Path> {
         }
 
         // relative path, i.e "github.com/a/b"
-        String packagePath = parentVendor.relativize(currentPath).toString();
+        String packagePath = toUnixString(parentVendor.relativize(currentPath));
         GolangPackage golangPackage = packagePathResolver.produce(packagePath).get();
         if (golangPackage instanceof VcsGolangPackage) {
             return FileVisitResult.SKIP_SUBTREE;

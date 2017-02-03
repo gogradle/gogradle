@@ -18,6 +18,7 @@ import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationP
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VENDOR_PATH_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class VendorResolvedDependency extends AbstractResolvedDependency {
 
@@ -91,7 +92,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
     public Map<String, Object> toLockedNotation() {
         Map<String, Object> ret = MapUtils.asMap(NAME_KEY, getName());
         Map<String, Object> host = new HashMap<>(hostDependency.toLockedNotation());
-        ret.put(VENDOR_PATH_KEY, relativePathToHost.toString());
+        ret.put(VENDOR_PATH_KEY, toUnixString(relativePathToHost));
         ret.put(HOST_KEY, host);
         return ret;
     }
