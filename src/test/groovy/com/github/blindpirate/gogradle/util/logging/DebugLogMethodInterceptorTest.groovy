@@ -151,7 +151,7 @@ class DebugLogMethodInterceptorTest {
         assertEnterAndExit()
         assert argumentsCaptor.allValues[0] == 'longTime'
         assert argumentsCaptor.allValues[3] == 'longTime'
-        assert argumentsCaptor.allValues[5].toDouble() > 100
+        assert argumentsCaptor.allValues[5].toDouble() > 80
         assert argumentsCaptor.allValues[6] == null
     }
 
