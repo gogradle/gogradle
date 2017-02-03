@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle.util;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.internal.impldep.org.apache.tools.tar.TarEntry;
 import org.gradle.internal.impldep.org.apache.tools.tar.TarInputStream;
 
@@ -12,6 +14,8 @@ import java.io.IOException;
 import java.util.zip.GZIPInputStream;
 
 public class CompressUtils {
+    private static final Logger LOGGER = Logging.getLogger(CompressUtils.class);
+
     public static void decompressZip(File zipFile, File destDir) {
         try {
             ZipFile zF = new ZipFile(zipFile);
@@ -45,6 +49,7 @@ public class CompressUtils {
     }
 
     public static void decompressZipOrTarGz(File compressedFile, File destDir) {
+        LOGGER.quiet("Extracting {} to {}", compressedFile.getAbsolutePath(), destDir.getAbsolutePath());
         if (compressedFile.getName().endsWith("tar.gz")) {
             decompressTarGz(compressedFile, destDir);
         } else if (compressedFile.getName().endsWith("zip")) {
