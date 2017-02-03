@@ -5,14 +5,13 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
 import org.mockito.Mock
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 
 import java.util.concurrent.CountDownLatch
 import java.util.function.Consumer
 import java.util.function.Supplier
 
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyInt
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -38,7 +37,7 @@ class SubprocessReaderTest {
     void 'stacktrace of exception should be consumed'() {
         // given
         when(supplier.get()).thenReturn(inputStream)
-        when(inputStream.read(any(byte[]), any(int), any(int))).thenThrow(new IOException())
+        when(inputStream.read(any(byte[]), anyInt(), anyInt())).thenThrow(new IOException())
         // when
         new SubprocessReader(supplier, consumer, new CountDownLatch(1)).start()
         // then
