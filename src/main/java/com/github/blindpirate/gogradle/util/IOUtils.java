@@ -180,4 +180,8 @@ public final class IOUtils {
         }
 
     }
+
+    public static String byteCountToDisplaySize(long size) {
+        return FileUtils.byteCountToDisplaySize(size);
+    }
 }
