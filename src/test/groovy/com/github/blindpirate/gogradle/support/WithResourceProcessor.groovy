@@ -10,6 +10,7 @@ import java.nio.file.Paths
 
 import static com.github.blindpirate.gogradle.GogradleRunner.findAnno
 import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
+import static com.github.blindpirate.gogradle.util.IOUtils.deleteQuitely
 import static com.github.blindpirate.gogradle.util.IOUtils.forceDelete
 
 // Every time we find a @WithResource, that resource will be copyed(or unzipped) to a temp dir
@@ -26,7 +27,7 @@ class WithResourceProcessor extends GogradleRunnerProcessor {
 
     @Override
     void afterTest(Object instance, FrameworkMethod method) {
-        forceDelete(resourceDir)
+        deleteQuitely(resourceDir)
     }
 
     File setUpResource(String resourceName) {

@@ -5,6 +5,7 @@ import org.gradle.testfixtures.ProjectBuilder
 import org.junit.runners.model.FrameworkMethod
 
 import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
+import static com.github.blindpirate.gogradle.util.IOUtils.deleteQuitely
 import static com.github.blindpirate.gogradle.util.IOUtils.forceDelete
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
 
@@ -39,7 +40,7 @@ class WithProjectProcessor extends GogradleRunnerProcessor {
 
     @Override
     void afterTest(Object instance, FrameworkMethod method) {
-        forceDelete(projectDir)
-        forceDelete(userhomeDir)
+        deleteQuitely(projectDir)
+        deleteQuitely(userhomeDir)
     }
 }
