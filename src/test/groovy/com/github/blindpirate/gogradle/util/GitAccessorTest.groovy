@@ -1,25 +1,16 @@
 package com.github.blindpirate.gogradle.util
 
-import com.github.blindpirate.gogradle.GogradleGlobal
-import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor
-import com.github.blindpirate.gogradle.support.AccessWeb
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GitRepositoryHandler
+import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.eclipse.jgit.lib.Repository
-import org.gradle.internal.logging.progress.ProgressLogger
-import org.gradle.internal.logging.progress.ProgressLoggerFactory
-import org.gradle.internal.service.ServiceRegistry
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
-
-import static org.mockito.Mockito.*
-import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")
@@ -99,13 +90,6 @@ class GitAccessorTest {
     void setUp() {
         gitAccessor = new GitAccessor(golangRepositoryHandler)
         repository = gitAccessor.getRepository(resource)
-
-        ProgressLogger mockLogger = mock(ProgressLogger)
-        ServiceRegistry mockServiceRegistry = mock(ServiceRegistry)
-        ProgressLoggerFactory mockLoggerFactory = mock(ProgressLoggerFactory)
-        when(GogradleGlobal.INSTANCE.injector.getInstance(ServiceRegistry)).thenReturn(mockServiceRegistry)
-        when(mockServiceRegistry.get(ProgressLoggerFactory)).thenReturn(mockLoggerFactory)
-        when(mockLoggerFactory.newOperation(LoggerProgressMonitor)).thenReturn(mockLogger)
     }
 
     @Test
