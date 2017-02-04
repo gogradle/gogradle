@@ -28,7 +28,7 @@ echo 'go version go1.7.1 darwin/amd64'
     String mockGoBat = '''\
 echo go version go1.7.1 windows/amd64
 '''
-    Path mockGoBinPath
+    String goBinPath
 
     String buildDotGradleBase = '''
 buildscript {
@@ -40,8 +40,10 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
-    goExecutable = "${mockGoBinPath}"
+    goExecutable = "${goBinPath}"
+    fuckGfw = true
 }
+
 '''
 
     void baseSetUp() {
@@ -56,8 +58,8 @@ golang {
         String mockGoBinName = Os.getHostOs() == Os.WINDOWS ? 'go.bat' : 'go'
         String mockGoBinContent = Os.getHostOs() == Os.WINDOWS ? mockGoBat : mockGo
         IOUtils.write(getProjectRoot(), mockGoBinName, mockGoBinContent)
-        mockGoBinPath = getProjectRoot().toPath().resolve(mockGoBinName)
-        IOUtils.chmodAddX(mockGoBinPath)
+        IOUtils.chmodAddX(getProjectRoot().toPath().resolve(mockGoBinName))
+        goBinPath = getProjectRoot().toPath().resolve(mockGoBinName).toString()
     }
 
     BuildLauncher newBuild(Closure closure) {
@@ -99,7 +101,7 @@ golang {
 
         return [
                 //"--debug",
-                "-PmockGoBinPath=${mockGoBinPath}",
+                "-PgoBinPath=${goBinPath}",
                 "-PjarPath=${jarPath}",
                 "-PpluginRootProject=${getMainClasspath()}",
                 "-Pclasspath=${getClasspath()}"]
