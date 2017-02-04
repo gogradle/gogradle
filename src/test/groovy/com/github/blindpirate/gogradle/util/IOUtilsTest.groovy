@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.support.OnlyOnUnix
 import com.github.blindpirate.gogradle.support.WithResource
 import org.apache.commons.io.filefilter.TrueFileFilter
 import org.junit.Test
@@ -133,6 +134,7 @@ class IOUtilsTest {
     }
 
     @Test(expected = IllegalStateException)
+    @OnlyOnUnix
     void 'exception should be thrown when chmod +x fails'() {
         IOUtils.chmodAddX(resource.toPath().resolve('unexistent'))
     }

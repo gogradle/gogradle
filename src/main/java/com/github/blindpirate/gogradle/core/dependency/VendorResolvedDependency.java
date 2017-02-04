@@ -100,7 +100,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
     @Override
     public String formatVersion() {
         return hostDependency.getName() + "#" + hostDependency.formatVersion()
-                + "/" + relativePathToHost;
+                + "/" + toUnixString(relativePathToHost);
     }
 
 }
