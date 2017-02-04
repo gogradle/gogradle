@@ -156,7 +156,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         gorootEnv = gorootPath.toAbsolutePath().toString();
         goVersion = version;
 
-        Path goExecutablePath = gorootPath.resolve("bin/go");
+        Path goExecutablePath = gorootPath.resolve("bin/go" + Os.getHostOs().exeExtension());
         binaryPath = goExecutablePath.toString();
         if (!Files.exists(goExecutablePath)) {
             LOGGER.quiet("Start downloading go {}.", version);
