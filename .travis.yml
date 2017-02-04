@@ -9,3 +9,6 @@ jdk:
 script: ./gradlew check
 after_success:
   - ./gradlew jacocoTestReport coveralls
+
+before_install: mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
+
