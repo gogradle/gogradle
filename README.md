@@ -13,7 +13,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 
 - Needless to preinstall anything but `JDK 8+` (including golang itself)
 - Support all versions of golang and allow their existence at the same time
-- Perfect cross-platform support (as long as `Java` can be run)
+- Perfect cross-platform support (as long as `Java` can be run, all tests have passed on OS X 10.11/Ubuntu 12.04/Windows 7)
 - Project-scope build, needless to set `GOPATH`
 - Full-featured package management
   - Needless to install dependency packages manually, all you need to do is specifying the version
