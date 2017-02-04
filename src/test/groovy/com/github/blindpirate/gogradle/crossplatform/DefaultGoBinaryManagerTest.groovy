@@ -120,7 +120,7 @@ class DefaultGoBinaryManagerTest {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve('1.7.4/go/bin/go').toString()
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}").toString()
         assert manager.getGoVersion() == '1.7.4'
         assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
         verify(httpUtils).download(anyString(), any(Path))
@@ -130,9 +130,9 @@ class DefaultGoBinaryManagerTest {
     void 'go binary in global cache should be returned directly if it has already existed'() {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
-        IOUtils.write(resource, '1.7.4/go/bin/go', 'mock go binary')
+        IOUtils.write(resource, "1.7.4/go/bin/go${Os.getHostOs().exeExtension()}", 'mock go binary')
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve('1.7.4/go/bin/go').toString()
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}").toString()
         assert manager.getGoVersion() == '1.7.4'
         assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
         verify(httpUtils, times(0)).download(anyString(), any(Path))
@@ -143,7 +143,7 @@ class DefaultGoBinaryManagerTest {
         // given
         when(setting.getGoVersion()).thenReturn("1.7.4")
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve('1.7.4/go/bin/go').toString()
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}").toString()
         assert manager.getGoVersion() == '1.7.4'
         assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
         verify(httpUtils).download(anyString(), any(Path))

@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.github.blindpirate.gogradle.general.Factory;
+import com.github.blindpirate.gogradle.common.Factory;
 
 import java.util.List;
 import java.util.Optional;

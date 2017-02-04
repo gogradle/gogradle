@@ -1,16 +1,12 @@
 package com.github.blindpirate.gogradle.dependencytest
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.WithProject
-import com.github.blindpirate.gogradle.WithResource
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import java.nio.file.Path
 
 @RunWith(GogradleRunner)
 @WithProject

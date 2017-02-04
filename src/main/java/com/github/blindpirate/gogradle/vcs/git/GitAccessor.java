@@ -241,7 +241,7 @@ public class GitAccessor implements VcsAccessor {
     public void checkout(Repository repository, String commitOrBranch) {
         try {
             Git git = Git.wrap(repository);
-            git.checkout().setName(commitOrBranch).call();
+            git.checkout().setName(commitOrBranch).setForce(true).call();
         } catch (GitAPIException e) {
             throw ExceptionHandler.uncheckException(e);
         }

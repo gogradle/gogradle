@@ -79,7 +79,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public String formatVersion() {
-        return rootDir.getAbsolutePath();
+        return rootDir.getAbsolutePath().replace('\\', '/');
     }
 
     @Override

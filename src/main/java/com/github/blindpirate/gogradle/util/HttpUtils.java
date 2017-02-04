@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.util.logging.ProgressMonitorInputStream;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -332,6 +334,6 @@ public class HttpUtils {
 
     public void download(String url, Path filePath) throws IOException {
         InputStream is = fetchAsInputStream(GET_METHOD, url, null, null);
-        Files.copy(is, filePath, StandardCopyOption.REPLACE_EXISTING);
+        Files.copy(new ProgressMonitorInputStream(url, is), filePath, StandardCopyOption.REPLACE_EXISTING);
     }
 }

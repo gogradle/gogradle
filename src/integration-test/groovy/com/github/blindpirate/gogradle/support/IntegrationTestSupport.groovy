@@ -1,11 +1,14 @@
 package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GolangPlugin
+import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.ConfigurableLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
+
+import java.nio.file.Path
 
 abstract class IntegrationTestSupport {
 
@@ -18,11 +21,14 @@ abstract class IntegrationTestSupport {
     ByteArrayOutputStream stderr = new ByteArrayOutputStream()
     PrintStream stderrPs = new PrintStream(stderr)
 
-    String mockGoBin = '''
+    String mockGo = '''\
 #!/usr/bin/env sh
 echo 'go version go1.7.1 darwin/amd64'
 '''
-    String mockGoBinPath
+    String mockGoBat = '''\
+echo go version go1.7.1 windows/amd64
+'''
+    String goBinPath
 
     String buildDotGradleBase = '''
 buildscript {
@@ -34,8 +40,10 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
-    goExecutable = "${mockGoBinPath}"
+    goExecutable = "${goBinPath}"
+    fuckGfw = true
 }
+
 '''
 
     void baseSetUp() {
@@ -47,9 +55,11 @@ golang {
     }
 
     void prepareMockGoBin() {
-        IOUtils.write(getProjectRoot(), "mockGoBin", mockGoBin)
-        IOUtils.chmodAddX(getProjectRoot().toPath().resolve('mockGoBin'))
-        mockGoBinPath = getProjectRoot().toPath().resolve('mockGoBin')
+        String mockGoBinName = Os.getHostOs() == Os.WINDOWS ? 'go.bat' : 'go'
+        String mockGoBinContent = Os.getHostOs() == Os.WINDOWS ? mockGoBat : mockGo
+        IOUtils.write(getProjectRoot(), mockGoBinName, mockGoBinContent)
+        IOUtils.chmodAddX(getProjectRoot().toPath().resolve(mockGoBinName))
+        goBinPath = getProjectRoot().toPath().resolve(mockGoBinName).toString()
     }
 
     BuildLauncher newBuild(Closure closure) {
@@ -91,7 +101,7 @@ golang {
 
         return [
                 //"--debug",
-                "-PmockGoBinPath=${mockGoBinPath}",
+                "-PgoBinPath=${goBinPath}",
                 "-PjarPath=${jarPath}",
                 "-PpluginRootProject=${getMainClasspath()}",
                 "-Pclasspath=${getClasspath()}"]

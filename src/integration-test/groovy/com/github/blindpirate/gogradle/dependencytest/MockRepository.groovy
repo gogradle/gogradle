@@ -1,14 +1,11 @@
 package com.github.blindpirate.gogradle.dependencytest
 
 import org.eclipse.jgit.attributes.AttributesNodeProvider
-import org.eclipse.jgit.lib.BaseRepositoryBuilder
-import org.eclipse.jgit.lib.ObjectDatabase
-import org.eclipse.jgit.lib.RefDatabase
-import org.eclipse.jgit.lib.ReflogReader
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.lib.StoredConfig
+import org.eclipse.jgit.lib.*
 
 import java.nio.file.Path
+
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 
 class MockRepository extends Repository {
 
@@ -20,7 +17,7 @@ class MockRepository extends Repository {
         this.root = repoRoot
         Path repoPath = repoRoot.toPath()
         // github.com/a/b
-        this.packageName = repoPath.subpath(repoPath.nameCount - 3, repoPath.nameCount)
+        this.packageName = toUnixString(repoPath.subpath(repoPath.nameCount - 3, repoPath.nameCount))
     }
 
     MockRepository(File repoRoot) {

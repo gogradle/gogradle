@@ -19,7 +19,8 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             (WithProject)     : WithProjectProcessor,
             (WithResource)    : WithResourceProcessor,
             (WithMockInjector): WithMockInjectorProcessor,
-            (OnlyOnUnix)      : OnlyOnUnixProcessor
+            (OnlyOnUnix)      : OnlyOnUnixProcessor,
+            (OnlyOnWindows)   : OnlyOnWindowsProcessor
     ]
 
     private List<GogradleRunnerProcessor> processors

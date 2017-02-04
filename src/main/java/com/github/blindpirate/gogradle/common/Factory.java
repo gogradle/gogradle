@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.general;
+package com.github.blindpirate.gogradle.common;
 
 import java.util.Optional;
 
