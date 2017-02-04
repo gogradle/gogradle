@@ -124,7 +124,7 @@ tasks.withType(FindBugs) {
         xml.enabled false
         html.enabled true
     }
-    def antlrDirPath = 'com.github.blindpirate.gogradle.antlr'.replace('.',File.separator)
+    def antlrDirPath = 'com.github.blindpirate.gogradle.antlr'.replace('.', File.separator)
     // FindBugs can't recognize groovy closure
     classes = classes.filter {
         // '\' separator on
@@ -142,17 +142,21 @@ jacocoTestReport {
         xml.enabled = true // coveralls plugin depends on xml format report
         html.enabled = true
     }
+    afterEvaluate {
+        classDirectories = files(classDirectories.files.collect {
+            fileTree(dir: it,
+                    exclude:
+                            ['com/github/blindpirate/gogradle/antlr/**',
+                             'com/github/blindpirate/gogradle/core/exceptions/**',
+                             'com/github/blindpirate/gogradle/vcs/bazaar/**',
+                             'com/github/blindpirate/gogradle/vcs/svn/**',
+                             'com/github/blindpirate/gogradle/vcs/mercurial/**',
+                             'com/github/blindpirate/gogradle/util/HttpUtils*',
+                             'com/github/blindpirate/gogradle/ProjectDecorator*'])
+        })
+    }
 }
-coverage {
-    excludePackages = ['com/github/blindpirate/gogradle/antlr/**',
-                       'com/github/blindpirate/gogradle/core/exceptions/**',
-                       'com/github/blindpirate/gogradle/vcs/bazaar/**',
-                       'com/github/blindpirate/gogradle/vcs/svn/**',
-                       'com/github/blindpirate/gogradle/vcs/mercurial/**']
-    excludeClasses = [
-            'com.github.blindpirate.gogradle.ProjectDecorator'
-    ]
-}
+
 jacocoTestReport.dependsOn 'test', 'integrationTest'
 //check.dependsOn 'coverageCheck'
 
