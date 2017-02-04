@@ -307,6 +307,7 @@ public class DefaultBuildManager implements BuildManager {
         outputFileName = outputFileName.replaceAll("\\$\\{os}", osAndArch.getLeft().toString());
         outputFileName = outputFileName.replaceAll("\\$\\{arch}", osAndArch.getRight().toString());
         outputFileName = outputFileName.replaceAll("\\$\\{packageName}", packageName);
+        outputFileName = outputFileName.replaceAll("\\$\\{extension}", osAndArch.getLeft().exeExtension());
 
         Path outputLocationPath = Paths.get(setting.getOutputLocation());
 
