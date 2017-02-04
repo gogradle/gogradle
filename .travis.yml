@@ -6,7 +6,7 @@ cache:
 
 jdk:
   - oraclejdk8
-script: ./gradlew check
+script: ./gradlew check --info
 after_success:
   - ./gradlew jacocoTestReport coveralls
 
