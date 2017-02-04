@@ -12,6 +12,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import javax.inject.Inject
+import java.nio.file.Paths
 
 @RunWith(GogradleRunner)
 @WithResource('vendor_test.zip')
@@ -30,16 +31,16 @@ class VendorWalkTest extends GogradleModuleSupport {
         // then
         assert dependencies.size() == 3
         dependencies.each { assert it instanceof VendorResolvedDependency }
-        dependencies.each { assert getHostDependency(it) == localPackage }
+        dependencies.each { assert it.hostDependency == localPackage }
 
         assert dependencies.any {
-            it.name == 'github.com/e/f' && getRelativePathToHost(it) == 'vendor/github.com/e/f'
+            it.name == 'github.com/e/f' && it.relativePathToHost == Paths.get('vendor/github.com/e/f')
         }
         assert dependencies.any {
-            it.name == 'github.com/e/g' && getRelativePathToHost(it) == 'vendor/github.com/e/g'
+            it.name == 'github.com/e/g' && it.relativePathToHost == Paths.get('vendor/github.com/e/g')
         }
         assert dependencies.any {
-            it.name == 'unrecognized/a' && getRelativePathToHost(it) == 'vendor/unrecognized/a'
+            it.name == 'unrecognized/a' && it.relativePathToHost == Paths.get('vendor/unrecognized/a')
         }
 
         VendorResolvedDependency github_e_f = dependencies.find { it.name == 'github.com/e/f' }
@@ -47,19 +48,10 @@ class VendorWalkTest extends GogradleModuleSupport {
 
         VendorResolvedDependency github_j_k = github_e_f.dependencies.first()
         assert github_j_k.name == 'github.com/j/k'
-        assert getRelativePathToHost(github_j_k) == 'vendor/github.com/e/f/vendor/github.com/j/k'
-        assert getHostDependency(github_j_k) == localPackage
+        assert github_j_k.relativePathToHost == Paths.get('vendor/github.com/e/f/vendor/github.com/j/k')
+        assert github_j_k.hostDependency == localPackage
 
         VendorResolvedDependency unrecognized_a = dependencies.find { it.name == 'unrecognized/a' }
         assert unrecognized_a.dependencies.isEmpty()
-    }
-
-
-    String getRelativePathToHost(VendorResolvedDependency dependency) {
-        ReflectionUtils.getField(dependency, 'relativePathToHost')
-    }
-
-    ResolvedDependency getHostDependency(VendorResolvedDependency dependency) {
-        ReflectionUtils.getField(dependency, 'hostDependency')
     }
 }
