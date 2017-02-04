@@ -15,18 +15,17 @@ import static com.github.blindpirate.gogradle.util.IOUtils.forceDelete
 
 // Every time we find a @WithResource, that resource will be copyed(or unzipped) to a temp dir
 // At the end of that method, these resource will be  destroyed
-class WithResourceProcessor extends GogradleRunnerProcessor {
+class WithResourceProcessor extends GogradleRunnerProcessor<WithResource> {
     File resourceDir
 
     @Override
-    void beforeTest(Object instance, FrameworkMethod method) {
-        WithResource anno = findAnno(method, WithResource)
-        setUpResource(anno.value())
+    void beforeTest(Object instance, FrameworkMethod method, WithResource annotation) {
+        setUpResource(annotation.value())
         ReflectionUtils.setFieldSafely(instance, 'resource', resourceDir)
     }
 
     @Override
-    void afterTest(Object instance, FrameworkMethod method) {
+    void afterTest(Object instance, FrameworkMethod method, WithResource annotation) {
         deleteQuitely(resourceDir)
     }
 

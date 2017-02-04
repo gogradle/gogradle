@@ -12,7 +12,7 @@ import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafel
 // Every time we find a @WithProject, a new temp project folder,a new user home folder and
 // a new project testInstance will be created
 // At the end of that method, these resources will be destroyed
-class WithProjectProcessor extends GogradleRunnerProcessor {
+class WithProjectProcessor extends GogradleRunnerProcessor<WithProject> {
     private static final String PROJECT_FEILD = 'project'
     private static final String PROJECT_DIR_FEILD = 'projectDir'
     private static final String USERHOME_FIELD = 'userhome'
@@ -21,7 +21,7 @@ class WithProjectProcessor extends GogradleRunnerProcessor {
     Project project
 
     @Override
-    void beforeTest(Object instance, FrameworkMethod method) {
+    void beforeTest(Object instance, FrameworkMethod method, WithProject annotation) {
         setUpProject()
         setFieldSafely(instance, PROJECT_FEILD, project)
         setFieldSafely(instance, PROJECT_DIR_FEILD, projectDir)
@@ -39,7 +39,7 @@ class WithProjectProcessor extends GogradleRunnerProcessor {
     }
 
     @Override
-    void afterTest(Object instance, FrameworkMethod method) {
+    void afterTest(Object instance, FrameworkMethod method, WithProject annotation) {
         deleteQuitely(projectDir)
         deleteQuitely(userhomeDir)
     }

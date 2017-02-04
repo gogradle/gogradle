@@ -1,21 +1,21 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.OnlyOnUnix
+import com.github.blindpirate.gogradle.support.OnlyOnPosix
 import com.github.blindpirate.gogradle.support.OnlyOnWindows
 import com.github.blindpirate.gogradle.support.WithResource
 import org.apache.commons.io.filefilter.TrueFileFilter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import java.nio.file.Path
 import java.nio.file.Paths
 import java.nio.file.SimpleFileVisitor
 
-import static org.mockito.Mockito.*
-import static org.mockito.Mockito.*
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -144,7 +144,7 @@ class IOUtilsTest {
     }
 
     @Test(expected = IllegalStateException)
-    @OnlyOnUnix
+    @OnlyOnPosix
     void 'exception should be thrown when chmod +x fails'() {
         IOUtils.chmodAddX(resource.toPath().resolve('unexistent'))
     }

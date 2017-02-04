@@ -11,7 +11,7 @@ import org.junit.runners.model.FrameworkMethod
 
 import static org.mockito.Mockito.*
 
-class WithMockInjectorProcessor extends GogradleRunnerProcessor {
+class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector> {
 
     Injector originalValue
 
@@ -25,7 +25,7 @@ class WithMockInjectorProcessor extends GogradleRunnerProcessor {
     }
 
     @Override
-    void beforeTest(Object instance, FrameworkMethod method) {
+    void beforeTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
         originalValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'injector')
         Injector mockInjector = mock(Injector, RETURNS_DEEP_STUBS)
         ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', mockInjector)
@@ -33,7 +33,7 @@ class WithMockInjectorProcessor extends GogradleRunnerProcessor {
     }
 
     @Override
-    void afterTest(Object instance, FrameworkMethod method) {
+    void afterTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
         ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', originalValue)
     }
 }

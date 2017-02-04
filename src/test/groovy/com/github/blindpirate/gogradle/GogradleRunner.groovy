@@ -8,6 +8,8 @@ import org.junit.runners.model.FrameworkMethod
 import org.junit.runners.model.InitializationError
 import org.mockito.MockitoAnnotations
 
+import java.lang.annotation.Annotation
+
 /**
  * Check annotations on a test and do some staff if necessary.
  */
@@ -19,11 +21,12 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             (WithProject)     : WithProjectProcessor,
             (WithResource)    : WithResourceProcessor,
             (WithMockInjector): WithMockInjectorProcessor,
-            (OnlyOnUnix)      : OnlyOnUnixProcessor,
+            (OnlyWhen)        : OnlyWhenProcessor,
+            (OnlyOnPosix)     : OnlyOnPosixProcessor,
             (OnlyOnWindows)   : OnlyOnWindowsProcessor
     ]
 
-    private List<GogradleRunnerProcessor> processors
+    private List<AnnotationAndProcessor> processors
 
     Object testInstance
 
@@ -38,7 +41,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         testInstance = super.createTest()
         MockitoAnnotations.initMocks(testInstance)
         setOfflineIfNecessary()
-        processors.each { it.beforeTest(testInstance, testMethod) }
+        processors.each { it.processor.beforeTest(testInstance, testMethod, it.annotation) }
         return testInstance
     }
 
@@ -55,13 +58,13 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         processors = annoToProcessorMap.entrySet().findResults { entry ->
             def anno = findAnno(method, entry.key)
             if (anno) {
-                return entry.value.newInstance()
+                return new AnnotationAndProcessor(annotation: anno, processor: entry.value.newInstance())
             } else {
                 return null
             }
         }
 
-        if (processors.any { it.shouldIgnore(method) }) {
+        if (processors.any { it.processor.shouldIgnore(method, it.annotation) }) {
             notifier.fireTestIgnored(describeChild(method))
             return
         }
@@ -69,7 +72,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         try {
             super.runChild(method, notifier)
         } finally {
-            processors.each { it.afterTest(testInstance, method) }
+            processors.each { it.processor.afterTest(testInstance, method, it.annotation) }
         }
     }
 
@@ -102,5 +105,10 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
         File ret = new File("build/tmp/${prefix}-${UUID.randomUUID()}").absoluteFile
         ret.mkdir()
         return ret
+    }
+
+    static class AnnotationAndProcessor {
+        Annotation annotation
+        GogradleRunnerProcessor processor
     }
 }
