@@ -15,6 +15,7 @@ public class ProgressMonitorInputStream extends InputStream {
     private InputStream delegate;
     private ProgressLogger logger;
     private int totalBytes;
+    private boolean completed;
 
     public ProgressMonitorInputStream(String url, InputStream delegate) {
         this.delegate = delegate;
@@ -29,8 +30,12 @@ public class ProgressMonitorInputStream extends InputStream {
     @Override
     public int read() throws IOException {
         int bytes = delegate.read();
+        if (completed) {
+            return bytes;
+        }
         if (bytes == -1) {
             logger.completed();
+            completed = true;
         } else {
             totalBytes += bytes;
             logger.progress(byteCountToDisplaySize(totalBytes) + " downloaded");
