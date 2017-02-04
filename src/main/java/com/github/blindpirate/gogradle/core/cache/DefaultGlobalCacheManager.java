@@ -1,9 +1,13 @@
 package com.github.blindpirate.gogradle.core.cache;
 
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.util.DateUtils;
+import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.wrapper.GradleUserHomeLookup;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.RandomAccessFile;
@@ -22,6 +26,14 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     public static final String GOPATH_CACHE_PATH = "go/gopath";
     public static final String GO_BINARAY_CACHE_PATH = "go/binary";
     public static final String GO_LOCKFILES_PATH = "go/lockfiles";
+
+    private final GolangPluginSetting setting;
+
+    @Inject
+    public DefaultGlobalCacheManager(GolangPluginSetting setting) {
+        this.setting = setting;
+    }
+
     private Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
 
     @Override
@@ -62,14 +74,27 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         }
     }
 
-    private File createLockFileIfNecessary(GolangDependency dependency) throws UnsupportedEncodingException {
-        String lockFileName = URLEncoder.encode(dependency.getName(), DEFAULT_CHARSET);
-        File lockFile = gradleHome
-                .resolve(GO_LOCKFILES_PATH)
-                .resolve(lockFileName)
-                .toFile();
-        IOUtils.touch(lockFile);
-        return lockFile;
+    @Override
+    public boolean isOutOfDate(GolangDependency dependency) {
+        long lastModifiedTime = Long.parseLong(IOUtils.toString(createLockFileIfNecessary(dependency)));
+        long cacheSecond = setting.getGlobalCacheSecond();
+        return System.currentTimeMillis() - lastModifiedTime > DateUtils.toMilliseconds(cacheSecond);
+    }
+
+    private File createLockFileIfNecessary(GolangDependency dependency) {
+        try {
+            String lockFileName = URLEncoder.encode(dependency.getName(), DEFAULT_CHARSET);
+            File lockFile = gradleHome
+                    .resolve(GO_LOCKFILES_PATH)
+                    .resolve(lockFileName)
+                    .toFile();
+            if (!lockFile.exists()) {
+                IOUtils.write(lockFile, "0");
+            }
+            return lockFile;
+        } catch (UnsupportedEncodingException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 
     private void createPackageDirectoryIfNeccessary(GolangDependency dependency) {

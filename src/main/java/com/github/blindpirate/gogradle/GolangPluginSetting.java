@@ -5,11 +5,14 @@ import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
@@ -24,8 +27,19 @@ import static java.util.stream.Collectors.toList;
 
 @Singleton
 public class GolangPluginSetting {
-    static final Pattern TARGET_PLATFORM_PATTERN
+    private static final Pattern TARGET_PLATFORM_PATTERN
             = Pattern.compile("(\\s*\\w+\\-\\w+\\s*)(,\\s*\\w+\\-\\w+\\s*)*");
+
+    private static final Map<String, TimeUnit> TIME_UNIT_MAP = ImmutableMap.<String, TimeUnit>builder()
+            .put("second", TimeUnit.SECONDS)
+            .put("seconds", TimeUnit.SECONDS)
+            .put("minute", TimeUnit.MINUTES)
+            .put("minutes", TimeUnit.MINUTES)
+            .put("hour", TimeUnit.HOURS)
+            .put("hours", TimeUnit.HOURS)
+            .put("day", TimeUnit.DAYS)
+            .put("days", TimeUnit.DAYS)
+            .build();
 
     private BuildMode buildMode = REPRODUCIBLE;
     private String packagePath;
@@ -35,6 +49,7 @@ public class GolangPluginSetting {
     private String outputLocation = GogradleGlobal.GOGRADLE_BUILD_DIR_NAME;
     private String outputPattern = "${os}_${arch}_${packageName}";
     private List<Pair<Os, Arch>> targetPlatforms = asList(Pair.of(getHostOs(), getHostArch()));
+    private long globalCacheSecond = 24 * 3600;
 
     // e.g 1.1/1.7/1.7.3/1.8beta1
     private String goVersion;
@@ -151,6 +166,16 @@ public class GolangPluginSetting {
 
     public void setFuckGfw(boolean fuckGfw) {
         this.fuckGfw = fuckGfw;
+    }
+
+    public void globalCacheFor(int count, String timeUnit) {
+        TimeUnit unit = TIME_UNIT_MAP.get(timeUnit);
+        Assert.isTrue(unit != null, "Time unit " + timeUnit + " is not supported!");
+        globalCacheSecond = unit.toSeconds(count);
+    }
+
+    public long getGlobalCacheSecond() {
+        return globalCacheSecond;
     }
 
     public void verify() {
