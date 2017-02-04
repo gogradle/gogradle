@@ -33,7 +33,6 @@ golang {
     packagePath="github.com/gogits/gogs"
 }
 
-build.dependsOn test
 """
 
     @Test
