@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.OnlyOnUnix
+import com.github.blindpirate.gogradle.support.OnlyOnWindows
 import com.github.blindpirate.gogradle.support.WithResource
 import org.apache.commons.io.filefilter.TrueFileFilter
 import org.junit.Test
@@ -106,6 +107,15 @@ class IOUtilsTest {
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when trying to get text from invalid file'() {
         IOUtils.toString(new File(resource, 'invalid'))
+    }
+
+    @Test
+    @OnlyOnWindows
+    void 'file should be closed after reading'() {
+        File file = new File(resource, 'test')
+        IOUtils.write(file, '')
+        assert IOUtils.toString(file) == ''
+        assert file.delete()
     }
 
     @Test(expected = IllegalStateException)

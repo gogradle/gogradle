@@ -116,8 +116,8 @@ public final class IOUtils {
     }
 
     public static String toString(File file) {
-        try {
-            return org.apache.commons.io.IOUtils.toString(new FileInputStream(file), DEFAULT_CHARSET);
+        try (InputStream is = new FileInputStream(file)) {
+            return org.apache.commons.io.IOUtils.toString(is, DEFAULT_CHARSET);
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
