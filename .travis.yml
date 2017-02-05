@@ -8,7 +8,7 @@ env:
   - GOGS_DIR=/home/travis/gogs
 jdk:
   - oraclejdk8
-script: ./gradlew check --info --no-daemon
+script: ./gradlew check --info --no-daemon --stacktrace
 after_success:
   - ./gradlew jacocoTestReport coveralls
 

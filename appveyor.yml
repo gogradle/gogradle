@@ -4,7 +4,7 @@ init:
 before_build:
   cmd: mkdir C:\gogs && git clone https://github.com/gogits/gogs.git C:\gogs
 build_script:
-  - gradlew check --info --no-daemon
+  - gradlew check --info --no-daemon --stacktrace
 cache:
   - C:\Users\appveyor\.gradle
 environment:
