@@ -4,10 +4,11 @@ init:
 before_build:
   cmd: mkdir C:\gogs && git clone https://github.com/gogits/gogs.git C:\gogs
 build_script:
-  - gradlew check --info
+  - gradlew check --info --no-daemon
 cache:
   - C:\Users\appveyor\.gradle
 environment:
+  JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
   GOGS_DIR: C:\gogs
   matrix:
   - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
