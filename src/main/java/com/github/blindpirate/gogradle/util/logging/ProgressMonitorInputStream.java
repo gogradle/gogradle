@@ -12,9 +12,11 @@ import static com.github.blindpirate.gogradle.util.IOUtils.byteCountToDisplaySiz
 
 
 public class ProgressMonitorInputStream extends InputStream {
+    private static final int BUF_SIZE = 4096;
     private InputStream delegate;
     private ProgressLogger logger;
     private int totalBytes;
+    private int bufferedBytes;
     private boolean completed;
 
     public ProgressMonitorInputStream(String url, InputStream delegate) {
@@ -29,17 +31,26 @@ public class ProgressMonitorInputStream extends InputStream {
 
     @Override
     public int read() throws IOException {
-        int bytes = delegate.read();
+        int ret = delegate.read();
         if (completed) {
-            return bytes;
+            return ret;
         }
-        if (bytes == -1) {
+        if (ret == -1) {
+            progress();
             logger.completed();
             completed = true;
         } else {
-            totalBytes += bytes;
-            logger.progress(byteCountToDisplaySize(totalBytes) + " downloaded");
+            bufferedBytes += 1;
+            if (bufferedBytes >= BUF_SIZE) {
+                progress();
+            }
         }
-        return bytes;
+        return ret;
+    }
+
+    private void progress() {
+        totalBytes += bufferedBytes;
+        bufferedBytes = 0;
+        logger.progress(byteCountToDisplaySize(totalBytes) + " downloaded");
     }
 }
