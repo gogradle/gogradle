@@ -4,6 +4,8 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
     - $HOME/.gradle/go/
+env:
+  - GOGS_DIR=/home/travis/gogs
 jdk:
   - oraclejdk8
 script: ./gradlew check --info
