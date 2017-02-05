@@ -134,6 +134,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
         if (GogradleGlobal.isOffline()) {
             LOGGER.info("Cannot pull {} since it is offline now.", gitAccessor.getRemoteUrl(repository));
         } else {
+            LOGGER.info("Pulling {} from {}", dependency, gitAccessor.getRemoteUrl(repository));
             gitAccessor.hardResetAndPull(dependency.getPackage().getRootPath(), repository);
         }
         return repository;
