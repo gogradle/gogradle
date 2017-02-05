@@ -46,9 +46,6 @@ golang {
     void baseSetUp() {
         prepareMockGoBin()
         IOUtils.touch(new File(getProjectRoot(), 'settings.gradle'))
-        if (userhome != null) {
-            System.setProperty('gradle.user.home', userhome.absolutePath)
-        }
     }
 
     void prepareMockGoBin() {
@@ -67,6 +64,7 @@ golang {
             configure(build)
 
             closure(build)
+
             build.run()
         } finally {
             connection.close()
