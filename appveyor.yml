@@ -9,7 +9,7 @@ cache:
   - C:\Users\appveyor\.gradle
 environment:
   JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
-  JAVA_OPTS: -Xmx2048m -XX:MaxPermSize=256m
+  JAVA_OPTS: -Xmx1600m -XX:MaxPermSize=256m
   GOGS_DIR: C:\gogs
   matrix:
   - JAVA_HOME: C:\Program Files\Java\jdk1.8.0
