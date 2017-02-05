@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.build;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.concurrent.CountDownLatch;
@@ -46,7 +45,8 @@ public class SubprocessReader extends Thread {
                     consumer.accept(line);
                 }
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
+            e.printStackTrace();
             consumer.accept(ExceptionHandler.getStackTrace(e));
         } finally {
             latch.countDown();
