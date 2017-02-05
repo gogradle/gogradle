@@ -8,8 +8,6 @@ import org.gradle.tooling.ConfigurableLauncher
 import org.gradle.tooling.GradleConnector
 import org.gradle.tooling.ProjectConnection
 
-import java.nio.file.Path
-
 abstract class IntegrationTestSupport {
 
     File resource
@@ -41,7 +39,6 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
     goExecutable = "${goBinPath}"
-    fuckGfw = true
 }
 
 '''
