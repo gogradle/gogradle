@@ -1,24 +1,26 @@
 package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
-import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.*
+import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
+import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_LOCKFILES_PATH
 import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
-import static com.github.blindpirate.gogradle.util.ReflectionUtils.setField
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -27,8 +29,9 @@ class DefaultGlobalCacheManagerTest {
 
     File resource
 
-    @InjectMocks
     DefaultGlobalCacheManager cacheManager
+    @Mock
+    GolangPluginSetting setting
     @Mock
     NotationDependency notationDependency
     @Mock
@@ -40,8 +43,9 @@ class DefaultGlobalCacheManagerTest {
 
     @Before
     void setUp() {
-        when(notationDependency.getName()).thenReturn("concurrenttest")
-        setField(cacheManager, "gradleHome", resource.toPath())
+        cacheManager = new DefaultGlobalCacheManager(setting)
+        when(notationDependency.getName()).thenReturn("dependency")
+        ReflectionUtils.setField(cacheManager, "gradleHome", resource.toPath())
     }
 
     @Test
@@ -57,6 +61,32 @@ class DefaultGlobalCacheManagerTest {
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
         assert new File(resource, GO_LOCKFILES_PATH).exists()
+    }
+
+    @Test
+    void 'lock file should be initialized as 0'() {
+        // when
+        cacheManager.isOutOfDate(notationDependency)
+        // then
+        assert IOUtils.toString(new File(resource, 'go/lockfiles/dependency')) == '0'
+    }
+
+    @Test
+    void 'dependency should be considered as out-of-date'() {
+        // given
+        when(setting.getGlobalCacheSecond()).thenReturn(1L)
+        IOUtils.write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
+        // then
+        assert cacheManager.isOutOfDate(notationDependency)
+    }
+
+    @Test
+    void 'dependency should be considered as up-to-date'() {
+        // given
+        when(setting.getGlobalCacheSecond()).thenReturn(1L)
+        IOUtils.write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
+        // then
+        assert !cacheManager.isOutOfDate(notationDependency)
     }
 
     @Test

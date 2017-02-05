@@ -27,4 +27,6 @@ public interface GlobalCacheManager {
     <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable) throws Exception;
 
     boolean isOutOfDate(GolangDependency dependency);
+
+    void updateLockFile(GolangDependency dependency);
 }

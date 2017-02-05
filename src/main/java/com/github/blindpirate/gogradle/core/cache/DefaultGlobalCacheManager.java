@@ -81,6 +81,12 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         return System.currentTimeMillis() - lastModifiedTime > DateUtils.toMilliseconds(cacheSecond);
     }
 
+    @Override
+    public void updateLockFile(GolangDependency dependency) {
+        File lockFile = createLockFileIfNecessary(dependency);
+        IOUtils.write(lockFile, "" + System.currentTimeMillis());
+    }
+
     private File createLockFileIfNecessary(GolangDependency dependency) {
         try {
             String lockFileName = URLEncoder.encode(dependency.getName(), DEFAULT_CHARSET);
