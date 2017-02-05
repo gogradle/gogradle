@@ -1,4 +1,6 @@
 version: "{branch} {build}"
+init:
+  - git config --global core.autocrlf true
 before_build:
   cmd: mkdir C:\gogs && git clone https://github.com/gogits/gogs.git C:\gogs
 build_script:
