@@ -66,7 +66,7 @@ class DefaultGlobalCacheManagerTest {
     @Test
     void 'lock file should be initialized as 0'() {
         // when
-        cacheManager.isOutOfDate(notationDependency)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
         // then
         assert IOUtils.toString(new File(resource, 'go/lockfiles/dependency')) == '0'
     }
@@ -77,7 +77,9 @@ class DefaultGlobalCacheManagerTest {
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
         IOUtils.write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
         // then
-        assert cacheManager.isOutOfDate(notationDependency)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            assert cacheManager.isOutOfDate(notationDependency)
+        } as Callable)
     }
 
     @Test
@@ -86,7 +88,9 @@ class DefaultGlobalCacheManagerTest {
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
         IOUtils.write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
         // then
-        assert !cacheManager.isOutOfDate(notationDependency)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            assert !cacheManager.isOutOfDate(notationDependency)
+        } as Callable)
     }
 
     @Test

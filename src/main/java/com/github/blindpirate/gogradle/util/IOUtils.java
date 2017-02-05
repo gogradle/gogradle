@@ -9,6 +9,7 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.ByteBuffer;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
@@ -81,6 +82,13 @@ public final class IOUtils {
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
+    }
+
+    public static byte[] toByteArray(ByteBuffer buf) {
+        buf.position(0);
+        byte[] ret = new byte[buf.remaining()];
+        buf.get(ret);
+        return ret;
     }
 
     public static void copyDirectory(final File srcDir, final File destDir,
