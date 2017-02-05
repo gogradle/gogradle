@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
@@ -20,6 +19,8 @@ import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_LOCKFILES_PATH
+import static com.github.blindpirate.gogradle.util.IOUtils.toString
+import static com.github.blindpirate.gogradle.util.IOUtils.write
 import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
 import static org.mockito.Mockito.when
 
@@ -68,14 +69,25 @@ class DefaultGlobalCacheManagerTest {
         // when
         cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
         // then
-        assert IOUtils.toString(new File(resource, 'go/lockfiles/dependency')) == '0'
+        assert toString(new File(resource, 'go/lockfiles/dependency')) == '0'
+    }
+
+    @Test
+    void 'lock file should be updated successfully'() {
+        // when
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateLockFile(notationDependency)
+            cacheManager.updateLockFile(notationDependency)
+        } as Callable)
+        // then
+        assert (-1000L..1000L).contains(toString(new File(resource, 'go/lockfiles/dependency')).toLong() - System.currentTimeMillis())
     }
 
     @Test
     void 'dependency should be considered as out-of-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        IOUtils.write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
+        write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
             assert cacheManager.isOutOfDate(notationDependency)
@@ -86,7 +98,7 @@ class DefaultGlobalCacheManagerTest {
     void 'dependency should be considered as up-to-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        IOUtils.write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
+        write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
             assert !cacheManager.isOutOfDate(notationDependency)
