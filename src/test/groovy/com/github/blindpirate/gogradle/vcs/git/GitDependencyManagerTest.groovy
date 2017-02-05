@@ -161,7 +161,7 @@ class GitDependencyManagerTest {
     void 'existed repository should be updated'() {
         IOUtils.write(resource, 'placeholder', '')
         // given:
-        when(cacheManager.isOutOfDate(notationDependency)).thenReturn(true)
+        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
         when(gitAccessor.getRemoteUrl(repository)).thenReturn(repoUrl)
         // when:
         gitDependencyManager.resolve(notationDependency)

@@ -76,8 +76,8 @@ class DefaultGlobalCacheManagerTest {
     void 'lock file should be updated successfully'() {
         // when
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateLockFile(notationDependency)
-            cacheManager.updateLockFile(notationDependency)
+            cacheManager.updateCurrentDependencyLock()
+            cacheManager.updateCurrentDependencyLock()
         } as Callable)
         // then
         assert (-1000L..1000L).contains(toString(new File(resource, 'go/lockfiles/dependency')).toLong() - System.currentTimeMillis())
@@ -90,7 +90,7 @@ class DefaultGlobalCacheManagerTest {
         write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert cacheManager.isOutOfDate(notationDependency)
+            assert cacheManager.currentDependencyIsOutOfDate()
         } as Callable)
     }
 
@@ -101,7 +101,7 @@ class DefaultGlobalCacheManagerTest {
         write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.isOutOfDate(notationDependency)
+            assert !cacheManager.currentDependencyIsOutOfDate()
         } as Callable)
     }
 

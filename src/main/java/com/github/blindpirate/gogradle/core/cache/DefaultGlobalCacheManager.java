@@ -82,7 +82,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public boolean isOutOfDate(GolangDependency dependency) {
+    public boolean currentDependencyIsOutOfDate() {
         try {
             // On windows we have to read file like this
             FileChannel currentLockFile = fileChannels.get();
@@ -99,13 +99,13 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public void updateLockFile(GolangDependency dependency) {
+    public void updateCurrentDependencyLock() {
         try {
             // On windows we have to write file like this
-            FileChannel currenLockFile = fileChannels.get();
-            currenLockFile.position(0);
+            FileChannel currentLockFile = fileChannels.get();
+            currentLockFile.position(0);
             byte[] bytesToWrite = Long.valueOf(System.currentTimeMillis()).toString().getBytes(DEFAULT_CHARSET);
-            currenLockFile.write(ByteBuffer.wrap(bytesToWrite));
+            currentLockFile.write(ByteBuffer.wrap(bytesToWrite));
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }

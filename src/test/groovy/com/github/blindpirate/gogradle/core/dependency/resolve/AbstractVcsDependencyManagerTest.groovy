@@ -130,19 +130,19 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'updating repository should be skipped if it is up-to-date'() {
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
-        verify(cacheManager, times(0)).updateLockFile(hostNotationDependency)
+        verify(cacheManager, times(0)).updateCurrentDependencyLock()
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
     }
 
     @Test
     void 'lock file should be updated after resolving'() {
         // given
-        when(cacheManager.isOutOfDate(hostNotationDependency)).thenReturn(true)
+        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
         // when
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         // then
         verify(subclassDelegate).updateRepository(hostNotationDependency, repository, resource)
-        verify(cacheManager).updateLockFile(hostNotationDependency)
+        verify(cacheManager).updateCurrentDependencyLock()
     }
 
 
