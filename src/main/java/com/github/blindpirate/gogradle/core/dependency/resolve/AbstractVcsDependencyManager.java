@@ -51,13 +51,23 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
     private ResolvedDependency doResolve(NotationDependency dependency) {
         LOGGER.quiet("Resolving {}", dependency);
         try {
-            return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
-                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
-                ResolvedDependency vcsResolvedDependency = resolveVcs(dependency, vcsRoot);
+            NotationDependency vcsNotationDependency = extractVcsHostDependency(dependency);
+
+            return globalCacheManager.runWithGlobalCacheLock(vcsNotationDependency, () -> {
+                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(vcsNotationDependency.getName()).toFile();
+                ResolvedDependency vcsResolvedDependency = resolveVcs(vcsNotationDependency, vcsRoot);
                 return extractVendorDependencyIfNecessary(dependency, vcsResolvedDependency);
             });
         } catch (Exception e) {
             throw DependencyResolutionException.cannotResolveDependency(dependency, e);
+        }
+    }
+
+    private NotationDependency extractVcsHostDependency(NotationDependency dependency) {
+        if (dependency instanceof VendorNotationDependency) {
+            return VendorNotationDependency.class.cast(dependency).getHostNotationDependency();
+        } else {
+            return dependency;
         }
     }
 
@@ -144,8 +154,13 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
         Optional<REPOSITORY> repositoryInGlobalCache = ensureGlobalCacheEmptyOrMatch(dependency, targetDirectory);
         if (!repositoryInGlobalCache.isPresent()) {
             return initRepository(dependency, targetDirectory);
+        } else if (globalCacheManager.isOutOfDate(dependency)) {
+            updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
+            globalCacheManager.updateLockFile(dependency);
+            return repositoryInGlobalCache.get();
         } else {
-            return updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
+            LOGGER.info("Skipped updating {} since it is up-to-date.", dependency);
+            return repositoryInGlobalCache.get();
         }
     }
 

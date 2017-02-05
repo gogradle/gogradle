@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
@@ -18,6 +18,7 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.util.concurrent.Callable
 
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
@@ -34,9 +35,9 @@ class AbstractVcsDependencyManagerTest {
 
     AbstractVcsDependencyManager manager
     @Mock
-    GlobalCacheManager cacheManager
+    AbstractVcsDependencyManager subclassDelegate
     @Mock
-    ResolvedDependency hostResolvedDependency
+    GlobalCacheManager cacheManager
     @Mock
     VendorResolvedDependency vendorResolvedDependency
     @Mock
@@ -44,29 +45,41 @@ class AbstractVcsDependencyManagerTest {
     @Mock
     DependencyRegistry dependencyRegistry
 
-    File resource
-    File src
-    File dest
 
+    Object repository = new Object()
+    ResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(ResolvedDependency, 'host')
+    NotationDependency hostNotationDependency = DependencyUtils.mockWithName(NotationDependency, 'host')
+
+    File resource
 
     @Before
     void setUp() {
+        // prevent ensureGlobalCacheEmptyOrMatch from returning directly
+        IOUtils.write(resource, '.git', '')
+
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         manager = new TestAbstractVcsDependencyManager(cacheManager, dependencyRegistry)
+
+        when(subclassDelegate.determineVersion(repository, hostNotationDependency)).thenReturn('version')
+        when(subclassDelegate.createResolvedDependency(hostNotationDependency, resource, repository, 'version')).thenReturn(hostResolvedDependency)
+        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(Optional.of(repository))
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
 
+        when(vendorNotationDependency.getHostNotationDependency()).thenReturn(hostNotationDependency)
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
+
         when(vendorNotationDependency.getName()).thenReturn('thisisvendor')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')
-        when(cacheManager.getGlobalPackageCachePath('thisisvendor')).thenReturn(resource.toPath())
+        when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(resource.toPath())
     }
 
     @Test
     void 'installing a vendor dependency hosting in vcs dependency should succeed'() {
         // given
-        src = IOUtils.mkdir(resource, 'src')
-        dest = IOUtils.mkdir(resource, 'dest')
+        File src = IOUtils.mkdir(resource, 'src')
+        File dest = IOUtils.mkdir(resource, 'dest')
         IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
         when(hostResolvedDependency.getName()).thenReturn('host')
         when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(src.toPath())
@@ -79,7 +92,7 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'resolving a vendor dependency hosting in vcs dependency should succeed'() {
         // given
-        GolangDependencySet set = DependencyUtils.asGolangDependencySet(vendorResolvedDependency)
+        GolangDependencySet set = asGolangDependencySet(vendorResolvedDependency)
         when(hostResolvedDependency.getDependencies()).thenReturn(set)
         when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
         when(vendorNotationDependency.getVendorPath()).thenReturn('vendor/root/package')
@@ -114,6 +127,24 @@ class AbstractVcsDependencyManagerTest {
         verify(dependencyRegistry).putIntoCache(vendorNotationDependency, vendorResolvedDependency)
     }
 
+    @Test
+    void 'updating repository should be skipped if it is up-to-date'() {
+        'resolving a vendor dependency hosting in vcs dependency should succeed'()
+        verify(cacheManager, times(0)).updateLockFile(hostNotationDependency)
+        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
+    }
+
+    @Test
+    void 'lock file should be updated after resolving'() {
+        // given
+        when(cacheManager.isOutOfDate(hostNotationDependency)).thenReturn(true)
+        // when
+        'resolving a vendor dependency hosting in vcs dependency should succeed'()
+        // then
+        verify(subclassDelegate).updateRepository(hostNotationDependency, repository, resource)
+        verify(cacheManager).updateLockFile(hostNotationDependency)
+    }
+
 
     class TestAbstractVcsDependencyManager extends AbstractVcsDependencyManager {
 
@@ -124,36 +155,38 @@ class AbstractVcsDependencyManagerTest {
 
         @Override
         protected ResolvedDependency createResolvedDependency(NotationDependency dependency, File directory, Object o, Object o2) {
-            return hostResolvedDependency
+            return subclassDelegate.createResolvedDependency(dependency, directory, o, o2)
         }
 
         @Override
         protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
+            subclassDelegate.doReset(dependency, globalCachePath)
         }
 
 
         @Override
         protected void resetToSpecificVersion(Object o, Object o2) {
+            subclassDelegate.resetToSpecificVersion(o, o2)
         }
 
         @Override
         protected Object determineVersion(Object o, NotationDependency dependency) {
-            return null
+            return subclassDelegate.determineVersion(o, dependency)
         }
 
         @Override
         protected Object updateRepository(NotationDependency dependency, Object o, File directory) {
-            return null
+            return subclassDelegate.updateRepository(dependency, o, directory)
         }
 
         @Override
         protected Object initRepository(NotationDependency dependency, File directory) {
-            return null
+            return subclassDelegate.initRepository(dependency, directory)
         }
 
         @Override
         protected Optional repositoryMatch(File directory, NotationDependency dependency) {
-            return null
+            return subclassDelegate.repositoryMatch(directory, dependency)
         }
     }
 }
