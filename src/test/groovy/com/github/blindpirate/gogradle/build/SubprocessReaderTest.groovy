@@ -7,6 +7,7 @@ import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 
 import java.util.concurrent.CountDownLatch
+import java.util.concurrent.TimeUnit
 import java.util.function.Consumer
 import java.util.function.Supplier
 
@@ -39,7 +40,9 @@ class SubprocessReaderTest {
         when(supplier.get()).thenReturn(inputStream)
         when(inputStream.read(any(byte[]), anyInt(), anyInt())).thenThrow(new IOException())
         // when
-        new SubprocessReader(supplier, consumer, new CountDownLatch(1)).start()
+        CountDownLatch latch = new CountDownLatch(1)
+        new SubprocessReader(supplier, consumer, latch).start()
+        latch.await(1, TimeUnit.SECONDS)
         // then
         ArgumentCaptor captor = ArgumentCaptor.forClass(String)
         verify(consumer).accept(captor.capture())
