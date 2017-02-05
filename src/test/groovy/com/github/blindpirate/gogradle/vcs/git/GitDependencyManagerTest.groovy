@@ -38,7 +38,7 @@ import static org.mockito.Mockito.*
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockInjector
-class GitDependencyManagerTest  {
+class GitDependencyManagerTest {
 
     GitNotationDependency notationDependency = mockWithName(GitNotationDependency, 'github.com/a/b')
     GitResolvedDependency resolvedDependency = mockWithName(GitResolvedDependency, 'github.com/a/b')
@@ -161,6 +161,7 @@ class GitDependencyManagerTest  {
     void 'existed repository should be updated'() {
         IOUtils.write(resource, 'placeholder', '')
         // given:
+        when(cacheManager.isOutOfDate(notationDependency)).thenReturn(true)
         when(gitAccessor.getRemoteUrl(repository)).thenReturn(repoUrl)
         // when:
         gitDependencyManager.resolve(notationDependency)
