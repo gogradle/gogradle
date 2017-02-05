@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDep
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -37,7 +38,7 @@ class LocalDirectoryDependencyTest {
 
     @Test
     void 'version format of local directory should be its absolute path'() {
-        assert dependency.formatVersion() == resource.absolutePath
+        assert dependency.formatVersion() == StringUtils.toUnixString(resource.toPath())
     }
 
     @Test(expected = UnsupportedOperationException)
