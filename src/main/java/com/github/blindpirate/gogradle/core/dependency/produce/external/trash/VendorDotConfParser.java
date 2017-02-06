@@ -3,9 +3,9 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.trash;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.base.CharMatcher;
-import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 
 import java.io.File;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -40,7 +40,7 @@ public class VendorDotConfParser {
         // github.com/davecgh/go-spew v1.0.0-9-g346938d
         // github.com/docker/docker 3a68292
         // github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://github.com/cpuguy83/check.git
-        Map<String, Object> ret = new HashedMap();
+        Map<String, Object> ret = new HashMap<>();
         String[] array = StringUtils.splitAndTrim(line, "\\s");
 
         ret.put("name", array[0]);

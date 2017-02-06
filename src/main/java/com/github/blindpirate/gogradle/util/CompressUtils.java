@@ -4,8 +4,8 @@ import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.internal.impldep.org.apache.tools.tar.TarEntry;
-import org.gradle.internal.impldep.org.apache.tools.tar.TarInputStream;
+import org.apache.tools.tar.TarEntry;
+import org.apache.tools.tar.TarInputStream;
 
 import java.io.File;
 import java.io.FileInputStream;

@@ -7,8 +7,13 @@ import java.util.Map;
 
 public class MapUtils {
     public static String getString(Map<String, Object> map, String key) {
-        return org.gradle.internal.impldep.org.apache.commons.collections.MapUtils
-                .getString(map, key);
+        if (map != null) {
+            Object answer = map.get(key);
+            if (answer != null) {
+                return answer.toString();
+            }
+        }
+        return null;
     }
 
     @SuppressWarnings("unchecked")
