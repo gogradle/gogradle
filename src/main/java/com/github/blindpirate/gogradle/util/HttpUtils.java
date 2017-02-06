@@ -30,152 +30,13 @@ public class HttpUtils {
     private static final int FOUR_KB = 4096;
     private static final int HTTP_INTERNAL_REDIRECTION = 307;
 
-    /**
-     * Send a get request
-     *
-     * @param url
-     * @return response
-     * @throws IOException
-     */
     public String get(String url) throws IOException {
         return get(url, null);
     }
 
-    /**
-     * Send a get request
-     *
-     * @param url     Url as string
-     * @param headers Optional map with headers
-     * @return response   Response as string
-     * @throws IOException
-     */
     public String get(String url,
                       Map<String, String> headers) throws IOException {
         return fetch(GET_METHOD, url, null, headers);
-    }
-
-    /**
-     * Send a post request
-     *
-     * @param url     Url as string
-     * @param body    Request body as string
-     * @param headers Optional map with headers
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String post(String url, String body,
-                       Map<String, String> headers) throws IOException {
-        return fetch("POST", url, body, headers);
-    }
-
-    /**
-     * Send a post request
-     *
-     * @param url  Url as string
-     * @param body Request body as string
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String post(String url, String body) throws IOException {
-        return post(url, body, null);
-    }
-
-    /**
-     * Post a form with parameters
-     *
-     * @param url    Url as string
-     * @param params map with parameters/values
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String postForm(String url, Map<String, String> params)
-            throws IOException {
-        return postForm(url, params, null);
-    }
-
-    /**
-     * Post a form with parameters
-     *
-     * @param url     Url as string
-     * @param params  Map with parameters/values
-     * @param headers Optional map with headers
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String postForm(String url, Map<String, String> params,
-                           Map<String, String> headers) throws IOException {
-        // set content type
-        if (headers == null) {
-            headers = new HashMap<String, String>();
-        }
-        headers.put("Content-Type", "application/x-www-form-urlencoded");
-
-        // parse parameters
-        StringBuilder body = new StringBuilder();
-        if (params != null) {
-            boolean first = true;
-            for (Map.Entry<String, String> param : params.entrySet()) {
-                if (first) {
-                    first = false;
-                } else {
-                    body.append("&");
-                }
-                String value = param.getValue();
-                body.append(URLEncoder.encode(param.getKey(), DEFAULT_CHARSET) + "=");
-                body.append(URLEncoder.encode(value, DEFAULT_CHARSET));
-            }
-        }
-
-        return post(url, body.toString(), headers);
-    }
-
-    /**
-     * Send a put request
-     *
-     * @param url     Url as string
-     * @param body    Request body as string
-     * @param headers Optional map with headers
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String put(String url, String body,
-                      Map<String, String> headers) throws IOException {
-        return fetch("PUT", url, body, headers);
-    }
-
-    /**
-     * Send a put request
-     *
-     * @param url Url as string
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String put(String url, String body) throws IOException {
-        return put(url, body, null);
-    }
-
-    /**
-     * Send a delete request
-     *
-     * @param url     Url as string
-     * @param headers Optional map with headers
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String delete(String url,
-                         Map<String, String> headers) throws IOException {
-        return fetch("DELETE", url, null, headers);
-    }
-
-    /**
-     * Send a delete request
-     *
-     * @param url Url as string
-     * @return response   Response as string
-     * @throws IOException
-     */
-    public String delete(String url) throws IOException {
-        return delete(url, null);
     }
 
     /**
@@ -184,7 +45,6 @@ public class HttpUtils {
      * @param url    Url as string
      * @param params Map with query parameters
      * @return url        Url with query parameters appended
-     * @throws IOException
      */
     public String appendQueryParams(String url,
                                     Map<String, String> params) {
@@ -211,63 +71,6 @@ public class HttpUtils {
     }
 
     /**
-     * Retrieve the query parameters from given url
-     *
-     * @param url Url containing query parameters
-     * @return params     Map with query parameters
-     * @throws IOException
-     */
-    public Map<String, String> getQueryParams(String url)
-            throws IOException {
-        Map<String, String> params = new HashMap<String, String>();
-
-        int start = url.indexOf('?');
-        while (start != -1) {
-            // read parameter name
-            int equals = url.indexOf('=', start);
-            String param = "";
-            if (equals != -1) {
-                param = url.substring(start + 1, equals);
-            } else {
-                param = url.substring(start + 1);
-            }
-
-            // read parameter value
-            String value = "";
-            if (equals != -1) {
-                start = url.indexOf('&', equals);
-                if (start != -1) {
-                    value = url.substring(equals + 1, start);
-                } else {
-                    value = url.substring(equals + 1);
-                }
-            }
-
-            params.put(URLDecoder.decode(param, DEFAULT_CHARSET),
-                    URLDecoder.decode(value, DEFAULT_CHARSET));
-        }
-
-        return params;
-    }
-
-    /**
-     * Returns the url without query parameters
-     *
-     * @param url Url containing query parameters
-     * @return url        Url without query parameters
-     * @throws IOException
-     */
-    public String removeQueryParams(String url)
-            throws IOException {
-        int q = url.indexOf('?');
-        if (q != -1) {
-            return url.substring(0, q);
-        } else {
-            return url;
-        }
-    }
-
-    /**
      * Send a request
      *
      * @param method  HTTP method, for example "GET" or "POST"
@@ -275,7 +78,7 @@ public class HttpUtils {
      * @param body    Request body as string
      * @param headers Optional map with headers
      * @return response   Response as string
-     * @throws IOException
+     * @throws IOException the exception thrown
      */
     private String fetch(String method, String url, String body,
                          Map<String, String> headers) throws IOException {

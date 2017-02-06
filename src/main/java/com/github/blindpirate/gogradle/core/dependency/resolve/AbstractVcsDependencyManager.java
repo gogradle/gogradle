@@ -191,7 +191,7 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
      *
      * @param directory  the directory
      * @param dependency the dependency
-     * @return
+     * @return {@code Optional.of()} if matched, {@code Optional.empty()} otherwise.
      */
     protected abstract Optional<REPOSITORY> repositoryMatch(File directory, NotationDependency dependency);
 }

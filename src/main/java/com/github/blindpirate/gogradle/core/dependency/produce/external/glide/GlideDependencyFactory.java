@@ -14,7 +14,7 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseYaml;
 /**
  * Converts glide.lock in repos managed by glide to gogradle map notations.
  *
- * @see <a href="https://github.com/Masterminds/glide">glide</a> for more details.
+ * @see <a href="https://github.com/Masterminds/glide">glide</a>
  */
 @Singleton
 public class GlideDependencyFactory extends ExternalDependencyFactory {

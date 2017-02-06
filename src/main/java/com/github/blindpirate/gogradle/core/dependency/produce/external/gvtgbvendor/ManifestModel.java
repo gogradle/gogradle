@@ -15,7 +15,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.removeEnd;
 /**
  * Model of vendor/manifest in repos managed by gvt or gbvendor.
  *
- * @see <a href="https://github.com/FiloSottile/gvt/blob/master/vendor/manifest">manifest</a>.
+ * @see <a href="https://github.com/FiloSottile/gvt/blob/master/vendor/manifest">manifest</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class ManifestModel {

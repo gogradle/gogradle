@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Model of glide.lock in repo managed by glide.
  *
- * @see <a href="https://github.com/Masterminds/glide/blob/master/glide.lock">glide.lock</a>.
+ * @see <a href="https://github.com/Masterminds/glide/blob/master/glide.lock">glide.lock</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GlideDotLockModel {

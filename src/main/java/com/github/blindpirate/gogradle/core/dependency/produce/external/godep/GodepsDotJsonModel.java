@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
 /**
  * Model of Godeps/Godeps.json.
  *
- * @see <a href="https://github.com/tools/godep/blob/master/Godeps/Godeps.json">Godeps.json</a>.
+ * @see <a href="https://github.com/tools/godep/blob/master/Godeps/Godeps.json">Godeps.json</a>
  */
 // NOTE: dependency in Godeps.json may be not the root package
 // Godeps/Godeps.json

@@ -12,7 +12,7 @@ import java.util.Map;
 /**
  * Converts vendor.conf in repos managed by trash to gogradle map notations
  *
- * @see <a href="https://github.com/rancher/trash">trash</>
+ * @see <a href="https://github.com/rancher/trash">trash</a>
  */
 @Singleton
 public class TrashDependencyFactory extends ExternalDependencyFactory {

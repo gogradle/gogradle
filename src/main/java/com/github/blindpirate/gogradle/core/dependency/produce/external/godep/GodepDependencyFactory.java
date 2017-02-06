@@ -14,7 +14,7 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
 /**
  * Converts Godeps/Godeps.json in repos managed by godep to gogradle map notations.
  *
- * @see <a href="https://github.com/tools/godep">godep</a> for more details.
+ * @see <a href="https://github.com/tools/godep">godep</a>
  */
 @Singleton
 public class GodepDependencyFactory extends ExternalDependencyFactory {

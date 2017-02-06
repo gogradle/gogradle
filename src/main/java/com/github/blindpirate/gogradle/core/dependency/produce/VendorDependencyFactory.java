@@ -13,7 +13,7 @@ import java.nio.file.Path;
 
 
 /**
- * A {@link VendorDependencyFactory is a factory that reads vendor directory and resolves them to
+ * A {@link VendorDependencyFactory} is a factory that reads vendor directory and resolves them to
  * {@link VendorResolvedDependency }
  */
 @Singleton

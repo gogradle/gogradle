@@ -12,7 +12,9 @@ public interface DependencyVisitor {
      * Visits dependencies managed by a external package management tool such as godep, govendor, etc.
      * Usually, it's determined by analyzing "lock file" of that tool.
      *
-     * @param rootDir root directory of a package
+     * @param dependency The dependency to visit
+     * @param rootDir Root directory of a package
+     * @param configuration Current context, {@code Configuration.BUILD} or {@code Configuration.TEST}
      * @return Dependencies managed by external package management tools
      */
     GolangDependencySet visitExternalDependencies(ResolvedDependency dependency,
@@ -20,9 +22,10 @@ public interface DependencyVisitor {
                                                   Configuration configuration);
 
     /**
-     * Visits dependencies in vendor and treats them as file dependencies.
+     * Visits dependencies in vendor.
      *
-     * @param rootDir root directory of a package
+     * @param dependency The dependency to visit
+     * @param rootDir Root directory of a package
      * @return Dependencies in vendor directory
      */
     GolangDependencySet visitVendorDependencies(ResolvedDependency dependency, File rootDir);
@@ -30,7 +33,9 @@ public interface DependencyVisitor {
     /**
      * Analyze the imports in source code (all .go files in root directory except vendor) to get dependencies.
      *
-     * @param rootDir root directory of a package
+     * @param dependency The dependency to visit
+     * @param rootDir Root directory of a package
+     * @param configuration Current context, {@code Configuration.BUILD} or {@code Configuration.TEST}
      * @return All imported package.
      */
     GolangDependencySet visitSourceCodeDependencies(ResolvedDependency dependency,

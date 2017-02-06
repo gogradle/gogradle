@@ -11,8 +11,8 @@ public interface DependencyRegistry {
     /**
      * Registers a dependency
      *
-     * @param dependency
-     * @return true if the dependency is newer than existing dependency with same name.
+     * @param dependency The dependency to register
+     * @return True if the dependency is newer than existing dependency with same name.
      */
     boolean register(ResolvedDependency dependency);
 

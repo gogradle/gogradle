@@ -31,7 +31,7 @@ public abstract class ExternalDependencyFactory {
      * Relative paths of the identity file.
      * For example, "Godeps/Godeps.json","glide.yaml"
      *
-     * @return
+     * @return name of that file
      */
     protected abstract String identityFileName();
 
