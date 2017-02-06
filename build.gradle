@@ -12,12 +12,13 @@ plugins {
     id 'antlr'
     id 'com.github.kt3k.coveralls' version '2.7.1'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id "com.gradle.plugin-publish" version "0.9.7"
 }
 
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.0.1-SNAPSHOT'
+version '0.1.0'
 
 /************** sourcesets **************/
 sourceSets {
@@ -37,7 +38,7 @@ sourceSets {
 /************** dependencies **************/
 repositories {
     mavenLocal()
-    mavenCentral()
+    jcenter()
     maven {
         url "https://repo.eclipse.org/content/groups/jgit/"
     }
@@ -84,6 +85,7 @@ project.tasks.withType(Test) {
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
 }
 
+check.dependsOn javadoc
 check.dependsOn integrationTest
 integrationTest.dependsOn test
 test.dependsOn 'shadowJar'
@@ -168,6 +170,35 @@ generateGrammarSource {
     arguments += ['-package', 'com.github.blindpirate.gogradle.antlr']
 }
 
+/************** publish **************/
+def updateVersion(String file, String oldVersionRegex, String newVersion){
+    String content = new File(rootDir, file).getText()
+    content = content.replaceAll(oldVersionRegex, newVersion)
+    new File(rootDir, file).write(content)
+}
+
+task('updateVersion'){
+    doLast {
+        updateVersion('README.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('README_CN.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('src/main/java/com/github/blindpirate/gogradle/GogradleGlobal.java', /GOGRADLE_VERSION = "(\w|\d|\.|\-)*"/, "GOGRADLE_VERSION = \"${version}\"")
+    }
+}
+
+pluginBundle {
+    website = 'https://github.com/blindpirate/gogradle'
+    vcsUrl = 'https://github.com/blindpirate/gogradle'
+    description = 'Full-featured Build Support for Golang'
+    tags = ['go', 'golang', 'build', 'test']
+    plugins {
+        golangPlugin {
+            id = 'com.github.blindpirate.gogradle'
+            displayName = 'Gogradle - Full-featured Build Plugin for Golang'
+        }
+    }
+}
+
+publishPlugins.dependsOn 'updateVersion'
 /************** wrapper **************/
 
 task wrapper(type: Wrapper) {
