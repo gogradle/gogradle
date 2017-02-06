@@ -38,7 +38,7 @@ public enum DependencyInstallFileFilter implements FileFilter {
             return false;
         }
 
-        return endsWithAny(name, ".go", ".asm", ".s");
+        return endsWithAny(name, ".go", ".asm", ".s", ".h", ".c");
     }
 
     private boolean acceptDirectory(File dir) {
