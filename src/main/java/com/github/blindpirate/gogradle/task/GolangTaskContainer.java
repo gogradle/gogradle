@@ -18,6 +18,7 @@ public class GolangTaskContainer {
     public static final String DEPENDENCIES_TASK_NAME = "dependencies";
 
     public static final String CHECK_TASK_NAME = "check";
+    public static final String LOCK_TASK_NAME = "lock";
     public static final String BUILD_TASK_NAME = "build";
     public static final String CLEAN_TASK_NAME = "clean";
     public static final String INSTALL_BUILD_DEPENDENCIES_TASK_NAME = "installBuildDependencies";
@@ -38,6 +39,7 @@ public class GolangTaskContainer {
             .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
             .put(CLEAN_TASK_NAME, CleanTask.class)
             .put(CHECK_TASK_NAME, CheckTask.class)
+            .put(LOCK_TASK_NAME, LockTask.class)
             .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
