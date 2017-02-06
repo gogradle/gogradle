@@ -31,8 +31,7 @@ echo go version go1.7.1 windows/amd64
     String buildDotGradleBase = '''
 buildscript {
     dependencies {
-        classpath files("${jarPath}")
-        classpath files("${classpath}".split(java.io.File.pathSeparatorChar as String))
+        classpath files("${classpath}".split(java.io.File.pathSeparator))
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
@@ -92,12 +91,9 @@ golang {
     }
 
     List<String> buildArguments() {
-        String jarPath = new File("build/libs/gradle-golang-plugin-0.0.1-SNAPSHOT.jar").absolutePath
-
         return [
                 //"--debug",
                 "-PgoBinPath=${goBinPath}",
-                "-PjarPath=${jarPath}",
                 "-PpluginRootProject=${getMainClasspath()}",
                 "-Pclasspath=${getClasspath()}"]
     }
