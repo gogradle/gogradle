@@ -1,9 +1,0 @@
-repositories {
-    mavenLocal()
-    mavenCentral()
-}
-
-dependencies {
-    compile group: 'commons-io', name: 'commons-io', version: '2.5'
-}
-
