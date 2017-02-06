@@ -1,7 +1,4 @@
-import com.github.blindpirate.gogradle.top1000.TestTop1000Task
-
 /************** plugins **************/
-
 plugins {
     id 'java'
     id 'groovy'
@@ -18,7 +15,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.1.0'
+version '0.1.1'
 
 /************** sourcesets **************/
 sourceSets {
@@ -89,26 +86,7 @@ project.tasks.withType(Test) {
 check.dependsOn javadoc
 check.dependsOn integrationTest
 integrationTest.dependsOn test
-test.dependsOn 'shadowJar'
-
-/************** testTop1000 **************/
-
-def getPropertyOrNull(propertyName) {
-    try {
-        return property(propertyName)
-    }
-    catch (MissingPropertyException) {
-        return null
-    }
-}
-
-task testTop1000(type: TestTop1000Task) {
-    doLast {
-        doTest(getPropertyOrNull('projectToTest'))
-    }
-}
-
-testTop1000.dependsOn 'shadowJar'
+//test.dependsOn 'jar'
 
 /************** checkstyle **************/
 

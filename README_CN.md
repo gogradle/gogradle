@@ -31,7 +31,9 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 支持构建、测试、单个/通配符测试、交叉编译  
 - 现代的、生产级别的自动化构建支持，添加自定义任务极其简单
 - 原生的Gradle语法
+- 增量构建（开发中）
 - 额外为中国大陆开发者提供的特性，你懂的
+- Shadowsocks支持（开发中）
 - IDE插件支持（规划中）
 
 ## 优势
@@ -54,15 +56,26 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 - 在欲构建的Go语言项目下新建`build.gradle`构建脚本，内容如下：
 
 ```groovy
+buildscript { 
+  // 当前，由于一个jgit的bug，必须以这种方式访问jgit的snapshot版本
+  // 在该bug修复之后，buildscript块就不再需要了
+  // 详见 https://github.com/eclipse/jgit/pull/42
+  repositories {
+    maven {
+      url "https://repo.eclipse.org/content/groups/jgit/"
+    }
+  }
+}
+
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.1.0'
+    id 'com.github.blindpirate.gogradle' version '0.1.1'
 }
 
 golang {
     packagePath = 'your/package/path' // 欲构建项目的path
 }
 ```
-如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。在Gogradle进行过第一次构建后，它会在项目目录下生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以选择删除它们。详见[依赖锁定](#依赖锁定)一节。
+如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。此外，可以令Gogradle生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以删除之。详见[依赖锁定](#依赖锁定)一节。
 
 ### 构建Go项目
 
@@ -155,7 +168,7 @@ github.com/gogits/gogs
 gradlew lock
 ```
 
-这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。默认情况下，该任务会在构建和测试之前运行，你无需手动运行它。
+这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。
 `gogradle.lock`是Gogradle推荐的依赖锁定方式。
 锁定依赖包版本是稳定构建（Reproducible build）的重要因素。与[其他包管理工具](https://github.com/golang/go/wiki/PackageManagementTools)类似，
 Gogradle能够锁定当前的所有依赖包版本。有所不同的是，Gogradle做的更加彻底，它甚至能够锁定`vendor`目录中的依赖包！
@@ -372,14 +385,14 @@ Gogradle解决依赖的策略是：
 
 ### 依赖锁定
 
-在每次构建或测试进行前，Gogradle会进行依赖的锁定，这会在项目目录下生成一个名为`gogradle.lock`的文件，记录了构建所需的全部依赖的详细版本，以便进行稳定的、可重现的构建。无论何时，此文件都不应被手动修改。
+你可以令Gogradle锁定当前构建的依赖，这会在项目目录下生成一个名为`gogradle.lock`的文件，记录了构建所需的全部依赖的详细版本，以便进行稳定的、可重现的构建。无论何时，此文件都不应被手动修改。
 
-Gogradle推荐将此文件提交到源代码管理系统中。此外，也可以通过
+Gogradle推荐将此文件提交到源代码管理系统中。可以通过
 
 ```
 gradlew lock
 ```
-手工生成依赖锁定文件。
+生成依赖锁定文件。
 
 ### 依赖安装到vendor目录
 
