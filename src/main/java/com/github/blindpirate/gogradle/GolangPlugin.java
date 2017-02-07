@@ -103,34 +103,6 @@ public class GolangPlugin implements Plugin<Project> {
 
         ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("git", repositoryHandler);
 
-//        DefaultProject defaultProject = (DefaultProject) project;
-//        DefaultServiceRegistry serviceRegistry = (DefaultServiceRegistry) defaultProject.getServices();
-//
-//        try {
-//            // 'cause it is package-private
-//            Class serviceProviderClass =
-//                    Class.forName("org.gradle.internal.service.DefaultServiceRegistry$ServiceProvider");
-//
-//            Object proxy = Proxy.newProxyInstance(
-//                    serviceProviderClass.getClassLoader(),
-//                    new Class[]{serviceProviderClass},
-//                    (proxy1, method, args) -> {
-//                        if ("get".equals(method.getName())) {
-//                            return injector.getInstance(GitRepositoryHandler.class);
-//                        } else {
-//                            return null;
-//                        }
-//                    });
-//
-//            Map providerCache = (Map) ReflectionUtils.getValueIncludingSuperclasses("providerCache",
-//                    serviceRegistry);
-//            synchronized (serviceRegistry) {
-//                providerCache.put(RepositoryHandler.class, proxy);
-//            }
-//
-//        } catch (IllegalAccessException | ClassNotFoundException e) {
-//            throw ExceptionHandler.uncheckException(e);
-//        }
     }
 
     private void configureConfigurations(Project project) {
