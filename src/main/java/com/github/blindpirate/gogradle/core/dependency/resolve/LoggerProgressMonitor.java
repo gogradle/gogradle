@@ -13,14 +13,13 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
     private static final int MAGIC_25 = 25;
     private static final int MAGIC_10 = 10;
     private static final int MAGIC_100 = 100;
-    private static final int PADDING_SPACE_COUNT = 20;
 
 
     public LoggerProgressMonitor(String url) {
         ProgressLoggerFactory progressLoggerFactory =
                 GogradleGlobal.getInstance(ServiceRegistry.class).get(ProgressLoggerFactory.class);
         logger = progressLoggerFactory.newOperation(this.getClass());
-        logger.start("Cloning " + url, "Cloning " + url);
+        logger.start("Cloning " + url + "\n", "Cloning " + url + "\n");
     }
 
     public void completed() {
@@ -50,9 +49,6 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
             s.append(' ');
         }
         s.append(workCurr);
-        for (int i = 0; i < PADDING_SPACE_COUNT; ++i) {
-            s.append(" ");
-        }
     }
 
     @Override
@@ -96,9 +92,5 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
         s.append("/"); //$NON-NLS-1$
         s.append(endStr);
         s.append(")"); //$NON-NLS-1$
-
-        for (int i = 0; i < PADDING_SPACE_COUNT; ++i) {
-            s.append(" ");
-        }
     }
 }
