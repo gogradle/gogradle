@@ -93,11 +93,12 @@ public class GitNotationDependency extends AbstractNotationDependency {
         }
         GitNotationDependency that = (GitNotationDependency) o;
         return Objects.equals(commit, that.commit)
-                && Objects.equals(getName(), that.getName());
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(isFirstLevel(), that.isFirstLevel());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(commit, getName());
+        return Objects.hash(commit, getName(), isFirstLevel());
     }
 }

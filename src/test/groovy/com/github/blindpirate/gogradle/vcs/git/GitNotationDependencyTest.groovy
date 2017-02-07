@@ -91,7 +91,7 @@ class GitNotationDependencyTest {
 
     @Test
     void 'hashCode should succeed'() {
-        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b')
+        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false)
     }
 
     GitNotationDependency withNameAndCommit(String name, String commit) {
