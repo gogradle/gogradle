@@ -153,7 +153,9 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
     private REPOSITORY resolveToGlobalCache(NotationDependency dependency, File targetDirectory) {
         Optional<REPOSITORY> repositoryInGlobalCache = ensureGlobalCacheEmptyOrMatch(dependency, targetDirectory);
         if (!repositoryInGlobalCache.isPresent()) {
-            return initRepository(dependency, targetDirectory);
+            REPOSITORY ret = initRepository(dependency, targetDirectory);
+            globalCacheManager.updateCurrentDependencyLock();
+            return ret;
         } else if (globalCacheManager.currentDependencyIsOutOfDate()) {
             updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
             globalCacheManager.updateCurrentDependencyLock();

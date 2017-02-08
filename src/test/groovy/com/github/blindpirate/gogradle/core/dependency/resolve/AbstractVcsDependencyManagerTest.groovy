@@ -145,6 +145,16 @@ class AbstractVcsDependencyManagerTest {
         verify(cacheManager).updateCurrentDependencyLock()
     }
 
+    @Test
+    void 'lock file should be updated after repository being initialized'() {
+        // given
+        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(Optional.empty())
+        // when
+        manager.resolve(hostNotationDependency)
+        // then
+        verify(cacheManager).updateCurrentDependencyLock()
+    }
+
 
     class TestAbstractVcsDependencyManager extends AbstractVcsDependencyManager {
 
