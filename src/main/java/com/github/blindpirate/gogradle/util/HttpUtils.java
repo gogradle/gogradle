@@ -125,7 +125,7 @@ public class HttpUtils {
             return fetchAsInputStream(method, location, body, headers);
         }
         if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IllegalStateException("Error in accessing " + url
+            throw new IOException("Error in accessing " + url
                     + ", http response code: " + conn.getResponseCode());
         }
 
