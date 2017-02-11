@@ -59,6 +59,7 @@ dependencies {
     compile 'com.google.guava:guava:20.0'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
     compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.7.0-SNAPSHOT'
+//    compile group: 'com.github.blindpirate.gogradle.jgit', name: 'org.eclipse.jgit', version: '4.7.0'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.5'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.5'
@@ -176,6 +177,7 @@ task('updateVersion') {
         updateVersion('README.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('README_CN.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('src/main/java/com/github/blindpirate/gogradle/GogradleGlobal.java', /GOGRADLE_VERSION = "(\w|\d|\.|\-)*"/, "GOGRADLE_VERSION = \"${version}\"")
+        updateVersion('buildSrc/main/groovy/com/github/blindpirate/gogradle/TestTop1000Task.groovy', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
     }
 }
 
