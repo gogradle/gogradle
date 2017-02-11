@@ -17,7 +17,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.1.2'
+version '0.1.3'
 
 /************** sourcesets **************/
 sourceSets {
@@ -177,7 +177,7 @@ task('updateVersion') {
         updateVersion('README.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('README_CN.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('src/main/java/com/github/blindpirate/gogradle/GogradleGlobal.java', /GOGRADLE_VERSION = "(\w|\d|\.|\-)*"/, "GOGRADLE_VERSION = \"${version}\"")
-        updateVersion('buildSrc/main/groovy/com/github/blindpirate/gogradle/TestTop1000Task.groovy', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('buildSrc/src/main/groovy/com/github/blindpirate/gogradle/TestTop1000Task.groovy', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
     }
 }
 

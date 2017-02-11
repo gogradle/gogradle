@@ -66,7 +66,7 @@ buildscript {
 }
 
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.1.2'
+    id 'com.github.blindpirate.gogradle' version '0.1.3'
 }
 
 golang {
