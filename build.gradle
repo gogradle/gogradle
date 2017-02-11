@@ -1,3 +1,5 @@
+import com.github.blindpirate.gogradle.TestTop1000Task
+
 /************** plugins **************/
 plugins {
     id 'java'
@@ -88,6 +90,19 @@ check.dependsOn integrationTest
 integrationTest.dependsOn test
 //test.dependsOn 'jar'
 
+/************** testTop1000 **********/
+
+task testOne(type: TestTop1000Task) {
+    doLast {
+        testOne("${testProjectDir}")
+    }
+}
+task testAll(type: TestTop1000Task) {
+    doLast {
+        testAll("${allTestProjectsDir}")
+    }
+}
+
 /************** checkstyle **************/
 
 checkstyle {
@@ -150,13 +165,13 @@ generateGrammarSource {
 }
 
 /************** publish **************/
-def updateVersion(String file, String oldVersionRegex, String newVersion){
+def updateVersion(String file, String oldVersionRegex, String newVersion) {
     String content = new File(rootDir, file).getText()
     content = content.replaceAll(oldVersionRegex, newVersion)
     new File(rootDir, file).write(content)
 }
 
-task('updateVersion'){
+task('updateVersion') {
     doLast {
         updateVersion('README.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('README_CN.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
