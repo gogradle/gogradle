@@ -208,6 +208,9 @@ golang {
     // 默认为false
     fuckGfw = true
     
+    // 全局缓存的时间，默认为24小时
+    globalCacheFor 24,'hours'
+    
     // 在构建和测试时额外传递给go命令行的参数，默认均为空列表
     extraBuildArgs = ['arg1','arg2']
     extraTestArgs = []

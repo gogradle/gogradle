@@ -209,6 +209,9 @@ golang {
     // ignore it if you are not
     fuckGfw = true
     
+    // cache time for global cache, 24 hours by default
+    globalCacheFor 24,'hours'
+    
     // Extra command line arguments in build or test
     // Empty list by default
     extraBuildArgs = ['arg1','arg2']
