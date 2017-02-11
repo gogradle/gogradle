@@ -54,17 +54,6 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Create a file named `build.gradle` in **the golang project to be built** with the following content:
 
 ```groovy
-buildscript { 
-  // due to a bug of jgit, we have to use a snapshot version of jgit
-  // this block will be unnecessary once the patch is published
-  // see https://github.com/eclipse/jgit/pull/42
-  repositories {
-    maven {
-      url "https://repo.eclipse.org/content/groups/jgit/"
-    }
-  }
-}
-
 plugins {
     id 'com.github.blindpirate.gogradle' version '0.1.3'
 }

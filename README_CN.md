@@ -56,17 +56,6 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 - 在欲构建的Go语言项目下新建`build.gradle`构建脚本，内容如下：
 
 ```groovy
-buildscript { 
-  // 当前，由于一个jgit的bug，必须以这种方式访问jgit的snapshot版本
-  // 在该bug修复之后，buildscript块就不再需要了
-  // 详见 https://github.com/eclipse/jgit/pull/42
-  repositories {
-    maven {
-      url "https://repo.eclipse.org/content/groups/jgit/"
-    }
-  }
-}
-
 plugins {
     id 'com.github.blindpirate.gogradle' version '0.1.3'
 }
