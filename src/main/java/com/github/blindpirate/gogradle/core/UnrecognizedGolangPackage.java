@@ -45,8 +45,8 @@ public class UnrecognizedGolangPackage extends GolangPackage {
 
     @Override
     public String toString() {
-        return "UnrecognizedGolangPackage{" +
-                "path='" + getPath() + '\'' +
-                '}';
+        return "UnrecognizedGolangPackage{"
+                + "path='" + getPath() + '\''
+                + '}';
     }
 }

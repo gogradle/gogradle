@@ -42,8 +42,8 @@ public class StandardGolangPackage extends GolangPackage {
 
     @Override
     public String toString() {
-        return "StandardGolangPackage{" +
-                "path='" + getPath() + '\'' +
-                '}';
+        return "StandardGolangPackage{"
+                + "path='" + getPath() + '\''
+                + '}';
     }
 }

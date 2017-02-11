@@ -41,8 +41,8 @@ public class IncompleteGolangPackage extends GolangPackage {
 
     @Override
     public String toString() {
-        return "IncompleteGolangPackage{" +
-                "path='" + getPath() + '\'' +
-                '}';
+        return "IncompleteGolangPackage{"
+                + "path='" + getPath() + '\''
+                + '}';
     }
 }
