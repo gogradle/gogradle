@@ -38,9 +38,6 @@ sourceSets {
 repositories {
     mavenLocal()
     jcenter()
-    maven {
-        url "https://repo.eclipse.org/content/groups/jgit/"
-    }
 }
 dependencies {
     integrationTestCompile sourceSets.main.output
@@ -58,8 +55,8 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile 'com.google.guava:guava:20.0'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.7.0-SNAPSHOT'
-//    compile group: 'com.github.blindpirate.gogradle.jgit', name: 'org.eclipse.jgit', version: '4.7.0'
+//    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.7.0-SNAPSHOT'
+    compile group: 'com.github.blindpirate.gogradle.jgit', name: 'org.eclipse.jgit', version: '4.7.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.5'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.5'
