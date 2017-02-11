@@ -6,13 +6,14 @@ import java.util.List;
 import java.util.Optional;
 
 public class UnrecognizedGolangPackage extends GolangPackage {
+
     private UnrecognizedGolangPackage(String path) {
         super(path);
     }
 
     @Override
     public String getRootPath() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
@@ -22,7 +23,7 @@ public class UnrecognizedGolangPackage extends GolangPackage {
 
     @Override
     public List<String> getUrls() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
@@ -40,5 +41,12 @@ public class UnrecognizedGolangPackage extends GolangPackage {
 
     public static UnrecognizedGolangPackage of(String packagePath) {
         return new UnrecognizedGolangPackage(packagePath);
+    }
+
+    @Override
+    public String toString() {
+        return "UnrecognizedGolangPackage{" +
+                "path='" + getPath() + '\'' +
+                '}';
     }
 }

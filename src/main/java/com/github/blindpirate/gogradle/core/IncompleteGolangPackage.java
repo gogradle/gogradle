@@ -12,17 +12,17 @@ public class IncompleteGolangPackage extends GolangPackage {
 
     @Override
     public String getRootPath() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
     public VcsType getVcsType() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
     public List<String> getUrls() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
@@ -37,5 +37,12 @@ public class IncompleteGolangPackage extends GolangPackage {
 
     public static IncompleteGolangPackage of(String path) {
         return new IncompleteGolangPackage(path);
+    }
+
+    @Override
+    public String toString() {
+        return "IncompleteGolangPackage{" +
+                "path='" + getPath() + '\'' +
+                '}';
     }
 }

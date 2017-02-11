@@ -18,12 +18,12 @@ public class StandardGolangPackage extends GolangPackage {
 
     @Override
     public VcsType getVcsType() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
     public List<String> getUrls() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException(toString());
     }
 
     @Override
@@ -38,5 +38,12 @@ public class StandardGolangPackage extends GolangPackage {
 
     public static StandardGolangPackage of(String path) {
         return new StandardGolangPackage(path);
+    }
+
+    @Override
+    public String toString() {
+        return "StandardGolangPackage{" +
+                "path='" + getPath() + '\'' +
+                '}';
     }
 }
