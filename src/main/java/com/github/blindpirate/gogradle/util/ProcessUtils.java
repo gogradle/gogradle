@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle.util;
 
 
 import com.google.common.collect.Lists;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.io.IOException;
@@ -10,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 
 public class ProcessUtils {
+    private static final Logger LOGGER = Logging.getLogger(ProcessUtils.class);
     private static final ProcessUtilsDelegate DELEGATE = new ProcessUtilsDelegate();
 
     public static class ProcessResult {
@@ -50,6 +53,7 @@ public class ProcessUtils {
     }
 
     public static Process run(List<String> args, Map<String, String> envs, File workingDirectory) {
+        LOGGER.debug("Forking process: args {}, envs {}, workingDir {}", args, envs, workingDirectory);
         return DELEGATE.run(args, envs, workingDirectory);
     }
 
