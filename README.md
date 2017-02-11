@@ -50,7 +50,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 ## Getting Started
 
 - Install [JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-- Copy `gradle` directory、`gradlew`(*nix)/`gradlew.bat`(Windows) file in **this project** to **the golang project to be built**
+- Copy `gradle` directory/`gradlew` file/`gradlew.bat` file in **this project** to **the golang project to be built**
 - Create a file named `build.gradle` in **the golang project to be built** with the following content:
 
 ```groovy

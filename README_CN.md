@@ -52,7 +52,7 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 ### 准备工作
 
 - 安装[JDK 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)
-- 将**本项目**中的`gradle`目录、`gradlew`（*nix）/`gradlew.bat`（Windows）文件拷贝到**欲构建的Go语言项目**目录下。
+- 将**本项目**中的`gradle`目录、`gradlew`文件、`gradlew.bat`文件拷贝到**欲构建的Go语言项目**目录下。
 - 在欲构建的Go语言项目下新建`build.gradle`构建脚本，内容如下：
 
 ```groovy
