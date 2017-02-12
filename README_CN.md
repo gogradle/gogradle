@@ -7,6 +7,8 @@
 
 Gogradle是一个提供Go语言构建支持的Gradle插件。
 
+> 2017-02-12 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000 Go repositories](http://github-rank.com/star?language=Go)中的510个！
+
 ## 功能特性
 
 - 除`JDK 8+`外无需预先安装任何东西（包括Go本身）

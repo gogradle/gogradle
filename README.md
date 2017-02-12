@@ -10,6 +10,8 @@
 
 Gogradle is a gradle plugin which provides support for building golang.
 
+> 2017-02-12 Now Gogradle can build 51% of [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) **WITHOUT** any extra configuration!
+
 ## Feature
 
 - Needless to preinstall anything but `JDK 8+` (including golang itself)
