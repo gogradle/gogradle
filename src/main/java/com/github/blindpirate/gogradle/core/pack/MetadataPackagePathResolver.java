@@ -21,6 +21,7 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.Optional;
 
+//https://golang.org/cmd/go/#hdr-Remote_import_paths
 @Singleton
 public class MetadataPackagePathResolver implements PackagePathResolver {
     public static final String GO_USER_AGENT = "Go-http-client/1.1";
@@ -55,14 +56,12 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
             Document document = Jsoup.parse(html);
             Elements elements = document.select("meta[name=go-import]");
 
-            if (elements.isEmpty()) {
-                LOGGER.debug("Missing meta in response of {}", url);
+            Optional<GoImportMetaTag> metaTag = findMatchedMetaTag(packagePath, url, elements);
+            if (!metaTag.isPresent()) {
+                LOGGER.debug("Cannot find matched meta tag in response of {}", url);
                 return Optional.empty();
             }
-
-            String content = elements.get(0).attr("content");
-            LOGGER.debug("Meta tag of url {} is:{}", url, content);
-            return Optional.of(buildPackageInfo(packagePath, content));
+            return Optional.of(buildPackageInfo(packagePath, metaTag.get()));
         } catch (IOException e) {
             LOGGER.info("Exception in accessing {}", url, e);
             return Optional.empty();
@@ -70,18 +69,19 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
     }
 
-    private GolangPackage buildPackageInfo(String packagePath, String content) {
-        String[] array = StringUtils.splitAndTrim(content, " ");
-        Assert.isTrue(array.length > 2, "Invalid content:" + content);
-        String rootPath = array[0];
-        VcsType vcs = VcsType.of(array[1]).get();
-        String url = array[2];
+    private Optional<GoImportMetaTag> findMatchedMetaTag(String packagePath, String url, Elements elements) {
+        return elements.stream()
+                .map(element -> new GoImportMetaTag(element.attr("content")))
+                .filter(tag -> packagePath.startsWith(tag.rootPath))
+                .findFirst();
+    }
 
+    private GolangPackage buildPackageInfo(String packagePath, GoImportMetaTag metaTag) {
         return VcsGolangPackage.builder()
                 .withPath(packagePath)
-                .withVcsType(vcs)
-                .withRootPath(rootPath)
-                .withUrl(url)
+                .withVcsType(metaTag.vcs)
+                .withRootPath(metaTag.rootPath)
+                .withUrl(metaTag.repoUrl)
                 .build();
     }
 
@@ -89,6 +89,21 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
         String realUrl = httpUtils.appendQueryParams(url, ImmutableMap.of("go-get", "1"));
         Map<String, String> headers = ImmutableMap.of(HttpUtils.USER_AGENT, GO_USER_AGENT);
         return httpUtils.get(realUrl, headers);
+    }
+
+
+    static class GoImportMetaTag {
+        private String rootPath;
+        private VcsType vcs;
+        private String repoUrl;
+
+        GoImportMetaTag(String content) {
+            String[] array = StringUtils.splitAndTrim(content, " ");
+            Assert.isTrue(array.length > 2, "Invalid content:" + content);
+            rootPath = array[0];
+            vcs = VcsType.of(array[1]).get();
+            repoUrl = array[2];
+        }
     }
 
 }

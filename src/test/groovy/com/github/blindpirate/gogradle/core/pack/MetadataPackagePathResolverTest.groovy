@@ -99,7 +99,26 @@ class MetadataPackagePathResolverTest {
         when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
 
         // then
-        resolver.produce(packagePath).isPresent()
+        resolver.produce(packagePath)
+    }
+
+    @Test
+    void 'matched tag should be found out in multiple meta tags'() {
+        // given
+        String packagePath = 'bazil.org/fuse/fs'
+        String realHttpsUrl = 'https://bazil.org/fuse/fs?go-get=1'
+        String metaTag = '''
+        <meta name="go-import" content="bazil.org/bazil git https://github.com/bazil/bazil">
+        <meta name="go-import" content="bazil.org/fuse git https://github.com/bazil/fuse">
+        <meta name="go-import" content="bazil.org/bolt-mount git https://github.com/bazil/bolt-mount">
+        '''
+        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
+        // when
+        GolangPackage pkg = resolver.produce(packagePath).get()
+        // then
+        assert pkg.path == 'bazil.org/fuse/fs'
+        assert pkg.rootPath == 'bazil.org/fuse'
+        assert pkg.vcsType == VcsType.GIT
     }
 
     String tagInHtml(String s) {
