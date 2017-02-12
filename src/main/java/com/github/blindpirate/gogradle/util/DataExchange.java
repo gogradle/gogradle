@@ -17,8 +17,20 @@ public class DataExchange {
         return parseWithMapper(JSON_MAPPER, file, clazz);
     }
 
+    public static <T> T parseJson(String str, Class<T> clazz) {
+        return parseWithMapper(JSON_MAPPER, str, clazz);
+    }
+
     public static <T> T parseYaml(File file, Class<T> clazz) {
         return parseWithMapper(YAML_MAPPER, file, clazz);
+    }
+
+    private static <T> T parseWithMapper(ObjectMapper mapper, String s, Class<T> clazz) {
+        try {
+            return mapper.readValue(s, clazz);
+        } catch (IOException e) {
+            throw uncheckException(e);
+        }
     }
 
     private static <T> T parseWithMapper(ObjectMapper mapper, File file, Class<T> clazz) {
