@@ -28,22 +28,18 @@ class TestTop1000Task extends DefaultTask {
 
     void testOne(String path) {
         init()
-        buildOne(Paths.get(path), null)
+        buildOne(Paths.get(path))
     }
 
     void testAll(String path) {
         init()
-        new File(path).eachDir { buildOne(it.toPath(), null) }
+        new File(path).eachDir { buildOne(it.toPath()) }
     }
 
-    void buildOne(Path path, String subDir) {
-
-        if (!path.toFile().list().any { it.endsWith('.go') }) {
-            path.toFile().eachDir { buildOne(path, it.name) }
-        } else {
-            String dirName = path.getFileName()
-            String[] userAndProject = dirName.split(/_/)
-            String buildDotGradle = """
+    void buildOne(Path path) {
+        String dirName = path.getFileName()
+        String[] userAndProject = dirName.split(/_/)
+        String buildDotGradle = """
 plugins {
     id 'com.github.blindpirate.gogradle' version '0.1.4'
 }
@@ -52,33 +48,32 @@ golang {
     packagePath = "github.com/${userAndProject[0]}/${userAndProject[1]}" // path of project to be built 
 }
 """
-            write(new File(path.toFile(), 'build.gradle'), buildDotGradle)
-            write(new File(path.toFile(), 'settings.gradle'), '')
+        write(new File(path.toFile(), 'build.gradle'), buildDotGradle)
+        write(new File(path.toFile(), 'settings.gradle'), '')
 
-            Path gradleLink = path.resolve('gradle')
-            Path gradlewLink = path.resolve('gradlew')
+        Path gradleLink = path.resolve('gradle')
+        Path gradlewLink = path.resolve('gradlew')
 
-            Files.deleteIfExists(gradleLink)
-            Files.deleteIfExists(gradlewLink)
+        Files.deleteIfExists(gradleLink)
+        Files.deleteIfExists(gradlewLink)
 
-            Files.createSymbolicLink(gradleLink, getProject().getRootDir().toPath().resolve('gradle'))
-            Files.createSymbolicLink(gradlewLink, getProject().getRootDir().toPath().resolve('gradlew'))
+        Files.createSymbolicLink(gradleLink, getProject().getRootDir().toPath().resolve('gradle'))
+        Files.createSymbolicLink(gradlewLink, getProject().getRootDir().toPath().resolve('gradlew'))
 
-            stdout.append("Start building ${path}\n")
-            stderr.append("Start building ${path}\n:")
+        stdout.append("Start building ${path}\n")
+        stderr.append("Start building ${path}\n:")
 
-            ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'build', '--stacktrace').directory(path.toFile())
-            pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
-            pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'build', '--stacktrace').directory(path.toFile())
+        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
+        pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 
 
-            if (pb.start().waitFor() == 0) {
-                stderr.append("Building ${path} succeed\n")
-                stdout.append("Building ${path} succeed\n")
-            } else {
-                stderr.append("Building ${path} failed\n")
-                stdout.append("Building ${path} failed\n")
-            }
+        if (pb.start().waitFor() == 0) {
+            stderr.append("Building ${path} succeed\n")
+            stdout.append("Building ${path} succeed\n")
+        } else {
+            stderr.append("Building ${path} failed\n")
+            stdout.append("Building ${path} failed\n")
         }
     }
 }
