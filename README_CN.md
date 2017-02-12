@@ -33,9 +33,9 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 支持构建、测试、单个/通配符测试、交叉编译  
 - 现代的、生产级别的自动化构建支持，添加自定义任务极其简单
 - 原生的Gradle语法
-- 增量构建（开发中）
 - 额外为中国大陆开发者提供的特性，你懂的
-- Shadowsocks支持（开发中）
+- Shadowsocks支持
+- 增量构建（开发中）
 - IDE插件支持（规划中）
 
 ## 优势
@@ -549,6 +549,22 @@ repositories{
 若一个仓库匹配某个仓库声明，那么该声明中的身份验证信息将会被用于拉取代码。Gogradle当前只支持Git仓库，身份验证信息可以使用户名/密码（http协议）或者ssh私钥（ssh协议）。
 
 对其他版本控制系统仓库的开发正在进行中，敬请期待。
+
+## 为构建设置代理
+
+若需要为拉取代码设置代理，可以在`gradlew`命令中增加参数（以Shadowsocks为例）：
+
+```./gradlew build -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080```
+
+其他命令类似。
+
+同时，你可以通过在`~/.gradle/gradle.properties`或`${projectRoot}/gradle.properties`中增加
+
+```
+org.gradle.jvmargs=-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080
+```
+
+来将此设置持久化，有关更多环境和代理的信息，详见[Gradle构建环境](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_properties_and_system_properties)与[Java代理](http://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html)
 
 ## IDE集成
 
