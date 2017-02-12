@@ -119,7 +119,7 @@ public class VcsGolangPackage extends GolangPackage {
     public String toString() {
         return "VcsGolangPackage{"
                 + "path='" + getPath() + '\''
-                + "rootPath='" + rootPath + '\''
+                + ", rootPath='" + rootPath + '\''
                 + ", vcsType=" + vcsType
                 + ", url='" + urls + '\''
                 + '}';
