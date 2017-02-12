@@ -29,6 +29,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.Gop
 import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor.GovendorDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory;
+import com.github.blindpirate.gogradle.core.pack.BitbucketPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
@@ -164,6 +165,7 @@ public class GogradleModule extends AbstractModule {
     @DefaultPackagePathResolver.PackagePathResolvers
     public List<PackagePathResolver> packagePathResolvers(
             GithubPackagePathResolver githubPackagePathResolver,
+            BitbucketPackagePathResolver bitbucketPackagePathResolver,
             StandardPackagePathResolver standardPackagePathResolver,
             GlobalCachePackagePathResolver globalCachePackagePathResolver,
             MetadataPackagePathResolver metadataPackagePathResolver,
@@ -171,6 +173,7 @@ public class GogradleModule extends AbstractModule {
         return CollectionUtils.immutableList(
                 standardPackagePathResolver,
                 githubPackagePathResolver,
+                bitbucketPackagePathResolver,
                 globalCachePackagePathResolver,
                 metadataPackagePathResolver,
                 unrecognizedPackagePathResolver
