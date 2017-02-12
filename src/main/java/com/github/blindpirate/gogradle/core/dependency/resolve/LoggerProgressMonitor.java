@@ -13,7 +13,7 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
     private static final int MAGIC_25 = 25;
     private static final int MAGIC_10 = 10;
     private static final int MAGIC_100 = 100;
-    private static final int PADDING_SPACE_COUNT = 50;
+    private static final int PADDING_SPACE_COUNT = 80;
 
 
     public LoggerProgressMonitor(String url) {
