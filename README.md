@@ -55,7 +55,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.1.3'
+    id 'com.github.blindpirate.gogradle' version '0.1.4'
 }
 
 golang {
