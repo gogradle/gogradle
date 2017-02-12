@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -68,8 +69,8 @@ public class DefaultMapNotationParser implements MapNotationParser {
     }
 
     private void verifyVcs(Map<String, Object> notation, GolangPackage golangPackage) {
-        if (notation.containsKey(VCS_KEY)) {
-            String declaredVcs = notation.get(VCS_KEY).toString();
+        String declaredVcs = MapUtils.getString(notation, VCS_KEY);
+        if (StringUtils.isNotBlank(declaredVcs)) {
             String actualVcs = golangPackage.getVcsType().getName();
             Assert.isTrue(declaredVcs.equals(actualVcs),
                     "Vcs type not match: declared is " + declaredVcs + " but actual is " + actualVcs);

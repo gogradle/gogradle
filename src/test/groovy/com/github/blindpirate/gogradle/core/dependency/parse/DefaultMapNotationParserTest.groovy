@@ -66,7 +66,7 @@ class DefaultMapNotationParserTest {
     @WithMockInjector
     void 'notation should be delegated to vcs parser'() {
         // given
-        Map notation = [name: 'path']
+        Map notation = [name: 'path', vcs: '']
         VcsGolangPackage vcsPackage = VcsGolangPackage.builder()
                 .withPath('path')
                 .withRootPath('path')
@@ -79,7 +79,7 @@ class DefaultMapNotationParserTest {
         parser.parse(notation)
 
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'path', 'package': vcsPackage]))
+        verify(vcsMapNotationParser).parse(eq([name: 'path', 'package': vcsPackage, vcs: '']))
     }
 
     @Test
@@ -102,4 +102,13 @@ class DefaultMapNotationParserTest {
         verify(vcsMapNotationParser).parse(eq([name: 'root', 'package': vcsPackage]))
     }
 
+    @Test(expected = IllegalStateException)
+    void 'notation with mismatched vcs should result in an exception'() {
+        // given
+        Map notation = [name: 'github.com/user/package', vcs: 'svn']
+        VcsGolangPackage vcsPackage = MockUtils.mockVcsPackage()
+        when(packagePathResolver.produce('github.com/user/package')).thenReturn(Optional.of(vcsPackage))
+        // when
+        parser.parse(notation)
+    }
 }
