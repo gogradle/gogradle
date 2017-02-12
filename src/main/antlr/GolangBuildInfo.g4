@@ -40,15 +40,15 @@ sourceFile
 //PackageClause  = "package" PackageName .
 //PackageName    = identifier .
 packageClause
-    : 'package' IDENTIFIER
+    : NEWLINE* 'package' IDENTIFIER NEWLINE*
     ;
 
 importDecl
-    : 'import' ( importSpec | '(' ( importSpec ';'? )* ')' )
+    : NEWLINE* 'import' ( importSpec | '(' ( importSpec ';'? )* ')' ) NEWLINE*
     ;
 
 importSpec
-    : ( '.' | IDENTIFIER )? importPath
+    : NEWLINE* ( '.' | IDENTIFIER )? importPath NEWLINE*
     ;
 
 importPath
@@ -56,8 +56,9 @@ importPath
     ;
 
 commentLine
-    : '//' '+build' buildTag
-    | '//' .*?
+    : NEWLINE* '//' '+build' buildTag NEWLINE
+    | NEWLINE* '//' '+build' buildTag '//' .*? NEWLINE
+    | NEWLINE* '//' .*? NEWLINE
     ;
 
 buildTag
@@ -158,7 +159,7 @@ fragment OCTAL_DIGIT   : [0-7]
 fragment HEX_DIGIT     : [0-9a-fA-F]
     ;
 
-fragment NEWLINE        : [\u000A] ; /* the Unicode code point U+000A */
+ NEWLINE        : [\u000A] ; /* the Unicode code point U+000A */
 fragment UNICODE_CHAR   : ~[\u000A] ; /* an arbitrary Unicode code point except newline */
 
 fragment UNICODE_DIGIT
@@ -458,7 +459,7 @@ fragment UNICODE_LETTER
 //    :   '// +build'
 //    ;
 
-WS  :  [ \t\r\n\u000C]+ -> skip
+WS  :  [ \t\r\u000C]+ -> skip
     ;
 
 //BUILD_TAG_LINE

@@ -39,12 +39,28 @@ func generate(ch chan<- int) {
     }
 
     @Test
+    void 'source code with package in comment should be parsed correctly'() {
+        assert extractor.extract('''
+// package main
+// this is package main
+package main
+
+import "fmt"
+
+func Main(){}
+''') == ['fmt']
+    }
+
+
+    @Test
     void 'multiple import should be extracted correctly'() {
         assert extractor.extract('''
 package main
 
 import (
     "fmt"
+    )
+import (
     "math"
 )
 
@@ -94,7 +110,8 @@ balabalabala
         String buildTags = '''
 /*redundant comment*/
 // redundant comment
-// +build appengine // redundant comment
+// package main is a special package
+// +build appengine // redundant comment 
 '''
         // then
         assert !evaluateBuildTags(buildTags, [])
@@ -107,7 +124,8 @@ balabalabala
         String buildTags = '''
 /*redundant comment*/
 // redundant comment
-// +build !appengine /*redundant comment*/
+// +build !appengine /* redundant 
+comment*/
 '''
         // then
         assert evaluateBuildTags(buildTags, [])
@@ -172,4 +190,5 @@ import "fmt"
 '''
         return !extractor.extract(code).isEmpty()
     }
+
 }
