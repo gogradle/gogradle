@@ -54,7 +54,7 @@ public class BitbucketPackagePathResolver extends AbstractPackagePathResolver {
     }
 
     private BitbucketApiModel queryByApi(Path path) {
-        String url = BITBUCKET_API_PREFIX + path.subpath(1, 3);
+        String url = BITBUCKET_API_PREFIX + toUnixString(path.subpath(1, 3));
         try {
             String response = httpUtils.get(url);
             return DataExchange.parseJson(response, BitbucketApiModel.class);
