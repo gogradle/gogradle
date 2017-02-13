@@ -16,6 +16,8 @@ import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.LogCommand;
 import org.eclipse.jgit.api.PullCommand;
 import org.eclipse.jgit.api.ResetCommand;
+import org.eclipse.jgit.api.SubmoduleInitCommand;
+import org.eclipse.jgit.api.SubmoduleUpdateCommand;
 import org.eclipse.jgit.api.TransportCommand;
 import org.eclipse.jgit.api.errors.GitAPIException;
 import org.eclipse.jgit.errors.IncorrectObjectTypeException;
@@ -91,9 +93,10 @@ public class GitAccessor implements VcsAccessor {
         }
         try {
             LOGGER.quiet("Cloing {} into {}", gitUrl, directory);
-            LoggerProgressMonitor monitor = new LoggerProgressMonitor(gitUrl);
+            LoggerProgressMonitor monitor = new LoggerProgressMonitor("Cloning from " + gitUrl);
             CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
+                    .setCloneSubmodules(true)
                     .setProgressMonitor(monitor)
                     .setDirectory(directory);
 
@@ -205,16 +208,38 @@ public class GitAccessor implements VcsAccessor {
         try {
             Git git = Git.wrap(repository);
             // Add all unstaged files and then reset to clear them
-            git.add().addFilepattern(".").call();
-            git.reset().setMode(ResetCommand.ResetType.HARD).call();
+            reset(git);
 
-            PullCommand pullCommand = git.pull();
-            setCredentialsIfNecessary(pullCommand, packageRoot, getRemoteUrl(repository));
-            pullCommand.call();
+            String url = getRemoteUrl(repository);
+
+            pull(packageRoot, git, url);
+
+            updateSubmodule(packageRoot, repository, url);
+
             return repository;
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);
         }
+    }
+
+    private void updateSubmodule(String packageRoot, Repository repository, String url) throws GitAPIException {
+        new SubmoduleInitCommand(repository).call();
+        SubmoduleUpdateCommand suc = new SubmoduleUpdateCommand(repository)
+                .setProgressMonitor(new LoggerProgressMonitor("Pulling from" + url));
+        setCredentialsIfNecessary(suc, packageRoot, url);
+        suc.call();
+    }
+
+    private void pull(String packageRoot, Git git, String url) throws GitAPIException {
+        PullCommand pullCommand = git.pull()
+                .setProgressMonitor(new LoggerProgressMonitor("Pulling from " + url));
+        setCredentialsIfNecessary(pullCommand, packageRoot, url);
+        pullCommand.call();
+    }
+
+    private void reset(Git git) throws GitAPIException {
+        git.add().addFilepattern(".").call();
+        git.reset().setMode(ResetCommand.ResetType.HARD).call();
     }
 
     public long lastCommitTimeOfPath(Repository repository, String path) {

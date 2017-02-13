@@ -143,6 +143,7 @@ class GitAccessorTest {
         gitAccessor.cloneWithUrl(null, "https://github.com/blindpirate/test-for-gogradle.git", resource)
         // then
         assert new File(resource, '.git').exists()
+        assert new File(resource, 'vendor/submodule/LICENSE').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
     }
 
@@ -186,6 +187,7 @@ class GitAccessorTest {
 
         assert !new File(resource, 'tmpfile').exists()
         assert new File(resource, 'helloworld.go').exists()
+        assert new File(resource, 'vendor/submodule/LICENSE').exists()
     }
 
     @Test
