@@ -5,9 +5,10 @@ import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolve
 import com.github.blindpirate.gogradle.util.StringUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
+
+import static java.util.Collections.singletonList;
 
 public class GitNotationDependency extends AbstractNotationDependency {
 
@@ -52,7 +53,7 @@ public class GitNotationDependency extends AbstractNotationDependency {
 
     public List<String> getUrls() {
         if (StringUtils.isNotBlank(url)) {
-            return Arrays.asList(url);
+            return singletonList(url);
         } else {
             return urls;
         }
