@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -131,12 +130,8 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     protected Repository updateRepository(NotationDependency dependency, Repository repository, File directory) {
         gitAccessor.checkout(repository, DEFAULT_BRANCH);
 
-        if (GogradleGlobal.isOffline()) {
-            LOGGER.info("Cannot pull {} since it is offline now.", gitAccessor.getRemoteUrl(repository));
-        } else {
-            LOGGER.info("Pulling {} from {}", dependency, gitAccessor.getRemoteUrl(repository));
-            gitAccessor.hardResetAndPull(dependency.getPackage().getRootPath(), repository);
-        }
+        LOGGER.info("Pulling {} from {}", dependency, gitAccessor.getRemoteUrl(repository));
+        gitAccessor.hardResetAndPull(dependency.getPackage().getRootPath(), repository);
         return repository;
     }
 
