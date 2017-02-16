@@ -34,6 +34,6 @@ public class Assert {
     }
 
     public static <T> void isNotEmpty(Collection<T> collection, String message) {
-        isTrue(collection.isEmpty(), message);
+        isTrue(!collection.isEmpty(), message);
     }
 }
