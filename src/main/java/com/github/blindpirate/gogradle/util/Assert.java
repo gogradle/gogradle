@@ -1,6 +1,8 @@
 package com.github.blindpirate.gogradle.util;
 
 
+import java.util.Collection;
+
 public class Assert {
     public static void isTrue(boolean value) {
         isTrue(value, "This value cannot be false!");
@@ -29,5 +31,9 @@ public class Assert {
     public static String isNotBlank(String s, String message) {
         isTrue(StringUtils.isNotBlank(s), message);
         return s;
+    }
+
+    public static <T> void isNotEmpty(Collection<T> collection, String message) {
+        isTrue(collection.isEmpty(), message);
     }
 }
