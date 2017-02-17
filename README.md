@@ -38,8 +38,8 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Native syntax of gradle
 - Additional features for users in mainland China who are behind the [GFW](https://en.wikipedia.org/wiki/Great_Firewall)
 - Support shadowsocks proxy 
-- Support incremental build (under development)
-- IDE support (in plan)
+- Support incremental build (developing)
+- IDE support (developing)
 
 ## Highlight
 
