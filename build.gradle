@@ -65,6 +65,8 @@ dependencies {
 //    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.13'
     compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.3.2'
     compile group: 'org.apache.ant', name: 'ant', version: '1.10.0'
+//    compile group: 'org.tmatesoft.svnkit', name: 'svnkit', version: '1.8.14'
+    compile 'com.github.blindpirate.gogradle.jgit:hg4j:1.2.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
