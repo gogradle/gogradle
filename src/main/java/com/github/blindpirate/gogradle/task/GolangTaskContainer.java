@@ -25,6 +25,7 @@ public class GolangTaskContainer {
     public static final String INSTALL_TEST_DEPENDENCIES_TASK_NAME = "installTestDependencies";
     public static final String TEST_TASK_NAME = "test";
     public static final String VENDOR_TASK_NAME = "vendor";
+    public static final String IDEA_MODULE_TASK_NAME = "ideaModule";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
@@ -40,6 +41,7 @@ public class GolangTaskContainer {
             .put(CLEAN_TASK_NAME, CleanTask.class)
             .put(CHECK_TASK_NAME, CheckTask.class)
             .put(LOCK_TASK_NAME, LockTask.class)
+            .put(IDEA_MODULE_TASK_NAME, IdeaModuleTask.class)
             .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
