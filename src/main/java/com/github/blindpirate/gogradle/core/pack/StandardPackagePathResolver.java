@@ -73,5 +73,8 @@ public class StandardPackagePathResolver implements PackagePathResolver {
                     "text",
                     "time",
                     "unicode",
-                    "unsafe");
+                    "unsafe",
+                    // since Go 1.8
+                    "plugin"
+                    );
 }
