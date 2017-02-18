@@ -188,7 +188,7 @@ golang {
     mode = 'REPRODUCIBLE'
     
     // The golang version to use. See https://golang.org/dl/
-    // If not specified, the latest table version is used
+    // If not specified, the latest stable version is used
     goVersion = '1.7.1'
     
     // Default value is "go". Modify this when go is not in $PATH
