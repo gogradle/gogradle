@@ -15,10 +15,13 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
+import org.gradle.plugins.ide.idea.GenerateIdeaModule;
 
 import javax.inject.Inject;
 import java.util.stream.Stream;
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 
 
@@ -56,6 +59,17 @@ public class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
         configureTasks(project);
         configureGlobalInjector();
+        configureIdeaPluginIfNecessary();
+    }
+
+    private void configureIdeaPluginIfNecessary() {
+        project.afterEvaluate(project -> {
+            GenerateIdeaModule ideaModuleTask = (GenerateIdeaModule) project.getTasks().findByName("ideaModule");
+            if (ideaModuleTask != null) {
+                ideaModuleTask.dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+                ideaModuleTask.setModule(new GolangIdeaModule(ideaModuleTask.getModule()));
+            }
+        });
     }
 
     private void init(Project project) {
