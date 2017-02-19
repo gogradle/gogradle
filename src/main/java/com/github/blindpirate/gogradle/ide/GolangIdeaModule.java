@@ -11,18 +11,18 @@ import java.util.Collections;
 import java.util.Set;
 
 public class GolangIdeaModule extends IdeaModule {
-    public static final String GO_LIBRARIES_DOT_XML_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" +
-            "<project version=\"4\">\n" +
-            "  <component name=\"GoLibraries\">\n" +
-            "    <option name=\"urls\">\n" +
-            "      <list>\n" +
-            "        <option value=\"file://$PROJECT_DIR$/.gogradle/project_gopath\" />\n" +
-            "        <option value=\"file://$PROJECT_DIR$/.gogradle/build_gopath\" />\n" +
-            "        <option value=\"file://$PROJECT_DIR$/.gogradle/test_gopath\" />\n" +
-            "      </list>\n" +
-            "    </option>\n" +
-            "  </component>\n" +
-            "</project>";
+    public static final String GO_LIBRARIES_DOT_XML_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+            + "<project version=\"4\">\n"
+            + "  <component name=\"GoLibraries\">\n"
+            + "    <option name=\"urls\">\n"
+            + "      <list>\n"
+            + "        <option value=\"file://$PROJECT_DIR$/.gogradle/project_gopath\" />\n"
+            + "        <option value=\"file://$PROJECT_DIR$/.gogradle/build_gopath\" />\n"
+            + "        <option value=\"file://$PROJECT_DIR$/.gogradle/test_gopath\" />\n"
+            + "      </list>\n"
+            + "    </option>\n"
+            + "  </component>\n"
+            + "</project>";
 
     public static final String GO_LIBRARIES_DOT_XML_PATH = ".idea/goLibraries.xml";
 
