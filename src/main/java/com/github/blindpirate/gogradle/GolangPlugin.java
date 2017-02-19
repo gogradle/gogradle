@@ -20,6 +20,7 @@ import org.gradle.plugins.ide.idea.GenerateIdeaModule;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
@@ -70,6 +71,7 @@ public class GolangPlugin implements Plugin<Project> {
             GenerateIdeaModule ideaModuleTask = (GenerateIdeaModule) project.getTasks().findByName("ideaModule");
             ideaModuleTask.setModule(golangIdeaModule);
             ideaPlugin.getModel().setModule(golangIdeaModule);
+            ideaPlugin.getModel().getProject().setModules(Arrays.asList(golangIdeaModule));
         });
     }
 
