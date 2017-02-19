@@ -119,7 +119,7 @@ golang {
     abstract File getProjectRoot()
 
     String getClasspath() {
-        return System.getProperty('java.class.path')
+        return System.getProperty('java.class.path').replace('\\','/')
     }
 
     String getMainClasspath() {
