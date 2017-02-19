@@ -1,5 +1,9 @@
-package com.github.blindpirate.gogradle;
+package com.github.blindpirate.gogradle.ide;
 
+import com.github.blindpirate.gogradle.task.GolangTaskContainer;
+import org.gradle.api.Task;
+import org.gradle.api.internal.TaskInternal;
+import org.gradle.api.logging.Logging;
 import org.gradle.plugins.ide.idea.model.Dependency;
 import org.gradle.plugins.ide.idea.model.IdeaModule;
 
@@ -33,6 +37,22 @@ public class GolangIdeaModule extends IdeaModule {
 
     @Override
     public Set<Dependency> resolveDependencies() {
+        Logging.getLogger(getClass()).quiet("haha");
+        try {
+            Thread.sleep(5000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+        runTask(GolangTaskContainer.PREPARE_TASK_NAME);
+        runTask(GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
+        runTask(GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
+        runTask(GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
+        runTask(GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME);
         return Collections.emptySet();
+    }
+
+    private void runTask(String taskName) {
+        Task task = getProject().getTasks().getByName(taskName);
+        TaskInternal.class.cast(task).execute();
     }
 }
