@@ -3,6 +3,9 @@ package com.github.blindpirate.gogradle.support
 import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.util.IOUtils
+import org.gradle.tooling.BuildAction
+import org.gradle.tooling.BuildActionExecuter
+import org.gradle.tooling.BuildController
 import org.gradle.tooling.BuildLauncher
 import org.gradle.tooling.ConfigurableLauncher
 import org.gradle.tooling.GradleConnector
@@ -65,6 +68,21 @@ golang {
             closure(build)
 
             build.run()
+        } finally {
+            connection.close()
+        }
+    }
+
+    Object buildAction(Closure closure) {
+        ProjectConnection connection = newProjectConnection()
+        try {
+            BuildActionExecuter executor = connection.action(new BuildAction() {
+                @Override
+                Object execute(BuildController controller) {
+                    closure(controller)
+                }
+            })
+            return executor.run()
         } finally {
             connection.close()
         }
