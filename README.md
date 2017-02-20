@@ -38,8 +38,8 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Native syntax of gradle
 - Additional features for users in mainland China who are behind the [GFW](https://en.wikipedia.org/wiki/Great_Firewall)
 - Support shadowsocks proxy 
+- IDE support (beta release for IDEA, support for VSCode and Gogland is under development)
 - Support incremental build (developing)
-- IDE support (developing)
 
 ## Highlight
 
@@ -58,7 +58,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.1.4'
+    id 'com.github.blindpirate.gogradle' version '0.2.0'
 }
 
 golang {

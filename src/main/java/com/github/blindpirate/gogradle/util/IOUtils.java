@@ -117,6 +117,7 @@ public final class IOUtils {
     }
 
     public static File write(File baseDir, String fileName, CharSequence data) {
+        Assert.isNotNull(baseDir);
         File targetFile = new File(baseDir, fileName);
         forceMkdir(targetFile.getParentFile());
         write(targetFile, data);

@@ -91,7 +91,7 @@ public class GitAccessor implements VcsAccessor {
         }
         try {
             LOGGER.quiet("Cloing {} into {}", gitUrl, directory);
-            LoggerProgressMonitor monitor = new LoggerProgressMonitor(gitUrl);
+            LoggerProgressMonitor monitor = new LoggerProgressMonitor("Cloning", gitUrl);
             CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setProgressMonitor(monitor)
@@ -208,8 +208,11 @@ public class GitAccessor implements VcsAccessor {
             git.add().addFilepattern(".").call();
             git.reset().setMode(ResetCommand.ResetType.HARD).call();
 
-            PullCommand pullCommand = git.pull();
-            setCredentialsIfNecessary(pullCommand, packageRoot, getRemoteUrl(repository));
+            String url = getRemoteUrl(repository);
+
+            PullCommand pullCommand = git.pull()
+                    .setProgressMonitor(new LoggerProgressMonitor("Pulling", url));
+            setCredentialsIfNecessary(pullCommand, packageRoot, url);
             pullCommand.call();
             return repository;
         } catch (GitAPIException e) {

@@ -36,8 +36,8 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 原生的Gradle语法
 - 额外为中国大陆开发者提供的特性，你懂的
 - Shadowsocks支持
+- IDE插件支持（对IDEA的支持正在内测，对VSCode和Gogland的支持正在开发中）
 - 增量构建（开发中）
-- IDE插件支持（开发中）
 
 ## 优势
 
@@ -60,7 +60,7 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.1.4'
+    id 'com.github.blindpirate.gogradle' version '0.2.0'
 }
 
 golang {

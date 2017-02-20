@@ -92,6 +92,12 @@ class IOUtilsTest {
         IOUtils.copyDirectory(new File(resource, 'invalid'), new File(resource, 'invalid'), TrueFileFilter.INSTANCE)
     }
 
+    @Test
+    void 'touching should succeed'() {
+        IOUtils.touch(new File(resource, 'newFile'))
+        assert new File(resource, 'newFile').exists()
+    }
+
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when touching fails'() {
         when(mockFile.exists()).thenReturn(true)

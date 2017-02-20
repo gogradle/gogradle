@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
+import com.github.blindpirate.gogradle.ide.GolangIdeaModule;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -15,8 +16,11 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
+import org.gradle.plugins.ide.idea.GenerateIdeaModule;
+import org.gradle.plugins.ide.idea.IdeaPlugin;
 
 import javax.inject.Inject;
+import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
@@ -56,6 +60,19 @@ public class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
         configureTasks(project);
         configureGlobalInjector();
+        configureIdeaPlugin();
+    }
+
+    private void configureIdeaPlugin() {
+        project.getPlugins().withId("idea", plugin -> {
+            IdeaPlugin ideaPlugin = (IdeaPlugin) plugin;
+            GolangIdeaModule golangIdeaModule = new GolangIdeaModule(ideaPlugin.getModel().getModule());
+
+            GenerateIdeaModule ideaModuleTask = (GenerateIdeaModule) project.getTasks().findByName("ideaModule");
+            ideaModuleTask.setModule(golangIdeaModule);
+            ideaPlugin.getModel().setModule(golangIdeaModule);
+            ideaPlugin.getModel().getProject().setModules(Arrays.asList(golangIdeaModule));
+        });
     }
 
     private void init(Project project) {
