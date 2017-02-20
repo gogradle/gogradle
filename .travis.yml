@@ -10,7 +10,7 @@ env:
     - JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=256m
 jdk:
   - oraclejdk8
-script: ./gradlew check --info --stacktrace
+script: ./gradlew check --info --stacktrace --no-daemon
 after_success:
   - ./gradlew jacocoTestReport coveralls
   - free -mt
@@ -21,7 +21,6 @@ before_install:
 
 after_failure:
   - free -mt
-  - dmesg
 
 
 
