@@ -7,12 +7,21 @@ cache:
 env:
   global:
     - GOGS_DIR=/home/travis/gogs
-    - JAVA_OPTS=-Xmx3072m -XX:MaxPermSize=256m
+    - JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=256m
 jdk:
   - oraclejdk8
 script: ./gradlew check --info --stacktrace
 after_success:
   - ./gradlew jacocoTestReport coveralls
+  - free -mth
 
-before_install: mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
+before_install:
+  - mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
+  - free -mth
+
+after_failure:
+  - free -mth
+  - dmesg
+
+
 
