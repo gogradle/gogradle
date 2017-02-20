@@ -111,15 +111,19 @@ golang {
     List<String> buildArguments() {
         return [
                 //"--debug",
-                "-PgoBinPath=${goBinPath.replace('\\', '/')}",
-                "-PpluginRootProject=${getMainClasspath().replace('\\', '/')}",
+                "-PgoBinPath=${getGoBinPath()}",
+                "-PpluginRootProject=${getMainClasspath()}",
                 "-Pclasspath=${getClasspath()}"]
     }
 
     abstract File getProjectRoot()
 
+    String getGoBinPath() {
+        return goBinPath.replace('\\', '/')
+    }
+
     String getClasspath() {
-        return System.getProperty('java.class.path')
+        return System.getProperty('java.class.path').replace('\\', '/')
     }
 
     String getMainClasspath() {
