@@ -13,14 +13,14 @@ jdk:
 script: ./gradlew check --info --stacktrace
 after_success:
   - ./gradlew jacocoTestReport coveralls
-  - free -mth
+  - free -mt
 
 before_install:
   - mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
-  - free -mth
+  - free -mt
 
 after_failure:
-  - free -mth
+  - free -mt
   - dmesg
 
 
