@@ -160,7 +160,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         String[] paths = StringUtils.splitAndTrim(PATH, File.pathSeparator);
 
         for (String path : paths) {
-            Path goExecutablePath = Paths.get(path).resolve("go");
+            Path goExecutablePath = Paths.get(path).resolve("go" + Os.getHostOs().exeExtension());
             Optional<Pair<Path, String>> pathAndVersion = tryInvokeGoVersion(goExecutablePath);
             if (pathAndVersion.isPresent()) {
                 return pathAndVersion;
