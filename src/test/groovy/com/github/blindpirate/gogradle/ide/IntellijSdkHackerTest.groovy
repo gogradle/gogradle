@@ -10,12 +10,12 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import java.nio.file.Paths
-
 @RunWith(GogradleRunner)
 @WithResource('')
-class IntellijSdkSupportTest {
+class IntellijSdkHackerTest {
     File resource
+
+    IntellijSdkHacker hacker = new IntellijSdkHacker()
 
     @Before
     void setUp() {
@@ -95,7 +95,7 @@ class IntellijSdkSupportTest {
         writeInto('IntelliJIdea', '2016.3', xmlWithoutGoSdk)
         writeInto('IdeaIC', '2016.1', xmlWithoutGoSdk)
         writeInto('IdeaIC', '2016.3', xmlWithoutGoSdk)
-        IntellijSdkSupport.ensureSpecificSdkExist('1.7.1', resource.toPath())
+        hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
 
         ['Go 1.7.1', 'Go SDK', "url=\"file://${resource.toPath().resolve('src')}\""].each {
             assert getFileContent('IntelliJIdea', '2016.1').contains(it)
@@ -114,7 +114,7 @@ class IntellijSdkSupportTest {
         writeInto('IdeaIC', '2016.3', xmlWithGoSdk)
 
         List<String> fileContents = loadFileContents()
-        IntellijSdkSupport.ensureSpecificSdkExist('1.7.1', resource.toPath())
+        hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
         assert loadFileContents() == fileContents
     }
 
@@ -136,9 +136,9 @@ class IntellijSdkSupportTest {
     String getLocation(String product, String version) {
         String location
         if (Os.getHostOs() == Os.DARWIN) {
-            location = ReflectionUtils.getStaticField(IntellijSdkSupport, "SETTING_LOCATION_ON_MAC")
+            location = ReflectionUtils.getStaticField(IntellijSdkHacker, "SETTING_LOCATION_ON_MAC")
         } else {
-            location = ReflectionUtils.getStaticField(IntellijSdkSupport, "SETTING_LOCATION_ON_OTHER_OS")
+            location = ReflectionUtils.getStaticField(IntellijSdkHacker, "SETTING_LOCATION_ON_OTHER_OS")
         }
         return StringUtils.render(location, [userHome: System.getProperty('user.home'),
                                              product : product,

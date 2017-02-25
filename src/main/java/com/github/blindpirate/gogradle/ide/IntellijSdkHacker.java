@@ -16,6 +16,7 @@ import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
 
+import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
@@ -38,7 +39,8 @@ import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 
 @SuppressWarnings("checkstyle:linelength")
-public class IntellijSdkSupport {
+@Singleton
+public class IntellijSdkHacker {
     private static final String GO_SDK = "Go SDK";
     private static final Map<String, List<String>> PRODUCTS = ImmutableMap
             .<String, List<String>>builder()
@@ -56,15 +58,15 @@ public class IntellijSdkSupport {
     private static final String SETTING_LOCATION_ON_MAC = "${userHome}/Library/Preferences/${product}${version}/options/jdk.table.xml";
     private static final String SETTING_LOCATION_ON_OTHER_OS = "${userHome}/.${product}${version}/options/jdk.table.xml";
 
-    private static final Logger LOGGER = Logging.getLogger(IntellijSdkSupport.class);
+    private static final Logger LOGGER = Logging.getLogger(IntellijSdkHacker.class);
 
-    private static List<File> getExistentFiles() {
+    private List<File> getExistentFiles() {
         return PRODUCTS.entrySet().stream()
                 .map(entry -> asList(asList(entry.getKey()), entry.getValue()))
                 // [[Idea, 2016.1][Idea,2016.2],[Idea,2016.3]]
                 .map(Lists::cartesianProduct)
                 // [<Idea,2016.1>,<Idea,2016.2>,<Idea,2016.3>]
-                .map(IntellijSdkSupport::listListToPairList)
+                .map(this::listListToPairList)
                 // [[<Idea,2016.1>,<Idea,2016.2>,<Idea,2016.3>],[<WebStorm,2016.1>, ... ], ...]
                 .collect(Collectors.toList())
                 .stream()
@@ -72,16 +74,16 @@ public class IntellijSdkSupport {
                 .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll)
                 .stream()
                 .map(obj -> (Pair<String, String>) obj)
-                .map(IntellijSdkSupport::ofProductAndVersion)
+                .map(this::ofProductAndVersion)
                 .filter(File::exists)
                 .collect(Collectors.toList());
     }
 
-    public static void ensureSpecificSdkExist(String version, Path goroot) {
+    public void ensureSpecificSdkExist(String version, Path goroot) {
         getExistentFiles().forEach(file -> ensureSpecificSdkExist(version, goroot, file));
     }
 
-    private static void ensureSpecificSdkExist(String version, Path goroot, File file) {
+    private void ensureSpecificSdkExist(String version, Path goroot, File file) {
         Document jdkTable = parseDocument(IOUtils.toString(file));
         Node component = child(child(jdkTable, "application"), "component");
 
@@ -96,7 +98,7 @@ public class IntellijSdkSupport {
         }
     }
 
-    private static void writeXmlToFile(Document document, File file) {
+    private void writeXmlToFile(Document document, File file) {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
             transformer.transform(new DOMSource(document), new StreamResult(file));
@@ -106,7 +108,7 @@ public class IntellijSdkSupport {
     }
 
 
-    private static Document parseDocument(String xml) {
+    private Document parseDocument(String xml) {
         try {
             InputStream is = new ByteArrayInputStream(xml.getBytes("UTF-8"));
             return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
@@ -115,7 +117,7 @@ public class IntellijSdkSupport {
         }
     }
 
-    private static Node createSdkNode(Document document, String version, Path goroot) {
+    private Node createSdkNode(Document document, String version, Path goroot) {
         String gorootSrc = goroot.resolve("src").toAbsolutePath().toString();
 
         Element jdk = createElement(document, "jdk", "version", "2");
@@ -154,21 +156,21 @@ public class IntellijSdkSupport {
         return jdk;
     }
 
-    private static Element createElement(Document doc, String tagName, String attrName, String attrValue) {
+    private Element createElement(Document doc, String tagName, String attrName, String attrValue) {
         Element ret = doc.createElement(tagName);
         ret.setAttribute(attrName, attrValue);
         return ret;
     }
 
-    private static Element createElement(Document doc, String tagName, String attrName1, String attrValue1,
-                                         String attrName2, String attrValue2) {
+    private Element createElement(Document doc, String tagName, String attrName1, String attrValue1,
+                                  String attrName2, String attrValue2) {
         Element ret = doc.createElement(tagName);
         ret.setAttribute(attrName1, attrValue1);
         ret.setAttribute(attrName2, attrValue2);
         return ret;
     }
 
-    private static Optional<Node> findGoSdkWithSpecificVersion(NodeList jdkList, String specificVersion) {
+    private Optional<Node> findGoSdkWithSpecificVersion(NodeList jdkList, String specificVersion) {
         /*
         <jdk version="2">
       <name value="Go 1.7.1" />
@@ -212,7 +214,7 @@ public class IntellijSdkSupport {
         return Optional.empty();
     }
 
-    private static Node child(Node node, String name) {
+    private Node child(Node node, String name) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
             if (child instanceof Element
                     && (name.equals(child.getNodeName())) || name.equals(child.getLocalName())) {
@@ -222,11 +224,11 @@ public class IntellijSdkSupport {
         return null;
     }
 
-    private static String attr(Node node, String attr) {
+    private String attr(Node node, String attr) {
         return Element.class.cast(node).getAttribute(attr);
     }
 
-    private static File ofProductAndVersion(Pair<String, String> productAndVersion) {
+    private File ofProductAndVersion(Pair<String, String> productAndVersion) {
         String locationTemplate = determineLocation();
         String realPath = StringUtils.render(locationTemplate,
                 of("userHome", System.getProperty("user.home"),
@@ -235,7 +237,7 @@ public class IntellijSdkSupport {
         return new File(realPath);
     }
 
-    private static String determineLocation() {
+    private String determineLocation() {
         if (Os.getHostOs() == Os.DARWIN) {
             return SETTING_LOCATION_ON_MAC;
         } else {
@@ -243,7 +245,7 @@ public class IntellijSdkSupport {
         }
     }
 
-    private static List<Pair<String, String>> listListToPairList(List<List<String>> listList) {
+    private List<Pair<String, String>> listListToPairList(List<List<String>> listList) {
         return listList.stream().map(list -> Pair.of(list.get(0), list.get(1))).collect(Collectors.toList());
     }
 }
