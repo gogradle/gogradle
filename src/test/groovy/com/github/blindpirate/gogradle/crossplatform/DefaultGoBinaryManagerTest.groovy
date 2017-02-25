@@ -79,10 +79,10 @@ class DefaultGoBinaryManagerTest {
     }
 
     private turnOnMockGo() {
-        IOUtils.write(resource, 'go/bin/go', '')
+        IOUtils.write(resource, "go/bin/go${Os.getHostOs().exeExtension()}", '')
         environmentVariables.set('PATH', new File(resource, 'go/bin').absolutePath)
         Process process = mock(Process)
-        when(processUtilsDelegate.run([new File(resource, 'go/bin/go').absolutePath, 'version'], null, null)).thenReturn(process)
+        when(processUtilsDelegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
         when(processUtilsDelegate.getResult(process)).thenReturn(processResult)
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
@@ -110,7 +110,7 @@ class DefaultGoBinaryManagerTest {
         // given
         turnOnMockGo()
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve('go/bin/go')
+        assert manager.getBinaryPath() == resource.toPath().resolve("go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.1'
         assert manager.getGoroot() == resource.toPath().resolve('go')
     }
@@ -121,7 +121,7 @@ class DefaultGoBinaryManagerTest {
         turnOnMockGo()
         when(setting.getGoVersion()).thenReturn('1.7.1')
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve('go/bin/go')
+        assert manager.getBinaryPath() == resource.toPath().resolve("go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.1'
         assert manager.getGoroot() == resource.toPath().resolve('go')
     }

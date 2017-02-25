@@ -57,7 +57,6 @@ class RenameVendorTaskTest extends TaskTest {
 
 
         IOUtils.mkdir(resource, 'vendor')
-        println(resource.list())
         task.renameVendor()
     }
 }
