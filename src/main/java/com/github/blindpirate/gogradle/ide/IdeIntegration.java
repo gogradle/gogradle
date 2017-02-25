@@ -93,8 +93,6 @@ public abstract class IdeIntegration {
         context.put("projectName", project.getName());
         context.put("moduleType", getModuleType());
         context.put("moduleImlDir", getModuleImlDir());
-        // it seem that there is a strange convention about '.' and '_'
         context.put("goVersion", goBinaryManager.getGoVersion());
-        context.put("goVersionUnderscore", goBinaryManager.getGoVersion().replace('.', '_'));
     }
 }

@@ -42,9 +42,9 @@ class GoglandIntegrationTest {
 
         String moduleIml = IOUtils.toString(new File(resource, '.idea/MyAwesomeProject.iml'))
         assert moduleIml.contains('WEB_MODULE')
-        assert moduleIml.contains('Go_1_7_1')
+        assert moduleIml.contains('Go SDK')
 
-        String goSdkXml = IOUtils.toString(new File(resource, '.idea/libraries/Go_1_7_1.xml'))
+        String goSdkXml = IOUtils.toString(new File(resource, '.idea/libraries/Go_SDK.xml'))
         assert goSdkXml.contains("file://${new File(resource, 'go/src').getAbsolutePath()}")
 
         String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))

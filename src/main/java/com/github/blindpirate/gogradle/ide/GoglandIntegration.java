@@ -15,13 +15,13 @@ public class GoglandIntegration extends IdeIntegration {
             + "  <component name=\"NewModuleRootManager\">\n"
             + "    <content url=\"file://$MODULE_DIR$\" />\n"
             + "    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n"
-            + "    <orderEntry type=\"library\" scope=\"PROVIDED\" name=\"Go_${goVersionUnderscore}\" level=\"project\" />\n"
+            + "    <orderEntry type=\"library\" scope=\"PROVIDED\" name=\"Go SDK\" level=\"project\" />\n"
             + "  </component>\n"
             + "</module>";
 
-    private static final String GO_SDK_DOT_XML_PATH = ".idea/libraries/Go_${goVersionUnderscore}.xml";
+    private static final String GO_SDK_DOT_XML_PATH = ".idea/libraries/Go_SDK.xml";
     private static final String GO_SDK_DOT_XML_CONTENT = "<component name=\"libraryTable\">\n"
-            + "  <library name=\"Go_${goVersionUnderscore}\">\n"
+            + "  <library name=\"Go SDK\">\n"
             + "    <CLASSES>\n"
             + "      <root url=\"file://${goRootSrc}\" />\n"
             + "    </CLASSES>\n"
