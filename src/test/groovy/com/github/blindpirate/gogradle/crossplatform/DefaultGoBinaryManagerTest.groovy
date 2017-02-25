@@ -54,7 +54,6 @@ class DefaultGoBinaryManagerTest {
     void setUp() {
         ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', processUtilsDelegate)
         when(setting.getGoExecutable()).thenReturn("go")
-        turnOffMockGo()
 
         when(globalCacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
             @Override
@@ -88,15 +87,20 @@ class DefaultGoBinaryManagerTest {
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
 
-    private turnOffMockGo() {
-        when(processResult.getStdout()).thenReturn('This is not a golang executable')
-    }
-
     @Test
     void 'user-specified go binary should be ignored if it cannot be executed'() {
         // given
         when(processUtilsDelegate.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
         when(setting.getGoExecutable()).thenReturn('/unexistent/go')
+        // then
+        'the newest stable version will be used if local binary not exist and no version specified'()
+    }
+
+    @Test
+    void 'local go binary should be ignored if it cannot be recognized'() {
+        // given
+        turnOnMockGo()
+        when(processResult.getStdout()).thenReturn('this is not a golang executable')
         // then
         'the newest stable version will be used if local binary not exist and no version specified'()
     }
@@ -143,6 +147,13 @@ class DefaultGoBinaryManagerTest {
         assert manager.getGoVersion() == '1.7.4'
         assert manager.getGoroot() == resource.toPath().resolve('1.7.4/go')
         verify(httpUtils, times(0)).download(anyString(), any(Path))
+    }
+
+    @Test
+    void 'go with specific version should be downloaded if it does not match go version on host'() {
+        // given
+        turnOnMockGo()
+        'go binary with specified version should be downloaded'()
     }
 
     @Test

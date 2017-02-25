@@ -154,6 +154,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         return tryInvokeGoVersion(givenGoExecutablePath);
     }
 
+    @SuppressWarnings({"checkstyle:localvariablename"})
     private Optional<Pair<Path, String>> findGoBinAndVersionInPATH() {
         String PATH = System.getenv("PATH");
         String[] paths = StringUtils.splitAndTrim(PATH, File.pathSeparator);
@@ -186,7 +187,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     private void fetchSpecifiedVersion(String version) {
-        Path goroot = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
+        goroot = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
         goVersion = version;
 
         binaryPath = goroot.resolve("bin/go" + Os.getHostOs().exeExtension());
