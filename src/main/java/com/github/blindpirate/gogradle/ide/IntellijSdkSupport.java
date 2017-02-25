@@ -23,8 +23,10 @@ import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -32,10 +34,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.util.IOUtils.toInputStream;
 import static com.google.common.collect.ImmutableMap.of;
 import static java.util.Arrays.asList;
 
+@SuppressWarnings("checkstyle:linelength")
 public class IntellijSdkSupport {
     private static final String GO_SDK = "Go SDK";
     private static final Map<String, List<String>> PRODUCTS = ImmutableMap
@@ -106,7 +108,8 @@ public class IntellijSdkSupport {
 
     private static Document parseDocument(String xml) {
         try {
-            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(toInputStream(xml));
+            InputStream is = new ByteArrayInputStream(xml.getBytes("UTF-8"));
+            return DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(is);
         } catch (SAXException | IOException | ParserConfigurationException e) {
             throw ExceptionHandler.uncheckException(e);
         }
@@ -211,8 +214,8 @@ public class IntellijSdkSupport {
 
     private static Node child(Node node, String name) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof Element &&
-                    (name.equals(child.getNodeName())) || name.equals(child.getLocalName())) {
+            if (child instanceof Element
+                    && (name.equals(child.getNodeName())) || name.equals(child.getLocalName())) {
                 return child;
             }
         }
