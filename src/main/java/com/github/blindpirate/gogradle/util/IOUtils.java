@@ -197,14 +197,6 @@ public final class IOUtils {
         }
     }
 
-    public static InputStream toInputStream(String s) {
-        try {
-            return org.apache.commons.io.IOUtils.toInputStream(s, "UTF-8");
-        } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
-        }
-    }
-
     public static String byteCountToDisplaySize(long size) {
         return FileUtils.byteCountToDisplaySize(size);
     }
