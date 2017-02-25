@@ -19,6 +19,7 @@ import org.xml.sax.SAXException;
 import javax.inject.Singleton;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.OutputKeys;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
@@ -101,6 +102,7 @@ public class IntellijSdkHacker {
     private void writeXmlToFile(Document document, File file) {
         try {
             Transformer transformer = TransformerFactory.newInstance().newTransformer();
+            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
             transformer.transform(new DOMSource(document), new StreamResult(file));
         } catch (TransformerException e) {
             throw ExceptionHandler.uncheckException(e);
@@ -143,7 +145,7 @@ public class IntellijSdkHacker {
         Element sourcePath = document.createElement("sourcePath");
         Element sourcePathRoot = createElement(document, "root", "type", "composite");
         sourcePathRoot.appendChild(createElement(document, "root", "type", "simple", "url", "file://" + gorootSrc));
-        sourcePath.appendChild(classPathRoot);
+        sourcePath.appendChild(sourcePathRoot);
 
         roots.appendChild(annotationsPath);
         roots.appendChild(classPath);

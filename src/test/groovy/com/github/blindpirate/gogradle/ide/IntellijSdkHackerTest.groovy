@@ -10,6 +10,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static org.apache.commons.lang3.StringUtils.countMatches
+
 @RunWith(GogradleRunner)
 @WithResource('')
 class IntellijSdkHackerTest {
@@ -122,7 +124,14 @@ class IntellijSdkHackerTest {
         writeInto('IdeaIC', '2016.3', xmlWithoutSpecificGoSdk)
         hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
 
-        ['Go 1.7.1', 'Go SDK', "url=\"file://${resource.toPath().resolve('src')}\""].each {
+        String location = "url=\"file://${resource.toPath().resolve('src')}\""
+
+        assert countMatches(getFileContent('IntelliJIdea', '2016.1'), location) == 2
+        assert countMatches(getFileContent('IntelliJIdea', '2016.3'), location) == 2
+        assert countMatches(getFileContent('IdeaIC', '2016.1'), location) == 2
+        assert countMatches(getFileContent('IdeaIC', '2016.3'), location) == 2
+
+        ['Go 1.7.1', 'Go SDK'].each {
             assert getFileContent('IntelliJIdea', '2016.1').contains(it)
             assert getFileContent('IntelliJIdea', '2016.3').contains(it)
             assert getFileContent('IdeaIC', '2016.1').contains(it)
