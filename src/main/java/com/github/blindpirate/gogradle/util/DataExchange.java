@@ -15,13 +15,13 @@ import static com.github.blindpirate.gogradle.util.ExceptionHandler.uncheckExcep
 public class DataExchange {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
     private static final ObjectMapper YAML_MAPPER = new ObjectMapper(new YAMLFactory());
-    private static XmlMapper XML_MAPPER;
+    private static XmlMapper xmlMapper;
 
     static {
         // Override the default config, otherwise it will not ignore <?xml ...>
         WstxInputFactory inputFactory = new WstxInputFactory();
         inputFactory.getConfig().setInputParsingMode(PARSING_MODE_DOCUMENTS);
-        XML_MAPPER = new XmlMapper(inputFactory);
+        xmlMapper = new XmlMapper(inputFactory);
     }
 
     public static <T> T parseJson(File file, Class<T> clazz) {
@@ -37,7 +37,7 @@ public class DataExchange {
     }
 
     public static <T> T parseXml(File file, Class<T> clazz) {
-        return parseWithMapper(XML_MAPPER, file, clazz);
+        return parseWithMapper(xmlMapper, file, clazz);
     }
 
     private static <T> T parseWithMapper(ObjectMapper mapper, String s, Class<T> clazz) {
