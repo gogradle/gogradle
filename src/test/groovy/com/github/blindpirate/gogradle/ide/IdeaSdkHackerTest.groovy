@@ -14,10 +14,10 @@ import static org.apache.commons.lang3.StringUtils.countMatches
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class IntellijSdkHackerTest {
+class IdeaSdkHackerTest {
     File resource
 
-    IntellijSdkHacker hacker = new IntellijSdkHacker()
+    IdeaSdkHacker hacker = new IdeaSdkHacker()
 
     @Before
     void setUp() {
@@ -176,9 +176,9 @@ class IntellijSdkHackerTest {
     String getLocation(String product, String version) {
         String location
         if (Os.getHostOs() == Os.DARWIN) {
-            location = ReflectionUtils.getStaticField(IntellijSdkHacker, "SETTING_LOCATION_ON_MAC")
+            location = ReflectionUtils.getStaticField(IdeaSdkHacker, "SETTING_LOCATION_ON_MAC")
         } else {
-            location = ReflectionUtils.getStaticField(IntellijSdkHacker, "SETTING_LOCATION_ON_OTHER_OS")
+            location = ReflectionUtils.getStaticField(IdeaSdkHacker, "SETTING_LOCATION_ON_OTHER_OS")
         }
         return StringUtils.render(location, [userHome: System.getProperty('user.home'),
                                              product : product,

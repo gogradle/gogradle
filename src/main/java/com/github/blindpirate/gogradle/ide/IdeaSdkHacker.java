@@ -41,25 +41,19 @@ import static java.util.Arrays.asList;
 
 @SuppressWarnings("checkstyle:linelength")
 @Singleton
-public class IntellijSdkHacker {
+public class IdeaSdkHacker {
     private static final String GO_SDK = "Go SDK";
     private static final Map<String, List<String>> PRODUCTS = ImmutableMap
             .<String, List<String>>builder()
             .put("IntelliJIdea", asList("2016.1", "2016.2", "2016.3"))
             .put("IdeaIC", asList("2016.1", "2016.2", "2016.3"))
-            .put("WebStorm", asList("2016.1", "2016.2", "2016.3"))
-            .put("PhpStorm", asList("2016.1", "2016.2", "2016.3"))
-            .put("PyCharm", asList("2016.1", "2016.2", "2016.3"))
-            .put("RubyMine", asList("2016.1", "2016.2", "2016.3"))
-            .put("CLion", asList("2016.1", "2016.2", "2016.3"))
-            //.put("Android Studio", asList())
             .build();
 
     // See https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
     private static final String SETTING_LOCATION_ON_MAC = "${userHome}/Library/Preferences/${product}${version}/options/jdk.table.xml";
     private static final String SETTING_LOCATION_ON_OTHER_OS = "${userHome}/.${product}${version}/options/jdk.table.xml";
 
-    private static final Logger LOGGER = Logging.getLogger(IntellijSdkHacker.class);
+    private static final Logger LOGGER = Logging.getLogger(IdeaSdkHacker.class);
 
     private List<File> getExistentFiles() {
         return PRODUCTS.entrySet().stream()

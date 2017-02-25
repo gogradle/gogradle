@@ -28,12 +28,12 @@ public class IdeaIntegration extends IdeIntegration {
             + "  </component>\n"
             + "</module>";
 
-    private final IntellijSdkHacker hacker;
+    private final IdeaSdkHacker hacker;
 
     @Inject
     public IdeaIntegration(GoBinaryManager goBinaryManager,
                            Project project,
-                           IntellijSdkHacker hacker) {
+                           IdeaSdkHacker hacker) {
         super(goBinaryManager, project);
         this.hacker = hacker;
     }

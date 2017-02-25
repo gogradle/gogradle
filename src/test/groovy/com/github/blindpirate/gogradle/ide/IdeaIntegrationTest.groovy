@@ -21,7 +21,7 @@ class IdeaIntegrationTest {
     @Mock
     Project project
     @Mock
-    IntellijSdkHacker hacker
+    IdeaSdkHacker hacker
 
     File resource
 
