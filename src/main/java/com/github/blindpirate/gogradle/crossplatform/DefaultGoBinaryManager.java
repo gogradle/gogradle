@@ -6,9 +6,11 @@ import com.github.blindpirate.gogradle.util.CompressUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.filefilter.TrueFileFilter;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -18,11 +20,14 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
+import static com.github.blindpirate.gogradle.util.IOUtils.toRealPath;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.getResult;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.run;
@@ -60,8 +65,8 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private final HttpUtils httpUtils;
 
     private boolean resolved = false;
-    private String binaryPath;
-    private String gorootEnv;
+    private Path binaryPath;
+    private Path goroot;
     private String goVersion;
 
     @Inject
@@ -74,15 +79,15 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     @Override
-    public String getBinaryPath() {
+    public Path getBinaryPath() {
         resolveIfNecessary();
         return binaryPath;
     }
 
     @Override
-    public String getGorootEnv() {
+    public Path getGoroot() {
         resolveIfNecessary();
-        return gorootEnv;
+        return goroot;
     }
 
     @Override
@@ -96,35 +101,35 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
             return;
         }
         determineGoBinaryAndVersion();
+        // $GOROOT/bin/go -> $GOROOT
+        goroot = toRealPath(binaryPath).resolve("../..").normalize();
         resolved = true;
     }
 
     private void determineGoBinaryAndVersion() {
-        Optional<String> versionOnHost = goVersionOnHost(setting.getGoExecutable());
+        Optional<Pair<Path, String>> binPathAndVersionOnHost = getGoBinPathAndVersionOnHost();
 
-        if (setting.getGoVersion() != null) {
-            if (specificVersionIsHostVersion(versionOnHost)) {
-                useGoExecutableOnHost(versionOnHost.get());
+        if (binPathAndVersionOnHost.isPresent()) {
+            Path goBinPath = binPathAndVersionOnHost.get().getLeft();
+            String version = binPathAndVersionOnHost.get().getRight();
+            if (setting.getGoVersion() == null || setting.getGoVersion().equals(version)) {
+                useGoExecutableOnHost(goBinPath, version);
             } else {
                 fetchSpecifiedVersion(setting.getGoVersion());
             }
         } else {
-            if (versionOnHost.isPresent()) {
-                useGoExecutableOnHost(versionOnHost.get());
-            } else {
+            if (setting.getGoVersion() == null) {
                 fetchNewestStableVersion();
+            } else {
+                fetchSpecifiedVersion(setting.getGoVersion());
             }
         }
     }
 
-    private void useGoExecutableOnHost(String versionOnHost) {
-        LOGGER.quiet("Found go {}, use it.", versionOnHost);
-        binaryPath = setting.getGoExecutable();
+    private void useGoExecutableOnHost(Path goBinPathOnHost, String versionOnHost) {
+        LOGGER.quiet("Found go {} in {}, use it.", versionOnHost, goBinPathOnHost);
+        binaryPath = goBinPathOnHost;
         goVersion = versionOnHost;
-    }
-
-    private boolean specificVersionIsHostVersion(Optional<String> versionOnHost) {
-        return setting.getGoVersion().equals(versionOnHost.orElse(null));
     }
 
     private void fetchNewestStableVersion() {
@@ -136,33 +141,60 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         }
     }
 
-    private Optional<String> goVersionOnHost(String goExePath) {
+    private Optional<Pair<Path, String>> getGoBinPathAndVersionOnHost() {
+        if ("go".equals(setting.getGoExecutable())) {
+            return findGoBinAndVersionInPATH();
+        } else {
+            return tryGivenGoExecutable();
+        }
+    }
+
+    private Optional<Pair<Path, String>> tryGivenGoExecutable() {
+        Path givenGoExecutablePath = Paths.get(setting.getGoExecutable());
+        return tryInvokeGoVersion(givenGoExecutablePath);
+    }
+
+    private Optional<Pair<Path, String>> findGoBinAndVersionInPATH() {
+        String PATH = System.getenv("PATH");
+        String[] paths = StringUtils.splitAndTrim(PATH, File.pathSeparator);
+
+        for (String path : paths) {
+            Path goExecutablePath = Paths.get(path).resolve("go");
+            Optional<Pair<Path, String>> pathAndVersion = tryInvokeGoVersion(goExecutablePath);
+            if (pathAndVersion.isPresent()) {
+                return pathAndVersion;
+            }
+        }
+        return Optional.empty();
+    }
+
+    private Optional<Pair<Path, String>> tryInvokeGoVersion(Path executablePath) {
         try {
-            Process process = run(goExePath, "version");
+            Process process = run(executablePath.toAbsolutePath().toString(), "version");
             ProcessResult result = getResult(process);
             Matcher m = GO_VERSION_OUTPUT_REGEX.matcher(result.getStdout());
             if (m.find()) {
-                return Optional.of(m.group(1));
+                Pair binaryPathAndVersion = Pair.of(executablePath, m.group(1));
+                return Optional.of(binaryPathAndVersion);
             } else {
                 return Optional.empty();
             }
         } catch (Exception e) {
+            LOGGER.debug("Encountered exception when running go version", e);
             return Optional.empty();
         }
     }
 
     private void fetchSpecifiedVersion(String version) {
-        Path gorootPath = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
-        gorootEnv = gorootPath.toAbsolutePath().toString();
+        Path goroot = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
         goVersion = version;
 
-        Path goExecutablePath = gorootPath.resolve("bin/go" + Os.getHostOs().exeExtension());
-        binaryPath = goExecutablePath.toString();
-        if (!Files.exists(goExecutablePath)) {
+        binaryPath = goroot.resolve("bin/go" + Os.getHostOs().exeExtension());
+        if (!Files.exists(binaryPath)) {
             LOGGER.quiet("Start downloading go {}.", version);
             downloadSpecifiedVersion(version);
-            addXPermissionToAllDescendant(gorootPath.resolve("bin"));
-            addXPermissionToAllDescendant(gorootPath.resolve("pkg/tool"));
+            addXPermissionToAllDescendant(goroot.resolve("bin"));
+            addXPermissionToAllDescendant(goroot.resolve("pkg/tool"));
         }
     }
 
@@ -184,7 +216,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         String url = injectVariables(baseUrl, version);
         String archiveFileName = injectVariables(FILENAME, version);
         Path goBinaryCachePath = globalCacheManager.getGlobalGoBinCache(archiveFileName);
-        IOUtils.forceMkdir(goBinaryCachePath.getParent().toFile());
+        forceMkdir(goBinaryCachePath.getParent().toFile());
         try {
             httpUtils.download(url, goBinaryCachePath);
         } catch (IOException e) {

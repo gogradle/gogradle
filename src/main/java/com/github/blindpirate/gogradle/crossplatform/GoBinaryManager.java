@@ -1,9 +1,11 @@
 package com.github.blindpirate.gogradle.crossplatform;
 
+import java.nio.file.Path;
+
 public interface GoBinaryManager {
     String getGoVersion();
 
-    String getBinaryPath();
+    Path getBinaryPath();
 
-    String getGorootEnv();
+    Path getGoroot();
 }
