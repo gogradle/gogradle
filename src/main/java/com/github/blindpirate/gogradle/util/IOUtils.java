@@ -189,9 +189,17 @@ public final class IOUtils {
         }
     }
 
-    public static Path toRealPath(String path) {
+    public static Path toRealPath(Path path) {
         try {
-            return Paths.get(path).toRealPath();
+            return path.toRealPath();
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public static InputStream toInputStream(String s) {
+        try {
+            return org.apache.commons.io.IOUtils.toInputStream(s, "UTF-8");
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
