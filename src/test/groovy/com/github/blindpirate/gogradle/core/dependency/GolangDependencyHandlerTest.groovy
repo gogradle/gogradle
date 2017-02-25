@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.gradle.api.Project
 import org.gradle.api.artifacts.Configuration
 import org.gradle.api.artifacts.ConfigurationContainer
 import org.gradle.api.artifacts.DependencySet
@@ -12,7 +13,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -29,12 +29,14 @@ class GolangDependencyHandlerTest {
     NotationParser notationParser
     @Mock
     DependencySet dependencies
+    @Mock
+    Project project
 
     GolangDependencyHandler handler
 
     @Before
     void setUp() {
-        handler = new GolangDependencyHandler(configurationContainer, notationParser)
+        handler = new GolangDependencyHandler(configurationContainer, notationParser, project)
         when(configurationContainer.findByName('build')).thenReturn(configuration)
         when(notationParser.parse('notation')).thenReturn(dependency)
         when(configuration.getDependencies()).thenReturn(dependencies)
@@ -42,7 +44,7 @@ class GolangDependencyHandlerTest {
 
     @Test
     void 'unsupported method should all throw UnsupportedException'() {
-        ReflectionUtils.testUnsupportedMethods(handler, DependencyHandler, ['create', 'add'])
+        ReflectionUtils.testUnsupportedMethods(handler, DependencyHandler, ['create', 'add', 'createArtifactResolutionQuery'])
     }
 
     @Test(expected = MissingMethodException)
@@ -57,7 +59,7 @@ class GolangDependencyHandlerTest {
     }
 
     @Test
-    void 'creating dependency should succeed'(){
+    void 'creating dependency should succeed'() {
         assert handler.create('notation').is(dependency)
     }
 }
