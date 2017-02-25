@@ -8,12 +8,16 @@ import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ExcludeRule;
+import org.gradle.api.artifacts.PublishArtifact;
 import org.gradle.api.artifacts.PublishArtifactSet;
 import org.gradle.api.artifacts.ResolutionStrategy;
 import org.gradle.api.artifacts.ResolvableDependencies;
 import org.gradle.api.artifacts.ResolvedConfiguration;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
+import org.gradle.api.internal.DefaultDomainObjectSet;
+import org.gradle.api.internal.collections.CollectionFilter;
+import org.gradle.api.internal.file.collections.SimpleFileCollection;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.StopExecutionException;
 import org.gradle.api.tasks.TaskDependency;
@@ -116,7 +120,7 @@ public class GolangConfiguration implements Configuration {
 
     @Override
     public String getDescription() {
-        throw new UnsupportedOperationException();
+        return getName() + " configuration";
     }
 
     @Override
@@ -187,17 +191,20 @@ public class GolangConfiguration implements Configuration {
 
     @Override
     public DependencySet getAllDependencies() {
-        throw new UnsupportedOperationException();
+        // hacking for IDEA
+        return new GolangDependencySet().toDependencySet();
     }
 
     @Override
     public PublishArtifactSet getArtifacts() {
-        throw new UnsupportedOperationException();
+        // hacking for IDEA
+        return new EmptyPublishArtifactSet();
     }
 
     @Override
     public PublishArtifactSet getAllArtifacts() {
-        throw new UnsupportedOperationException();
+        // hacking for IDEA
+        return new EmptyPublishArtifactSet();
     }
 
     @Override
@@ -338,6 +345,24 @@ public class GolangConfiguration implements Configuration {
     @Override
     public Object addToAntBuilder(Object builder, String nodeName) {
         throw new UnsupportedOperationException();
+    }
+
+
+    private static class EmptyPublishArtifactSet extends DefaultDomainObjectSet<PublishArtifact> implements PublishArtifactSet {
+        protected EmptyPublishArtifactSet() {
+            super(new DefaultDomainObjectSet<>(PublishArtifact.class),
+                    new CollectionFilter<>(PublishArtifact.class));
+        }
+
+        @Override
+        public FileCollection getFiles() {
+            return new SimpleFileCollection();
+        }
+
+        @Override
+        public TaskDependency getBuildDependencies() {
+            return null;
+        }
     }
 
 }
