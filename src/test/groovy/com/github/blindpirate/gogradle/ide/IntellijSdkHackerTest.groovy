@@ -82,19 +82,44 @@ class IntellijSdkHackerTest {
   </component>
 </application>
 '''
-    String xmlWithoutGoSdk = '''
+    String xmlWithoutSpecificGoSdk = '''
 <application>
   <component name="ProjectJdkTable"> 
+  <jdk version="2">
+      <name value="Go 1.7.4" />
+      <type value="Go SDK" />
+      <version value="1.7.4" />
+      <homePath value="/usr/local/Cellar/go/1.7.4/libexec" />
+      <roots>
+        <annotationsPath>
+          <root type="composite" />
+        </annotationsPath>
+        <classPath>
+          <root type="composite">
+            <root type="simple" url="file:///usr/local/Cellar/go/1.7.4/libexec/src" />
+          </root>
+        </classPath>
+        <javadocPath>
+          <root type="composite" />
+        </javadocPath>
+        <sourcePath>
+          <root type="composite">
+            <root type="simple" url="file:///usr/local/Cellar/go/1.7.4/libexec/src" />
+          </root>
+        </sourcePath>
+      </roots>
+      <additional />
+    </jdk>
   </component>
 </application>
 '''
 
     @Test
     void 'sdk should be added if not exist'() {
-        writeInto('IntelliJIdea', '2016.1', xmlWithoutGoSdk)
-        writeInto('IntelliJIdea', '2016.3', xmlWithoutGoSdk)
-        writeInto('IdeaIC', '2016.1', xmlWithoutGoSdk)
-        writeInto('IdeaIC', '2016.3', xmlWithoutGoSdk)
+        writeInto('IntelliJIdea', '2016.1', xmlWithoutSpecificGoSdk)
+        writeInto('IntelliJIdea', '2016.3', xmlWithoutSpecificGoSdk)
+        writeInto('IdeaIC', '2016.1', xmlWithoutSpecificGoSdk)
+        writeInto('IdeaIC', '2016.3', xmlWithoutSpecificGoSdk)
         hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
 
         ['Go 1.7.1', 'Go SDK', "url=\"file://${resource.toPath().resolve('src')}\""].each {
@@ -116,6 +141,12 @@ class IntellijSdkHackerTest {
         List<String> fileContents = loadFileContents()
         hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
         assert loadFileContents() == fileContents
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exceptions should be thrown if xml is corrupted'() {
+        writeInto('IdeaIC', '2016.1', '<badxml><')
+        hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
     }
 
     List loadFileContents() {

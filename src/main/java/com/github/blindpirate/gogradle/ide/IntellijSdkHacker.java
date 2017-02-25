@@ -216,8 +216,7 @@ public class IntellijSdkHacker {
 
     private Node child(Node node, String name) {
         for (Node child = node.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof Element
-                    && (name.equals(child.getNodeName())) || name.equals(child.getLocalName())) {
+            if (child instanceof Element && (name.equals(child.getNodeName()))) {
                 return child;
             }
         }
