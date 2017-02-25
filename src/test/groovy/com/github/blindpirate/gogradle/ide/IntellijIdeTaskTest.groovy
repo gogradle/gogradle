@@ -10,12 +10,12 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
-class GoglandTaskTest extends TaskTest {
-    GoglandTask task
+class IntellijIdeTaskTest extends TaskTest {
+    IntellijIdeTask task
 
     @Before
     void setUp() {
-        task = buildTask(GoglandTask)
+        task = buildTask(IntellijIdeTask)
     }
 
     @Test

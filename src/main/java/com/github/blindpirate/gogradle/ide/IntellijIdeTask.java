@@ -8,11 +8,11 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_B
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RENAME_VENDOR_TASK_NAME;
 
-public class GoglandTask extends AbstractGolangTask {
+public class IntellijIdeTask extends AbstractGolangTask {
     @Inject
-    private GoglandIntegration goglandIntegration;
+    private IntellijIdeIntegration intellijIdeIntegration;
 
-    public GoglandTask() {
+    public IntellijIdeTask() {
         dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
                 INSTALL_TEST_DEPENDENCIES_TASK_NAME,
                 RENAME_VENDOR_TASK_NAME);
@@ -20,6 +20,6 @@ public class GoglandTask extends AbstractGolangTask {
 
     @TaskAction
     public void generateXmlsForGogland() {
-        goglandIntegration.generateIdeaXmls();
+        intellijIdeIntegration.generateIdeaXmls();
     }
 }

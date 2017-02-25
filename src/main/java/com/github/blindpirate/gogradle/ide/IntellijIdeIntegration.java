@@ -6,9 +6,12 @@ import org.gradle.api.Project;
 
 import javax.inject.Singleton;
 
+/**
+ * For PHPStorm/PyCharm/WebStorm/Gogland
+ */
 @Singleton
 @SuppressWarnings("checkstyle:linelength")
-public class GoglandIntegration extends IdeIntegration {
+public class IntellijIdeIntegration extends IdeIntegration {
     private static final String MODULE_IML_PATH = ".idea/${projectName}.iml";
     private static final String MODULE_IML_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
             + "<module type=\"${moduleType}\" version=\"4\">\n"
@@ -32,7 +35,7 @@ public class GoglandIntegration extends IdeIntegration {
             + "</component>";
 
     @Inject
-    public GoglandIntegration(GoBinaryManager goBinaryManager, Project project) {
+    public IntellijIdeIntegration(GoBinaryManager goBinaryManager, Project project) {
         super(goBinaryManager, project);
     }
 

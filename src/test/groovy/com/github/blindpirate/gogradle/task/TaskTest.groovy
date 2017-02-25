@@ -8,7 +8,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
-import com.github.blindpirate.gogradle.ide.GoglandIntegration
+import com.github.blindpirate.gogradle.ide.IntellijIdeIntegration
 import com.github.blindpirate.gogradle.ide.IdeaIntegration
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
@@ -42,7 +42,7 @@ abstract class TaskTest {
     @Mock
     IdeaIntegration ideaIntegration
     @Mock
-    GoglandIntegration goglandIntegration
+    IntellijIdeIntegration goglandIntegration
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 

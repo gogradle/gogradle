@@ -14,18 +14,18 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class GoglandIntegrationTest {
+class IntellijIdeIntegrationTest {
     @Mock
     GoBinaryManager manager
     @Mock
     Project project
     File resource
 
-    GoglandIntegration goglandIntegration
+    IntellijIdeIntegration goglandIntegration
 
     @Before
     void setUp() {
-        goglandIntegration = new GoglandIntegration(manager, project)
+        goglandIntegration = new IntellijIdeIntegration(manager, project)
         when(project.getRootDir()).thenReturn(resource)
         when(manager.getBinaryPath()).thenReturn(new File(resource, 'go/bin/go').toPath())
         when(manager.getGoroot()).thenReturn(new File(resource, 'go').toPath())

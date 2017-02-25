@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.ide.GoglandTask;
+import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
 import com.github.blindpirate.gogradle.ide.IdeaTask;
 import com.github.blindpirate.gogradle.ide.RenameVendorTask;
 import com.google.common.collect.ImmutableMap;
@@ -30,6 +30,8 @@ public class GolangTaskContainer {
     public static final String VENDOR_TASK_NAME = "vendor";
     public static final String IDEA_TASK_NAME = "ideaGolang";
     public static final String GOGLAND_TASK_NAME = "gogland";
+    public static final String WEBSTORM_TASK_NAME = "webStorm";
+    public static final String PHPSTORM_TASK_NAME = "phpStorm";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
@@ -47,7 +49,9 @@ public class GolangTaskContainer {
             .put(CHECK_TASK_NAME, CheckTask.class)
             .put(LOCK_TASK_NAME, LockTask.class)
             .put(IDEA_TASK_NAME, IdeaTask.class)
-            .put(GOGLAND_TASK_NAME, GoglandTask.class)
+            .put(GOGLAND_TASK_NAME, IntellijIdeTask.class)
+            .put(WEBSTORM_TASK_NAME, IntellijIdeTask.class)
+            .put(PHPSTORM_TASK_NAME, IntellijIdeTask.class)
             .put(RENAME_VENDOR_TASK_NAME, RenameVendorTask.class)
             .build();
 
