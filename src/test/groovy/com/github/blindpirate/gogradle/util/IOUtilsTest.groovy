@@ -195,5 +195,8 @@ class IOUtilsTest {
         assert new File(resource, 'a/b/c').getText() == 'content'
     }
 
-
+    @Test(expected = IllegalStateException)
+    void 'tracking an unexistent path should fail'() {
+        IOUtils.toRealPath(Paths.get('/gogradle_unexistent'))
+    }
 }
