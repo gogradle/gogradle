@@ -186,7 +186,8 @@ public class GolangConfiguration implements Configuration {
     @Override
     public TaskDependency getTaskDependencyFromProjectDependency(boolean useDependedOn,
                                                                  String taskName) {
-        throw new UnsupportedOperationException("Unsupported method getTaskDependencyFromProjectDependency is invoked!");
+        throw new UnsupportedOperationException("Unsupported method getTaskDependencyFromProjectDependency "
+                + "is invoked!");
     }
 
     @Override
@@ -347,8 +348,8 @@ public class GolangConfiguration implements Configuration {
         throw new UnsupportedOperationException("Unsupported method addToAntBuilder is invoked!");
     }
 
-
-    private static class EmptyPublishArtifactSet extends DefaultDomainObjectSet<PublishArtifact> implements PublishArtifactSet {
+    private static class EmptyPublishArtifactSet extends DefaultDomainObjectSet<PublishArtifact>
+            implements PublishArtifactSet {
         protected EmptyPublishArtifactSet() {
             super(new DefaultDomainObjectSet<>(PublishArtifact.class),
                     new CollectionFilter<>(PublishArtifact.class));

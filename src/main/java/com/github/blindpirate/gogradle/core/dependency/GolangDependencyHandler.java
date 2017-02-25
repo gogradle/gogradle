@@ -154,7 +154,8 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
     }
 
     // See org.jetbrains.plugins.gradle.tooling.util.DependencyResolverImpl
-    private static class EmptyArtifactResolutionQuery extends HashSet<ComponentArtifactsResult> implements ArtifactResolutionQuery {
+    private static class EmptyArtifactResolutionQuery extends HashSet<ComponentArtifactsResult>
+            implements ArtifactResolutionQuery {
         @Override
         public ArtifactResolutionQuery forComponents(Iterable<? extends ComponentIdentifier> componentIds) {
             return this;
@@ -166,7 +167,8 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
         }
 
         @Override
-        public ArtifactResolutionQuery withArtifacts(Class<? extends Component> componentType, Class<? extends Artifact>[] artifactTypes) {
+        public ArtifactResolutionQuery withArtifacts(Class<? extends Component> componentType,
+                                                     Class<? extends Artifact>[] artifactTypes) {
             return this;
         }
 
