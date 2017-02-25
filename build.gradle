@@ -69,6 +69,7 @@ dependencies {
 
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
 }
 /************** test **************/
