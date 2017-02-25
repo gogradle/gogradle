@@ -98,52 +98,52 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     @Override
     public Dependency module(Object notation) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method module is invoked!");
     }
 
     @Override
     public Dependency module(Object notation, Closure configureClosure) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method module is invoked!");
     }
 
     @Override
     public Dependency project(Map<String, ?> notation) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method project is invoked!");
     }
 
     @Override
     public Dependency gradleApi() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method gradleApi is invoked!");
     }
 
     @Override
     public Dependency gradleTestKit() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method gradleTestKit is invoked!");
     }
 
     @Override
     public Dependency localGroovy() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method localGroovy is invoked!");
     }
 
     @Override
     public ComponentMetadataHandler getComponents() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method getComponents is invoked!");
     }
 
     @Override
     public void components(Action<? super ComponentMetadataHandler> configureAction) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method components is invoked!");
     }
 
     @Override
     public ComponentModuleMetadataHandler getModules() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method getModules is invoked!");
     }
 
     @Override
     public void modules(Action<? super ComponentModuleMetadataHandler> configureAction) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method modules is invoked!");
     }
 
     @Override
