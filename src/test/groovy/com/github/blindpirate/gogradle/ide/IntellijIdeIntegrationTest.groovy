@@ -21,11 +21,11 @@ class IntellijIdeIntegrationTest {
     Project project
     File resource
 
-    IntellijIdeIntegration goglandIntegration
+    IntellijIdeIntegration intellijIdeIntegration
 
     @Before
     void setUp() {
-        goglandIntegration = new IntellijIdeIntegration(manager, project)
+        intellijIdeIntegration = new IntellijIdeIntegration(manager, project)
         when(project.getRootDir()).thenReturn(resource)
         when(manager.getBinaryPath()).thenReturn(new File(resource, 'go/bin/go').toPath())
         when(manager.getGoroot()).thenReturn(new File(resource, 'go').toPath())
@@ -35,8 +35,8 @@ class IntellijIdeIntegrationTest {
     }
 
     @Test
-    void 'gogland xmls should be generated correctly'() {
-        goglandIntegration.generateXmls()
+    void 'xmls should be generated correctly'() {
+        intellijIdeIntegration.generateXmls()
 
         assert new File(resource, '.idea/goLibraries.xml').exists()
 
