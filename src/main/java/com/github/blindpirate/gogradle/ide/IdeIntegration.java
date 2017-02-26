@@ -51,7 +51,7 @@ public abstract class IdeIntegration {
 
     protected abstract String getModuleImlDir();
 
-    protected void generateIdeaXmls() {
+    protected void generateXmls() {
         generateGoLibrariesDotXml();
         generateModuleIml();
         generateGoSdkDotXml();

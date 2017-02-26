@@ -21,9 +21,9 @@ class IntellijIdeTaskTest extends TaskTest {
     @Test
     void 'gogland task should be executed successfully'() {
         // when
-        task.generateXmlsForGogland()
+        task.generateXmls()
         // then
-        verify(goglandIntegration).generateIdeaXmls()
+        verify(goglandIntegration).generateXmls()
         assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
         assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
         assertTaskDependsOn(task, RENAME_VENDOR_TASK_NAME)

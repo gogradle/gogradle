@@ -40,7 +40,7 @@ class IdeaIntegrationTest {
 
     @Test
     void 'idea xmls should be generated correctly'() {
-        ideaIntegration.generateIdeaXmls()
+        ideaIntegration.generateXmls()
 
         verify(hacker).ensureSpecificSdkExist('1.7.1', new File(resource, 'go').toPath())
 

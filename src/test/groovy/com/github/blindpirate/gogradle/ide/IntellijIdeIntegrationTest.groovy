@@ -36,7 +36,7 @@ class IntellijIdeIntegrationTest {
 
     @Test
     void 'gogland xmls should be generated correctly'() {
-        goglandIntegration.generateIdeaXmls()
+        goglandIntegration.generateXmls()
 
         assert new File(resource, '.idea/goLibraries.xml').exists()
 

@@ -22,6 +22,6 @@ public class IdeaTask extends AbstractGolangTask {
 
     @TaskAction
     public void generateXmlsForIdea() {
-        ideaIntegration.generateIdeaXmls();
+        ideaIntegration.generateXmls();
     }
 }

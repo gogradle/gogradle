@@ -19,7 +19,7 @@ public class IntellijIdeTask extends AbstractGolangTask {
     }
 
     @TaskAction
-    public void generateXmlsForGogland() {
-        intellijIdeIntegration.generateIdeaXmls();
+    public void generateXmls() {
+        intellijIdeIntegration.generateXmls();
     }
 }

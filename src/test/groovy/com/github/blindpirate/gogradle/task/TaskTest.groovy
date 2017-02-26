@@ -42,7 +42,7 @@ abstract class TaskTest {
     @Mock
     IdeaIntegration ideaIntegration
     @Mock
-    IntellijIdeIntegration goglandIntegration
+    IntellijIdeIntegration intellijIdeIntegration
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -71,7 +71,7 @@ abstract class TaskTest {
                       buildConstraintManager : buildConstraintManager,
                       lockedDependencyManager: lockedDependencyManager,
                       ideaIntegration        : ideaIntegration,
-                      goglandIntegration     : goglandIntegration,
+                      intellijIdeIntegration : intellijIdeIntegration,
                       project                : project]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
