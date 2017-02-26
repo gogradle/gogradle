@@ -32,6 +32,9 @@ public class GolangTaskContainer {
     public static final String GOGLAND_TASK_NAME = "gogland";
     public static final String WEBSTORM_TASK_NAME = "webStorm";
     public static final String PHPSTORM_TASK_NAME = "phpStorm";
+    public static final String PYCHARM_TASK_NAME = "pyCharm";
+    private static final String RUBYMINE_TASK_NAME = "rubyMine";
+    private static final String CLION_TASK_NAME = "cLion";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
@@ -52,6 +55,9 @@ public class GolangTaskContainer {
             .put(GOGLAND_TASK_NAME, IntellijIdeTask.class)
             .put(WEBSTORM_TASK_NAME, IntellijIdeTask.class)
             .put(PHPSTORM_TASK_NAME, IntellijIdeTask.class)
+            .put(PYCHARM_TASK_NAME, IntellijIdeTask.class)
+            .put(RUBYMINE_TASK_NAME, IntellijIdeTask.class)
+            .put(CLION_TASK_NAME, IntellijIdeTask.class)
             .put(RENAME_VENDOR_TASK_NAME, RenameVendorTask.class)
             .build();
 
