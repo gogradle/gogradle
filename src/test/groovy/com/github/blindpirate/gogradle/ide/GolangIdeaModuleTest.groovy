@@ -17,6 +17,7 @@ import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -40,6 +41,8 @@ class GolangIdeaModuleTest {
     TaskInternal installBuildDependenciesTask
     @Mock
     TaskInternal installTestDependenciesTask
+    @Mock
+    TaskInternal renameVendorTask
 
 
     @Before
@@ -57,6 +60,7 @@ class GolangIdeaModuleTest {
         when(taskContainer.getByName(RESOLVE_TEST_DEPENDENCIES_TASK_NAME)).thenReturn(resolveTestDependenciesTask)
         when(taskContainer.getByName(INSTALL_BUILD_DEPENDENCIES_TASK_NAME)).thenReturn(installBuildDependenciesTask)
         when(taskContainer.getByName(INSTALL_TEST_DEPENDENCIES_TASK_NAME)).thenReturn(installTestDependenciesTask)
+        when(taskContainer.getByName(RENAME_VENDOR_TASK_NAME)).thenReturn(renameVendorTask)
 
     }
 
@@ -76,7 +80,8 @@ class GolangIdeaModuleTest {
                 installBuildDependenciesTask,
                 installTestDependenciesTask,
                 resolveBuildDependenciesTask,
-                resolveTestDependenciesTask)
+                resolveTestDependenciesTask,
+                renameVendorTask)
         // when
         golangIdeaModule.resolveDependencies()
         // then
@@ -85,14 +90,5 @@ class GolangIdeaModuleTest {
         order.verify(resolveTestDependenciesTask).execute()
         order.verify(installBuildDependenciesTask).execute()
         order.verify(installTestDependenciesTask).execute()
-    }
-
-    @Test
-    @WithResource('')
-    void 'goLibraries.xml should be generated'() {
-        // when
-        golangIdeaModule.resolveDependencies()
-        // assert
-        IOUtils.toString(new File(resource, '.idea/goLibraries.xml')).contains('project_gopath')
     }
 }

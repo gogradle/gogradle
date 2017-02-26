@@ -187,7 +187,14 @@ public final class IOUtils {
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
+    }
 
+    public static Path toRealPath(Path path) {
+        try {
+            return path.toRealPath();
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 
     public static String byteCountToDisplaySize(long size) {

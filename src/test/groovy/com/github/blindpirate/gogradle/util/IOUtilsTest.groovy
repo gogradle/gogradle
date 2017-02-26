@@ -116,6 +116,12 @@ class IOUtilsTest {
     }
 
     @Test
+    void 'getting text from file should succeed'() {
+        IOUtils.touch(new File(resource, 'file'))
+        assert IOUtils.toString(new File(resource, 'file')) == ''
+    }
+
+    @Test
     @OnlyOnWindows
     void 'file should be closed after reading'() {
         File file = new File(resource, 'test')
@@ -189,5 +195,8 @@ class IOUtilsTest {
         assert new File(resource, 'a/b/c').getText() == 'content'
     }
 
-
+    @Test(expected = IllegalStateException)
+    void 'tracking an unexistent path should fail'() {
+        IOUtils.toRealPath(Paths.get('/gogradle_unexistent'))
+    }
 }

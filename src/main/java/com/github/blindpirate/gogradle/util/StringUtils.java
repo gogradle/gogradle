@@ -4,7 +4,9 @@ package com.github.blindpirate.gogradle.util;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 public class StringUtils {
@@ -54,5 +56,11 @@ public class StringUtils {
 
     public static String toUnixString(Path path) {
         return path.toString().replace("\\", "/");
+    }
+
+    public static String render(String template, Map<String, String> context) {
+        AtomicReference<String> result = new AtomicReference<>(template);
+        context.forEach((key, value) -> result.set(result.get().replace("${" + key + "}", value)));
+        return result.get();
     }
 }

@@ -4,7 +4,7 @@ import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
-import com.github.blindpirate.gogradle.ide.GolangIdeaModule;
+import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -16,15 +16,10 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
-import org.gradle.plugins.ide.idea.GenerateIdeaModule;
-import org.gradle.plugins.ide.idea.IdeaPlugin;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 
 
@@ -62,20 +57,12 @@ public class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
         configureTasks(project);
         configureGlobalInjector();
-        configureIdeaPlugin();
+        hackIdeaPlugin();
     }
 
-    private void configureIdeaPlugin() {
+    private void hackIdeaPlugin() {
         project.getPlugins().withId("idea", plugin -> {
-            IdeaPlugin ideaPlugin = (IdeaPlugin) plugin;
-            GolangIdeaModule golangIdeaModule = new GolangIdeaModule(ideaPlugin.getModel().getModule());
-
-            GenerateIdeaModule ideaModuleTask = (GenerateIdeaModule) project.getTasks().findByName("ideaModule");
-            ideaModuleTask.dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, INSTALL_TEST_DEPENDENCIES_TASK_NAME);
-
-            ideaModuleTask.setModule(golangIdeaModule);
-            ideaPlugin.getModel().setModule(golangIdeaModule);
-            ideaPlugin.getModel().getProject().setModules(Arrays.asList(golangIdeaModule));
+            injector.getInstance(IdeaIntegration.class).hack();
         });
     }
 
@@ -113,7 +100,8 @@ public class GolangPlugin implements Plugin<Project> {
         project.setProperty("dependencyHandler",
                 instantiator.newInstance(GolangDependencyHandler.class,
                         configurationContainer,
-                        parser));
+                        parser,
+                        project));
 
         overwriteRepositoryHandler(project);
     }
