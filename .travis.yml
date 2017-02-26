@@ -34,7 +34,6 @@ before_install:
 
 after_failure:
   - free -mt
-  - dmesg
 
 
 
