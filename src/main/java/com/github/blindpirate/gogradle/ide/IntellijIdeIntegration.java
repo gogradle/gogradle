@@ -7,7 +7,7 @@ import org.gradle.api.Project;
 import javax.inject.Singleton;
 
 /**
- * For PHPStorm/PyCharm/WebStorm/Gogland
+ * For PHPStorm/PyCharm/WebStorm/Gogland/RubyMine/CLion
  */
 @Singleton
 @SuppressWarnings("checkstyle:linelength")
