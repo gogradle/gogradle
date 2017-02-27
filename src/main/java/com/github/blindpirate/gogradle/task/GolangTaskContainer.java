@@ -35,6 +35,7 @@ public class GolangTaskContainer {
     public static final String PYCHARM_TASK_NAME = "pyCharm";
     private static final String RUBYMINE_TASK_NAME = "rubyMine";
     private static final String CLION_TASK_NAME = "cLion";
+    private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
     public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
 
@@ -58,6 +59,7 @@ public class GolangTaskContainer {
             .put(PYCHARM_TASK_NAME, IntellijIdeTask.class)
             .put(RUBYMINE_TASK_NAME, IntellijIdeTask.class)
             .put(CLION_TASK_NAME, IntellijIdeTask.class)
+            .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGorootTask.class)
             .put(RENAME_VENDOR_TASK_NAME, RenameVendorTask.class)
             .build();
 
