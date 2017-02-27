@@ -47,7 +47,7 @@ class ShowGopathGorootTaskTest extends TaskTest {
         String buildGopath = new File(resource, 'project/.gogradle/build_gopath').getAbsolutePath().replace('\\', '/')
         String testGopath = new File(resource, 'project/.gogradle/test_gopath').getAbsolutePath().replace('\\', '/')
         String separator = File.pathSeparator
-        verify(logger).quiet("GOROOT: {}", new File(resource, 'goroot').absolutePath)
         verify(logger).quiet("GOPATH: {}", "${projectGopath}${separator}${buildGopath}${separator}${testGopath}".toString())
+        verify(logger).quiet("GOROOT: {}", new File(resource, 'goroot').absolutePath.replace('\\', '/'))
     }
 }
