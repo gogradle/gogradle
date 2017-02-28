@@ -60,7 +60,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 - [Tasks in Gogradle](./docs/tasks.md)
 - [Repository Management](./docs/repository-management.md)
 - [Set Proxy For Build](./docs/proxy.md)
-- [](./docs/cross-compile.md)
+- [Build Output and Cross Compile](./docs/cross-compile.md)
 - [IDE Integration](./docs/ide.md)
 
 

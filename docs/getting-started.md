@@ -65,7 +65,7 @@ dependencies {
 
 The `build` and `test` are two independent dependency sets. Only `build` dependencies will take effect in build process; both `build` and `test` dependencies will take effect in test process.
 
-To learn more details about dependency, see [Dependency Management](#dependency-management).
+To learn more details about dependency, see [Dependency Management](./dependency-management.md).
 
 ## Display Dependencies
 
@@ -110,7 +110,7 @@ This command will let Gogradle generate a `gogradle.lock` file in project root d
 
 `gogradle.lock` is recommended by Gogradle. Locking dependencies play an important role in reproducible build. Similar to [other package management tools](https://github.com/golang/go/wiki/PackageManagementTools), Gogradle can lock the versions of all dependency packages. Moreover, Gogradle can lock dependency packages even when they are in `vendor`!
 
-Gogradle supports transitive dependency/dependency exclusion/customized url, see [Dependency Management](#dependency-management).
+Gogradle supports transitive dependency/dependency exclusion/customized url, see [Dependency Management](./dependency-management.md).
 
 Currently, only Git dependencies are supported, support for other vcs is under development.
 

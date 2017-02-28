@@ -53,7 +53,7 @@ dependencies {
 }
 ```
 
-You can specify a url in declaration, which is extremely useful in case of private repository. See [Repository Management](#repository-management) for more details.
+You can specify a url in declaration, which is extremely useful in case of private repository. See [Repository Management](./repository-management.md) for more details.
 
 ```groovy
 dependencies {

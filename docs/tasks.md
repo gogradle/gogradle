@@ -61,10 +61,10 @@ Clean temp files in project.
 
 ## lock
 
-Generate dependency lock file. See [Dependency Lock](#dependency-lock)
+Generate dependency lock file. See [Dependency Lock](./getting-started.md#dependency-lock)
 
 ## vendor
 
-Install resolved `build` dependencies into vendor directory. See [Install Dependencies into Vendor](#install-dependencies-into-vendor). 
+Install resolved `build` dependencies into vendor directory. See [Install Dependencies into Vendor](./getting-started.md#install-dependencies-into-vendor). 
 
 
