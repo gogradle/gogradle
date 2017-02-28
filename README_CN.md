@@ -12,7 +12,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 
 ## 功能特性
 
-- 除`JDK 8+`外无需预先安装任何东西（包括Go本身）
+- 除`JDK 8+`外无需预先安装任何东西（包括Go本身），若使用JetBrains系IDE可无需安装JDK
 - 支持所有版本的Go且允许多版本共存
 - 完美支持几乎所有平台（只要能够运行`Java`，本项目的所有测试在OS X 10.11/Ubuntu 12.04/Windows 7上通过）
 - 项目级的依赖隔离，无需设置`GOPATH`
@@ -37,7 +37,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 原生的Gradle语法
 - 额外为中国大陆开发者提供的特性，你懂的
 - Shadowsocks支持
-- IDE支持（IntellijIdea/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim）
+- IDE支持（IntelliJIDEA/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim）
 - 增量构建（开发中）
 
 ## 优势
