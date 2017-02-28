@@ -54,7 +54,7 @@ dependencies {
 }
 ```
 
-可以在声明时指定仓库的url。这尤其适用于私有仓库。有关私有仓库的权限验证请参考[仓库管理](#仓库管理)。
+可以在声明时指定仓库的url。这尤其适用于私有仓库。有关私有仓库的权限验证请参考[仓库管理](./repository-management-cn.md)。
 
 ```groovy
 dependencies {

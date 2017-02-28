@@ -63,10 +63,10 @@ go test
 
 ## lock
 
-生成依赖锁定文件。详见[依赖锁定](#依赖锁定)。
+生成依赖锁定文件。详见[依赖锁定](./getting-started-cn.md#依赖锁定)。
 
 ## vendor
 
-将解析后的`build`依赖安装到vendor目录。详见[依赖安装到vendor目录](#依赖安装到vendor目录)。
+将解析后的`build`依赖安装到vendor目录。详见[依赖安装到vendor目录](./dependency-management-cn.md#依赖安装到vendor目录)。
 
 

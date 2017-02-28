@@ -1,6 +1,7 @@
 # Gogradle - 完善的Go语言构建工具
 
 [![Build Status](https://travis-ci.org/blindpirate/gogradle.svg?branch=master)](https://travis-ci.org/blindpirate/gogradle)
+[![Build Status](https://ci.appveyor.com/api/projects/status/github/blindpirate/gogradle?branch=master&svg=true)](https://ci.appveyor.com/api/projects/status/github/blindpirate/gogradle?branch=master&svg=true)
 [![Coverage Status](https://coveralls.io/repos/github/blindpirate/gogradle/badge.svg?branch=master)](https://coveralls.io/github/blindpirate/gogradle?branch=master)
 [![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
 [![Apache License 2](https://img.shields.io/badge/license-APL2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
@@ -8,6 +9,7 @@
 Gogradle是一个提供Go语言构建支持的Gradle插件。
 
 > 2017-02-12 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](http://github-rank.com/star?language=Go)中的526个！
+>
 > 2017-02-26 现在Gogradle已经与IDE深度集成，安装IDE后，无需设置GOPATH，无需预先安装Go即可开始开发！
 
 ## 功能特性

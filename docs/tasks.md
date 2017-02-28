@@ -65,6 +65,6 @@ Generate dependency lock file. See [Dependency Lock](./getting-started.md#depend
 
 ## vendor
 
-Install resolved `build` dependencies into vendor directory. See [Install Dependencies into Vendor](./getting-started.md#install-dependencies-into-vendor). 
+Install resolved `build` dependencies into vendor directory. See [Install Dependencies into Vendor](./dependency-management.md#install-dependencies-into-vendor). 
 
 

@@ -70,7 +70,7 @@ dependencies {
 
 其中，build和test分别是构建和测试的依赖，二者是独立的。构建时的环境中只包含声明为`build`的依赖包，测试时的环境中包含声明为`build`和`test`的依赖包。
 
-有关依赖的详细解释，参考[依赖管理](#依赖管理)一节
+有关依赖的详细解释，参考[依赖管理](./dependency-management-cn.md)一节
 
 ## 查看依赖
 
@@ -117,7 +117,7 @@ gradlew lock
 锁定依赖包版本是稳定构建（Reproducible build）的重要因素。与[其他包管理工具](https://github.com/golang/go/wiki/PackageManagementTools)类似，
 Gogradle能够锁定当前的所有依赖包版本。有所不同的是，Gogradle做的更加彻底，它甚至能够锁定`vendor`目录中的依赖包！
 
-Gogradle支持传递性依赖、依赖排除、自定义仓库URL等多种功能，详见[依赖文档](#依赖管理)。
+Gogradle支持传递性依赖、依赖排除、自定义仓库URL等多种功能，详见[依赖管理](./dependency-management-cn.md)。
 
 目前，Gogradle仅支持Git依赖，对其他版本控制工具的支持正在开发中。
 
