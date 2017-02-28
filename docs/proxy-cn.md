@@ -12,4 +12,10 @@
 org.gradle.jvmargs=-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080
 ```
 
+此外，你可以通过以下参数设置HTTP代理：
+
+```
+-Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port>
+```
+
 来将此设置持久化，有关更多环境和代理的信息，详见[Gradle构建环境](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_properties_and_system_properties)与[Java代理](http://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html)
