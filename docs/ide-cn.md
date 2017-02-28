@@ -38,6 +38,11 @@ Preferences > plugins > Browse Repositories > 搜索'Go'并安装
 ```
 
 Windows下：
+```
+File > Settings > Plugins > Browse Repositories > 搜索'Go'并安装
+```
+
+Windows下：
 
 
 ## 准备JRE
@@ -53,6 +58,9 @@ Windows下：
 
 在Windows下，自带的JRE位于
 
+```
+<软件的安装路径>/jre/jre
+```
 
 设置环境变量`JAVA_HOME`为以上路径即可。
 

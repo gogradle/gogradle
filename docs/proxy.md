@@ -18,4 +18,10 @@ And HTTP proxy:
 -Dhttp.proxyHost=<host> -Dhttp.proxyPort=<port>
 ```
 
-To learn more about environment and proxy, see [Gradle environment](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_properties_and_system_properties) and [Java proxy](http://docs.oracle.com/javase/6/docs/technotes/guides/net/proxies.html)
+And HTTPS proxy:
+
+```
+-Dhttps.proxyHost=<host> -Dhttps.proxyPort=<port>
+```
+
+To learn more about environment and proxy, see [Gradle environment](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_properties_and_system_properties) and [Java proxy](http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html)
