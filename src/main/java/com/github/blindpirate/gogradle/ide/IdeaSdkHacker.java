@@ -51,7 +51,7 @@ public class IdeaSdkHacker {
 
     // See https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
     private static final String SETTING_LOCATION_ON_MAC = "${userHome}/Library/Preferences/${product}${version}/options/jdk.table.xml";
-    private static final String SETTING_LOCATION_ON_OTHER_OS = "${userHome}/.${product}${version}/options/jdk.table.xml";
+    private static final String SETTING_LOCATION_ON_OTHER_OS = "${userHome}/.${product}${version}/config/options/jdk.table.xml";
 
     private static final Logger LOGGER = Logging.getLogger(IdeaSdkHacker.class);
 
