@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs.mercurial
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.AccessWeb
+import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
 import org.junit.Test
@@ -9,6 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
+@OnlyWhen(value = '"hg version".execute().text', whenException = OnlyWhen.ExceptionStrategy.FALSE)
 class MercurialAccessorTest {
 
     MercurialAccessor accessor = new HgClientMercurialAccessor()
@@ -54,7 +56,6 @@ class MercurialAccessorTest {
     @WithResource('')
     void 'cloning should succeed'() {
         accessor.cloneWithUrl(resource, 'https://blindpirate@bitbucket.org/blindpirate/test-for-gogradle')
-//        accessor.cloneWithUrl(resource, 'ssh://hg@bitbucket.org/blindpirate/test-for-gogradle')
         assert new File(resource, 'commit1').exists()
     }
 
