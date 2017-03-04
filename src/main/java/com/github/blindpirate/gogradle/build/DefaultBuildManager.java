@@ -167,7 +167,13 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private void buildOne(String goBinary, String outputFilePath, Map<String, String> envs) {
-        List<String> args = Lists.newArrayList(goBinary, "build", "-o", outputFilePath);
+        List<String> args = Lists.newArrayList(goBinary, "build");
+
+        if (setting.isGenerateOutput()) {
+            args.add("-o");
+            args.add(outputFilePath);
+        }
+
         args.addAll(setting.getExtraBuildArgs());
 
         int retCode = startBuildOrTest(args, envs);

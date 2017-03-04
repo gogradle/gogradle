@@ -46,6 +46,7 @@ public class GolangPluginSetting {
     private List<String> buildTags = new ArrayList<>();
     private List<String> extraBuildArgs = new ArrayList<>();
     private List<String> extraTestArgs = new ArrayList<>();
+    private boolean generateOutput = true;
     private String outputLocation = GogradleGlobal.GOGRADLE_BUILD_DIR_NAME;
     private String outputPattern = "${os}_${arch}_${packageName}";
     private List<Pair<Os, Arch>> targetPlatforms = asList(Pair.of(getHostOs(), getHostArch()));
@@ -105,6 +106,14 @@ public class GolangPluginSetting {
 
     public void setExtraTestArgs(List<String> extraTestArgs) {
         this.extraTestArgs = extraTestArgs;
+    }
+
+    public boolean isGenerateOutput() {
+        return generateOutput;
+    }
+
+    public void setGenerateOutput(boolean generateOutput) {
+        this.generateOutput = generateOutput;
     }
 
     public String getOutputLocation() {

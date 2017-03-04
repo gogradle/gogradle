@@ -132,6 +132,18 @@ class DefaultBuildManagerTest {
         )
     }
 
+    @Test
+    void 'build without output should succeed'() {
+        // when
+        setting.generateOutput = false
+        manager.build()
+        // then
+        verify(delegate).run([goBin, 'build'],
+                [GOPATH: getBuildGopath(), GOROOT: goroot],
+                resource
+        )
+    }
+
     @Test(expected = BuildException)
     void 'exception should be thrown if go build return non-zero'() {
         // given
