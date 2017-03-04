@@ -60,6 +60,8 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - [构建输出与交叉编译](./docs/cross-compile-cn.md)
 - [IDE支持](./docs/ide-cn.md)
 
+> **注意** Gogradle不遵循Golang的全局[工作空间的约定](https://golang.org/doc/code.html#Workspaces)。它不使用全局的GOPATH，而是为每个项目生成一个独立的GOPATH。
+
 ## 向Gogradle贡献提出建议或贡献代码
 
 若觉得不错，请Star。

@@ -64,6 +64,8 @@ Gogradle is a gradle plugin which provides support for building golang.
 - [Build Output and Cross Compile](./docs/cross-compile.md)
 - [IDE Integration](./docs/ide.md)
 
+> **NOTE** Gogradle doesn't conform Golang's global [workspace convention](https://golang.org/doc/code.html#Workspaces). It will generate a project-scoped GOPATH for each project instead of use the global one.
+
 
 ## Contributing
 
