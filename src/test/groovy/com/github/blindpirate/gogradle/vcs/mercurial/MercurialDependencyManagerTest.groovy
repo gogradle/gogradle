@@ -14,10 +14,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.tmatesoft.hg.core.HgChangeset
-import org.tmatesoft.hg.core.HgDate
-import org.tmatesoft.hg.core.Nodeid
-import org.tmatesoft.hg.repo.HgRepository
 
 import java.nio.file.Paths
 import java.util.concurrent.Callable
@@ -47,13 +43,14 @@ class MercurialDependencyManagerTest {
     GolangDependencySet dependencySet
     @Mock
     DependencyProduceStrategy strategy
+    @Mock
+    HgRepository repository
 
     MercurialNotationDependency notationDependency = mockWithName(MercurialNotationDependency, 'bitbucket.org/user/project')
     MercurialResolvedDependency resolvedDependency = mockWithName(MercurialResolvedDependency, 'bitbucket.org/user/project')
 
     MercurialDependencyManager manager
 
-    HgRepository repository
 
     File resource
 
@@ -68,7 +65,6 @@ class MercurialDependencyManagerTest {
     @Before
     void setUp() {
         manager = new MercurialDependencyManager(mercurialAccessor, visitor, cacheManager, dependencyRegistry)
-        repository = new HgRepository(resource.absolutePath)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
@@ -86,8 +82,8 @@ class MercurialDependencyManagerTest {
 
         when(dependencySet.flatten()).thenReturn([])
 
-        when(hgChangeset.getNodeid()).thenReturn(Nodeid.fromAscii('1' * 40))
-        when(hgChangeset.getDate()).thenReturn(new HgDate(1L, 0))
+        when(hgChangeset.getNodeid()).thenReturn('1' * 40)
+        when(hgChangeset.getCommitTime()).thenReturn(1L)
     }
 
     @Test
@@ -126,7 +122,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'nodeId should be used if it exists'() {
         // given
-        when(mercurialAccessor.findChangesetByNodeId(repository, 'nodeId')).thenReturn(of(hgChangeset))
+        when(mercurialAccessor.findChangesetById(repository, 'nodeId')).thenReturn(of(hgChangeset))
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
     }

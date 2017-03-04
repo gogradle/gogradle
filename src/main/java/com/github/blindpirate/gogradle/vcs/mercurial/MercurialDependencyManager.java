@@ -14,8 +14,6 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.tmatesoft.hg.core.HgChangeset;
-import org.tmatesoft.hg.repo.HgRepository;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -59,9 +57,9 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
         MercurialResolvedDependency ret = MercurialResolvedDependency.builder()
                 .withNotationDependency(notationDependency)
                 .withName(dependency.getPackage().getRootPath())
-                .withNodeId(hgChangeset.getNodeid().toString())
+                .withNodeId(hgChangeset.getId())
                 .withTag(notationDependency.getTag())
-                .withCommitTime(hgChangeset.getDate().getRawTime())
+                .withCommitTime(hgChangeset.getCommitTime())
                 .build();
         GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor);
         ret.setDependencies(dependencies);
@@ -82,7 +80,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
 
     @Override
     protected void resetToSpecificVersion(HgRepository hgRepository, HgChangeset hgChangeset) {
-        mercurialAccessor.resetToSpecificNodeId(hgRepository, hgChangeset.getNodeid().toString());
+        mercurialAccessor.resetToSpecificNodeId(hgRepository, hgChangeset.getId());
     }
 
     @Override
@@ -97,7 +95,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
         }
         if (isConcreteCommit(notationDependency.getNodeId())) {
             String nodeId = notationDependency.getNodeId();
-            Optional<HgChangeset> changeset = mercurialAccessor.findChangesetByNodeId(repository, nodeId);
+            Optional<HgChangeset> changeset = mercurialAccessor.findChangesetById(repository, nodeId);
             if (changeset.isPresent()) {
                 return changeset.get();
             }

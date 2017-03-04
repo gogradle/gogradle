@@ -3,15 +3,15 @@ package com.github.blindpirate.gogradle.vcs.mercurial
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.tmatesoft.hg.repo.HgRepository
 
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
 class MercurialAccessorTest {
 
-    MercurialAccessor accessor = new MercurialAccessor()
+    MercurialAccessor accessor = new HgClientMercurialAccessor()
 
     File resource
 
@@ -32,13 +32,13 @@ class MercurialAccessorTest {
     @Test
     void 'finding changeset by tag should succeed'() {
         repository = accessor.getRepository(resource)
-        assert accessor.findChangesetByTag(repository, 'commit2_tag').get().nodeid.toString() == '1eaebd519f4c3f7d793b9ff42328d4383d672529'
+        assert accessor.findChangesetByTag(repository, 'commit2_tag').get().id == '1eaebd519f4c3f7d793b9ff42328d4383d672529'
     }
 
     @Test
     void 'getting head of branch should succeed'() {
         repository = accessor.getRepository(resource)
-        assert accessor.headOfBranch(repository, 'default').nodeid.toString() == '620889544e2db8b064180431bcd1bb965704f4c2'
+        assert accessor.headOfBranch(repository, 'default').id == '620889544e2db8b064180431bcd1bb965704f4c2'
     }
 
     @Test
@@ -61,7 +61,7 @@ class MercurialAccessorTest {
     @Test
     void 'resetting should succeed'() {
         repository = accessor.getRepository(resource)
-        accessor.resetToSpecificNodeId(repository, '5aa10')
+        accessor.resetToSpecificNodeId(repository, '5aa103927c66cc82c03161adcacd3a6509859f01')
         assert !new File(resource, 'commit2').exists()
     }
 }
