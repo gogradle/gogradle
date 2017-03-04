@@ -82,7 +82,7 @@ class MercurialDependencyManagerTest {
 
         when(dependencySet.flatten()).thenReturn([])
 
-        when(hgChangeset.getNodeid()).thenReturn('1' * 40)
+        when(hgChangeset.getId()).thenReturn('1' * 40)
         when(hgChangeset.getCommitTime()).thenReturn(1L)
     }
 
