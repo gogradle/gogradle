@@ -6,8 +6,6 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.mercurial.HgChangeset;
 import com.github.blindpirate.gogradle.vcs.mercurial.HgRepository;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialAccessor;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.util.Arrays;
@@ -22,7 +20,6 @@ import static com.github.blindpirate.gogradle.util.ProcessUtils.run;
 import static java.util.Arrays.asList;
 
 public class HgClientMercurialAccessor implements MercurialAccessor {
-    private static Logger LOGGER = Logging.getLogger(HgClientMercurialAccessor.class);
     private static final Pattern DEFAULT_URL_PATTERN = Pattern.compile("default\\s*=\\s*(\\S+)");
     // tip                                2:620889544e2d
     // commit2_tag                        1:1eaebd519f4c
@@ -48,7 +45,7 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     @Override
     public String getRemoteUrl(HgRepository repository) {
-        return getRemoteUrl(HgClientRepository.class.cast(repository));
+        return getRemoteUrl(HgClientRepository.class.cast(repository).getRootDir());
     }
 
     @Override
