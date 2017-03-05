@@ -14,8 +14,8 @@ import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyMana
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.GitMapNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.GitNotationConverter;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitMercurialMapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitMercurialNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
@@ -52,8 +52,7 @@ import com.github.blindpirate.gogradle.vcs.bazaar.BazaarAccessor;
 import com.github.blindpirate.gogradle.vcs.bazaar.BazaarMapNotationParser;
 import com.github.blindpirate.gogradle.vcs.bazaar.BazaarNotationConverter;
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor;
-import com.github.blindpirate.gogradle.vcs.mercurial.MercurialMapNotationParser;
-import com.github.blindpirate.gogradle.vcs.mercurial.MercurialNotationConverter;
+import com.github.blindpirate.gogradle.vcs.mercurial.MercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.svn.SvnAccessor;
 import com.github.blindpirate.gogradle.vcs.svn.SvnMapNotationParser;
@@ -105,13 +104,14 @@ public class GogradleModule extends AbstractModule {
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
         bind(LockedDependencyManager.class).to(DefaultLockedDependencyManager.class);
+        bind(MercurialAccessor.class).to(HgClientMercurialAccessor.class);
 
-        bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
-        bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
+        bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMercurialMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Git.class).to(GitMercurialNotationConverter.class);
         bind(VcsAccessor.class).annotatedWith(Git.class).to(GitAccessor.class);
 
-        bind(MapNotationParser.class).annotatedWith(Mercurial.class).to(MercurialMapNotationParser.class);
-        bind(NotationConverter.class).annotatedWith(Mercurial.class).to(MercurialNotationConverter.class);
+        bind(MapNotationParser.class).annotatedWith(Mercurial.class).to(GitMercurialMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Mercurial.class).to(GitMercurialNotationConverter.class);
         bind(VcsAccessor.class).annotatedWith(Mercurial.class).to(HgClientMercurialAccessor.class);
 
         bind(MapNotationParser.class).annotatedWith(Svn.class).to(SvnMapNotationParser.class);
