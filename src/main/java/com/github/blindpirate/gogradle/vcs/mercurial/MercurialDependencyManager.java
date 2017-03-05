@@ -12,6 +12,8 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -43,7 +45,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
 
     @Override
     protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
-        MercurialResolvedDependency resolvedDependency = (MercurialResolvedDependency) dependency;
+        GitMercurialResolvedDependency resolvedDependency = (GitMercurialResolvedDependency) dependency;
         HgRepository repository = mercurialAccessor.getRepository(globalCachePath.toFile());
         mercurialAccessor.resetToSpecificNodeId(repository, resolvedDependency.getVersion());
     }
@@ -53,11 +55,12 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
                                                           File directory,
                                                           HgRepository hgRepository,
                                                           HgChangeset hgChangeset) {
-        MercurialNotationDependency notationDependency = MercurialNotationDependency.class.cast(dependency);
-        MercurialResolvedDependency ret = MercurialResolvedDependency.builder()
+        GitMercurialNotationDependency notationDependency = GitMercurialNotationDependency.class.cast(dependency);
+        GitMercurialResolvedDependency ret = GitMercurialResolvedDependency.mercurialBuilder()
                 .withNotationDependency(notationDependency)
                 .withName(dependency.getPackage().getRootPath())
-                .withNodeId(hgChangeset.getId())
+                .withCommitId(hgChangeset.getId())
+                .withRepoUrl(mercurialAccessor.getRemoteUrl(hgRepository))
                 .withTag(notationDependency.getTag())
                 .withCommitTime(hgChangeset.getCommitTime())
                 .build();
@@ -85,7 +88,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
 
     @Override
     protected HgChangeset determineVersion(HgRepository repository, NotationDependency dependency) {
-        MercurialNotationDependency notationDependency = (MercurialNotationDependency) dependency;
+        GitMercurialNotationDependency notationDependency = (GitMercurialNotationDependency) dependency;
         if (notationDependency.getTag() != null) {
             String tag = notationDependency.getTag();
             Optional<HgChangeset> changeset = mercurialAccessor.findChangesetByTag(repository, tag);
@@ -93,8 +96,8 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
                 return changeset.get();
             }
         }
-        if (isConcreteCommit(notationDependency.getNodeId())) {
-            String nodeId = notationDependency.getNodeId();
+        if (isConcreteCommit(notationDependency.getCommit())) {
+            String nodeId = notationDependency.getCommit();
             Optional<HgChangeset> changeset = mercurialAccessor.findChangesetById(repository, nodeId);
             if (changeset.isPresent()) {
                 return changeset.get();
@@ -105,7 +108,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
     }
 
     private boolean isConcreteCommit(String nodeId) {
-        return nodeId != null && !MercurialNotationDependency.NEWEST_COMMIT.equals(nodeId);
+        return nodeId != null && !GitMercurialNotationDependency.NEWEST_COMMIT.equals(nodeId);
     }
 
     @Override
@@ -116,7 +119,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
 
     @Override
     protected HgRepository initRepository(NotationDependency dependency, File directory) {
-        List<String> urls = MercurialNotationDependency.class.cast(dependency).getUrls();
+        List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
         Assert.isNotEmpty(urls, "Urls cannot be empty!");
         for (int i = 0; i < urls.size(); ++i) {
             IOUtils.clearDirectory(directory);
@@ -137,7 +140,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
     protected Optional<HgRepository> repositoryMatch(File directory, NotationDependency dependency) {
         HgRepository repository = mercurialAccessor.getRepository(directory);
         String url = mercurialAccessor.getRemoteUrl(directory);
-        if (MercurialNotationDependency.class.cast(dependency).getUrls().contains(url)) {
+        if (GitMercurialNotationDependency.class.cast(dependency).getUrls().contains(url)) {
             return Optional.of(repository);
         } else {
             return Optional.empty();

@@ -9,6 +9,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
@@ -75,7 +76,7 @@ class MercurialDependencyManagerTest {
 
         when(notationDependency.getPackage()).thenReturn(pkg)
         when(notationDependency.getTag()).thenReturn('tag')
-        when(notationDependency.getNodeId()).thenReturn('nodeId')
+        when(notationDependency.getCommit()).thenReturn('nodeId')
         when(notationDependency.getStrategy()).thenReturn(strategy)
 
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
@@ -104,11 +105,19 @@ class MercurialDependencyManagerTest {
         ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, repository, hgChangeset)
         // then
         assert result instanceof MercurialResolvedDependency
-        assert result.tag == 'tag'
+        assert ReflectionUtils.getField(result, 'tag') == 'tag'
         assert result.name == 'bitbucket.org/user/project'
         assert result.version == '1' * 40
         assert result.updateTime == 1L
         verify(mercurialAccessor).getLastCommitTimeOfPath(repository, 'relative/path')
+    }
+
+    @Test
+    void 'resetting to specific version should succeed'() {
+        // when
+        manager.resetToSpecificVersion(repository, hgChangeset)
+        // then
+        verify(mercurialAccessor).resetToSpecificNodeId(repository, '1' * 40)
     }
 
     @Test
@@ -138,7 +147,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'head commit should be used if nodeId is NEWEST_COMMIT'() {
         // given
-        when(notationDependency.getNodeId()).thenReturn('NEWEST_COMMIT')
+        when(notationDependency.getCommit()).thenReturn('NEWEST_COMMIT')
         when(mercurialAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
