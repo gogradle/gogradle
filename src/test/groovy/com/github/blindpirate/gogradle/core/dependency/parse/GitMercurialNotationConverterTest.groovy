@@ -2,9 +2,9 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import org.junit.Test
 
-class GitNotationConverterTest {
+class GitMercurialNotationConverterTest {
 
-    GitNotationConverter converter = new GitNotationConverter()
+    GitMercurialNotationConverter converter = new GitMercurialNotationConverter()
 
     @Test
     void 'package with only name should be parsed correctly'() {

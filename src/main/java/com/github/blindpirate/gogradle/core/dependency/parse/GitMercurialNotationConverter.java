@@ -8,8 +8,8 @@ import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMMIT_KEY;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
 
 // github.com/a/b
 // github.com/a/b@v1.0.0
@@ -24,7 +24,7 @@ import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_
 
 // sem version
 @Singleton
-public class GitNotationConverter implements NotationConverter {
+public class GitMercurialNotationConverter implements NotationConverter {
 
     private static final String TAG_SEPERATOR = "@";
     private static final String COMMIT_SEPERATOR = "#";
@@ -70,6 +70,4 @@ public class GitNotationConverter implements NotationConverter {
                 NAME_KEY, name,
                 TAG_KEY, tag);
     }
-
-
 }
