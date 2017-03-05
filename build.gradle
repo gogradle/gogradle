@@ -146,7 +146,7 @@ jacocoTestReport {
                              'com/github/blindpirate/gogradle/core/exceptions/**',
                              'com/github/blindpirate/gogradle/vcs/bazaar/**',
                              'com/github/blindpirate/gogradle/vcs/svn/**',
-                             'com/github/blindpirate/gogradle/vcs/mercurial/**',
+                             'com/github/blindpirate/gogradle/vcs/mercurial/hg4j/**',
                              'com/github/blindpirate/gogradle/util/HttpUtils*',
                              'com/github/blindpirate/gogradle/ProjectDecorator*'])
         })
