@@ -225,7 +225,7 @@ public class GitAccessor implements VcsAccessor {
     private void updateSubmodule(String packageRoot, Repository repository, String url) throws GitAPIException {
         new SubmoduleInitCommand(repository).call();
         SubmoduleUpdateCommand suc = new SubmoduleUpdateCommand(repository)
-                .setProgressMonitor(new LoggerProgressMonitor("Pulling from" + url));
+                .setProgressMonitor(new LoggerProgressMonitor("Pulling from " + url));
         setCredentialsIfNecessary(suc, packageRoot, url);
         suc.call();
     }
