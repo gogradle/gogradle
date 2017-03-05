@@ -120,8 +120,8 @@ class GitDependencyManagerTest {
     void assertResolvedDependency(GitResolvedDependency result) {
         assert result.name == 'github.com/a/b'
         assert result.dependencies.isEmpty()
-        assert result.repoUrl == repoUrl
-        assert result.tag == 'tag'
+        assert ReflectionUtils.getField(result, 'repoUrl') == repoUrl
+        assert ReflectionUtils.getField(result, 'tag') == 'tag'
         assert result.version == commitId
         assert result.updateTime == 123000L
         assert result.firstLevel
