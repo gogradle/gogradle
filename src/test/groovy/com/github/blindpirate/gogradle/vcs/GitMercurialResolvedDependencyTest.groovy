@@ -1,9 +1,11 @@
-package com.github.blindpirate.gogradle.vcs.git
+package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.specs.Spec
 import org.junit.Before
 import org.junit.Test
@@ -12,7 +14,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 
 @RunWith(GogradleRunner)
-class GitResolvedDependencyTest {
+class GitMercurialResolvedDependencyTest {
     @Mock
     NotationDependency notationDependency
     @Mock
@@ -23,8 +25,8 @@ class GitResolvedDependencyTest {
         Mockito.when(notationDependency.getTransitiveDepExclusions()).thenReturn([exclusionSpec] as Set)
     }
 
-    GitResolvedDependency newResolvedDependency() {
-        return GitResolvedDependency.builder()
+    GitMercurialResolvedDependency newResolvedDependency() {
+        return GitMercurialResolvedDependency.gitBuilder()
                 .withName("package")
                 .withCommitId('commitId')
                 .withCommitTime(42L)
@@ -41,7 +43,7 @@ class GitResolvedDependencyTest {
     @Test
     void 'a resolved dependency should be converted to notation successfully'() {
         // given
-        GitResolvedDependency dependency = newResolvedDependency()
+        GitMercurialResolvedDependency dependency = newResolvedDependency()
         // then
         assert dependency.toLockedNotation() == [name: 'package', commit: 'commitId', vcs: 'git', url: 'repoUrl']
     }
@@ -49,7 +51,7 @@ class GitResolvedDependencyTest {
     @Test
     void 'notation\'s specs should be copied into resolved dependency'() {
         // given
-        GitResolvedDependency dependency = newResolvedDependency()
+        GitMercurialResolvedDependency dependency = newResolvedDependency()
         assert DependencyUtils.getExclusionSpecs(dependency).contains(exclusionSpec)
     }
 
@@ -66,7 +68,7 @@ class GitResolvedDependencyTest {
     @Test
     void 'formatting with tag should succeed'() {
         // given
-        GitResolvedDependency dependency = newResolvedDependency()
+        GitMercurialResolvedDependency dependency = newResolvedDependency()
         ReflectionUtils.setField(dependency, 'tag', 'tag')
 
         // then
