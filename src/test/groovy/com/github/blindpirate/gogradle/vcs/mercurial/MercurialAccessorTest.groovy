@@ -38,6 +38,18 @@ class MercurialAccessorTest {
     }
 
     @Test
+    void 'finding changeset by id should succeed'() {
+        repository = accessor.getRepository(resource)
+        assert accessor.findChangesetById(repository, '1eaebd519f4c3f7d793b9ff42328d4383d672529').isPresent()
+    }
+
+    @Test
+    void 'empty result should be returned if that tag does not exist'() {
+        repository = accessor.getRepository(resource)
+        assert !accessor.findChangesetByTag(repository, 'unexistent').isPresent()
+    }
+
+    @Test
     void 'getting head of branch should succeed'() {
         repository = accessor.getRepository(resource)
         assert accessor.headOfBranch(repository, 'default').id == '620889544e2db8b064180431bcd1bb965704f4c2'
@@ -64,5 +76,17 @@ class MercurialAccessorTest {
         repository = accessor.getRepository(resource)
         accessor.resetToSpecificNodeId(repository, '5aa103927c66cc82c03161adcacd3a6509859f01')
         assert !new File(resource, 'commit2').exists()
+    }
+
+    @Test
+    void 'getting remote url from repository should succeed'() {
+        HgRepository repository = accessor.getRepository(resource)
+        assert accessor.getRemoteUrl(repository) == 'https://blindpirate@bitbucket.org/blindpirate/test-for-gogradle'
+    }
+
+    @Test(expected = IllegalStateException)
+    @WithResource('')
+    void 'exception should be thrown if no repo exists'() {
+        accessor.getRemoteUrl(resource)
     }
 }
