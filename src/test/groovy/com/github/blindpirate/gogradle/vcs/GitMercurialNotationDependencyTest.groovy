@@ -64,11 +64,11 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'toString should succeed'() {
-        assert dependency.toString() == "GitMercurialNotationDependency{name='github.com/a/b', commit='commitId'}"
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId'}"
         dependency.url = 'https://github.com/a/b.git'
-        assert dependency.toString() == "GitMercurialNotationDependency{name='github.com/a/b', commit='commitId', url='https://github.com/a/b.git'}"
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', url='https://github.com/a/b.git'}"
         dependency.tag = '1.0.0'
-        assert dependency.toString() == "GitMercurialNotationDependency{name='github.com/a/b', commit='commitId', tag='1.0.0', url='https://github.com/a/b.git'}"
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', tag='1.0.0', url='https://github.com/a/b.git'}"
     }
 
     @Test

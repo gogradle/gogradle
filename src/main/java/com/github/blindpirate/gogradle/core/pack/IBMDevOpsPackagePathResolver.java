@@ -23,7 +23,7 @@ public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
                 .withPath(packagePath)
                 .withRootPath(toUnixString(rootPath))
                 .withVcsType(VcsType.GIT)
-                .withUrl(HTTPS + rootPath)
+                .withUrl(HTTPS + toUnixString(rootPath))
                 .build();
         return Optional.of(pkg);
     }
