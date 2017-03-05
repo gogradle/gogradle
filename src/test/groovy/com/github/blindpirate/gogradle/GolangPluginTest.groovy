@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithProject
-import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.gradle.api.Project
 import org.junit.Before
@@ -61,7 +61,7 @@ class GolangPluginTest {
         assert dependency.name == 'github.com/a/b'
         assert dependency.commit == 'commitId'
         assert dependency.version == 'commitId'
-        assert dependency instanceof GitNotationDependency
+        assert dependency instanceof GitMercurialNotationDependency
     }
 
     def findFirstInDependencies() {
