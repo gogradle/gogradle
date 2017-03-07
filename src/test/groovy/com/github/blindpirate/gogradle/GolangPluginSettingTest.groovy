@@ -95,6 +95,12 @@ class GolangPluginSettingTest {
         assertCacheTimeEquals(3, 'days', 3600 * 24 * 3)
     }
 
+    @Test
+    void 'setting useHgClient should succeed'() {
+        setting.useHgClient = false
+        assert !setting.useHgClient
+    }
+
     @Test(expected = IllegalStateException)
     void 'setting an unsupported time unit should fail'() {
         setting.globalCacheFor(1, 'year')

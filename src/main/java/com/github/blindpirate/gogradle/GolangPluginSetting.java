@@ -59,6 +59,16 @@ public class GolangPluginSetting {
     // designed for Chinese developer
     private boolean fuckGfw;
 
+    private boolean useHgClient = true;
+
+    public boolean isUseHgClient() {
+        return useHgClient;
+    }
+
+    public void setUseHgClient(boolean useHgClient) {
+        this.useHgClient = useHgClient;
+    }
+
     public String getGoExecutable() {
         return goExecutable == null ? "go" : goExecutable;
     }
