@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.mercurial
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
@@ -11,6 +12,8 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
+import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
+import com.github.blindpirate.gogradle.vcs.mercurial.hg4j.Hg4JMercurialAccessor
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,7 +34,11 @@ import static org.mockito.Mockito.when
 @WithResource('')
 class MercurialDependencyManagerTest {
     @Mock
-    MercurialAccessor mercurialAccessor
+    Hg4JMercurialAccessor hg4JAccessor
+    @Mock
+    HgClientMercurialAccessor hgClientAccessor
+    @Mock
+    GolangPluginSetting setting
     @Mock
     DependencyVisitor visitor
     @Mock
@@ -65,12 +72,14 @@ class MercurialDependencyManagerTest {
 
     @Before
     void setUp() {
-        manager = new MercurialDependencyManager(mercurialAccessor, visitor, cacheManager, dependencyRegistry)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, setting, visitor, cacheManager, dependencyRegistry)
+        when(setting.isUseHgClient()).thenReturn(false)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
 
-        when(mercurialAccessor.getRepository(any(File))).thenReturn(repository)
+        when(hg4JAccessor.getRepository(any(File))).thenReturn(repository)
+        when(hgClientAccessor.getRepository(any(File))).thenReturn(repository)
 
         when(resolvedDependency.getVersion()).thenReturn('nodeId')
 
@@ -90,9 +99,10 @@ class MercurialDependencyManagerTest {
     @Test
     void 'installing mercurial dependency should succeed'() {
         // when
+        when(setting.isUseHgClient()).thenReturn(true)
         manager.doReset(resolvedDependency, resource.toPath())
         // then
-        verify(mercurialAccessor).resetToSpecificNodeId(repository, 'nodeId')
+        verify(hgClientAccessor).resetToSpecificNodeId(repository, 'nodeId')
     }
 
     @Test
@@ -109,7 +119,7 @@ class MercurialDependencyManagerTest {
         assert result.name == 'bitbucket.org/user/project'
         assert result.version == '1' * 40
         assert result.updateTime == 1L
-        verify(mercurialAccessor).getLastCommitTimeOfPath(repository, 'relative/path')
+        verify(hg4JAccessor).getLastCommitTimeOfPath(repository, 'relative/path')
     }
 
     @Test
@@ -117,13 +127,13 @@ class MercurialDependencyManagerTest {
         // when
         manager.resetToSpecificVersion(repository, hgChangeset)
         // then
-        verify(mercurialAccessor).resetToSpecificNodeId(repository, '1' * 40)
+        verify(hg4JAccessor).resetToSpecificNodeId(repository, '1' * 40)
     }
 
     @Test
     void 'tag should be used if it exists'() {
         // given
-        when(mercurialAccessor.findChangesetByTag(repository, 'tag')).thenReturn(of(hgChangeset))
+        when(hg4JAccessor.findChangesetByTag(repository, 'tag')).thenReturn(of(hgChangeset))
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
     }
@@ -131,7 +141,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'nodeId should be used if it exists'() {
         // given
-        when(mercurialAccessor.findChangesetById(repository, 'nodeId')).thenReturn(of(hgChangeset))
+        when(hg4JAccessor.findChangesetById(repository, 'nodeId')).thenReturn(of(hgChangeset))
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
     }
@@ -139,7 +149,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'head commit should be used if tag and nodeId do not exist'() {
         // given
-        when(mercurialAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
+        when(hg4JAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
     }
@@ -148,7 +158,7 @@ class MercurialDependencyManagerTest {
     void 'head commit should be used if nodeId is NEWEST_COMMIT'() {
         // given
         when(notationDependency.getCommit()).thenReturn('NEWEST_COMMIT')
-        when(mercurialAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
+        when(hg4JAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
     }
@@ -158,25 +168,25 @@ class MercurialDependencyManagerTest {
         // when
         manager.updateRepository(notationDependency, repository, resource)
         // then
-        verify(mercurialAccessor).pull(repository)
+        verify(hg4JAccessor).pull(repository)
     }
 
     @Test
     void 'all urls should be tried to clone repo'() {
         // given
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(mercurialAccessor.cloneWithUrl(resource, 'url1')).thenThrow(new IllegalStateException())
+        when(hg4JAccessor.cloneWithUrl(resource, 'url1')).thenThrow(new IllegalStateException())
         // when
         manager.initRepository(notationDependency, resource)
         // then
-        verify(mercurialAccessor).cloneWithUrl(resource, 'url2')
+        verify(hg4JAccessor).cloneWithUrl(resource, 'url2')
     }
 
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown if all urls are tried'() {
         // when
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(mercurialAccessor.cloneWithUrl(any(File), anyString())).thenThrow(new IllegalStateException())
+        when(hg4JAccessor.cloneWithUrl(any(File), anyString())).thenThrow(new IllegalStateException())
         // then
         manager.initRepository(notationDependency, resource)
     }
@@ -184,7 +194,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'repo should be considered matched if url matched'() {
         // given
-        when(mercurialAccessor.getRemoteUrl(resource)).thenReturn('url')
+        when(hg4JAccessor.getRemoteUrl(resource)).thenReturn('url')
         when(notationDependency.getUrls()).thenReturn(['url', 'url2'])
         // then
         assert manager.repositoryMatch(resource, notationDependency).isPresent()
@@ -193,9 +203,17 @@ class MercurialDependencyManagerTest {
     @Test
     void 'repo should be considered unmatched if url not matched'() {
         // given
-        when(mercurialAccessor.getRemoteUrl(repository)).thenReturn('url')
+        when(hg4JAccessor.getRemoteUrl(repository)).thenReturn('url')
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
         // then
         assert !manager.repositoryMatch(resource, notationDependency).isPresent()
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown when urls are empty'() {
+        // given
+        when(notationDependency.getUrls()).thenReturn([])
+        // when
+        manager.initRepository(notationDependency, resource)
     }
 }
