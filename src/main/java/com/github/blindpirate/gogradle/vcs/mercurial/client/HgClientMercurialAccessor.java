@@ -25,8 +25,20 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
     // commit2_tag                        1:1eaebd519f4c
     private static final Pattern TAGS_PATTERN = Pattern.compile("(\\w+)\\s+(\\d)+:([a-fA-F0-9]+)");
 
+    private boolean verified;
+
+    private void checkClient() {
+        if (!verified) {
+            Process process = ProcessUtils.run("hg", "version");
+            Assert.isTrue(ProcessUtils.getStdout(process).contains("Mercurial"),
+                    "Can't find hg in $PATH, do you have mercurial client installed?");
+            verified = true;
+        }
+    }
+
     @Override
     public String getRemoteUrl(File repoRoot) {
+        checkClient();
         Process process = run(asList("hg", "paths"), null, repoRoot);
         ProcessResult result = ProcessUtils.getResult(process);
 
@@ -40,20 +52,24 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     @Override
     public HgRepository getRepository(File dir) {
+        checkClient();
         return HgClientRepository.of(dir);
     }
 
     @Override
     public String getRemoteUrl(HgRepository repository) {
+        checkClient();
         return getRemoteUrl(HgClientRepository.class.cast(repository).getRootDir());
     }
 
     @Override
     public void resetToSpecificNodeId(HgRepository repository, String version) {
+        checkClient();
         runCmdsInRepo(asList("hg", "checkout", version, "--clean"), repository);
     }
 
     private void runCmdsInRepo(List<String> cmds, HgRepository repository) {
+        checkClient();
         File repoRoot = repository == null ? null : HgClientRepository.class.cast(repository).getRootDir();
         Process process = run(cmds, null, repoRoot);
         checkReturnCode(ProcessUtils.getResult(process), cmds, repoRoot);
@@ -61,6 +77,7 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     @Override
     public long getLastCommitTimeOfPath(HgRepository repository, String relativePath) {
+        checkClient();
         File repoRoot = HgClientRepository.class.cast(repository).getRootDir();
         List<String> cmds = asList("hg", "log", relativePath, "--limit", "1", "--template", "{date|hgdate}");
         Process process = run(cmds, null, repoRoot);
@@ -86,6 +103,7 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     @Override
     public Optional<HgChangeset> findChangesetByTag(HgRepository repository, String tag) {
+        checkClient();
         File repoRoot = HgClientRepository.class.cast(repository).getRootDir();
         Process process = run(asList("hg", "tags", "--debug"), null, repoRoot);
         ProcessResult result = ProcessUtils.getResult(process);
@@ -120,12 +138,14 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     @Override
     public Optional<HgChangeset> findChangesetById(HgRepository repository, String id) {
+        checkClient();
         File repoRoot = HgClientRepository.class.cast(repository).getRootDir();
         return Optional.ofNullable(findDetailOfChangeset(id, repoRoot));
     }
 
     @Override
     public HgChangeset headOfBranch(HgRepository repository, String defaultBranch) {
+        checkClient();
         File repoRoot = HgClientRepository.class.cast(repository).getRootDir();
         // 620889544e2db8b064180431bcd1bb965704f4c2 1487252847 -28800
         List<String> cmds = asList("hg", "log", "--limit", "1", "--template", "{node} {date|hgdate}");
@@ -143,11 +163,13 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     @Override
     public void pull(HgRepository repository) {
+        checkClient();
         runCmdsInRepo(asList("hg", "pull", "-u"), repository);
     }
 
     @Override
     public HgRepository cloneWithUrl(File directory, String url) {
+        checkClient();
         runCmdsInRepo(asList("hg", "clone", url, directory.getAbsolutePath()), null);
         return getRepository(directory);
     }
