@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
 @OnlyWhen(value = '"hg version".execute().text', whenException = OnlyWhen.ExceptionStrategy.FALSE)
-class MercurialAccessorTest {
+class HgClientMercurialAccessorTest {
 
     MercurialAccessor accessor = new HgClientMercurialAccessor()
 
@@ -21,7 +21,7 @@ class MercurialAccessorTest {
 
     @Test
     void 'getting remote url should succeed'() {
-        assert accessor.getRemoteUrl(resource) == 'https://blindpirate@bitbucket.org/blindpirate/test-for-gogradle'
+        assert accessor.getRemoteUrl(resource) == 'https://bitbucket.org/blindpirate/test-for-gogradle'
     }
 
     @Test
@@ -67,7 +67,16 @@ class MercurialAccessorTest {
     @AccessWeb
     @WithResource('')
     void 'cloning should succeed'() {
-        accessor.cloneWithUrl(resource, 'https://blindpirate@bitbucket.org/blindpirate/test-for-gogradle')
+        accessor.cloneWithUrl(resource, 'https://bitbucket.org/blindpirate/test-for-gogradle')
+        assert new File(resource, 'commit1').exists()
+    }
+
+    @Test
+    @AccessWeb
+    @WithResource('')
+    @OnlyWhen('new File("${System.getProperty(/user.home/)}/.ssh").exists()')
+    void 'cloning with ssh should succeed'() {
+        accessor.cloneWithUrl(resource, 'ssh://hg@bitbucket.org/blindpirate/test-for-gogradle')
         assert new File(resource, 'commit1').exists()
     }
 
@@ -81,7 +90,7 @@ class MercurialAccessorTest {
     @Test
     void 'getting remote url from repository should succeed'() {
         HgRepository repository = accessor.getRepository(resource)
-        assert accessor.getRemoteUrl(repository) == 'https://blindpirate@bitbucket.org/blindpirate/test-for-gogradle'
+        assert accessor.getRemoteUrl(repository) == 'https://bitbucket.org/blindpirate/test-for-gogradle'
     }
 
     @Test(expected = IllegalStateException)
