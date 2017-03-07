@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.mercurial.hg4j;
 
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.vcs.mercurial.HgChangeset;
 import com.github.blindpirate.gogradle.vcs.mercurial.HgRepository;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialAccessor;
@@ -8,7 +9,6 @@ import org.tmatesoft.hg.core.HgCheckoutCommand;
 import org.tmatesoft.hg.core.HgCloneCommand;
 import org.tmatesoft.hg.core.HgException;
 import org.tmatesoft.hg.core.HgLogCommand;
-import org.tmatesoft.hg.core.HgPullCommand;
 import org.tmatesoft.hg.core.HgRepositoryNotFoundException;
 import org.tmatesoft.hg.core.Nodeid;
 import org.tmatesoft.hg.repo.HgLookup;
@@ -111,14 +111,17 @@ public class Hg4JMercurialAccessor implements MercurialAccessor {
         }
     }
 
+    // Walkaround: there's issues in Hg4J's pull functionality
     @Override
     public void pull(HgRepository repository) {
         String url = getRemoteUrl(repository);
-        System.setProperty("http.agent", "mercurial/proto-1.0");
         try {
-            HgRemoteRepository remote = hgLookup.detectRemote(url, peel(repository));
-            HgPullCommand cmd = new HgPullCommand(peel(repository)).source(remote);
-            cmd.execute();
+            File dir = peel(repository).getWorkingDir();
+            IOUtils.clearDirectory(dir);
+            cloneWithUrl(dir, url);
+//            HgRemoteRepository remote = hgLookup.detectRemote(url, peel(repository));
+//            HgPullCommand cmd = new HgPullCommand(peel(repository)).source(remote);
+//            cmd.execute();
         } catch (Exception e) {
             throw ExceptionHandler.uncheckException(e);
         }
