@@ -12,12 +12,13 @@ plugins {
     id 'com.github.kt3k.coveralls' version '2.7.1'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id "com.gradle.plugin-publish" version "0.9.7"
+    id "co.riiid.gradle" version "0.4.2"
 }
 
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.2.7'
+version '0.2.8'
 
 /************** sourcesets **************/
 sourceSets {
@@ -194,7 +195,28 @@ pluginBundle {
     }
 }
 
+compileJava.dependsOn updateVersion
+
 publishPlugins.dependsOn 'updateVersion'
+
+/************** github release **************/
+
+github {
+    owner = 'blindpirate'
+    repo = 'gogradle'
+    token = "${System.getenv('GITHUB_TOKEN')}"
+    tagName = version
+    targetCommitish = 'master'
+    name = "gogradle-${version}-all.jar"
+    body = """# Gogradle ${version}
+New features in this release: 
+- Fully support Mercurial
+"""
+    assets = ["build/libs/gogradle-${version}-all.jar"]
+}
+
+githubRelease.dependsOn shadowJar, updateVersion
+
 /************** wrapper **************/
 
 task wrapper(type: Wrapper) {
