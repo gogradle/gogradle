@@ -20,7 +20,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 项目级的依赖隔离，无需设置`GOPATH`
 - 完善的包管理
   - 无需手工安装依赖包，只需指定版本
-  - 无需安装即可支持Go语言默认支持的四种版本控制工具：Git/Svn/Mercurial/Bazzar （当前只实现了Git）
+  - 无需安装即可支持Go语言默认支持的四种版本控制工具：Git/Svn/Mercurial/Bazzar （当前只实现了Git和Mercurial）
   - 支持传递性依赖
   - 支持自定义传递性依赖策略
   - 自动解决冲突 
