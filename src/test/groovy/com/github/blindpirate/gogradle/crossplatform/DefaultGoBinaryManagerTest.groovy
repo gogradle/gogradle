@@ -10,7 +10,9 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
+import org.junit.contrib.java.lang.system.EnvironmentVariables
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
@@ -44,6 +46,9 @@ class DefaultGoBinaryManagerTest {
 
     DefaultGoBinaryManager manager
 
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables()
+
     @Before
     void setUp() {
         Process process = mock(Process)
@@ -51,7 +56,7 @@ class DefaultGoBinaryManagerTest {
         when(delegate.run(['go', 'version'], null, null)).thenReturn(process)
         when(delegate.getResult(process)).thenReturn(processResult)
         turnOffMockGo()
-
+      
         when(cacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
@@ -71,11 +76,12 @@ class DefaultGoBinaryManagerTest {
     }
 
     private turnOnMockGo() {
+        IOUtils.write(resource, "go/bin/go${Os.getHostOs().exeExtension()}", '')
+        environmentVariables.set('PATH', new File(resource, 'go/bin').absolutePath)
+        Process process = mock(Process)
+        when(processUtilsDelegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
+        when(processUtilsDelegate.getResult(process)).thenReturn(processResult)
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
-    }
-
-    private turnOffMockGo() {
-        when(processResult.getStdout()).thenReturn('This is not a golang executable')
     }
 
     @Test
@@ -88,13 +94,22 @@ class DefaultGoBinaryManagerTest {
     }
 
     @Test
+    void 'local go binary should be ignored if it cannot be recognized'() {
+        // given
+        turnOnMockGo()
+        when(processResult.getStdout()).thenReturn('this is not a golang executable')
+        // then
+        'the newest stable version will be used if local binary not exist and no version specified'()
+    }
+
+    @Test
     void 'local go binary should be returned if it exists and no version specified'() {
         // given
         turnOnMockGo()
         // then
-        assert manager.getBinaryPath() == 'go'
+        assert manager.getBinaryPath() == resource.toPath().resolve("go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.1'
-        assert manager.getGorootEnv() == null
+        assert manager.getGoroot() == resource.toPath().resolve('go')
     }
 
     @Test
@@ -103,9 +118,9 @@ class DefaultGoBinaryManagerTest {
         turnOnMockGo()
         when(setting.getGoVersion()).thenReturn('1.7.1')
         // then
-        assert manager.getBinaryPath() == 'go'
+        assert manager.getBinaryPath() == resource.toPath().resolve("go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.1'
-        assert manager.getGorootEnv() == null
+        assert manager.getGoroot() == resource.toPath().resolve('go')
     }
 
     @Test
@@ -113,9 +128,9 @@ class DefaultGoBinaryManagerTest {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}").toString()
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.4'
-        assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
+        assert manager.getGoroot() == resource.toPath().resolve('1.7.4/go')
         verify(httpUtils).download(anyString(), any(Path))
     }
 
@@ -125,10 +140,17 @@ class DefaultGoBinaryManagerTest {
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
         IOUtils.write(resource, "1.7.4/go/bin/go${Os.getHostOs().exeExtension()}", 'mock go binary')
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}").toString()
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.4'
-        assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
+        assert manager.getGoroot() == resource.toPath().resolve('1.7.4/go')
         verify(httpUtils, times(0)).download(anyString(), any(Path))
+    }
+
+    @Test
+    void 'go with specific version should be downloaded if it does not match go version on host'() {
+        // given
+        turnOnMockGo()
+        'go binary with specified version should be downloaded'()
     }
 
     @Test
@@ -136,9 +158,9 @@ class DefaultGoBinaryManagerTest {
         // given
         when(setting.getGoVersion()).thenReturn("1.7.4")
         // then
-        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}").toString()
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.4'
-        assert manager.getGorootEnv() == resource.toPath().resolve('1.7.4/go').toString()
+        assert manager.getGoroot() == resource.toPath().resolve('1.7.4/go')
         verify(httpUtils).download(anyString(), any(Path))
     }
 

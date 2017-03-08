@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitRepository
 import org.gradle.api.Project
+import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +26,11 @@ class GolangPluginTest {
 
     @Test
     void 'smoke test should succeed'() {
+    }
+
+    @Test
+    void 'integration with idea plugin should succeed'(){
+        project.pluginManager.apply(IdeaPlugin)
     }
 
     @Test

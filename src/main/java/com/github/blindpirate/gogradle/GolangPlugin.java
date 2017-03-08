@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
+import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
@@ -56,6 +57,13 @@ public class GolangPlugin implements Plugin<Project> {
         configureConfigurations(project);
         configureTasks(project);
         configureGlobalInjector();
+        hackIdeaPlugin();
+    }
+
+    private void hackIdeaPlugin() {
+        project.getPlugins().withId("idea", plugin -> {
+            injector.getInstance(IdeaIntegration.class).hack();
+        });
     }
 
     private void init(Project project) {
@@ -92,7 +100,8 @@ public class GolangPlugin implements Plugin<Project> {
         project.setProperty("dependencyHandler",
                 instantiator.newInstance(GolangDependencyHandler.class,
                         configurationContainer,
-                        parser));
+                        parser,
+                        project));
 
         overwriteRepositoryHandler(project);
     }

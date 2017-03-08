@@ -17,4 +17,9 @@ class StringUtilsTest {
     private void assertEquals(String source, String regex, List result) {
         assert StringUtils.splitAndTrim(source, regex) == result as String[]
     }
+
+    @Test
+    void 'rendering template should succeed'() {
+        assert StringUtils.render('${a}${b}${c}', [a: '1', b: '2', c: '3']) == '123'
+    }
 }

@@ -28,7 +28,6 @@ import java.nio.file.Files
 import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -55,13 +54,21 @@ class DefaultBuildManagerTest {
 
     GolangPluginSetting setting = new GolangPluginSetting()
 
+    String goBin
+
+    String goroot
+
     @Before
     void setUp() {
         manager = new DefaultBuildManager(project, binaryManager, setting)
         when(project.getRootDir()).thenReturn(resource)
         setting.packagePath = 'root/package'
 
-        when(binaryManager.getBinaryPath()).thenReturn('go')
+        goroot = resource.toPath().resolve('go').toAbsolutePath().toString()
+        goBin = resource.toPath().resolve('go/bin/go').toAbsolutePath().toString()
+
+        when(binaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('go/bin/go'))
+        when(binaryManager.getGoroot()).thenReturn(resource.toPath().resolve('go'))
 
         when(delegate.run(anyList(), anyMap(), any(File))).thenReturn(process)
     }
@@ -114,23 +121,22 @@ class DefaultBuildManagerTest {
         manager.build()
         // then
         String expectedOutputPath = new File(resource, ".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_package")
-        verify(delegate).run(['go', 'build', '-o', expectedOutputPath, 'a', 'b'],
-                [GOPATH: getBuildGopath()],
+        verify(delegate).run([goBin, 'build', '-o', expectedOutputPath, 'a', 'b'],
+                [GOPATH: getBuildGopath(), GOROOT: goroot],
                 resource
         )
     }
 
     @Test
-    void 'setting GOROOT should succeed'() {
-        // given
-        when(binaryManager.gorootEnv).thenReturn('goroot')
+    void 'build without output should succeed'() {
         // when
+        setting.generateOutput = false
         manager.build()
         // then
-        String expectedOutputPath = new File(resource, ".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_package")
-        verify(delegate).run(['go', 'build', '-o', expectedOutputPath],
-                [GOPATH: getBuildGopath(), GOROOT: 'goroot'],
-                resource)
+        verify(delegate).run([goBin, 'build'],
+                [GOPATH: getBuildGopath(), GOROOT: goroot],
+                resource
+        )
     }
 
     @Test(expected = BuildException)
@@ -165,8 +171,8 @@ class DefaultBuildManagerTest {
         // when
         manager.test()
         // then
-        verify(delegate).run(['go', 'test', './...', 'a', 'b'],
-                [GOPATH: getTestGopath()],
+        verify(delegate).run([goBin, 'test', './...', 'a', 'b'],
+                [GOPATH: getTestGopath(), GOROOT: goroot],
                 resource
         )
     }
@@ -182,11 +188,11 @@ class DefaultBuildManagerTest {
         // when
         manager.testWithPatterns(['*_test*'])
         // then
-        verify(delegate).run(['go', 'test', b1.absolutePath, b2.absolutePath],
-                [GOPATH: getTestGopath()],
+        verify(delegate).run([goBin, 'test', b1.absolutePath, b2.absolutePath],
+                [GOPATH: getTestGopath(), GOROOT: goroot],
                 resource)
-        verify(delegate).run(['go', 'test', a1.absolutePath, a2.absolutePath, a3.absolutePath],
-                [GOPATH: getTestGopath()],
+        verify(delegate).run([goBin, 'test', a1.absolutePath, a2.absolutePath, a3.absolutePath],
+                [GOPATH: getTestGopath(), GOROOT: goroot],
                 resource)
     }
 
@@ -212,8 +218,8 @@ class DefaultBuildManagerTest {
     }
 
     void assertOutputFile(String fileName) {
-        verify(delegate).run(['go', 'build', '-o', new File(resource, fileName).toString()],
-                [GOPATH: getBuildGopath()],
+        verify(delegate).run([goBin, 'build', '-o', new File(resource, fileName).toString()],
+                [GOPATH: getBuildGopath(), GOROOT: goroot],
                 resource
         )
     }
@@ -226,8 +232,8 @@ class DefaultBuildManagerTest {
         manager.build()
         // then
         String expectedOutput = "a/b/c/${Os.getHostOs()}_${Arch.getHostArch()}_package"
-        verify(delegate).run(['go', 'build', '-o', new File(resource, expectedOutput).toString()],
-                [GOPATH: getBuildGopath()],
+        verify(delegate).run([goBin, 'build', '-o', new File(resource, expectedOutput).toString()],
+                [GOPATH: getBuildGopath(), GOROOT: goroot],
                 resource
         )
     }

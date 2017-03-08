@@ -92,8 +92,8 @@ public class GitAccessor implements VcsAccessor {
             return;
         }
         try {
-            LOGGER.quiet("Cloing {} into {}", gitUrl, directory);
-            LoggerProgressMonitor monitor = new LoggerProgressMonitor("Cloning from " + gitUrl);
+            LOGGER.quiet("Cloning {} into {}", gitUrl, directory);
+            LoggerProgressMonitor monitor = new LoggerProgressMonitor("Cloning from ", gitUrl);
             CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setCloneSubmodules(true)
@@ -216,6 +216,12 @@ public class GitAccessor implements VcsAccessor {
 
             updateSubmodule(packageRoot, repository, url);
 
+            String url = getRemoteUrl(repository);
+
+            PullCommand pullCommand = git.pull()
+                    .setProgressMonitor(new LoggerProgressMonitor("Pulling", url));
+            setCredentialsIfNecessary(pullCommand, packageRoot, url);
+            pullCommand.call();
             return repository;
         } catch (GitAPIException e) {
             throw new IllegalStateException("Exception in git operation", e);

@@ -42,22 +42,22 @@ public abstract class AbstractGolangDependency implements GolangDependency {
 
     @Override
     public String getGroup() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method getGroup is invoked!");
     }
 
     @Override
     public String getVersion() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method getVersion is invoked!");
     }
 
     @Override
     public boolean contentEquals(Dependency dependency) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method contentEquals is invoked!");
     }
 
     @Override
     public Dependency copy() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method copy is invoked!");
     }
 
     public enum NoTransitiveSpec implements Spec<GolangDependency> {
@@ -101,5 +101,4 @@ public abstract class AbstractGolangDependency implements GolangDependency {
             return properties.hashCode();
         }
     }
-
 }

@@ -128,11 +128,11 @@ public class DefaultBuildManager implements BuildManager {
     @Override
     public void build() {
         autoRecoverVendor(() -> {
-            String goBinary = goBinaryManager.getBinaryPath();
+            Path goBinary = goBinaryManager.getBinaryPath();
             String gopath = getBuildGopath();
             Map<String, String> envs = getEnvs(gopath);
             determineOutputFilePaths().forEach(outputFilePath ->
-                    buildOne(goBinary, outputFilePath, envs)
+                    buildOne(goBinary.toAbsolutePath().toString(), outputFilePath, envs)
             );
         });
     }
@@ -157,7 +157,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private Map<String, String> getEnvs(String gopath) {
-        String gorootEnv = goBinaryManager.getGorootEnv();
+        String gorootEnv = goBinaryManager.getGoroot().toAbsolutePath().toString();
         Map<String, String> envs = asMap("GOPATH", gopath);
         if (gorootEnv != null) {
             envs.put("GOROOT", gorootEnv);
@@ -167,7 +167,13 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private void buildOne(String goBinary, String outputFilePath, Map<String, String> envs) {
-        List<String> args = Lists.newArrayList(goBinary, "build", "-o", outputFilePath);
+        List<String> args = Lists.newArrayList(goBinary, "build");
+
+        if (setting.isGenerateOutput()) {
+            args.add("-o");
+            args.add(outputFilePath);
+        }
+
         args.addAll(setting.getExtraBuildArgs());
 
         int retCode = startBuildOrTest(args, envs);
@@ -183,11 +189,11 @@ public class DefaultBuildManager implements BuildManager {
 
     private void testWithTargets(List<String> targets) {
         autoRecoverVendor(() -> {
-            String goBinary = goBinaryManager.getBinaryPath();
+            Path goBinary = goBinaryManager.getBinaryPath();
             String gopath = getTestGopath();
 
             Map<String, String> envs = getEnvs(gopath);
-            List<String> args = Lists.newArrayList(goBinary, "test");
+            List<String> args = Lists.newArrayList(goBinary.toAbsolutePath().toString(), "test");
             args.addAll(targets);
             args.addAll(setting.getExtraTestArgs());
 

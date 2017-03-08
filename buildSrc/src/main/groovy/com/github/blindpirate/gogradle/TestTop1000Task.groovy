@@ -41,7 +41,7 @@ class TestTop1000Task extends DefaultTask {
         String[] userAndProject = dirName.split(/_/)
         String buildDotGradle = """
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.1.4'
+    id 'com.github.blindpirate.gogradle' version '0.2.7'
 }
 
 golang {

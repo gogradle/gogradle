@@ -92,6 +92,12 @@ class IOUtilsTest {
         IOUtils.copyDirectory(new File(resource, 'invalid'), new File(resource, 'invalid'), TrueFileFilter.INSTANCE)
     }
 
+    @Test
+    void 'touching should succeed'() {
+        IOUtils.touch(new File(resource, 'newFile'))
+        assert new File(resource, 'newFile').exists()
+    }
+
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when touching fails'() {
         when(mockFile.exists()).thenReturn(true)
@@ -107,6 +113,12 @@ class IOUtilsTest {
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when trying to get text from invalid file'() {
         IOUtils.toString(new File(resource, 'invalid'))
+    }
+
+    @Test
+    void 'getting text from file should succeed'() {
+        IOUtils.touch(new File(resource, 'file'))
+        assert IOUtils.toString(new File(resource, 'file')) == ''
     }
 
     @Test
@@ -183,5 +195,8 @@ class IOUtilsTest {
         assert new File(resource, 'a/b/c').getText() == 'content'
     }
 
-
+    @Test(expected = IllegalStateException)
+    void 'tracking an unexistent path should fail'() {
+        IOUtils.toRealPath(Paths.get('/gogradle_unexistent'))
+    }
 }

@@ -17,7 +17,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.1.4'
+version '0.2.7'
 
 /************** sourcesets **************/
 sourceSets {
@@ -55,20 +55,22 @@ dependencies {
     compile group: 'commons-io', name: 'commons-io', version: '2.5'
     compile 'com.google.guava:guava:20.0'
     compile 'com.github.zafarkhaja:java-semver:0.9.0'
-//    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.7.0-SNAPSHOT'
     compile group: 'com.github.blindpirate.gogradle.jgit', name: 'org.eclipse.jgit', version: '4.7.1'
     compile group: 'org.jsoup', name: 'jsoup', version: '1.7.2'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-databind', version: '2.8.5'
     compile group: 'com.fasterxml.jackson.core', name: 'jackson-annotations', version: '2.8.5'
     compile group: 'com.google.code.findbugs', name: 'annotations', version: '3.0.1'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-yaml', version: '2.8.5'
-//    compile group: 'org.apache.commons', name: 'commons-compress', version: '1.13'
     compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.3.2'
     compile group: 'org.apache.ant', name: 'ant', version: '1.10.0'
 //    compile group: 'org.tmatesoft.svnkit', name: 'svnkit', version: '1.8.14'
     compile 'com.github.blindpirate.gogradle.jgit:hg4j:1.2.5'
+    compile group: 'com.typesafe.sbt', name: 'sbt-interface', version: '0.13.13'
+    compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.6.3'
+    compile group: 'org.codehaus.woodstox', name: 'woodstox-core-asl', version: '4.4.1'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
+    testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
 }
 /************** test **************/
@@ -172,8 +174,8 @@ def updateVersion(String file, String oldVersionRegex, String newVersion) {
 
 task('updateVersion') {
     doLast {
-        updateVersion('README.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
-        updateVersion('README_CN.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('docs/getting-started.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('docs/getting-started-cn.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('src/main/java/com/github/blindpirate/gogradle/GogradleGlobal.java', /GOGRADLE_VERSION = "(\w|\d|\.|\-)*"/, "GOGRADLE_VERSION = \"${version}\"")
         updateVersion('buildSrc/src/main/groovy/com/github/blindpirate/gogradle/TestTop1000Task.groovy', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
     }

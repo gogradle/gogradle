@@ -1,24 +1,36 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import com.github.blindpirate.gogradle.util.TaskUtil;
 import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import groovy.lang.MissingMethodException;
 import org.gradle.api.Action;
+import org.gradle.api.Project;
 import org.gradle.api.artifacts.Configuration;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.artifacts.component.ComponentIdentifier;
 import org.gradle.api.artifacts.dsl.ComponentMetadataHandler;
 import org.gradle.api.artifacts.dsl.ComponentModuleMetadataHandler;
 import org.gradle.api.artifacts.dsl.DependencyHandler;
 import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
+import org.gradle.api.artifacts.result.ArtifactResolutionResult;
+import org.gradle.api.artifacts.result.ComponentArtifactsResult;
+import org.gradle.api.artifacts.result.ComponentResult;
+import org.gradle.api.component.Artifact;
+import org.gradle.api.component.Component;
 import org.gradle.util.CollectionUtils;
 import org.gradle.util.ConfigureUtil;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.IDEA_TASK_NAME;
 
 @Singleton
 public class GolangDependencyHandler extends GroovyObjectSupport implements DependencyHandler {
@@ -27,11 +39,15 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     private final NotationParser notationParser;
 
+    private final Project project;
+
     @Inject
     public GolangDependencyHandler(ConfigurationContainer configurationContainer,
-                                   NotationParser notationParser) {
+                                   NotationParser notationParser,
+                                   Project project) {
         this.configurationContainer = configurationContainer;
         this.notationParser = notationParser;
+        this.project = project;
     }
 
     public Dependency add(String configurationName, Object dependencyNotation) {
@@ -82,56 +98,93 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
 
     @Override
     public Dependency module(Object notation) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method module is invoked!");
     }
 
     @Override
     public Dependency module(Object notation, Closure configureClosure) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method module is invoked!");
     }
 
     @Override
     public Dependency project(Map<String, ?> notation) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method project is invoked!");
     }
 
     @Override
     public Dependency gradleApi() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method gradleApi is invoked!");
     }
 
     @Override
     public Dependency gradleTestKit() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method gradleTestKit is invoked!");
     }
 
     @Override
     public Dependency localGroovy() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method localGroovy is invoked!");
     }
 
     @Override
     public ComponentMetadataHandler getComponents() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method getComponents is invoked!");
     }
 
     @Override
     public void components(Action<? super ComponentMetadataHandler> configureAction) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method components is invoked!");
     }
 
     @Override
     public ComponentModuleMetadataHandler getModules() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method getModules is invoked!");
     }
 
     @Override
     public void modules(Action<? super ComponentModuleMetadataHandler> configureAction) {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unsupported method modules is invoked!");
     }
 
     @Override
     public ArtifactResolutionQuery createArtifactResolutionQuery() {
-        throw new UnsupportedOperationException();
+        // hacking for IDEA
+        TaskUtil.runTask(project, IDEA_TASK_NAME);
+        return new EmptyArtifactResolutionQuery();
+    }
+
+    // See org.jetbrains.plugins.gradle.tooling.util.DependencyResolverImpl
+    private static class EmptyArtifactResolutionQuery extends HashSet<ComponentArtifactsResult>
+            implements ArtifactResolutionQuery {
+        @Override
+        public ArtifactResolutionQuery forComponents(Iterable<? extends ComponentIdentifier> componentIds) {
+            return this;
+        }
+
+        @Override
+        public ArtifactResolutionQuery forComponents(ComponentIdentifier... componentIds) {
+            return this;
+        }
+
+        @Override
+        public ArtifactResolutionQuery withArtifacts(Class<? extends Component> componentType,
+                                                     Class<? extends Artifact>[] artifactTypes) {
+            return this;
+        }
+
+        @Override
+        public ArtifactResolutionResult execute() {
+            return new ArtifactResolutionResult() {
+                @Override
+                public Set<ComponentResult> getComponents() {
+                    return new HashSet<>();
+                }
+
+                @Override
+                public Set<ComponentArtifactsResult> getResolvedComponents() {
+                    return new HashSet<>();
+                }
+            };
+        }
     }
 }
