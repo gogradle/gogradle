@@ -74,16 +74,17 @@ class Hg4JMercurialAccessorTest {
         assert new File(resource, 'commit1').exists()
     }
 
-    private void hgUpdate(){
+    private void hgUpdate() {
         HgRepository repository = accessor.getRepository(resource)
         HgChangeset tip = accessor.headOfBranch(repository, 'default')
         accessor.resetToSpecificNodeId(repository, tip.getId())
     }
 
+    // Only on my computer
     @Test
     @AccessWeb
     @WithResource('')
-    @OnlyWhen('new File("${System.getProperty(/user.home/)}/.ssh").exists()')
+    @OnlyWhen('"zhb"==System.getProperty("user.home")')
     void 'cloning with ssh should succeed'() {
         accessor.cloneWithUrl(resource, 'ssh://hg@bitbucket.org/blindpirate/test-for-gogradle')
         hgUpdate()

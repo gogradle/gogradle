@@ -74,7 +74,7 @@ class HgClientMercurialAccessorTest {
     @Test
     @AccessWeb
     @WithResource('')
-    @OnlyWhen('new File("${System.getProperty(/user.home/)}/.ssh").exists()')
+    @OnlyWhen('"zhb"==System.getProperty("user.home")')
     void 'cloning with ssh should succeed'() {
         accessor.cloneWithUrl(resource, 'ssh://hg@bitbucket.org/blindpirate/test-for-gogradle')
         assert new File(resource, 'commit1').exists()
