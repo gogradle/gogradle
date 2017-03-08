@@ -55,8 +55,7 @@ class DefaultGoBinaryManagerTest {
         when(setting.getGoExecutable()).thenReturn("go")
         when(delegate.run(['go', 'version'], null, null)).thenReturn(process)
         when(delegate.getResult(process)).thenReturn(processResult)
-        turnOffMockGo()
-      
+
         when(cacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
@@ -79,8 +78,8 @@ class DefaultGoBinaryManagerTest {
         IOUtils.write(resource, "go/bin/go${Os.getHostOs().exeExtension()}", '')
         environmentVariables.set('PATH', new File(resource, 'go/bin').absolutePath)
         Process process = mock(Process)
-        when(processUtilsDelegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
-        when(processUtilsDelegate.getResult(process)).thenReturn(processResult)
+        when(delegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
+        when(delegate.getResult(process)).thenReturn(processResult)
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
 
