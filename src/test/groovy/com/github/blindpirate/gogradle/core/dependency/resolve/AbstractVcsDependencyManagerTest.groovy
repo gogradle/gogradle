@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -129,6 +130,14 @@ class AbstractVcsDependencyManagerTest {
 
     @Test
     void 'updating repository should be skipped if it is up-to-date'() {
+        'resolving a vendor dependency hosting in vcs dependency should succeed'()
+        verify(cacheManager, times(0)).updateCurrentDependencyLock()
+        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
+    }
+
+    @Test
+    @MockOffline
+    void 'updating repository should be skipped when offline'() {
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock()
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
