@@ -8,16 +8,15 @@ import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,10 +33,14 @@ import static org.mockito.Mockito.*
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockInjector
+@WithMockProcess
 class DefaultBuildManagerTest {
     DefaultBuildManager manager
 
     File resource
+
+    ProcessUtilsDelegate delegate
+
     @Mock
     Project project
     @Mock
@@ -46,8 +49,6 @@ class DefaultBuildManagerTest {
     ResolvedDependency resolvedDependency
     @Mock
     GitDependencyManager gitDependencyManager
-    @Mock
-    ProcessUtilsDelegate delegate
     @Mock
     Process process
 
@@ -69,13 +70,7 @@ class DefaultBuildManagerTest {
         when(binaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('go/bin/go'))
         when(binaryManager.getGoroot()).thenReturn(resource.toPath().resolve('go'))
 
-        ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', delegate)
         when(delegate.run(anyList(), anyMap(), any(File))).thenReturn(process)
-    }
-
-    @After
-    void cleanUp() {
-        ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', new ProcessUtils.ProcessUtilsDelegate())
     }
 
     @Test(expected = IllegalStateException)

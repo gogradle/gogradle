@@ -1,21 +1,21 @@
-package com.github.blindpirate.gogradle.vcs.git;
+package com.github.blindpirate.gogradle.vcs.mercurial;
 
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-public class GitResolvedDependency extends GitMercurialResolvedDependency {
-    public GitResolvedDependency(String name, String commitId, long commitTime) {
+public class MercurialResolvedDependency extends GitMercurialResolvedDependency {
+    public MercurialResolvedDependency(String name, String commitId, long commitTime) {
         super(name, commitId, commitTime);
     }
 
     @Override
     protected Class<? extends DependencyInstaller> getInstallerClass() {
-        return GitDependencyManager.class;
+        return MercurialDependencyManager.class;
     }
 
     @Override
     protected VcsType getVcsType() {
-        return VcsType.GIT;
+        return VcsType.MERCURIAL;
     }
 }

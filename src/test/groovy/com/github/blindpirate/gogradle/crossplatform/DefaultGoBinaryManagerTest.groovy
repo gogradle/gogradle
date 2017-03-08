@@ -2,15 +2,13 @@ package com.github.blindpirate.gogradle.crossplatform
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
+import com.github.blindpirate.gogradle.support.WithMockProcess
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import org.junit.After
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -29,19 +27,20 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
+@WithMockProcess
 class DefaultGoBinaryManagerTest {
     @Mock
     GolangPluginSetting setting
     @Mock
     HttpUtils httpUtils
     @Mock
-    GlobalCacheManager globalCacheManager
-    @Mock
-    ProcessUtilsDelegate processUtilsDelegate
-    @Mock
     ProcessResult processResult
+    @Mock
+    GlobalCacheManager cacheManager
 
     File resource
+
+    ProcessUtilsDelegate delegate
 
     InputStream mockGoTarGz = getClass().classLoader.getResourceAsStream('mock-go-1.7.4' + Os.getHostOs().archiveExtension())
 
@@ -52,10 +51,12 @@ class DefaultGoBinaryManagerTest {
 
     @Before
     void setUp() {
-        ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', processUtilsDelegate)
+        Process process = mock(Process)
         when(setting.getGoExecutable()).thenReturn("go")
+        when(delegate.run(['go', 'version'], null, null)).thenReturn(process)
+        when(delegate.getResult(process)).thenReturn(processResult)
 
-        when(globalCacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
+        when(cacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 return resource.toPath().resolve(invocation.getArgument(0))
@@ -70,27 +71,22 @@ class DefaultGoBinaryManagerTest {
                 return null
             }
         })
-        manager = new DefaultGoBinaryManager(setting, globalCacheManager, httpUtils)
-    }
-
-    @After
-    void cleanUp() {
-        ReflectionUtils.setStaticFinalField(ProcessUtils, 'DELEGATE', new ProcessUtilsDelegate())
+        manager = new DefaultGoBinaryManager(setting, cacheManager, httpUtils)
     }
 
     private turnOnMockGo() {
         IOUtils.write(resource, "go/bin/go${Os.getHostOs().exeExtension()}", '')
         environmentVariables.set('PATH', new File(resource, 'go/bin').absolutePath)
         Process process = mock(Process)
-        when(processUtilsDelegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
-        when(processUtilsDelegate.getResult(process)).thenReturn(processResult)
+        when(delegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
+        when(delegate.getResult(process)).thenReturn(processResult)
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
 
     @Test
     void 'user-specified go binary should be ignored if it cannot be executed'() {
         // given
-        when(processUtilsDelegate.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
+        when(delegate.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
         when(setting.getGoExecutable()).thenReturn('/unexistent/go')
         // then
         'the newest stable version will be used if local binary not exist and no version specified'()

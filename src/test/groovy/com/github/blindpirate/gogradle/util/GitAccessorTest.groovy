@@ -144,6 +144,7 @@ class GitAccessorTest {
         gitAccessor.cloneWithUrl(null, "https://github.com/blindpirate/test-for-gogradle.git", resource)
         // then
         assert new File(resource, '.git').exists()
+        assert new File(resource, 'vendor/submodule/LICENSE').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master').isPresent()
     }
 
@@ -187,6 +188,7 @@ class GitAccessorTest {
 
         assert !new File(resource, 'tmpfile').exists()
         assert new File(resource, 'helloworld.go').exists()
+        assert new File(resource, 'vendor/submodule/LICENSE').exists()
     }
 
     @Test
@@ -232,7 +234,7 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     @WithResource('')
-    @OnlyWhen("System.getenv('MY_OWN_PRIVATE_KEY')!=null")
+    @OnlyWhen('System.getenv("MY_OWN_PRIVATE_KEY")!=null')
     void 'cloning with ssh private key should succeed'() {
         GitRepository gitRepo = new GitRepository()
         gitRepo.all()
@@ -247,19 +249,17 @@ class GitAccessorTest {
     @Test
     @AccessWeb
     @WithResource('')
-    @OnlyWhen("System.getenv('MY_GITHUB_PASSWORD')!=null")
+    @OnlyWhen('System.getenv("MY_GITHUB_PASSWORD")!=null')
     void 'cloning with username and password should succeed'() {
-        if (System.getenv('MY_GITHUB_PASSWORD')) {
-            GitRepository gitRepo = new GitRepository()
-            gitRepo.all()
-            gitRepo.username(System.getenv('MY_GITHUB_USERNAME'))
-            gitRepo.password(System.getenv('MY_GITHUB_PASSWORD'))
-            addOneRepo(gitRepo)
+        GitRepository gitRepo = new GitRepository()
+        gitRepo.all()
+        gitRepo.username(System.getenv('MY_GITHUB_USERNAME'))
+        gitRepo.password(System.getenv('MY_GITHUB_PASSWORD'))
+        addOneRepo(gitRepo)
 
-            gitAccessor.cloneWithUrl('name', 'https://github.com/adieu/archon-ui-ruff.git', resource)
-            gitAccessor.hardResetAndPull('name', gitAccessor.getRepository(resource))
-            assert new File(resource, 'README.md').exists()
-        }
+        gitAccessor.cloneWithUrl('name', 'https://github.com/adieu/archon-ui-ruff.git', resource)
+        gitAccessor.hardResetAndPull('name', gitAccessor.getRepository(resource))
+        assert new File(resource, 'README.md').exists()
     }
 
     void addOneRepo(GitRepository repository) {

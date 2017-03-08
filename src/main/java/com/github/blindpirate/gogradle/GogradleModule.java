@@ -14,8 +14,8 @@ import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyMana
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.GitMapNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.parse.GitNotationConverter;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitMercurialMapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.GitMercurialNotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationConverter;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
@@ -33,6 +33,7 @@ import com.github.blindpirate.gogradle.core.pack.BitbucketPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.IBMDevOpsPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
@@ -51,9 +52,7 @@ import com.github.blindpirate.gogradle.vcs.bazaar.BazaarAccessor;
 import com.github.blindpirate.gogradle.vcs.bazaar.BazaarMapNotationParser;
 import com.github.blindpirate.gogradle.vcs.bazaar.BazaarNotationConverter;
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor;
-import com.github.blindpirate.gogradle.vcs.mercurial.MercurialAccessor;
-import com.github.blindpirate.gogradle.vcs.mercurial.MercurialMapNotationParser;
-import com.github.blindpirate.gogradle.vcs.mercurial.MercurialNotationConverter;
+import com.github.blindpirate.gogradle.vcs.mercurial.hg4j.Hg4JMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.svn.SvnAccessor;
 import com.github.blindpirate.gogradle.vcs.svn.SvnMapNotationParser;
 import com.github.blindpirate.gogradle.vcs.svn.SvnNotationConverter;
@@ -105,13 +104,13 @@ public class GogradleModule extends AbstractModule {
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
         bind(LockedDependencyManager.class).to(DefaultLockedDependencyManager.class);
 
-        bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMapNotationParser.class);
-        bind(NotationConverter.class).annotatedWith(Git.class).to(GitNotationConverter.class);
+        bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMercurialMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Git.class).to(GitMercurialNotationConverter.class);
         bind(VcsAccessor.class).annotatedWith(Git.class).to(GitAccessor.class);
 
-        bind(MapNotationParser.class).annotatedWith(Mercurial.class).to(MercurialMapNotationParser.class);
-        bind(NotationConverter.class).annotatedWith(Mercurial.class).to(MercurialNotationConverter.class);
-        bind(VcsAccessor.class).annotatedWith(Mercurial.class).to(MercurialAccessor.class);
+        bind(MapNotationParser.class).annotatedWith(Mercurial.class).to(GitMercurialMapNotationParser.class);
+        bind(NotationConverter.class).annotatedWith(Mercurial.class).to(GitMercurialNotationConverter.class);
+        bind(VcsAccessor.class).annotatedWith(Mercurial.class).to(Hg4JMercurialAccessor.class);
 
         bind(MapNotationParser.class).annotatedWith(Svn.class).to(SvnMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Svn.class).to(SvnNotationConverter.class);
@@ -166,6 +165,7 @@ public class GogradleModule extends AbstractModule {
     public List<PackagePathResolver> packagePathResolvers(
             GithubPackagePathResolver githubPackagePathResolver,
             BitbucketPackagePathResolver bitbucketPackagePathResolver,
+            IBMDevOpsPackagePathResolver ibmDevOpsPackagePathResolver,
             StandardPackagePathResolver standardPackagePathResolver,
             GlobalCachePackagePathResolver globalCachePackagePathResolver,
             MetadataPackagePathResolver metadataPackagePathResolver,
@@ -174,6 +174,7 @@ public class GogradleModule extends AbstractModule {
                 standardPackagePathResolver,
                 githubPackagePathResolver,
                 bitbucketPackagePathResolver,
+                ibmDevOpsPackagePathResolver,
                 globalCachePackagePathResolver,
                 metadataPackagePathResolver,
                 unrecognizedPackagePathResolver

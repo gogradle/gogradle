@@ -1,9 +1,11 @@
-package com.github.blindpirate.gogradle.vcs.git
+package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,9 +16,9 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithMockInjector
-class GitNotationDependencyTest {
+class GitMercurialNotationDependencyTest {
 
-    GitNotationDependency dependency = new GitNotationDependency()
+    GitMercurialNotationDependency dependency = new GitNotationDependency()
 
     @Mock
     GitDependencyManager gitDependencyManager
@@ -40,8 +42,8 @@ class GitNotationDependencyTest {
     @Test
     void 'git dependencies with same name and commit should be equal'() {
         // when
-        GitNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
-        GitNotationDependency dependency2 = withNameAndCommit('name', 'NEWEST_COMMIT')
+        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
+        GitMercurialNotationDependency dependency2 = withNameAndCommit('name', 'NEWEST_COMMIT')
         // then
         assert dependency1 == dependency2
 
@@ -54,8 +56,8 @@ class GitNotationDependencyTest {
     @Test
     void 'git dependencies with different name or commit should not be equal'() {
         // when
-        GitNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
-        GitNotationDependency dependency2 = withNameAndCommit('name', '12345')
+        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
+        GitMercurialNotationDependency dependency2 = withNameAndCommit('name', '12345')
         // then
         assert dependency1 != dependency2
     }
@@ -75,7 +77,7 @@ class GitNotationDependencyTest {
         assert !dependency.equals(null)
         assert dependency != new LocalDirectoryDependency()
 
-        GitNotationDependency dependency2 = new GitNotationDependency()
+        GitMercurialNotationDependency dependency2 = new GitNotationDependency()
         dependency2.name = 'github.com/a/b'
         dependency2.commit = 'commitId'
         assert dependency == dependency2
@@ -94,8 +96,8 @@ class GitNotationDependencyTest {
         assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false)
     }
 
-    GitNotationDependency withNameAndCommit(String name, String commit) {
-        GitNotationDependency ret = new GitNotationDependency()
+    GitMercurialNotationDependency withNameAndCommit(String name, String commit) {
+        GitMercurialNotationDependency ret = new GitNotationDependency()
         ret.setName(name)
         ret.setCommit(commit)
         return ret

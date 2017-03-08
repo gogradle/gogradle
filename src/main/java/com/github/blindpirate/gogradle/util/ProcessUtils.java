@@ -41,7 +41,12 @@ public class ProcessUtils {
 
     public static ProcessResult getResult(Process process) {
         return DELEGATE.getResult(process);
+    }
 
+    public static String getStdout(Process process) {
+        String ret = getResult(process).getStdout();
+        LOGGER.debug("Process stdout: {}", ret);
+        return ret;
     }
 
     public static Process run(String... args) {

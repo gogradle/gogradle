@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -11,6 +10,8 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency;
 import org.eclipse.jgit.lib.Repository;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.gradle.api.logging.Logger;
@@ -25,7 +26,7 @@ import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.NEWEST_COMMIT;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
 
 @Singleton
 public class GitDependencyManager extends AbstractVcsDependencyManager<Repository, RevCommit> {
@@ -49,23 +50,23 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     @Override
     protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
-        GitResolvedDependency gitResolvedDependency = (GitResolvedDependency) dependency;
+        GitMercurialResolvedDependency gitMercurialResolvedDependency = (GitMercurialResolvedDependency) dependency;
         Repository repository = gitAccessor.getRepository(globalCachePath.toFile());
 
-        resetToSpecificCommit(repository, gitResolvedDependency.getVersion());
+        resetToSpecificCommit(repository, gitMercurialResolvedDependency.getVersion());
     }
 
     @Override
-    protected GitResolvedDependency createResolvedDependency(NotationDependency dependency,
-                                                             File directory,
-                                                             Repository repository,
-                                                             RevCommit commit) {
+    protected GitMercurialResolvedDependency createResolvedDependency(NotationDependency dependency,
+                                                                      File directory,
+                                                                      Repository repository,
+                                                                      RevCommit commit) {
 
-        GitResolvedDependency ret = GitResolvedDependency.builder()
+        GitMercurialResolvedDependency ret = GitMercurialResolvedDependency.gitBuilder()
                 .withNotationDependency(dependency)
                 .withName(dependency.getPackage().getRootPath())
                 .withCommitId(commit.getName())
-                .withTag(GitNotationDependency.class.cast(dependency).getTag())
+                .withTag(GitMercurialNotationDependency.class.cast(dependency).getTag())
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
@@ -97,25 +98,25 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     @Override
     protected RevCommit determineVersion(Repository repository, NotationDependency dependency) {
-        GitNotationDependency gitNotationDependency = (GitNotationDependency) dependency;
-        if (gitNotationDependency.getTag() != null) {
-            Optional<RevCommit> commit = gitAccessor.findCommitByTag(repository, gitNotationDependency.getTag());
+        GitMercurialNotationDependency notationDependency = (GitMercurialNotationDependency) dependency;
+        if (notationDependency.getTag() != null) {
+            Optional<RevCommit> commit = gitAccessor.findCommitByTag(repository, notationDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
             }
 
-            commit = gitAccessor.findCommitBySemVersion(repository, gitNotationDependency.getTag());
+            commit = gitAccessor.findCommitBySemVersion(repository, notationDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
             }
         }
 
-        if (isConcreteCommit(gitNotationDependency.getCommit())) {
-            Optional<RevCommit> commit = gitAccessor.findCommit(repository, gitNotationDependency.getCommit());
+        if (isConcreteCommit(notationDependency.getCommit())) {
+            Optional<RevCommit> commit = gitAccessor.findCommit(repository, notationDependency.getCommit());
             if (commit.isPresent()) {
                 return commit.get();
             } else {
-                throw DependencyResolutionException.cannotFindGitCommit(gitNotationDependency);
+                throw DependencyResolutionException.cannotFindGitCommit(notationDependency);
             }
         }
 
@@ -131,18 +132,14 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     protected Repository updateRepository(NotationDependency dependency, Repository repository, File directory) {
         gitAccessor.checkout(repository, DEFAULT_BRANCH);
 
-        if (GogradleGlobal.isOffline()) {
-            LOGGER.info("Cannot pull {} since it is offline now.", gitAccessor.getRemoteUrl(repository));
-        } else {
-            LOGGER.info("Pulling {} from {}", dependency, gitAccessor.getRemoteUrl(repository));
-            gitAccessor.hardResetAndPull(dependency.getPackage().getRootPath(), repository);
-        }
+        LOGGER.info("Pulling {} from {}", dependency, gitAccessor.getRemoteUrl(repository));
+        gitAccessor.hardResetAndPull(dependency.getPackage().getRootPath(), repository);
         return repository;
     }
 
     @Override
     protected Repository initRepository(NotationDependency dependency, File directory) {
-        List<String> urls = GitNotationDependency.class.cast(dependency).getUrls();
+        List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
         tryCloneWithUrls(dependency, urls, directory);
         return gitAccessor.getRepository(directory);
     }
@@ -167,7 +164,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     @Override
     protected Optional<Repository> repositoryMatch(File repoRootDir, NotationDependency dependency) {
         Repository repository = gitAccessor.getRepository(repoRootDir);
-        List<String> urls = GitNotationDependency.class.cast(dependency).getUrls();
+        List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
 
         if (urls.contains(gitAccessor.getRemoteUrl(repository))) {
             return Optional.of(repository);

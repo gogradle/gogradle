@@ -16,9 +16,9 @@ import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationP
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.BRANCH_KEY;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.COMMIT_KEY;
-import static com.github.blindpirate.gogradle.vcs.git.GitNotationDependency.TAG_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.BRANCH_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
 
 /**
  * Parses .gopmfile and generates gogradle map notations.

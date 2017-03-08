@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
@@ -157,9 +158,14 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
             globalCacheManager.updateCurrentDependencyLock();
             return ret;
         } else if (globalCacheManager.currentDependencyIsOutOfDate()) {
-            updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
-            globalCacheManager.updateCurrentDependencyLock();
-            return repositoryInGlobalCache.get();
+            if (GogradleGlobal.isOffline()) {
+                LOGGER.info("Cannot pull update {} since it is offline now.", dependency);
+                return repositoryInGlobalCache.get();
+            } else {
+                updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
+                globalCacheManager.updateCurrentDependencyLock();
+                return repositoryInGlobalCache.get();
+            }
         } else {
             LOGGER.info("Skipped updating {} since it is up-to-date.", dependency);
             return repositoryInGlobalCache.get();
