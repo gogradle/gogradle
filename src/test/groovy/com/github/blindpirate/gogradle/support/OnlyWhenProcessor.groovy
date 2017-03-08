@@ -8,7 +8,7 @@ class OnlyWhenProcessor extends GogradleRunnerProcessor<OnlyWhen> {
         try {
             return !new GroovyShell().evaluate(annotation.value())
         } catch (Exception e) {
-            switch (annotation.whenException()) {
+            switch (annotation.ignoreTestWhenException()) {
                 case OnlyWhen.ExceptionStrategy.TRUE:
                     return true
                 case OnlyWhen.ExceptionStrategy.FALSE:

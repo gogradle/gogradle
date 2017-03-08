@@ -10,7 +10,7 @@ import java.lang.annotation.Target
 @interface OnlyWhen {
     String value()
 
-    ExceptionStrategy whenException() default ExceptionStrategy.FAIL
+    ExceptionStrategy ignoreTestWhenException() default ExceptionStrategy.FAIL
 
     enum ExceptionStrategy {
         /**
