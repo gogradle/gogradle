@@ -15,11 +15,10 @@ public class LoggerProgressMonitor extends BatchingProgressMonitor {
     private static final int MAGIC_100 = 100;
     private static final int PADDING_SPACE_COUNT = 80;
 
-    public LoggerProgressMonitor(String action, String url) {
+    public LoggerProgressMonitor(String desc) {
         ProgressLoggerFactory progressLoggerFactory =
                 GogradleGlobal.getInstance(ServiceRegistry.class).get(ProgressLoggerFactory.class);
         logger = progressLoggerFactory.newOperation(this.getClass());
-        String desc = action + " from " + url;
         logger.start(desc, desc);
     }
 

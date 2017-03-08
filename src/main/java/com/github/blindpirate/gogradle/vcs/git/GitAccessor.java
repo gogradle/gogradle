@@ -93,7 +93,7 @@ public class GitAccessor implements VcsAccessor {
         }
         try {
             LOGGER.quiet("Cloning {} into {}", gitUrl, directory);
-            LoggerProgressMonitor monitor = new LoggerProgressMonitor("Cloning from ", gitUrl);
+            LoggerProgressMonitor monitor = new LoggerProgressMonitor("Cloning from " + gitUrl);
             CloneCommand command = Git.cloneRepository()
                     .setURI(gitUrl)
                     .setCloneSubmodules(true)
@@ -216,10 +216,8 @@ public class GitAccessor implements VcsAccessor {
 
             updateSubmodule(packageRoot, repository, url);
 
-            String url = getRemoteUrl(repository);
-
             PullCommand pullCommand = git.pull()
-                    .setProgressMonitor(new LoggerProgressMonitor("Pulling", url));
+                    .setProgressMonitor(new LoggerProgressMonitor("Pulling " + url));
             setCredentialsIfNecessary(pullCommand, packageRoot, url);
             pullCommand.call();
             return repository;
@@ -231,7 +229,7 @@ public class GitAccessor implements VcsAccessor {
     private void updateSubmodule(String packageRoot, Repository repository, String url) throws GitAPIException {
         new SubmoduleInitCommand(repository).call();
         SubmoduleUpdateCommand suc = new SubmoduleUpdateCommand(repository)
-                .setProgressMonitor(new LoggerProgressMonitor("Pulling from " + url));
+                .setProgressMonitor(new LoggerProgressMonitor("Pulling " + url));
         setCredentialsIfNecessary(suc, packageRoot, url);
         suc.call();
     }
