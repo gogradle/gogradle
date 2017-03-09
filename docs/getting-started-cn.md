@@ -25,15 +25,9 @@ golang {
 本节的目的是为访问官方插件仓库https://plugins.gradle.org存在问题的小伙伴提供的workaround。若你在构建时没有遇到无法下载Gogradle插件的问题，请忽略本节。
 
 - 移步[Gogradle Release](https://github.com/blindpirate/gogradle/releases)下载最新版本的jar包。
-- 将上文的构建脚本中的
+- 将构建脚本改为
 
-```
-plugins {
-    id 'com.github.blindpirate.gogradle' version '0.2.8'
-}
-```
-
-替换为
+build.gradle:
 
 ```
 buildscript {
@@ -43,6 +37,10 @@ buildscript {
 }
 
 apply plugin: 'com.github.blindpirate.gogradle'
+
+golang {
+    packagePath = 'your/package/path' // 欲构建项目的path
+}
 
 ```
 
