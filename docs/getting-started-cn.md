@@ -16,7 +16,7 @@ plugins {
 }
 
 golang {
-    packagePath = 'your/package/path' // 欲构建项目的path
+    packagePath = 'github.com/your/package' // 欲构建项目的path
 }
 ```
 如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。此外，可以令Gogradle生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以删除之。详见[依赖锁定](#依赖锁定)一节。

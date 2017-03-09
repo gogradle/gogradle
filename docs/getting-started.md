@@ -11,7 +11,7 @@ plugins {
 }
 
 golang {
-    packagePath = 'your/package/path' // path of project to be built 
+    packagePath = 'github.com/your/package' // path of project to be built 
 }
 ```
 
