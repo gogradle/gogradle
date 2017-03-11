@@ -26,6 +26,11 @@ public class MapUtils {
         return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
     }
 
+    @SuppressWarnings("unchecked")
+    public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return asMap(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3));
+    }
+
     private static <K, V> Map<K, V> asMap(Pair<K, V>... entries) {
         Map<K, V> ret = new HashMap<>();
         for (Pair<K, V> entry : entries) {
