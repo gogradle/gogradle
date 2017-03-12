@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
@@ -70,7 +71,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
-        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor);
+        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor, BUILD);
         ret.setDependencies(dependencies);
 
         setVendorUpdateTimeIfNecessary(repository, dependencies);

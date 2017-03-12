@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -38,7 +39,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
         VendorOnlyProduceStrategy strategy = GogradleGlobal.getInstance(VendorOnlyProduceStrategy.class);
-        GolangDependencySet dependencies = strategy.produce(ret, rootDir, visitor);
+        GolangDependencySet dependencies = strategy.produce(ret, rootDir, visitor, Configuration.BUILD);
         ret.setDependencies(dependencies);
         return ret;
     }

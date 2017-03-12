@@ -27,6 +27,8 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
+
 @Singleton
 public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgRepository, HgChangeset> {
     public static final String DEFAULT_BRANCH = "default";
@@ -81,7 +83,7 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
                 .withTag(notationDependency.getTag())
                 .withCommitTime(hgChangeset.getCommitTime())
                 .build();
-        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor);
+        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor, BUILD);
         ret.setDependencies(dependencies);
 
         setVendorUpdateTimeIfNecessary(hgRepository, dependencies);

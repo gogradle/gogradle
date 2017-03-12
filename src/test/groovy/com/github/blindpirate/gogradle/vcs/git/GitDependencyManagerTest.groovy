@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
@@ -87,7 +88,7 @@ class GitDependencyManagerTest {
 
         when(gitAccessor.getRemoteUrl(repository)).thenReturn("https://github.com/a/b.git")
         when(notationDependency.getStrategy()).thenReturn(strategy)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),any(Configuration))).thenReturn(dependencySet)
 
         when(notationDependency.getTransitiveDepExclusions()).thenReturn(exclusionSpecs)
 
@@ -146,7 +147,7 @@ class GitDependencyManagerTest {
         // given
         VendorResolvedDependency vendorResolvedDependency = mockWithName(VendorResolvedDependency, 'vendorResolvedDependency')
         GolangDependencySet dependencies = DependencyUtils.asGolangDependencySet(vendorResolvedDependency)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencies)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),any(Configuration))).thenReturn(dependencies)
         when(vendorResolvedDependency.getHostDependency()).thenReturn(resolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/path/to/vendor'))
         when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())

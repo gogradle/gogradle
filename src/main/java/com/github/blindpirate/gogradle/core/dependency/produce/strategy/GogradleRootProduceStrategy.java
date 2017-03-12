@@ -25,7 +25,7 @@ import java.io.File;
  * a scan for external dependency management tools will be performed.
  */
 @Singleton
-public class GogradleRootProduceStrategy {
+public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
 
     private final GolangPluginSetting settings;
     private final ConfigurationContainer configurationContainer;
@@ -91,5 +91,4 @@ public class GogradleRootProduceStrategy {
 
         return DependencySetFacade.class.cast(golangConfiguration.getDependencies()).toGolangDependencies();
     }
-
 }

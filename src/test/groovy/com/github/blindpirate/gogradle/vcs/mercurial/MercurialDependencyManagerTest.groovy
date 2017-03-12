@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs.mercurial
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
+import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
@@ -100,7 +101,7 @@ class MercurialDependencyManagerTest {
         when(notationDependency.getCommit()).thenReturn('nodeId')
         when(notationDependency.getStrategy()).thenReturn(strategy)
 
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),any(Configuration))).thenReturn(dependencySet)
 
         when(dependencySet.flatten()).thenReturn([])
 

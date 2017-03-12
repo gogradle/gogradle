@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -42,7 +43,7 @@ class VendorResolvedDependencyTest {
         when(hostDependency.formatVersion()).thenReturn('version')
         when(GogradleGlobal.INSTANCE.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
         when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
-        when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(GolangDependencySet.empty())
+        when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),any(Configuration))).thenReturn(GolangDependencySet.empty())
         when(GogradleGlobal.INSTANCE.getInstance(DependencyInstaller)).thenReturn(hostDependencyInstaller)
         when(hostDependency.getInstallerClass()).thenReturn(DependencyInstaller)
 
