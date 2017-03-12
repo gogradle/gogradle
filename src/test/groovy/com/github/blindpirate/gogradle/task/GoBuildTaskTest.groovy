@@ -12,12 +12,12 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class BuildTaskTest extends TaskTest {
-    BuildTask task
+class GoBuildTaskTest extends TaskTest {
+    GoBuildTask task
 
     @Before
     void setUp() {
-        task = buildTask(BuildTask)
+        task = buildTask(GoBuildTask)
         when(setting.getTargetPlatforms()).thenReturn(
                 [Pair.of(Os.DARWIN, Arch.AMD64),
                  Pair.of(Os.LINUX, Arch.I386),

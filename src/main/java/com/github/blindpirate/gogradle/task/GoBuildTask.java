@@ -14,12 +14,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class BuildTask extends Go {
+public class GoBuildTask extends Go {
 
     @Inject
     private GolangPluginSetting setting;
 
-    public BuildTask() {
+    public GoBuildTask() {
         dependsOn(GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
