@@ -10,8 +10,6 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
-
 public class Go extends AbstractGolangTask {
 
     @Inject
@@ -36,20 +34,14 @@ public class Go extends AbstractGolangTask {
     protected void doAddDefaultAction() {
     }
 
-    public Object methodMissing(String name, Object args) {
-        Object[] argsArray = (Object[]) args;
+    public void go(String arg) {
+        Assert.isNotBlank(arg, "Arguments must not be null!");
+        buildManager.go(extractArgs(arg), currentEnv);
+    }
 
-        if ("go".equals(name)) {
-            Assert.isTrue(argsArray.length == 1, "Args must be put into a single string: go 'build -v -a");
-            buildManager.go(extractArgs(argsArray[0].toString()), currentEnv);
-        } else if ("run".equals(name)) {
-            Assert.isTrue(argsArray.length == 1, "Args must be put into a single string: run 'go build -v -a");
-            buildManager.run(extractArgs(argsArray[0].toString()), currentEnv);
-        } else {
-            Assert.isTrue(argsArray.length == 1, "Args must be put into a single string: golint 'package/path/name'");
-            buildManager.run(asStringList(name, extractArgs(argsArray[0].toString())), currentEnv);
-        }
-        return null;
+    public void run(String arg) {
+        Assert.isNotBlank(arg, "Arguments must not be null!");
+        buildManager.run(extractArgs(arg), currentEnv);
     }
 
     private List<String> extractArgs(String arg) {
