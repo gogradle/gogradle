@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -25,6 +26,20 @@ public class CollectionUtils {
         for (Optional<T> optional : optionals) {
             optional.ifPresent(ret::add);
         }
+        return ret;
+    }
+
+    public static List<String> asStringList(Object... elements) {
+        List<String> ret = new ArrayList<>();
+        Stream.of(elements).forEach(element -> {
+            if (element instanceof Collection) {
+                ret.addAll((Collection) element);
+            } else if (element != null && element.getClass().isArray()) {
+                Stream.of((String[]) element).forEach(ret::add);
+            } else {
+                ret.add((String) element);
+            }
+        });
         return ret;
     }
 

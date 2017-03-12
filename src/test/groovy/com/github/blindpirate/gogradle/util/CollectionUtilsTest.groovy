@@ -32,4 +32,9 @@ class CollectionUtilsTest {
         assert [1, 2, 3, 4, 5] == CollectionUtils.flatten([1, [2, 3], [[4]], [], 5])
     }
 
+    @Test
+    void 'collect string from collections and arrays should succeed'() {
+        assert CollectionUtils.asStringList('1', ['2', '3'], ['4', '5'] as String[]) == ['1', '2', '3', '4', '5']
+    }
+
 }
