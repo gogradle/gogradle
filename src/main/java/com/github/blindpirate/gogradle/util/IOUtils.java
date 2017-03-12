@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.filefilter.IOFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -166,8 +166,7 @@ public final class IOUtils {
         }
     }
 
-    public static Collection<File> filterTestsMatchingPatterns(File dir, List<String> namePattern) {
-        TestPatternFilter filter = new TestPatternFilter(namePattern);
+    public static Collection<File> filterFilesRecursively(File dir, IOFileFilter filter) {
         return FileUtils.listFiles(dir, filter, filter);
     }
 
