@@ -4,17 +4,13 @@ import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
-import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
-import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
-import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -25,12 +21,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -38,12 +31,9 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 import static com.github.blindpirate.gogradle.build.Configuration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
-import static com.github.blindpirate.gogradle.util.IOUtils.filterTestsMatchingPatterns;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
-import static com.github.blindpirate.gogradle.util.MapUtils.asMap;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
 
 // ${projectRoot}
 // └── .gogradle
@@ -66,8 +56,6 @@ public class DefaultBuildManager implements BuildManager {
     private static final String SRC = "src";
 
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
-    // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-    private static final String ALL_TEST = "./...";
     private static final Predicate<String> NO_TEST_FILES_FILTER = line -> !line.contains("[no test files]");
 
     private final Project project;
@@ -125,19 +113,7 @@ public class DefaultBuildManager implements BuildManager {
         this.setting = setting;
     }
 
-    @Override
-    public void build() {
-        autoRecoverVendor(() -> {
-            Path goBinary = goBinaryManager.getBinaryPath();
-            String gopath = getBuildGopath();
-            Map<String, String> envs = getEnvs(gopath);
-            determineOutputFilePaths().forEach(outputFilePath ->
-                    buildOne(goBinary.toAbsolutePath().toString(), outputFilePath, envs)
-            );
-        });
-    }
-
-    private void autoRecoverVendor(Runnable runnable) {
+    private void renameVendorDuringBuild(Runnable runnable) {
         File vendorDir = new File(project.getRootDir(), VENDOR_DIRECTORY);
         File targetDir = new File(project.getRootDir(), "." + VENDOR_DIRECTORY);
         try {
@@ -156,107 +132,30 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    private Map<String, String> getEnvs(String gopath) {
-        String gorootEnv = goBinaryManager.getGoroot().toAbsolutePath().toString();
-        Map<String, String> envs = asMap("GOPATH", gopath);
-        if (gorootEnv != null) {
-            envs.put("GOROOT", gorootEnv);
-        }
-
-        return envs;
-    }
-
-    private void buildOne(String goBinary, String outputFilePath, Map<String, String> envs) {
-        List<String> args = Lists.newArrayList(goBinary, "build");
-
-        if (setting.isGenerateOutput()) {
-            args.add("-o");
-            args.add(outputFilePath);
-        }
-
-        args.addAll(setting.getExtraBuildArgs());
-
-        int retCode = startBuildOrTest(args, envs);
-        if (retCode != 0) {
-            throw BuildException.processReturnNonZero(retCode);
-        }
+    @Override
+    public void go(List<String> args, Map<String, String> env) {
+        List<String> cmdAndArgs = asStringList(getGoBinary(), args);
+        run(cmdAndArgs, env);
     }
 
     @Override
-    public void test() {
-        testWithTargets(Arrays.asList(ALL_TEST));
-    }
+    public void run(List<String> args, Map<String, String> env) {
+        renameVendorDuringBuild(() -> {
+            Map<String, String> finalEnv = determineEnv(env);
+            List<String> finalArgs = renderArgs(args, finalEnv);
 
-    private void testWithTargets(List<String> targets) {
-        autoRecoverVendor(() -> {
-            Path goBinary = goBinaryManager.getBinaryPath();
-            String gopath = getTestGopath();
-
-            Map<String, String> envs = getEnvs(gopath);
-            List<String> args = Lists.newArrayList(goBinary.toAbsolutePath().toString(), "test");
-            args.addAll(targets);
-            args.addAll(setting.getExtraTestArgs());
-
-            int retCode = startBuildOrTest(args, envs);
-            if (retCode != 0) {
-                throw BuildException.processReturnNonZero(retCode);
-            }
+            doRun(finalArgs, finalEnv);
         });
     }
 
-    @Override
-    public void testWithPatterns(List<String> testNamePattern) {
-        Collection<File> filesMatchingPatterns = filterTestsMatchingPatterns(project.getRootDir(), testNamePattern);
-        if (filesMatchingPatterns.isEmpty()) {
-            LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
-        } else {
-            LOGGER.quiet("Found " + filesMatchingPatterns.size() + " tests to run.");
-
-            Map<File, List<File>> groupByParentDir = filesMatchingPatterns.stream()
-                    .collect(Collectors.groupingBy(File::getParentFile));
-
-            groupByParentDir.forEach((parentDir, tests) -> {
-                List<String> fullPaths = tests.stream()
-                        .map(File::getAbsolutePath).collect(toList());
-                fullPaths.addAll(getAllNonTestGoFiles(parentDir));
-                testWithTargets(fullPaths);
-            });
-        }
+    private List<String> renderArgs(List<String> args, Map<String, String> env) {
+        Map<String, String> context = new HashMap<>(env);
+        context.put("PROJECT_NAME", project.getName());
+        return args.stream().map(s -> StringUtils.render(s, context)).collect(Collectors.toList());
     }
 
-    private List<String> getAllNonTestGoFiles(File dir) {
-        List<String> names = IOUtils.safeList(dir);
-        return names.stream()
-                .filter(name -> name.endsWith(".go"))
-                .filter(name -> !StringUtils.startsWithAny(name, "_", "."))
-                .filter(name -> !name.endsWith("_test.go"))
-                .map(name -> new File(dir, name))
-                .map(File::getAbsolutePath)
-                .collect(toList());
-    }
-
-    private String getBuildGopath() {
-        String projectGopath = getGogradleBuildDir()
-                .resolve(PROJECT_GOPATH)
-                .toAbsolutePath()
-                .toString();
-        String buildGopath = getGopathDir(BUILD)
-                .toAbsolutePath()
-                .toString();
-
-        return projectGopath + File.pathSeparator + buildGopath;
-    }
-
-    private String getTestGopath() {
-        String testGopath = getGopathDir(TEST)
-                .toAbsolutePath()
-                .toString();
-
-        return getBuildGopath() + File.pathSeparator + testGopath;
-    }
-
-    private int startBuildOrTest(List<String> args, Map<String, String> envs) {
-        Process process = ProcessUtils.run(args, envs, project.getRootDir());
+    private void doRun(List<String> args, Map<String, String> env) {
+        Process process = ProcessUtils.run(args, determineEnv(env), project.getRootDir());
 
         CountDownLatch latch = new CountDownLatch(2);
 
@@ -270,12 +169,50 @@ public class DefaultBuildManager implements BuildManager {
         }
 
         try {
-            return process.waitFor();
+            int retcode = process.waitFor();
+
+            if (retcode != 0) {
+                throw BuildException.processReturnNonZero(retcode);
+            }
+
         } catch (InterruptedException e) {
             throw ExceptionHandler.uncheckException(e);
         }
     }
 
+    private Map<String, String> determineEnv(Map<String, String> env) {
+        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getTestGopath(),
+                "GOROOT", goBinaryManager.getGoroot().toAbsolutePath().toString());
+        if (env != null) {
+            defaultEnvs.putAll(env);
+        }
+        return defaultEnvs;
+    }
+
+    private String getGoBinary() {
+        return goBinaryManager.getBinaryPath().toAbsolutePath().toString();
+    }
+
+
+    public String getBuildGopath() {
+        String projectGopath = getGogradleBuildDir()
+                .resolve(PROJECT_GOPATH)
+                .toAbsolutePath()
+                .toString();
+        String buildGopath = getGopathDir(BUILD)
+                .toAbsolutePath()
+                .toString();
+
+        return projectGopath + File.pathSeparator + buildGopath;
+    }
+
+    public String getTestGopath() {
+        String testGopath = getGopathDir(TEST)
+                .toAbsolutePath()
+                .toString();
+
+        return getBuildGopath() + File.pathSeparator + testGopath;
+    }
 
     @Override
     public void installDependency(ResolvedDependency dependency, Configuration configuration) {
@@ -299,32 +236,5 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(dependency.getName())
                 .toFile();
         installTo(dependency, targetDir);
-    }
-
-    private List<String> determineOutputFilePaths() {
-        return setting.getTargetPlatforms().stream()
-                .map(this::determineOne)
-                .collect(toList());
-    }
-
-    private String determineOne(Pair<Os, Arch> osAndArch) {
-        String packageName = Objects.toString(Paths.get(setting.getPackagePath()).getFileName());
-        String outputFileName = setting.getOutputPattern();
-        outputFileName = outputFileName.replaceAll("\\$\\{os}", osAndArch.getLeft().toString());
-        outputFileName = outputFileName.replaceAll("\\$\\{arch}", osAndArch.getRight().toString());
-        outputFileName = outputFileName.replaceAll("\\$\\{packageName}", packageName);
-        outputFileName = outputFileName.replaceAll("\\$\\{extension}", osAndArch.getLeft().exeExtension());
-
-        Path outputLocationPath = Paths.get(setting.getOutputLocation());
-
-        if (outputLocationPath.isAbsolute()) {
-            return outputLocationPath.resolve(outputFileName).toString();
-        } else {
-            return project.getRootDir().toPath()
-                    .resolve(outputLocationPath)
-                    .resolve(outputFileName)
-                    .normalize()
-                    .toString();
-        }
     }
 }

@@ -26,6 +26,7 @@ import org.mockito.stubbing.Answer
 
 import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
 import static org.mockito.Mockito.*
@@ -71,6 +72,10 @@ class DefaultBuildManagerTest {
         when(binaryManager.getGoroot()).thenReturn(resource.toPath().resolve('go'))
 
         when(delegate.run(anyList(), anyMap(), any(File))).thenReturn(process)
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream([] as byte[]))
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream([] as byte[]))
+
+        when(project.getName()).thenReturn('project')
     }
 
     @Test(expected = IllegalStateException)
@@ -107,36 +112,10 @@ class DefaultBuildManagerTest {
             }
         })
         // when
-        manager.build()
+        manager.go(['test'], [:])
         // then
         assert dirDuringBuild == '.vendor'
         assert new File(resource, 'vendor').exists()
-    }
-
-    @Test
-    void 'build should succeed'() {
-        // given
-        setting.extraBuildArgs = ['a', 'b']
-        // when
-        manager.build()
-        // then
-        String expectedOutputPath = new File(resource, ".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_package")
-        verify(delegate).run([goBin, 'build', '-o', expectedOutputPath, 'a', 'b'],
-                [GOPATH: getBuildGopath(), GOROOT: goroot],
-                resource
-        )
-    }
-
-    @Test
-    void 'build without output should succeed'() {
-        // when
-        setting.generateOutput = false
-        manager.build()
-        // then
-        verify(delegate).run([goBin, 'build'],
-                [GOPATH: getBuildGopath(), GOROOT: goroot],
-                resource
-        )
     }
 
     @Test(expected = BuildException)
@@ -144,56 +123,11 @@ class DefaultBuildManagerTest {
         // given
         when(process.waitFor()).thenReturn(1)
         // then
-        manager.build()
-    }
-
-    @Test(expected = BuildException)
-    void 'exception should be thrown if go test return non-zero'() {
-        // given
-        when(process.waitFor()).thenReturn(1)
-        // then
-        manager.test()
-    }
-
-    @Test
-    void 'nothing should happen if no matched tests found'() {
-        manager.testWithPatterns([])
+        manager.go(['test', './...'], null)
     }
 
     String getBuildGopath() {
         return "" + new File(resource, '.gogradle/project_gopath') + File.pathSeparator + new File(resource, '.gogradle/build_gopath')
-    }
-
-    @Test
-    void 'test should succeed'() {
-        // given
-        setting.extraTestArgs = ['a', 'b']
-        // when
-        manager.test()
-        // then
-        verify(delegate).run([goBin, 'test', './...', 'a', 'b'],
-                [GOPATH: getTestGopath(), GOROOT: goroot],
-                resource
-        )
-    }
-
-    @Test
-    void 'test with specific patterns should succeed'() {
-        // given
-        File a1 = IOUtils.write(resource, 'a/a1_test.go', '')
-        File a2 = IOUtils.write(resource, 'a/a2_test.go', '')
-        File a3 = IOUtils.write(resource, 'a/a3.go', '')
-        File b1 = IOUtils.write(resource, 'b/b1_test.go', '')
-        File b2 = IOUtils.write(resource, 'b/b2.go', '')
-        // when
-        manager.testWithPatterns(['*_test*'])
-        // then
-        verify(delegate).run([goBin, 'test', b1.absolutePath, b2.absolutePath],
-                [GOPATH: getTestGopath(), GOROOT: goroot],
-                resource)
-        verify(delegate).run([goBin, 'test', a1.absolutePath, a2.absolutePath, a3.absolutePath],
-                [GOPATH: getTestGopath(), GOROOT: goroot],
-                resource)
     }
 
     String getTestGopath() {
@@ -204,39 +138,35 @@ class DefaultBuildManagerTest {
     }
 
     @Test
-    void 'settings should take effect'() {
-        // given
-        setting.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
-        setting.outputPattern = 'myresult_${os}_${arch}'
-        setting.outputLocation = resource.absolutePath
+    void 'command args should be rendered correctly'() {
         // when
-        manager.build()
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
         // then
-        assertOutputFile('myresult_windows_amd64')
-        assertOutputFile('myresult_linux_amd64')
-        assertOutputFile('myresult_linux_386')
+        verify(delegate).run([goBin, 'build', '-o', 'linux_amd64_project'],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
+                resource)
     }
 
-    void assertOutputFile(String fileName) {
-        verify(delegate).run([goBin, 'build', '-o', new File(resource, fileName).toString()],
-                [GOPATH: getBuildGopath(), GOROOT: goroot],
-                resource
-        )
-    }
+//    @Test
+//    void 'settings should take effect'() {
+//        // given
+//        setting.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+//        setting.outputPattern = 'myresult_${os}_${arch}'
+//        setting.outputLocation = resource.absolutePath
+//        // when
+//        manager.build()
+//        // then
+//        assertOutputFile('myresult_windows_amd64')
+//        assertOutputFile('myresult_linux_amd64')
+//        assertOutputFile('myresult_linux_386')
+//    }
 
-    @Test
-    void 'relative path should take effect'() {
-        // given
-        setting.outputLocation = './a/b/c'
-        // when
-        manager.build()
-        // then
-        String expectedOutput = "a/b/c/${Os.getHostOs()}_${Arch.getHostArch()}_package"
-        verify(delegate).run([goBin, 'build', '-o', new File(resource, expectedOutput).toString()],
-                [GOPATH: getBuildGopath(), GOROOT: goroot],
-                resource
-        )
-    }
+//    void assertOutputFile(String fileName) {
+//        verify(delegate).run([goBin, 'build', '-o', new File(resource, fileName).toString()],
+//                [GOPATH: getBuildGopath(), GOROOT: goroot],
+//                resource
+//        )
+//    }
 
     @Test
     void 'build stdout and stderr should be redirected to current process'() {
@@ -246,7 +176,7 @@ class DefaultBuildManagerTest {
         Logger mockLogger = mock(Logger)
         ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', mockLogger)
         // when
-        manager.build()
+        manager.go(['build'], [:])
         // then
         verify(mockLogger).quiet('stdout')
         verify(mockLogger).error('stderr')
@@ -294,21 +224,21 @@ class DefaultBuildManagerTest {
         IOUtils.mkdir(resource, 'vendor')
         IOUtils.write(resource, '.vendor', '')
         // then
-        manager.build()
+        manager.go(['build'], [:])
     }
 
     @Test(expected = BuildException)
     void 'exception should be thrown if renaming .vendor back fails'() {
         // given
         IOUtils.mkdir(resource, 'vendor')
-        when(binaryManager.getBinaryPath()).thenAnswer(new Answer<Object>() {
+        when(process.getInputStream()).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 IOUtils.mkdir(resource, 'vendor')
-                return 'go'
+                return new ByteArrayInputStream([] as byte[])
             }
         })
         // then
-        manager.build()
+        manager.go(['build'], [:])
     }
 }
