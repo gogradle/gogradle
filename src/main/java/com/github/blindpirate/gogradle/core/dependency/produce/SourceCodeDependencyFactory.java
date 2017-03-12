@@ -10,7 +10,6 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,18 +35,16 @@ public class SourceCodeDependencyFactory {
     @Inject
     public SourceCodeDependencyFactory(PackagePathResolver packagePathResolver,
                                        NotationParser notationParser,
-                                       GoImportExtractor extractor) {
+                                       GoImportExtractor goImportExtractor) {
         this.packagePathResolver = packagePathResolver;
         this.notationParser = notationParser;
-        this.goImportExtractor = extractor;
+        this.goImportExtractor = goImportExtractor;
     }
 
     public GolangDependencySet produce(ResolvedDependency resolvedDependency,
                                        File rootDir,
                                        Configuration configuration) {
-        SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor(configuration, goImportExtractor);
-        IOUtils.walkFileTreeSafely(rootDir.toPath(), visitor);
-        return createDependencies(resolvedDependency, visitor.getImportPaths());
+        return createDependencies(resolvedDependency, goImportExtractor.getImportPaths(rootDir, configuration));
     }
 
     private GolangDependencySet createDependencies(ResolvedDependency resolvedDependency, Set<String> importPaths) {
