@@ -37,15 +37,19 @@ public class GolangTaskContainer {
     private static final String CLION_TASK_NAME = "cLion";
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
-    public static final String COVERAGE_CHECK_TASK_NAME = "coverageCheck";
+    public static final String COVERAGE_TASK_NAME = "cover";
+    public static final String GOLINT_TAK_NAME = "golint";
+    public static final String GOFMT_TASK_NAME = "gofmt";
+    public static final String GOVET_TASK_NAME = "govet";
+
 
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
             .put(PREPARE_TASK_NAME, PrepareTask.class)
             .put(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, ResolveBuildDependenciesTask.class)
             .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependenciesTask.class)
             .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
-            .put(BUILD_TASK_NAME, BuildTask.class)
-            .put(TEST_TASK_NAME, TestTask.class)
+            .put(BUILD_TASK_NAME, GoBuildTask.class)
+            .put(TEST_TASK_NAME, GoTestTask.class)
             .put(VENDOR_TASK_NAME, VendorTask.class)
             .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
             .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
@@ -61,6 +65,10 @@ public class GolangTaskContainer {
             .put(CLION_TASK_NAME, IntellijIdeTask.class)
             .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGorootTask.class)
             .put(RENAME_VENDOR_TASK_NAME, RenameVendorTask.class)
+            .put(COVERAGE_TASK_NAME, GoCoverTask.class)
+            .put(GOLINT_TAK_NAME, GolintTask.class)
+            .put(GOVET_TASK_NAME, GoVetTask.class)
+            .put(GOFMT_TASK_NAME, GofmtTask.class)
             .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
