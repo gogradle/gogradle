@@ -48,4 +48,9 @@ class GoTest extends TaskTest {
     void 'exception should be thrown if args number of run is zero'() {
         task.run()
     }
+
+    @Test
+    void 'invoking doAddDefaultAction should succeed'() {
+        task.doAddDefaultAction()
+    }
 }

@@ -98,4 +98,12 @@ class BuildTaskTest extends TaskTest {
         task.actions.each { it.contextualise(null) }
         task.actions.each { assert it.classLoader == c.class.classLoader }
     }
+
+    @Test(expected = NullPointerException)
+    void 'exception should be thrown if closure throws an exception'() {
+        task.doLast {
+            throw new NullPointerException()
+        }
+        task.actions.each { it.execute(task) }
+    }
 }
