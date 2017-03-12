@@ -17,14 +17,14 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class TestTaskTest extends TaskTest {
-    TestTask task
+class GoTestTaskTest extends TaskTest {
+    GoTestTask task
 
     File resource
 
     @Before
     void setUp() {
-        task = buildTask(TestTask)
+        task = buildTask(GoTestTask)
         when(project.getRootDir()).thenReturn(resource)
     }
 
@@ -40,7 +40,7 @@ class TestTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         task.actions[0].execute(task)
         // then
-        verify(buildManager).go(['test', './...'], null)
+        verify(buildManager).go(['test', './...', '-coverprofile=.gogradle/coverage.out'], null)
     }
 
     @Test
@@ -69,6 +69,5 @@ class TestTaskTest extends TaskTest {
         // then
         verify(buildManager, times(0)).go(anyList(), anyMap())
     }
-
 
 }
