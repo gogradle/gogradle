@@ -89,6 +89,7 @@ project.tasks.withType(Test) {
 }
 
 check.dependsOn javadoc
+check.dependsOn jacocoTestReport
 check.dependsOn integrationTest
 integrationTest.dependsOn test
 //test.dependsOn 'jar'
