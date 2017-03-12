@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
 import groovy.lang.Closure;
-import org.codehaus.groovy.runtime.InvokerInvocationException;
 import org.gradle.api.Task;
 import org.gradle.api.internal.tasks.ContextAwareTaskAction;
 import org.gradle.api.internal.tasks.TaskExecutionContext;
@@ -42,12 +41,6 @@ public class GoExecutionAction implements ContextAwareTaskAction {
                     closure.call(task);
                 }
             }
-        } catch (InvokerInvocationException e) {
-            Throwable cause = e.getCause();
-            if (cause instanceof RuntimeException) {
-                throw (RuntimeException) cause;
-            }
-            throw e;
         } finally {
             Thread.currentThread().setContextClassLoader(original);
             Go.class.cast(task).setCurrentEnv(originalEnv);
