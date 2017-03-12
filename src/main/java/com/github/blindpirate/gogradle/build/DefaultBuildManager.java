@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
@@ -64,8 +63,10 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void ensureDotVendorDirNotExist() {
-        Assert.isTrue(!new File(project.getRootDir(), "." + VENDOR_DIRECTORY).exists(),
-                "We need .vendor directory as temp directory, existent .vendor before build is not allowed.");
+        if (new File(project.getRootDir(), "." + VENDOR_DIRECTORY).exists()) {
+            throw new IllegalStateException("We need .vendor directory as temp directory, "
+                    + "existent .vendor before build is not allowed.");
+        }
     }
 
     @Override

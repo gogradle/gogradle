@@ -85,6 +85,11 @@ class DefaultBuildManagerTest {
     }
 
     @Test
+    void 'nothing should happen if .vendor not exist'() {
+        manager.ensureDotVendorDirNotExist()
+    }
+
+    @Test
     void 'symbolic links should be created properly in preparation'() {
         // when
         manager.prepareSymbolicLinks()
