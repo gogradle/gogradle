@@ -41,6 +41,17 @@ public class BuildTask extends Go {
         return this;
     }
 
+    @Override
+    public Task doFirst(final Closure closure) {
+        List<Map<String, String>> envs = getEnvs();
+        envs.forEach(env -> doFirst(GoExecutionAction.wrapClousureWithEnvs(closure, env)));
+        return this;
+    }
+
+    public Task leftShift(final Closure action) {
+        throw new UnsupportedOperationException("Left shift is not supported since it's deprecated officially");
+    }
+
     private List<Map<String, String>> getEnvs() {
         List<Map<String, String>> ret = setting.getTargetPlatforms().stream()
                 .map(this::pairToEnv)

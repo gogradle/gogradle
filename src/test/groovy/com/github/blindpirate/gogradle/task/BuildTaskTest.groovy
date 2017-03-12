@@ -48,11 +48,54 @@ class BuildTaskTest extends TaskTest {
     }
 
     @Test
-    void 'custom action should be expanded when added'() {
+    void 'custom action should be expanded when added in doLast'() {
         // when
         task.doLast {}
         // then
         assert task.actions.size() == 3
         assert task.actions.any { it instanceof GoExecutionAction }
+    }
+
+    @Test
+    void 'custom action should be expanded when added in doFirst'() {
+        // when
+        task.doFirst {}
+        // then
+        assert task.actions.size() == 3
+        assert task.actions.any { it instanceof GoExecutionAction }
+    }
+
+    @Test(expected = UnsupportedOperationException)
+    void 'left shift should be unsupported'() {
+        task << {}
+    }
+
+    @Test
+    void 'execution of custom action should succeed'() {
+        // when
+        task.doLast {
+            go 'build -o output'
+        }
+        task.actions.each { it.execute(task) }
+        // then
+        assert task.actions.size() == 3
+        assert task.actions.any { it instanceof GoExecutionAction }
+        assert task.currentEnv == null
+        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'])
+        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'])
+    }
+
+    @Test
+    void 'other methods in GoExecutionAction should succeed'() {
+        // when
+        Closure c = {
+            go 'build -o output'
+        }
+
+        task.doLast(c)
+        // then
+        task.actions.each { it.contextualise(null) }
+        task.actions.each { assert it.classLoader == c.class.classLoader }
     }
 }
