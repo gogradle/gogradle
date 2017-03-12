@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.build;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import java.util.List;
+import java.util.Map;
 
 public interface BuildManager {
 
@@ -14,9 +15,12 @@ public interface BuildManager {
 
     void installDependencyToVendor(ResolvedDependency dependency);
 
-    void build();
+    String getBuildGopath();
 
-    void test();
+    String getTestGopath();
 
-    void testWithPatterns(List<String> testNamePattern);
+    void go(List<String> args, Map<String, String> env);
+
+    void run(List<String> args, Map<String, String> env);
+
 }
