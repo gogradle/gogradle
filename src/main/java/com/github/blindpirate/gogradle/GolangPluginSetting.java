@@ -44,11 +44,6 @@ public class GolangPluginSetting {
     private BuildMode buildMode = REPRODUCIBLE;
     private String packagePath;
     private List<String> buildTags = new ArrayList<>();
-    private List<String> extraBuildArgs = new ArrayList<>();
-    private List<String> extraTestArgs = new ArrayList<>();
-    private boolean generateOutput = true;
-    private String outputLocation = GogradleGlobal.GOGRADLE_BUILD_DIR_NAME;
-    private String outputPattern = "${os}_${arch}_${packageName}";
     private List<Pair<Os, Arch>> targetPlatforms = asList(Pair.of(getHostOs(), getHostArch()));
     private long globalCacheSecond = 24 * 3600;
 
@@ -90,48 +85,6 @@ public class GolangPluginSetting {
 
     public void setBuildTags(List<String> buildTags) {
         this.buildTags = buildTags;
-    }
-
-    public List<String> getExtraBuildArgs() {
-        return extraBuildArgs;
-    }
-
-    public void setExtraBuildArgs(List<String> extraBuildArgs) {
-        this.extraBuildArgs = extraBuildArgs;
-    }
-
-    public List<String> getExtraTestArgs() {
-        return extraTestArgs;
-    }
-
-    public void setExtraTestArgs(List<String> extraTestArgs) {
-        this.extraTestArgs = extraTestArgs;
-    }
-
-    public boolean isGenerateOutput() {
-        return generateOutput;
-    }
-
-    public void setGenerateOutput(boolean generateOutput) {
-        this.generateOutput = generateOutput;
-    }
-
-    public String getOutputLocation() {
-        return outputLocation;
-    }
-
-    public void setOutputLocation(String outputLocation) {
-        Assert.isNotBlank(outputLocation, "outputLocation cannot be blank!");
-        this.outputLocation = outputLocation;
-    }
-
-    public String getOutputPattern() {
-        return outputPattern;
-    }
-
-    public void setOutputPattern(String outputPattern) {
-        Assert.isNotBlank(outputPattern, "outputPattern cannot be blank!");
-        this.outputPattern = outputPattern;
     }
 
     public List<Pair<Os, Arch>> getTargetPlatforms() {

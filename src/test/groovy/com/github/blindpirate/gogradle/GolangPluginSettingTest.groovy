@@ -72,18 +72,6 @@ class GolangPluginSettingTest {
     }
 
     @Test
-    void 'setting extraBuildArgs should succeed'() {
-        setting.extraBuildArgs = ['']
-        assert setting.extraBuildArgs == ['']
-    }
-
-    @Test
-    void 'setting extraTestArgs should succeed'() {
-        setting.extraTestArgs = ['1']
-        assert setting.extraTestArgs == ['1']
-    }
-
-    @Test
     void 'setting global cache time should succeed'() {
         assertCacheTimeEquals(1, 'second', 1)
         assertCacheTimeEquals(1, 'second', 1)
@@ -103,16 +91,6 @@ class GolangPluginSettingTest {
     void assertCacheTimeEquals(int count, String unit, long expectedResult) {
         setting.globalCacheFor(count, unit)
         assert setting.getGlobalCacheSecond() == expectedResult
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'setting blank outputLocation should result in an exception'() {
-        setting.outputLocation = ' '
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'setting blank outputPattern should result in an exception'() {
-        setting.outputPattern = ' '
     }
 
     @Test(expected = IllegalStateException)
