@@ -9,6 +9,9 @@ import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
+import static org.mockito.ArgumentMatchers.anyList
+import static org.mockito.ArgumentMatchers.anyMap
+import static org.mockito.Mockito.times
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -51,9 +54,21 @@ class TestTaskTest extends TaskTest {
         // when
         task.setTestNamePattern(['*_test*'])
         task.addDefaultActionIfNoCustomActions()
-        task.actions.each {it.execute(task)}
+        task.actions.each { it.execute(task) }
         // then
         verify(buildManager).go(['test', b1.absolutePath, b2.absolutePath], null)
         verify(buildManager).go(['test', a1.absolutePath, a2.absolutePath, a3.absolutePath], null)
     }
+
+    @Test
+    void 'nothing should happened if no matched tests found'() {
+        // when
+        task.setTestNamePattern(['*_test*'])
+        task.addDefaultActionIfNoCustomActions()
+        task.actions.each { it.execute(task) }
+        // then
+        verify(buildManager, times(0)).go(anyList(), anyMap())
+    }
+
+
 }
