@@ -19,7 +19,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
 
         // when
-        strategy.produce(resolvedDependency, rootDir, visitor)
+        strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
 
         //then
         verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)
@@ -32,7 +32,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         externalDependencies(a2, c2)
 
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
         // then
         assert result.any { it.is(a1) }
         assert result.any { it.is(b1) }
@@ -47,7 +47,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies(a1)
         externalDependencies()
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
         // then
         assert result.size() == 1
         assert result.any { it.is(a1) }
@@ -60,7 +60,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
         externalDependencies(a2)
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor,BUILD)
         // then
         assert result.size() == 1
         assert result.any { it.is(a2) }

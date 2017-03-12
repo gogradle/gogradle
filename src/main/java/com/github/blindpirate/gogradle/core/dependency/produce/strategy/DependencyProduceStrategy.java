@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
+import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -18,5 +19,8 @@ public interface DependencyProduceStrategy {
 
     DependencyProduceStrategy DEFAULT_STRATEGY = new DefaultDependencyProduceStrategy();
 
-    GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor);
+    GolangDependencySet produce(ResolvedDependency dependency,
+                                File rootDir,
+                                DependencyVisitor visitor,
+                                Configuration configuration);
 }
