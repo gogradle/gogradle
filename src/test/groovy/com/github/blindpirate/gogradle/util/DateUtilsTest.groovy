@@ -7,6 +7,10 @@ class DateUtilsTest {
     void 'getting ms from second should succeed'() {
         assert DateUtils.toMilliseconds(1) == 1000
     }
+    @Test
+    void 'getting ms from double second should succeed'() {
+        assert DateUtils.toMilliseconds(1d) == 1000L
+    }
 
     @Test
     void 'formatting current time should succeed'() {
