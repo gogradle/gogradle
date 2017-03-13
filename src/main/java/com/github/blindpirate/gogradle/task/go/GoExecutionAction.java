@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.task;
+package com.github.blindpirate.gogradle.task.go;
 
 import groovy.lang.Closure;
 import org.gradle.api.Task;

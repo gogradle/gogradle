@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.task;
+package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -11,7 +11,6 @@ import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;

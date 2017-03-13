@@ -1,7 +1,8 @@
-package com.github.blindpirate.gogradle.task;
+package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
+import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import org.gradle.api.Task;
 
 import javax.inject.Inject;

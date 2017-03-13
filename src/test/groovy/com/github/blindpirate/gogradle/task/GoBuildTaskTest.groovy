@@ -3,6 +3,8 @@ package com.github.blindpirate.gogradle.task
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
+import com.github.blindpirate.gogradle.task.go.GoBuildTask
+import com.github.blindpirate.gogradle.task.go.GoExecutionAction
 import org.apache.commons.lang3.tuple.Pair
 import org.junit.Before
 import org.junit.Test

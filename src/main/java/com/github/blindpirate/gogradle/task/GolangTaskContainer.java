@@ -3,6 +3,12 @@ package com.github.blindpirate.gogradle.task;
 import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
 import com.github.blindpirate.gogradle.ide.IdeaTask;
 import com.github.blindpirate.gogradle.ide.RenameVendorTask;
+import com.github.blindpirate.gogradle.task.go.GoBuildTask;
+import com.github.blindpirate.gogradle.task.go.GoCoverTask;
+import com.github.blindpirate.gogradle.task.go.GoTestTask;
+import com.github.blindpirate.gogradle.task.go.GoVetTask;
+import com.github.blindpirate.gogradle.task.go.GofmtTask;
+import com.github.blindpirate.gogradle.task.go.GolintTask;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Task;
 

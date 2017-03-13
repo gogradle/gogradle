@@ -1,8 +1,9 @@
-package com.github.blindpirate.gogradle.task;
+package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.Os;
+import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import groovy.lang.Closure;
 import org.apache.commons.lang3.tuple.Pair;

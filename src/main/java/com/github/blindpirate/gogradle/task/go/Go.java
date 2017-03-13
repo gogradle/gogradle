@@ -1,6 +1,7 @@
-package com.github.blindpirate.gogradle.task;
+package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
+import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.util.Assert;
 import org.apache.tools.ant.types.Commandline;
 import org.gradle.api.internal.AbstractTask;
