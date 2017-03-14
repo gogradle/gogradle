@@ -43,8 +43,7 @@ public class CollectionUtils {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> flatten(List<T>... lists) {
-        return (List<T>) DefaultGroovyMethods.flatten(lists);
+    public static <T> List<T> flatten(List<List<T>> lists) {
+        return lists.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
     }
 }
