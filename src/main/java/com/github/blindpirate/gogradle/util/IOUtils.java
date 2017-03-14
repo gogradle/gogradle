@@ -9,6 +9,8 @@ import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitor;
@@ -198,5 +200,13 @@ public final class IOUtils {
 
     public static String byteCountToDisplaySize(long size) {
         return FileUtils.byteCountToDisplaySize(size);
+    }
+
+    public static String encodeInternally(String s) {
+        try {
+            return URLEncoder.encode(s, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 }
