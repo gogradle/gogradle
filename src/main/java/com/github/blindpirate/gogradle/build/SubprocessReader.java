@@ -17,7 +17,6 @@ public class SubprocessReader extends Thread {
     private Supplier<InputStream> is;
     private CountDownLatch latch;
     private Consumer<String> consumer;
-    private Predicate<String> lineFilter = line -> true;
 
     public SubprocessReader(Supplier<InputStream> is,
                             Consumer<String> consumer,
@@ -27,24 +26,12 @@ public class SubprocessReader extends Thread {
         this.consumer = consumer;
     }
 
-    public SubprocessReader(Supplier<InputStream> is,
-                            Consumer<String> consumer,
-                            CountDownLatch latch,
-                            Predicate<String> lineFilter) {
-        this.is = is;
-        this.latch = latch;
-        this.consumer = consumer;
-        this.lineFilter = lineFilter;
-    }
-
     @Override
     public void run() {
         try (BufferedReader br = new BufferedReader(new InputStreamReader(is.get(), DEFAULT_CHARSET))) {
             String line;
             while ((line = br.readLine()) != null) {
-                if (lineFilter.test(line)) {
-                    consumer.accept(line);
-                }
+                consumer.accept(line);
             }
         } catch (IOException e) {
             consumer.accept(ExceptionHandler.getStackTrace(e));
