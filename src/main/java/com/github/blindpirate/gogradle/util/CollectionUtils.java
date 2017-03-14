@@ -1,7 +1,5 @@
 package com.github.blindpirate.gogradle.util;
 
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;

@@ -15,7 +15,8 @@ import java.util.Queue;
 @Singleton
 public class SerialBuildOperationProcessor implements BuildOperationProcessor {
     @Override
-    public <T extends BuildOperation> void run(BuildOperationWorker<T> worker, Action<BuildOperationQueue<T>> generator) {
+    public <T extends BuildOperation> void run(BuildOperationWorker<T> worker,
+                                               Action<BuildOperationQueue<T>> generator) {
         throw new UnsupportedOperationException();
     }
 

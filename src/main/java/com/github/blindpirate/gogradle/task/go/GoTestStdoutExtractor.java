@@ -38,7 +38,7 @@ public class GoTestStdoutExtractor {
             Pattern.compile("=== RUN\\s+(\\w+)\\n((?:.|\\n)*?)--- (PASS|FAIL):\\s+\\w+\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
 
     private static final String SETUP_FAILED_ERROR = "[setup failed]";
-    public static AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
+    private static final AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
 
     public List<TestClassResult> extractTestResult(PackageTestContext context) {
         if (context.getStdout().contains(SETUP_FAILED_ERROR)) {
@@ -121,7 +121,8 @@ public class GoTestStdoutExtractor {
         return escapedPackagePath.replaceAll("%2F", ".") + "." + nameWithoutDotGo;
     }
 
-    private Map<File, List<TestMethodResult>> groupByTestFile(List<TestMethodResult> results, Map<File, String> testFiles) {
+    private Map<File, List<TestMethodResult>> groupByTestFile(List<TestMethodResult> results,
+                                                              Map<File, String> testFiles) {
         return results.stream()
                 .collect(groupingBy(
                         result -> findTestFileOfMethod(testFiles, result.getName())
