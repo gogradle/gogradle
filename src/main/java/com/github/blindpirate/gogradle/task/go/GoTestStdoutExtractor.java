@@ -112,8 +112,11 @@ public class GoTestStdoutExtractor {
 
     private String determineClassName(String packagePath, File testFile) {
         String escapedPackagePath = IOUtils.encodeInternally(packagePath);
+        escapedPackagePath = escapedPackagePath.replaceAll("\\.", "%2E");
+
         String fileName = testFile.getName();
         String nameWithoutDotGo = testFile.getName().substring(0, fileName.length() - 3);
+        nameWithoutDotGo = nameWithoutDotGo.replaceAll("\\.", "%2E");
 
         return escapedPackagePath.replaceAll("%2F", ".") + "." + nameWithoutDotGo;
     }

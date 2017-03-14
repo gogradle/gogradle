@@ -21,7 +21,7 @@ class GoTestStdoutExtractorTest {
         // given
         IOUtils.write(resource, 'a_test.go', 'func TestDiffToHTML()')
         IOUtils.write(resource, 'b_test.go', 'func Test_parsePostgreSQLHostPort() func Test_SSHParsePublicKey()')
-        IOUtils.write(resource, 'c_test.go', 'func TestRepo()')
+        IOUtils.write(resource, 'c.c_test.go', 'func TestRepo()')
         IOUtils.write(resource, 'd_test.go', 'func Useless()')
         String stdout = '''
 2017/03/13 16:05:18 \u001B[1;33m[W] Custom config '/var/folders/y2/gy07kxsn58jdd97b43jcch040000gn/T/go-build158292335/github.com/gogits/gogs/models/_test/custom/conf/app.ini' not found, ignore this if you're running first time
@@ -94,13 +94,17 @@ FAIL\tgithub.com/gogits/gogs/models\t0.074s
 
         // then
         assert results.size() == 3
+        assert results.unique({ it.id }).size() == 3
 
+        assert results[0].className == 'github%2Ecom.gogits.gogs.models.a_test'
         assert results[0].results.size() == 1
         assert results[0].results[0].name == 'TestDiffToHTML'
         assert results[0].results[0].message == ''
         assert results[0].results[0].resultType == TestResult.ResultType.SUCCESS
 
+        assert results[1].className == 'github%2Ecom.gogits.gogs.models.b_test'
         assert results[1].results.size() == 2
+        assert results[1].results.unique { it.id }.size() == 2
         assert results[1].results[0].name == 'Test_parsePostgreSQLHostPort'
         assert results[1].results[0].resultType == TestResult.ResultType.SUCCESS
         assert results[1].results[0].message.contains('Parse PostgreSQL host and port')
@@ -108,10 +112,35 @@ FAIL\tgithub.com/gogits/gogs/models\t0.074s
         assert results[1].results[1].resultType == TestResult.ResultType.FAILURE
         assert results[1].results[1].message.contains('Failures:')
 
+        assert results[2].className == 'github%2Ecom.gogits.gogs.models.c%2Ec_test'
         assert results[2].results.size() == 1
         assert results[2].results[0].name == 'TestRepo'
         assert results[2].results[0].message.contains('33 total assertions')
         assert results[2].results[0].resultType == TestResult.ResultType.SUCCESS
+    }
 
+    @Test
+    void 'extracting results from stdout with [setup failed] should succeed'() {
+        // given
+        String stdout = '''
+# github.com/gogits/gogs/models
+.gogradle/project_gopath/src/github.com/gogits/gogs/models/ssh_key_test.go:7:1: expected declaration, found 'IDENT' sfds
+FAIL\tgithub.com/gogits/gogs/models [setup failed]
+'''
+        // when
+        PackageTestContext context = PackageTestContext.builder()
+                .withPackageDirectory(resource)
+                .withPackagePath('github.com/gogits/gogs/models')
+                .withStdout(stdout)
+                .withTestFiles([])
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+        // then
+        assert results.size() == 1
+        assert results[0].className == '[setup failed]'
+        assert results[0].results.size() == 1
+        assert results[0].results[0].name == '[setup failed]'
+        assert results[0].results[0].message.contains('github.com/gogits/gogs/models [setup failed]')
+        assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
     }
 }
