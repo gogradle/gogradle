@@ -82,7 +82,6 @@ FAIL\tgithub.com/gogits/gogs/models\t0.074s
 '''
         // when
         PackageTestContext context = PackageTestContext.builder()
-                .withPackageDirectory(resource)
                 .withPackagePath('github.com/gogits/gogs/models')
                 .withStdout(stdout)
                 .withTestFiles(resource.listFiles() as List)
@@ -129,7 +128,6 @@ FAIL\tgithub.com/gogits/gogs/models [setup failed]
 '''
         // when
         PackageTestContext context = PackageTestContext.builder()
-                .withPackageDirectory(resource)
                 .withPackagePath('github.com/gogits/gogs/models')
                 .withStdout(stdout)
                 .withTestFiles([])
