@@ -29,6 +29,7 @@ import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
+import static com.github.blindpirate.gogradle.util.IOUtils.*;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
@@ -56,9 +57,19 @@ public class GoTestTask extends Go {
 
     private List<String> testNamePattern;
 
+    private boolean generateCoverageProfile = true;
+
     public GoTestTask() {
         dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
                 INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+    }
+
+    public boolean isGenerateCoverageProfile() {
+        return generateCoverageProfile;
+    }
+
+    public void setGenerateCoverageProfile(boolean generateCoverageProfile) {
+        this.generateCoverageProfile = generateCoverageProfile;
     }
 
     @Option(option = "tests", description = "Sets test class or method name to be included, '*' is supported.")
@@ -102,7 +113,7 @@ public class GoTestTask extends Go {
 
     private void addTestAllAction() {
         // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-        Collection<File> allTestFiles = IOUtils.filterFilesRecursively(project.getRootDir(), TEST_GO_FILTER);
+        Collection<File> allTestFiles = filterFilesRecursively(project.getRootDir(), TEST_GO_FILTER);
         doLast(new TestPackagesAction(groupByParentDir(allTestFiles), false));
     }
 
@@ -143,10 +154,10 @@ public class GoTestTask extends Go {
 
             parentDirToTestFiles.forEach((parentDir, testFiles) -> {
                 String packageImportPath = dirToImportPath(parentDir);
-                StdoutStderrCollector stdoutCollector = doSingleTest(parentDir, testFiles, retcodeCollector);
+                String stdout = doSingleTest(parentDir, testFiles, retcodeCollector);
                 PackageTestContext context = PackageTestContext.builder()
                         .withPackagePath(packageImportPath)
-                        .withStdout(stdoutCollector.getStdoutStderr())
+                        .withStdout(stdout)
                         .withTestFiles(testFiles)
                         .build();
 
@@ -168,21 +179,30 @@ public class GoTestTask extends Go {
             }
         }
 
-        private StdoutStderrCollector doSingleTest(File parentDir, List<File> testFiles, RetcodeCollector collector) {
+        private String doSingleTest(File parentDir, List<File> testFiles, RetcodeCollector collector) {
             StdoutStderrCollector lineConsumer = new StdoutStderrCollector();
+            String importPath = dirToImportPath(parentDir);
+            List<String> args;
+
             if (isCommandLineArguments) {
-                List<String> args = CollectionUtils.asStringList(
+                args = CollectionUtils.asStringList(
                         "test",
                         "-v",
                         testFiles.stream().map(File::getAbsolutePath).collect(toList()));
-                buildManager.go(args, null, lineConsumer, lineConsumer, collector);
             } else {
-                String importPath = dirToImportPath(parentDir);
-                buildManager.go(asList("test", "-v", importPath), null, lineConsumer, lineConsumer, collector);
+                args = asList("test", "-v", importPath);
             }
 
-            return lineConsumer;
+            if (generateCoverageProfile) {
+                clearDirectory(new File(project.getRootDir(), ".gogradle/coverage"));
+                File profilesDir = new File(project.getRootDir(), ".gogradle/coverage/profiles/" + importPath);
+                args.add("-coverprofile=" + profilesDir.getAbsolutePath());
+            }
+
+            buildManager.go(args, null, lineConsumer, lineConsumer, collector);
+            return lineConsumer.getStdoutStderr();
         }
+
 
         private void logResult(String packagePath, List<TestClassResult> resultOfSinglePackage) {
             LOGGER.quiet("Test for {} finished, {} succeed, {} failed",
