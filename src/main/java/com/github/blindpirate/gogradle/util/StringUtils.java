@@ -45,6 +45,9 @@ public class StringUtils {
     public static boolean fileNameStartsWithAny(File file, String... prefix) {
         return startsWithAny(file.getName(), prefix);
     }
+    public static boolean fileNameEndsWithAny(File file, String... prefix) {
+        return endsWithAny(file.getName(), prefix);
+    }
 
     public static boolean startsWithAny(String str, String... prefix) {
         return Stream.of(prefix).anyMatch(str::startsWith);

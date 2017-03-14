@@ -138,6 +138,10 @@ public final class IOUtils {
         String[] files = dir.list();
         return files == null ? Collections.emptyList() : Arrays.asList(files);
     }
+    public static List<File> safeListFiles(File dir) {
+        File[] files = dir.listFiles();
+        return files == null ? Collections.emptyList() : Arrays.asList(files);
+    }
 
     public static boolean isValidDirectory(File dir) {
         return dir.exists() && dir.isDirectory();
