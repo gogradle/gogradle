@@ -24,6 +24,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -135,17 +136,35 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void go(List<String> args, Map<String, String> env) {
-        List<String> cmdAndArgs = asStringList(getGoBinary(), args);
-        run(cmdAndArgs, env);
+        go(args, env, null, null, null);
     }
 
     @Override
     public void run(List<String> args, Map<String, String> env) {
+        run(args, env, null, null, null);
+
+    }
+
+    @Override
+    public void go(List<String> args,
+                   Map<String, String> env,
+                   Consumer<String> stdoutLineConsumer,
+                   Consumer<String> stderrLineConsumer,
+                   Consumer<Integer> retcodeConsumer) {
+        List<String> cmdAndArgs = asStringList(getGoBinary(), args);
+        run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
+    }
+
+    @Override
+    public void run(List<String> args, Map<String, String> env,
+                    Consumer<String> stdoutLineConsumer,
+                    Consumer<String> stderrLineConsumer,
+                    Consumer<Integer> retcodeConsumer) {
         renameVendorDuringBuild(() -> {
             Map<String, String> finalEnv = determineEnv(env);
             List<String> finalArgs = renderArgs(args, finalEnv);
 
-            doRun(finalArgs, finalEnv);
+            doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
         });
     }
 
@@ -155,13 +174,21 @@ public class DefaultBuildManager implements BuildManager {
         return args.stream().map(s -> StringUtils.render(s, context)).collect(Collectors.toList());
     }
 
-    private void doRun(List<String> args, Map<String, String> env) {
+    private void doRun(List<String> args,
+                       Map<String, String> env,
+                       Consumer<String> stdoutLineConsumer,
+                       Consumer<String> stderrLineConsumer,
+                       Consumer<Integer> retcodeConsumer) {
+        stdoutLineConsumer = stdoutLineConsumer == null ? LOGGER::quiet : stdoutLineConsumer;
+        stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
+        retcodeConsumer = retcodeConsumer == null ? this::ensureProcessReturnZero : retcodeConsumer;
+
         Process process = ProcessUtils.run(args, determineEnv(env), project.getRootDir());
 
         CountDownLatch latch = new CountDownLatch(2);
 
-        new SubprocessReader(process::getInputStream, LOGGER::quiet, latch, NO_TEST_FILES_FILTER).start();
-        new SubprocessReader(process::getErrorStream, LOGGER::error, latch).start();
+        new SubprocessReader(process::getInputStream, stdoutLineConsumer, latch).start();
+        new SubprocessReader(process::getErrorStream, stderrLineConsumer, latch).start();
 
         try {
             latch.await();
@@ -172,12 +199,15 @@ public class DefaultBuildManager implements BuildManager {
         try {
             int retcode = process.waitFor();
 
-            if (retcode != 0) {
-                throw BuildException.processReturnNonZero(retcode);
-            }
-
+            retcodeConsumer.accept(retcode);
         } catch (InterruptedException e) {
             throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    private void ensureProcessReturnZero(int retcode) {
+        if (retcode != 0) {
+            throw BuildException.processReturnNonZero(retcode);
         }
     }
 

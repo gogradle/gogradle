@@ -4,9 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
-import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
-import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
@@ -26,9 +24,10 @@ import org.mockito.stubbing.Answer
 
 import java.nio.file.Files
 import java.nio.file.Path
-import java.nio.file.Paths
+import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -152,31 +151,10 @@ class DefaultBuildManagerTest {
                 resource)
     }
 
-//    @Test
-//    void 'settings should take effect'() {
-//        // given
-//        setting.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
-//        setting.outputPattern = 'myresult_${os}_${arch}'
-//        setting.outputLocation = resource.absolutePath
-//        // when
-//        manager.build()
-//        // then
-//        assertOutputFile('myresult_windows_amd64')
-//        assertOutputFile('myresult_linux_amd64')
-//        assertOutputFile('myresult_linux_386')
-//    }
-
-//    void assertOutputFile(String fileName) {
-//        verify(delegate).run([goBin, 'build', '-o', new File(resource, fileName).toString()],
-//                [GOPATH: getBuildGopath(), GOROOT: goroot],
-//                resource
-//        )
-//    }
-
     @Test
-    void 'build stdout and stderr should be redirected to current process'() {
+    void 'build stdout and stderr should be redirected to logger if consumer is not specified'() {
         // given
-        when(process.getInputStream()).thenReturn(new ByteArrayInputStream('stdout\n[no test files]'.getBytes(DEFAULT_CHARSET)))
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream('stdout\nanotherline'.getBytes(DEFAULT_CHARSET)))
         when(process.getErrorStream()).thenReturn(new ByteArrayInputStream('stderr'.getBytes(DEFAULT_CHARSET)))
         Logger mockLogger = mock(Logger)
         ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', mockLogger)
@@ -184,8 +162,26 @@ class DefaultBuildManagerTest {
         manager.go(['build'], [:])
         // then
         verify(mockLogger).quiet('stdout')
+        verify(mockLogger).quiet('anotherline')
         verify(mockLogger).error('stderr')
         ReflectionUtils.setStaticFinalField(DefaultBuildManager, 'LOGGER', Logging.getLogger(DefaultBuildManager))
+    }
+
+    @Test
+    void 'build stdout and stderr should be redirected'() {
+        // given
+        when(process.getInputStream()).thenReturn(new ByteArrayInputStream('stdout\nanotherline'.getBytes(DEFAULT_CHARSET)))
+        when(process.getErrorStream()).thenReturn(new ByteArrayInputStream('stderr'.getBytes(DEFAULT_CHARSET)))
+        Consumer stdoutLineConsumer = mock(Consumer)
+        Consumer stderrLineConsumer = mock(Consumer)
+        Consumer retcodeConsumer = mock(Consumer)
+        // when
+        manager.go(['build'], [:], stdoutLineConsumer, stderrLineConsumer, retcodeConsumer)
+        // then
+        verify(stdoutLineConsumer).accept('stdout')
+        verify(stdoutLineConsumer).accept('anotherline')
+        verify(stderrLineConsumer).accept('stderr')
+        verify(retcodeConsumer).accept(0)
     }
 
     @Test
