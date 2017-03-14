@@ -38,6 +38,10 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.isEmpty(s);
     }
 
+    public static boolean isNotEmpty(String s) {
+        return !isEmpty(s);
+    }
+
     public static boolean fileNameStartsWithAny(File file, String... prefix) {
         return startsWithAny(file.getName(), prefix);
     }
