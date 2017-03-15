@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.google.inject.Inject;
-import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
@@ -18,8 +17,6 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(ShowGopathGorootTask.class);
 
     @Inject
-    private Project project;
-    @Inject
     private GoBinaryManager goBinaryManager;
 
     public ShowGopathGorootTask() {
@@ -28,7 +25,7 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
 
     @TaskAction
     public void showGopathGoroot() {
-        File projectRoot = project.getRootDir();
+        File projectRoot = getProject().getRootDir();
         String projectGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/project_gopath"));
         String buildGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/build_gopath"));
         String testGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/test_gopath"));
