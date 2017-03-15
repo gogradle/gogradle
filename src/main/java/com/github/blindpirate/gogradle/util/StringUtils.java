@@ -1,12 +1,15 @@
 package com.github.blindpirate.gogradle.util;
 
 
+import groovy.text.SimpleTemplateEngine;
+
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
 
 public class StringUtils {
@@ -45,6 +48,7 @@ public class StringUtils {
     public static boolean fileNameStartsWithAny(File file, String... prefix) {
         return startsWithAny(file.getName(), prefix);
     }
+
     public static boolean fileNameEndsWithAny(File file, String... prefix) {
         return endsWithAny(file.getName(), prefix);
     }
@@ -65,9 +69,20 @@ public class StringUtils {
         return path.toString().replace("\\", "/");
     }
 
-    public static String render(String template, Map<String, String> context) {
-        AtomicReference<String> result = new AtomicReference<>(template);
-        context.forEach((key, value) -> result.set(result.get().replace("${" + key + "}", value)));
-        return result.get();
+    public static String render(String template, Map<String, Object> context) {
+        try {
+            context = new HashMap<>(context);
+            return new SimpleTemplateEngine().createTemplate(template).make(context).toString();
+        } catch (ClassNotFoundException | IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public static int lastIndexOf(String str, String substr) {
+        return org.apache.commons.lang3.StringUtils.lastIndexOf(str, substr);
+    }
+
+    public static String substring(String s, int start, int end) {
+        return org.apache.commons.lang3.StringUtils.substring(s, start, end);
     }
 }
