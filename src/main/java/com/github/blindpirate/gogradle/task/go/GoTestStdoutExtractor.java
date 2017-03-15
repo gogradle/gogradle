@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult;
@@ -110,12 +111,12 @@ public class GoTestStdoutExtractor {
         return ret;
     }
 
+    @SuppressWarnings({"checkstyle:magicnumber"})
     private String determineClassName(String packagePath, File testFile) {
         String escapedPackagePath = IOUtils.encodeInternally(packagePath);
         escapedPackagePath = escapedPackagePath.replaceAll("\\.", "%2E");
 
-        String fileName = testFile.getName();
-        String nameWithoutDotGo = testFile.getName().substring(0, fileName.length() - 3);
+        String nameWithoutDotGo = StringUtils.substring(testFile.getName(), 0, -3);
         nameWithoutDotGo = nameWithoutDotGo.replaceAll("\\.", "%2E");
 
         return escapedPackagePath.replaceAll("%2F", ".") + "." + nameWithoutDotGo;

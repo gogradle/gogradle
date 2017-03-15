@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -77,8 +78,7 @@ public class GoImportExtractor {
 
         @Override
         public void enterImportPath(ImportPathContext ctx) {
-            String importPathWithQuote = ctx.STRING_LIT().getText();
-            String importPath = importPathWithQuote.substring(1, importPathWithQuote.length() - 1);
+            String importPath = StringUtils.substring(ctx.STRING_LIT().getText(), 1, -1);
             importPaths.add(importPath);
         }
 
