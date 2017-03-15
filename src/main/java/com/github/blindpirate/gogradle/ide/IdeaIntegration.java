@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.ide;
 
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.Project;
 import org.gradle.plugins.ide.idea.GenerateIdeaModule;
 import org.gradle.plugins.ide.idea.IdeaPlugin;
@@ -19,14 +20,6 @@ public class IdeaIntegration extends IdeIntegration {
 
 
     private static final String MODULE_IML_PATH = ".idea/modules/${projectName}.iml";
-    private static final String MODULE_IML_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<module external.linked.project.id=\"${projectName}\" external.linked.project.path=\"$MODULE_DIR$/../..\" external.root.project.path=\"$MODULE_DIR$/../..\" external.system.id=\"GRADLE\" type=\"GO_MODULE\" version=\"4\">\n"
-            + "  <component name=\"NewModuleRootManager\">\n"
-            + "    <content url=\"file://$MODULE_DIR$/../..\" />\n"
-            + "    <orderEntry type=\"sourceFolder\" forTests=\"false\" />\n"
-            + "    <orderEntry type=\"jdk\" jdkName=\"Go ${goVersion}\" jdkType=\"Go SDK\" />\n"
-            + "  </component>\n"
-            + "</module>";
 
     private final IdeaSdkHacker hacker;
 
@@ -50,7 +43,8 @@ public class IdeaIntegration extends IdeIntegration {
 
     @Override
     protected void generateModuleIml() {
-        writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(MODULE_IML_CONTENT));
+        String moduleImlTemplate = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ide/module.iml.template"));
+        writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(moduleImlTemplate));
         hacker.ensureSpecificSdkExist(goBinaryManager.getGoVersion(), goBinaryManager.getGoroot());
     }
 
