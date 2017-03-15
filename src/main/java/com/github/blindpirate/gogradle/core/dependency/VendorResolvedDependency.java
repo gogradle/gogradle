@@ -35,7 +35,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                 hostDependency.getVersion(),
                 rootDir.lastModified(),
                 hostDependency,
-                caculateRootPathToHost(parent, name));
+                calculateRootPathToHost(parent, name));
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
         VendorOnlyProduceStrategy strategy = GogradleGlobal.getInstance(VendorOnlyProduceStrategy.class);
@@ -55,7 +55,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         this.relativePathToHost = relativePathToHost;
     }
 
-    private static Path caculateRootPathToHost(ResolvedDependency parent, String packagePath) {
+    private static Path calculateRootPathToHost(ResolvedDependency parent, String packagePath) {
         if (parent instanceof VendorResolvedDependency) {
             VendorResolvedDependency parentVendorResolvedDependency = (VendorResolvedDependency) parent;
             return parentVendorResolvedDependency.relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
