@@ -38,14 +38,14 @@ public class GoBuildTask extends Go {
     @Override
     public Task doLast(final Closure closure) {
         List<Map<String, String>> envs = getEnvs();
-        envs.forEach(env -> doLast(GoExecutionAction.wrapClousureWithEnvs(closure, env)));
+        envs.forEach(env -> doLast(GoExecutionAction.wrapClosureWithEnvs(closure, env)));
         return this;
     }
 
     @Override
     public Task doFirst(final Closure closure) {
         List<Map<String, String>> envs = getEnvs();
-        envs.forEach(env -> doFirst(GoExecutionAction.wrapClousureWithEnvs(closure, env)));
+        envs.forEach(env -> doFirst(GoExecutionAction.wrapClosureWithEnvs(closure, env)));
         return this;
     }
 

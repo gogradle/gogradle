@@ -11,7 +11,7 @@ public class GoExecutionAction implements ContextAwareTaskAction {
     private Closure closure;
     private Map<String, String> env;
 
-    public static GoExecutionAction wrapClousureWithEnvs(Closure closure, Map<String, String> env) {
+    public static GoExecutionAction wrapClosureWithEnvs(Closure closure, Map<String, String> env) {
         GoExecutionAction ret = new GoExecutionAction();
         ret.env = env;
         ret.closure = closure;
@@ -35,11 +35,7 @@ public class GoExecutionAction implements ContextAwareTaskAction {
         Go.class.cast(task).setCurrentEnv(env);
         try {
             synchronized (task) {
-                if (closure.getMaximumNumberOfParameters() == 0) {
-                    closure.call();
-                } else {
-                    closure.call(task);
-                }
+                closure.call(task);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(original);
