@@ -71,8 +71,7 @@ abstract class TaskTest {
                       buildConstraintManager : buildConstraintManager,
                       lockedDependencyManager: lockedDependencyManager,
                       ideaIntegration        : ideaIntegration,
-                      intellijIdeIntegration : intellijIdeIntegration,
-                      project                : project]
+                      intellijIdeIntegration : intellijIdeIntegration]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
