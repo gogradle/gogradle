@@ -43,7 +43,8 @@ public class IdeaIntegration extends IdeIntegration {
 
     @Override
     protected void generateModuleIml() {
-        String moduleImlTemplate = IOUtils.toString(getClass().getClassLoader().getResourceAsStream("ide/module.iml.template"));
+        String moduleImlTemplate = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("ide/idea_module.iml.template"));
         writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(moduleImlTemplate));
         hacker.ensureSpecificSdkExist(goBinaryManager.getGoVersion(), goBinaryManager.getGoroot());
     }

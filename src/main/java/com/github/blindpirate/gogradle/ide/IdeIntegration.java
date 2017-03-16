@@ -38,9 +38,9 @@ public abstract class IdeIntegration {
     }
 
     private void generateGoLibrariesDotXml() {
-        writeFileIntoProjectRoot(GO_LIBRARIES_DOT_XML_PATH,
-                IOUtils.toString(IdeIntegration.class.getClassLoader()
-                        .getResourceAsStream("ide/goLibraries.xml")));
+        String goLibrariesXmlTemplate = IOUtils.toString(
+                IdeIntegration.class.getClassLoader().getResourceAsStream("ide/goLibraries.xml"));
+        writeFileIntoProjectRoot(GO_LIBRARIES_DOT_XML_PATH, goLibrariesXmlTemplate);
     }
 
     protected abstract void generateModuleIml();
@@ -48,9 +48,8 @@ public abstract class IdeIntegration {
     protected abstract void generateGoSdkDotXml();
 
     private void generateModulesDotXml() {
-        String modulesDotXmlTemplate
-                = IOUtils.toString(IdeIntegration.class.getClassLoader()
-                .getResourceAsStream("ide/modules.xml.template"));
+        String modulesDotXmlTemplate = IOUtils.toString(
+                IdeIntegration.class.getClassLoader().getResourceAsStream("ide/modules.xml.template"));
         String content = render(modulesDotXmlTemplate);
         writeFileIntoProjectRoot(MODULES_DOT_XML_PATH, content);
     }

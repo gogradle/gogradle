@@ -1,0 +1,460 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/>
+    <style type="text/css">
+        body,
+        td {
+            font-family: sans-serif;
+            font-size: 10pt;
+        }
+
+        h1 {
+            font-weight: bold;
+            font-size: 18pt;
+        }
+
+        /*
+        .breadcrumb {
+            border: #d6d3ce 1px solid;
+            padding: 2px 4px 2px 4px;
+        }
+        */
+
+        .breadcrumb .info {
+            float: right;
+        }
+
+        .breadcrumb .info a {
+            margin-left: 8px;
+        }
+
+        /*
+        .el_report {
+            padding-left: 18px;
+            background-image: url(report.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+
+        .el_group {
+            padding-left: 18px;
+            background-image: url(group.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+
+        .el_bundle {
+            padding-left: 18px;
+            background-image: url(bundle.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+        */
+
+        .el_package {
+            padding-left: 18px;
+            background-image: url(package.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+
+        /*
+        .el_class {
+            padding-left: 18px;
+            background-image: url(class.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+
+        .el_source {
+            padding-left: 18px;
+            background-image: url(source.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+
+        .el_method {
+            padding-left: 18px;
+            background-image: url(method.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+
+        .el_session {
+            padding-left: 18px;
+            background-image: url(session.gif);
+            background-position: left center;
+            background-repeat: no-repeat;
+        }
+        */
+
+        pre.source {
+            border: #d6d3ce 1px solid;
+            font-family: monospace;
+        }
+
+        pre.source ol {
+            margin-bottom: 0px;
+            margin-top: 0px;
+        }
+
+        pre.source li {
+            border-left: 1px solid #D6D3CE;
+            color: #A0A0A0;
+            padding-left: 0px;
+        }
+
+        pre.source span.fc {
+            background-color: #ccffcc;
+        }
+
+        pre.source span.nc {
+            background-color: #ffaaaa;
+        }
+
+        pre.source span.pc {
+            background-color: #ffffcc;
+        }
+
+        pre.source span.bfc {
+            background-image: url(branchfc.gif);
+            background-repeat: no-repeat;
+            background-position: 2px center;
+        }
+
+        pre.source span.bfc:hover {
+            background-color: #80ff80;
+        }
+
+        pre.source span.bnc {
+            background-image: url(branchnc.gif);
+            background-repeat: no-repeat;
+            background-position: 2px center;
+        }
+
+        pre.source span.bnc:hover {
+            background-color: #ff8080;
+        }
+
+        pre.source span.bpc {
+            background-image: url(branchpc.gif);
+            background-repeat: no-repeat;
+            background-position: 2px center;
+        }
+
+        pre.source span.bpc:hover {
+            background-color: #ffff80;
+        }
+
+        table.coverage {
+            empty-cells: show;
+            border-collapse: collapse;
+        }
+
+        table.coverage thead {
+            background-color: #e0e0e0;
+        }
+
+        table.coverage thead td {
+            white-space: nowrap;
+            padding: 2px 14px 0px 6px;
+            border-bottom: #b0b0b0 1px solid;
+        }
+
+        table.coverage thead td.bar {
+            border-left: #cccccc 1px solid;
+        }
+
+        table.coverage thead td.ctr1 {
+            text-align: right;
+            border-left: #cccccc 1px solid;
+        }
+
+        table.coverage thead td.ctr2 {
+            text-align: right;
+            padding-left: 2px;
+        }
+
+        table.coverage thead td.sortable {
+            cursor: pointer;
+            background-image: url(sort.gif);
+            background-position: right center;
+            background-repeat: no-repeat;
+        }
+
+        table.coverage thead td.up {
+            background-image: url(up.gif);
+        }
+
+        table.coverage thead td.down {
+            background-image: url(down.gif);
+        }
+
+        table.coverage tbody td {
+            white-space: nowrap;
+            padding: 2px 6px 2px 6px;
+            border-bottom: #d6d3ce 1px solid;
+        }
+
+        table.coverage tbody tr:hover {
+            background: #f0f0d0 !important;
+        }
+
+        table.coverage tbody td.bar {
+            border-left: #e8e8e8 1px solid;
+        }
+
+        table.coverage tbody td.ctr1 {
+            text-align: right;
+            padding-right: 14px;
+            border-left: #e8e8e8 1px solid;
+        }
+
+        table.coverage tbody td.ctr2 {
+            text-align: right;
+            padding-right: 14px;
+            padding-left: 2px;
+        }
+
+        table.coverage tfoot td {
+            white-space: nowrap;
+            padding: 2px 6px 2px 6px;
+        }
+
+        table.coverage tfoot td.bar {
+            border-left: #e8e8e8 1px solid;
+        }
+
+        table.coverage tfoot td.ctr1 {
+            text-align: right;
+            padding-right: 14px;
+            border-left: #e8e8e8 1px solid;
+        }
+
+        table.coverage tfoot td.ctr2 {
+            text-align: right;
+            padding-right: 14px;
+            padding-left: 2px;
+        }
+
+        .footer {
+            margin-top: 20px;
+            border-top: #d6d3ce 1px solid;
+            padding-top: 2px;
+            font-size: 8pt;
+            color: #a0a0a0;
+        }
+
+        .footer a {
+            color: #a0a0a0;
+        }
+
+        .right {
+            float: right;
+        }
+    </style>
+    <link rel="shortcut icon" href="report.gif" type="image/gif"/>
+    <title><%=projectName =></title>
+    <script type="text/javascript">
+        /*******************************************************************************
+         * Copyright (c) 2009, 2016 Mountainminds GmbH & Co. KG and Contributors
+         * All rights reserved. This program and the accompanying materials
+         * are made available under the terms of the Eclipse Public License v1.0
+         * which accompanies this distribution, and is available at
+         * http://www.eclipse.org/legal/epl-v10.html
+         *
+         * Contributors:
+         *    Marc R. Hoffmann - initial API and implementation
+         *
+         *******************************************************************************/
+
+        (function () {
+
+            /**
+             * Sets the initial sorting derived from the hash.
+             *
+             * @param linkelementids
+             *          list of element ids to search for links to add sort inidcator
+             *          hash links
+             */
+            function initialSort(linkelementids) {
+                window.linkelementids = linkelementids;
+                var hash = window.location.hash;
+                if (hash) {
+                    var m = hash.match(/up-./);
+                    if (m) {
+                        var header = window.document.getElementById(m[0].charAt(3));
+                        if (header) {
+                            sortColumn(header, true);
+                        }
+                        return;
+                    }
+                    var m = hash.match(/dn-./);
+                    if (m) {
+                        var header = window.document.getElementById(m[0].charAt(3));
+                        if (header) {
+                            sortColumn(header, false);
+                        }
+                        return
+                    }
+                }
+            }
+
+            /**
+             * Sorts the columns with the given header dependening on the current sort state.
+             */
+            function toggleSort(header) {
+                var sortup = header.className.indexOf('down ') == 0;
+                sortColumn(header, sortup);
+            }
+
+            /**
+             * Sorts the columns with the given header in the given direction.
+             */
+            function sortColumn(header, sortup) {
+                var table = header.parentNode.parentNode.parentNode;
+                var body = table.tBodies[0];
+                var colidx = getNodePosition(header);
+
+                resetSortedStyle(table);
+
+                var rows = body.rows;
+                var sortedrows = [];
+                for (var i = 0; i < rows.length; i++) {
+                    r = rows[i];
+                    sortedrows[parseInt(r.childNodes[colidx].id.slice(1))] = r;
+                }
+
+                var hash;
+
+                if (sortup) {
+                    for (var i = sortedrows.length - 1; i >= 0; i--) {
+                        body.appendChild(sortedrows[i]);
+                    }
+                    header.className = 'up ' + header.className;
+                    hash = 'up-' + header.id;
+                } else {
+                    for (var i = 0; i < sortedrows.length; i++) {
+                        body.appendChild(sortedrows[i]);
+                    }
+                    header.className = 'down ' + header.className;
+                    hash = 'dn-' + header.id;
+                }
+
+                setHash(hash);
+            }
+
+            /**
+             * Adds the sort indicator as a hash to the document URL and all links.
+             */
+            function setHash(hash) {
+                window.document.location.hash = hash;
+                ids = window.linkelementids;
+                for (var i = 0; i < ids.length; i++) {
+                    setHashOnAllLinks(document.getElementById(ids[i]), hash);
+                }
+            }
+
+            /**
+             * Extend all links within the given tag with the given hash.
+             */
+            function setHashOnAllLinks(tag, hash) {
+                links = tag.getElementsByTagName("a");
+                for (var i = 0; i < links.length; i++) {
+                    var a = links[i];
+                    var href = a.href;
+                    var hashpos = href.indexOf("#");
+                    if (hashpos != -1) {
+                        href = href.substring(0, hashpos);
+                    }
+                    a.href = href + "#" + hash;
+                }
+            }
+
+            /**
+             * Calculates the position of a element within its parent.
+             */
+            function getNodePosition(element) {
+                var pos = -1;
+                while (element) {
+                    element = element.previousSibling;
+                    pos++;
+                }
+                return pos;
+            }
+
+            /**
+             * Remove the sorting indicator style from all headers.
+             */
+            function resetSortedStyle(table) {
+                for (var c = table.tHead.firstElementChild.firstChild; c; c = c.nextSibling) {
+                    if (c.className) {
+                        if (c.className.indexOf('down ') == 0) {
+                            c.className = c.className.slice(5);
+                        }
+                        if (c.className.indexOf('up ') == 0) {
+                            c.className = c.className.slice(3);
+                        }
+                    }
+                }
+            }
+
+            window['initialSort'] = initialSort;
+            window['toggleSort'] = toggleSort;
+
+        })();
+    </script>
+</head>
+
+<body onload="initialSort(['coveragetable'])">
+<h1><%=projectName =></h1>
+<table class="coverage" cellspacing="0" id="coveragetable">
+    <thead>
+    <tr>
+        <td class="sortable" id="a" onclick="toggleSort(this)">Packages</td>
+        <td class="sortable bar" id="b" onclick="toggleSort(this)">Missed Lines</td>
+        <td class="sortable ctr2" id="c" onclick="toggleSort(this)">Cov.</td>
+    </tr>
+    </thead>
+    <tfoot>
+    <tr>
+        <td>Total</td>
+        <td class="bar"><%=totalMissedLines => of <%=totalLines =></td>
+        <td class="ctr2"><%=totalCoverageRate =></td>
+    </tr>
+    </tfoot>
+    <tbody>
+    <% packages.each {
+    println """
+    <tr>
+        <td id='a${it.nameOrder}'>
+            <a href='${it.url}' class='el_package'>${it.name}</a>
+        </td>
+        <td class='bar' id='b${it.coverageRateOrder}'>
+            <img src='redbar.gif' width='${it.uncoveredLineRate}' height='10' title='${it.uncoveredLineCount}'
+                 alt='${it.uncoveredLineCount}'/>
+            <img src="greenbar.gif" width='${it.coveredLineRate}' height='10' title='${it.coveredLineCount}'
+                 alt='${it.coveredLineCount}'/>
+        </td>
+        <td class='ctr2' id='c${it.coverageRateOrder}'>${it.coverageOrder}</td>
+    </tr>
+    """
+    }%>
+
+    <!-- tr>
+        <td id="a1">
+            <a href="com.github.blindpirate.gogradle.vcs.git/index.html" class="el_package">vcs.git</a>
+        </td>
+        <td class="bar" id="b0"><img src="redbar.gif" width="30" height="10" title="360" alt="360" /><img src="greenbar.gif" width="30" height="10" title="726" alt="726" /></td>
+        <td class="ctr2" id="c1">67%</td>
+    </tr -->
+    </tbody>
+</table>
+<div class="footer"><span class="right">Created By <a href="https://github.com/blindpirate/gogradle">Gogradle</a> <%=gogradleVersion => with html/js/css from <a
+        href="http://www.eclemma.org/jacoco">JaCoCo</a></span></div>
+</body>
+
+</html>
