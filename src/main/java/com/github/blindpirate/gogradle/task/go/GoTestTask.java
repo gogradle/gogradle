@@ -4,9 +4,9 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.google.common.collect.Lists;
 import org.gradle.api.Action;
 import org.gradle.api.Incubating;
-import org.gradle.api.Project;
 import org.gradle.api.Task;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.internal.tasks.testing.junit.report.DefaultTestReport;
@@ -29,22 +29,18 @@ import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
-import static com.github.blindpirate.gogradle.util.IOUtils.*;
+import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
 public class GoTestTask extends Go {
     private static final Logger LOGGER = Logging.getLogger(GoTestTask.class);
-
-    @Inject
-    private Project project;
 
     @Inject
     private GolangPluginSetting setting;
@@ -108,12 +104,12 @@ public class GoTestTask extends Go {
 
     private Collection<File> filterMatchedTests() {
         TestPatternFilter filter = TestPatternFilter.withPattern(testNamePattern);
-        return filterFilesRecursively(project.getRootDir(), filter);
+        return filterFilesRecursively(getProject().getRootDir(), filter);
     }
 
     private void addTestAllAction() {
         // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-        Collection<File> allTestFiles = filterFilesRecursively(project.getRootDir(), TEST_GO_FILTER);
+        Collection<File> allTestFiles = filterFilesRecursively(getProject().getRootDir(), TEST_GO_FILTER);
         doLast(new TestPackagesAction(groupByParentDir(allTestFiles), false));
     }
 
@@ -132,7 +128,7 @@ public class GoTestTask extends Go {
     }
 
     private String dirToImportPath(File dir) {
-        Path relativeToProjectRoot = project.getRootDir().toPath().relativize(dir.toPath());
+        Path relativeToProjectRoot = getProject().getRootDir().toPath().relativize(dir.toPath());
         Path importPath = Paths.get(setting.getPackagePath()).resolve(relativeToProjectRoot);
         return toUnixString(importPath);
     }
@@ -168,7 +164,7 @@ public class GoTestTask extends Go {
 
             GoTestResultsProvider provider = new GoTestResultsProvider(testResults);
 
-            File reportDir = new File(project.getRootDir(), "reports/test");
+            File reportDir = new File(getProject().getRootDir(), "reports/test");
             DefaultTestReport report = new DefaultTestReport(buildOperationProcessor);
             report.generateReport(provider, reportDir);
 
@@ -190,13 +186,17 @@ public class GoTestTask extends Go {
                         "-v",
                         testFiles.stream().map(File::getAbsolutePath).collect(toList()));
             } else {
-                args = asList("test", "-v", importPath);
+                args = Lists.newArrayList("test", "-v", importPath);
             }
 
             if (generateCoverageProfile) {
-                clearDirectory(new File(project.getRootDir(), ".gogradle/coverage"));
-                File profilesDir = new File(project.getRootDir(), ".gogradle/coverage/profiles/" + importPath);
-                args.add("-coverprofile=" + profilesDir.getAbsolutePath());
+                File coverageDir = new File(getProject().getRootDir(), ".gogradle/coverage");
+                IOUtils.forceMkdir(coverageDir);
+                clearDirectory(coverageDir);
+
+                File profilesPath = new File(getProject().getRootDir(), ".gogradle/coverage/profiles/"
+                        + IOUtils.encodeInternally(importPath));
+                args.add("-coverprofile=" + profilesPath.getAbsolutePath());
             }
 
             buildManager.go(args, null, lineConsumer, lineConsumer, collector);

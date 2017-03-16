@@ -95,6 +95,23 @@ class GoTestTaskTest extends TaskTest {
         task.actions[0].execute(task)
         // then
         verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
+        assert argumentsCaptor.getAllValues().contains(
+                ['test', '-v', 'github.com/my/package/a',
+                 "-coverprofile=${resource.absolutePath}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
+        assert argumentsCaptor.getAllValues().contains(
+                ['test', '-v', 'github.com/my/package/b',
+                 "-coverprofile=${resource.absolutePath}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb".toString()])
+    }
+
+    @Test
+    void 'coverage profiles should not be generated if not specified'() {
+        // when
+        task.addDefaultActionIfNoCustomActions()
+        task.setGenerateCoverageProfile(false)
+        task.actions[0].execute(task)
+        // then
+        assert !task.generateCoverageProfile
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/a'])
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/b'])
     }
@@ -108,9 +125,10 @@ class GoTestTaskTest extends TaskTest {
         // then
         verify(buildManager).go(argumentsCaptor.capture(), isNull(Map), any(Consumer), any(Consumer), any(Consumer))
         List<String> args = argumentsCaptor.getValue()
-        assert args.size() == 5
+        assert args.size() == 6
         assert args[0..1] == ['test', '-v']
         assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any { args.contains(new File(resource, it).absolutePath) }
+        assert args[5] == "-coverprofile=${resource.absolutePath}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()
     }
 
     @Test
