@@ -162,14 +162,17 @@ public class DefaultBuildManager implements BuildManager {
                     Consumer<Integer> retcodeConsumer) {
         renameVendorDuringBuild(() -> {
             Map<String, String> finalEnv = determineEnv(env);
-            List<String> finalArgs = renderArgs(args, finalEnv);
+
+            @SuppressWarnings("unchecked")
+            List<String> finalArgs = renderArgs(args, (Map) finalEnv);
 
             doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
         });
     }
 
+    @SuppressWarnings("unchecked")
     private List<String> renderArgs(List<String> args, Map<String, String> env) {
-        Map<String, String> context = new HashMap<>(env);
+        Map<String, Object> context = new HashMap<>(env);
         context.put("PROJECT_NAME", project.getName());
         return args.stream().map(s -> StringUtils.render(s, context)).collect(Collectors.toList());
     }
