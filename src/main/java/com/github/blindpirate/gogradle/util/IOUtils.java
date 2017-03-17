@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -10,6 +11,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
+import java.net.URL;
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.file.FileVisitOption;
@@ -23,6 +26,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
 import static com.github.blindpirate.gogradle.GogradleGlobal.MAX_DFS_DEPTH;
@@ -102,6 +106,14 @@ public final class IOUtils {
         }
     }
 
+    public static void copyFile(File src, File dest) {
+        try {
+            FileUtils.copyFile(src, dest);
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
     public static void touch(File file) {
         try {
             org.apache.commons.io.FileUtils.touch(file);
@@ -138,6 +150,7 @@ public final class IOUtils {
         String[] files = dir.list();
         return files == null ? Collections.emptyList() : Arrays.asList(files);
     }
+
     public static List<File> safeListFiles(File dir) {
         File[] files = dir.listFiles();
         return files == null ? Collections.emptyList() : Arrays.asList(files);
@@ -155,12 +168,20 @@ public final class IOUtils {
         }
     }
 
-    public static List<String> getLines(File file) {
+    public static List<String> readLines(File file) {
         String content = toString(file);
         if (StringUtils.isEmpty(content)) {
             return Collections.emptyList();
         } else {
             return Arrays.asList(content.split("\n"));
+        }
+    }
+
+    public static List<String> readLines(InputStream is) {
+        try {
+            return org.apache.commons.io.IOUtils.readLines(is, GogradleGlobal.DEFAULT_CHARSET);
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 
@@ -213,4 +234,31 @@ public final class IOUtils {
             throw ExceptionHandler.uncheckException(e);
         }
     }
+
+    public static String decodeInternally(String encoded) {
+        try {
+            return URLDecoder.decode(encoded, "UTF8");
+        } catch (UnsupportedEncodingException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    // It is said that this method has very bad performance
+    // http://stackoverflow.com/questions/453018/number-of-lines-in-a-file-in-java
+    public static long countLines(Path path) {
+        try (Stream<String> lines = Files.lines(path)) {
+            return lines.count();
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public static void copyURLToFile(URL url, File dest) {
+        try {
+            FileUtils.copyURLToFile(url, dest);
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
 }
