@@ -27,7 +27,6 @@ class GofmtTaskTest extends TaskTest {
         IOUtils.write(resource, 'go/bin/go', '')
         IOUtils.write(resource, 'go/bin/gofmt', '')
         when(goBinaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('go/bin/go'))
-        when(setting.getPackagePath()).thenReturn('github.com/my/package')
     }
 
     @Test
@@ -43,7 +42,7 @@ class GofmtTaskTest extends TaskTest {
         task.actions[0].execute(task)
 
         // then
-        verify(buildManager).run([new File(resource, 'go/bin/gofmt').absolutePath, 'github.com/my/package'], null)
+        verify(buildManager).run([new File(resource, 'go/bin/gofmt').absolutePath, '-w', '.'], null)
     }
 
     @Test

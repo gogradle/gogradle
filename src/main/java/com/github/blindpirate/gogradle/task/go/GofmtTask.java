@@ -27,7 +27,7 @@ public class GofmtTask extends Go {
     }
 
     private void execute(Task task) {
-        buildManager.run(asList(getGofmtPath(), "-w", "-s", "."), null);
+        buildManager.run(asList(getGofmtPath(), "-w", "."), null);
     }
 
     private String getGofmtPath() {
