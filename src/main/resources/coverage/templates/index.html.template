@@ -34,21 +34,21 @@
         /*
         .el_report {
             padding-left: 18px;
-            background-image: url(report.gif);
+            background-image: url(static/report.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
 
         .el_group {
             padding-left: 18px;
-            background-image: url(group.gif);
+            background-image: url(static/group.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
 
         .el_bundle {
             padding-left: 18px;
-            background-image: url(bundle.gif);
+            background-image: url(static/bundle.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
@@ -56,7 +56,7 @@
 
         .el_package {
             padding-left: 18px;
-            background-image: url(package.gif);
+            background-image: url(static/package.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
@@ -64,28 +64,28 @@
         /*
         .el_class {
             padding-left: 18px;
-            background-image: url(class.gif);
+            background-image: url(static/class.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
 
         .el_source {
             padding-left: 18px;
-            background-image: url(source.gif);
+            background-image: url(static/source.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
 
         .el_method {
             padding-left: 18px;
-            background-image: url(method.gif);
+            background-image: url(static/method.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
 
         .el_session {
             padding-left: 18px;
-            background-image: url(session.gif);
+            background-image: url(static/session.gif);
             background-position: left center;
             background-repeat: no-repeat;
         }
@@ -120,7 +120,7 @@
         }
 
         pre.source span.bfc {
-            background-image: url(branchfc.gif);
+            background-image: url(static/branchfc.gif);
             background-repeat: no-repeat;
             background-position: 2px center;
         }
@@ -130,7 +130,7 @@
         }
 
         pre.source span.bnc {
-            background-image: url(branchnc.gif);
+            background-image: url(static/branchnc.gif);
             background-repeat: no-repeat;
             background-position: 2px center;
         }
@@ -140,7 +140,7 @@
         }
 
         pre.source span.bpc {
-            background-image: url(branchpc.gif);
+            background-image: url(static/branchpc.gif);
             background-repeat: no-repeat;
             background-position: 2px center;
         }
@@ -180,17 +180,17 @@
 
         table.coverage thead td.sortable {
             cursor: pointer;
-            background-image: url(sort.gif);
+            background-image: url(static/sort.gif);
             background-position: right center;
             background-repeat: no-repeat;
         }
 
         table.coverage thead td.up {
-            background-image: url(up.gif);
+            background-image: url(static/up.gif);
         }
 
         table.coverage thead td.down {
-            background-image: url(down.gif);
+            background-image: url(static/down.gif);
         }
 
         table.coverage tbody td {
@@ -256,8 +256,8 @@
             float: right;
         }
     </style>
-    <link rel="shortcut icon" href="report.gif" type="image/gif"/>
-    <title><%=projectName =></title>
+    <link rel="shortcut icon" href="static/report.gif" type="image/gif"/>
+    <title>${projectName}</title>
     <script type="text/javascript">
         /*******************************************************************************
          * Copyright (c) 2009, 2016 Mountainminds GmbH & Co. KG and Contributors
@@ -410,7 +410,7 @@
 </head>
 
 <body onload="initialSort(['coveragetable'])">
-<h1><%=projectName =></h1>
+<h1>${projectName}</h1>
 <table class="coverage" cellspacing="0" id="coveragetable">
     <thead>
     <tr>
@@ -422,38 +422,52 @@
     <tfoot>
     <tr>
         <td>Total</td>
-        <td class="bar"><%=totalMissedLines => of <%=totalLines =></td>
-        <td class="ctr2"><%=totalCoverageRate =></td>
+        <td class="bar">${totalMissedLines} of ${totalLines}</td>
+        <td class="ctr2">${totalCoverageRate}</td>
     </tr>
     </tfoot>
     <tbody>
-    <% packages.each {
-    println """
+    ${writer ->
+    packages.each {
+    def template = '''
     <tr>
-        <td id='a${it.nameOrder}'>
-            <a href='${it.url}' class='el_package'>${it.name}</a>
+        <td id="a${it.nameOrder}">
+            <a href="${it.url}" class="el_package">${it.name}</a>
         </td>
-        <td class='bar' id='b${it.coverageRateOrder}'>
-            <img src='redbar.gif' width='${it.uncoveredLineRate}' height='10' title='${it.uncoveredLineCount}'
-                 alt='${it.uncoveredLineCount}'/>
-            <img src="greenbar.gif" width='${it.coveredLineRate}' height='10' title='${it.coveredLineCount}'
-                 alt='${it.coveredLineCount}'/>
+        <td class="bar" id="b${it.coverageRateOrder}" style="font-size:0">
+            <img src="static/redbar.gif" width="${it.uncoveredLineWidth}" height="10" title="${it.uncoveredLineCount}"
+                 alt="${it.uncoveredLineCount}"/>
+            <img src="static/greenbar.gif" width="${it.coveredLineWidth}" height="10" title="${it.coveredLineCount}"
+                 alt="${it.coveredLineCount}"/>
         </td>
-        <td class='ctr2' id='c${it.coverageRateOrder}'>${it.coverageOrder}</td>
+        <td class="ctr2" id="c${it.coverageRateOrder}">${it.coveredLineRate}%</td>
     </tr>
-    """
-    }%>
+    '''
+
+    writer << ['${it.url}':it.url,
+    '${it.name}':it.name,
+    '${it.nameOrder}':it.nameOrder,
+    '${it.coverageRateOrder}':it.coverageRateOrder,
+    '${it.coveredLineCount}':it.coveredLineCount,
+    '${it.coveredLineWidth}':it.coveredLineWidth,
+    '${it.coveredLineRate}':it.coveredLineRate,
+    '${it.uncoveredLineCount}':it.uncoveredLineCount,
+    '${it.uncoveredLineWidth}':it.uncoveredLineWidth
+    ].inject(template, {s,entry -> s.replace(entry.key,entry.value.toString())})
+
+    }
+    }
 
     <!-- tr>
         <td id="a1">
             <a href="com.github.blindpirate.gogradle.vcs.git/index.html" class="el_package">vcs.git</a>
         </td>
-        <td class="bar" id="b0"><img src="redbar.gif" width="30" height="10" title="360" alt="360" /><img src="greenbar.gif" width="30" height="10" title="726" alt="726" /></td>
+        <td class="bar" id="b0"><img src="static/redbar.gif" width="30" height="10" title="360" alt="360" /><img src="static/greenbar.gif" width="30" height="10" title="726" alt="726" /></td>
         <td class="ctr2" id="c1">67%</td>
     </tr -->
     </tbody>
 </table>
-<div class="footer"><span class="right">Created By <a href="https://github.com/blindpirate/gogradle">Gogradle</a> <%=gogradleVersion => with html/js/css from <a
+<div class="footer"><span class="right">Created by <a href="https://github.com/blindpirate/gogradle">Gogradle</a> ${gogradleVersion} with html/js/css from <a
         href="http://www.eclemma.org/jacoco">JaCoCo</a></span></div>
 </body>
 
