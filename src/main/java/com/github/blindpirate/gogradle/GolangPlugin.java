@@ -25,7 +25,6 @@ import java.util.stream.Stream;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.BUILD_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.COVERAGE_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOLINT_TAK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
@@ -96,8 +95,7 @@ public class GolangPlugin implements Plugin<Project> {
                 TEST_TASK_NAME,
                 COVERAGE_TASK_NAME,
                 GOFMT_TASK_NAME,
-                GOVET_TASK_NAME,
-                GOLINT_TAK_NAME)
+                GOVET_TASK_NAME)
                 .forEach(task -> Go.class.cast(taskContainer.getByName(task)).addDefaultActionIfNoCustomActions());
     }
 

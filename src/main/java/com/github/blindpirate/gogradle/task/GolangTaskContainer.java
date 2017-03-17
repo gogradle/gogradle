@@ -1,14 +1,13 @@
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
 import com.github.blindpirate.gogradle.ide.IdeaTask;
+import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
 import com.github.blindpirate.gogradle.ide.RenameVendorTask;
 import com.github.blindpirate.gogradle.task.go.GoBuildTask;
 import com.github.blindpirate.gogradle.task.go.GoCoverTask;
 import com.github.blindpirate.gogradle.task.go.GoTestTask;
 import com.github.blindpirate.gogradle.task.go.GoVetTask;
 import com.github.blindpirate.gogradle.task.go.GofmtTask;
-import com.github.blindpirate.gogradle.task.go.GolintTask;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Task;
 
@@ -44,7 +43,6 @@ public class GolangTaskContainer {
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
     public static final String COVERAGE_TASK_NAME = "cover";
-    public static final String GOLINT_TAK_NAME = "golint";
     public static final String GOFMT_TASK_NAME = "gofmt";
     public static final String GOVET_TASK_NAME = "govet";
 
@@ -72,7 +70,6 @@ public class GolangTaskContainer {
             .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGorootTask.class)
             .put(RENAME_VENDOR_TASK_NAME, RenameVendorTask.class)
             .put(COVERAGE_TASK_NAME, GoCoverTask.class)
-            .put(GOLINT_TAK_NAME, GolintTask.class)
             .put(GOVET_TASK_NAME, GoVetTask.class)
             .put(GOFMT_TASK_NAME, GofmtTask.class)
             .build();
