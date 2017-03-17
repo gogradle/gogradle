@@ -34,9 +34,9 @@ class GoBuildTaskTest extends TaskTest {
         task.actions.each { it.execute(task) }
         // then
         assert task.actions.size() == 3
-        verify(buildManager).go(['build', '-o', './gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
-        verify(buildManager).go(['build', '-o', './gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'])
-        verify(buildManager).go(['build', '-o', './gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'])
+        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'])
+        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'])
     }
 
     @Test
