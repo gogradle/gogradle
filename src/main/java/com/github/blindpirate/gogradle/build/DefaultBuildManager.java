@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -34,7 +33,8 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static com.github.blindpirate.gogradle.util.StringUtils.render;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 // ${projectRoot}
 // └── .gogradle

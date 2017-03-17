@@ -6,7 +6,6 @@ import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.NumberUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Task;
 import org.jsoup.Jsoup;
@@ -26,13 +25,19 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.util.IOUtils.countLines;
-import static com.github.blindpirate.gogradle.util.IOUtils.decodeInternally;
+
+import static com.github.blindpirate.gogradle.util.IOUtils.copyURLToFile;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
-import static com.github.blindpirate.gogradle.util.StringUtils.lastIndexOf;
+import static com.github.blindpirate.gogradle.util.IOUtils.write;
+import static com.github.blindpirate.gogradle.util.IOUtils.readLines;
+import static com.github.blindpirate.gogradle.util.IOUtils.mkdir;
+import static com.github.blindpirate.gogradle.util.IOUtils.decodeInternally;
+import static com.github.blindpirate.gogradle.util.IOUtils.countLines;
+import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.substring;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Arrays.asList;
+import static org.gradle.internal.impldep.org.apache.commons.lang.StringUtils.lastIndexOf;
 
 public class GoCoverTask extends Go {
 
@@ -61,14 +66,14 @@ public class GoCoverTask extends Go {
     }
 
     private void copyStaticResources() {
-        IOUtils.mkdir(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH);
-        List<String> files = IOUtils.readLines(
+        mkdir(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH);
+        List<String> files = readLines(
                 getClass().getClassLoader().getResourceAsStream(COVERATE_STATIC_RESOURCE));
 
         files.forEach(fileName -> {
             URL url = getClass().getClassLoader().getResource(COVERATE_STATIC_RESOURCE + "/" + fileName);
             File file = new File(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH + "/" + fileName);
-            IOUtils.copyURLToFile(url, file);
+            copyURLToFile(url, file);
         });
     }
 
@@ -82,7 +87,7 @@ public class GoCoverTask extends Go {
                             "<a href=\"index.html\" style=\"color:white;\">"
                                     + getProject().getName()
                                     + "</a><span style=\"color: white;\"> &gt; </span><select id=\"files\">");
-                    IOUtils.write(file, html);
+                    write(file, html);
                 });
     }
 
@@ -112,7 +117,7 @@ public class GoCoverTask extends Go {
         String template = IOUtils.toString(getClass().getClassLoader()
                 .getResourceAsStream("coverage/templates/index.html.template"));
         String html = render(template, context);
-        IOUtils.write(getProject().getRootDir(), COVERAGE_HTMLS_PATH + "/index.html", html);
+        write(getProject().getRootDir(), COVERAGE_HTMLS_PATH + "/index.html", html);
     }
 
     private long calculateMaxPackageLines(List<PackageCoverage> packageCoverages) {
