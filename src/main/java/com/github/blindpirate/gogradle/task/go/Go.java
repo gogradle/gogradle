@@ -45,7 +45,7 @@ public class Go extends AbstractGolangTask {
         buildManager.run(extractArgs(arg), currentEnv);
     }
 
-    private List<String> extractArgs(String arg) {
+    protected List<String> extractArgs(String arg) {
         return Arrays.asList(Commandline.translateCommandline(arg));
     }
 }
