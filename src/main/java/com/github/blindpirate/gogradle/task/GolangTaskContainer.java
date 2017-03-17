@@ -43,8 +43,8 @@ public class GolangTaskContainer {
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
     public static final String COVERAGE_TASK_NAME = "cover";
-    public static final String GOFMT_TASK_NAME = "gofmt";
-    public static final String GOVET_TASK_NAME = "govet";
+    public static final String GOFMT_TASK_NAME = "fmt";
+    public static final String GOVET_TASK_NAME = "vet";
 
 
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
