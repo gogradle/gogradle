@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.Lists;
 import org.gradle.api.Action;
 import org.gradle.api.Incubating;
@@ -196,7 +197,7 @@ public class GoTestTask extends Go {
 
                 File profilesPath = new File(getProject().getRootDir(), ".gogradle/coverage/profiles/"
                         + IOUtils.encodeInternally(importPath));
-                args.add("-coverprofile=" + profilesPath.getAbsolutePath());
+                args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
             }
 
             buildManager.go(args, null, lineConsumer, lineConsumer, collector);

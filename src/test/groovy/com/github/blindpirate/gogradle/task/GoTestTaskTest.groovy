@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.task.go.GoTestTask
 import com.github.blindpirate.gogradle.task.go.PackageTestContext
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult
 import org.gradle.api.logging.Logger
@@ -97,10 +98,10 @@ class GoTestTaskTest extends TaskTest {
         verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
-                 "-coverprofile=${resource.absolutePath}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
+                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/b',
-                 "-coverprofile=${resource.absolutePath}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb".toString()])
+                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb".toString()])
     }
 
     @Test
@@ -128,7 +129,6 @@ class GoTestTaskTest extends TaskTest {
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
         assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any { args.contains(new File(resource, it).absolutePath) }
-        assert args[5] == "-coverprofile=${resource.absolutePath}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()
     }
 
     @Test

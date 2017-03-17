@@ -26,9 +26,9 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
     @TaskAction
     public void showGopathGoroot() {
         File projectRoot = getProject().getRootDir();
-        String projectGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/project_gopath"));
-        String buildGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/build_gopath"));
-        String testGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/test_gopath"));
+        String projectGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/project_gopath").toAbsolutePath());
+        String buildGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/build_gopath").toAbsolutePath());
+        String testGopath = toUnixString(projectRoot.toPath().resolve(".gogradle/test_gopath").toAbsolutePath());
 
         String gopath = String.join(File.pathSeparator, Arrays.asList(projectGopath, buildGopath, testGopath));
 

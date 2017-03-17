@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.task.go;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.Task;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -33,7 +34,7 @@ public class GofmtTask extends Go {
     private String getGofmtPath() {
         Path goBinPath = goBinaryManager.getBinaryPath();
         Path gofmtPath = goBinPath.resolve("../gofmt").normalize();
-        return gofmtPath.toAbsolutePath().toString();
+        return StringUtils.toUnixString(gofmtPath.toAbsolutePath());
     }
 
     public void gofmt(String arg) {

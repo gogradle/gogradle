@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.TaskTest
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,7 +43,7 @@ class GofmtTaskTest extends TaskTest {
         task.actions[0].execute(task)
 
         // then
-        verify(buildManager).run([new File(resource, 'go/bin/gofmt').absolutePath, '-w', '.'], null)
+        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), '-w', '.'], null)
     }
 
     @Test
@@ -51,6 +52,6 @@ class GofmtTaskTest extends TaskTest {
         task.gofmt 'whatever'
         task.actions[0].execute(task)
         // then
-        verify(buildManager).run([new File(resource, 'go/bin/gofmt').absolutePath, 'whatever'], null)
+        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), 'whatever'], null)
     }
 }

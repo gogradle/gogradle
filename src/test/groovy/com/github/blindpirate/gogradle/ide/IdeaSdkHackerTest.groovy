@@ -124,7 +124,7 @@ class IdeaSdkHackerTest {
         writeInto('IdeaIC', '2016.3', xmlWithoutSpecificGoSdk)
         hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
 
-        String location = "url=\"file://${resource.toPath().resolve('src')}\""
+        String location = "url=\"file://${StringUtils.toUnixString(new File(resource, 'src'))}\""
 
         assert countMatches(getFileContent('IntelliJIdea', '2016.1'), location) == 2
         assert countMatches(getFileContent('IntelliJIdea', '2016.3'), location) == 2

@@ -65,8 +65,16 @@ public class StringUtils {
         return Stream.of(name).anyMatch(file.getName()::equals);
     }
 
+    public static String toUnixString(File file) {
+        return toUnixString(file.toPath());
+    }
+
     public static String toUnixString(Path path) {
         return path.toString().replace("\\", "/");
+    }
+
+    public static String toUnixString(String s) {
+        return s.replace("\\", "/");
     }
 
     public static String render(String template, Map<String, Object> context) {

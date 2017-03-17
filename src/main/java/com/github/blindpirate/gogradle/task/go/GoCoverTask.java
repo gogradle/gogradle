@@ -29,6 +29,7 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.util.IOUtils.countLines;
 import static com.github.blindpirate.gogradle.util.IOUtils.decodeInternally;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
+import static com.github.blindpirate.gogradle.util.StringUtils.*;
 import static com.github.blindpirate.gogradle.util.StringUtils.lastIndexOf;
 import static com.github.blindpirate.gogradle.util.StringUtils.substring;
 import static java.util.Arrays.asList;
@@ -110,7 +111,7 @@ public class GoCoverTask extends Go {
 
         String template = IOUtils.toString(getClass().getClassLoader()
                 .getResourceAsStream("coverage/templates/index.html.template"));
-        String html = StringUtils.render(template, context);
+        String html = render(template, context);
         IOUtils.write(getProject().getRootDir(), COVERAGE_HTMLS_PATH + "/index.html", html);
     }
 
@@ -183,8 +184,9 @@ public class GoCoverTask extends Go {
     }
 
     private void analyzeProfile(File profile) {
-        String htmlOutputFilePath = profileFileToHtmlFile(profile).getAbsolutePath();
-        buildManager.go(asList("tool", "cover", "-html=" + profile.getAbsolutePath(), "-o", htmlOutputFilePath), null);
+        String htmlOutputFilePath = toUnixString(profileFileToHtmlFile(profile));
+        String profilePath = toUnixString(profile);
+        buildManager.go(asList("tool", "cover", "-html=" + profilePath, "-o", htmlOutputFilePath), null);
     }
 
     private File profileFileToHtmlFile(File profile) {

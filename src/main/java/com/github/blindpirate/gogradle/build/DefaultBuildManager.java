@@ -34,6 +34,7 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
+import static com.github.blindpirate.gogradle.util.StringUtils.*;
 
 // ${projectRoot}
 // └── .gogradle
@@ -174,7 +175,7 @@ public class DefaultBuildManager implements BuildManager {
     private List<String> renderArgs(List<String> args, Map<String, String> env) {
         Map<String, Object> context = new HashMap<>(env);
         context.put("PROJECT_NAME", project.getName());
-        return args.stream().map(s -> StringUtils.render(s, context)).collect(Collectors.toList());
+        return args.stream().map(s -> render(s, context)).collect(Collectors.toList());
     }
 
     private void doRun(List<String> args,
@@ -216,7 +217,7 @@ public class DefaultBuildManager implements BuildManager {
 
     private Map<String, String> determineEnv(Map<String, String> env) {
         Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getTestGopath(),
-                "GOROOT", goBinaryManager.getGoroot().toAbsolutePath().toString());
+                "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()));
         if (env != null) {
             defaultEnvs.putAll(env);
         }
@@ -224,7 +225,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private String getGoBinary() {
-        return goBinaryManager.getBinaryPath().toAbsolutePath().toString();
+        return toUnixString(goBinaryManager.getBinaryPath().toAbsolutePath());
     }
 
 
@@ -237,7 +238,7 @@ public class DefaultBuildManager implements BuildManager {
                 .toAbsolutePath()
                 .toString();
 
-        return projectGopath + File.pathSeparator + buildGopath;
+        return toUnixString(projectGopath + File.pathSeparator + buildGopath);
     }
 
     public String getTestGopath() {
@@ -245,7 +246,7 @@ public class DefaultBuildManager implements BuildManager {
                 .toAbsolutePath()
                 .toString();
 
-        return getBuildGopath() + File.pathSeparator + testGopath;
+        return toUnixString(getBuildGopath() + File.pathSeparator + testGopath);
     }
 
     @Override

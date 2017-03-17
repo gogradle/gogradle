@@ -30,7 +30,7 @@ public class GoBuildTask extends Go {
     }
 
     private void addOneBuildAction(Map<String, String> env) {
-        List<String> args = Arrays.asList("build", "-o", "./gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}");
+        List<String> args = Arrays.asList("build", "-o", "./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}");
         doLast(task -> buildManager.go(args, env));
     }
 
