@@ -26,14 +26,18 @@ class StringUtilsTest {
     @Test
     void 'rendering complicated template should succeed'() {
         assert StringUtils.render(
-                '''
-<%=a %>
-<%
+                '''${a}
+${writer ->
 list.each {
-    println it.name
+    def template ='${it.name}${it.url}'
+    def result = ['${it.name}':it.name,'${it.url}':it.url].inject(template, {s,entry -> 
+        s.replace(entry.key,entry.value)
+        })
+        
+    writer << result    
 }
-%>
-''', [a: '1', list: [[name: 'name1'], [name: 'name2']]]).replaceAll('\n', '') == '1name1name2'
+}
+''', [a: '1', list: [[name: 'name1', url: 'url1'], [name: 'name2', url: 'url2']]]) == '1\nname1url1name2url2\n'
     }
 
     @Test(expected = IllegalStateException)

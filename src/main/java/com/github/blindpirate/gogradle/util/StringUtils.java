@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
 
-import groovy.text.SimpleTemplateEngine;
+import groovy.text.GStringTemplateEngine;
 
 import java.io.File;
 import java.io.IOException;
@@ -72,7 +72,7 @@ public class StringUtils {
     public static String render(String template, Map<String, Object> context) {
         try {
             context = new HashMap<>(context);
-            return new SimpleTemplateEngine().createTemplate(template).make(context).toString();
+            return new GStringTemplateEngine().createTemplate(template).make(context).toString();
         } catch (ClassNotFoundException | IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
