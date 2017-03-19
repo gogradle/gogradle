@@ -4,10 +4,13 @@ import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
+import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
+import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -185,7 +188,7 @@ public class DefaultBuildManager implements BuildManager {
                        Consumer<Integer> retcodeConsumer) {
         stdoutLineConsumer = stdoutLineConsumer == null ? LOGGER::quiet : stdoutLineConsumer;
         stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
-        retcodeConsumer = retcodeConsumer == null ? this::ensureProcessReturnZero : retcodeConsumer;
+        retcodeConsumer = retcodeConsumer == null ? code -> ensureProcessReturnZero(code, args, env) : retcodeConsumer;
 
         Process process = ProcessUtils.run(args, determineEnv(env), project.getRootDir());
 
@@ -209,15 +212,21 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    private void ensureProcessReturnZero(int retcode) {
+    private void ensureProcessReturnZero(int retcode, List<String> args, Map<String, String> env) {
         if (retcode != 0) {
-            throw BuildException.processReturnNonZero(retcode);
+            String message = "\nCommand:\n "
+                    + String.join(" ", args)
+                    + "\nEnv:\n"
+                    + StringUtils.formatEnv(env);
+            throw BuildException.processReturnNonZero(retcode, message);
         }
     }
 
     private Map<String, String> determineEnv(Map<String, String> env) {
         Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getTestGopath(),
-                "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()));
+                "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()),
+                "GOOS", Os.getHostOs().toString(),
+                "GOARCH", Arch.getHostArch().toString());
         if (env != null) {
             defaultEnvs.putAll(env);
         }
