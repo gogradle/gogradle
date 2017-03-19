@@ -1,15 +1,13 @@
 package com.github.blindpirate.gogradle.task.go;
 
-import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import org.gradle.api.Task;
-
-import javax.inject.Inject;
-import java.util.Arrays;
 
 public class GoVetTask extends Go {
-    @Inject
-    private GolangPluginSetting setting;
+    private boolean continueWhenFail;
+
+    public void setContinueWhenFail(boolean continueWhenFail) {
+        this.continueWhenFail = continueWhenFail;
+    }
 
     public GoVetTask() {
         dependsOn(GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
@@ -17,10 +15,12 @@ public class GoVetTask extends Go {
     }
 
     protected void doAddDefaultAction() {
-        doLast(this::execute);
-    }
-
-    private void execute(Task task) {
-        buildManager.go(Arrays.asList("tool", "vet", setting.getPackagePath()), null);
+        doLast(task -> {
+            if (continueWhenFail) {
+                setRetcodeConsumer(code -> {
+                });
+            }
+            go("vet ./...");
+        });
     }
 }
