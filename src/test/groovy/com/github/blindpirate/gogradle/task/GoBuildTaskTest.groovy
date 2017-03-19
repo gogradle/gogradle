@@ -33,10 +33,10 @@ class GoBuildTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         task.actions.each { it.execute(task) }
         // then
-        assert task.actions.size() == 3
-        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
-        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'])
-        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'])
+        assert task.actions.size() == 1
+        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
+        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
+        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'], null, null, null)
     }
 
     @Test
@@ -82,10 +82,10 @@ class GoBuildTaskTest extends TaskTest {
         // then
         assert task.actions.size() == 3
         assert task.actions.any { it instanceof GoExecutionAction }
-        assert task.currentEnv == null
-        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
-        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'])
-        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'])
+        assert task.env == null
+        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
+        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
+        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'], null, null, null)
     }
 
     @Test
