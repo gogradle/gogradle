@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
@@ -42,7 +41,7 @@ public class DefaultDependencyVisitor implements DependencyVisitor {
     @DebugLog
     public GolangDependencySet visitExternalDependencies(ResolvedDependency dependency,
                                                          File rootDir,
-                                                         Configuration configuration) {
+                                                         String configuration) {
         for (ExternalDependencyFactory factory : externalDependencyFactories) {
             Optional<GolangDependencySet> result = factory.produce(rootDir, configuration);
             if (result.isPresent()) {
@@ -63,7 +62,7 @@ public class DefaultDependencyVisitor implements DependencyVisitor {
     @DebugLog
     public GolangDependencySet visitSourceCodeDependencies(ResolvedDependency dependency,
                                                            File rootDir,
-                                                           Configuration configuration) {
+                                                           String configuration) {
         return sourceCodeDependencyFactory.produce(dependency, rootDir, configuration);
     }
 

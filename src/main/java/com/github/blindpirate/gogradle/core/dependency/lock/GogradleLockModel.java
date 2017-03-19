@@ -7,8 +7,8 @@ import com.google.common.collect.ImmutableMap;
 import java.util.List;
 import java.util.Map;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 public class GogradleLockModel {
     @JsonProperty("apiVersion")
@@ -20,8 +20,8 @@ public class GogradleLockModel {
                                        List<Map<String, Object>> testNotations) {
         GogradleLockModel ret = new GogradleLockModel();
         ret.apiVersion = GogradleGlobal.GOGRADLE_VERSION;
-        ret.dependencies = ImmutableMap.of(BUILD.getName(), buildNotations,
-                TEST.getName(), testNotations);
+        ret.dependencies = ImmutableMap.of(BUILD, buildNotations,
+                TEST, testNotations);
         return ret;
     }
 

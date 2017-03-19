@@ -9,8 +9,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
-import static com.github.blindpirate.gogradle.build.Configuration.TEST
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
@@ -48,7 +46,7 @@ class InstallDependenciesTaskTest extends TaskTest {
         // when
         installBuildDependenciesTask.installDependencies()
         // then
-        verify(buildManager).installDependency(resolvedDependency, BUILD)
+        verify(buildManager).installDependency(resolvedDependency, 'build')
     }
 
     @Test
@@ -58,7 +56,7 @@ class InstallDependenciesTaskTest extends TaskTest {
         // when
         installTestDependenciesTask.installDependencies()
         // then
-        verify(buildManager).installDependency(resolvedDependency, TEST)
+        verify(buildManager).installDependency(resolvedDependency, 'test')
     }
 
 

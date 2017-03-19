@@ -13,7 +13,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
@@ -56,7 +55,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
     void lockedDependencies(GolangDependency... dependencies) {
         GolangDependencySet result = asGolangDependencySet(dependencies)
-        when(lockedDependencyManager.getLockedDependencies(BUILD)).thenReturn(result)
+        when(lockedDependencyManager.getLockedDependencies('build')).thenReturn(result)
     }
 
     @Test
@@ -68,7 +67,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies(b2)
 
         // when
-        def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
+        def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
         assert resultDependencies.any { it.is(a1) }
@@ -87,7 +86,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
         assert result.any { it.is(a2) }
@@ -105,7 +104,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
         assert result.any { it.is(a2) }
@@ -123,10 +122,10 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
+        strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
-        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)
+        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
     @Test
@@ -141,7 +140,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         vendorDependencies()
 
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor, BUILD)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
         assert result.any { it.is(a1) }

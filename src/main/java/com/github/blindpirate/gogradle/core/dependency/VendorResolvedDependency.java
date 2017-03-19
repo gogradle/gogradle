@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -15,6 +14,7 @@ import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.HOST_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VENDOR_PATH_KEY;
@@ -39,7 +39,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
         VendorOnlyProduceStrategy strategy = GogradleGlobal.getInstance(VendorOnlyProduceStrategy.class);
-        GolangDependencySet dependencies = strategy.produce(ret, rootDir, visitor, Configuration.BUILD);
+        GolangDependencySet dependencies = strategy.produce(ret, rootDir, visitor, BUILD);
         ret.setDependencies(dependencies);
         return ret;
     }

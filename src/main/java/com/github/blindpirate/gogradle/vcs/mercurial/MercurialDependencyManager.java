@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.mercurial;
 
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
-import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -27,7 +26,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 
 @Singleton
 public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgRepository, HgChangeset> {
@@ -42,9 +41,8 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
     public MercurialDependencyManager(HgClientMercurialAccessor hgClientAccessor,
                                       Hg4JMercurialAccessor hg4JAccessor,
                                       DependencyVisitor visitor,
-                                      GlobalCacheManager cacheManager,
-                                      DependencyRegistry dependencyRegistry) {
-        super(cacheManager, dependencyRegistry);
+                                      GlobalCacheManager cacheManager) {
+        super(cacheManager);
         this.visitor = visitor;
         this.accessor = determineAccessor(hg4JAccessor, hgClientAccessor);
     }

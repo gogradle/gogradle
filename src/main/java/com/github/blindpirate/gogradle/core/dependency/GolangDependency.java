@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import org.gradle.api.artifacts.Dependency;
 
 /**
@@ -25,7 +26,7 @@ public interface GolangDependency extends Dependency {
     @Override
     String getVersion();
 
-    ResolvedDependency resolve();
+    ResolvedDependency resolve(GolangConfiguration configuration);
 
     boolean isFirstLevel();
 

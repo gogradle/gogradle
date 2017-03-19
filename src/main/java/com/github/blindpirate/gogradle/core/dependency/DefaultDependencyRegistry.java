@@ -1,12 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-@Singleton
 public class DefaultDependencyRegistry implements DependencyRegistry {
 
     private Map<String, ResolvedDependency> packages = new HashMap<>();

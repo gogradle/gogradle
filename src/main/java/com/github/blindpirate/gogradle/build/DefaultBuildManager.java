@@ -30,8 +30,8 @@ import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
@@ -100,8 +100,8 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    private Path getGopathDir(Configuration configuration) {
-        String gopathDirName = String.format(GOPATH, configuration.getName());
+    private Path getGopathDir(String configuration) {
+        String gopathDirName = String.format(GOPATH, configuration);
         return getGogradleBuildDir().resolve(gopathDirName);
     }
 
@@ -259,7 +259,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
-    public void installDependency(ResolvedDependency dependency, Configuration configuration) {
+    public void installDependency(ResolvedDependency dependency, String configuration) {
         File targetDir = getGopathDir(configuration)
                 .resolve(SRC)
                 .resolve(dependency.getName())

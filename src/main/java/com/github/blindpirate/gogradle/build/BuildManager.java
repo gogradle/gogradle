@@ -12,7 +12,7 @@ public interface BuildManager {
 
     void prepareSymbolicLinks();
 
-    void installDependency(ResolvedDependency dependency, Configuration configuration);
+    void installDependency(ResolvedDependency dependency, String configuration);
 
     void installDependencyToVendor(ResolvedDependency dependency);
 

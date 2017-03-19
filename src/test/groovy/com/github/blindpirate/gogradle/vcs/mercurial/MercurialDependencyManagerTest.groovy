@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.mercurial
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
@@ -12,7 +10,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.Dependen
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
 import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -23,7 +20,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import java.nio.file.Paths
 import java.util.concurrent.Callable
@@ -34,9 +30,6 @@ import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -50,8 +43,6 @@ class MercurialDependencyManagerTest {
     DependencyVisitor visitor
     @Mock
     GlobalCacheManager cacheManager
-    @Mock
-    DependencyRegistry dependencyRegistry
     @Mock
     HgChangeset hgChangeset
     @Mock
@@ -86,7 +77,7 @@ class MercurialDependencyManagerTest {
         when(delegate.getResult(any(Process))).thenReturn(hgVersionResult)
         when(hgVersionResult.getStdout()).thenReturn('Mercurial Distributed SCM (version 4.1)')
 
-        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, dependencyRegistry)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
@@ -101,7 +92,7 @@ class MercurialDependencyManagerTest {
         when(notationDependency.getCommit()).thenReturn('nodeId')
         when(notationDependency.getStrategy()).thenReturn(strategy)
 
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),any(Configuration))).thenReturn(dependencySet)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),anyString())).thenReturn(dependencySet)
 
         when(dependencySet.flatten()).thenReturn([])
 
@@ -114,7 +105,7 @@ class MercurialDependencyManagerTest {
         // given
         when(hgVersionResult.getStdout()).thenReturn('This is not hg client')
         // when
-        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, dependencyRegistry)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager)
         // then
         assert ReflectionUtils.getField(manager, 'accessor').is(hg4JAccessor)
     }

@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
@@ -43,7 +42,7 @@ public class SourceCodeDependencyFactory {
 
     public GolangDependencySet produce(ResolvedDependency resolvedDependency,
                                        File rootDir,
-                                       Configuration configuration) {
+                                       String configuration) {
         return createDependencies(resolvedDependency, goImportExtractor.getImportPaths(rootDir, configuration));
     }
 

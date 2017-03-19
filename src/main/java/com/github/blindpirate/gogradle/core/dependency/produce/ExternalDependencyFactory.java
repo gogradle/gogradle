@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -14,11 +13,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 public abstract class ExternalDependencyFactory {
-    private Map<Configuration, Function<File, List>> adapters =
+    private Map<String, Function<File, List>> adapters =
             ImmutableMap.of(BUILD, this::adapt, TEST, this::adaptTest);
 
     protected final MapNotationParser mapNotationParser;
@@ -36,7 +35,7 @@ public abstract class ExternalDependencyFactory {
     protected abstract String identityFileName();
 
     @SuppressWarnings("unchecked")
-    public Optional<GolangDependencySet> produce(File rootDir, Configuration configuration) {
+    public Optional<GolangDependencySet> produce(File rootDir, String configuration) {
         File identityFile = identityFile(rootDir);
         if (identityFile.exists()) {
             Function<File, List> adapter = adapters.get(configuration);

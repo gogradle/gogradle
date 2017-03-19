@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -16,7 +15,7 @@ public class VendorOnlyProduceStrategy implements DependencyProduceStrategy {
     public GolangDependencySet produce(ResolvedDependency dependency,
                                        File rootDir,
                                        DependencyVisitor visitor,
-                                       Configuration configuration) {
+                                       String configuration) {
         return visitor.visitVendorDependencies(dependency, rootDir);
     }
 }

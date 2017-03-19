@@ -191,7 +191,7 @@ class DefaultBuildManagerTest {
         // given
         when(resolvedDependency.getName()).thenReturn('root/package')
         // when
-        manager.installDependency(resolvedDependency, Configuration.BUILD)
+        manager.installDependency(resolvedDependency, 'build')
         // then
         File targetDir = new File(resource, '.gogradle/build_gopath/src/root/package')
         assert targetDir.exists()
@@ -216,7 +216,7 @@ class DefaultBuildManagerTest {
         when(resolvedDependency.getName()).thenReturn('root/package')
         IOUtils.write(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go', '')
         // when
-        manager.installDependency(resolvedDependency, Configuration.BUILD)
+        manager.installDependency(resolvedDependency, 'build')
         // then
         assert !new File(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go').exists()
     }

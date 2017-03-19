@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -10,13 +9,12 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOn
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.util.StringUtils.*
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
@@ -43,7 +41,7 @@ class VendorResolvedDependencyTest {
         when(hostDependency.formatVersion()).thenReturn('version')
         when(GogradleGlobal.INSTANCE.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
         when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
-        when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),any(Configuration))).thenReturn(GolangDependencySet.empty())
+        when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
         when(GogradleGlobal.INSTANCE.getInstance(DependencyInstaller)).thenReturn(hostDependencyInstaller)
         when(hostDependency.getInstallerClass()).thenReturn(DependencyInstaller)
 

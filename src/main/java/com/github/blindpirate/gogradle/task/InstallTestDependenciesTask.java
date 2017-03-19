@@ -1,13 +1,13 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 
 public class InstallTestDependenciesTask extends AbstractGolangTask {
@@ -23,7 +23,7 @@ public class InstallTestDependenciesTask extends AbstractGolangTask {
         DependencyTreeNode rootNode = getTask(ResolveTestDependenciesTask.class).getDependencyTree();
         rootNode.flatten()
                 .stream()
-                .map(GolangDependency::resolve)
+                .map(dependency -> (ResolvedDependency) dependency)
                 .forEach((dependency) -> buildManager.installDependency(dependency, TEST));
     }
 }

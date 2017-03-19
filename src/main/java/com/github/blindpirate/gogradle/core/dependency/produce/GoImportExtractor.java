@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoBaseListener;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoLexer;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser;
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -29,14 +28,16 @@ import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildO
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTagContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTermContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.ImportPathContext;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 @Singleton
 public class GoImportExtractor {
     private final BuildConstraintManager buildConstraintManager;
 
-    private static final Map<Configuration, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
-            Configuration.BUILD, GoSourceCodeFilter.BUILD_GO_FILTER,
-            Configuration.TEST, GoSourceCodeFilter.TEST_GO_FILTER
+    private static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
+            BUILD, GoSourceCodeFilter.BUILD_GO_FILTER,
+            TEST, GoSourceCodeFilter.TEST_GO_FILTER
     );
 
     @Inject
@@ -44,7 +45,7 @@ public class GoImportExtractor {
         this.buildConstraintManager = buildConstraintManager;
     }
 
-    public Set<String> getImportPaths(File dir, Configuration configuration) {
+    public Set<String> getImportPaths(File dir, String configuration) {
         Collection<File> files = IOUtils.filterFilesRecursively(dir, FILTERS.get(configuration));
 
         return files.stream().map(IOUtils::toString)

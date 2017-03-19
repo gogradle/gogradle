@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
@@ -42,10 +43,10 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     }
 
     @Override
-    public ResolvedDependency resolve() {
+    public ResolvedDependency resolve(GolangConfiguration configuration) {
         if (resolvedDependency == null) {
             DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
-            resolvedDependency = resolver.resolve(this);
+            resolvedDependency = resolver.resolve(configuration, this);
         }
         return resolvedDependency;
     }

@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
@@ -18,8 +17,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.util.DataExchange.parseYaml;
 
 @Singleton
@@ -38,13 +37,13 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     private static final String LOCK_FILE = "gogradle.lock";
 
     @Override
-    public GolangDependencySet getLockedDependencies(Configuration configuration) {
+    public GolangDependencySet getLockedDependencies(String configuration) {
         File lockFile = new File(project.getRootDir(), LOCK_FILE);
         if (!lockFile.exists()) {
             return GolangDependencySet.empty();
         }
         GogradleLockModel model = parseYaml(lockFile, GogradleLockModel.class);
-        List<Map<String, Object>> notations = model.getDependencies(configuration.getName());
+        List<Map<String, Object>> notations = model.getDependencies(configuration);
         return DependencySetUtils.parseMany(notations, mapNotationParser);
     }
 
@@ -78,12 +77,12 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     @SuppressWarnings("unchecked")
     protected List<Map<String, Object>> adapt(File file) {
         GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
-        return model.getDependencies(BUILD.getName());
+        return model.getDependencies(BUILD);
     }
 
     @Override
     protected List<Map<String, Object>> adaptTest(File file) {
         GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
-        return model.getDependencies(TEST.getName());
+        return model.getDependencies(TEST);
     }
 }

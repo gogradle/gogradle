@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.build.Configuration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -18,7 +17,7 @@ class VendorOnlyProduceStrategyTest extends DependencyProduceStrategyTest {
         sourceCodeDependencies(c1)
 
         // when
-        GolangDependencySet result = strategy.produce(resolvedDependency, rootDir, visitor, Configuration.BUILD)
+        GolangDependencySet result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
         assert result.size() == 1

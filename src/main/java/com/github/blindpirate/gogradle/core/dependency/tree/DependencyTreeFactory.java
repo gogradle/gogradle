@@ -1,10 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.tree;
 
-import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,19 +14,16 @@ import java.util.Set;
  */
 @Singleton
 public class DependencyTreeFactory {
-    @Inject
-    private DependencyRegistry registry;
-
-    public DependencyTreeNode getTree(ResolvedDependency rootProject) {
-
-        resolve(rootProject);
-
-        return getSubTree(rootProject, new HashSet<>());
+    public DependencyTreeNode getTree(GolangConfiguration configuration, ResolvedDependency rootProject) {
+        resolve(configuration, rootProject);
+        return getSubTree(configuration, rootProject, new HashSet<>());
     }
 
-    private DependencyTreeNode getSubTree(ResolvedDependency resolvedDependency,
+    private DependencyTreeNode getSubTree(GolangConfiguration configuration,
+                                          ResolvedDependency resolvedDependency,
                                           Set<ResolvedDependency> existedDependenciesInTree) {
-        ResolvedDependency finalDependency = registry.retrieve(resolvedDependency.getName());
+        ResolvedDependency finalDependency = configuration.getDependencyRegistry()
+                .retrieve(resolvedDependency.getName());
 
         boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 
@@ -38,20 +34,20 @@ public class DependencyTreeFactory {
         if (!hasExistedInTree) {
             existedDependenciesInTree.add(finalDependency);
             for (GolangDependency dependency : finalDependency.getDependencies()) {
-                node.addChild(getSubTree(dependency.resolve(), existedDependenciesInTree));
+                node.addChild(getSubTree(configuration, dependency.resolve(configuration), existedDependenciesInTree));
             }
         }
         return node;
     }
 
-    private void resolve(ResolvedDependency resolvedDependency) {
-        if (!registry.register(resolvedDependency)) {
+    private void resolve(GolangConfiguration configuration, ResolvedDependency resolvedDependency) {
+        if (!configuration.getDependencyRegistry().register(resolvedDependency)) {
             // current dependency is older
             return;
         }
         for (GolangDependency unresolvedChild : resolvedDependency.getDependencies()) {
-            ResolvedDependency resolvedChild = unresolvedChild.resolve();
-            resolve(resolvedChild);
+            ResolvedDependency resolvedChild = unresolvedChild.resolve(configuration);
+            resolve(configuration, resolvedChild);
         }
     }
 }

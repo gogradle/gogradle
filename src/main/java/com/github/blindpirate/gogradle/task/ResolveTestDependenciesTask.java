@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.build.Configuration;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 public class ResolveTestDependenciesTask extends ResolveTask {
     @Override
-    protected Configuration getConfiguration() {
-        return Configuration.TEST;
+    protected String getConfigurationName() {
+        return TEST;
     }
 }

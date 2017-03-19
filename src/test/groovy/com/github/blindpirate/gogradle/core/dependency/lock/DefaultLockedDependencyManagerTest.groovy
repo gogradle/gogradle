@@ -17,8 +17,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
-import static com.github.blindpirate.gogradle.build.Configuration.TEST
 import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfaces
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.when
@@ -75,8 +73,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.getLockedDependencies(BUILD)
-        GolangDependencySet testResult = manager.getLockedDependencies(TEST)
+        GolangDependencySet buildResult = manager.getLockedDependencies('build')
+        GolangDependencySet testResult = manager.getLockedDependencies('test')
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }
@@ -90,8 +88,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.produce(project.rootDir, BUILD).get()
-        GolangDependencySet testResult = manager.produce(project.rootDir, TEST).get()
+        GolangDependencySet buildResult = manager.produce(project.rootDir, 'build').get()
+        GolangDependencySet testResult = manager.produce(project.rootDir, 'test').get()
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }

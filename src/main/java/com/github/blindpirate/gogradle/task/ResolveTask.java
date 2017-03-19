@@ -1,7 +1,8 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.build.Configuration;
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
+import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy;
@@ -29,6 +30,9 @@ public abstract class ResolveTask extends DefaultTask {
     @Inject
     private GogradleRootProduceStrategy strategy;
 
+    @Inject
+    private GolangConfigurationManager configurationManager;
+
     private DependencyTreeNode tree;
 
     public ResolveTask() {
@@ -41,14 +45,15 @@ public abstract class ResolveTask extends DefaultTask {
         LocalDirectoryDependency rootProject = LocalDirectoryDependency.fromLocal(
                 setting.getPackagePath(),
                 rootDir);
-        Configuration configuration = getConfiguration();
+        GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
 
-        GolangDependencySet dependencies = strategy.produce(rootProject, rootDir, visitor, configuration);
+        GolangDependencySet dependencies = strategy.produce(rootProject, rootDir, visitor, getConfigurationName());
         rootProject.setDependencies(dependencies);
-        tree = dependencyTreeFactory.getTree(rootProject);
+        tree = dependencyTreeFactory.getTree(configuration, rootProject);
     }
 
-    protected abstract Configuration getConfiguration();
+
+    protected abstract String getConfigurationName();
 
     public DependencyTreeNode getDependencyTree() {
         return tree;

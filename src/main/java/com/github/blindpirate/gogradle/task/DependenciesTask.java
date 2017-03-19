@@ -1,13 +1,12 @@
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
 
@@ -30,8 +29,8 @@ public class DependenciesTask extends AbstractGolangTask {
         display(TEST, testTree);
     }
 
-    private void display(Configuration configuration, DependencyTreeNode tree) {
-        LOGGER.quiet(configuration.getName() + ":");
+    private void display(String configuration, DependencyTreeNode tree) {
+        LOGGER.quiet(configuration + ":");
         LOGGER.quiet(tree.output());
     }
 }
