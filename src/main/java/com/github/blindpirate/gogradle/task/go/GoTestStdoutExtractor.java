@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult;
 import org.gradle.api.logging.Logger;
@@ -14,10 +13,14 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
+import java.util.OptionalInt;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static java.lang.Double.parseDouble;
@@ -35,8 +38,11 @@ public class GoTestStdoutExtractor {
 
     //=== RUN   TestDiffToHTML
     //--- PASS: TestDiffToHTML (0.00s)
-    private static final Pattern TEST_RESULT_PATTERN =
-            Pattern.compile("=== RUN\\s+(\\w+)\\n((?:.|\\n)*?)--- (PASS|FAIL):\\s+\\w+\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
+    private static final Pattern TEST_END_LINE_PATTERN
+            = Pattern.compile("--- (PASS|FAIL):\\s+(\\w+)\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
+    private static final String TEST_START = "=== RUN";
+    private static final String TEST_PASS = "--- PASS";
+    private static final String TEST_FAIL = "--- FAIL";
 
     private static final String SETUP_FAILED_ERROR = "[setup failed]";
     private static final String BUILD_FAILED_ERROR = "[build failed]";
@@ -60,7 +66,7 @@ public class GoTestStdoutExtractor {
     }
 
     private List<TestClassResult> successfulTestResults(PackageTestContext context) {
-        String stdout = removeTailMessages(context.getStdout());
+        List<String> stdout = removeTailMessages(context.getStdout());
 
         Map<File, String> testFileContents = loadTestFiles(context.getTestFiles());
         List<GoTestMethodResult> results = extractTestMethodResult(stdout);
@@ -75,7 +81,7 @@ public class GoTestStdoutExtractor {
                 .collect(toList());
     }
 
-    private String removeTailMessages(List<String> stdout) {
+    private List<String> removeTailMessages(List<String> stdout) {
         /*
             FAIL
             coverage: 66.7% of statements
@@ -97,10 +103,10 @@ public class GoTestStdoutExtractor {
         for (int i = 1; i <= 4 && i <= stdout.size(); ++i) {
             String line = stdout.get(stdout.size() - i).trim();
             if ("FAIL".equals(line) || "PASS".equals(line)) {
-                return String.join("\n", stdout.subList(0, stdout.size() - i));
+                return stdout.subList(0, stdout.size() - i);
             }
         }
-        return String.join("\n", stdout);
+        return stdout;
     }
 
     private List<TestClassResult> failResult(PackageTestContext context, String reason) {
@@ -119,44 +125,58 @@ public class GoTestStdoutExtractor {
         return asList(methodResultsToClassResult(className, asList(result)));
     }
 
-    private List<GoTestMethodResult> extractTestMethodResult(String stdout) {
-        Matcher matcher = TEST_RESULT_PATTERN.matcher(stdout);
+    private List<GoTestMethodResult> extractTestMethodResult(List<String> stdout) {
+        List<Integer> testStartLines = IntStream.range(0, stdout.size())
+                .filter(line -> stdout.get(line).startsWith(TEST_START))
+                .boxed()
+                .collect(Collectors.toList());
+
         List<GoTestMethodResult> ret = new ArrayList<>();
-        List<Pair<Integer, Integer>> startAndEnds = new ArrayList<>();
-        while (matcher.find()) {
-            long id = GLOBAL_COUNTER.incrementAndGet();
-            String methodName = matcher.group(1);
-            String message = matcher.group(2);
-            TestResult.ResultType resultType = RESULT_TYPE_MAP.get(matcher.group(3));
-            long duration = toMilliseconds(parseDouble(matcher.group(4)));
 
-            GoTestMethodResult result = new GoTestMethodResult(id,
-                    methodName,
-                    resultType,
-                    duration,
-                    0L,
-                    message);
-            if (TestResult.ResultType.FAILURE == resultType) {
-                result.addFailure(message, message, message);
-            }
-            ret.add(result);
+        for (int i = 0; i < testStartLines.size(); ++i) {
+            int testResultStart = testStartLines.get(i);
+            int nextTestResultStart = i == testStartLines.size() - 1 ? stdout.size() : testStartLines.get(i + 1);
+            List<String> middleLines = stdout.subList(testResultStart, nextTestResultStart);
 
-            startAndEnds.add(Pair.of(matcher.start(), matcher.end()));
-        }
-
-        for (int i = 0; i < ret.size(); ++i) {
-            int thisMatchEndIndex = startAndEnds.get(i).getRight();
-            int nextMatchStartIndex = i == ret.size() - 1 ? stdout.length() : startAndEnds.get(i + 1).getLeft();
-
-            String middle = thisMatchEndIndex >= nextMatchStartIndex
-                    ? ""
-                    : stdout.substring(thisMatchEndIndex + 1, nextMatchStartIndex).trim();
-
-            GoTestMethodResult methodResult = ret.get(i);
-            methodResult.setMessage(methodResult.getMessage() + middle);
+            Optional<GoTestMethodResult> oneResult = extractOneTestMethod(middleLines);
+            oneResult.ifPresent(ret::add);
         }
 
         return ret;
+    }
+
+    private Optional<GoTestMethodResult> extractOneTestMethod(List<String> middleLines) {
+        OptionalInt testResultLineIndex = IntStream.range(0, middleLines.size())
+                .filter(index -> middleLines.get(index).startsWith(TEST_FAIL)
+                        || middleLines.get(index).startsWith(TEST_PASS))
+                .findAny();
+        if (testResultLineIndex.isPresent()) {
+            String line = middleLines.get(testResultLineIndex.getAsInt());
+            Matcher matcher = TEST_END_LINE_PATTERN.matcher(line);
+            if (matcher.find()) {
+                long id = GLOBAL_COUNTER.incrementAndGet();
+                TestResult.ResultType resultType = RESULT_TYPE_MAP.get(matcher.group(1));
+                String methodName = matcher.group(2);
+                long duration = toMilliseconds(parseDouble(matcher.group(3)));
+
+                String message = IntStream.range(1, middleLines.size())
+                        .filter(i -> i != testResultLineIndex.getAsInt())
+                        .mapToObj(middleLines::get)
+                        .collect(Collectors.joining("\n"));
+
+                GoTestMethodResult result = new GoTestMethodResult(id,
+                        methodName,
+                        resultType,
+                        duration,
+                        0L,
+                        message);
+                if (TestResult.ResultType.FAILURE == resultType) {
+                    result.addFailure(message, message, message);
+                }
+                return Optional.of(result);
+            }
+        }
+        return Optional.empty();
     }
 
     private Map<File, String> loadTestFiles(List<File> testFiles) {

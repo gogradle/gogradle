@@ -260,4 +260,72 @@ can't load package: package github.com/my/project/b: found packages broken (b1.g
         assert results[0].results[0].message.contains('found packages broken')
         assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
     }
+
+    @Test
+    void 'extracting stdout which can cause stack overflow should succeed'() {
+        // given
+        String stdout = '''\
+=== RUN   TestMarkdown
+
+  Rendering an issue mention 
+    To the internal issue tracker 
+      It should not render anything when there are no mentions \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render freestanding mentions \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should not render issue mention without leading space \u001B[32m✔\u001B[0m
+      It should not render issue mention without trailing space \u001B[32m✔\u001B[0m
+      It should render issue mention in parentheses \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render multiple issue mentions in the same line \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+    To an external issue tracker with numeric style 
+      should not render anything when there are no mentions \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render freestanding issue mentions \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should not render issue mention without leading space \u001B[32m✔\u001B[0m
+      It should not render issue mention without trailing space \u001B[32m✔\u001B[0m
+      It should render issue mention in parentheses \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render multiple issue mentions in the same line \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+    To an external issue tracker with alphanumeric style 
+      It should not render anything when there are no mentions \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render freestanding issue mention \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render issue mention in parentheses \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+      It should render multiple issue mentions in the same line \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+
+\u001B[31m\u001B[0m\u001B[33m\u001B[0m\u001B[32m
+81 total assertions\u001B[0m
+
+
+  Rendering an issue URL 
+    To the internal issue tracker 
+      It should render valid issue URLs \u001B[32m✔\u001B[0m
+      It should render but not change non-issue URLs \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+
+\u001B[31m\u001B[0m\u001B[33m\u001B[0m\u001B[32m
+88 total assertions\u001B[0m
+
+
+  Rendering a commit URL 
+    To the internal issue tracker 
+      It should correctly convert URLs \u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m\u001B[32m✔\u001B[0m
+
+\u001B[31m\u001B[0m\u001B[33m\u001B[0m\u001B[32m
+92 total assertions\u001B[0m
+
+--- PASS: TestMarkdown (0.00s)
+'''
+        IOUtils.write(resource, 'gogs_test.go', 'func TestMarkdown()')
+
+        // when
+        PackageTestContext context = PackageTestContext.builder()
+                .withPackagePath('gogs')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+        // then
+        assert results.size() == 1
+        assert results[0].className == "gogs.gogs_test_DOT_go"
+        assert results[0].results.size() == 1
+        assert results[0].results[0].name == "TestMarkdown"
+        assert results[0].results[0].message.contains('Rendering a commit URL')
+        assert results[0].results[0].resultType == TestResult.ResultType.SUCCESS
+
+    }
 }
