@@ -27,7 +27,7 @@ public class DependencyTreeFactory {
 
     private DependencyTreeNode getSubTree(ResolvedDependency resolvedDependency,
                                           Set<ResolvedDependency> existedDependenciesInTree) {
-        ResolvedDependency finalDependency = registry.retrive(resolvedDependency.getName());
+        ResolvedDependency finalDependency = registry.retrieve(resolvedDependency.getName());
 
         boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 

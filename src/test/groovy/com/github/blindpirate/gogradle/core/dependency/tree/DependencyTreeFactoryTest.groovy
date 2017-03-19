@@ -56,7 +56,7 @@ class DependencyTreeFactoryTest {
 
     void bind(ResolvedDependency dependency, String name) {
         when(dependency.getName()).thenReturn(name)
-        when(registry.retrive(name)).thenReturn(dependency)
+        when(registry.retrieve(name)).thenReturn(dependency)
     }
 
     void bindDependencies(ResolvedDependency dependency, ResolvedDependency... dependencies) {

@@ -40,7 +40,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
     }
 
     @Override
-    public ResolvedDependency retrive(String name) {
+    public ResolvedDependency retrieve(String name) {
         return packages.get(name);
     }
 

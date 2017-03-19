@@ -50,6 +50,18 @@ class GitMercurialMapNotationParserTest {
     }
 
     @Test
+    void 'mercurial map notation should be parsed correctly'() {
+        // when
+        GitMercurialNotationDependency dependency = parser.parse([name: 'bitbucket.org/a/b', version: 'v1.0.0', vcs: 'hg'])
+        // then
+        assert dependency instanceof GitMercurialNotationDependency
+        assert dependency.name == 'bitbucket.org/a/b'
+        assert !dependency.tag
+        assert !dependency.urls
+        assert dependency.commit == 'v1.0.0'
+    }
+
+    @Test
     void 'url in map notation should not be overwritten'() {
         // when
         GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: packageInfo])

@@ -101,7 +101,7 @@ class DefaultDependencyRegistryTest {
         // when
         registry.register(resolvedDependency1)
         // then
-        assert registry.retrive('resolvedDependency').is(resolvedDependency1)
+        assert registry.retrieve('resolvedDependency').is(resolvedDependency1)
     }
 
 }
