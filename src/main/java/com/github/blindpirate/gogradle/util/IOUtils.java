@@ -197,6 +197,10 @@ public final class IOUtils {
         return FileUtils.listFiles(dir, filter, filter);
     }
 
+    public static Collection<File> filterFilesRecursively(File dir, IOFileFilter fileFilter, IOFileFilter dirFilter) {
+        return FileUtils.listFiles(dir, fileFilter, dirFilter);
+    }
+
     public static void clearDirectory(File dir) {
         try {
             FileUtils.cleanDirectory(dir);
