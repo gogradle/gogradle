@@ -20,7 +20,7 @@ class StringReverse extends IntegrationTestSupport {
     @Before
     void setUp() {
         IOUtils.write(resource, 'hello.go', helloDotGo)
-        writeBuildAndSettingsDotGradle(resource, buildDotGradle)
+        writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
     @Test
