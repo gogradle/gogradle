@@ -10,7 +10,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.Task;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,12 +25,12 @@ public class GoBuildTask extends Go {
 
     @Override
     protected void doAddDefaultAction() {
-        getEnvs().forEach(this::addOneBuildAction);
+        doLast(task -> getEnvs().forEach(this::buildWithEnv));
     }
 
-    private void addOneBuildAction(Map<String, String> env) {
-        List<String> args = Arrays.asList("build", "-o", "./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}");
-        doLast(task -> buildManager.go(args, env));
+    private void buildWithEnv(Map<String, String> env) {
+        setEnv(env);
+        go("build -o ./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}");
     }
 
 
