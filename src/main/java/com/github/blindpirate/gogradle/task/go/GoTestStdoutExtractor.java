@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
+import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult;
 import org.gradle.api.logging.Logger;
@@ -39,43 +39,90 @@ public class GoTestStdoutExtractor {
             Pattern.compile("=== RUN\\s+(\\w+)\\n((?:.|\\n)*?)--- (PASS|FAIL):\\s+\\w+\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
 
     private static final String SETUP_FAILED_ERROR = "[setup failed]";
+    private static final String BUILD_FAILED_ERROR = "[build failed]";
+    private static final String CANNOT_LOAD_PACKAGE_ERROR = "can't load package";
     private static final AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
 
     public List<TestClassResult> extractTestResult(PackageTestContext context) {
-        if (context.getStdout().contains(SETUP_FAILED_ERROR)) {
-            return setupFailedResult(context);
+        if (stdoutContains(context, SETUP_FAILED_ERROR)) {
+            return failResult(context, SETUP_FAILED_ERROR);
+        } else if (stdoutContains(context, BUILD_FAILED_ERROR)) {
+            return failResult(context, BUILD_FAILED_ERROR);
+        } else if (stdoutContains(context, CANNOT_LOAD_PACKAGE_ERROR)) {
+            return failResult(context, CANNOT_LOAD_PACKAGE_ERROR);
         } else {
             return successfulTestResults(context);
         }
     }
 
-    private List<TestClassResult> successfulTestResults(PackageTestContext context) {
-        Map<File, String> testFileContents = loadTestFiles(context.getTestFiles());
-        List<TestMethodResult> results = extractTestMethodResult(context.getStdout());
+    private boolean stdoutContains(PackageTestContext context, String error) {
+        return context.getStdout().stream().anyMatch(s -> s.contains(error));
+    }
 
-        Map<File, List<TestMethodResult>> testFileToResults = groupByTestFile(results, testFileContents);
+    private List<TestClassResult> successfulTestResults(PackageTestContext context) {
+        String stdout = removeTailMessages(context.getStdout());
+
+        Map<File, String> testFileContents = loadTestFiles(context.getTestFiles());
+        List<GoTestMethodResult> results = extractTestMethodResult(stdout);
+
+        Map<File, List<GoTestMethodResult>> testFileToResults = groupByTestFile(results, testFileContents);
 
         return testFileToResults.entrySet().stream()
                 .map(entry -> {
-                    String className = determineClassName(context.getPackagePath(), entry.getKey());
-                    return methodResultsToClassResult(context.getPackagePath(), className, entry.getValue());
+                    String className = determineClassName(context.getPackagePath(), entry.getKey().getName());
+                    return methodResultsToClassResult(className, entry.getValue());
                 })
                 .collect(toList());
     }
 
-    private List<TestClassResult> setupFailedResult(PackageTestContext context) {
-        GoTestMethodResult result = new GoTestMethodResult(GLOBAL_COUNTER.incrementAndGet(),
-                SETUP_FAILED_ERROR,
-                TestResult.ResultType.FAILURE,
-                0L, 0L, context.getStdout()
-        );
+    private String removeTailMessages(List<String> stdout) {
+        /*
+            FAIL
+            coverage: 66.7% of statements
+            exit status 1
+            FAIL github.com/my/project/a 0.006s
 
-        return asList(methodResultsToClassResult(context.getPackagePath(), SETUP_FAILED_ERROR, asList(result)));
+            FAIL
+            exit status 1
+            FAIL a 0.006s
+
+            PASS
+            coverage: 83.3% of statements
+            ok a 0.005s
+
+            PASS
+            ok a 0.005s
+         */
+
+        for (int i = 1; i <= 4 && i <= stdout.size(); ++i) {
+            String line = stdout.get(stdout.size() - i).trim();
+            if ("FAIL".equals(line) || "PASS".equals(line)) {
+                return String.join("\n", stdout.subList(0, stdout.size() - i));
+            }
+        }
+        return String.join("\n", stdout);
     }
 
-    private List<TestMethodResult> extractTestMethodResult(String stdout) {
+    private List<TestClassResult> failResult(PackageTestContext context, String reason) {
+        String message = String.join("\n", context.getStdout());
+        GoTestMethodResult result = new GoTestMethodResult(GLOBAL_COUNTER.incrementAndGet(),
+                reason,
+                TestResult.ResultType.FAILURE,
+                0L,
+                0L,
+                message);
+
+        result.addFailure(message, message, message);
+
+        String className = determineClassName(context.getPackagePath(), reason);
+
+        return asList(methodResultsToClassResult(className, asList(result)));
+    }
+
+    private List<GoTestMethodResult> extractTestMethodResult(String stdout) {
         Matcher matcher = TEST_RESULT_PATTERN.matcher(stdout);
-        List<TestMethodResult> ret = new ArrayList<>();
+        List<GoTestMethodResult> ret = new ArrayList<>();
+        List<Pair<Integer, Integer>> startAndEnds = new ArrayList<>();
         while (matcher.find()) {
             long id = GLOBAL_COUNTER.incrementAndGet();
             String methodName = matcher.group(1);
@@ -83,7 +130,7 @@ public class GoTestStdoutExtractor {
             TestResult.ResultType resultType = RESULT_TYPE_MAP.get(matcher.group(3));
             long duration = toMilliseconds(parseDouble(matcher.group(4)));
 
-            TestMethodResult result = new GoTestMethodResult(id,
+            GoTestMethodResult result = new GoTestMethodResult(id,
                     methodName,
                     resultType,
                     duration,
@@ -93,7 +140,22 @@ public class GoTestStdoutExtractor {
                 result.addFailure(message, message, message);
             }
             ret.add(result);
+
+            startAndEnds.add(Pair.of(matcher.start(), matcher.end()));
         }
+
+        for (int i = 0; i < ret.size(); ++i) {
+            int thisMatchEndIndex = startAndEnds.get(i).getRight();
+            int nextMatchStartIndex = i == ret.size() - 1 ? stdout.length() : startAndEnds.get(i + 1).getLeft();
+
+            String middle = thisMatchEndIndex >= nextMatchStartIndex
+                    ? ""
+                    : stdout.substring(thisMatchEndIndex + 1, nextMatchStartIndex).trim();
+
+            GoTestMethodResult methodResult = ret.get(i);
+            methodResult.setMessage(methodResult.getMessage() + middle);
+        }
+
         return ret;
     }
 
@@ -103,27 +165,23 @@ public class GoTestStdoutExtractor {
                 .collect(toMap(Function.identity(), IOUtils::toString));
     }
 
-    private TestClassResult methodResultsToClassResult(String packagePath,
-                                                       String className,
-                                                       List<TestMethodResult> methodResults) {
+    private TestClassResult methodResultsToClassResult(String className,
+                                                       List<GoTestMethodResult> methodResults) {
         TestClassResult ret = new TestClassResult(GLOBAL_COUNTER.incrementAndGet(), className, 0L);
         methodResults.forEach(ret::add);
         return ret;
     }
 
     @SuppressWarnings({"checkstyle:magicnumber"})
-    private String determineClassName(String packagePath, File testFile) {
+    private String determineClassName(String packagePath, String fileName) {
         String escapedPackagePath = IOUtils.encodeInternally(packagePath);
-        escapedPackagePath = escapedPackagePath.replaceAll("\\.", "%2E");
+        escapedPackagePath = escapedPackagePath.replaceAll("\\.", "_DOT_");
 
-        String nameWithoutDotGo = StringUtils.substring(testFile.getName(), 0, -3);
-        nameWithoutDotGo = nameWithoutDotGo.replaceAll("\\.", "%2E");
-
-        return escapedPackagePath.replaceAll("%2F", ".") + "." + nameWithoutDotGo;
+        return escapedPackagePath.replaceAll("%2F", ".") + "." + fileName.replaceAll("\\.", "_DOT_");
     }
 
-    private Map<File, List<TestMethodResult>> groupByTestFile(List<TestMethodResult> results,
-                                                              Map<File, String> testFiles) {
+    private Map<File, List<GoTestMethodResult>> groupByTestFile(List<GoTestMethodResult> results,
+                                                                Map<File, String> testFiles) {
         return results.stream()
                 .collect(groupingBy(
                         result -> findTestFileOfMethod(testFiles, result.getName())
@@ -146,6 +204,10 @@ public class GoTestStdoutExtractor {
 
         public String getMessage() {
             return message;
+        }
+
+        public void setMessage(String message) {
+            this.message = message;
         }
 
         public GoTestMethodResult(long id,
