@@ -6,7 +6,7 @@ import java.util.List;
 public class PackageTestContext {
     private String packagePath;
     private List<File> testFiles;
-    private String stdout;
+    private List<String> stdout;
 
     public String getPackagePath() {
         return packagePath;
@@ -16,7 +16,7 @@ public class PackageTestContext {
         return testFiles;
     }
 
-    public String getStdout() {
+    public List<String> getStdout() {
         return stdout;
     }
 
@@ -27,7 +27,7 @@ public class PackageTestContext {
     public static final class PackageTestContextBuilder {
         private String packagePath;
         private List<File> testFiles;
-        private String stdout;
+        private List<String> stdout;
 
         private PackageTestContextBuilder() {
         }
@@ -42,7 +42,7 @@ public class PackageTestContext {
             return this;
         }
 
-        public PackageTestContextBuilder withStdout(String stdout) {
+        public PackageTestContextBuilder withStdout(List<String> stdout) {
             this.stdout = stdout;
             return this;
         }
