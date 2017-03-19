@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.gogs
 
 import com.github.blindpirate.gogradle.GitRepositoryHandler
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
@@ -11,6 +12,7 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -28,11 +30,28 @@ class GogsBuild extends IntegrationTestSupport {
     GitAccessor gitAccessor = new GitAccessor(new GitRepositoryHandler())
 
     String buildDotGradle = """
-${buildDotGradleBase}
+buildscript {
+    dependencies {
+        classpath files("${System.getProperty('GOGRADLE_ROOT')}/build/libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar")
+    }
+}
+apply plugin: 'com.github.blindpirate.gogradle'
+
+build.dependsOn test
+
 golang {
     packagePath="github.com/gogits/gogs"
 }
+
+vet {
+    continueWhenFail = true
+}
 """
+
+    @Before
+    void setUp() {
+        writeBuildAndSettingsDotGradle(buildDotGradle)
+    }
 
     @Test
     @AccessWeb
@@ -41,11 +60,11 @@ golang {
         // v0.9.113
         gitAccessor.checkout(repository, '114c179e5a50e3313f7a5894100693805e64e440')
 
-        IOUtils.write(resource, 'build.gradle', buildDotGradle)
+        writeBuildAndSettingsDotGradle(buildDotGradle)
 
         try {
             newBuild {
-                it.forTasks('build')
+                it.forTasks('build', 'check')
             }
         } finally {
             println(stdout)
@@ -60,12 +79,7 @@ golang {
 
         Process process = run([gogsBinPath.toFile().absolutePath], [:])
         assert getResult(process).stdout.contains('Gogs')
-    }
 
-    @Override
-    List<String> buildArguments() {
-        goBinPath = ''
-        return super.buildArguments()
     }
 
     @Override
