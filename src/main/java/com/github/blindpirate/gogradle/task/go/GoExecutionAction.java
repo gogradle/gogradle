@@ -31,15 +31,15 @@ public class GoExecutionAction implements ContextAwareTaskAction {
         closure.setResolveStrategy(Closure.DELEGATE_FIRST);
         ClassLoader original = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(closure.getClass().getClassLoader());
-        Map<String, String> originalEnv = Go.class.cast(task).getCurrentEnv();
-        Go.class.cast(task).setCurrentEnv(env);
+        Map<String, String> originalEnv = Go.class.cast(task).getEnv();
+        Go.class.cast(task).setEnv(env);
         try {
             synchronized (task) {
                 closure.call(task);
             }
         } finally {
             Thread.currentThread().setContextClassLoader(original);
-            Go.class.cast(task).setCurrentEnv(originalEnv);
+            Go.class.cast(task).setEnv(originalEnv);
         }
     }
 
