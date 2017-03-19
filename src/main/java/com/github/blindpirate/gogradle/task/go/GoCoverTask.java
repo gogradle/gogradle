@@ -2,12 +2,16 @@ package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.build.BuildManager;
+import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.NumberUtils;
 import com.google.common.collect.ImmutableMap;
-import org.gradle.api.Task;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.TaskAction;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -25,53 +29,60 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-
 import static com.github.blindpirate.gogradle.util.IOUtils.copyURLToFile;
+import static com.github.blindpirate.gogradle.util.IOUtils.countLines;
+import static com.github.blindpirate.gogradle.util.IOUtils.decodeInternally;
+import static com.github.blindpirate.gogradle.util.IOUtils.mkdir;
+import static com.github.blindpirate.gogradle.util.IOUtils.readLines;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.IOUtils.write;
-import static com.github.blindpirate.gogradle.util.IOUtils.readLines;
-import static com.github.blindpirate.gogradle.util.IOUtils.mkdir;
-import static com.github.blindpirate.gogradle.util.IOUtils.decodeInternally;
-import static com.github.blindpirate.gogradle.util.IOUtils.countLines;
 import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.substring;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Arrays.asList;
 import static org.gradle.internal.impldep.org.apache.commons.lang.StringUtils.lastIndexOf;
 
-public class GoCoverTask extends Go {
+public class GoCoverTask extends AbstractGolangTask {
 
-    private static final String COVERAGE_PROFILES_PATH = ".gogradle/coverage/profiles";
-    private static final String COVERAGE_HTMLS_PATH = ".gogradle/coverage/reports";
-    private static final String COVERAGE_HTML_STATIC_PATH = ".gogradle/coverage/reports/static";
-    private static final String COVERATE_STATIC_RESOURCE = "coverage/static";
+    public static final String COVERAGE_PROFILES_PATH = ".gogradle/reports/coverage/profiles";
+    private static final String COVERAGE_HTMLS_PATH = ".gogradle/reports/coverage";
+    private static final String COVERAGE_HTML_STATIC_PATH = ".gogradle/reports/coverage/static";
+    private static final String COVERAGE_STATIC_RESOURCE = "coverage/static/";
+    private static final Logger LOGGER = Logging.getLogger(GoCoverTask.class);
 
     @Inject
     private GolangPluginSetting setting;
+    @Inject
+    private BuildManager buildManager;
 
     public GoCoverTask() {
         dependsOn(GolangTaskContainer.TEST_TASK_NAME);
     }
 
-    protected void doAddDefaultAction() {
-        doLast(this::execute);
+    @TaskAction
+    public void coverage() {
+        if (profileGeneratedInTest()) {
+            safeListFiles(new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH))
+                    .forEach(this::analyzeProfile);
+            writeIndexHtml();
+            updateCoverageHtmls();
+            copyStaticResources();
+        } else {
+            LOGGER.warn("No coverage profile generated in test task, skip.");
+        }
     }
 
-    private void execute(Task task) {
-        safeListFiles(new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH))
-                .forEach(this::analyzeProfile);
-        writeIndexHtml();
-        updateCoverageHtmls();
-        copyStaticResources();
+    private boolean profileGeneratedInTest() {
+        return getTask(GoTestTask.class).isGenerateCoverageProfile();
     }
 
     private void copyStaticResources() {
         mkdir(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH);
         List<String> files = readLines(
-                getClass().getClassLoader().getResourceAsStream(COVERATE_STATIC_RESOURCE));
+                GoCoverTask.class.getClassLoader().getResourceAsStream(COVERAGE_STATIC_RESOURCE));
 
         files.forEach(fileName -> {
-            URL url = getClass().getClassLoader().getResource(COVERATE_STATIC_RESOURCE + "/" + fileName);
+            URL url = getClass().getClassLoader().getResource(COVERAGE_STATIC_RESOURCE + "/" + fileName);
             File file = new File(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH + "/" + fileName);
             copyURLToFile(url, file);
         });

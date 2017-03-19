@@ -30,10 +30,12 @@ class GoCoverTaskTest extends TaskTest {
 
         task = buildTask(GoCoverTask)
 
-        when(project.getRootDir()).thenReturn(new File(resource, 'src/github.com/my/project'))
+        when(project.getRootDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
 
-        when(project.getName()).thenReturn('myProject')
+        when(golangTaskContainer.get(GoTestTask).isGenerateCoverageProfile()).thenReturn(true)
+
+        when(project.getName()).thenReturn(resource.getName())
         when(buildManager.go(anyList(), isNull())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
@@ -42,12 +44,12 @@ class GoCoverTaskTest extends TaskTest {
                 String profileArg = args[2]
 
                 if (profileArg.endsWith('a')) {
-                    File srcHtml = new File(resource, "html/a.html")
-                    File destHtml = new File(project.getRootDir(), '.gogradle/coverage/reports/github.com%2Fmy%2Fproject%2Fa.html')
+                    File srcHtml = new File(resource, "a.html")
+                    File destHtml = new File(project.getRootDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html')
                     IOUtils.copyFile(srcHtml, destHtml)
                 } else {
-                    File srcHtml = new File(resource, "html/b.html")
-                    File destHtml = new File(project.getRootDir(), '.gogradle/coverage/reports/github.com%2Fmy%2Fproject%2Fb.html')
+                    File srcHtml = new File(resource, "b.html")
+                    File destHtml = new File(project.getRootDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fb.html')
                     IOUtils.copyFile(srcHtml, destHtml)
                 }
                 return null
@@ -58,13 +60,16 @@ class GoCoverTaskTest extends TaskTest {
     @Test
     void 'htmls should be generated correctly'() {
         // when
-        task.doAddDefaultAction()
-        task.actions[0].execute(task)
+        task.coverage()
         // then
-        String indexHtml = IOUtils.toString(new File(project.getRootDir(), '.gogradle/coverage/reports/index.html'))
+        examineCoverageHtmls(project.getRootDir())
+    }
+
+    static void examineCoverageHtmls(File projectRoot) {
+        String indexHtml = IOUtils.toString(new File(projectRoot, '.gogradle/reports/coverage/index.html'))
         Document document = Jsoup.parse(indexHtml)
 
-        assert document.select('h1').first().text() == 'myProject'
+        assert document.select('h1').first().text() == projectRoot.getName()
 
         Elements pkgs = document.select('tbody > tr')
 
@@ -99,12 +104,12 @@ class GoCoverTaskTest extends TaskTest {
         assert pkgs[1].child(2).id() == 'c1'
         assert pkgs[1].child(2).text() == '70%'
 
-        ['.gogradle/coverage/reports/github.com%2Fmy%2Fproject%2Fa.html',
-         '.gogradle/coverage/reports/github.com%2Fmy%2Fproject%2Fb.html'].each {
-            String html = IOUtils.toString(new File(project.getRootDir(), it))
+        ['.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html',
+         '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fb.html'].each {
+            String html = IOUtils.toString(new File(projectRoot, it))
             Document doc = Jsoup.parse(html)
 
-            assert doc.select('#nav>a')[0].text() == 'myProject'
+            assert doc.select('#nav>a')[0].text() == projectRoot.getName()
             assert doc.select('#nav>a')[0].attr('href') == 'index.html'
             assert doc.select('#nav>span')[0].text() == '>'
         }
