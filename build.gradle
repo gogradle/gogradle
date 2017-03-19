@@ -92,7 +92,7 @@ check.dependsOn javadoc
 check.dependsOn jacocoTestReport
 check.dependsOn integrationTest
 integrationTest.dependsOn test
-//test.dependsOn 'jar'
+integrationTest.dependsOn shadowJar
 
 /************** testTop1000 **********/
 
