@@ -16,8 +16,6 @@ import org.junit.runner.RunWith
 class IdeaPluginIntegrationTest extends IntegrationTestSupport implements Serializable {
     static final long serialVersionUID = 1L
 
-    File resource
-
     String buildDotGradle = """
 ${buildDotGradleBase}
 golang {
@@ -32,9 +30,7 @@ golang {
 
     @Before
     void setUp() {
-        baseSetUp()
-        IOUtils.write(resource, 'build.gradle',
-                StringUtils.render(buildDotGradle, [classpath: getClasspath(), goBinPath: getGoBinPath()]))
+        writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
     @Test

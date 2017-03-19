@@ -19,9 +19,8 @@ import org.junit.runner.RunWith
 class StringReverse extends IntegrationTestSupport {
     @Before
     void setUp() {
-        baseSetUp()
         IOUtils.write(resource, 'hello.go', helloDotGo)
-        IOUtils.write(resource, 'build.gradle', buildDotGradle)
+        writeBuildAndSettingsDotGradle(resource, buildDotGradle)
     }
 
     @Test
