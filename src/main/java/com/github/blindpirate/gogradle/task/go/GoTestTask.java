@@ -6,6 +6,9 @@ import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.Lists;
+import groovy.lang.Closure;
+import org.apache.commons.io.filefilter.SuffixFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Action;
 import org.gradle.api.Incubating;
 import org.gradle.api.Task;
@@ -29,9 +32,12 @@ import java.util.function.Consumer;
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.go.GoCoverTask.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
+import static com.github.blindpirate.gogradle.util.IOUtils.encodeInternally;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
+import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
@@ -42,6 +48,8 @@ import static java.util.stream.Collectors.toList;
 
 public class GoTestTask extends Go {
     private static final Logger LOGGER = Logging.getLogger(GoTestTask.class);
+
+    private static final String REWRITE_SCRIPT_RESOURCE = "test/rewrite.html";
 
     @Inject
     private GolangPluginSetting setting;
@@ -55,6 +63,8 @@ public class GoTestTask extends Go {
     private List<String> testNamePattern;
 
     private boolean generateCoverageProfile = true;
+
+    private boolean coverageProfileGenerated = false;
 
     public GoTestTask() {
         dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
@@ -83,6 +93,26 @@ public class GoTestTask extends Go {
         } else {
             addTestActions();
         }
+    }
+
+    @Override
+    public Task doLast(final Closure closure) {
+        warnNoTestReport();
+        return super.doLast(closure);
+    }
+
+    @Override
+    public Task doFirst(final Closure closure) {
+        warnNoTestReport();
+        return super.doFirst(closure);
+    }
+
+    private void warnNoTestReport() {
+        LOGGER.warn("WARNING: test report is not supported in customized test action.");
+    }
+
+    public Task leftShift(final Closure action) {
+        throw new UnsupportedOperationException("Left shift is not supported since it's deprecated officially");
     }
 
     private void addTestActions() {
@@ -147,11 +177,12 @@ public class GoTestTask extends Go {
         @Override
         public void execute(Task task) {
             List<TestClassResult> testResults = new ArrayList<>();
-            RetcodeCollector retcodeCollector = new RetcodeCollector();
+            prepareCoverageProfileDir();
 
             parentDirToTestFiles.forEach((parentDir, testFiles) -> {
                 String packageImportPath = dirToImportPath(parentDir);
-                String stdout = doSingleTest(parentDir, testFiles, retcodeCollector);
+                List<String> stdout = doSingleTest(parentDir, testFiles);
+
                 PackageTestContext context = PackageTestContext.builder()
                         .withPackagePath(packageImportPath)
                         .withStdout(stdout)
@@ -165,18 +196,45 @@ public class GoTestTask extends Go {
 
             GoTestResultsProvider provider = new GoTestResultsProvider(testResults);
 
-            File reportDir = new File(getProject().getRootDir(), "reports/test");
+            File reportDir = new File(getProject().getRootDir(), ".gogradle/reports/test");
             DefaultTestReport report = new DefaultTestReport(buildOperationProcessor);
             report.generateReport(provider, reportDir);
 
-            if (retcodeCollector.containsNonZero()) {
-                throw new IllegalStateException("There are failed tests. Please see "
+            rewritePackageName(reportDir);
+
+            reportErrorIfNecessary(testResults, reportDir);
+        }
+
+        private void rewritePackageName(File reportDir) {
+            Collection<File> htmlFiles = filterFilesRecursively(
+                    reportDir,
+                    new SuffixFileFilter(".html"),
+                    TrueFileFilter.INSTANCE);
+            String rewriteScript = IOUtils.toString(
+                    GoTestTask.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
+            htmlFiles.forEach(htmlFile -> {
+                String content = IOUtils.toString(htmlFile);
+                content = content.replace("</body>", "</body>" + rewriteScript);
+                IOUtils.write(htmlFile, content);
+            });
+        }
+
+        private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
+            int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
+            if (totalFailureCount > 0) {
+                throw new IllegalStateException("There are " + totalFailureCount + " failed tests. Please see "
                         + reportDir.getAbsolutePath()
-                        + " for more details");
+                        + " for more details.");
             }
         }
 
-        private String doSingleTest(File parentDir, List<File> testFiles, RetcodeCollector collector) {
+        private void prepareCoverageProfileDir() {
+            File coverageDir = new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH);
+            forceMkdir(coverageDir);
+            clearDirectory(coverageDir);
+        }
+
+        private List<String> doSingleTest(File parentDir, List<File> testFiles) {
             StdoutStderrCollector lineConsumer = new StdoutStderrCollector();
             String importPath = dirToImportPath(parentDir);
             List<String> args;
@@ -191,16 +249,14 @@ public class GoTestTask extends Go {
             }
 
             if (generateCoverageProfile) {
-                File coverageDir = new File(getProject().getRootDir(), ".gogradle/coverage");
-                IOUtils.forceMkdir(coverageDir);
-                clearDirectory(coverageDir);
-
-                File profilesPath = new File(getProject().getRootDir(), ".gogradle/coverage/profiles/"
-                        + IOUtils.encodeInternally(importPath));
+                File profilesPath = new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH + "/"
+                        + encodeInternally(importPath));
                 args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
+                coverageProfileGenerated = true;
             }
 
-            buildManager.go(args, null, lineConsumer, lineConsumer, collector);
+            buildManager.go(args, null, lineConsumer, lineConsumer, code -> {
+            });
             return lineConsumer.getStdoutStderr();
         }
 
@@ -226,29 +282,15 @@ public class GoTestTask extends Go {
     }
 
     private static class StdoutStderrCollector implements Consumer<String> {
-        private StringBuffer sb = new StringBuffer();
+        private List<String> lines = new ArrayList<>();
 
         @Override
-        public void accept(String s) {
-            sb.append(s).append("\n");
+        public synchronized void accept(String s) {
+            lines.add(s);
         }
 
-        public String getStdoutStderr() {
-            return sb.toString();
-        }
-    }
-
-    private static class RetcodeCollector implements Consumer<Integer> {
-        private List<Integer> retcodes = new ArrayList<>();
-
-        private boolean containsNonZero() {
-            return retcodes.stream().anyMatch(code -> code != 0);
-        }
-
-        @Override
-        public synchronized void accept(Integer code) {
-            retcodes.add(code);
+        public List<String> getStdoutStderr() {
+            return lines;
         }
     }
-
 }

@@ -10,8 +10,6 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult
-import org.gradle.api.logging.Logger
-import org.gradle.api.logging.Logging
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.internal.operations.BuildOperationProcessor
 import org.junit.Before
@@ -27,16 +25,8 @@ import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.anyList
-import static org.mockito.ArgumentMatchers.anyMap
-import static org.mockito.ArgumentMatchers.anyString
-import static org.mockito.ArgumentMatchers.eq
-import static org.mockito.ArgumentMatchers.isNull
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.times
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.ArgumentMatchers.*
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -98,10 +88,10 @@ class GoTestTaskTest extends TaskTest {
         verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
-                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
+                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/b',
-                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb".toString()])
+                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb".toString()])
     }
 
     @Test
@@ -150,7 +140,7 @@ class GoTestTaskTest extends TaskTest {
         verify(extractor).extractTestResult(argumentCaptor.capture())
         PackageTestContext context = argumentCaptor.getValue()
         assert context.packagePath == 'github.com/my/package/a'
-        assert context.stdout == 'stdout\nstderr\n'
+        assert context.stdout == ['stdout', 'stderr']
         assert context.testFiles.size() == 3
     }
 
@@ -162,31 +152,16 @@ class GoTestTaskTest extends TaskTest {
         result.add(new TestMethodResult(1L, 'methodName', TestResult.ResultType.SUCCESS, 2L, 3L))
         when(extractor.extractTestResult(any(PackageTestContext))).thenReturn([result])
 
-        Logger mockLogger = mock(Logger)
-        ReflectionUtils.setStaticFinalField(GoTestTask, 'LOGGER', mockLogger)
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
 
         // when
         task.addDefaultActionIfNoCustomActions()
-        task.actions[0].execute(task)
-        // then
-        verify(mockLogger).quiet("Test for {} finished, {} succeed, {} failed", 'github.com/my/package/a', 1, 1)
-        ReflectionUtils.setStaticFinalField(GoTestTask, 'LOGGER', Logging.getLogger(GoTestTask))
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if go test return non-zero'() {
-        // given
-        when(buildManager.go(anyList(), isNull(Map), any(Consumer), any(Consumer), any(Consumer))).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                invocation.arguments[4].accept(0)
-                invocation.arguments[4].accept(1)
-            }
-        })
-        // when
-        task.addDefaultActionIfNoCustomActions()
-        task.actions[0].execute(task)
+        try {
+            task.actions[0].execute(task)
+            assert false
+        } catch (Exception e) {
+            assert e.getMessage().contains('There are 1 failed tests')
+        }
     }
 
     @Test
