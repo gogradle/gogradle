@@ -10,20 +10,31 @@ import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 public class Go extends AbstractGolangTask {
 
     @Inject
     protected BuildManager buildManager;
 
-    private Map<String, String> currentEnv;
+    private Map<String, String> env;
 
-    public void setCurrentEnv(Map<String, String> currentEnv) {
-        this.currentEnv = currentEnv;
+    private Consumer<Integer> retcodeConsumer;
+
+    public Map<String, String> getEnv() {
+        return env;
     }
 
-    public Map<String, String> getCurrentEnv() {
-        return currentEnv;
+    public void setEnv(Map<String, String> env) {
+        this.env = env;
+    }
+
+    public Consumer<Integer> getRetcodeConsumer() {
+        return retcodeConsumer;
+    }
+
+    public void setRetcodeConsumer(Consumer<Integer> retcodeConsumer) {
+        this.retcodeConsumer = retcodeConsumer;
     }
 
     public void addDefaultActionIfNoCustomActions() {
@@ -37,12 +48,12 @@ public class Go extends AbstractGolangTask {
 
     public void go(String arg) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        buildManager.go(extractArgs(arg), currentEnv);
+        buildManager.go(extractArgs(arg), env, null, null, retcodeConsumer);
     }
 
     public void run(String arg) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        buildManager.run(extractArgs(arg), currentEnv);
+        buildManager.run(extractArgs(arg), env, null, null, retcodeConsumer);
     }
 
     protected List<String> extractArgs(String arg) {

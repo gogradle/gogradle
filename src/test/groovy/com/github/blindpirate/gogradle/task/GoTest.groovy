@@ -21,7 +21,7 @@ class GoTest extends TaskTest {
     @Test
     void 'go command on ToolTask should succeed'() {
         task.go('build -o "output name"')
-        verify(buildManager).go(['build', '-o', 'output name'], null)
+        verify(buildManager).go(['build', '-o', 'output name'], null, null, null, null)
     }
 
     @Test(expected = MissingMethodException)
@@ -37,7 +37,7 @@ class GoTest extends TaskTest {
     @Test
     void 'run command on ToolTask should succeed'() {
         task.run('golint -v -a')
-        verify(buildManager).run(['golint', '-v', '-a'], null)
+        verify(buildManager).run(['golint', '-v', '-a'], null, null, null, null)
     }
 
     @Test(expected = MissingMethodException)
