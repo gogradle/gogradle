@@ -5,8 +5,8 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
-import com.github.blindpirate.gogradle.task.go.Go;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
+import com.github.blindpirate.gogradle.task.go.Go;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -19,15 +19,14 @@ import org.gradle.api.tasks.TaskContainer;
 import org.gradle.internal.reflect.Instantiator;
 
 import javax.inject.Inject;
-import java.util.Arrays;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.BUILD_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.COVERAGE_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
+import static java.util.Arrays.asList;
 
 
 public class GolangPlugin implements Plugin<Project> {
@@ -91,12 +90,11 @@ public class GolangPlugin implements Plugin<Project> {
             golangTaskContainer.put((Class) entry.getValue(), task);
         });
 
-        Arrays.asList(BUILD_TASK_NAME,
-                TEST_TASK_NAME,
-                COVERAGE_TASK_NAME,
-                GOFMT_TASK_NAME,
-                GOVET_TASK_NAME)
-                .forEach(task -> Go.class.cast(taskContainer.getByName(task)).addDefaultActionIfNoCustomActions());
+        project.afterEvaluate(p ->
+                asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
+                        task -> Go.class.cast(taskContainer.getByName(task)).addDefaultActionIfNoCustomActions())
+        );
+
     }
 
     /**
