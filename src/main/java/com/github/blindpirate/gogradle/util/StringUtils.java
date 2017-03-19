@@ -12,6 +12,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
+import static java.util.stream.Collectors.toList;
+
 public class StringUtils {
     public static String removeEnd(String s, String suffix) {
         return org.apache.commons.lang3.StringUtils.removeEnd(s, suffix);
@@ -86,11 +88,12 @@ public class StringUtils {
         }
     }
 
-    public static int lastIndexOf(String str, String substr) {
-        return org.apache.commons.lang3.StringUtils.lastIndexOf(str, substr);
-    }
-
     public static String substring(String s, int start, int end) {
         return org.apache.commons.lang3.StringUtils.substring(s, start, end);
+    }
+
+    public static String formatEnv(Map<String, String> env) {
+        return String.join("\n",
+                env.entrySet().stream().map(entry -> " " + entry.getKey() + "=" + entry.getValue()).collect(toList()));
     }
 }
