@@ -16,9 +16,7 @@ public class GofmtTask extends Go {
     }
 
     protected void doAddDefaultAction() {
-        doLast(task -> {
-            super.run(getGofmtPath() + " -w .");
-        });
+        doLast(task -> run(getGofmtPath() + " -w ."));
     }
 
     private String getGofmtPath() {
@@ -28,6 +26,6 @@ public class GofmtTask extends Go {
     }
 
     public void gofmt(String arg) {
-        super.run(getGofmtPath() + " " + arg);
+        run(getGofmtPath() + " " + arg);
     }
 }

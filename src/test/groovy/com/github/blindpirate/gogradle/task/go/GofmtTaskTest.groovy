@@ -41,15 +41,14 @@ class GofmtTaskTest extends TaskTest {
         task.actions[0].execute(task)
 
         // then
-        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), '-w', '.'], null)
+        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), '-w', '.'], null, null, null, null)
     }
 
     @Test
     void 'customized action should be executed successfully'() {
         // when
         task.gofmt 'whatever'
-        task.actions[0].execute(task)
         // then
-        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), 'whatever'], null)
+        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), 'whatever'], null, null, null, null)
     }
 }
