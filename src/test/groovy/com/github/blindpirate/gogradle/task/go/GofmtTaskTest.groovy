@@ -8,9 +8,12 @@ import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static com.github.blindpirate.gogradle.util.StringUtils.*
+import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -21,14 +24,21 @@ class GofmtTaskTest extends TaskTest {
 
     File resource
 
+    @Captor
+    ArgumentCaptor captor
+
     @Before
     void setUp() {
         task = buildTask(GofmtTask)
 
-        IOUtils.write(resource, 'go/bin/go', '')
-        IOUtils.write(resource, 'go/bin/gofmt', '')
+        IOUtils.write(resource, '.go/bin/go', '')
+        IOUtils.write(resource, '.go/bin/gofmt', '')
         when(project.getRootDir()).thenReturn(resource)
-        when(goBinaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('go/bin/go'))
+        when(goBinaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('.go/bin/go'))
+
+        IOUtils.write(resource, 'a.go', '')
+        IOUtils.write(resource, '.a.go', '')
+        IOUtils.mkdir(resource, 'b')
     }
 
     @Test
@@ -43,11 +53,15 @@ class GofmtTaskTest extends TaskTest {
         task.actions[0].execute(task)
 
         // then
-        verify(buildManager).run([toUnixString(new File(resource, 'go/bin/gofmt')), '-w', toUnixString(resource.getAbsolutePath())]
-                , null
-                , null
-                , null
-                , null)
+        verify(buildManager).run(captor.capture(), isNull(), isNull(), isNull(), isNull())
+
+        assert captor.value[0..1] == [absolutePath('.go/bin/gofmt'), '-w']
+        assert captor.value.contains(absolutePath('a.go'))
+        assert captor.value.contains(absolutePath('b'))
+    }
+
+    private String absolutePath(String fileName) {
+        return toUnixString(new File(resource, fileName))
     }
 
     @Test
@@ -55,6 +69,6 @@ class GofmtTaskTest extends TaskTest {
         // when
         task.gofmt 'whatever'
         // then
-        verify(buildManager).run([toUnixString(new File(resource, 'go/bin/gofmt')), 'whatever'], null, null, null, null)
+        verify(buildManager).run([absolutePath('.go/bin/gofmt'), 'whatever'], null, null, null, null)
     }
 }

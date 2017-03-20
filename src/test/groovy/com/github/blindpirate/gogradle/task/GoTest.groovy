@@ -29,11 +29,6 @@ class GoTest extends TaskTest {
         task.go('a', 'b')
     }
 
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if args number of go is zero'() {
-        task.go()
-    }
-
     @Test
     void 'run command on ToolTask should succeed'() {
         task.run('golint -v -a')
@@ -43,11 +38,6 @@ class GoTest extends TaskTest {
     @Test(expected = MissingMethodException)
     void 'exception should be thrown if args number of run is more than 1'() {
         task.run('a', 'b')
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if args number of run is zero'() {
-        task.run()
     }
 
     @Test

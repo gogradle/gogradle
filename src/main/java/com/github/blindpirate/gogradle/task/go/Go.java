@@ -48,12 +48,20 @@ public class Go extends AbstractGolangTask {
 
     public void go(String arg) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        buildManager.go(extractArgs(arg), env, null, null, retcodeConsumer);
+        go(extractArgs(arg));
+    }
+
+    public void go(List<String> args) {
+        buildManager.go(args, env, null, null, retcodeConsumer);
     }
 
     public void run(String arg) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        buildManager.run(extractArgs(arg), env, null, null, retcodeConsumer);
+        run(extractArgs(arg));
+    }
+
+    public void run(List<String> args) {
+        buildManager.run(args, env, null, null, retcodeConsumer);
     }
 
     protected List<String> extractArgs(String arg) {
