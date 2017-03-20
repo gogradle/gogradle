@@ -41,7 +41,7 @@ build.dependsOn test
 
 golang {
     packagePath="github.com/gogits/gogs"
-    globalCacheFor 10,'minutes'
+    goVersion='1.8'
 }
 
 vet {
