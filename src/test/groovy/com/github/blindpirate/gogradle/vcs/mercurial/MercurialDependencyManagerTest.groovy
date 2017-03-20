@@ -138,6 +138,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'resetting to specific version should succeed'() {
         // when
+        System.out.println(ReflectionUtils.getField(manager,'accessor').getClass().getName())
         manager.resetToSpecificVersion(repository, hgChangeset)
         // then
         verify(hgClientAccessor).resetToSpecificNodeId(repository, '1' * 40)
