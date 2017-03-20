@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -26,6 +27,7 @@ class GofmtTaskTest extends TaskTest {
 
         IOUtils.write(resource, 'go/bin/go', '')
         IOUtils.write(resource, 'go/bin/gofmt', '')
+        when(project.getRootDir()).thenReturn(resource)
         when(goBinaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('go/bin/go'))
     }
 
@@ -41,7 +43,11 @@ class GofmtTaskTest extends TaskTest {
         task.actions[0].execute(task)
 
         // then
-        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), '-w', '.'], null, null, null, null)
+        verify(buildManager).run([toUnixString(new File(resource, 'go/bin/gofmt')), '-w', toUnixString(resource.getAbsolutePath())]
+                , null
+                , null
+                , null
+                , null)
     }
 
     @Test
@@ -49,6 +55,6 @@ class GofmtTaskTest extends TaskTest {
         // when
         task.gofmt 'whatever'
         // then
-        verify(buildManager).run([StringUtils.toUnixString(new File(resource, 'go/bin/gofmt')), 'whatever'], null, null, null, null)
+        verify(buildManager).run([toUnixString(new File(resource, 'go/bin/gofmt')), 'whatever'], null, null, null, null)
     }
 }

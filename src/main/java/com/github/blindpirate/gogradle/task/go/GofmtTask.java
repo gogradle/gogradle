@@ -2,10 +2,11 @@ package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import com.github.blindpirate.gogradle.util.StringUtils;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
+
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class GofmtTask extends Go {
     @Inject
@@ -16,13 +17,14 @@ public class GofmtTask extends Go {
     }
 
     protected void doAddDefaultAction() {
-        doLast(task -> run(getGofmtPath() + " -w ."));
+        doLast(task
+                -> run(getGofmtPath() + " -w " + toUnixString(getProject().getRootDir().getAbsolutePath())));
     }
 
     private String getGofmtPath() {
         Path goBinPath = goBinaryManager.getBinaryPath();
         Path gofmtPath = goBinPath.resolve("../gofmt").normalize();
-        return StringUtils.toUnixString(gofmtPath.toAbsolutePath());
+        return toUnixString(gofmtPath.toAbsolutePath());
     }
 
     public void gofmt(String arg) {
