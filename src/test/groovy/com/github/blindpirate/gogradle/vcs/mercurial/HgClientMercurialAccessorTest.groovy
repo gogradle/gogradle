@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
-@OnlyWhen(value = '"hg version".execute().text', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
+@OnlyWhen(value = '"hg version".execute().text.contains("Mercurial")', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
 class HgClientMercurialAccessorTest {
 
     MercurialAccessor accessor = new HgClientMercurialAccessor()
