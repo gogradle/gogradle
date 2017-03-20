@@ -259,11 +259,13 @@ public class GoCoverTask extends AbstractGolangTask {
         }
 
         public long getCoveredLineWidth() {
-            return MAX_BAR_WIDTH * coveredLineCount / maxPackageTotalLine;
+            long width = MAX_BAR_WIDTH * coveredLineCount / maxPackageTotalLine;
+            return width <= 0 ? 1 : width;
         }
 
         public long getUncoveredLineWidth() {
-            return MAX_BAR_WIDTH * uncoveredLineCount / maxPackageTotalLine;
+            long width = MAX_BAR_WIDTH * uncoveredLineCount / maxPackageTotalLine;
+            return width <= 0 ? 1 : width;
         }
 
         private void add(FileCoverage coverage) {
