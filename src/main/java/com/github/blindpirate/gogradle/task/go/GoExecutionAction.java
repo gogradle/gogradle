@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task.go;
 
+import com.github.blindpirate.gogradle.Go;
 import groovy.lang.Closure;
 import org.gradle.api.Task;
 import org.gradle.api.internal.tasks.ContextAwareTaskAction;

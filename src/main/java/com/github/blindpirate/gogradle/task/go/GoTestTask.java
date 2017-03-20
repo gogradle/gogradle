@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task.go;
 
+import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.util.CollectionUtils;

@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.task.go.Go
+import com.github.blindpirate.gogradle.Go
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

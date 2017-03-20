@@ -1,4 +1,4 @@
-package com.github.blindpirate.gogradle.task.go;
+package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
@@ -6,20 +6,25 @@ import com.github.blindpirate.gogradle.util.Assert;
 import org.apache.tools.ant.types.Commandline;
 import org.gradle.api.internal.AbstractTask;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
+
 public class Go extends AbstractGolangTask {
 
-    @Inject
     protected BuildManager buildManager;
 
     private Map<String, String> env;
 
     private Consumer<Integer> retcodeConsumer;
+
+    public Go() {
+        dependsOn(PREPARE_TASK_NAME);
+        buildManager = GogradleGlobal.getInstance(BuildManager.class);
+    }
 
     public Map<String, String> getEnv() {
         return env;

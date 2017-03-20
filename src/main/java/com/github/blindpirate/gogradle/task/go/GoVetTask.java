@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task.go;
 
+import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 
 public class GoVetTask extends Go {

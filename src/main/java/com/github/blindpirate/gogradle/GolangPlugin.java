@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import com.github.blindpirate.gogradle.task.go.Go;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -59,11 +58,11 @@ public class GolangPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         init(project);
+        configureGlobalInjector();
         customizeProjectInternalServices(project);
         configureSettings(project);
         configureConfigurations(project);
         configureTasks(project);
-        configureGlobalInjector();
         hackIdeaPlugin();
     }
 

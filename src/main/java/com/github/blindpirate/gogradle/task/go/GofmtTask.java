@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task.go;
 
+import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
