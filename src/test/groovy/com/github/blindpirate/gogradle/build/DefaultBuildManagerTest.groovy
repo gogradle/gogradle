@@ -4,7 +4,9 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
+import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
+import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -137,6 +139,16 @@ class DefaultBuildManagerTest {
                 File.pathSeparator + new File(resource, '.gogradle/build_gopath') +
                 File.pathSeparator + new File(resource, '.gogradle/test_gopath')
 
+    }
+
+    @Test
+    void 'customized command should succeed'() {
+        // when
+        manager.run(['golint'], [:], null, null, null)
+        // then
+        verify(processUtils).run(['golint'],
+                [GOPATH: getTestGopath(), GOROOT: getGoroot(), GOOS: Os.getHostOs().toString(), GOARCH: Arch.getHostArch().toString()],
+                resource)
     }
 
     @Test

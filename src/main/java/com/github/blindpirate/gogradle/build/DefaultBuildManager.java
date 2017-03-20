@@ -27,7 +27,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
@@ -60,7 +59,6 @@ public class DefaultBuildManager implements BuildManager {
     private static final String SRC = "src";
 
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
-    private static final Predicate<String> NO_TEST_FILES_FILTER = line -> !line.contains("[no test files]");
 
     private final Project project;
     private final GoBinaryManager goBinaryManager;

@@ -142,6 +142,8 @@ class AbstractVcsDependencyManagerTest {
     @Test
     @MockOffline
     void 'updating repository should be skipped when offline'() {
+        // given
+        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock()
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)

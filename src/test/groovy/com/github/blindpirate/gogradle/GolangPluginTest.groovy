@@ -128,7 +128,6 @@ class GolangPluginTest {
         def dependency = findFirstInDependencies()
         assert dependency instanceof LocalDirectoryDependency
         assert !getExclusionSpecs(dependency).isEmpty()
-
     }
 
     @Test

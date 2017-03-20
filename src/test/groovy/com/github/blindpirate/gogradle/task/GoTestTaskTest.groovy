@@ -10,6 +10,7 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult
+import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.testing.TestResult
 import org.gradle.internal.operations.BuildOperationProcessor
 import org.junit.Before
@@ -25,7 +26,6 @@ import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -171,5 +171,22 @@ class GoTestTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         // then
         task.actions.size() == 0
+    }
+
+    @Test(expected = UnsupportedOperationException)
+    void 'leftShift should not be supported!'() {
+        task.leftShift {}
+    }
+
+    @Test
+    void 'doLast and doFirst should be warned'() {
+        // given
+        Logger mockLogger = mock(Logger)
+        ReflectionUtils.setStaticFinalField(GoTestTask, 'LOGGER', mockLogger)
+        // when
+        task.doFirst {}
+        task.doLast {}
+        // then
+        verify(mockLogger, times(2)).warn('WARNING: test report is not supported in customized test action.')
     }
 }

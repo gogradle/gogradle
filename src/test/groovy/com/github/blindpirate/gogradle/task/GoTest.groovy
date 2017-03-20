@@ -6,6 +6,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import java.util.function.Consumer
+
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
@@ -43,5 +46,12 @@ class GoTest extends TaskTest {
     @Test
     void 'invoking doAddDefaultAction should succeed'() {
         task.doAddDefaultAction()
+    }
+
+    @Test
+    void 'setting retcode consumer should succeed'() {
+        Consumer consumer = mock(Consumer)
+        task.retcodeConsumer = consumer
+        assert task.retcodeConsumer == consumer
     }
 }

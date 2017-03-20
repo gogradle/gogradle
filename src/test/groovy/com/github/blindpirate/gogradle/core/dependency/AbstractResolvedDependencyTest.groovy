@@ -92,6 +92,11 @@ class AbstractResolvedDependencyTest {
         assert dependency.updateTime == 1L
     }
 
+    @Test
+    void 'toString should succeed'() {
+        assert withNameAndVersion('name', 'version').toString() == 'name:version'
+    }
+
     AbstractResolvedDependency withNameAndVersion(String name, String version) {
         return new ResolvedDependencyForTest(name, version, 0)
     }
@@ -113,7 +118,7 @@ class AbstractResolvedDependencyTest {
 
         @Override
         String formatVersion() {
-            return null
+            return 'version'
         }
     }
 }

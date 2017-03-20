@@ -159,9 +159,18 @@ class MercurialDependencyManagerTest {
     @Test
     void 'head commit should be used if tag and nodeId do not exist'() {
         // given
+        when(notationDependency.getTag()).thenReturn(null)
+        when(notationDependency.getCommit()).thenReturn(null)
         when(hgClientAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
+    }
+
+    @Test
+    void 'concrete commit should succeed'() {
+        assert !manager.isConcreteCommit('NEWEST_COMMIT')
+        assert manager.isConcreteCommit('12345')
+        assert !manager.isConcreteCommit(null)
     }
 
     @Test
