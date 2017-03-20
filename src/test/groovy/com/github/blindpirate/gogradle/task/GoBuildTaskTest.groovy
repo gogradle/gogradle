@@ -97,6 +97,12 @@ class GoBuildTaskTest extends TaskTest {
         task.actions.each { assert it.classLoader == c.class.classLoader }
     }
 
+    @Test
+    void 'setting output location should succeed'() {
+        task.outputLocation = 'outputlocation'
+        assert task.outputLocation == 'outputlocation'
+    }
+
     @Test(expected = NullPointerException)
     void 'exception should be thrown if closure throws an exception'() {
         task.doLast {

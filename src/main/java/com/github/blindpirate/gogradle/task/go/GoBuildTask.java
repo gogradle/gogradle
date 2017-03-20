@@ -11,6 +11,7 @@ import groovy.lang.Closure;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.Task;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -27,11 +28,17 @@ public class GoBuildTask extends Go {
 
     private List<Pair<Os, Arch>> targetPlatforms = asList(Pair.of(Os.getHostOs(), Arch.getHostArch()));
 
+    private String outputLocation = "./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}";
+
     public void setTargetPlatform(String targetPlatform) {
         Matcher matcher = TARGET_PLATFORM_PATTERN.matcher(targetPlatform);
         Assert.isTrue(matcher.matches(),
                 "Illegal target platform:" + targetPlatform);
         targetPlatforms = extractPlatforms(targetPlatform);
+    }
+
+    public void setOutputLocation(String outputLocation) {
+        this.outputLocation = outputLocation;
     }
 
     private List<Pair<Os, Arch>> extractPlatforms(String targetPlatform) {
@@ -57,7 +64,7 @@ public class GoBuildTask extends Go {
 
     private void buildWithEnv(Map<String, String> env) {
         setEnv(env);
-        go("build -o ./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}");
+        go(Arrays.asList("build", "-o", outputLocation));
     }
 
 
