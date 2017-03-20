@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.task.go.GoBuildTask
@@ -20,10 +21,7 @@ class GoBuildTaskTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(GoBuildTask)
-        when(setting.getTargetPlatforms()).thenReturn(
-                [Pair.of(Os.DARWIN, Arch.AMD64),
-                 Pair.of(Os.LINUX, Arch.I386),
-                 Pair.of(Os.WINDOWS, Arch.AMD64)])
+        task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
         when(buildManager.getBuildGopath()).thenReturn('build_gopath')
     }
 
@@ -42,7 +40,7 @@ class GoBuildTaskTest extends TaskTest {
     @Test
     void 'default action should not be added if there is customized action'() {
         // when
-        when(setting.getTargetPlatforms()).thenReturn([Pair.of(Os.hostOs, Arch.hostArch)])
+        task.setTargetPlatform("${Os.hostOs}-${Arch.hostArch}")
         task.doLast {}
         task.addDefaultActionIfNoCustomActions()
         // then
@@ -107,5 +105,48 @@ class GoBuildTaskTest extends TaskTest {
             throw new NullPointerException()
         }
         task.actions.each { it.execute(task) }
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'setting illegal target platform should result in an exception'() {
+        task.targetPlatform = 'a-b,'
+    }
+
+    @Test(expected = IllegalArgumentException)
+    void 'setting illegal os or arch should result in an exception'() {
+        task.targetPlatform = 'a-b'
+    }
+
+    @Test(expected = IllegalArgumentException)
+    void 'os must located at left'() {
+        task.targetPlatform = 'amd64-linux'
+    }
+
+    @Test
+    void 'setting target platform should succeed'() {
+        task.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+        assert task.targetPlatforms[0].left == Os.WINDOWS
+        assert task.targetPlatforms[0].right == Arch.AMD64
+        assert task.targetPlatforms[1].left == Os.LINUX
+        assert task.targetPlatforms[1].right == Arch.AMD64
+        assert task.targetPlatforms[2].left == Os.LINUX
+        assert task.targetPlatforms[2].right == Arch.I386
+    }
+
+    @Test
+    void 'pattern matching targetPlatform should be correct'() {
+        assert isValidTargetPlatform('a-b')
+        assert isValidTargetPlatform('\t a-b \n')
+        assert !isValidTargetPlatform(' a -b ')
+        assert !isValidTargetPlatform('\ta-b,\n')
+        assert !isValidTargetPlatform('a-b,')
+        assert !isValidTargetPlatform(' a-b, ')
+        assert !isValidTargetPlatform(',a-b,')
+        assert isValidTargetPlatform('a-b,1-a,c-d')
+        assert isValidTargetPlatform('\t\t\na-b\n ,\n 1-a\t\n , c-2d  ')
+    }
+
+    boolean isValidTargetPlatform(String value) {
+        return GoBuildTask.TARGET_PLATFORM_PATTERN.matcher(value).matches()
     }
 }

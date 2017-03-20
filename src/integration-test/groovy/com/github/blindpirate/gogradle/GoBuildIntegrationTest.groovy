@@ -25,6 +25,8 @@ class GoBuildIntegrationTest extends IntegrationTestSupport {
 ${buildDotGradleBase}
 golang {
     packagePath='github.com/my/package'
+}
+build {
     targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
 }
 """

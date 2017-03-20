@@ -93,46 +93,5 @@ class GolangPluginSettingTest {
         assert setting.getGlobalCacheSecond() == expectedResult
     }
 
-    @Test(expected = IllegalStateException)
-    void 'setting illegal target platform should result in an exception'() {
-        setting.targetPlatform = 'a-b,'
-    }
 
-    @Test(expected = IllegalArgumentException)
-    void 'setting illegal os or arch should result in an exception'() {
-        setting.targetPlatform = 'a-b'
-    }
-
-    @Test(expected = IllegalArgumentException)
-    void 'os must located at left'() {
-        setting.targetPlatform = 'amd64-linux'
-    }
-
-    @Test
-    void 'setting target platform should succeed'() {
-        setting.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
-        assert setting.targetPlatforms[0].left == Os.WINDOWS
-        assert setting.targetPlatforms[0].right == Arch.AMD64
-        assert setting.targetPlatforms[1].left == Os.LINUX
-        assert setting.targetPlatforms[1].right == Arch.AMD64
-        assert setting.targetPlatforms[2].left == Os.LINUX
-        assert setting.targetPlatforms[2].right == Arch.I386
-    }
-
-    @Test
-    void 'pattern matching targetPlatform should be correct'() {
-        assert isValidTargetPlatform('a-b')
-        assert isValidTargetPlatform('\t a-b \n')
-        assert !isValidTargetPlatform(' a -b ')
-        assert !isValidTargetPlatform('\ta-b,\n')
-        assert !isValidTargetPlatform('a-b,')
-        assert !isValidTargetPlatform(' a-b, ')
-        assert !isValidTargetPlatform(',a-b,')
-        assert isValidTargetPlatform('a-b,1-a,c-d')
-        assert isValidTargetPlatform('\t\t\na-b\n ,\n 1-a\t\n , c-2d  ')
-    }
-
-    boolean isValidTargetPlatform(String value) {
-        return GolangPluginSetting.TARGET_PLATFORM_PATTERN.matcher(value).matches()
-    }
 }
