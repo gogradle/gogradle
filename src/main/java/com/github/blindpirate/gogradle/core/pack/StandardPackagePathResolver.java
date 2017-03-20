@@ -25,7 +25,7 @@ public class StandardPackagePathResolver implements PackagePathResolver {
         }
     }
 
-    private boolean isStandardPackage(Path path) {
+    public boolean isStandardPackage(Path path) {
         return path.getNameCount() > 0
                 && standardFirstLevelPackages.contains(path.getName(0).toString());
     }
@@ -76,6 +76,7 @@ public class StandardPackagePathResolver implements PackagePathResolver {
                     "unsafe",
                     // since Go 1.8
                     "plugin",
+                    // workaround
                     "appengine",
                     "appengine_internal"
                     );

@@ -14,6 +14,12 @@ class GlideDependencyFactoryTest extends ExternalDependencyFactoryTest {
     GlideDependencyFactory factory
 
     @Test
+    void 'test dependencies should be empty'() {
+        prepareGlideDotLock(glideDotLock)
+        assert factory.produce(resource, 'test').get().isEmpty()
+    }
+
+    @Test
     void 'package without glide.lock should be rejected'() {
         assert !factory.produce(resource, 'build').isPresent()
     }

@@ -1,9 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
@@ -19,10 +17,6 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
  */
 @Singleton
 public class GvtGbvendorDependencyFactory extends ExternalDependencyFactory {
-    @Inject
-    public GvtGbvendorDependencyFactory(MapNotationParser mapNotationParser) {
-        super(mapNotationParser);
-    }
 
     @Override
     protected String identityFileName() {

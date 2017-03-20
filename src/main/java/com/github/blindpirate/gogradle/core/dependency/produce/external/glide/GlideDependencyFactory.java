@@ -1,9 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.glide;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
-import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
@@ -18,10 +16,6 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseYaml;
  */
 @Singleton
 public class GlideDependencyFactory extends ExternalDependencyFactory {
-    @Inject
-    public GlideDependencyFactory(MapNotationParser mapNotationParser) {
-        super(mapNotationParser);
-    }
 
     @Override
     protected String identityFileName() {
