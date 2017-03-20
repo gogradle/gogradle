@@ -7,7 +7,7 @@
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.2.8'
+    id 'com.github.blindpirate.gogradle' version '0.3.1'
 }
 
 golang {
@@ -153,18 +153,24 @@ golang {
     // cache time for global cache, 24 hours by default
     globalCacheFor 24,'hours'
     
-    // Extra command line arguments in build or test
-    // Empty list by default
-    extraBuildArgs = ['arg1','arg2']
-    extraTestArgs = []
-
-    // Location of build output, the default value is ./.gogradle
-    // It can be absolute or relative (to project root)
-    outputLocation = ''
-    // Pattern or output, note that it must be single quote here
-    outputPattern = '${os}_${arch}_${packageName}'
     // Specify output platforms in cross compile
     // Go 1.5+ required
     targetPlatform = 'windows-amd64, linux-amd64, linux-386'
 }
 ```
+
+
+task build {
+    doLast {
+        go 'run test'
+        golint 'hahaha'
+        run 'golint hahaha'
+    }
+}
+
+task myTask(type:Tool) {
+    doLast {
+       go 'run test'
+       golint ''
+    }
+}
