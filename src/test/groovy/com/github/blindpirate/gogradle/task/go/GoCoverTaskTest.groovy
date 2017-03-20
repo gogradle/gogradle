@@ -113,6 +113,9 @@ class GoCoverTaskTest extends TaskTest {
             assert doc.select('#nav>a')[0].attr('href') == 'index.html'
             assert doc.select('#nav>span')[0].text() == '>'
         }
+
+        // static resources
+        assert new File(projectRoot, '.gogradle/reports/coverage/static').listFiles().size() > 4
     }
 
     @Test(expected = IllegalStateException)

@@ -33,7 +33,6 @@ import static com.github.blindpirate.gogradle.util.IOUtils.copyURLToFile;
 import static com.github.blindpirate.gogradle.util.IOUtils.countLines;
 import static com.github.blindpirate.gogradle.util.IOUtils.decodeInternally;
 import static com.github.blindpirate.gogradle.util.IOUtils.mkdir;
-import static com.github.blindpirate.gogradle.util.IOUtils.readLines;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.IOUtils.write;
 import static com.github.blindpirate.gogradle.util.StringUtils.render;
@@ -47,7 +46,7 @@ public class GoCoverTask extends AbstractGolangTask {
     public static final String COVERAGE_PROFILES_PATH = ".gogradle/reports/coverage/profiles";
     private static final String COVERAGE_HTMLS_PATH = ".gogradle/reports/coverage";
     private static final String COVERAGE_HTML_STATIC_PATH = ".gogradle/reports/coverage/static";
-    private static final String COVERAGE_STATIC_RESOURCE = "coverage/static/";
+    private static final String COVERAGE_STATIC_RESOURCE = "/coverage/static/";
     private static final Logger LOGGER = Logging.getLogger(GoCoverTask.class);
 
     @Inject
@@ -78,11 +77,11 @@ public class GoCoverTask extends AbstractGolangTask {
 
     private void copyStaticResources() {
         mkdir(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH);
-        List<String> files = readLines(
-                GoCoverTask.class.getClassLoader().getResourceAsStream(COVERAGE_STATIC_RESOURCE));
+        List<String> files = asList("bundle.gif", "down.gif", "greenbar.gif", "group.gif",
+                "package.gif", "redbar.gif", "report.gif", "sort.gif", "source.gif", "up.gif");
 
         files.forEach(fileName -> {
-            URL url = getClass().getClassLoader().getResource(COVERAGE_STATIC_RESOURCE + "/" + fileName);
+            URL url = getClass().getResource(COVERAGE_STATIC_RESOURCE + fileName);
             File file = new File(getProject().getRootDir(), COVERAGE_HTML_STATIC_PATH + "/" + fileName);
             copyURLToFile(url, file);
         });

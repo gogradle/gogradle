@@ -44,6 +44,7 @@ golang {
         assert stdout.toString().contains('3 succeed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
 
+
         GoCoverTaskTest.examineCoverageHtmls(resource)
     }
 
