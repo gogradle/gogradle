@@ -5,15 +5,16 @@ import com.google.common.collect.Lists;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
+import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
+@Singleton
 public class ProcessUtils {
     private static final Logger LOGGER = Logging.getLogger(ProcessUtils.class);
-    private static final ProcessUtilsDelegate DELEGATE = new ProcessUtilsDelegate();
 
     public static class ProcessResult {
         private int code;
@@ -39,71 +40,52 @@ public class ProcessUtils {
         }
     }
 
-    public static ProcessResult getResult(Process process) {
-        return DELEGATE.getResult(process);
-    }
-
-    public static String getStdout(Process process) {
+    public String getStdout(Process process) {
         String ret = getResult(process).getStdout();
         LOGGER.debug("Process stdout: {}", ret);
         return ret;
     }
 
-    public static Process run(String... args) {
+    public Process run(String... args) {
         return run(Arrays.asList(args), null, null);
     }
 
-    public static Process run(List<String> args, Map<String, String> envs) {
+    public Process run(List<String> args, Map<String, String> envs) {
         return run(args, envs, null);
     }
 
-    public static Process run(List<String> args, Map<String, String> envs, File workingDirectory) {
+    public ProcessResult getResult(Process process) {
+        try {
+            return new ProcessResult(process);
+        } catch (InterruptedException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public Process run(List<String> args, Map<String, String> envs, File workingDirectory) {
         LOGGER.debug("Forking process: args {}, envs {}, workingDir {}", args, envs, workingDirectory);
-        return DELEGATE.run(args, envs, workingDirectory);
+        try {
+            ProcessBuilder pb = new ProcessBuilder().command(args);
+            if (envs != null) {
+                pb.environment().putAll(envs);
+            }
+            if (workingDirectory != null) {
+                pb.directory(workingDirectory);
+            }
+            return pb.start();
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
     }
 
-    public static ProcessResult runProcessWithCurrentClasspath(Class mainClass,
-                                                               List<String> args,
-                                                               Map<String, String> envs) {
-        return DELEGATE.runProcessWithCurrentClasspath(mainClass, args, envs);
-    }
+    // this should be moved to test source set since it's only used in test
+    ProcessResult runProcessWithCurrentClasspath(Class mainClass,
+                                                 List<String> args,
+                                                 Map<String, String> envs) {
+        String currentClasspath = System.getProperty("java.class.path");
 
-    public static class ProcessUtilsDelegate {
-        private ProcessUtilsDelegate() {
-        }
-
-        ProcessResult getResult(Process process) {
-            try {
-                return new ProcessResult(process);
-            } catch (InterruptedException e) {
-                throw ExceptionHandler.uncheckException(e);
-            }
-        }
-
-        Process run(List<String> args, Map<String, String> envs, File workingDirectory) {
-            try {
-                ProcessBuilder pb = new ProcessBuilder().command(args);
-                if (envs != null) {
-                    pb.environment().putAll(envs);
-                }
-                if (workingDirectory != null) {
-                    pb.directory(workingDirectory);
-                }
-                return pb.start();
-            } catch (IOException e) {
-                throw ExceptionHandler.uncheckException(e);
-            }
-        }
-
-        // this should be moved to test source set since it's only used in test
-        ProcessResult runProcessWithCurrentClasspath(Class mainClass,
-                                                     List<String> args,
-                                                     Map<String, String> envs) {
-            String currentClasspath = System.getProperty("java.class.path");
-
-            List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());
-            cmds.addAll(args);
-            return getResult(run(cmds, envs, null));
-        }
+        List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());
+        cmds.addAll(args);
+        return getResult(run(cmds, envs, null));
     }
 }

@@ -5,20 +5,21 @@ import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.getResult
-import static com.github.blindpirate.gogradle.util.ProcessUtils.run
 
 @RunWith(GogradleRunner)
 @WithResource('')
 class GoBuildIntegrationTest extends IntegrationTestSupport {
 
     File resource
+
+    ProcessUtils processUtils = new ProcessUtils()
 
     String buildDotGradle = """
 ${buildDotGradleBase}
@@ -89,7 +90,7 @@ func main(){
         }
         IOUtils.chmodAddX(exe)
 
-        return getResult(run(exe.toFile().absolutePath)).stdout
+        return processUtils.getResult(processUtils.run(exe.toFile().absolutePath)).stdout
     }
 
     @Test

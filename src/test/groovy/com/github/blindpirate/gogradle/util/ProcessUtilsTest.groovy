@@ -2,10 +2,9 @@ package com.github.blindpirate.gogradle.util
 
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
-import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
-
 class ProcessUtilsTest {
+
+    ProcessUtils processUtils = new ProcessUtils()
 
     class Child {
         static void main(String[] args) {
@@ -18,7 +17,7 @@ class ProcessUtilsTest {
     @Test
     void 'getting result of child process should succeed'() {
         // when
-        ProcessResult result = runProcessWithCurrentClasspath(Child, [], [:])
+        ProcessUtils.ProcessResult result = processUtils.runProcessWithCurrentClasspath(Child, [], [:])
         // then
         assert result.code == 42
         assert result.stderr.contains('This is stderr')

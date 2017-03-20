@@ -4,14 +4,15 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
-import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
-import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
@@ -33,7 +34,6 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-@WithMockProcess
 class MercurialDependencyManagerTest {
     @Mock
     Hg4JMercurialAccessor hg4JAccessor
@@ -52,14 +52,12 @@ class MercurialDependencyManagerTest {
     @Mock
     HgRepository repository
     @Mock
-    ProcessResult hgVersionResult
+    ProcessUtils processUtils
 
     MercurialNotationDependency notationDependency = mockWithName(MercurialNotationDependency, 'bitbucket.org/user/project')
     MercurialResolvedDependency resolvedDependency = mockWithName(MercurialResolvedDependency, 'bitbucket.org/user/project')
 
     MercurialDependencyManager manager
-
-    ProcessUtilsDelegate delegate
 
     File resource
 
@@ -73,11 +71,10 @@ class MercurialDependencyManagerTest {
 
     @Before
     void setUp() {
-        when(delegate.run(['hg', 'version'], null, null)).thenReturn(mock(Process))
-        when(delegate.getResult(any(Process))).thenReturn(hgVersionResult)
-        when(hgVersionResult.getStdout()).thenReturn('Mercurial Distributed SCM (version 4.1)')
+        when(processUtils.run(['hg', 'version'] as String[])).thenReturn(mock(Process))
+        when(processUtils.getStdout(any(Process))).thenReturn('Mercurial Distributed SCM (version 4.1)')
 
-        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, processUtils)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
@@ -92,7 +89,7 @@ class MercurialDependencyManagerTest {
         when(notationDependency.getCommit()).thenReturn('nodeId')
         when(notationDependency.getStrategy()).thenReturn(strategy)
 
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor),anyString())).thenReturn(dependencySet)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencySet)
 
         when(dependencySet.flatten()).thenReturn([])
 
@@ -103,9 +100,9 @@ class MercurialDependencyManagerTest {
     @Test
     void 'hg4j should be used if no hg client found'() {
         // given
-        when(hgVersionResult.getStdout()).thenReturn('This is not hg client')
+        when(processUtils.getStdout(any(Process))).thenReturn('This is not hg client')
         // when
-        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, processUtils)
         // then
         assert ReflectionUtils.getField(manager, 'accessor').is(hg4JAccessor)
     }
@@ -138,7 +135,7 @@ class MercurialDependencyManagerTest {
     @Test
     void 'resetting to specific version should succeed'() {
         // when
-        System.out.println(ReflectionUtils.getField(manager,'accessor').getClass().getName())
+        System.out.println(ReflectionUtils.getField(manager, 'accessor').getClass().getName())
         manager.resetToSpecificVersion(repository, hgChangeset)
         // then
         verify(hgClientAccessor).resetToSpecificNodeId(repository, '1' * 40)

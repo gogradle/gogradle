@@ -6,12 +6,10 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
-import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
@@ -29,19 +27,15 @@ import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
 import static com.github.blindpirate.gogradle.util.StringUtils.*
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockInjector
-@WithMockProcess
 class DefaultBuildManagerTest {
     DefaultBuildManager manager
 
     File resource
-
-    ProcessUtilsDelegate delegate
 
     @Mock
     Project project
@@ -53,6 +47,8 @@ class DefaultBuildManagerTest {
     GitDependencyManager gitDependencyManager
     @Mock
     Process process
+    @Mock
+    ProcessUtils processUtils
 
     GolangPluginSetting setting = new GolangPluginSetting()
 
@@ -62,7 +58,7 @@ class DefaultBuildManagerTest {
 
     @Before
     void setUp() {
-        manager = new DefaultBuildManager(project, binaryManager, setting)
+        manager = new DefaultBuildManager(project, binaryManager, setting, processUtils)
         when(project.getRootDir()).thenReturn(resource)
         setting.packagePath = 'root/package'
 
@@ -72,7 +68,7 @@ class DefaultBuildManagerTest {
         when(binaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('go/bin/go'))
         when(binaryManager.getGoroot()).thenReturn(resource.toPath().resolve('go'))
 
-        when(delegate.run(anyList(), anyMap(), any(File))).thenReturn(process)
+        when(processUtils.run(anyList(), anyMap(), any(File))).thenReturn(process)
         when(process.getErrorStream()).thenReturn(new ByteArrayInputStream([] as byte[]))
         when(process.getInputStream()).thenReturn(new ByteArrayInputStream([] as byte[]))
 
@@ -110,7 +106,7 @@ class DefaultBuildManagerTest {
         // given
         IOUtils.mkdir(resource, 'vendor')
         String dirDuringBuild = null
-        when(delegate.run(anyList(), anyMap(), any(File))).thenAnswer(new Answer<Object>() {
+        when(processUtils.run(anyList(), anyMap(), any(File))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 dirDuringBuild = IOUtils.safeList(resource).first()
@@ -148,7 +144,7 @@ class DefaultBuildManagerTest {
         // when
         manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
         // then
-        verify(delegate).run([goBin, 'build', '-o', 'linux_amd64_project'],
+        verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project'],
                 [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
                 resource)
     }

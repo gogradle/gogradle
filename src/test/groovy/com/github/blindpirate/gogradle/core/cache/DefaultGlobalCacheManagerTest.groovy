@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
@@ -21,7 +22,6 @@ import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManag
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_LOCKFILES_PATH
 import static com.github.blindpirate.gogradle.util.IOUtils.toString
 import static com.github.blindpirate.gogradle.util.IOUtils.write
-import static com.github.blindpirate.gogradle.util.ProcessUtils.runProcessWithCurrentClasspath
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -124,9 +124,11 @@ class DefaultGlobalCacheManagerTest {
         // when
         String filePath = new File(resource, 'shared').getAbsolutePath()
 
+        ProcessUtils processUtils = new ProcessUtils()
+
         Callable runOneProcess = {
             cacheManager.runWithGlobalCacheLock(notationDependency, {
-                runProcessWithCurrentClasspath(CounterProcess, [filePath], [:])
+                processUtils.runProcessWithCurrentClasspath(CounterProcess, [filePath], [:])
             })
         }
 

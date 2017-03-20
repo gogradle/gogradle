@@ -37,21 +37,25 @@ public class MercurialDependencyManager extends AbstractVcsDependencyManager<HgR
 
     private final DependencyVisitor visitor;
 
+    private final ProcessUtils processUtils;
+
     @Inject
     public MercurialDependencyManager(HgClientMercurialAccessor hgClientAccessor,
                                       Hg4JMercurialAccessor hg4JAccessor,
                                       DependencyVisitor visitor,
-                                      GlobalCacheManager cacheManager) {
+                                      GlobalCacheManager cacheManager,
+                                      ProcessUtils processUtils) {
         super(cacheManager);
         this.visitor = visitor;
+        this.processUtils = processUtils;
         this.accessor = determineAccessor(hg4JAccessor, hgClientAccessor);
     }
 
     private MercurialAccessor determineAccessor(Hg4JMercurialAccessor hg4JAccessor,
                                                 HgClientMercurialAccessor hgClientAccessor) {
         try {
-            Process process = ProcessUtils.run("hg", "version");
-            Assert.isTrue(ProcessUtils.getStdout(process).contains("Mercurial"),
+            Process process = processUtils.run("hg", "version");
+            Assert.isTrue(processUtils.getStdout(process).contains("Mercurial"),
                     "Can't find hg in $PATH, do you have mercurial client installed?");
             return hgClientAccessor;
         } catch (Exception e) {

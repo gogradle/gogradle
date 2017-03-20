@@ -65,6 +65,18 @@ public class DefaultBuildManager implements BuildManager {
     private final Project project;
     private final GoBinaryManager goBinaryManager;
     private final GolangPluginSetting setting;
+    private final ProcessUtils processUtils;
+
+    @Inject
+    public DefaultBuildManager(Project project,
+                               GoBinaryManager goBinaryManager,
+                               GolangPluginSetting setting,
+                               ProcessUtils processUtils) {
+        this.project = project;
+        this.goBinaryManager = goBinaryManager;
+        this.setting = setting;
+        this.processUtils = processUtils;
+    }
 
     @Override
     public void ensureDotVendorDirNotExist() {
@@ -110,14 +122,6 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(GogradleGlobal.GOGRADLE_BUILD_DIR_NAME);
     }
 
-    @Inject
-    public DefaultBuildManager(Project project,
-                               GoBinaryManager goBinaryManager,
-                               GolangPluginSetting setting) {
-        this.project = project;
-        this.goBinaryManager = goBinaryManager;
-        this.setting = setting;
-    }
 
     private void renameVendorDuringBuild(Runnable runnable) {
         File vendorDir = new File(project.getRootDir(), VENDOR_DIRECTORY);
@@ -190,7 +194,7 @@ public class DefaultBuildManager implements BuildManager {
         stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
         retcodeConsumer = retcodeConsumer == null ? code -> ensureProcessReturnZero(code, args, env) : retcodeConsumer;
 
-        Process process = ProcessUtils.run(args, determineEnv(env), project.getRootDir());
+        Process process = processUtils.run(args, determineEnv(env), project.getRootDir());
 
         CountDownLatch latch = new CountDownLatch(2);
 

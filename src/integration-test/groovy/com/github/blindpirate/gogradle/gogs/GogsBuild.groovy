@@ -10,6 +10,7 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
@@ -18,9 +19,6 @@ import org.junit.runner.RunWith
 
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.getResult
-import static com.github.blindpirate.gogradle.util.ProcessUtils.run
-
 @RunWith(GogradleRunner)
 @WithMockInjector
 @OnlyWhen("System.getenv('GOGS_DIR')!=null")
@@ -28,6 +26,8 @@ class GogsBuild extends IntegrationTestSupport {
     File resource = new File(System.getenv('GOGS_DIR'))
 
     GitAccessor gitAccessor = new GitAccessor(new GitRepositoryHandler())
+
+    ProcessUtils processUtils = new ProcessUtils()
 
     String buildDotGradle = """
 buildscript {
@@ -86,8 +86,8 @@ vet {
         }
         IOUtils.chmodAddX(gogsBinPath)
 
-        Process process = run([gogsBinPath.toFile().absolutePath], [:])
-        assert getResult(process).stdout.contains('Gogs')
+        Process process = processUtils.run([gogsBinPath.toFile().absolutePath], [:])
+        assert processUtils.getResult(process).stdout.contains('Gogs')
 
     }
 
