@@ -12,6 +12,7 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
@@ -132,13 +133,13 @@ class DefaultBuildManagerTest {
     }
 
     String getBuildGopath() {
-        return "" + new File(resource, '.gogradle/project_gopath') + File.pathSeparator + new File(resource, '.gogradle/build_gopath')
+        return StringUtils.toUnixString("" + new File(resource, '.gogradle/project_gopath') + File.pathSeparator + new File(resource, '.gogradle/build_gopath'))
     }
 
     String getTestGopath() {
-        return "" + new File(resource, '.gogradle/project_gopath') +
+        return StringUtils.toUnixString("" + new File(resource, '.gogradle/project_gopath') +
                 File.pathSeparator + new File(resource, '.gogradle/build_gopath') +
-                File.pathSeparator + new File(resource, '.gogradle/test_gopath')
+                File.pathSeparator + new File(resource, '.gogradle/test_gopath'))
 
     }
 
