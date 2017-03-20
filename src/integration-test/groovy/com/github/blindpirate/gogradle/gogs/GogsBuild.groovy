@@ -48,16 +48,6 @@ vet {
 
 """
 
-    @Before
-    void setUp() {
-        // I don't know why it will fail on Windows
-        if (Os.getHostOs() == Os.WINDOWS) {
-            writeBuildAndSettingsDotGradle(buildDotGradle + 'test.enabled = false')
-        } else {
-            writeBuildAndSettingsDotGradle(buildDotGradle)
-        }
-    }
-
     @Test
     @AccessWeb
     void 'gogs should be built successfully'() {
@@ -65,7 +55,12 @@ vet {
         // v0.9.113
         gitAccessor.checkout(repository, '114c179e5a50e3313f7a5894100693805e64e440')
 
-        writeBuildAndSettingsDotGradle(buildDotGradle)
+        // I don't know why it will fail on Windows
+        if (Os.getHostOs() == Os.WINDOWS) {
+            writeBuildAndSettingsDotGradle(buildDotGradle + 'test.enabled = false')
+        } else {
+            writeBuildAndSettingsDotGradle(buildDotGradle)
+        }
 
         try {
             newBuild {
