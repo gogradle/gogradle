@@ -12,9 +12,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 
 import static org.mockito.ArgumentMatchers.anyString
-import static org.mockito.Mockito.times
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @WithMockInjector
 @RunWith(GogradleRunner)

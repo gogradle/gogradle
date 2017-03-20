@@ -6,7 +6,6 @@ import org.junit.runners.model.FrameworkMethod
 
 import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
 import static com.github.blindpirate.gogradle.util.IOUtils.deleteQuitely
-import static com.github.blindpirate.gogradle.util.IOUtils.forceDelete
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
 
 // Every time we find a @WithProject, a new temp project folder,a new user home folder and

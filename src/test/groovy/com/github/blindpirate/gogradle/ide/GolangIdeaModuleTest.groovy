@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.ide
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.api.Project
 import org.gradle.api.internal.TaskInternal
 import org.gradle.api.tasks.TaskContainer
@@ -17,7 +16,6 @@ import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

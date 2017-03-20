@@ -28,7 +28,8 @@ import java.nio.file.Path
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
-import static com.github.blindpirate.gogradle.util.StringUtils.*
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

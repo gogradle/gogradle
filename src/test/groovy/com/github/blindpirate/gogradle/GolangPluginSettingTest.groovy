@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.mode.BuildMode
-import com.github.blindpirate.gogradle.crossplatform.Arch
-import com.github.blindpirate.gogradle.crossplatform.Os
 import org.junit.Before
 import org.junit.Test
 

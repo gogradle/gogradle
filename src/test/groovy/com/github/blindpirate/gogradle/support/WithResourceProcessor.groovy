@@ -8,10 +8,8 @@ import org.junit.runners.model.FrameworkMethod
 import java.nio.file.Path
 import java.nio.file.Paths
 
-import static com.github.blindpirate.gogradle.GogradleRunner.findAnno
 import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
 import static com.github.blindpirate.gogradle.util.IOUtils.deleteQuitely
-import static com.github.blindpirate.gogradle.util.IOUtils.forceDelete
 
 // Every time we find a @WithResource, that resource will be copyed(or unzipped) to a temp dir
 // At the end of that method, these resource will be  destroyed

@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
+import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

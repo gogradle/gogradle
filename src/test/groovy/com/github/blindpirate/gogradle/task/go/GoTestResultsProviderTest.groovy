@@ -12,9 +12,7 @@ import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult
 import static org.mockito.ArgumentMatchers.anyString
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 class GoTestResultsProviderTest {

@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.specs.Spec
 import org.junit.Before

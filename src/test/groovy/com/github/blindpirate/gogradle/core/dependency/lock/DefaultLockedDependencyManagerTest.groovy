@@ -2,14 +2,14 @@ package com.github.blindpirate.gogradle.core.dependency.lock
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
-import com.github.blindpirate.gogradle.support.WithProject
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
+import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
+import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Project
