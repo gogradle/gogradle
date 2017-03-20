@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
@@ -11,6 +12,7 @@ import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactor
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.ide.IdeaIntegration
 import com.github.blindpirate.gogradle.ide.IntellijIdeIntegration
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
 import org.gradle.api.internal.AbstractTask
@@ -21,6 +23,7 @@ import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
 
+@WithMockInjector
 abstract class TaskTest {
     @Mock
     ProjectInternal project
@@ -51,10 +54,12 @@ abstract class TaskTest {
 
     @Before
     void superSetUp() {
-        for (Map.Entry entry in GolangTaskContainer.TASKS.entrySet())
+        for (Map.Entry entry in GolangTaskContainer.TASKS.entrySet()) {
             GolangTaskContainer.TASKS.each { taskName, taskClass ->
                 golangTaskContainer.put(taskClass, Mockito.mock(taskClass))
             }
+        }
+        Mockito.when(GogradleGlobal.INSTANCE.injector.getInstance(BuildManager)).thenReturn(buildManager)
     }
 
     void assertTaskDependsOn(Task task, Object dependency) {
