@@ -1,13 +1,11 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.GogradleModuleSupport
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 

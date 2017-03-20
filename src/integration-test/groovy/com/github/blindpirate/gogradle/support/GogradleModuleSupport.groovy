@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.support
 
-import com.github.blindpirate.gogradle.GogradleModule
 import com.github.blindpirate.gogradle.GogradleGlobal
+import com.github.blindpirate.gogradle.GogradleModule
 import com.google.inject.Guice
 import com.google.inject.Injector
 import org.gradle.api.internal.project.DefaultProject

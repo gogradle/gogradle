@@ -13,7 +13,6 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
 import org.eclipse.jgit.lib.Repository
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
