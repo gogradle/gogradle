@@ -71,9 +71,6 @@ public class SourceCodeDependencyFactory {
         if (isRelativePath(importPath)) {
             return Optional.empty();
         }
-        if (isSelfDependency(resolvedDependency, importPath)) {
-            return Optional.empty();
-        }
 
         GolangPackage info = packagePathResolver.produce(importPath).get();
         if (info instanceof StandardGolangPackage) {
@@ -85,10 +82,6 @@ public class SourceCodeDependencyFactory {
         }
 
         return Optional.of(info.getRootPath());
-    }
-
-    private boolean isSelfDependency(ResolvedDependency resolvedDependency, String importPath) {
-        return importPath.startsWith(resolvedDependency.getName());
     }
 
     private boolean isRelativePath(String importPath) {
