@@ -86,7 +86,7 @@ project.tasks.withType(Test) {
         it.systemProperty("TEST_ARE_OFFLINE", 'true')
     }
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
-    it.systemProperty('GOGRADLE_ROOT', rootDir)
+    it.systemProperty('GOGRADLE_ROOT', rootDir.absolutePath.replace('\\', '/'))
 }
 
 check.dependsOn javadoc
