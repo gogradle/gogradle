@@ -10,9 +10,11 @@ class OnlyWhenProcessor extends GogradleRunnerProcessor<OnlyWhen> {
     @Override
     boolean shouldIgnore(FrameworkMethod method, OnlyWhen annotation) {
         try {
-            Object ret = !new GroovyShell().evaluate(annotation.value())
-            return ret
+            Object scriptRetValue = new GroovyShell().evaluate(annotation.value())
+            LOGGER.error("script {} result {}", annotation.value(), scriptRetValue)
+            return !scriptRetValue
         } catch (Exception e) {
+            LOGGER.error("", e)
             switch (annotation.ignoreTestWhenException()) {
                 case OnlyWhen.ExceptionStrategy.TRUE:
                     return true
