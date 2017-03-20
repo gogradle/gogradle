@@ -34,9 +34,6 @@ before_install:
 
 after_failure:
   - free -mt
-  - cat /home/travis/gogs/.gogradle/reports/test/packages/*
-  - cat /home/travis/gogs/.gogradle/reports/test/classes/*
-  - cat /home/travis/gogs/.gogradle/reports/test/index.html
 
 
 
