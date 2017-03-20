@@ -48,8 +48,13 @@ golang {
 
     @Test
     void 'gofmt should succeed'() {
-        newBuild {
-            it.forTasks('fmt')
+        try {
+            newBuild {
+                it.forTasks('fmt')
+            }
+        } finally {
+            println(stderr)
+            println(stdout)
         }
 
         assert new File(resource, 'main.go').getText() == '''\
