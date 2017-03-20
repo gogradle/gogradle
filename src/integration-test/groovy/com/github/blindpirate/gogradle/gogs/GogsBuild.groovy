@@ -67,6 +67,14 @@ vet {
             newBuild {
                 it.forTasks('build', 'check')
             }
+        } catch (Exception e) {
+            new File(resource, ".gogradle/reports/test/packages").listFiles().each {
+                println(it.text)
+            }
+            new File(resource, ".gogradle/reports/test/classes").listFiles().each {
+                println(it.text)
+            }
+            throw e
         } finally {
             println(stdout)
             println(stderr)
