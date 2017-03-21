@@ -162,6 +162,10 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
 
     @Override
     protected Optional<Repository> repositoryMatch(File repoRootDir, NotationDependency dependency) {
+        if (repoRootHasOnlyDotGit(repoRootDir)) {
+            // in case of damaged repository dir
+            return Optional.empty();
+        }
         Repository repository = gitAccessor.getRepository(repoRootDir);
         List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
 
@@ -170,5 +174,10 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
         } else {
             return Optional.empty();
         }
+    }
+
+    private boolean repoRootHasOnlyDotGit(File repoRoot) {
+        List<File> files = IOUtils.safeListFiles(repoRoot);
+        return files.size() == 1 && files.get(0).isDirectory() && ".git".equals(files.get(0).getName());
     }
 }

@@ -277,6 +277,16 @@ class GitDependencyManagerTest {
     }
 
     @Test
+    void 'directory has only .git should be cleared'() {
+        // given
+        IOUtils.mkdir(resource, '.git')
+        // when
+        gitDependencyManager.resolve(configuration, notationDependency)
+        // then
+        assert IOUtils.dirIsEmpty(resource)
+    }
+
+    @Test
     void 'installing a resolved dependency should succeed'() {
         // given
         File globalCache = IOUtils.mkdir(resource, 'globalCache')
