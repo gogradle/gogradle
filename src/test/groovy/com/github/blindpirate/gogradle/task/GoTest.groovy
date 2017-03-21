@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.Go
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,9 +50,8 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'setting retcode consumer should succeed'() {
-        Consumer consumer = mock(Consumer)
-        task.retcodeConsumer = consumer
-        assert task.retcodeConsumer == consumer
+    void 'setting continueWhenFail should succeed'() {
+        task.continueWhenFail = true
+        assert ReflectionUtils.getField(task, 'continueWhenFail')
     }
 }

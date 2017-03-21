@@ -14,12 +14,18 @@ import java.util.function.Consumer;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 
 public class Go extends AbstractGolangTask {
+    private static final Consumer<Integer> DO_NOTHING = code -> {
+    };
 
     protected BuildManager buildManager;
 
     private Map<String, String> env;
 
-    private Consumer<Integer> retcodeConsumer;
+    private boolean continueWhenFail;
+
+    public void setContinueWhenFail(boolean continueWhenFail) {
+        this.continueWhenFail = continueWhenFail;
+    }
 
     public Go() {
         dependsOn(PREPARE_TASK_NAME);
@@ -32,14 +38,6 @@ public class Go extends AbstractGolangTask {
 
     public void setEnv(Map<String, String> env) {
         this.env = env;
-    }
-
-    public Consumer<Integer> getRetcodeConsumer() {
-        return retcodeConsumer;
-    }
-
-    public void setRetcodeConsumer(Consumer<Integer> retcodeConsumer) {
-        this.retcodeConsumer = retcodeConsumer;
     }
 
     public void addDefaultActionIfNoCustomActions() {
@@ -57,7 +55,7 @@ public class Go extends AbstractGolangTask {
     }
 
     public void go(List<String> args) {
-        buildManager.go(args, env, null, null, retcodeConsumer);
+        buildManager.go(args, env, null, null, continueWhenFail ? DO_NOTHING : null);
     }
 
     public void run(String arg) {
@@ -66,7 +64,7 @@ public class Go extends AbstractGolangTask {
     }
 
     public void run(List<String> args) {
-        buildManager.run(args, env, null, null, retcodeConsumer);
+        buildManager.run(args, env, null, null, continueWhenFail ? DO_NOTHING : null);
     }
 
     protected List<String> extractArgs(String arg) {
