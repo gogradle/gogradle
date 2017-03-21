@@ -22,7 +22,7 @@ public class BuildException extends RuntimeException {
         return new BuildException("Renaming to " + dotVendorDir + " failed, cannot build or test");
     }
 
-    public static BuildException processReturnNonZero(int retCode) {
-        return new BuildException("Build failed due to non-zero return code of go process: " + retCode);
+    public static BuildException processReturnNonZero(int retCode, String message) {
+        return new BuildException("Build failed due to return code " + retCode + " of: " + message);
     }
 }

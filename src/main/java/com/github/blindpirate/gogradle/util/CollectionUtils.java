@@ -1,12 +1,11 @@
 package com.github.blindpirate.gogradle.util;
 
-import org.codehaus.groovy.runtime.DefaultGroovyMethods;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
 
@@ -28,8 +27,21 @@ public class CollectionUtils {
         return ret;
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> List<T> flatten(List<T>... lists) {
-        return (List<T>) DefaultGroovyMethods.flatten(lists);
+    public static List<String> asStringList(Object... elements) {
+        List<String> ret = new ArrayList<>();
+        Stream.of(elements).forEach(element -> {
+            if (element instanceof Collection) {
+                ret.addAll((Collection) element);
+            } else if (element != null && element.getClass().isArray()) {
+                Stream.of((String[]) element).forEach(ret::add);
+            } else {
+                ret.add((String) element);
+            }
+        });
+        return ret;
+    }
+
+    public static <T> List<T> flatten(List<List<T>> lists) {
+        return lists.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
     }
 }

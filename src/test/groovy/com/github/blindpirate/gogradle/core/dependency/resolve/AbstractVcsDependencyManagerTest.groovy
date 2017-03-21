@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
@@ -45,6 +46,8 @@ class AbstractVcsDependencyManagerTest {
     VendorNotationDependency vendorNotationDependency
     @Mock
     DependencyRegistry dependencyRegistry
+    @Mock
+    GolangConfiguration configuration
 
 
     Object repository = new Object()
@@ -58,8 +61,9 @@ class AbstractVcsDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(resource, '.git', '')
 
+        when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
-        manager = new TestAbstractVcsDependencyManager(cacheManager, dependencyRegistry)
+        manager = new TestAbstractVcsDependencyManager(cacheManager)
 
         when(subclassDelegate.determineVersion(repository, hostNotationDependency)).thenReturn('version')
         when(subclassDelegate.createResolvedDependency(hostNotationDependency, resource, repository, 'version')).thenReturn(hostResolvedDependency)
@@ -99,7 +103,7 @@ class AbstractVcsDependencyManagerTest {
         when(vendorNotationDependency.getVendorPath()).thenReturn('vendor/root/package')
 
         // when
-        ResolvedDependency result = manager.resolve(vendorNotationDependency)
+        ResolvedDependency result = manager.resolve(configuration, vendorNotationDependency)
         // then
         assert result.is(vendorResolvedDependency)
     }
@@ -109,7 +113,7 @@ class AbstractVcsDependencyManagerTest {
         // given
         when(hostResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
         // then
-        manager.resolve(vendorNotationDependency)
+        manager.resolve(configuration, vendorNotationDependency)
     }
 
     @Test
@@ -118,7 +122,7 @@ class AbstractVcsDependencyManagerTest {
         when(dependencyRegistry.getFromCache(vendorNotationDependency))
                 .thenReturn(Optional.of(vendorResolvedDependency))
         // then
-        assert manager.resolve(vendorNotationDependency).is(vendorResolvedDependency)
+        assert manager.resolve(configuration, vendorNotationDependency).is(vendorResolvedDependency)
         verify(cacheManager, times(0)).runWithGlobalCacheLock(any(GolangDependency), any(Callable))
     }
 
@@ -138,6 +142,8 @@ class AbstractVcsDependencyManagerTest {
     @Test
     @MockOffline
     void 'updating repository should be skipped when offline'() {
+        // given
+        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock()
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
@@ -159,7 +165,7 @@ class AbstractVcsDependencyManagerTest {
         // given
         when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(Optional.empty())
         // when
-        manager.resolve(hostNotationDependency)
+        manager.resolve(configuration, hostNotationDependency)
         // then
         verify(cacheManager).updateCurrentDependencyLock()
     }
@@ -167,9 +173,8 @@ class AbstractVcsDependencyManagerTest {
 
     class TestAbstractVcsDependencyManager extends AbstractVcsDependencyManager {
 
-        TestAbstractVcsDependencyManager(GlobalCacheManager cacheManager,
-                                         DependencyRegistry dependencyRegistry) {
-            super(cacheManager, dependencyRegistry)
+        TestAbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
+            super(cacheManager)
         }
 
         @Override

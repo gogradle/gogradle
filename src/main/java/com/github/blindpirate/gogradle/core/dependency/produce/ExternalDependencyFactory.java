@@ -1,31 +1,35 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
+import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.DependencySetUtils;
+import com.github.blindpirate.gogradle.util.MapUtils;
 import com.google.common.collect.ImmutableMap;
 
+import javax.inject.Inject;
 import java.io.File;
+import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-import static com.github.blindpirate.gogradle.build.Configuration.TEST;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
+import static com.github.blindpirate.gogradle.util.DependencySetUtils.parseMany;
 
 public abstract class ExternalDependencyFactory {
-    private Map<Configuration, Function<File, List>> adapters =
+    private Map<String, Function<File, List>> adapters =
             ImmutableMap.of(BUILD, this::adapt, TEST, this::adaptTest);
 
-    protected final MapNotationParser mapNotationParser;
+    @Inject
+    protected MapNotationParser mapNotationParser;
 
-    public ExternalDependencyFactory(MapNotationParser mapNotationParser) {
-        this.mapNotationParser = mapNotationParser;
-    }
+    @Inject
+    private StandardPackagePathResolver standardPackagePathResolver;
 
     /**
      * Relative paths of the identity file.
@@ -36,15 +40,26 @@ public abstract class ExternalDependencyFactory {
     protected abstract String identityFileName();
 
     @SuppressWarnings("unchecked")
-    public Optional<GolangDependencySet> produce(File rootDir, Configuration configuration) {
+    public Optional<GolangDependencySet> produce(File rootDir, String configuration) {
         File identityFile = identityFile(rootDir);
         if (identityFile.exists()) {
             Function<File, List> adapter = adapters.get(configuration);
             List<Map<String, Object>> mapNotations = adapter.apply(identityFile);
-            return Optional.of(DependencySetUtils.parseMany(mapNotations, mapNotationParser));
+
+            mapNotations = removeStandardPackages(mapNotations);
+
+            return Optional.of(parseMany(mapNotations, mapNotationParser));
         } else {
             return Optional.empty();
         }
+    }
+
+    private List<Map<String, Object>> removeStandardPackages(List<Map<String, Object>> packages) {
+        return packages.stream().filter(pkg -> {
+            String path = MapUtils.getString(pkg, MapNotationParser.NAME_KEY, "");
+            return !standardPackagePathResolver.isStandardPackage(Paths.get(path));
+
+        }).collect(Collectors.toList());
     }
 
     /**

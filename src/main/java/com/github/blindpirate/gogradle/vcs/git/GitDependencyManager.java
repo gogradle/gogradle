@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
-import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -24,6 +23,7 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
@@ -41,9 +41,8 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
     @Inject
     public GitDependencyManager(GlobalCacheManager cacheManager,
                                 GitAccessor gitAccessor,
-                                DependencyVisitor visitor,
-                                DependencyRegistry dependencyRegistry) {
-        super(cacheManager, dependencyRegistry);
+                                DependencyVisitor visitor) {
+        super(cacheManager);
         this.gitAccessor = gitAccessor;
         this.visitor = visitor;
     }
@@ -70,7 +69,7 @@ public class GitDependencyManager extends AbstractVcsDependencyManager<Repositor
                 .withRepoUrl(gitAccessor.getRemoteUrl(repository))
                 .withCommitTime(toMilliseconds(commit.getCommitTime()))
                 .build();
-        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor);
+        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, directory, visitor, BUILD);
         ret.setDependencies(dependencies);
 
         setVendorUpdateTimeIfNecessary(repository, dependencies);

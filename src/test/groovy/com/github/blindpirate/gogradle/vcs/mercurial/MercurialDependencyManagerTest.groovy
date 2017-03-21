@@ -1,19 +1,18 @@
 package com.github.blindpirate.gogradle.vcs.mercurial
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
-import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
-import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.ProcessUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
@@ -22,7 +21,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import java.nio.file.Paths
 import java.util.concurrent.Callable
@@ -33,13 +31,9 @@ import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-@WithMockProcess
 class MercurialDependencyManagerTest {
     @Mock
     Hg4JMercurialAccessor hg4JAccessor
@@ -50,8 +44,6 @@ class MercurialDependencyManagerTest {
     @Mock
     GlobalCacheManager cacheManager
     @Mock
-    DependencyRegistry dependencyRegistry
-    @Mock
     HgChangeset hgChangeset
     @Mock
     GolangDependencySet dependencySet
@@ -60,14 +52,12 @@ class MercurialDependencyManagerTest {
     @Mock
     HgRepository repository
     @Mock
-    ProcessResult hgVersionResult
+    ProcessUtils processUtils
 
     MercurialNotationDependency notationDependency = mockWithName(MercurialNotationDependency, 'bitbucket.org/user/project')
     MercurialResolvedDependency resolvedDependency = mockWithName(MercurialResolvedDependency, 'bitbucket.org/user/project')
 
     MercurialDependencyManager manager
-
-    ProcessUtilsDelegate delegate
 
     File resource
 
@@ -81,11 +71,10 @@ class MercurialDependencyManagerTest {
 
     @Before
     void setUp() {
-        when(delegate.run(['hg', 'version'], null, null)).thenReturn(mock(Process))
-        when(delegate.getResult(any(Process))).thenReturn(hgVersionResult)
-        when(hgVersionResult.getStdout()).thenReturn('Mercurial Distributed SCM (version 4.1)')
+        when(processUtils.run(['hg', 'version'] as String[])).thenReturn(mock(Process))
+        when(processUtils.getStdout(any(Process))).thenReturn('Mercurial Distributed SCM (version 4.1)')
 
-        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, dependencyRegistry)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, processUtils)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
@@ -100,7 +89,7 @@ class MercurialDependencyManagerTest {
         when(notationDependency.getCommit()).thenReturn('nodeId')
         when(notationDependency.getStrategy()).thenReturn(strategy)
 
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencySet)
 
         when(dependencySet.flatten()).thenReturn([])
 
@@ -111,9 +100,9 @@ class MercurialDependencyManagerTest {
     @Test
     void 'hg4j should be used if no hg client found'() {
         // given
-        when(hgVersionResult.getStdout()).thenReturn('This is not hg client')
+        when(processUtils.getStdout(any(Process))).thenReturn('This is not hg client')
         // when
-        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, dependencyRegistry)
+        manager = new MercurialDependencyManager(hgClientAccessor, hg4JAccessor, visitor, cacheManager, processUtils)
         // then
         assert ReflectionUtils.getField(manager, 'accessor').is(hg4JAccessor)
     }
@@ -170,9 +159,18 @@ class MercurialDependencyManagerTest {
     @Test
     void 'head commit should be used if tag and nodeId do not exist'() {
         // given
+        when(notationDependency.getTag()).thenReturn(null)
+        when(notationDependency.getCommit()).thenReturn(null)
         when(hgClientAccessor.headOfBranch(repository, 'default')).thenReturn(hgChangeset)
         // then
         assert manager.determineVersion(repository, notationDependency) == hgChangeset
+    }
+
+    @Test
+    void 'concrete commit should succeed'() {
+        assert !manager.isConcreteCommit('NEWEST_COMMIT')
+        assert manager.isConcreteCommit('12345')
+        assert !manager.isConcreteCommit(null)
     }
 
     @Test

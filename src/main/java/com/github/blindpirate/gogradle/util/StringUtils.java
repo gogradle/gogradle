@@ -1,13 +1,18 @@
 package com.github.blindpirate.gogradle.util;
 
 
+import groovy.text.GStringTemplateEngine;
+
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.toList;
 
 public class StringUtils {
     public static String removeEnd(String s, String suffix) {
@@ -38,8 +43,16 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.isEmpty(s);
     }
 
+    public static boolean isNotEmpty(String s) {
+        return !isEmpty(s);
+    }
+
     public static boolean fileNameStartsWithAny(File file, String... prefix) {
         return startsWithAny(file.getName(), prefix);
+    }
+
+    public static boolean fileNameEndsWithAny(File file, String... prefix) {
+        return endsWithAny(file.getName(), prefix);
     }
 
     public static boolean startsWithAny(String str, String... prefix) {
@@ -54,13 +67,33 @@ public class StringUtils {
         return Stream.of(name).anyMatch(file.getName()::equals);
     }
 
+    public static String toUnixString(File file) {
+        return toUnixString(file.toPath());
+    }
+
     public static String toUnixString(Path path) {
         return path.toString().replace("\\", "/");
     }
 
-    public static String render(String template, Map<String, String> context) {
-        AtomicReference<String> result = new AtomicReference<>(template);
-        context.forEach((key, value) -> result.set(result.get().replace("${" + key + "}", value)));
-        return result.get();
+    public static String toUnixString(String s) {
+        return s.replace("\\", "/");
+    }
+
+    public static String render(String template, Map<String, Object> context) {
+        try {
+            context = new HashMap<>(context);
+            return new GStringTemplateEngine().createTemplate(template).make(context).toString();
+        } catch (ClassNotFoundException | IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public static String substring(String s, int start, int end) {
+        return org.apache.commons.lang3.StringUtils.substring(s, start, end);
+    }
+
+    public static String formatEnv(Map<String, String> env) {
+        return String.join("\n",
+                env.entrySet().stream().map(entry -> " " + entry.getKey() + "=" + entry.getValue()).collect(toList()));
     }
 }

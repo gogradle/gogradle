@@ -3,7 +3,11 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoBaseListener;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoLexer;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser;
+import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
+import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
+import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -11,27 +15,45 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildOptionContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTagContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTermContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.ImportPathContext;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 @Singleton
 public class GoImportExtractor {
-
     private final BuildConstraintManager buildConstraintManager;
+
+    private static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
+            BUILD, GoSourceCodeFilter.BUILD_GO_FILTER,
+            TEST, GoSourceCodeFilter.TEST_GO_FILTER
+    );
 
     @Inject
     public GoImportExtractor(BuildConstraintManager buildConstraintManager) {
         this.buildConstraintManager = buildConstraintManager;
     }
 
-    public List<String> extract(String sourceFileContent) {
+    public Set<String> getImportPaths(File dir, String configuration) {
+        Collection<File> files = IOUtils.filterFilesRecursively(dir, FILTERS.get(configuration));
+
+        return files.stream().map(IOUtils::toString)
+                .map(this::extract)
+                .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
+    }
+
+    private List<String> extract(String sourceFileContent) {
         GolangBuildInfoLexer lexer = new GolangBuildInfoLexer(new ANTLRInputStream(sourceFileContent));
         CommonTokenStream tokens = new CommonTokenStream(lexer);
         GolangBuildInfoParser parser = new GolangBuildInfoParser(tokens);
@@ -57,8 +79,7 @@ public class GoImportExtractor {
 
         @Override
         public void enterImportPath(ImportPathContext ctx) {
-            String importPathWithQuote = ctx.STRING_LIT().getText();
-            String importPath = importPathWithQuote.substring(1, importPathWithQuote.length() - 1);
+            String importPath = StringUtils.substring(ctx.STRING_LIT().getText(), 1, -1);
             importPaths.add(importPath);
         }
 

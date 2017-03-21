@@ -19,7 +19,29 @@ class StringUtilsTest {
     }
 
     @Test
-    void 'rendering template should succeed'() {
+    void 'rendering simple template should succeed'() {
         assert StringUtils.render('${a}${b}${c}', [a: '1', b: '2', c: '3']) == '123'
+    }
+
+    @Test
+    void 'rendering complicated template should succeed'() {
+        assert StringUtils.render(
+                '''${a}
+${writer ->
+list.each {
+    def template ='${it.name}${it.url}'
+    def result = ['${it.name}':it.name,'${it.url}':it.url].inject(template, {s,entry -> 
+        s.replace(entry.key,entry.value)
+        })
+        
+    writer << result    
+}
+}
+''', [a: '1', list: [[name: 'name1', url: 'url1'], [name: 'name2', url: 'url2']]]) == '1\nname1url1name2url2\n'
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if rendering fails'() {
+        StringUtils.render('${Class.forName(/unexistent/)}', [:])
     }
 }

@@ -36,7 +36,7 @@ public class GopmfileParser {
 
     public List<Map<String, Object>> parse(File file) {
 
-        List<String> lines = IOUtils.getLines(file)
+        List<String> lines = IOUtils.readLines(file)
                 .stream()
                 .filter(StringUtils::isNotBlank)
                 .collect(Collectors.toList());

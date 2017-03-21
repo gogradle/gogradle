@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -46,7 +47,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
-    public ResolvedDependency resolve() {
+    public ResolvedDependency resolve(GolangConfiguration configuration) {
         return this;
     }
 

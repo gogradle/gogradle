@@ -6,7 +6,6 @@ import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.MockUtils
-import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -20,6 +19,7 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
@@ -59,7 +59,7 @@ class GlobalCachePackagePathResolverTest {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 File file = invocation.getArgument(0)
-                if (StringUtils.toUnixString(file.toPath()).endsWith('github.com/a/b')) {
+                if (toUnixString(file.toPath()).endsWith('github.com/a/b')) {
                     return 'url'
                 } else {
                     throw new IllegalArgumentException()

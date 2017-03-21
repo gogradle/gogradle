@@ -4,9 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
 import com.github.blindpirate.gogradle.vcs.mercurial.hg4j.Hg4JMercurialAccessor
-import com.github.blindpirate.gogradle.vcs.mercurial.hg4j.Hg4JRepository
 import org.junit.Test
 import org.junit.runner.RunWith
 

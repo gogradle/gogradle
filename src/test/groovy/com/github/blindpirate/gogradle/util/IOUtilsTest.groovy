@@ -26,6 +26,8 @@ class IOUtilsTest {
 
     File resource
 
+    File unexistent = new File('/gogradle_unexistent')
+
     @Test(expected = IllegalStateException)
     void 'exception should be thrown when forceMkdir fails'() {
         IOUtils.write(resource, 'dir', '')
@@ -39,7 +41,7 @@ class IOUtilsTest {
 
     @Test(expected = IllegalStateException)
     void 'deleting unexistent file should throw exception'() {
-        IOUtils.forceDelete(new File(resource, 'unexistent'))
+        IOUtils.forceDelete(unexistent)
     }
 
     @Test
@@ -54,9 +56,15 @@ class IOUtilsTest {
     }
 
     @Test
-    void 'safeList should succeed'() {
+    void 'safeList should succeed when File.list() return null'() {
         when(mockFile.list()).thenReturn(null)
         assert IOUtils.safeList(mockFile) == []
+    }
+
+    @Test
+    void 'safeList should succeed'() {
+        IOUtils.mkdir(resource, 'a')
+        assert IOUtils.safeList(resource) == ['a']
     }
 
     @Test
@@ -140,7 +148,7 @@ class IOUtilsTest {
     @Test
     void 'empty list should be returned if file is empty'() {
         IOUtils.write(resource, 'file', '')
-        assert IOUtils.getLines(new File(resource, 'file')) == []
+        assert IOUtils.readLines(new File(resource, 'file')) == []
     }
 
     @Test(expected = IllegalStateException)
@@ -197,6 +205,30 @@ class IOUtilsTest {
 
     @Test(expected = IllegalStateException)
     void 'tracking an unexistent path should fail'() {
-        IOUtils.toRealPath(Paths.get('/gogradle_unexistent'))
+        IOUtils.toRealPath(unexistent.toPath())
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if copyFile fails'() {
+        IOUtils.copyFile(unexistent, unexistent)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if readLines fails'() {
+        // given
+        InputStream is = mock(InputStream)
+        when(is.read()).thenThrow(IOException)
+        // when
+        IOUtils.readLines(is)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if countLines fails'() {
+        IOUtils.countLines(unexistent.toPath())
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if copyURLToFile fails'() {
+        IOUtils.copyURLToFile(new URL('http://unexistent'), unexistent)
     }
 }

@@ -1,18 +1,14 @@
 package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
-import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.core.BuildConstraintManager
-import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.StandardGolangPackage
-import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.*
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
+import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
@@ -21,12 +17,8 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
-import static com.github.blindpirate.gogradle.build.Configuration.TEST
 import static org.mockito.ArgumentMatchers.anyString
-import static org.mockito.Mockito.times
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -74,8 +66,8 @@ class SourceCodeDependencyFactoryTest {
 
     @Test
     void 'empty dependency set should be produced when no go code exists'() {
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
-        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
     @Test
@@ -91,7 +83,7 @@ import (
 func Whatever(){}
 ''')
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
         verify(packagePathResolver, times(0)).produce(anyString())
     }
 
@@ -118,7 +110,7 @@ import (
 func main(){}
 ''')
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
     }
 
     @Test
@@ -126,7 +118,7 @@ func main(){}
         // given
         IOUtils.write(resource, 'main.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource, BUILD)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, 'build')
         // then
         assert result.size() == 1
         assert result.any { it.is(dependency) }
@@ -137,7 +129,7 @@ func main(){}
         // given
         IOUtils.write(resource, 'main_test.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource, TEST)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, 'test')
         // then
         assert result.size() == 1
         assert result.any { it.is(dependency) }
@@ -154,8 +146,8 @@ func main(){}
         IOUtils.write(subsub, 'main_test.go', mainDotGo)
         IOUtils.write(subsub, 'garbage', 'This is unused')
         // when
-        GolangDependencySet buildResult = factory.produce(resolvedDependency, resource, BUILD)
-        GolangDependencySet testResult = factory.produce(resolvedDependency, resource, TEST)
+        GolangDependencySet buildResult = factory.produce(resolvedDependency, resource, 'build')
+        GolangDependencySet testResult = factory.produce(resolvedDependency, resource, 'test')
         // then
         assert buildResult.size() == 1
         assert buildResult.any { it.is(dependency) }
@@ -169,8 +161,8 @@ func main(){}
         IOUtils.write(resource, '_.go', mainDotGo)
         IOUtils.write(resource, '.should_be_ignored.go', mainDotGo)
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
-        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
     @Test
@@ -179,8 +171,8 @@ func main(){}
         IOUtils.write(resource, '_/main.go', mainDotGo)
         IOUtils.write(resource, '.should_be_ignored/main.go', mainDotGo)
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
-        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
     @Test
@@ -189,7 +181,7 @@ func main(){}
         IOUtils.write(resource, 'a_test.go', mainDotGo)
         IOUtils.write(resource, '_test.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource, BUILD)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, 'build')
         // then
         assert result.isEmpty()
     }
@@ -200,7 +192,7 @@ func main(){}
         IOUtils.write(resource, 'main1.go', mainDotGo)
         IOUtils.write(resource, 'main2.go', mainDotGo)
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource, TEST)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, 'test')
         // then
         assert result.isEmpty()
     }
@@ -213,8 +205,8 @@ func main(){}
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         IOUtils.write(vendorDir, "main_test.go", mainDotGo)
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
-        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
     @Test
@@ -225,8 +217,8 @@ func main(){}
         IOUtils.write(vendorDir, "main.go", mainDotGo)
         IOUtils.write(vendorDir, "main_test.go", mainDotGo)
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
-        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
     @Test
@@ -236,8 +228,8 @@ func main(){}
         IOUtils.write(resource, 'main_test.go', mainDotGo)
         when(resolvedDependency.getName()).thenReturn('github.com/a/b')
         // then
-        assert factory.produce(resolvedDependency, resource, BUILD).isEmpty()
-        assert factory.produce(resolvedDependency, resource, TEST).isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'build').isEmpty()
+        assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
     @Test(expected = DependencyProductionException)
@@ -251,7 +243,7 @@ func main(){}
             }
         })
         // then
-        factory.produce(resolvedDependency, resource, BUILD)
+        factory.produce(resolvedDependency, resource, 'build')
     }
 
     String mainDotGo = '''

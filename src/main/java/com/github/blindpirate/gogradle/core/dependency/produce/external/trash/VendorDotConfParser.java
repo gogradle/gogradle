@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 public class VendorDotConfParser {
 
     public List<Map<String, Object>> parse(File file) {
-        List<String> lines = IOUtils.getLines(file);
+        List<String> lines = IOUtils.readLines(file);
         return lines.stream()
                 .filter(this::isNotCommentLine)
                 .filter(StringUtils::isNotBlank)

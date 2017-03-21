@@ -1,0 +1,21 @@
+<script>
+    function decode(s) {
+        s = s.replace(/\./g, '/');
+        s = s.replace(/_DOT_/g, '.');
+        return s;
+    }
+    var tags = document.querySelectorAll('h1,li>a,td>a,.breadcrumbs>a');
+    if (tags) {
+        for (var i = 0; i < tags.length; i++) {
+            tags[i].textContent = decode(tags[i].textContent);
+        }
+    }
+
+    var breadcrumb = document.getElementsByClassName('breadcrumbs');
+    if (breadcrumb && breadcrumb[0]) {
+        var children = breadcrumb[0].childNodes;
+        for (var i = 0; i < children.length; i++) {
+            children[i].textContent = decode(children[i].textContent);
+        }
+    }
+</script>

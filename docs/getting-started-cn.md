@@ -12,13 +12,15 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.2.8'
+    id 'com.github.blindpirate.gogradle' version '0.3.3'
 }
 
 golang {
-    packagePath = 'github.com/your/package' // 欲构建项目的path
+    packagePath = 'github.com/your/package' // 欲构建项目的go import path，注意不是本地目录的路径！
 }
 ```
+
+
 如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。此外，可以令Gogradle生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以删除之。详见[依赖锁定](#依赖锁定)一节。
 
 ## 离线使用Gogradle插件
@@ -59,6 +61,20 @@ gradlew build # Windows
 以上命令等价于在当前项目目录下运行`go build`，区别在于，Gogradle自动完成了依赖解析、安装等一系列过程。注意，Gogradle**不使用全局的`GOPATH`**，它会将所有的依赖安装在当前项目目录下并自动设置与构建相关的环境变量——这意味着构建是完全隔离的、可复现的。
 
 
+若你的main包不在根目录，则需要在`build.gradle`中添加如下代码
+
+```groovy
+build {
+    doLast {
+        go 'build -o ./gogradle/output github.com/my/package/my/subpackage'
+    }
+}
+```
+
+其中go后面的引号是必须的。
+
+
+
 ## 测试Go项目
 
 进入项目目录，运行 
@@ -79,6 +95,8 @@ gradlew test --tests *_test.go // 通配符测试
 ```groovy
 build.dependsOn test
 ```
+
+HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`目录。
 
 ## 添加依赖
 
@@ -177,17 +195,5 @@ golang {
     
     // 全局缓存的时间，默认为24小时
     globalCacheFor 24,'hours'
-    
-    // 在构建和测试时额外传递给go命令行的参数，默认均为空列表
-    extraBuildArgs = ['arg1','arg2']
-    extraTestArgs = []
-
-    // 输出文件的位置，默认为./.gogradle
-    // 可以为绝对路径或者相对项目目录的相对路径
-    outputLocation = ''
-    // 输出文件的格式，这里必须使用单引号
-    outputPattern = '${os}_${arch}_${packageName}'
-    // 交叉编译的输出选项，注意，要求go 1.5+
-    targetPlatform = 'windows-amd64, linux-amd64, linux-386'
 }
 ```

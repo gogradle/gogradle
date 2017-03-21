@@ -8,6 +8,10 @@ public class DateUtils {
         return 1000L * second;
     }
 
+    public static long toMilliseconds(double second) {
+        return (long) (1000L * second);
+    }
+
     public static String formatNow(String pattern) {
         return new SimpleDateFormat(pattern).format(new Date());
     }

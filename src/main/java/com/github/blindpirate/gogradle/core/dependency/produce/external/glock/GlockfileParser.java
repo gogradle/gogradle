@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 public class GlockfileParser {
     public List<Map<String, Object>> parse(File file) {
-        return IOUtils.getLines(file)
+        return IOUtils.readLines(file)
                 .stream()
                 .filter(this::isNotCmdLine)
                 .filter(StringUtils::isNotBlank)

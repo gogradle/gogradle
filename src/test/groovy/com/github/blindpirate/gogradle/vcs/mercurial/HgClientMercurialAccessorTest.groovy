@@ -4,16 +4,17 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.vcs.mercurial.client.HgClientMercurialAccessor
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
-@OnlyWhen(value = '"hg version".execute().text', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
+@OnlyWhen(value = '"hg version".execute().text.contains("Mercurial")', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
 class HgClientMercurialAccessorTest {
 
-    MercurialAccessor accessor = new HgClientMercurialAccessor()
+    MercurialAccessor accessor = new HgClientMercurialAccessor(new ProcessUtils())
 
     File resource
 

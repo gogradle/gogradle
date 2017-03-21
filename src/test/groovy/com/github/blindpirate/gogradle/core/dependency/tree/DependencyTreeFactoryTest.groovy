@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.tree
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -8,7 +9,6 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.InjectMocks
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
@@ -16,11 +16,13 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class DependencyTreeFactoryTest {
-    @InjectMocks
-    DependencyTreeFactory factory
+    DependencyTreeFactory factory = new DependencyTreeFactory()
 
     @Mock
     DependencyRegistry registry
+
+    @Mock
+    GolangConfiguration configuration
 
     @Mock
     ResolvedDependency rootProject
@@ -41,7 +43,7 @@ class DependencyTreeFactoryTest {
     @Before
     void setUp() {
         [rootProject, a1, a2, a3, b, c, d].each {
-            when(it.resolve()).thenReturn(it)
+            when(it.resolve(configuration)).thenReturn(it)
             when(it.getDependencies()).thenReturn(GolangDependencySet.empty())
             when(registry.register(it)).thenReturn(true)
         }
@@ -52,11 +54,13 @@ class DependencyTreeFactoryTest {
         DependencyTreeNode.metaClass.getFinalDependency = {
             return ReflectionUtils.getField(delegate, 'finalDependency')
         }
+
+        when(configuration.getDependencyRegistry()).thenReturn(registry)
     }
 
     void bind(ResolvedDependency dependency, String name) {
         when(dependency.getName()).thenReturn(name)
-        when(registry.retrive(name)).thenReturn(dependency)
+        when(registry.retrieve(name)).thenReturn(dependency)
     }
 
     void bindDependencies(ResolvedDependency dependency, ResolvedDependency... dependencies) {
@@ -102,7 +106,7 @@ class DependencyTreeFactoryTest {
         bindDependencies(a2, d)
         bindDependencies(d, a3)
         // when
-        DependencyTreeNode rootNode = factory.getTree(rootProject)
+        DependencyTreeNode rootNode = factory.getTree(configuration, rootProject)
         // then
         assertChildrenOfNodeAre(rootNode, a2, b)
         assertChildrenOfNodeAre(rootNode.children[0], d)

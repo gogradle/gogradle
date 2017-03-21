@@ -18,7 +18,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.2.8'
+version '0.3.3'
 
 /************** sourcesets **************/
 sourceSets {
@@ -86,12 +86,14 @@ project.tasks.withType(Test) {
         it.systemProperty("TEST_ARE_OFFLINE", 'true')
     }
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
+    it.systemProperty('GOGRADLE_ROOT', rootDir.absolutePath.replace('\\', '/'))
 }
 
 check.dependsOn javadoc
+check.dependsOn jacocoTestReport
 check.dependsOn integrationTest
 integrationTest.dependsOn test
-//test.dependsOn 'jar'
+integrationTest.dependsOn shadowJar
 
 /************** testTop1000 **********/
 

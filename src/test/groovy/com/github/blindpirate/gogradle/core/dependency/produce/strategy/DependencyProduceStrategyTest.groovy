@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import org.junit.Before
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static org.mockito.Mockito.when
 
@@ -50,12 +49,12 @@ abstract class DependencyProduceStrategyTest {
 
     void externalDependencies(GolangDependency... dependencies) {
         GolangDependencySet set = asGolangDependencySet(dependencies)
-        when(visitor.visitExternalDependencies(resolvedDependency, rootDir, BUILD)).thenReturn(set)
+        when(visitor.visitExternalDependencies(resolvedDependency, rootDir, 'build')).thenReturn(set)
     }
 
     void sourceCodeDependencies(GolangDependency... dependencies) {
         GolangDependencySet set = asGolangDependencySet(dependencies)
-        when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)).thenReturn(set)
+        when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')).thenReturn(set)
     }
 
 

@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
@@ -10,7 +9,6 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -36,18 +34,16 @@ public class SourceCodeDependencyFactory {
     @Inject
     public SourceCodeDependencyFactory(PackagePathResolver packagePathResolver,
                                        NotationParser notationParser,
-                                       GoImportExtractor extractor) {
+                                       GoImportExtractor goImportExtractor) {
         this.packagePathResolver = packagePathResolver;
         this.notationParser = notationParser;
-        this.goImportExtractor = extractor;
+        this.goImportExtractor = goImportExtractor;
     }
 
     public GolangDependencySet produce(ResolvedDependency resolvedDependency,
                                        File rootDir,
-                                       Configuration configuration) {
-        SourceCodeDirectoryVisitor visitor = new SourceCodeDirectoryVisitor(configuration, goImportExtractor);
-        IOUtils.walkFileTreeSafely(rootDir.toPath(), visitor);
-        return createDependencies(resolvedDependency, visitor.getImportPaths());
+                                       String configuration) {
+        return createDependencies(resolvedDependency, goImportExtractor.getImportPaths(rootDir, configuration));
     }
 
     private GolangDependencySet createDependencies(ResolvedDependency resolvedDependency, Set<String> importPaths) {
@@ -75,9 +71,6 @@ public class SourceCodeDependencyFactory {
         if (isRelativePath(importPath)) {
             return Optional.empty();
         }
-        if (isSelfDependency(resolvedDependency, importPath)) {
-            return Optional.empty();
-        }
 
         GolangPackage info = packagePathResolver.produce(importPath).get();
         if (info instanceof StandardGolangPackage) {
@@ -89,10 +82,6 @@ public class SourceCodeDependencyFactory {
         }
 
         return Optional.of(info.getRootPath());
-    }
-
-    private boolean isSelfDependency(ResolvedDependency resolvedDependency, String importPath) {
-        return importPath.startsWith(resolvedDependency.getName());
     }
 
     private boolean isRelativePath(String importPath) {

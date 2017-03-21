@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 import static org.mockito.Mockito.times
 import static org.mockito.Mockito.verify
 
@@ -19,10 +18,10 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
 
         // when
-        strategy.produce(resolvedDependency, rootDir, visitor)
+        strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         //then
-        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)
+        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
     @Test
@@ -32,13 +31,13 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         externalDependencies(a2, c2)
 
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
         // then
         assert result.any { it.is(a1) }
         assert result.any { it.is(b1) }
         assert result.any { it.is(c2) }
         assert !result.any { it.is(a2) }
-        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
     @Test
@@ -47,11 +46,11 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies(a1)
         externalDependencies()
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
         // then
         assert result.size() == 1
         assert result.any { it.is(a1) }
-        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
     @Test
@@ -60,11 +59,11 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
         externalDependencies(a2)
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor)
+        def result = strategy.produce(resolvedDependency, rootDir, visitor,'build')
         // then
         assert result.size() == 1
         assert result.any { it.is(a2) }
-        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, BUILD)
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
 }

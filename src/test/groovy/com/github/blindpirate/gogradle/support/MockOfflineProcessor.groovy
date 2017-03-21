@@ -4,8 +4,6 @@ import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.runners.model.FrameworkMethod
 
-import java.lang.annotation.Annotation
-
 class MockOfflineProcessor extends GogradleRunnerProcessor<MockOffline> {
     Boolean originalValue
 

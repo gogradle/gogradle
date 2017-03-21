@@ -12,8 +12,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
-
 @RunWith(GogradleRunner)
 class SourceCodeAnalysisTest extends GogradleModuleSupport {
 
@@ -32,7 +30,7 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
         // given
         Mockito.when(resolvedDependency.getName()).thenReturn("name")
         // when
-        GolangDependencySet result = factory.produce(resolvedDependency, resource, BUILD)
+        GolangDependencySet result = factory.produce(resolvedDependency, resource, 'build')
 
         // then
         def expectation = ['golang.org/x/tools', 'github.com/golang/example'] as Set

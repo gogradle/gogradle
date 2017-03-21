@@ -12,35 +12,14 @@ import java.util.Map;
 public abstract class IdeIntegration {
 
     private static final String GO_LIBRARIES_DOT_XML_PATH = ".idea/goLibraries.xml";
-    private static final String GO_LIBRARIES_DOT_XML_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<project version=\"4\">\n"
-            + "  <component name=\"GoLibraries\">\n"
-            + "    <option name=\"urls\">\n"
-            + "      <list>\n"
-            + "        <option value=\"file://$PROJECT_DIR$/.gogradle/project_gopath\" />\n"
-            + "        <option value=\"file://$PROJECT_DIR$/.gogradle/build_gopath\" />\n"
-            + "        <option value=\"file://$PROJECT_DIR$/.gogradle/test_gopath\" />\n"
-            + "      </list>\n"
-            + "    </option>\n"
-            + "  </component>\n"
-            + "</project>";
 
     private static final String MODULES_DOT_XML_PATH = ".idea/modules.xml";
-    private static final String MODULES_DOT_XML_CONTENT = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<project version=\"4\">\n"
-            + "  <component name=\"ProjectModuleManager\">\n"
-            + "    <modules>\n"
-            + "      <module fileurl=\"file://$PROJECT_DIR$/${moduleImlDir}/${projectName}.iml\" "
-            + "filepath=\"$PROJECT_DIR$/${moduleImlDir}/${projectName}.iml\" />\n"
-            + "    </modules>\n"
-            + "  </component>\n"
-            + "</project>\n";
 
     protected final GoBinaryManager goBinaryManager;
 
     protected final Project project;
 
-    private final Map<String, String> context = new HashMap<>();
+    private final Map<String, Object> context = new HashMap<>();
 
     protected IdeIntegration(GoBinaryManager goBinaryManager, Project project) {
         this.goBinaryManager = goBinaryManager;
@@ -59,7 +38,9 @@ public abstract class IdeIntegration {
     }
 
     private void generateGoLibrariesDotXml() {
-        writeFileIntoProjectRoot(GO_LIBRARIES_DOT_XML_PATH, GO_LIBRARIES_DOT_XML_CONTENT);
+        String goLibrariesXmlTemplate = IOUtils.toString(
+                IdeIntegration.class.getClassLoader().getResourceAsStream("ide/goLibraries.xml"));
+        writeFileIntoProjectRoot(GO_LIBRARIES_DOT_XML_PATH, goLibrariesXmlTemplate);
     }
 
     protected abstract void generateModuleIml();
@@ -67,7 +48,9 @@ public abstract class IdeIntegration {
     protected abstract void generateGoSdkDotXml();
 
     private void generateModulesDotXml() {
-        String content = render(MODULES_DOT_XML_CONTENT);
+        String modulesDotXmlTemplate = IOUtils.toString(
+                IdeIntegration.class.getClassLoader().getResourceAsStream("ide/modules.xml.template"));
+        String content = render(modulesDotXmlTemplate);
         writeFileIntoProjectRoot(MODULES_DOT_XML_PATH, content);
     }
 
@@ -79,7 +62,7 @@ public abstract class IdeIntegration {
         return StringUtils.render(template, getContext());
     }
 
-    private Map<String, String> getContext() {
+    private Map<String, Object> getContext() {
         if (context.isEmpty()) {
             loadContext();
         }

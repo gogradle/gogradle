@@ -7,7 +7,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 
 
 public class InstallBuildDependenciesTask extends AbstractGolangTask {

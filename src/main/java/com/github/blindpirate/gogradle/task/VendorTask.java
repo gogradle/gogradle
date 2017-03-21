@@ -6,7 +6,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyF
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import org.gradle.api.Project;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
@@ -18,8 +17,6 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_B
 public class VendorTask extends AbstractGolangTask {
 
     @Inject
-    private Project project;
-    @Inject
     private BuildManager buildManager;
 
     public VendorTask() {
@@ -28,7 +25,7 @@ public class VendorTask extends AbstractGolangTask {
 
     @TaskAction
     void vendor() {
-        File vendorDir = new File(project.getRootDir(), VendorDependencyFactory.VENDOR_DIRECTORY);
+        File vendorDir = new File(getProject().getRootDir(), VendorDependencyFactory.VENDOR_DIRECTORY);
         if (vendorDir.exists()) {
             Assert.isTrue(vendorDir.isDirectory(), "Vendor must be a directory!");
             clearAllSubDirectories(vendorDir);

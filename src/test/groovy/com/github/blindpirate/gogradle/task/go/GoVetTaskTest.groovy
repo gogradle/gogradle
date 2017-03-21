@@ -1,44 +1,38 @@
-package com.github.blindpirate.gogradle.task
+package com.github.blindpirate.gogradle.task.go
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.task.TaskTest
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
-import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
-class TestTaskTest extends TaskTest {
-    TestTask task
+class GoVetTaskTest extends TaskTest {
+    GoVetTask task
 
     @Before
     void setUp() {
-        task = buildTask(TestTask)
+        task = buildTask(GoVetTask)
+
+        Mockito.when(setting.getPackagePath()).thenReturn('github.com/my/package')
     }
 
     @Test
-    void 'test task should depend on install task'() {
+    void 'it should depend on install tasks'() {
         assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
         assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
     }
 
     @Test
-    void 'test task should be executed properly'() {
+    void 'go vet should succeed'() {
         // when
-        task.test()
+        task.doAddDefaultAction()
+        task.actions[0].execute(task)
         // then
-        verify(buildManager).test()
-    }
-
-    @Test
-    void 'test task should be executed with pattern when provided'() {
-        // given
-        task.setTestNamePattern(['pattern'])
-        // when
-        task.test()
-        // then
-        verify(buildManager).testWithPatterns(['pattern'])
+        Mockito.verify(buildManager).go(['vet', './...'], null, null, null, null)
     }
 }

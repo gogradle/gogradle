@@ -75,11 +75,11 @@ Place `gradlew`/`gradle`/`build.gradle` as documented in [Getting Started](./get
 - 1st method: run `gradlew idea` in project root directory, then do `File`-`Open` to the project root.
 - 2nd method: use `File`-`Open` to open `build.gradle` and select `Open as Project` as follows.
 
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/openproject.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/openproject.png)
 
 IDEA has Gradle integrated, so you can enable it via `View > ToolWindows > Gradle` and sync your project with button on that tool window:
 
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/gradle.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
 ## Gogland
 

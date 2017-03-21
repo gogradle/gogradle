@@ -17,7 +17,7 @@ class VendorOnlyProduceStrategyTest extends DependencyProduceStrategyTest {
         sourceCodeDependencies(c1)
 
         // when
-        GolangDependencySet result = strategy.produce(resolvedDependency, rootDir, visitor)
+        GolangDependencySet result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
         assert result.size() == 1

@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.build.Configuration;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 
 public class ResolveBuildDependenciesTask extends ResolveTask {
     @Override
-    protected Configuration getConfiguration() {
-        return Configuration.BUILD;
+    protected String getConfigurationName() {
+        return BUILD;
     }
 }

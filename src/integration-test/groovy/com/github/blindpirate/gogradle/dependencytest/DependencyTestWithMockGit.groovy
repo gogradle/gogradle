@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.dependencytest
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
+import com.github.blindpirate.gogradle.support.WithMockGo
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
@@ -11,6 +12,7 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithProject
 @WithResource('dependency-test-with-mock-git.zip')
+@WithMockGo
 class DependencyTestWithMockGit extends IntegrationTestSupport {
 
     File globalCache
@@ -27,8 +29,6 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
         projectRoot = new File(resource, 'project')
         fsRoot = new File(resource, 'mock-fs-root')
         mockGitRepo = new File(resource, 'mock-git-repo')
-
-        baseSetUp()
     }
 
 
@@ -73,7 +73,8 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
     List<String> buildArguments() {
         return super.buildArguments() + ["-PmockFsRoot=${fsRoot.absolutePath}",
                                          "-PmockGitRepo=${mockGitRepo.absolutePath}",
-                                         "-Puserhome=${userhome.absolutePath}"]
+                                         "-Puserhome=${userhome.absolutePath}",
+                                         "-Pclasspath=${System.getProperty('java.class.path').replace('\\', '/')}"]
     }
 
     @Override

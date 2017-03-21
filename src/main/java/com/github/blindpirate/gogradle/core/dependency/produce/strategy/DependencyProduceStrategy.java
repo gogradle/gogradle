@@ -18,5 +18,8 @@ public interface DependencyProduceStrategy {
 
     DependencyProduceStrategy DEFAULT_STRATEGY = new DefaultDependencyProduceStrategy();
 
-    GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor);
+    GolangDependencySet produce(ResolvedDependency dependency,
+                                File rootDir,
+                                DependencyVisitor visitor,
+                                String configuration);
 }

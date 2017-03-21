@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 
 import java.io.File;
@@ -27,7 +28,7 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
     }
 
     @Override
-    public ResolvedDependency resolve() {
+    public ResolvedDependency resolve(GolangConfiguration configuration) {
         return this;
     }
 

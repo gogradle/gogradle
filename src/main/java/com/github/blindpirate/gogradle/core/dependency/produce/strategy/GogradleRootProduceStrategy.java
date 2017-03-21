@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.build.Configuration;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -25,7 +24,7 @@ import java.io.File;
  * a scan for external dependency management tools will be performed.
  */
 @Singleton
-public class GogradleRootProduceStrategy {
+public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
 
     private final GolangPluginSetting settings;
     private final ConfigurationContainer configurationContainer;
@@ -45,7 +44,7 @@ public class GogradleRootProduceStrategy {
     public GolangDependencySet produce(ResolvedDependency dependency,
                                        File rootDir,
                                        DependencyVisitor visitor,
-                                       Configuration configuration) {
+                                       String configuration) {
         // Here we can just fetch them from internal container
         GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
         GolangDependencySet lockedDependencies = getLockedDependencies(dependency, rootDir, visitor, configuration);
@@ -76,7 +75,7 @@ public class GogradleRootProduceStrategy {
     private GolangDependencySet getLockedDependencies(ResolvedDependency dependency,
                                                       File rootDir,
                                                       DependencyVisitor visitor,
-                                                      Configuration configuration) {
+                                                      String configuration) {
         GolangDependencySet lockedByGogradle = lockedDependenciesManager.getLockedDependencies(configuration);
         if (lockedByGogradle.isEmpty()) {
             return visitor.visitExternalDependencies(dependency, rootDir, configuration);
@@ -85,11 +84,10 @@ public class GogradleRootProduceStrategy {
         }
     }
 
-    private GolangDependencySet getDependenciesInBuildDotGradle(Configuration configuration) {
+    private GolangDependencySet getDependenciesInBuildDotGradle(String configuration) {
         GolangConfiguration golangConfiguration =
-                (GolangConfiguration) configurationContainer.getByName(configuration.getName());
+                (GolangConfiguration) configurationContainer.getByName(configuration);
 
         return DependencySetFacade.class.cast(golangConfiguration.getDependencies()).toGolangDependencies();
     }
-
 }

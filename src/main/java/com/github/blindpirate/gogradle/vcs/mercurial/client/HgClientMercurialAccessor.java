@@ -7,6 +7,8 @@ import com.github.blindpirate.gogradle.vcs.mercurial.HgChangeset;
 import com.github.blindpirate.gogradle.vcs.mercurial.HgRepository;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialAccessor;
 
+import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
@@ -16,19 +18,26 @@ import java.util.regex.Pattern;
 
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult;
-import static com.github.blindpirate.gogradle.util.ProcessUtils.run;
 import static java.util.Arrays.asList;
 
+@Singleton
 public class HgClientMercurialAccessor implements MercurialAccessor {
     private static final Pattern DEFAULT_URL_PATTERN = Pattern.compile("default\\s*=\\s*(\\S+)");
     // tip                                2:620889544e2d
     // commit2_tag                        1:1eaebd519f4c
     private static final Pattern TAGS_PATTERN = Pattern.compile("(\\w+)\\s+(\\d)+:([a-fA-F0-9]+)");
 
+    private final ProcessUtils processUtils;
+
+    @Inject
+    public HgClientMercurialAccessor(ProcessUtils processUtils) {
+        this.processUtils = processUtils;
+    }
+
     @Override
     public String getRemoteUrl(File repoRoot) {
-        Process process = run(asList("hg", "paths"), null, repoRoot);
-        ProcessResult result = ProcessUtils.getResult(process);
+        Process process = processUtils.run(asList("hg", "paths"), null, repoRoot);
+        ProcessResult result = processUtils.getResult(process);
 
         checkReturnCode(result, asList("hg", "paths"), repoRoot);
 
@@ -55,16 +64,16 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
 
     private void runCmdsInRepo(List<String> cmds, HgRepository repository) {
         File repoRoot = repository == null ? null : HgClientRepository.class.cast(repository).getRootDir();
-        Process process = run(cmds, null, repoRoot);
-        checkReturnCode(ProcessUtils.getResult(process), cmds, repoRoot);
+        Process process = processUtils.run(cmds, null, repoRoot);
+        checkReturnCode(processUtils.getResult(process), cmds, repoRoot);
     }
 
     @Override
     public long getLastCommitTimeOfPath(HgRepository repository, String relativePath) {
         File repoRoot = HgClientRepository.class.cast(repository).getRootDir();
         List<String> cmds = asList("hg", "log", relativePath, "--limit", "1", "--template", "{date|hgdate}");
-        Process process = run(cmds, null, repoRoot);
-        ProcessResult result = ProcessUtils.getResult(process);
+        Process process = processUtils.run(cmds, null, repoRoot);
+        ProcessResult result = processUtils.getResult(process);
 
         checkReturnCode(result, cmds, repoRoot);
 
@@ -87,8 +96,8 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
     @Override
     public Optional<HgChangeset> findChangesetByTag(HgRepository repository, String tag) {
         File repoRoot = HgClientRepository.class.cast(repository).getRootDir();
-        Process process = run(asList("hg", "tags", "--debug"), null, repoRoot);
-        ProcessResult result = ProcessUtils.getResult(process);
+        Process process = processUtils.run(asList("hg", "tags", "--debug"), null, repoRoot);
+        ProcessResult result = processUtils.getResult(process);
 
         checkReturnCode(result, asList("hg", "tags", "--debug"), repoRoot);
 
@@ -110,8 +119,8 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
     private HgChangeset findDetailOfChangeset(String changesetId, File repo) {
         // 1487252847 -28800
         List<String> cmds = Arrays.asList("hg", "log", "-r" + changesetId, "--template", "{date|hgdate}");
-        Process process = run(cmds, null, repo);
-        ProcessResult result = ProcessUtils.getResult(process);
+        Process process = processUtils.run(cmds, null, repo);
+        ProcessResult result = processUtils.getResult(process);
 
         checkReturnCode(result, cmds, repo);
 
@@ -130,8 +139,8 @@ public class HgClientMercurialAccessor implements MercurialAccessor {
         // 620889544e2db8b064180431bcd1bb965704f4c2 1487252847 -28800
         List<String> cmds = asList("hg", "log", "--limit", "1", "--template", "{node} {date|hgdate}");
 
-        Process process = run(cmds, null, repoRoot);
-        ProcessResult result = ProcessUtils.getResult(process);
+        Process process = processUtils.run(cmds, null, repoRoot);
+        ProcessResult result = processUtils.getResult(process);
         checkReturnCode(result, cmds, repoRoot);
 
         String[] idTimestampTimezone = StringUtils.splitAndTrim(result.getStdout(), "\\s");

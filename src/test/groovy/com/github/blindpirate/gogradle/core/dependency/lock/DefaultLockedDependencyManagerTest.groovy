@@ -2,34 +2,40 @@ package com.github.blindpirate.gogradle.core.dependency.lock
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.WithProject
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
+import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
+import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.InjectMocks
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
-import static com.github.blindpirate.gogradle.build.Configuration.TEST
+import java.nio.file.Path
+
 import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfaces
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithProject
 class DefaultLockedDependencyManagerTest {
-    DefaultLockedDependencyManager manager
     Project project
     @Mock
     MapNotationParser parser
+    @Mock
+    StandardPackagePathResolver standardPackagePathResolver
+    @InjectMocks
+    DefaultLockedDependencyManager manager
     GolangDependency dependency1 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
     GolangDependency dependency2 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
     GolangDependency dependency3 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
@@ -55,11 +61,12 @@ dependencies:
 
     @Before
     void setUp() {
-        manager = new DefaultLockedDependencyManager(parser, project)
+        ReflectionUtils.setField(manager, 'project', project)
         when(dependency1.getName()).thenReturn('a')
         when(dependency2.getName()).thenReturn('b')
         when(dependency3.getName()).thenReturn('a')
         when(dependency4.getName()).thenReturn('c')
+        when(standardPackagePathResolver.isStandardPackage(any(Path))).thenReturn(false)
     }
 
     void prepareGogradleDotLock() {
@@ -75,8 +82,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.getLockedDependencies(BUILD)
-        GolangDependencySet testResult = manager.getLockedDependencies(TEST)
+        GolangDependencySet buildResult = manager.getLockedDependencies('build')
+        GolangDependencySet testResult = manager.getLockedDependencies('test')
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }
@@ -90,8 +97,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.produce(project.rootDir, BUILD).get()
-        GolangDependencySet testResult = manager.produce(project.rootDir, TEST).get()
+        GolangDependencySet buildResult = manager.produce(project.rootDir, 'build').get()
+        GolangDependencySet testResult = manager.produce(project.rootDir, 'test').get()
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }

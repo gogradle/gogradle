@@ -13,6 +13,8 @@ Gogradle is a gradle plugin which provides support for building golang.
 > 2017-02-12 Now Gogradle can build 526 of [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) **WITHOUT** any extra configuration!
 >
 > 2017-02-26 Now Gogradle can integrate with IDE perfectly!
+>
+> 2017-03-20 Now Gogradle can generate HTML reports for test and coverage! 
 
 ## Feature
 
@@ -42,6 +44,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Additional features for users in mainland China who are behind the [GFW](https://en.wikipedia.org/wiki/Great_Firewall)
 - Support shadowsocks proxy 
 - IDE support (IntelliJIDEA/Gogland/Webstorm/PhpStorm/PyCharm/RubyMine/CLion/Vim)
+- Test and coverage report generation
 - Support incremental build (developing)
 
 ## Highlight
@@ -49,7 +52,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Project-scope build
 - Perfect cross-platform support
 - Almost all external package management supported
-- Fully test coverage
+- Test and coverage support and report generation
 - Long-term support
 - Various gradle plugin to enpower your build
 
@@ -66,6 +69,16 @@ Gogradle is a gradle plugin which provides support for building golang.
 
 > **NOTE** Gogradle doesn't conform Golang's global [workspace convention](https://golang.org/doc/code.html#Workspaces). It will generate a project-scoped GOPATH for each project instead of use the global one.
 
+Test report
+
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/index.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/classes.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/packages.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/failedtest.png)
+
+Coverage report
+
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coveragepackage.png)
 
 ## Contributing
 

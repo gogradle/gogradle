@@ -7,13 +7,17 @@ import java.util.Map;
 
 public class MapUtils {
     public static String getString(Map<String, Object> map, String key) {
+        return getString(map, key, null);
+    }
+
+    public static String getString(Map<String, Object> map, String key, String defaultValue) {
         if (map != null) {
             Object answer = map.get(key);
             if (answer != null) {
                 return answer.toString();
             }
         }
-        return null;
+        return defaultValue;
     }
 
     @SuppressWarnings("unchecked")
@@ -24,6 +28,16 @@ public class MapUtils {
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2) {
         return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3) {
+        return asMap(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3));
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
+        return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4)});
     }
 
     private static <K, V> Map<K, V> asMap(Pair<K, V>... entries) {

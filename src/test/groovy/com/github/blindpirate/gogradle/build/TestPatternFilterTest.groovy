@@ -69,11 +69,11 @@ class TestPatternFilterTest {
     }
 
     TestPatternFilter filter(String pattern) {
-        return new TestPatternFilter([pattern])
+        return TestPatternFilter.withPattern([pattern])
     }
 
     TestPatternFilter filter(List<String> patterns) {
-        return new TestPatternFilter(patterns)
+        return TestPatternFilter.withPattern(patterns)
     }
 
 }

@@ -3,12 +3,10 @@ package com.github.blindpirate.gogradle.crossplatform
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
-import com.github.blindpirate.gogradle.support.WithMockProcess
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
-import com.github.blindpirate.gogradle.util.ProcessUtils.ProcessUtilsDelegate
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -27,20 +25,19 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-@WithMockProcess
 class DefaultGoBinaryManagerTest {
     @Mock
     GolangPluginSetting setting
     @Mock
     HttpUtils httpUtils
     @Mock
-    ProcessResult processResult
+    ProcessUtils.ProcessResult processResult
     @Mock
     GlobalCacheManager cacheManager
+    @Mock
+    ProcessUtils processUtils
 
     File resource
-
-    ProcessUtilsDelegate delegate
 
     InputStream mockGoTarGz = getClass().classLoader.getResourceAsStream('mock-go-1.7.4' + Os.getHostOs().archiveExtension())
 
@@ -53,8 +50,8 @@ class DefaultGoBinaryManagerTest {
     void setUp() {
         Process process = mock(Process)
         when(setting.getGoExecutable()).thenReturn("go")
-        when(delegate.run(['go', 'version'], null, null)).thenReturn(process)
-        when(delegate.getResult(process)).thenReturn(processResult)
+        when(processUtils.run(['go', 'version'], null, null)).thenReturn(process)
+        when(processUtils.getResult(process)).thenReturn(processResult)
 
         when(cacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
             @Override
@@ -71,22 +68,22 @@ class DefaultGoBinaryManagerTest {
                 return null
             }
         })
-        manager = new DefaultGoBinaryManager(setting, cacheManager, httpUtils)
+        manager = new DefaultGoBinaryManager(setting, cacheManager, httpUtils, processUtils)
     }
 
     private turnOnMockGo() {
         IOUtils.write(resource, "go/bin/go${Os.getHostOs().exeExtension()}", '')
         environmentVariables.set('PATH', new File(resource, 'go/bin').absolutePath)
         Process process = mock(Process)
-        when(delegate.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'], null, null)).thenReturn(process)
-        when(delegate.getResult(process)).thenReturn(processResult)
+        when(processUtils.run([new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}").absolutePath, 'version'] as String[])).thenReturn(process)
+        when(processUtils.getResult(process)).thenReturn(processResult)
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
 
     @Test
     void 'user-specified go binary should be ignored if it cannot be executed'() {
         // given
-        when(delegate.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
+        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
         when(setting.getGoExecutable()).thenReturn('/unexistent/go')
         // then
         'the newest stable version will be used if local binary not exist and no version specified'()

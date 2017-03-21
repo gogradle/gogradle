@@ -8,8 +8,6 @@ import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import javax.inject.Singleton;
 import java.io.File;
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
-
 /**
  * Default strategy to generate dependencies of a package.
  * <p>
@@ -21,15 +19,19 @@ import static com.github.blindpirate.gogradle.build.Configuration.BUILD;
 public class DefaultDependencyProduceStrategy implements DependencyProduceStrategy {
     @Override
     @DebugLog
-    public GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor) {
-        GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency, rootDir, BUILD);
+    public GolangDependencySet produce(ResolvedDependency dependency,
+                                       File rootDir,
+                                       DependencyVisitor visitor,
+                                       String configuration) {
+        GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency,
+                rootDir, configuration);
 
         GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
 
         GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
 
         if (candidate.isEmpty()) {
-            return visitor.visitSourceCodeDependencies(dependency, rootDir, BUILD);
+            return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         } else {
             return candidate;
         }

@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
+import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
@@ -29,11 +31,19 @@ import java.util.Set;
 
 public class GolangConfiguration implements Configuration {
 
+    public static final String BUILD = "build";
+    public static final String TEST = "test";
+
     private final String name;
     private final GolangDependencySet dependencies = new GolangDependencySet();
+    private final DependencyRegistry dependencyRegistry = new DefaultDependencyRegistry();
 
     public GolangConfiguration(String name) {
         this.name = name;
+    }
+
+    public DependencyRegistry getDependencyRegistry() {
+        return dependencyRegistry;
     }
 
     @Override

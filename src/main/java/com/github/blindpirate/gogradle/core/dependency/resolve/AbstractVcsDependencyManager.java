@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
-import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
@@ -29,23 +29,19 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
     private final GlobalCacheManager globalCacheManager;
 
-    private final DependencyRegistry dependencyRegistry;
-
-    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager,
-                                        DependencyRegistry dependencyRegistry) {
+    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
         this.globalCacheManager = cacheManager;
-        this.dependencyRegistry = dependencyRegistry;
     }
 
     @Override
-    public ResolvedDependency resolve(final NotationDependency dependency) {
-        Optional<ResolvedDependency> resultInCache = dependencyRegistry.getFromCache(dependency);
+    public ResolvedDependency resolve(GolangConfiguration configuration, NotationDependency dependency) {
+        Optional<ResolvedDependency> resultInCache = configuration.getDependencyRegistry().getFromCache(dependency);
         if (resultInCache.isPresent()) {
             return resultInCache.get();
         }
         ResolvedDependency ret = doResolve(dependency);
 
-        dependencyRegistry.putIntoCache(dependency, ret);
+        configuration.getDependencyRegistry().putIntoCache(dependency, ret);
         return ret;
     }
 

@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.util.CompressUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -29,8 +30,6 @@ import java.util.regex.Pattern;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.IOUtils.toRealPath;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult;
-import static com.github.blindpirate.gogradle.util.ProcessUtils.getResult;
-import static com.github.blindpirate.gogradle.util.ProcessUtils.run;
 import static java.lang.Boolean.FALSE;
 import static java.lang.Boolean.TRUE;
 import static org.apache.commons.io.FileUtils.listFiles;
@@ -63,6 +62,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private final GolangPluginSetting setting;
     private final GlobalCacheManager globalCacheManager;
     private final HttpUtils httpUtils;
+    private final ProcessUtils processUtils;
 
     private boolean resolved = false;
     private Path binaryPath;
@@ -72,10 +72,12 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     @Inject
     public DefaultGoBinaryManager(GolangPluginSetting setting,
                                   GlobalCacheManager globalCacheManager,
-                                  HttpUtils httpUtils) {
+                                  HttpUtils httpUtils,
+                                  ProcessUtils processUtils) {
         this.setting = setting;
         this.globalCacheManager = globalCacheManager;
         this.httpUtils = httpUtils;
+        this.processUtils = processUtils;
     }
 
     @Override
@@ -171,8 +173,8 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     private Optional<Pair<Path, String>> tryInvokeGoVersion(Path executablePath) {
         try {
-            Process process = run(executablePath.toAbsolutePath().toString(), "version");
-            ProcessResult result = getResult(process);
+            Process process = processUtils.run(executablePath.toAbsolutePath().toString(), "version");
+            ProcessResult result = processUtils.getResult(process);
             Matcher m = GO_VERSION_OUTPUT_REGEX.matcher(result.getStdout());
             if (m.find()) {
                 Pair binaryPathAndVersion = Pair.of(executablePath, m.group(1));

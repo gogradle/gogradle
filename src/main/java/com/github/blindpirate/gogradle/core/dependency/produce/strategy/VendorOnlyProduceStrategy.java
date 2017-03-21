@@ -12,7 +12,10 @@ import java.io.File;
 public class VendorOnlyProduceStrategy implements DependencyProduceStrategy {
     @Override
     @DebugLog
-    public GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor) {
+    public GolangDependencySet produce(ResolvedDependency dependency,
+                                       File rootDir,
+                                       DependencyVisitor visitor,
+                                       String configuration) {
         return visitor.visitVendorDependencies(dependency, rootDir);
     }
 }

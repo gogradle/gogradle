@@ -114,13 +114,13 @@ public class IdeaSdkHacker {
     }
 
     private Node createSdkNode(Document document, String version, Path goroot) {
-        String gorootSrc = goroot.resolve("src").toAbsolutePath().toString();
+        String gorootSrc = StringUtils.toUnixString(goroot.resolve("src").toAbsolutePath());
 
         Element jdk = createElement(document, "jdk", "version", "2");
         jdk.appendChild(createElement(document, "name", "value", "Go " + version));
         jdk.appendChild(createElement(document, "type", "value", "Go SDK"));
         jdk.appendChild(createElement(document, "version", "value", version));
-        jdk.appendChild(createElement(document, "homePath", "value", goroot.toAbsolutePath().toString()));
+        jdk.appendChild(createElement(document, "homePath", "value", StringUtils.toUnixString(goroot)));
 
         Element roots = document.createElement("roots");
 

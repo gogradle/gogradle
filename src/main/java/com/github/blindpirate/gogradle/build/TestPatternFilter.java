@@ -1,51 +1,20 @@
 package com.github.blindpirate.gogradle.build;
 
-import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory;
-import com.github.blindpirate.gogradle.util.StringUtils;
-import org.apache.commons.io.filefilter.IOFileFilter;
+import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Predicate;
 
-public class TestPatternFilter implements IOFileFilter {
-    private final WildcardFileFilter wildcardFilter;
-
-    public TestPatternFilter(List<String> namePatterns) {
-        this.wildcardFilter = new WildcardFileFilter(namePatterns);
+public class TestPatternFilter extends GoSourceCodeFilter {
+    public static TestPatternFilter withPattern(List<String> patterns) {
+        WildcardFileFilter wildcardFileFilter = new WildcardFileFilter(patterns);
+        Predicate<File> andPredicate = (file) -> wildcardFileFilter.accept(file) && isTestGoFile(file);
+        return new TestPatternFilter(andPredicate);
     }
 
-    @Override
-    public boolean accept(File file) {
-        if (file.isDirectory()) {
-            return acceptDir(file);
-        } else {
-            return acceptFile(file);
-        }
-    }
-
-    private boolean acceptFile(File file) {
-        if (StringUtils.fileNameStartsWithAny(file, "_", ".")) {
-            return false;
-        }
-        if (!file.getName().endsWith("_test.go")) {
-            return false;
-        }
-        return wildcardFilter.accept(file);
-    }
-
-    private boolean acceptDir(File dir) {
-        if (StringUtils.fileNameStartsWithAny(dir, "_", ".")) {
-            return false;
-        }
-        if (SourceCodeDependencyFactory.TESTDATA_DIRECTORY.equals(dir.getName())) {
-            return false;
-        }
-        return true;
-    }
-
-    @Override
-    public boolean accept(File dir, String name) {
-        return accept(new File(dir, name));
+    private TestPatternFilter(Predicate<File> filePredicate) {
+        super(filePredicate);
     }
 }

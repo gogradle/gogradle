@@ -20,5 +20,7 @@ class CheckTaskTest extends TaskTest {
     @Test
     void 'check task should depends on test task'() {
         assertTaskDependsOn(task, TEST_TASK_NAME)
+        assertTaskDependsOn(task, GOFMT_TASK_NAME)
+        assertTaskDependsOn(task, GOVET_TASK_NAME)
     }
 }

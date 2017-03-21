@@ -10,6 +10,9 @@
 - installTestDependencies
 - build
 - test
+- fmt
+- vet
+- cover
 - clean
 - check
 - lock
@@ -45,13 +48,30 @@ go build -o <output path>
 
 ## test
 
-执行测试工作。这等价于：
+执行测试工作。Gogradle会扫描所有的包并逐个测试，这是为了生成测试报告。
 
+## fmt
+
+运行[`gofmt`](https://golang.org/cmd/gofmt/)，默认情况下，它会使用`-w`修改项目中的文件。若不希望如此，或者想添加其他的参数，使用：
+
+```groovy
+fmt {
+    gofmt "-r '(a) -> a' -l *.go"
+}
 ```
-cd <project path>
-export GOPATH=<build dependencies path>:<test dependencies path>
-go test
+
+## vet
+
+运行[go vet](https://golang.org/cmd/vet/)。默认情况下，若`go vet`返回值非零，该任务会失败。由于`go vet`可能不准确，可以使用以下配置忽略错误：
+
+```groovy
+vet {
+    continueWhenFail = true
+}
 ```
+
+## cover 
+生成测试报告，默认位于 `<project root>/.gogradle/reports/coverage`
 
 ## check
 
@@ -68,5 +88,24 @@ go test
 ## vendor
 
 将解析后的`build`依赖安装到vendor目录。详见[依赖安装到vendor目录](./dependency-management-cn.md#依赖安装到vendor目录)。
+
+# 自定义任务
+
+Gogradle支持自定义的go任务。例如，若希望添加一个任务，运行[`golint`](https://github.com/golang/lint)检查：
+
+build.gradle:
+
+```groovy
+task golint(type: com.github.blindpirate.gogradle.Go){
+    doLast {
+        run 'golint github.com/my/project'
+    }
+}
+
+check.dependsOn golint
+```
+
+如此即可。欲了解更多有关任务的信息，请参考[官方文档](https://docs.gradle.org/current/userguide/more_about_tasks.html)
+
 
 

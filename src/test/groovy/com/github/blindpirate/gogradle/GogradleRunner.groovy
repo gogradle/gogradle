@@ -21,7 +21,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             (WithProject)     : WithProjectProcessor,
             (WithResource)    : WithResourceProcessor,
             (WithMockInjector): WithMockInjectorProcessor,
-            (WithMockProcess) : WithMockProcessProcessor,
+            (WithMockGo)      : WithMockGoProcessor,
             (OnlyWhen)        : OnlyWhenProcessor,
             (OnlyOnPosix)     : OnlyOnPosixProcessor,
             (OnlyOnWindows)   : OnlyOnWindowsProcessor

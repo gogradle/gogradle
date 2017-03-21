@@ -38,7 +38,7 @@ class LocalDirectoryDependencyTest {
 
     @Test
     void 'version format of local directory should be its absolute path'() {
-        assert dependency.formatVersion() == StringUtils.toUnixString(resource.toPath())
+        assert dependency.formatVersion() == StringUtils.toUnixString(resource.toPath().toAbsolutePath())
     }
 
     @Test(expected = UnsupportedOperationException)

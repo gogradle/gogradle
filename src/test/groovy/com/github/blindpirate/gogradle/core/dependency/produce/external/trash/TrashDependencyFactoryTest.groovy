@@ -7,7 +7,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
-import static com.github.blindpirate.gogradle.build.Configuration.BUILD
 
 @RunWith(GogradleRunner)
 class TrashDependencyFactoryTest extends ExternalDependencyFactoryTest {
@@ -28,7 +27,7 @@ github.com/stretchr/testify                     v1.1.3
 github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://github.com/cpuguy83/check.git
 ''')
         // when
-        factory.produce(resource, BUILD)
+        factory.produce(resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/Sirupsen/logrus', tag: 'v0.10.0'])
         verifyMapParsed([name: 'github.com/cloudfoundry-incubator/candiedyaml', version: '99c3df8'])

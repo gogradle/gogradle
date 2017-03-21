@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -12,8 +11,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver.*
-import static com.github.blindpirate.gogradle.util.HttpUtils.*
+import static com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver.GO_USER_AGENT
+import static com.github.blindpirate.gogradle.util.HttpUtils.USER_AGENT
 import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.verify

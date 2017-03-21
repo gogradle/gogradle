@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
@@ -55,6 +56,10 @@ class GitDependencyManagerTest {
     DependencyProduceStrategy strategy
     @Mock
     Set exclusionSpecs
+    @Mock
+    GolangConfiguration configuration
+    @Mock
+    DependencyRegistry dependencyRegistry
 
     GitDependencyManager gitDependencyManager
 
@@ -74,8 +79,9 @@ class GitDependencyManagerTest {
     void setUp() {
         gitDependencyManager = new GitDependencyManager(cacheManager,
                 gitAccessor,
-                mock(DependencyVisitor),
-                mock(DependencyRegistry))
+                mock(DependencyVisitor))
+
+        when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
@@ -87,7 +93,7 @@ class GitDependencyManagerTest {
 
         when(gitAccessor.getRemoteUrl(repository)).thenReturn("https://github.com/a/b.git")
         when(notationDependency.getStrategy()).thenReturn(strategy)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencySet)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencySet)
 
         when(notationDependency.getTransitiveDepExclusions()).thenReturn(exclusionSpecs)
 
@@ -101,7 +107,7 @@ class GitDependencyManagerTest {
         // given:
         when(notationDependency.getUrls()).thenReturn(["url"])
         // when:
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then:
         verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url', resource)
     }
@@ -112,7 +118,7 @@ class GitDependencyManagerTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(notationDependency.isFirstLevel()).thenReturn(true)
         // when
-        GitResolvedDependency result = gitDependencyManager.resolve(notationDependency)
+        GitResolvedDependency result = gitDependencyManager.resolve(configuration, notationDependency)
         // then
         assertResolvedDependency(result)
     }
@@ -136,7 +142,7 @@ class GitDependencyManagerTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(notationDependency.isFirstLevel()).thenReturn(true)
         // when
-        GitResolvedDependency result = gitDependencyManager.resolve(notationDependency)
+        GitResolvedDependency result = gitDependencyManager.resolve(configuration, notationDependency)
         // then
         assertResolvedDependency(result)
     }
@@ -146,13 +152,13 @@ class GitDependencyManagerTest {
         // given
         VendorResolvedDependency vendorResolvedDependency = mockWithName(VendorResolvedDependency, 'vendorResolvedDependency')
         GolangDependencySet dependencies = DependencyUtils.asGolangDependencySet(vendorResolvedDependency)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor))).thenReturn(dependencies)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencies)
         when(vendorResolvedDependency.getHostDependency()).thenReturn(resolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/path/to/vendor'))
         when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
         when(gitAccessor.lastCommitTimeOfPath(repository, 'vendor/path/to/vendor')).thenReturn(456L)
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(vendorResolvedDependency).setUpdateTime(456L)
     }
@@ -164,7 +170,7 @@ class GitDependencyManagerTest {
         when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
         when(gitAccessor.getRemoteUrl(repository)).thenReturn(repoUrl)
         // when:
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then:
         verify(gitAccessor).hardResetAndPull('github.com/a/b', repository)
     }
@@ -176,7 +182,7 @@ class GitDependencyManagerTest {
         // given:
         when(gitAccessor.getRemoteUrl(repository)).thenReturn(repoUrl)
         // when:
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then:
         verify(gitAccessor, times(0)).hardResetAndPull('github.com/a/b', repository)
     }
@@ -187,7 +193,7 @@ class GitDependencyManagerTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(gitAccessor.findCommitByTag(repository, 'tag')).thenReturn(of(revCommit))
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(gitAccessor).checkout(repository, revCommit.getName())
     }
@@ -199,7 +205,7 @@ class GitDependencyManagerTest {
         when(gitAccessor.findCommitByTag(repository, 'semversion')).thenReturn(empty())
         when(gitAccessor.findCommitBySemVersion(repository, 'semversion')).thenReturn(of(revCommit))
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(gitAccessor).checkout(repository, revCommit.getName())
     }
@@ -210,7 +216,7 @@ class GitDependencyManagerTest {
         when(notationDependency.getCommit()).thenReturn(null)
         when(notationDependency.getTag()).thenReturn('tag')
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(gitAccessor).headCommitOfBranch(repository, 'master')
     }
@@ -220,7 +226,7 @@ class GitDependencyManagerTest {
         // given
         when(notationDependency.getCommit()).thenReturn(GitNotationDependency.NEWEST_COMMIT)
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(gitAccessor).headCommitOfBranch(repository, 'master')
     }
@@ -231,13 +237,13 @@ class GitDependencyManagerTest {
         when(gitAccessor.cloneWithUrl('github.com/a/b', repoUrl, resource)).thenThrow(new IllegalStateException())
 
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
     }
 
     @Test
     void 'resetting to a commit should succeed'() {
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(gitAccessor).checkout(repository, revCommit.name)
     }
@@ -247,7 +253,7 @@ class GitDependencyManagerTest {
         // given
         when(notationDependency.getCommit()).thenReturn('inexistent')
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -256,7 +262,7 @@ class GitDependencyManagerTest {
         when(cacheManager.runWithGlobalCacheLock(any(GitNotationDependency), any(Callable)))
                 .thenThrow(new IOException())
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
     }
 
     @Test
@@ -265,7 +271,7 @@ class GitDependencyManagerTest {
         when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
         IOUtils.write(resource, 'some file', 'file content')
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         assert IOUtils.dirIsEmpty(resource)
     }
@@ -298,7 +304,7 @@ class GitDependencyManagerTest {
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
         when(gitAccessor.cloneWithUrl('github.com/a/b', 'url1', resource)).thenThrow(IOException)
         // when
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
         // then
         verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url2', resource)
     }
@@ -310,7 +316,7 @@ class GitDependencyManagerTest {
         when(gitAccessor.cloneWithUrl('github.com/a/b', 'url1', resource)).thenThrow(IOException)
         when(gitAccessor.cloneWithUrl('github.com/a/b', 'url2', resource)).thenThrow(IOException)
         // then
-        gitDependencyManager.resolve(notationDependency)
+        gitDependencyManager.resolve(configuration, notationDependency)
     }
 
 }

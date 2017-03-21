@@ -6,7 +6,6 @@ import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.specs.Spec
 import org.junit.Test
 
-
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.*

@@ -16,7 +16,7 @@ public interface DependencyRegistry {
      */
     boolean register(ResolvedDependency dependency);
 
-    ResolvedDependency retrive(String name);
+    ResolvedDependency retrieve(String name);
 
     Optional<ResolvedDependency> getFromCache(NotationDependency dependency);
 
