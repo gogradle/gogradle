@@ -17,11 +17,13 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.util.Path
 import org.junit.Before
 import org.mockito.Mock
 import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
+import static org.mockito.Mockito.*
 
 @WithMockInjector
 abstract class TaskTest {
@@ -56,10 +58,12 @@ abstract class TaskTest {
     void superSetUp() {
         for (Map.Entry entry in GolangTaskContainer.TASKS.entrySet()) {
             GolangTaskContainer.TASKS.each { taskName, taskClass ->
-                golangTaskContainer.put(taskClass, Mockito.mock(taskClass))
+                golangTaskContainer.put(taskClass, mock(taskClass))
             }
         }
-        Mockito.when(GogradleGlobal.INSTANCE.injector.getInstance(BuildManager)).thenReturn(buildManager)
+        when(GogradleGlobal.INSTANCE.injector.getInstance(BuildManager)).thenReturn(buildManager)
+        when(project.getProjectPath()).thenReturn(mock(Path))
+        when(project.getIdentityPath()).thenReturn(mock(Path))
     }
 
     void assertTaskDependsOn(Task task, Object dependency) {

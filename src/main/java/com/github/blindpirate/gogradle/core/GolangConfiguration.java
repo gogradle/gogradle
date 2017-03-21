@@ -7,6 +7,7 @@ import groovy.lang.Closure;
 import groovy.lang.DelegatesTo;
 import org.gradle.api.Action;
 import org.gradle.api.artifacts.Configuration;
+import org.gradle.api.artifacts.ConfigurationPublications;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
 import org.gradle.api.artifacts.ExcludeRule;
@@ -15,6 +16,7 @@ import org.gradle.api.artifacts.PublishArtifactSet;
 import org.gradle.api.artifacts.ResolutionStrategy;
 import org.gradle.api.artifacts.ResolvableDependencies;
 import org.gradle.api.artifacts.ResolvedConfiguration;
+import org.gradle.api.attributes.AttributeContainer;
 import org.gradle.api.file.FileCollection;
 import org.gradle.api.file.FileTree;
 import org.gradle.api.internal.DefaultDomainObjectSet;
@@ -244,6 +246,16 @@ public class GolangConfiguration implements Configuration {
     }
 
     @Override
+    public ConfigurationPublications getOutgoing() {
+        throw new UnsupportedOperationException("Unsupported method getOutgoing is invoked!");
+    }
+
+    @Override
+    public void outgoing(Action<? super ConfigurationPublications> action) {
+        throw new UnsupportedOperationException("Unsupported method outgoing is invoked!");
+    }
+
+    @Override
     public Configuration copy() {
         throw new UnsupportedOperationException("Unsupported method copy is invoked!");
     }
@@ -274,23 +286,23 @@ public class GolangConfiguration implements Configuration {
     }
 
     @Override
-    public Configuration attribute(String key, String value) {
-        throw new UnsupportedOperationException("Unsupported method attribute is invoked!");
+    public void setCanBeConsumed(boolean b) {
+
     }
 
     @Override
-    public Configuration attributes(Map<String, String> attributes) {
-        throw new UnsupportedOperationException("Unsupported method attributes is invoked!");
+    public boolean isCanBeConsumed() {
+        return false;
     }
 
     @Override
-    public Map<String, String> getAttributes() {
-        throw new UnsupportedOperationException("Unsupported method getAttributes is invoked!");
+    public void setCanBeResolved(boolean b) {
+
     }
 
     @Override
-    public boolean hasAttributes() {
-        throw new UnsupportedOperationException("Unsupported method hasAttributes is invoked!");
+    public boolean isCanBeResolved() {
+        return false;
     }
 
     @Override
@@ -356,6 +368,16 @@ public class GolangConfiguration implements Configuration {
     @Override
     public Object addToAntBuilder(Object builder, String nodeName) {
         throw new UnsupportedOperationException("Unsupported method addToAntBuilder is invoked!");
+    }
+
+    @Override
+    public Configuration attributes(Action<? super AttributeContainer> action) {
+        throw new UnsupportedOperationException("Unsupported method attributes is invoked!");
+    }
+
+    @Override
+    public AttributeContainer getAttributes() {
+        throw new UnsupportedOperationException("Unsupported method getAttributes is invoked!");
     }
 
     private static class EmptyPublishArtifactSet extends DefaultDomainObjectSet<PublishArtifact>

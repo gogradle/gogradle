@@ -98,6 +98,11 @@ public class ProjectDecorator implements Project {
     }
 
     @Override
+    public String getDisplayName() {
+        return project.getDisplayName();
+    }
+
+    @Override
     public String getDescription() {
         return project.getDescription();
     }
@@ -225,6 +230,11 @@ public class ProjectDecorator implements Project {
     @Override
     public Project project(String path, Closure configureClosure) {
         return project.project(path, configureClosure);
+    }
+
+    @Override
+    public Project project(String s, Action<? super Project> action) {
+        return project.project(s, action);
     }
 
     @Override

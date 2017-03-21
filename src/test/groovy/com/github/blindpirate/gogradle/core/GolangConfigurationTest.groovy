@@ -9,7 +9,8 @@ class GolangConfigurationTest {
     @Test
     void 'explicit exception should be thrown when invoking unsupported methods'() {
         ReflectionUtils.testUnsupportedMethods(configuration, GolangConfiguration,
-                ['getDependencyRegistry', 'getName', 'getDependencies', 'getDescription', 'getAllDependencies', 'getArtifacts', 'getAllArtifacts'])
+                ['getDependencyRegistry', 'getName', 'getDependencies', 'getDescription', 'getAllDependencies',
+                 'getArtifacts', 'getAllArtifacts','setCanBeConsumed','isCanBeConsumed','setCanBeResolved','isCanBeResolved'])
     }
 
     @Test

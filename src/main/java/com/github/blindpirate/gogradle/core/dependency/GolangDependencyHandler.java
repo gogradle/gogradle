@@ -18,6 +18,7 @@ import org.gradle.api.artifacts.query.ArtifactResolutionQuery;
 import org.gradle.api.artifacts.result.ArtifactResolutionResult;
 import org.gradle.api.artifacts.result.ComponentArtifactsResult;
 import org.gradle.api.artifacts.result.ComponentResult;
+import org.gradle.api.attributes.AttributesSchema;
 import org.gradle.api.component.Artifact;
 import org.gradle.api.component.Component;
 import org.gradle.util.CollectionUtils;
@@ -151,6 +152,16 @@ public class GolangDependencyHandler extends GroovyObjectSupport implements Depe
         // hacking for IDEA
         TaskUtil.runTask(project, IDEA_TASK_NAME);
         return new EmptyArtifactResolutionQuery();
+    }
+
+    @Override
+    public AttributesSchema attributesSchema(Action<? super AttributesSchema> action) {
+        throw new UnsupportedOperationException("Unsupported method attributesSchema is invoked!");
+    }
+
+    @Override
+    public AttributesSchema getAttributesSchema() {
+        throw new UnsupportedOperationException("Unsupported method getAttributesSchema is invoked!");
     }
 
     // See org.jetbrains.plugins.gradle.tooling.util.DependencyResolverImpl
