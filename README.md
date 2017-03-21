@@ -56,6 +56,8 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Long-term support
 - Various gradle plugin to enpower your build
 
+See [here](https://github.com/gogradle/samples) for examples.
+
 
 ## Table of Content
 

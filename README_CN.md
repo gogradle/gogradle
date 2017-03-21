@@ -51,6 +51,8 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 长期维护
 - 众多Gradle插件
 
+猛戳[这里](https://github.com/gogradle/samples)查看Gogradle的示例。
+
 ## 目录
 
 - [入门](./docs/getting-started-cn.md)
