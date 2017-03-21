@@ -149,7 +149,11 @@ class DefaultBuildManagerTest {
         manager.run(['golint'], [:], null, null, null)
         // then
         verify(processUtils).run(['golint'],
-                [GOPATH: getTestGopath(), GOROOT: getGoroot(), GOOS: Os.getHostOs().toString(), GOARCH: Arch.getHostArch().toString()],
+                [GOPATH: getTestGopath(),
+                 GOROOT: getGoroot(),
+                 GOOS  : Os.getHostOs().toString(),
+                 GOARCH: Arch.getHostArch().toString(),
+                 GOEXE : Os.getHostOs().exeExtension()],
                 resource)
     }
 

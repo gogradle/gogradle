@@ -36,8 +36,8 @@ public class MapUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4)});
+    public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
+        return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4), Pair.of(k5, v5)});
     }
 
     private static <K, V> Map<K, V> asMap(Pair<K, V>... entries) {

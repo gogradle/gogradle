@@ -228,6 +228,7 @@ public class DefaultBuildManager implements BuildManager {
         Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getTestGopath(),
                 "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()),
                 "GOOS", Os.getHostOs().toString(),
+                "GOEXE", Os.getHostOs().exeExtension(),
                 "GOARCH", Arch.getHostArch().toString());
         if (env != null) {
             defaultEnvs.putAll(env);
