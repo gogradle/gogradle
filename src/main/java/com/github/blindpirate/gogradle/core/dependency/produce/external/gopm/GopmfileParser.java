@@ -3,10 +3,10 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.gopm;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.gradle.internal.impldep.org.apache.commons.collections.map.HashedMap;
 
 import java.io.File;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -96,7 +96,7 @@ public class GopmfileParser {
         String name = nameAndValue.getLeft();
         String value = nameAndValue.getRight();
 
-        Map<String, Object> ret = new HashedMap();
+        Map<String, Object> ret = new HashMap<>();
         ret.put(NAME_KEY, name);
         if (value.startsWith(BRANCH_KEYWORD)) {
             ret.put(BRANCH_KEY, value.substring(BRANCH_KEYWORD.length()));

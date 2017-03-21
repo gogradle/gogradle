@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.NumberUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -39,7 +40,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.substring;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Arrays.asList;
-import static org.gradle.internal.impldep.org.apache.commons.lang.StringUtils.lastIndexOf;
 
 public class GoCoverTask extends AbstractGolangTask {
 
@@ -186,7 +186,7 @@ public class GoCoverTask extends AbstractGolangTask {
     @SuppressWarnings({"checkstyle:magicnumber"})
     private FileCoverage extractFileCoverageInfo(Element element) {
         String fileAndCoverage = element.text();
-        int lastLeftParenIndex = lastIndexOf(fileAndCoverage, "(");
+        int lastLeftParenIndex = StringUtils.lastIndexOf(fileAndCoverage, "(");
         String filePath = fileAndCoverage.substring(0, lastLeftParenIndex - 1);
         Double coverage = Double.parseDouble(substring(fileAndCoverage, lastLeftParenIndex + 1, -2));
         long lineCount = countLinesInFile(filePath);

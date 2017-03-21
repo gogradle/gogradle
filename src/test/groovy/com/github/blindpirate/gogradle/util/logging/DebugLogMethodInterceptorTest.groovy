@@ -8,7 +8,7 @@ import com.google.inject.Injector
 import com.google.inject.matcher.Matchers
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
-import org.gradle.internal.impldep.org.junit.After
+import org.junit.After
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

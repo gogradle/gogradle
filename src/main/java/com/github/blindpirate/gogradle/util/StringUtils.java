@@ -96,4 +96,8 @@ public class StringUtils {
         return String.join("\n",
                 env.entrySet().stream().map(entry -> " " + entry.getKey() + "=" + entry.getValue()).collect(toList()));
     }
+
+    public static int lastIndexOf(String s, String substr) {
+        return org.apache.commons.lang3.StringUtils.lastIndexOf(s, substr);
+    }
 }
