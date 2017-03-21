@@ -72,6 +72,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 
 覆盖率报告截图
 
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coverage.png)
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coveragepackage.png)
 
 ## 向Gogradle贡献提出建议或贡献代码

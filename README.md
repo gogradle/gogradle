@@ -78,6 +78,7 @@ Test report
 
 Coverage report
 
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coverage.png)
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coveragepackage.png)
 
 ## Contributing
