@@ -40,13 +40,14 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 额外为中国大陆开发者提供的特性，你懂的
 - Shadowsocks支持
 - IDE支持（IntelliJIDEA/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim）
+- 测试和覆盖率报告生成
 - 增量构建（开发中）
 
 ## 优势
 
 - 完善的跨平台支持
 - 支持所有主流外部依赖管理工具
-- 完善的测试覆盖
+- 完善的测试、覆盖率功能以及报告生成
 - 长期维护
 - 众多Gradle插件
 
@@ -61,6 +62,17 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - [IDE支持](./docs/ide-cn.md)
 
 > **注意** Gogradle不遵循Golang的全局[工作空间的约定](https://golang.org/doc/code.html#Workspaces)。它不使用全局的GOPATH，而是为每个项目生成一个独立的GOPATH。
+
+测试报告截图
+
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/index.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/classes.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/packages.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/failedtest.png)
+
+覆盖率报告截图
+
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coveragepackage.png)
 
 ## 向Gogradle贡献提出建议或贡献代码
 

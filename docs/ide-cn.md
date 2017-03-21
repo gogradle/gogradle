@@ -70,11 +70,11 @@ File > Settings > Plugins > Browse Repositories > 搜索'Go'并安装
 - 方式一：在项目目录下，执行`gradlew idea`，完成后使用IDEA的`File`-`Open`打开项目所在目录即可。
 - 方式二：使用IDEA的`File`-`Open`，打开项目目录下的`build.gradle`文件，此时IDEA会弹出对话框，选择`Open as Project`即可。
 
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/openproject.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/openproject.png)
 
 IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来开启之，并通过Gradle工具栏上的按钮来执行同步操作：
 
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/gradle.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
 ## Gogland
 

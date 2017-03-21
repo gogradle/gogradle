@@ -10,8 +10,11 @@ A task unit executed independently is usually called [Task](https://docs.gradle.
 - installTestDependencies
 - build
 - test
-- clean
+- fmt 
+- vet 
+- cover 
 - check
+- clean
 - lock
 - vendor
 
@@ -43,17 +46,38 @@ go build -o <output path>
 
 ## test
 
-Do test. This task is equivalent to:
+Do test.
 
+It will scan all packages in your project and test them one by one so that test reports can be generated. 
+ 
+## fmt 
+
+Run [gofmt](https://golang.org/cmd/gofmt/) on the whole project. It will use `-w` by default, so your code will be modified.
+If the default behavior is not expected, or you want to change the command line argument, use following code to configure it:
+
+```groovy
+fmt {
+    gofmt "-r '(a) -> a' -l *.go"
+}
 ```
-cd <project path>
-export GOPATH=<build dependencies path>:<test dependencies path>
-go test
+
+## vet 
+
+Run [go vet](https://golang.org/cmd/vet/) on the whole project. By default, it will fail the build if `go vet` return non-zero.
+Since `go vet` is inaccurate, you can ignore the error:
+
+```groovy
+vet {
+    continueWhenFail = true
+}
 ```
+## cover 
+
+Generate coverage reports. It will be placed into `<project root>/.gogradle/reports/coverage`
 
 ## check
 
-This task is usually executed by CI to do some checking, such as test coverage rate. It depends on test task by default.
+This task is usually executed by CI to do some checking, such as test coverage rate. It depends on `test`/`cover`/`fmt`/`vet` task by default.
 
 ## clean
 
@@ -66,5 +90,23 @@ Generate dependency lock file. See [Dependency Lock](./getting-started.md#depend
 ## vendor
 
 Install resolved `build` dependencies into vendor directory. See [Install Dependencies into Vendor](./dependency-management.md#install-dependencies-into-vendor). 
+
+# Define custom task
+
+Gogradle support customized go task. For example, we want to add a task which runs [`golint`](https://github.com/golang/lint) on my project.
+
+build.gradle:
+
+```groovy
+task golint(type: com.github.blindpirate.gogradle.Go){
+    doLast {
+        run 'golint github.com/my/project'
+    }
+}
+
+check.dependsOn golint
+```
+
+That's all. More about tasks, please see the [doc](https://docs.gradle.org/current/userguide/more_about_tasks.html)
 
 
