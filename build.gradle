@@ -64,11 +64,9 @@ dependencies {
     compile group: 'net.lingala.zip4j', name: 'zip4j', version: '1.3.2'
     compile group: 'org.apache.ant', name: 'ant', version: '1.10.0'
 //    compile group: 'org.tmatesoft.svnkit', name: 'svnkit', version: '1.8.14'
-    compile 'com.github.blindpirate.gogradle.jgit:hg4j:1.2.5'
     compile group: 'com.typesafe.sbt', name: 'sbt-interface', version: '0.13.13'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.6.3'
     compile group: 'org.codehaus.woodstox', name: 'woodstox-core-asl', version: '4.4.1'
-    compile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.1.201703071140-r'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
