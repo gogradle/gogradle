@@ -18,6 +18,7 @@ import org.jsoup.select.Elements;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,9 +79,9 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
     private GolangPackage buildPackageInfo(String packagePath, GoImportMetaTag metaTag) {
         return VcsGolangPackage.builder()
-                .withPath(packagePath)
+                .withPath(Paths.get(packagePath))
                 .withVcsType(metaTag.vcs)
-                .withRootPath(metaTag.rootPath)
+                .withRootPath(Paths.get(metaTag.rootPath))
                 .withUrl(metaTag.repoUrl)
                 .build();
     }

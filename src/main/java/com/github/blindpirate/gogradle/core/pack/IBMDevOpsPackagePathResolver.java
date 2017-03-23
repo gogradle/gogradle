@@ -20,8 +20,8 @@ public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
         Path path = Paths.get(packagePath);
         Path rootPath = path.subpath(0, 4);
         GolangPackage pkg = VcsGolangPackage.builder()
-                .withPath(packagePath)
-                .withRootPath(toUnixString(rootPath))
+                .withPath(path)
+                .withRootPath(rootPath)
                 .withVcsType(VcsType.GIT)
                 .withUrl(HTTPS + toUnixString(rootPath))
                 .build();

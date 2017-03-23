@@ -172,14 +172,8 @@ class AbstractVcsDependencyManagerTest {
 
 
     class TestAbstractVcsDependencyManager extends AbstractVcsDependencyManager {
-
         TestAbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
             super(cacheManager)
-        }
-
-        @Override
-        protected ResolvedDependency createResolvedDependency(NotationDependency dependency, File directory, Object o, Object o2) {
-            return subclassDelegate.createResolvedDependency(dependency, directory, o, o2)
         }
 
         @Override
@@ -187,29 +181,33 @@ class AbstractVcsDependencyManagerTest {
             subclassDelegate.doReset(dependency, globalCachePath)
         }
 
-
         @Override
-        protected void resetToSpecificVersion(Object o, Object o2) {
-            subclassDelegate.resetToSpecificVersion(o, o2)
+        protected ResolvedDependency createResolvedDependency(NotationDependency dependency, File repoRoot, Object o) {
+            return subclassDelegate.createResolvedDependency(dependency, repoRoot, o)
         }
 
         @Override
-        protected Object determineVersion(Object o, NotationDependency dependency) {
-            return subclassDelegate.determineVersion(o, dependency)
+        protected void resetToSpecificVersion(File repository, Object o) {
+            subclassDelegate.resetToSpecificVersion(repository, o)
         }
 
         @Override
-        protected Object updateRepository(NotationDependency dependency, Object o, File directory) {
-            return subclassDelegate.updateRepository(dependency, o, directory)
+        protected Object determineVersion(File repository, NotationDependency dependency) {
+            return subclassDelegate.determineVersion(repository, dependency)
         }
 
         @Override
-        protected Object initRepository(NotationDependency dependency, File directory) {
-            return subclassDelegate.initRepository(dependency, directory)
+        protected void updateRepository(NotationDependency dependency, File repoRoot) {
+            subclassDelegate.updateRepository(dependency, repoRoot)
         }
 
         @Override
-        protected Optional repositoryMatch(File directory, NotationDependency dependency) {
+        protected void initRepository(NotationDependency dependency, File repoRoot) {
+            subclassDelegate.initRepository(dependency, repoRoot)
+        }
+
+        @Override
+        protected boolean repositoryMatch(File directory, NotationDependency dependency) {
             return subclassDelegate.repositoryMatch(directory, dependency)
         }
     }

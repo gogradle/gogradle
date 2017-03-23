@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
@@ -78,6 +79,14 @@ public class VcsGolangPackage extends GolangPackage {
         private List<String> urls;
 
         private Builder() {
+        }
+
+        public Builder withPath(String path) {
+            return withPath(Paths.get(path));
+        }
+
+        public Builder withRootPath(String rootPath) {
+            return withRootPath(Paths.get(rootPath));
         }
 
         public Builder withPath(Path path) {

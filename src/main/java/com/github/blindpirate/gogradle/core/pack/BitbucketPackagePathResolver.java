@@ -47,8 +47,8 @@ public class BitbucketPackagePathResolver extends AbstractPackagePathResolver {
                 .collect(Collectors.toList());
         return VcsGolangPackage.builder()
                 .withUrls(urls)
-                .withPath(toUnixString(path))
-                .withRootPath(toUnixString(path.subpath(0, 3)))
+                .withPath(path)
+                .withRootPath(path.subpath(0, 3))
                 .withVcsType(VcsType.of(packageInfo.scm).get())
                 .build();
     }

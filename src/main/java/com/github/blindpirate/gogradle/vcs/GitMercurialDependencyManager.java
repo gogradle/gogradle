@@ -1,6 +1,8 @@
 package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.GolangRepositoryHandler;
+import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
@@ -11,6 +13,7 @@ import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDepend
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
@@ -53,9 +56,11 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected ResolvedDependency createResolvedDependency(NotationDependency dependency, File repoRoot, GitMercurialCommit commit) {
+        VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
+
         GitMercurialResolvedDependency ret = GitMercurialResolvedDependency.gitBuilder()
                 .withNotationDependency(dependency)
-                .withName(dependency.getPackage().getRootPath())
+                .withName(StringUtils.toUnixString(pkg.getRootPath()))
                 .withCommitId(commit.getId())
                 .withTag(GitMercurialNotationDependency.class.cast(dependency).getTag())
                 .withRepoUrl(getAccessor().getRemoteUrl(repoRoot))

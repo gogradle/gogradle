@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class UnrecognizedGolangPackage extends GolangPackage {
@@ -24,6 +25,10 @@ public class UnrecognizedGolangPackage extends GolangPackage {
 
     public static UnrecognizedGolangPackage of(Path packagePath) {
         return new UnrecognizedGolangPackage(packagePath);
+    }
+
+    public static UnrecognizedGolangPackage of(String packagePath) {
+        return of(Paths.get(packagePath));
     }
 
     @Override

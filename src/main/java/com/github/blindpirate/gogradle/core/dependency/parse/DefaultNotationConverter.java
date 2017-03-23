@@ -31,7 +31,7 @@ public class DefaultNotationConverter implements NotationConverter {
         String packagePath = extractPackagePath(notation);
         GolangPackage packageInfo = packagePathResolver.produce(packagePath).get();
         Assert.isTrue(packageInfo instanceof VcsGolangPackage, "Package must be from vcs!");
-        return packageInfo.getVcsType();
+        return VcsGolangPackage.class.cast(packageInfo).getVcsType();
     }
 
 

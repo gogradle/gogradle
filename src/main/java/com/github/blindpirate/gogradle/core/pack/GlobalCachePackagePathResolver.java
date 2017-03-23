@@ -28,28 +28,28 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     @Override
     @DebugLog
     public Optional<GolangPackage> produce(String packagePath) {
-        Path path = Paths.get(packagePath);
-        while (isNotRoot(path)) {
-            Optional<VcsType> vcs = findVcsRepo(path);
-            if (vcs.isPresent()) {
-                return Optional.of(buildPackageInfo(vcs.get(), packagePath, path));
-            }
-            path = path.getParent();
-        }
+//        Path path = Paths.get(packagePath);
+//        while (isNotRoot(path)) {
+//            Optional<VcsType> vcs = findVcsRepo(path);
+//            if (vcs.isPresent()) {
+//                return Optional.of(buildPackageInfo(vcs.get(), packagePath, path));
+//            }
+//            path = path.getParent();
+//        }
         return Optional.empty();
     }
 
-    private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
-        Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(repoRootPath));
-        String url = vcsType.getAccessor().getRemoteUrl(realPath.toFile());
-        return VcsGolangPackage.builder()
-                .withPath(packagePath)
-                .withRootPath(toUnixString(repoRootPath))
-                .withVcsType(vcsType)
-                .withUrl(url)
-                .build();
-
-    }
+//    private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
+//        Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(repoRootPath));
+//        String url = vcsType.getAccessor().getRemoteUrl(realPath.toFile());
+//        return VcsGolangPackage.builder()
+//                .withPath(packagePath)
+//                .withRootPath(toUnixString(repoRootPath))
+//                .withVcsType(vcsType)
+//                .withUrl(url)
+//                .build();
+//
+//    }
 
     private Optional<VcsType> findVcsRepo(Path path) {
         Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(path));

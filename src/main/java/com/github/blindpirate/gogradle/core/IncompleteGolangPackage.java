@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class IncompleteGolangPackage extends GolangPackage {
@@ -20,6 +21,10 @@ public class IncompleteGolangPackage extends GolangPackage {
 
     public static IncompleteGolangPackage of(Path path) {
         return new IncompleteGolangPackage(path);
+    }
+
+    public static IncompleteGolangPackage of(String path) {
+        return of(Paths.get(path));
     }
 
     @Override

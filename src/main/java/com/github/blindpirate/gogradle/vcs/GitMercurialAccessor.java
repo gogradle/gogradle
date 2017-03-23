@@ -12,7 +12,7 @@ import java.util.function.Function;
 
 import static java.util.Collections.emptyMap;
 
-public abstract class GitMercurialAccessor {
+public abstract class GitMercurialAccessor implements VcsAccessor {
 
     protected final ProcessUtils processUtils;
 
@@ -22,6 +22,7 @@ public abstract class GitMercurialAccessor {
 
     public abstract void checkout(File repoRoot, String version);
 
+    @Override
     public abstract String getRemoteUrl(File repoRoot);
 
     public abstract long lastCommitTimeOfPath(File repoRoot, String relativePath);

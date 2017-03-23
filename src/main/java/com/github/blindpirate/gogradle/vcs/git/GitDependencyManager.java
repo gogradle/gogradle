@@ -6,8 +6,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.vcs.Git;
 import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.GitMercurialDependencyManager;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 
 import javax.inject.Singleton;
 

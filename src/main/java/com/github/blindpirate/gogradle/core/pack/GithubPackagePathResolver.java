@@ -32,12 +32,11 @@ public class GithubPackagePathResolver extends AbstractPackagePathResolver {
         Path path = Paths.get(packagePath);
         String sshUrl = String.format("git@%s.git", toUnixString(path.subpath(0, 3)).replaceFirst("/", ":"));
         String httpsUrl = String.format("https://%s.git", toUnixString(path.subpath(0, 3)));
-        String rootPackagePath = toUnixString(path.subpath(0, 3));
 
         GolangPackage info = VcsGolangPackage.builder()
-                .withPath(packagePath)
+                .withPath(path)
                 .withVcsType(VcsType.GIT)
-                .withRootPath(rootPackagePath)
+                .withRootPath(path.subpath(0,3))
                 .withUrls(Arrays.asList(sshUrl, httpsUrl))
                 .build();
         return Optional.of(info);

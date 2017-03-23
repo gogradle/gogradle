@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -29,9 +30,9 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         String tag = getString(notation, TAG_KEY);
         String commit = getString(notation, COMMIT_KEY);
 
-        GolangPackage info = MapUtils.getValue(notation, PACKAGE_KEY, GolangPackage.class);
-        if (info != null) {
-            notation.put(URLS_KEY, info.getUrls());
+        VcsGolangPackage pkg = MapUtils.getValue(notation, PACKAGE_KEY, VcsGolangPackage.class);
+        if (pkg != null) {
+            notation.put(URLS_KEY, pkg.getUrls());
         }
 
         if (allBlank(version, tag, commit)) {
@@ -55,7 +56,7 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         if (vcsType.isPresent()) {
             return vcsType.get();
         } else {
-            GolangPackage pkg = MapUtils.getValue(notationMap, PACKAGE_KEY, GolangPackage.class);
+            VcsGolangPackage pkg = MapUtils.getValue(notationMap, PACKAGE_KEY, VcsGolangPackage.class);
             Assert.isTrue(pkg != null, "Cannot found vcs in " + notationMap);
             return pkg.getVcsType();
         }
