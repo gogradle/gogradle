@@ -22,7 +22,7 @@ import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
-public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
+public abstract class AbstractVcsDependencyManager<VERSION>
         implements DependencyResolver, DependencyInstaller {
 
     private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
@@ -90,10 +90,10 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
     }
 
     private ResolvedDependency resolveVcs(NotationDependency dependency, File vcsRoot) {
-        REPOSITORY repository = resolveToGlobalCache(dependency, vcsRoot);
-        VERSION version = determineVersion(repository, dependency);
-        resetToSpecificVersion(repository, version);
-        return createResolvedDependency(dependency, vcsRoot, repository, version);
+        resolveRepository(dependency, vcsRoot);
+        VERSION version = determineVersion(vcsRoot, dependency);
+        resetToSpecificVersion(vcsRoot, version);
+        return createResolvedDependency(dependency, vcsRoot, version);
     }
 
     @Override
@@ -139,53 +139,47 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
 
 
     protected abstract ResolvedDependency createResolvedDependency(NotationDependency dependency,
-                                                                   File directory,
-                                                                   REPOSITORY repository,
+                                                                   File repoRoot,
                                                                    VERSION version);
 
-    protected abstract void resetToSpecificVersion(REPOSITORY repository, VERSION version);
+    protected abstract void resetToSpecificVersion(File repository, VERSION version);
 
-    protected abstract VERSION determineVersion(REPOSITORY repository, NotationDependency dependency);
+    protected abstract VERSION determineVersion(File repository, NotationDependency dependency);
 
-    private REPOSITORY resolveToGlobalCache(NotationDependency dependency, File targetDirectory) {
-        Optional<REPOSITORY> repositoryInGlobalCache = ensureGlobalCacheEmptyOrMatch(dependency, targetDirectory);
-        if (!repositoryInGlobalCache.isPresent()) {
-            REPOSITORY ret = initRepository(dependency, targetDirectory);
+    private void resolveRepository(NotationDependency dependency, File repoRoot) {
+        boolean repositoryIsMatched = globalCacheRepositoryMatch(dependency, repoRoot);
+        if (!repositoryIsMatched) {
+            initRepository(dependency, repoRoot);
             globalCacheManager.updateCurrentDependencyLock();
-            return ret;
         } else if (globalCacheManager.currentDependencyIsOutOfDate()) {
             if (GogradleGlobal.isOffline()) {
                 LOGGER.info("Cannot pull update {} since it is offline now.", dependency);
-                return repositoryInGlobalCache.get();
             } else {
-                updateRepository(dependency, repositoryInGlobalCache.get(), targetDirectory);
+                updateRepository(dependency, repoRoot);
                 globalCacheManager.updateCurrentDependencyLock();
-                return repositoryInGlobalCache.get();
             }
         } else {
             LOGGER.info("Skipped updating {} since it is up-to-date.", dependency);
-            return repositoryInGlobalCache.get();
         }
     }
 
-    protected abstract REPOSITORY updateRepository(NotationDependency dependency,
-                                                   REPOSITORY repository,
-                                                   File directory);
+    protected abstract void updateRepository(NotationDependency dependency,
+                                             File repoRoot);
 
-    protected abstract REPOSITORY initRepository(NotationDependency dependency, File directory);
+    protected abstract void initRepository(NotationDependency dependency, File repoRoot);
 
 
-    private Optional<REPOSITORY> ensureGlobalCacheEmptyOrMatch(NotationDependency dependency, File directory) {
-        if (IOUtils.dirIsEmpty(directory)) {
-            return Optional.empty();
+    private boolean globalCacheRepositoryMatch(NotationDependency dependency, File globalCacheRepoRoot) {
+        if (IOUtils.dirIsEmpty(globalCacheRepoRoot)) {
+            return false;
         } else {
-            Optional<REPOSITORY> ret = repositoryMatch(directory, dependency);
-            if (ret.isPresent()) {
-                return ret;
+            boolean match = repositoryMatch(globalCacheRepoRoot, dependency);
+            if (match) {
+                return true;
             } else {
-                LOGGER.warn("Repo " + directory.getAbsolutePath()
+                LOGGER.warn("Repo " + globalCacheRepoRoot.getAbsolutePath()
                         + "doesn't match url declared in dependency, it will be cleared.");
-                return Optional.empty();
+                return false;
             }
         }
     }
@@ -197,5 +191,5 @@ public abstract class AbstractVcsDependencyManager<REPOSITORY, VERSION>
      * @param dependency the dependency
      * @return {@code Optional.of()} if matched, {@code Optional.empty()} otherwise.
      */
-    protected abstract Optional<REPOSITORY> repositoryMatch(File directory, NotationDependency dependency);
+    protected abstract boolean repositoryMatch(File directory, NotationDependency dependency);
 }

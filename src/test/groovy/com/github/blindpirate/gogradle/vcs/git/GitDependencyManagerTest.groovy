@@ -109,7 +109,7 @@ class GitDependencyManagerTest {
         // when:
         gitDependencyManager.resolve(configuration, notationDependency)
         // then:
-        verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url', resource)
+        verify(gitAccessor).clone('github.com/a/b', 'url', resource)
     }
 
     @Test
@@ -234,7 +234,7 @@ class GitDependencyManagerTest {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown when every url has been tried'() {
         // given
-        when(gitAccessor.cloneWithUrl('github.com/a/b', repoUrl, resource)).thenThrow(new IllegalStateException())
+        when(gitAccessor.clone('github.com/a/b', repoUrl, resource)).thenThrow(new IllegalStateException())
 
         // when
         gitDependencyManager.resolve(configuration, notationDependency)
@@ -312,19 +312,19 @@ class GitDependencyManagerTest {
     void 'every url should be tried until success'() {
         // given
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(gitAccessor.cloneWithUrl('github.com/a/b', 'url1', resource)).thenThrow(IOException)
+        when(gitAccessor.clone('github.com/a/b', 'url1', resource)).thenThrow(IOException)
         // when
         gitDependencyManager.resolve(configuration, notationDependency)
         // then
-        verify(gitAccessor).cloneWithUrl('github.com/a/b', 'url2', resource)
+        verify(gitAccessor).clone('github.com/a/b', 'url2', resource)
     }
 
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown when all urls have been tried'() {
         // given
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(gitAccessor.cloneWithUrl('github.com/a/b', 'url1', resource)).thenThrow(IOException)
-        when(gitAccessor.cloneWithUrl('github.com/a/b', 'url2', resource)).thenThrow(IOException)
+        when(gitAccessor.clone('github.com/a/b', 'url1', resource)).thenThrow(IOException)
+        when(gitAccessor.clone('github.com/a/b', 'url2', resource)).thenThrow(IOException)
         // then
         gitDependencyManager.resolve(configuration, notationDependency)
     }

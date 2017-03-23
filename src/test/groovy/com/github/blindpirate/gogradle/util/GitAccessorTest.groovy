@@ -1,13 +1,13 @@
 package com.github.blindpirate.gogradle.util
 
-import com.github.blindpirate.gogradle.GitRepositoryHandler
+import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.vcs.git.GitAccessor
-import com.github.blindpirate.gogradle.vcs.git.GitRepository
+import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
 import org.junit.Test
@@ -85,7 +85,7 @@ class GitAccessorTest {
     GitAccessor gitAccessor
     Repository repository
 
-    GitRepositoryHandler golangRepositoryHandler = new GitRepositoryHandler()
+    GolangRepositoryHandler golangRepositoryHandler = new GolangRepositoryHandler()
 
     @Before
     void setUp() {
@@ -141,7 +141,7 @@ class GitAccessorTest {
     @WithMockInjector
     void 'cloning with https should succeed'() {
         // when
-        gitAccessor.cloneWithUrl(null, "https://github.com/blindpirate/test-for-gogradle.git", resource)
+        gitAccessor.clone(null, "https://github.com/blindpirate/test-for-gogradle.git", resource)
         // then
         assert new File(resource, '.git').exists()
         assert new File(resource, 'vendor/submodule/LICENSE').exists()
@@ -218,7 +218,7 @@ class GitAccessorTest {
     @WithMockInjector
     void 'cloning and pulling a proxy repository should succeed'() {
         // https://bugs.eclipse.org/bugs/show_bug.cgi?id=465167
-        gitAccessor.cloneWithUrl('gopkg.in/ini.v1', 'https://gopkg.in/ini.v1', resource)
+        gitAccessor.clone('gopkg.in/ini.v1', 'https://gopkg.in/ini.v1', resource)
         assert new File(resource, 'README.md').exists()
         assert gitAccessor.headCommitOfBranch(repository, 'master')
     }
@@ -236,12 +236,12 @@ class GitAccessorTest {
     @WithResource('')
     @OnlyWhen('System.getenv("MY_OWN_PRIVATE_KEY")!=null')
     void 'cloning with ssh private key should succeed'() {
-        GitRepository gitRepo = new GitRepository()
+        GolangRepository gitRepo = new GolangRepository()
         gitRepo.all()
         gitRepo.privateKeyFile(System.getenv('MY_OWN_PRIVATE_KEY'))
         addOneRepo(gitRepo)
 
-        gitAccessor.cloneWithUrl('name', 'git@github.com:adieu/archon-ui-ruff.git', resource)
+        gitAccessor.clone('name', 'git@github.com:adieu/archon-ui-ruff.git', resource)
         gitAccessor.hardResetAndPull('name', gitAccessor.getRepository(resource))
         assert new File(resource, 'README.md').exists()
     }
@@ -251,18 +251,18 @@ class GitAccessorTest {
     @WithResource('')
     @OnlyWhen('System.getenv("MY_GITHUB_PASSWORD")!=null')
     void 'cloning with username and password should succeed'() {
-        GitRepository gitRepo = new GitRepository()
+        GolangRepository gitRepo = new GolangRepository()
         gitRepo.all()
         gitRepo.username(System.getenv('MY_GITHUB_USERNAME'))
         gitRepo.password(System.getenv('MY_GITHUB_PASSWORD'))
         addOneRepo(gitRepo)
 
-        gitAccessor.cloneWithUrl('name', 'https://github.com/adieu/archon-ui-ruff.git', resource)
+        gitAccessor.clone('name', 'https://github.com/adieu/archon-ui-ruff.git', resource)
         gitAccessor.hardResetAndPull('name', gitAccessor.getRepository(resource))
         assert new File(resource, 'README.md').exists()
     }
 
-    void addOneRepo(GitRepository repository) {
+    void addOneRepo(GolangRepository repository) {
         ReflectionUtils.getField(golangRepositoryHandler, 'gitRepositories').add(repository)
     }
 }
