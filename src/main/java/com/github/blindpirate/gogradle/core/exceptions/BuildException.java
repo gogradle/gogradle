@@ -1,8 +1,14 @@
 package com.github.blindpirate.gogradle.core.exceptions;
 
+import com.github.blindpirate.gogradle.util.ProcessUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
+
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 public class BuildException extends RuntimeException {
     private BuildException(String msg) {
@@ -22,7 +28,20 @@ public class BuildException extends RuntimeException {
         return new BuildException("Renaming to " + dotVendorDir + " failed, cannot build or test");
     }
 
-    public static BuildException processReturnNonZero(int retCode, String message) {
+    public static BuildException processInteractionFailed(int retCode, String message) {
         return new BuildException("Build failed due to return code " + retCode + " of: " + message);
+    }
+
+    public static BuildException processInteractionFailed(List<String> cmds,
+                                                          Map<String, String> env,
+                                                          File workingDir,
+                                                          ProcessUtils.ProcessResult result) {
+        env = new HashMap<>(env);
+        env.put("PATH", System.getenv("PATH"));
+
+        return new BuildException("Build failed due to return code " + result.getCode()
+                + " of cmd: " + String.join(" ", cmds)
+                + "\nin: " + workingDir.getAbsolutePath()
+                + "\nwith env:\n" + StringUtils.formatEnv(env));
     }
 }

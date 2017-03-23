@@ -1,48 +1,31 @@
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.vcs.VcsType;
-
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public class IncompleteGolangPackage extends GolangPackage {
-    private IncompleteGolangPackage(String path) {
+    private IncompleteGolangPackage(Path path) {
         super(path);
     }
 
     @Override
-    public String getRootPath() {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    @Override
-    public VcsType getVcsType() {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    @Override
-    public List<String> getUrls() {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    @Override
-    protected Optional<GolangPackage> longerPath(String packagePath) {
+    protected Optional<GolangPackage> longerPath(Path packagePath) {
         return Optional.empty();
     }
 
     @Override
-    protected Optional<GolangPackage> shorterPath(String packagePath) {
+    protected Optional<GolangPackage> shorterPath(Path packagePath) {
         return Optional.of(of(packagePath));
     }
 
-    public static IncompleteGolangPackage of(String path) {
+    public static IncompleteGolangPackage of(Path path) {
         return new IncompleteGolangPackage(path);
     }
 
     @Override
     public String toString() {
         return "IncompleteGolangPackage{"
-                + "path='" + getPath() + '\''
+                + "path='" + getPathString() + '\''
                 + '}';
     }
 }

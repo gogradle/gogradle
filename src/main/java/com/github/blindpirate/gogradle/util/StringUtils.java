@@ -100,4 +100,8 @@ public class StringUtils {
     public static int lastIndexOf(String s, String substr) {
         return org.apache.commons.lang3.StringUtils.lastIndexOf(s, substr);
     }
+
+    public static String trimToNull(String str) {
+        return org.apache.commons.lang3.StringUtils.trimToNull(str);
+    }
 }

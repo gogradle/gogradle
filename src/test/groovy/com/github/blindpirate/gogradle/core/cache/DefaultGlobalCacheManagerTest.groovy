@@ -19,7 +19,7 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
-import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_LOCKFILES_PATH
+import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_METADATA_PATH
 import static com.github.blindpirate.gogradle.util.IOUtils.toString
 import static com.github.blindpirate.gogradle.util.IOUtils.write
 import static org.mockito.Mockito.when
@@ -61,7 +61,7 @@ class DefaultGlobalCacheManagerTest {
         // then
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
-        assert new File(resource, GO_LOCKFILES_PATH).exists()
+        assert new File(resource, GO_METADATA_PATH).exists()
     }
 
     @Test

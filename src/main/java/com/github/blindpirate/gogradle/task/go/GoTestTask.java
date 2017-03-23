@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.task.go;
 import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
+import com.github.blindpirate.gogradle.common.LineCollector;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
@@ -236,7 +237,7 @@ public class GoTestTask extends Go {
         }
 
         private List<String> doSingleTest(File parentDir, List<File> testFiles) {
-            StdoutStderrCollector lineConsumer = new StdoutStderrCollector();
+            LineCollector lineCollector = new LineCollector();
             String importPath = dirToImportPath(parentDir);
             List<String> args;
 
@@ -256,9 +257,9 @@ public class GoTestTask extends Go {
                 coverageProfileGenerated = true;
             }
 
-            buildManager.go(args, null, lineConsumer, lineConsumer, code -> {
+            buildManager.go(args, null, lineCollector, lineCollector, code -> {
             });
-            return lineConsumer.getStdoutStderr();
+            return lineCollector.getLines();
         }
 
 
@@ -282,16 +283,5 @@ public class GoTestTask extends Go {
         }
     }
 
-    private static class StdoutStderrCollector implements Consumer<String> {
-        private List<String> lines = new ArrayList<>();
 
-        @Override
-        public synchronized void accept(String s) {
-            lines.add(s);
-        }
-
-        public List<String> getStdoutStderr() {
-            return lines;
-        }
-    }
 }

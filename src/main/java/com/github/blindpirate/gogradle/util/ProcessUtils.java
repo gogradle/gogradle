@@ -46,6 +46,10 @@ public class ProcessUtils {
         return ret;
     }
 
+    public String runAndGetStdout(String... args) {
+        return getStdout(run(args));
+    }
+
     public Process run(String... args) {
         return run(Arrays.asList(args), null, null);
     }

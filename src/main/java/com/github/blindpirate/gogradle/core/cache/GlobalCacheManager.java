@@ -9,6 +9,7 @@ import java.util.concurrent.Callable;
 // + ~/.gradle/go
 //   - gopath
 //   - binary
+//   - metadata
 public interface GlobalCacheManager {
     void ensureGlobalCacheExistAndWritable();
 

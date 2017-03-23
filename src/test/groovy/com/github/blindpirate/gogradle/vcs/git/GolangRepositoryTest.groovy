@@ -2,8 +2,8 @@ package com.github.blindpirate.gogradle.vcs.git
 
 import org.junit.Test
 
-class GitRepositoryTest {
-    GitRepository repository = new GitRepository()
+class GolangRepositoryTest {
+    GolangRepository repository = new GolangRepository()
 
     @Test
     void 'a repository should match all repos if declared as `all`'() {

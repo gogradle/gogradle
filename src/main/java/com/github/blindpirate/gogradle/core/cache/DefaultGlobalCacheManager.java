@@ -27,7 +27,7 @@ import static com.github.blindpirate.gogradle.util.IOUtils.write;
 public class DefaultGlobalCacheManager implements GlobalCacheManager {
     public static final String GOPATH_CACHE_PATH = "go/gopath";
     public static final String GO_BINARAY_CACHE_PATH = "go/binary";
-    public static final String GO_LOCKFILES_PATH = "go/lockfiles";
+    public static final String GO_METADATA_PATH = "go/metadata";
 
     private final GolangPluginSetting setting;
 
@@ -44,7 +44,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     public void ensureGlobalCacheExistAndWritable() {
         ensureDirExistAndWritable(gradleHome, GOPATH_CACHE_PATH);
         ensureDirExistAndWritable(gradleHome, GO_BINARAY_CACHE_PATH);
-        ensureDirExistAndWritable(gradleHome, GO_LOCKFILES_PATH);
+        ensureDirExistAndWritable(gradleHome, GO_METADATA_PATH);
     }
 
     @Override
@@ -113,7 +113,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     private File createLockFileIfNecessary(GolangDependency dependency) {
         String lockFileName = IOUtils.encodeInternally(dependency.getName());
         File lockFile = gradleHome
-                .resolve(GO_LOCKFILES_PATH)
+                .resolve(GO_METADATA_PATH)
                 .resolve(lockFileName)
                 .toFile();
         if (!lockFile.exists()) {

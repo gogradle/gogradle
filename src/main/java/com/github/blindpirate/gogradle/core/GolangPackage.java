@@ -1,29 +1,27 @@
 package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.vcs.VcsType;
+import com.github.blindpirate.gogradle.util.StringUtils;
 
-import java.util.List;
+import java.nio.file.Path;
 import java.util.Optional;
 
 public abstract class GolangPackage {
-    private String path;
+    private Path path;
 
-    public GolangPackage(String path) {
+    public GolangPackage(Path path) {
         this.path = path;
     }
 
-    public String getPath() {
+    public Path getPath() {
         return path;
     }
 
-    public abstract String getRootPath();
+    public String getPathString(){
+        return StringUtils.toUnixString(path);
+    }
 
-    public abstract VcsType getVcsType();
-
-    public abstract List<String> getUrls();
-
-    public Optional<GolangPackage> resolve(String packagePath) {
+    public Optional<GolangPackage> resolve(Path packagePath) {
         Assert.isTrue(packagePath.startsWith(path) || path.startsWith(packagePath));
         if (path.equals(packagePath)) {
             return Optional.of(this);
@@ -34,9 +32,9 @@ public abstract class GolangPackage {
         }
     }
 
-    protected abstract Optional<GolangPackage> longerPath(String packagePath);
+    protected abstract Optional<GolangPackage> longerPath(Path packagePath);
 
-    protected abstract Optional<GolangPackage> shorterPath(String packagePath);
+    protected abstract Optional<GolangPackage> shorterPath(Path packagePath);
 
 
 }

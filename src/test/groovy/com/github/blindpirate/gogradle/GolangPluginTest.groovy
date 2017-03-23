@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
-import com.github.blindpirate.gogradle.vcs.git.GitRepository
+import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.gradle.api.Project
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.junit.Before
@@ -29,7 +29,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'integration with idea plugin should succeed'(){
+    void 'integration with idea plugin should succeed'() {
         project.pluginManager.apply(IdeaPlugin)
     }
 
@@ -180,14 +180,24 @@ class GolangPluginTest {
                     privateKeyFile 'path'
                 }
             }
+
+            git {
+                name ~/.*f/
+                substitute { name, url ->
+                    'github.com/another/package'
+                }
+            }
         }
 
-        GitRepository repository = GogradleGlobal.getInstance(GitRepositoryHandler).findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
+        GolangRepository repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
 
         assert repository.username == 'username'
         assert repository.password == 'password'
 
-        repository = GogradleGlobal.getInstance(GitRepositoryHandler).findMatchedRepository('github.com/c/d', null).get()
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d', null).get()
         assert repository.privateKeyFilePath == 'path'
+
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/e/f', null).get()
+        assert repository.substitution.call('', '') == 'github.com/another/package'
     }
 }

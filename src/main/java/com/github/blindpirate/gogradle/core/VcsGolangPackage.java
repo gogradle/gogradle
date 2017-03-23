@@ -2,18 +2,20 @@ package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class VcsGolangPackage extends GolangPackage {
-    private String rootPath;
+    private Path rootPath;
     private VcsType vcsType;
     private List<String> urls;
 
-    private VcsGolangPackage(String path) {
+    private VcsGolangPackage(Path path) {
         super(path);
     }
 
@@ -21,12 +23,10 @@ public class VcsGolangPackage extends GolangPackage {
         return rootPath.equals(getPath());
     }
 
-    @Override
-    public String getRootPath() {
+    public Path getRootPath() {
         return rootPath;
     }
 
-    @Override
     public VcsType getVcsType() {
         return vcsType;
     }
@@ -36,21 +36,20 @@ public class VcsGolangPackage extends GolangPackage {
         return isEmpty(urls) ? null : urls.get(0);
     }
 
-    @Override
     public List<String> getUrls() {
         return urls;
     }
 
     @Override
-    protected Optional<GolangPackage> longerPath(String packagePath) {
+    protected Optional<GolangPackage> longerPath(Path packagePath) {
         // I am github.com/a/b/c, the param is github.com/a/b/c/d
         return Optional.of(sameRoot(packagePath));
     }
 
     @Override
-    protected Optional<GolangPackage> shorterPath(String packagePath) {
+    protected Optional<GolangPackage> shorterPath(Path packagePath) {
         // I am github.com/a/b/c, the param is github.com/a or github.com/a/b
-        if (packagePath.length() < rootPath.length()) {
+        if (packagePath.getNameCount() < rootPath.getNameCount()) {
             // github.com/a
             return Optional.of(IncompleteGolangPackage.of(packagePath));
         } else {
@@ -59,7 +58,7 @@ public class VcsGolangPackage extends GolangPackage {
         }
     }
 
-    private GolangPackage sameRoot(String packagePath) {
+    private GolangPackage sameRoot(Path packagePath) {
         return builder().withPath(packagePath)
                 .withRootPath(rootPath)
                 .withVcsType(vcsType)
@@ -73,20 +72,20 @@ public class VcsGolangPackage extends GolangPackage {
     }
 
     public static final class Builder {
-        private String path;
-        private String rootPath;
+        private Path path;
+        private Path rootPath;
         private VcsType vcsType;
         private List<String> urls;
 
         private Builder() {
         }
 
-        public Builder withPath(String path) {
+        public Builder withPath(Path path) {
             this.path = path;
             return this;
         }
 
-        public Builder withRootPath(String rootPath) {
+        public Builder withRootPath(Path rootPath) {
             this.rootPath = rootPath;
             return this;
         }
@@ -118,8 +117,8 @@ public class VcsGolangPackage extends GolangPackage {
     @Override
     public String toString() {
         return "VcsGolangPackage{"
-                + "path='" + getPath() + '\''
-                + ", rootPath='" + rootPath + '\''
+                + "path='" + getPathString() + '\''
+                + ", rootPath='" + toUnixString(rootPath) + '\''
                 + ", vcsType=" + vcsType
                 + ", url='" + urls + '\''
                 + '}';

@@ -9,7 +9,7 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.github.blindpirate.gogradle.vcs.git.GitAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import com.google.inject.Injector
 import org.eclipse.jgit.lib.Repository
 import org.junit.Before
@@ -31,7 +31,7 @@ class GlobalCachePackagePathResolverTest {
     @Mock
     GlobalCacheManager cacheManager
     @Mock
-    GitAccessor gitAccessor
+    GitClientAccessor gitAccessor
     @Mock
     Repository repository
     @Mock

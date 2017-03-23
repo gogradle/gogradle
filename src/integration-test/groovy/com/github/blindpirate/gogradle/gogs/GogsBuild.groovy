@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.gogs
 
-import com.github.blindpirate.gogradle.GitRepositoryHandler
+import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
@@ -24,7 +24,7 @@ import java.nio.file.Path
 class GogsBuild extends IntegrationTestSupport {
     File resource = new File(System.getenv('GOGS_DIR'))
 
-    GitAccessor gitAccessor = new GitAccessor(new GitRepositoryHandler())
+    GitAccessor gitAccessor = new GitAccessor(new GolangRepositoryHandler())
 
     ProcessUtils processUtils = new ProcessUtils()
 

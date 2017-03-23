@@ -220,7 +220,7 @@ public class DefaultBuildManager implements BuildManager {
                     + String.join(" ", args)
                     + "\nEnv:\n"
                     + StringUtils.formatEnv(env);
-            throw BuildException.processReturnNonZero(retcode, message);
+            throw BuildException.processInteractionFailed(retcode, message);
         }
     }
 
