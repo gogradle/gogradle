@@ -100,8 +100,8 @@ class DefaultPackagePathResolverTest {
         // then
         verify(resolver1, times(0)).produce(anyString())
         assert result1 == rootInfo
-        assert result2.path == 'github.com/a/b/c'
-        assert result3.path == 'github.com/a/b/c/d'
+        assert result2.pathString == 'github.com/a/b/c'
+        assert result3.pathString == 'github.com/a/b/c/d'
         assert allFieldsEquals(result2, rootInfo, ['vcsType', 'url', 'rootPath'])
         assert allFieldsEquals(result3, rootInfo, ['vcsType', 'url', 'rootPath'])
     }

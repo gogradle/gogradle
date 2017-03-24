@@ -125,8 +125,8 @@ class BitbucketPackagePathResolverTest {
         GolangPackage pkg = resolver.produce('bitbucket.org/zombiezen/gopdf/a').get()
         // then
         assert pkg instanceof VcsGolangPackage
-        assert pkg.path == 'bitbucket.org/zombiezen/gopdf/a'
-        assert pkg.rootPath == 'bitbucket.org/zombiezen/gopdf'
+        assert pkg.pathString == 'bitbucket.org/zombiezen/gopdf/a'
+        assert pkg.rootPathString == 'bitbucket.org/zombiezen/gopdf'
         assert pkg.vcsType == VcsType.MERCURIAL
         assert pkg.urls == ["https://bitbucket.org/zombiezen/gopdf", "ssh://hg@bitbucket.org/zombiezen/gopdf"]
     }
