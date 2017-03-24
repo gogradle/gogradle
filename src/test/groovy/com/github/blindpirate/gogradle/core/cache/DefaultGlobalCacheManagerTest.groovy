@@ -1,12 +1,20 @@
 package com.github.blindpirate.gogradle.core.cache
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.DataExchange
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency
+import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.google.inject.Key
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.junit.Before
@@ -20,12 +28,13 @@ import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_METADATA_PATH
-import static com.github.blindpirate.gogradle.util.IOUtils.toString
 import static com.github.blindpirate.gogradle.util.IOUtils.write
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
+@WithMockInjector
 class DefaultGlobalCacheManagerTest {
 
     File resource
@@ -34,18 +43,27 @@ class DefaultGlobalCacheManagerTest {
     @Mock
     GolangPluginSetting setting
     @Mock
-    NotationDependency notationDependency
+    PackagePathResolver packagePathResolver
     @Mock
-    ResolvedDependency resolvedDependency
+    GitMercurialNotationDependency notationDependency
+    @Mock
+    GitMercurialResolvedDependency resolvedDependency
     @Mock
     Project project
+    @Mock
+    VcsAccessor accessor
+
+    VcsGolangPackage pkg = MockUtils.mockRootVcsPackage()
 
     ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
     @Before
     void setUp() {
-        cacheManager = new DefaultGlobalCacheManager(setting)
-        when(notationDependency.getName()).thenReturn("dependency")
+        cacheManager = new DefaultGlobalCacheManager(setting, packagePathResolver)
+        when(notationDependency.getName()).thenReturn(pkg.getPathString())
+        when(notationDependency.getUrls()).thenReturn(pkg.getUrls())
+        when(packagePathResolver.produce(pkg.getRootPathString())).thenReturn(Optional.of(pkg))
+        when(GogradleGlobal.getInstance((Key) any(Key))).thenReturn(accessor)
         ReflectionUtils.setField(cacheManager, "gradleHome", resource.toPath())
     }
 
@@ -65,32 +83,46 @@ class DefaultGlobalCacheManagerTest {
     }
 
     @Test
-    void 'lock file should be initialized as 0'() {
+    void 'lock file should be initialized'() {
         // when
         cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
         // then
-        assert toString(new File(resource, 'go/lockfiles/dependency')) == '0'
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+        assert metadata.lastUpdateTime == 0
+        assert metadata.lastUpdateUrl == null
+        assert metadata.vcs == 'git'
+        assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 
     @Test
     void 'lock file should be updated successfully'() {
         // when
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateCurrentDependencyLock()
-            cacheManager.updateCurrentDependencyLock()
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+            cacheManager.updateCurrentDependencyLock(notationDependency)
         } as Callable)
         // then
-        assert (-1000L..1000L).contains(toString(new File(resource, 'go/lockfiles/dependency')).toLong() - System.currentTimeMillis())
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+        assert (-1000L..1000L).contains(metadata.getLastUpdateTime() - System.currentTimeMillis())
     }
 
     @Test
     void 'dependency should be considered as out-of-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+vcs:
+  git
+lastUpdated:
+  time: ${System.currentTimeMillis() - 2000}
+  url: https://github.com/user/package.git
+""")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert cacheManager.currentDependencyIsOutOfDate()
+            assert cacheManager.currentDependencyIsOutOfDate(notationDependency)
         } as Callable)
     }
 
@@ -98,10 +130,19 @@ class DefaultGlobalCacheManagerTest {
     void 'dependency should be considered as up-to-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+vcs:
+  git
+lastUpdated:
+  time: ${System.currentTimeMillis()}
+  url: https://github.com/user/package.git
+""")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.currentDependencyIsOutOfDate()
+            assert !cacheManager.currentDependencyIsOutOfDate(notationDependency)
         } as Callable)
     }
 

@@ -1,10 +1,15 @@
 package com.github.blindpirate.gogradle.core.cache;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
 import org.gradle.wrapper.GradleUserHomeLookup;
 
 import javax.inject.Inject;
@@ -15,10 +20,15 @@ import java.io.RandomAccessFile;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.Callable;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
+import static com.github.blindpirate.gogradle.util.DataExchange.parseYaml;
+import static com.github.blindpirate.gogradle.util.DataExchange.toYaml;
 import static com.github.blindpirate.gogradle.util.IOUtils.ensureDirExistAndWritable;
 import static com.github.blindpirate.gogradle.util.IOUtils.toByteArray;
 import static com.github.blindpirate.gogradle.util.IOUtils.write;
@@ -31,11 +41,14 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     private final GolangPluginSetting setting;
 
+    private final PackagePathResolver packagePathResolver;
+
     private final ThreadLocal<FileChannel> fileChannels = new ThreadLocal<>();
 
     @Inject
-    public DefaultGlobalCacheManager(GolangPluginSetting setting) {
+    public DefaultGlobalCacheManager(GolangPluginSetting setting, PackagePathResolver packagePathResolver) {
         this.setting = setting;
+        this.packagePathResolver = packagePathResolver;
     }
 
     private Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
@@ -58,11 +71,46 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
+    public Optional<GlobalCacheMetadata> getMetadata(Path packagePath) {
+        try {
+            return doGetMetadata(packagePath);
+        } catch (IOException e) {
+            return Optional.empty();
+        }
+    }
+
+    private Optional<GlobalCacheMetadata> doGetMetadata(Path packagePath) throws IOException {
+        Path lockfilePath = getGlobalPackageCachePath(StringUtils.toUnixString(packagePath));
+        if (Files.exists(lockfilePath)) {
+            FileChannel channel = null;
+            FileLock lock = null;
+            try {
+                channel = new RandomAccessFile(lockfilePath.toFile(), "r").getChannel();
+                // Here we must use tryLock to avoid dead-lock
+                lock = channel.tryLock();
+                if (lock == null) {
+                    return Optional.empty();
+                } else {
+                    return Optional.of(readFile(channel));
+                }
+            } finally {
+                if (lock != null) {
+                    lock.release();
+                }
+                if (channel != null) {
+                    channel.close();
+                }
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public synchronized <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable)
             throws Exception {
         FileChannel channel = null;
         FileLock lock = null;
-        createPackageDirectoryIfNeccessary(dependency);
+        createPackageDirectoryIfNecessary(dependency);
         File lockFile = createLockFileIfNecessary(dependency);
         try {
             channel = new RandomAccessFile(lockFile, "rw").getChannel();
@@ -81,29 +129,42 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public boolean currentDependencyIsOutOfDate() {
+    public boolean currentDependencyIsOutOfDate(NotationDependency dependency) {
         try {
             // On windows we have to read file like this
-            FileChannel currentLockFile = fileChannels.get();
-            ByteBuffer buf = ByteBuffer.allocate((int) currentLockFile.size());
-            currentLockFile.position(0);
-            currentLockFile.read(buf);
-
-            long lastModifiedTime = Long.parseLong(new String(toByteArray(buf), DEFAULT_CHARSET));
-            long cacheSecond = setting.getGlobalCacheSecond();
-            return System.currentTimeMillis() - lastModifiedTime > DateUtils.toMilliseconds(cacheSecond);
+            GlobalCacheMetadata metadata = readFile(fileChannels.get());
+            return determineIfOutOfDate(dependency, metadata);
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
         }
     }
 
+    private GlobalCacheMetadata readFile(FileChannel fileChannel) throws IOException {
+        ByteBuffer buf = ByteBuffer.allocate((int) fileChannel.size());
+        fileChannel.position(0);
+        fileChannel.read(buf);
+
+        String fileContent = new String(toByteArray(buf), DEFAULT_CHARSET);
+        return parseYaml(fileContent, GlobalCacheMetadata.class);
+    }
+
+    private boolean determineIfOutOfDate(NotationDependency dependency, GlobalCacheMetadata metadata) {
+        List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
+        if (urls.contains(metadata.getLastUpdateUrl())) {
+            long cacheSecond = setting.getGlobalCacheSecond();
+            return System.currentTimeMillis() - metadata.getLastUpdateTime() > DateUtils.toMilliseconds(cacheSecond);
+        } else {
+            return true;
+        }
+    }
+
     @Override
-    public void updateCurrentDependencyLock() {
+    public void updateCurrentDependencyLock(NotationDependency dependency) {
         try {
             // On windows we have to write file like this
             FileChannel currentLockFile = fileChannels.get();
             currentLockFile.position(0);
-            byte[] bytesToWrite = Long.valueOf(System.currentTimeMillis()).toString().getBytes(DEFAULT_CHARSET);
+            byte[] bytesToWrite = toYaml(updatedMetaData(dependency)).getBytes(DEFAULT_CHARSET);
             currentLockFile.write(ByteBuffer.wrap(bytesToWrite));
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
@@ -117,12 +178,25 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
                 .resolve(lockFileName)
                 .toFile();
         if (!lockFile.exists()) {
-            write(lockFile, "0");
+            write(lockFile, toYaml(newMetadata((NotationDependency) dependency)));
         }
         return lockFile;
     }
 
-    private void createPackageDirectoryIfNeccessary(GolangDependency dependency) {
+    private GlobalCacheMetadata newMetadata(NotationDependency dependency) {
+        VcsGolangPackage pkg = (VcsGolangPackage) packagePathResolver.produce(dependency.getName()).get();
+        return GlobalCacheMetadata.newMetadata(pkg);
+    }
+
+    private GlobalCacheMetadata updatedMetaData(NotationDependency dependency) {
+        VcsGolangPackage pkg = (VcsGolangPackage) packagePathResolver.produce(dependency.getName()).get();
+        Path cacheRoot = getGlobalPackageCachePath(pkg.getRootPathString());
+
+        String url = pkg.getVcsType().getAccessor().getRemoteUrl(cacheRoot.toFile());
+        return GlobalCacheMetadata.updatedMetadata(pkg, url);
+    }
+
+    private void createPackageDirectoryIfNecessary(GolangDependency dependency) {
         Path path = getGlobalPackageCachePath(dependency.getName());
         ensureDirExistAndWritable(path);
     }
