@@ -8,7 +8,9 @@ import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
+import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
@@ -86,7 +88,7 @@ class GitMercurialDependencyManagerTest {
         when(commit.getId()).thenReturn(commitId)
         when(commit.getCommitTime()).thenReturn(123000L)
 
-        when(accessor.getRemoteUrl(resource)).thenReturn("https://github.com/a/b.git")
+        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
         when(notationDependency.getStrategy()).thenReturn(strategy)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencySet)
 
@@ -148,29 +150,35 @@ class GitMercurialDependencyManagerTest {
         verify(vendorResolvedDependency).setUpdateTime(456L)
     }
 
-//    @Test
-//    void 'existed repository should be updated'() {
-//        IOUtils.write(resource, 'placeholder', '')
-//        // given:
-//        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
-//        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
-//        // when:
-//        manager.resolve(configuration, notationDependency)
-//        // then:
-//        verify(accessor).pull(resource)
-//    }
-//
-//    @Test
-//    @MockOffline
-//    void 'pull should not be executed if offline'() {
-//        IOUtils.write(resource, 'placeholder', '')
-//        // given:
-//        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
-//        // when:
-//        manager.resolve(configuration, notationDependency)
-//        // then:
-//        verify(accessor, times(0)).pull(resource)
-//    }
+    @Test
+    void 'existed repository should be updated'() {
+        // given:
+        when(cacheManager.currentDependencyIsOutOfDate(notationDependency)).thenReturn(true)
+        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
+        // when:
+        manager.resolve(configuration, notationDependency)
+        // then:
+        verify(accessor).pull(resource)
+    }
+
+    @Test
+    void 'empty repository should be cloned'() {
+        // given
+        IOUtils.clearDirectory(resource)
+        // when
+        manager.resolve(configuration, notationDependency)
+        // then
+        verify(accessor).clone(repoUrl, resource)
+    }
+
+    @Test
+    @MockOffline
+    void 'pull should not be executed if offline'() {
+        // when:
+        manager.resolve(configuration, notationDependency)
+        // then:
+        verify(accessor, times(0)).pull(resource)
+    }
 
     @Test
     void 'dependency with tag should be resolved successfully'() {
@@ -243,65 +251,54 @@ class GitMercurialDependencyManagerTest {
         verify(accessor).checkout(resource, commitId)
     }
 
-//    @Test(expected = DependencyResolutionException)
-//    void 'trying to resolve an inexistent commit should result in an exception'() {
-//        // given
-//        when(notationDependency.getCommit()).thenReturn('inexistent')
-//        // when
-//        manager.resolve(configuration, notationDependency)
-//    }
+    @Test(expected = DependencyResolutionException)
+    void 'trying to resolve an inexistent commit should result in an exception'() {
+        // given
+        when(notationDependency.getCommit()).thenReturn('inexistent')
+        // when
+        manager.resolve(configuration, notationDependency)
+    }
 
-//    @Test(expected = DependencyResolutionException)
-//    void 'exception in locked block should not be swallowed'() {
-//        // given
-//        when(cacheManager.runWithGlobalCacheLock(any(GitNotationDependency), any(Callable)))
-//                .thenThrow(new IOException())
-//        // when
-//        manager.resolve(configuration, notationDependency)
-//    }
+    @Test(expected = DependencyResolutionException)
+    void 'exception in locked block should not be swallowed'() {
+        // given
+        when(cacheManager.runWithGlobalCacheLock(any(GitMercurialNotationDependency), any(Callable)))
+                .thenThrow(new IOException())
+        // when
+        manager.resolve(configuration, notationDependency)
+    }
 
-//    @Test
-//    void 'mismatched repository should be cleared'() {
-//        // given
-//        when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
-//        IOUtils.write(resource, 'some file', 'file content')
-//        // when
-//        manager.resolve(configuration, notationDependency)
-//        // then
-//        assert IOUtils.dirIsEmpty(resource)
-//    }
-//
-//    @Test
-//    void 'directory has only .git should be cleared'() {
-//        // given
-//        IOUtils.mkdir(resource, '.git')
-//        // when
-//        manager.resolve(configuration, notationDependency)
-//        // then
-//        assert IOUtils.dirIsEmpty(resource)
-//    }
+    @Test
+    void 'mismatched repository should be cleared'() {
+        // given
+        when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
+        IOUtils.write(resource, 'some file', 'file content')
+        // when
+        manager.resolve(configuration, notationDependency)
+        // then
+        assert IOUtils.dirIsEmpty(resource)
+    }
 
-//    @Test
-//    void 'installing a resolved dependency should succeed'() {
-//        // given
-//        File globalCache = IOUtils.mkdir(resource, 'globalCache')
-//        File projectGopath = IOUtils.mkdir(resource, 'projectGopath')
-//        when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(globalCache.toPath())
-//        when(resolvedDependency.getVersion()).thenReturn(revCommit.getName())
-//        when(accessor.getRepository(globalCache)).thenReturn(repository)
-//        // when
-//        manager.install(resolvedDependency, projectGopath)
-//        // then
-//        verify(accessor).checkout(repository, revCommit.getName())
-//    }
+    @Test
+    void 'installing a resolved dependency should succeed'() {
+        // given
+        File globalCache = IOUtils.mkdir(resource, 'globalCache')
+        File projectGopath = IOUtils.mkdir(resource, 'projectGopath')
+        when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(globalCache.toPath())
+        when(resolvedDependency.getVersion()).thenReturn(commitId)
+        // when
+        manager.install(resolvedDependency, projectGopath)
+        // then
+        verify(accessor).checkout(globalCache, commitId)
+    }
 
-//    @Test(expected = DependencyInstallationException)
-//    void 'exception in install process should be wrapped'() {
-//        // given
-//        when(cacheManager.getGlobalPackageCachePath(anyString())).thenThrow(new IllegalStateException())
-//        // then
-//        manager.install(resolvedDependency, resource)
-//    }
+    @Test(expected = DependencyInstallationException)
+    void 'exception in install process should be wrapped'() {
+        // given
+        when(cacheManager.getGlobalPackageCachePath(anyString())).thenThrow(IllegalStateException)
+        // then
+        manager.install(resolvedDependency, resource)
+    }
 
     class TestGitMercurialDependencyManager extends GitMercurialDependencyManager {
         GitMercurialAccessor accessor

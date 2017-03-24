@@ -1,12 +1,11 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
-import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
-import com.github.blindpirate.gogradle.vcs.Git;
 import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.GitMercurialDependencyManager;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
 @Singleton
@@ -16,11 +15,11 @@ public class GitDependencyManager extends GitMercurialDependencyManager {
 
     private final GitClientAccessor gitAccessor;
 
+    @Inject
     public GitDependencyManager(GlobalCacheManager cacheManager,
                                 DependencyVisitor dependencyVisitor,
-                                GitClientAccessor gitAccessor,
-                                @Git GolangRepositoryHandler golangRepositoryHandler) {
-        super(cacheManager, dependencyVisitor, golangRepositoryHandler);
+                                GitClientAccessor gitAccessor) {
+        super(cacheManager, dependencyVisitor);
         this.gitAccessor = gitAccessor;
     }
 

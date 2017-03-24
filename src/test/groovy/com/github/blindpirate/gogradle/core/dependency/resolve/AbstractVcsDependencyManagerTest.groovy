@@ -134,7 +134,7 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'updating repository should be skipped if it is up-to-date'() {
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
-        verify(cacheManager, times(0)).updateCurrentDependencyLock()
+        verify(cacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, resource)
     }
 
@@ -142,9 +142,9 @@ class AbstractVcsDependencyManagerTest {
     @MockOffline
     void 'updating repository should be skipped when offline'() {
         // given
-        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
+        when(cacheManager.currentDependencyIsOutOfDate(hostNotationDependency)).thenReturn(true)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
-        verify(cacheManager, times(0)).updateCurrentDependencyLock()
+        verify(cacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, resource)
     }
 
