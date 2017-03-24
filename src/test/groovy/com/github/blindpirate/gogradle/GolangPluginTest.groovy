@@ -166,38 +166,27 @@ class GolangPluginTest {
     @Test
     void 'configuring repository should succeed'() {
         project.repositories {
-            git {
-                url 'https://github.com/a/b.git'
-                credentials {
-                    username 'username'
-                    password 'password'
-                }
+            golang {
+                name { it.endsWith('b') }
+                url 'bbbbb'
             }
 
-            git {
-                name { it.endsWith('d') }
-                credentials {
-                    privateKeyFile 'path'
-                }
-            }
-
-            git {
-                name ~/.*f/
-                substitute { name, url ->
-                    'github.com/another/package'
+            golang {
+                name ~/.*d/
+                url { name, url ->
+                    name + url
                 }
             }
         }
 
-        GolangRepository repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
+        GolangRepository repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b')
 
-        assert repository.username == 'username'
-        assert repository.password == 'password'
+        assert repository.substitute(null, null) == 'bbbbb'
 
-        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d', null).get()
-        assert repository.privateKeyFilePath == 'path'
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d')
+        assert repository.substitute('name', 'url') == 'nameurl'
 
-        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/e/f', null).get()
-        assert repository.substitution.call('', '') == 'github.com/another/package'
+        repository=GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('something else')
+        assert repository.is(GolangRepository.EMPTY_INSTANCE)
     }
 }

@@ -122,7 +122,7 @@ public class GolangPlugin implements Plugin<Project> {
 
         GolangRepositoryHandler repositoryHandler = injector.getInstance(GolangRepositoryHandler.class);
 
-        ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("git", repositoryHandler);
+        ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("golang", repositoryHandler);
 
     }
 
