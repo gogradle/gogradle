@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class StandardGolangPackage extends GolangPackage {
@@ -31,6 +32,10 @@ public class StandardGolangPackage extends GolangPackage {
 
     public static StandardGolangPackage of(Path path) {
         return new StandardGolangPackage(path);
+    }
+
+    public static StandardGolangPackage of(String path) {
+        return new StandardGolangPackage(Paths.get(path));
     }
 
     @Override

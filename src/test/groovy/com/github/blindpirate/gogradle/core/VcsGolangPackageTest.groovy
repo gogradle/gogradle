@@ -49,6 +49,6 @@ class VcsGolangPackageTest {
         assert golangPackage instanceof VcsGolangPackage
         assert golangPackage.rootPathString == 'github.com/user/package'
         assert golangPackage.vcsType == VcsType.GIT
-        assert golangPackage.url == 'https://github.com/user/package.git'
+        assert golangPackage.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 }

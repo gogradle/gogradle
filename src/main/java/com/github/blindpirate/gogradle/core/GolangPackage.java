@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public abstract class GolangPackage {
@@ -17,7 +18,7 @@ public abstract class GolangPackage {
         return path;
     }
 
-    public String getPathString(){
+    public String getPathString() {
         return StringUtils.toUnixString(path);
     }
 
@@ -30,6 +31,10 @@ public abstract class GolangPackage {
         } else {
             return longerPath(packagePath);
         }
+    }
+
+    public Optional<GolangPackage> resolve(String packagePath) {
+        return resolve(Paths.get(packagePath));
     }
 
     protected abstract Optional<GolangPackage> longerPath(Path packagePath);
