@@ -150,13 +150,13 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         boolean repositoryIsMatched = globalCacheRepositoryMatch(dependency, repoRoot);
         if (!repositoryIsMatched) {
             initRepository(dependency, repoRoot);
-            globalCacheManager.updateCurrentDependencyLock();
-        } else if (globalCacheManager.currentDependencyIsOutOfDate()) {
+            globalCacheManager.updateCurrentDependencyLock(dependency);
+        } else if (globalCacheManager.currentDependencyIsOutOfDate(dependency)) {
             if (GogradleGlobal.isOffline()) {
                 LOGGER.info("Cannot pull update {} since it is offline now.", dependency);
             } else {
                 updateRepository(dependency, repoRoot);
-                globalCacheManager.updateCurrentDependencyLock();
+                globalCacheManager.updateCurrentDependencyLock(dependency);
             }
         } else {
             LOGGER.info("Skipped updating {} since it is up-to-date.", dependency);

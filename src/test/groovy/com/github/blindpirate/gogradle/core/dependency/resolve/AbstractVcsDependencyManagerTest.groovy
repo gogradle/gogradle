@@ -50,7 +50,6 @@ class AbstractVcsDependencyManagerTest {
     GolangConfiguration configuration
 
 
-    Object repository = new Object()
     ResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(ResolvedDependency, 'host')
     NotationDependency hostNotationDependency = DependencyUtils.mockWithName(NotationDependency, 'host')
 
@@ -65,9 +64,9 @@ class AbstractVcsDependencyManagerTest {
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         manager = new TestAbstractVcsDependencyManager(cacheManager)
 
-        when(subclassDelegate.determineVersion(repository, hostNotationDependency)).thenReturn('version')
-        when(subclassDelegate.createResolvedDependency(hostNotationDependency, resource, repository, 'version')).thenReturn(hostResolvedDependency)
-        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(Optional.of(repository))
+        when(subclassDelegate.determineVersion(resource, hostNotationDependency)).thenReturn('version')
+        when(subclassDelegate.createResolvedDependency(hostNotationDependency, resource, 'version')).thenReturn(hostResolvedDependency)
+        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(true)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
@@ -136,7 +135,7 @@ class AbstractVcsDependencyManagerTest {
     void 'updating repository should be skipped if it is up-to-date'() {
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock()
-        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
+        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, resource)
     }
 
     @Test
@@ -146,28 +145,28 @@ class AbstractVcsDependencyManagerTest {
         when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock()
-        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repository, resource)
+        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, resource)
     }
 
     @Test
     void 'lock file should be updated after resolving'() {
         // given
-        when(cacheManager.currentDependencyIsOutOfDate()).thenReturn(true)
+        when(cacheManager.currentDependencyIsOutOfDate(hostNotationDependency)).thenReturn(true)
         // when
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         // then
-        verify(subclassDelegate).updateRepository(hostNotationDependency, repository, resource)
-        verify(cacheManager).updateCurrentDependencyLock()
+        verify(subclassDelegate).updateRepository(hostNotationDependency, resource)
+        verify(cacheManager).updateCurrentDependencyLock(hostNotationDependency)
     }
 
     @Test
     void 'lock file should be updated after repository being initialized'() {
         // given
-        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(Optional.empty())
+        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(false)
         // when
         manager.resolve(configuration, hostNotationDependency)
         // then
-        verify(cacheManager).updateCurrentDependencyLock()
+        verify(cacheManager).updateCurrentDependencyLock(hostNotationDependency)
     }
 
 
