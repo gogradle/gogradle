@@ -8,13 +8,23 @@ import com.github.blindpirate.gogradle.task.go.GoExecutionAction
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import java.util.function.Consumer
+
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.isNull
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 class GoBuildTaskTest extends TaskTest {
     GoBuildTask task
+
+    @Captor
+    ArgumentCaptor cmdsCaptor
+    @Captor
+    ArgumentCaptor envCaptor
 
     @Before
     void setUp() {
@@ -30,9 +40,17 @@ class GoBuildTaskTest extends TaskTest {
         task.actions.each { it.execute(task) }
         // then
         assert task.actions.size() == 1
-        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
-        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
-        verify(buildManager).go(['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'], null, null, null)
+        verify(buildManager, times(3)).go(cmdsCaptor.capture(), envCaptor.capture(), any(Consumer), any(Consumer), isNull())
+        assert cmdsCaptor.allValues ==
+                [['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'],
+                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'],
+                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'],
+                ]
+        assert envCaptor.allValues == [
+                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'],
+                [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'],
+                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath']
+        ]
     }
 
     @Test
@@ -79,9 +97,17 @@ class GoBuildTaskTest extends TaskTest {
         assert task.actions.size() == 3
         assert task.actions.any { it instanceof GoExecutionAction }
         assert task.env == null
-        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
-        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'], null, null, null)
-        verify(buildManager).go(['build', '-o', 'output'], [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath'], null, null, null)
+        verify(buildManager, times(3)).go(cmdsCaptor.capture(), envCaptor.capture(), any(Consumer), any(Consumer), isNull())
+        assert cmdsCaptor.allValues == [
+                ['build', '-o', 'output'],
+                ['build', '-o', 'output'],
+                ['build', '-o', 'output']
+        ]
+        assert envCaptor.allValues == [
+                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'],
+                [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'],
+                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath']
+        ]
     }
 
     @Test
