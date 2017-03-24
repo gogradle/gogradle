@@ -16,19 +16,4 @@ class UnrecognizedGolangPackageTest {
     void 'path shorter than unrecognized package should also be unrecognized'() {
         assert unrecognizedGolangPackage.resolve('golang').get() instanceof UnrecognizedGolangPackage
     }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'exception should be thrown when invoking getRootPath()'() {
-        unrecognizedGolangPackage.getRootPath()
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'exception should be thrown when invoking getVcsType()'() {
-        unrecognizedGolangPackage.getVcsType()
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'exception should be thrown when invoking getUrls()'() {
-        unrecognizedGolangPackage.getUrls()
-    }
 }

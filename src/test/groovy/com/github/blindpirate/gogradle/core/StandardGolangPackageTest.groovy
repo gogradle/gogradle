@@ -7,19 +7,9 @@ import static com.github.blindpirate.gogradle.core.StandardGolangPackage.of
 class StandardGolangPackageTest {
     StandardGolangPackage standardGolangPackage = of('go/ast')
 
-    @Test(expected = UnsupportedOperationException)
-    void 'getVcsType should throw exception'() {
-        of('incomplete').vcsType
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'getUrl should throw exception'() {
-        of('incomplete').urls
-    }
-
     @Test
     void 'rootPath of a standard package should be itself'() {
-        assert standardGolangPackage.rootPath == 'go/ast'
+        assert standardGolangPackage.rootPathString == 'go/ast'
     }
 
     @Test

@@ -13,7 +13,7 @@ class UnrecognizedPackagePathResolverTest {
         GolangPackage pkg = resolver.produce('any').get()
         // then
         assert pkg instanceof UnrecognizedGolangPackage
-        assert pkg.path == 'any'
+        assert pkg.pathString == 'any'
     }
 
 

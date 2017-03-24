@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.util.StringUtils;
+
 import java.nio.file.Path;
 import java.util.Optional;
 
@@ -11,6 +13,10 @@ public class StandardGolangPackage extends GolangPackage {
 
     public Path getRootPath() {
         return getPath();
+    }
+
+    public String getRootPathString() {
+        return StringUtils.toUnixString(getPath());
     }
 
     @Override
