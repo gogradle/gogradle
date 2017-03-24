@@ -1,42 +1,31 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.MapUtils;
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
-import java.util.Map;
-
 public class GolangRepository {
     public static final GolangRepository EMPTY_INSTANCE = new GolangRepository() {
+        @Override
         public void all() {
             throw new UnsupportedOperationException();
         }
 
+        @Override
         public void name(Object name) {
             throw new UnsupportedOperationException();
         }
 
-        public void substitute(Closure closure) {
+        @Override
+        public void url(Object urlOrClosure) {
             throw new UnsupportedOperationException();
         }
 
-        public void httpsProxy(String httpsProxy) {
-            throw new UnsupportedOperationException();
-        }
-
-        public void httpProxy(String httpProxy) {
-            throw new UnsupportedOperationException();
-        }
     };
 
-    private static final String HTTP_PROXY = "http_proxy";
-    private static final String HTTPS_PROXY = "https_proxy";
     private boolean all;
     private Object namePattern;
-    private String httpProxy;
-    private String httpsProxy;
-    private Closure substitution;
+    private Object urlSubstitution;
 
     public void all() {
         this.all = true;
@@ -46,32 +35,25 @@ public class GolangRepository {
         namePattern = name;
     }
 
-    public void substitute(Closure closure) {
-        this.substitution = closure;
+    public void url(Object urlOrClosure) {
+        urlSubstitution = urlOrClosure;
     }
 
-    public void httpsProxy(String httpsProxy) {
-        this.httpsProxy = httpsProxy;
-    }
-
-    public void httpProxy(String httpProxy) {
-        this.httpProxy = httpProxy;
-    }
-
-    public String substitute(String url) {
-        if (substitution == null) {
-            return url;
+    public String substitute(String name, String url) {
+        if (urlSubstitution instanceof String) {
+            return (String) urlSubstitution;
         }
-        return (String) substitution.call(new Object[]{url});
+        if (urlSubstitution instanceof Closure) {
+            Closure closure = (Closure) urlSubstitution;
+            if (closure.getMaximumNumberOfParameters() == 1) {
+                return (String) closure.call(name);
+            } else if (closure.getMaximumNumberOfParameters() == 2) {
+                return (String) closure.call(name, url);
+            }
+        }
+        return url;
     }
 
-    public Closure getSubstitution() {
-        return substitution;
-    }
-
-    public Map<String, String> getProxyEnv() {
-        return MapUtils.asMap(HTTP_PROXY, httpProxy, HTTPS_PROXY, httpsProxy);
-    }
 
     public boolean match(String name) {
         if (all) {
