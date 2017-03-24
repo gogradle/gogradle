@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
@@ -10,11 +11,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Optional;
-
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static java.nio.file.Files.exists;
 
 @Singleton
 public class GlobalCachePackagePathResolver implements PackagePathResolver {
@@ -28,37 +25,21 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     @Override
     @DebugLog
     public Optional<GolangPackage> produce(String packagePath) {
-//        Path path = Paths.get(packagePath);
-//        while (isNotRoot(path)) {
-//            Optional<VcsType> vcs = findVcsRepo(path);
-//            if (vcs.isPresent()) {
-//                return Optional.of(buildPackageInfo(vcs.get(), packagePath, path));
-//            }
-//            path = path.getParent();
-//        }
+        Path path = Paths.get(packagePath);
+        for (int i = path.getNameCount(); i > 0; i--) {
+            Path subpath = path.subpath(0, i);
+            Optional<GlobalCacheMetadata> metadata = globalCacheManager.getMetadata(subpath);
+            if (metadata.isPresent()) {
+                VcsGolangPackage pkg = VcsGolangPackage.builder()
+                        .withPath(packagePath)
+                        .withRootPath(subpath)
+                        .withVcsType(VcsType.of(metadata.get().getVcs()).get())
+                        .withUrls(metadata.get().getOriginalUrls())
+                        .build();
+                return Optional.of(pkg);
+            }
+        }
+
         return Optional.empty();
-    }
-
-//    private GolangPackage buildPackageInfo(VcsType vcsType, String packagePath, Path repoRootPath) {
-//        Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(repoRootPath));
-//        String url = vcsType.getAccessor().getRemoteUrl(realPath.toFile());
-//        return VcsGolangPackage.builder()
-//                .withPath(packagePath)
-//                .withRootPath(toUnixString(repoRootPath))
-//                .withVcsType(vcsType)
-//                .withUrl(url)
-//                .build();
-//
-//    }
-
-    private Optional<VcsType> findVcsRepo(Path path) {
-        Path realPath = globalCacheManager.getGlobalPackageCachePath(toUnixString(path));
-        return Arrays.stream(VcsType.values())
-                .filter(vcs -> exists(realPath.resolve(vcs.getRepo())))
-                .findFirst();
-    }
-
-    private boolean isNotRoot(Path path) {
-        return path != null && path.getParent() != null;
     }
 }

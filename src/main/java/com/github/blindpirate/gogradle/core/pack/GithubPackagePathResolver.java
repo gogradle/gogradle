@@ -36,7 +36,7 @@ public class GithubPackagePathResolver extends AbstractPackagePathResolver {
         GolangPackage info = VcsGolangPackage.builder()
                 .withPath(path)
                 .withVcsType(VcsType.GIT)
-                .withRootPath(path.subpath(0,3))
+                .withRootPath(path.subpath(0, 3))
                 .withUrls(Arrays.asList(sshUrl, httpsUrl))
                 .build();
         return Optional.of(info);

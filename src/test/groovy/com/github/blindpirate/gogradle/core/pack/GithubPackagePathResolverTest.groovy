@@ -15,7 +15,7 @@ class GithubPackagePathResolverTest {
         GolangPackage result = resolver.produce('github.com/a/b').get()
 
         // then
-        assert result.path == 'github.com/a/b'
+        assert result.pathString == 'github.com/a/b'
         assertVcsTypeUrlAndRootPath(result)
     }
 
@@ -34,7 +34,7 @@ class GithubPackagePathResolverTest {
         GolangPackage info = resolver.produce('github.com/a/b/c').get()
 
         // then
-        assert info.path == 'github.com/a/b/c'
+        assert info.pathString == 'github.com/a/b/c'
         assertVcsTypeUrlAndRootPath(info)
     }
 
@@ -45,7 +45,7 @@ class GithubPackagePathResolverTest {
         GolangPackage info = resolver.produce(wtf).get()
 
         // then
-        assert info.path == wtf
+        assert info.pathString == wtf
         assertVcsTypeUrlAndRootPath(info)
     }
 
@@ -58,6 +58,6 @@ class GithubPackagePathResolverTest {
         assert info.vcsType == VcsType.GIT
         assert info.vcsType == VcsType.GIT
         assert info.urls == ['git@github.com:a/b.git', 'https://github.com/a/b.git']
-        assert info.rootPath == 'github.com/a/b'
+        assert info.rootPathString == 'github.com/a/b'
     }
 }

@@ -2,10 +2,12 @@ package com.github.blindpirate.gogradle.core
 
 import org.junit.Test
 
+import java.nio.file.Paths
+
 import static com.github.blindpirate.gogradle.core.StandardGolangPackage.of
 
 class StandardGolangPackageTest {
-    StandardGolangPackage standardGolangPackage = of('go/ast')
+    StandardGolangPackage standardGolangPackage = of(Paths.get('go/ast'))
 
     @Test
     void 'rootPath of a standard package should be itself'() {
