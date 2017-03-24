@@ -32,7 +32,7 @@ class VcsGolangPackageTest {
         // when
         GolangPackage packageWithLongerPath = vcsGolangPackage.resolve('github.com/user/package/a/b').get()
         // then
-        assert packageWithLongerPath.path == 'github.com/user/package/a/b'
+        assert packageWithLongerPath.pathString == 'github.com/user/package/a/b'
         assertRootPathAndSoOn(packageWithLongerPath)
     }
 
@@ -41,13 +41,13 @@ class VcsGolangPackageTest {
         // when
         GolangPackage rootPackage = vcsGolangPackage.resolve('github.com/user/package').get()
         // then
-        assert rootPackage.path == 'github.com/user/package'
+        assert rootPackage.pathString == 'github.com/user/package'
         assertRootPathAndSoOn(rootPackage)
     }
 
     void assertRootPathAndSoOn(GolangPackage golangPackage) {
         assert golangPackage instanceof VcsGolangPackage
-        assert golangPackage.rootPath == 'github.com/user/package'
+        assert golangPackage.rootPathString == 'github.com/user/package'
         assert golangPackage.vcsType == VcsType.GIT
         assert golangPackage.url == 'https://github.com/user/package.git'
     }

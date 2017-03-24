@@ -28,6 +28,10 @@ public class VcsGolangPackage extends GolangPackage {
         return rootPath;
     }
 
+    public String getRootPathString() {
+        return toUnixString(rootPath);
+    }
+
     public VcsType getVcsType() {
         return vcsType;
     }
