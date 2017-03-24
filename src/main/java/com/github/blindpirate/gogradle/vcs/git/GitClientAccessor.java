@@ -9,9 +9,7 @@ import com.github.blindpirate.gogradle.vcs.GitMercurialCommit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -60,7 +58,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
     @Override
     public long lastCommitTimeOfPath(File repoRoot, String relativePath) {
         return run(repoRoot,
-                asList("git", "log", "-1", "--pretty=format:\"%ct\""),
+                asList("git", "log", "-1", "--pretty=format:%ct", relativePath),
                 result -> toMilliseconds(Long.valueOf(result.getStdout().trim())));
     }
 
@@ -71,7 +69,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
 
     private Optional<GitMercurialCommit> findCommitOrTag(File repoRoot, String tagOrCommit) {
         return run(repoRoot,
-                asList("git", "log", tagOrCommit, "-1", "--pretty=format:\"%H:%ct\""),
+                asList("git", "log", tagOrCommit, "-1", "--pretty=format:%H:%ct"),
                 result -> {
                     String[] commitAndTime = result.getStdout().split(":");
                     String commit = commitAndTime[0];
@@ -82,21 +80,22 @@ public class GitClientAccessor extends GitMercurialAccessor {
         );
     }
 
+    @SuppressWarnings("checkstyle:linelength")
     @Override
     public List<GitMercurialCommit> getAllTags(File repository) {
         // git for-each-ref --sort=-committerdate --format '%(objectname):%(refname:short):%(committerdate:iso)' refs/tags
         // 5ddaee09d704261aa360068cdcafff1e5f188ece:v3.4.1:2017-03-03 14:45:52 -0500
         return run(repository,
-                asList("git", "for-each-ref", "--sort=-committerdate", "--format", "'%(objectname):%(refname:short):%(committerdate:iso)'", "refs/tags"),
+                asList("git", "for-each-ref", "--sort=-taggerdate", "--format", "%(objectname):%(refname:short):%(taggerdate:raw)", "refs/tags"),
                 this::convertToCommits);
     }
 
     private List<GitMercurialCommit> convertToCommits(ProcessResult result) {
         return Stream.of(result.getStdout().split("\\n")).map(line -> {
-            String[] commitTagAndISO8601 = line.split(":");
-            String commit = commitTagAndISO8601[0];
-            String tag = commitTagAndISO8601[1];
-            long ms = Instant.parse(commitTagAndISO8601[2]).toEpochMilli();
+            String[] commitTagAndTime = line.split(":");
+            String commit = commitTagAndTime[0];
+            String tag = commitTagAndTime[1];
+            long ms = DateUtils.parseRaw(commitTagAndTime[2]);
             return GitMercurialCommit.of(commit, tag, ms);
         }).collect(Collectors.toList());
     }
@@ -109,7 +108,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
     @Override
     public GitMercurialCommit headCommitOfBranch(File repository, String branch) {
         return run(repository,
-                asList("git", "log", "-1", "--pretty=format:\"%H:%ct\""),
+                asList("git", "log", branch, "-1", "--pretty=format:%H:%ct"),
                 result -> {
                     String[] commitAndTime = result.getStdout().split(":");
                     String commit = commitAndTime[0];
@@ -120,12 +119,14 @@ public class GitClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public void hardResetAndPull(File repoRoot, Map<String, String> proxyEnv) {
-        run(repoRoot, asList("git", "pull"), proxyEnv);
+    public void hardResetAndPull(File repoRoot) {
+        run(repoRoot, asList("git", "pull"));
+        run(repoRoot, asList("git", "submodule", "update", "--init", "--recursive"));
     }
 
     @Override
-    public void clone(String url, File directory, Map<String, String> proxyEnv) {
-        run(null, asList("git", "clone", url, directory.getAbsolutePath()), proxyEnv);
+    @SuppressWarnings("checkstyle:linelenght")
+    public void clone(String url, File directory) {
+        run(new File("."), asList("git", "clone", "--recursive", url, directory.getAbsolutePath()));
     }
 }
