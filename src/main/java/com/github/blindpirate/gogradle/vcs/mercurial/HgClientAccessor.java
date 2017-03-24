@@ -11,7 +11,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -64,18 +63,10 @@ public class HgClientAccessor extends GitMercurialAccessor {
     public long lastCommitTimeOfPath(File repoRoot, String relativePath) {
         return run(repoRoot,
                 asList("hg", "log", relativePath, "--limit", "1", "--template", "{date|hgdate}"),
-                result -> extractCommitMillisecond(result.getStdout())
+                result -> DateUtils.parseRaw(result.getStdout())
         );
     }
 
-    private long extractCommitMillisecond(String output) {
-        // 1241506546 0
-        String[] timestampAndTimezone = output.split("\\s");
-
-        Assert.isTrue(timestampAndTimezone.length == 2);
-        long unixSecond = Long.parseLong(timestampAndTimezone[0]);
-        return DateUtils.toMilliseconds(unixSecond);
-    }
 
     @Override
     public Optional<GitMercurialCommit> findCommitByTag(File repository, String tag) {
@@ -98,7 +89,7 @@ public class HgClientAccessor extends GitMercurialAccessor {
 
         String id = commitTagAndTime[0];
         String tag = StringUtils.trimToNull(commitTagAndTime[1]);
-        long time = extractCommitMillisecond(commitTagAndTime[2]);
+        long time = DateUtils.parseRaw(commitTagAndTime[2]);
 
         return GitMercurialCommit.of(id, tag, time);
     }
@@ -129,12 +120,12 @@ public class HgClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public void hardResetAndPull(File repoRoot, Map<String, String> proxyEnv) {
-        run(repoRoot, asList("hg", "pull", "-u"), proxyEnv);
+    public void pull(File repoRoot) {
+        run(repoRoot, asList("hg", "pull", "-u"));
     }
 
     @Override
-    public void clone(String url, File directory, Map<String, String> proxyEnv) {
+    public void clone(String url, File directory) {
         run(new File("."), asList("hg", "clone", url, directory.getAbsolutePath()));
     }
 }

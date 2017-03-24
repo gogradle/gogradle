@@ -158,7 +158,7 @@ class GitClientAccessorTest {
     @Test
     @AccessWeb
     void 'git pull should succeed'() {
-        accessor.hardResetAndPull(resource)
+        accessor.pull(resource)
         assert !new File(resource, 'tmpfile').exists()
         assert new File(resource, 'helloworld.go').exists()
         assert new File(resource, 'vendor/submodule/LICENSE').exists()

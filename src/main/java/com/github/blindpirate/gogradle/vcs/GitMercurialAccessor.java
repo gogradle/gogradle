@@ -35,9 +35,9 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
 
     public abstract GitMercurialCommit headCommitOfBranch(File repository, String branch);
 
-    public abstract void hardResetAndPull(File repoRoot, Map<String, String> proxyEnv);
+    public abstract void pull(File repoRoot);
 
-    public abstract void clone(String url, File directory, Map<String, String> proxyEnv);
+    public abstract void clone(String url, File directory);
 
     protected void run(File workingDir, List<String> cmds) {
         run(workingDir, cmds, emptyMap());
@@ -56,7 +56,8 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
     }
 
     protected <T> T run(File workingDir, List<String> cmds,
-                        Function<ProcessUtils.ProcessResult, T> successFunc, Function<ProcessUtils.ProcessResult, T> failureFunc) {
+                        Function<ProcessUtils.ProcessResult, T> successFunc,
+                        Function<ProcessUtils.ProcessResult, T> failureFunc) {
         return run(workingDir, cmds, emptyMap(), successFunc, failureFunc);
     }
 
@@ -69,16 +70,18 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
 
         Process process = processUtils.run(cmds, env, workingDir);
 
-        ProcessUtils.ProcessResult result = processUtils.getResult(process);
-
         try {
+            ProcessUtils.ProcessResult result = processUtils.getResult(process);
             if (result.getCode() == 0) {
                 return successFunc.apply(result);
             } else {
                 return failFunc.apply(result);
             }
         } catch (Exception e) {
-            throw BuildException.processInteractionFailed(cmds, env, workingDir, result);
+            if (e instanceof BuildException) {
+                throw e;
+            }
+            throw BuildException.processInteractionFailed(cmds, env, workingDir, e);
         }
     }
 

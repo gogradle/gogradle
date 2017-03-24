@@ -119,7 +119,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public void hardResetAndPull(File repoRoot) {
+    public void pull(File repoRoot) {
         run(repoRoot, asList("git", "pull"));
         run(repoRoot, asList("git", "submodule", "update", "--init", "--recursive"));
     }
