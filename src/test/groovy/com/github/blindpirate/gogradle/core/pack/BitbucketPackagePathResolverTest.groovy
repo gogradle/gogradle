@@ -11,6 +11,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -23,6 +24,13 @@ class BitbucketPackagePathResolverTest {
     @Before
     void setUp() {
         resolver = new BitbucketPackagePathResolver(httpUtils)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if IOException occurs'() {
+        when(httpUtils.get(anyString())).thenThrow(IOException)
+        resolver = new BitbucketPackagePathResolver(httpUtils)
+        resolver.produce('bitbucket.org/a/b')
     }
 
     @Test

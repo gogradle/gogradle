@@ -2,8 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangRepositoryHandler
+import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.MockUtils
@@ -236,6 +238,14 @@ class DefaultMapNotationParserTest {
     }
 
     @Test(expected = IllegalStateException)
+    void 'exception should be thrown if unrecognized and no url specified'() {
+        // given
+        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('recognized')))
+        // when
+        parser.parse([name: 'unrecognized'])
+    }
+
+    @Test(expected = IllegalStateException)
     void 'notation with mismatched vcs should result in an exception'() {
         // given
         Map notation = [name: 'github.com/user/package', vcs: 'svn']
@@ -243,5 +253,12 @@ class DefaultMapNotationParserTest {
         when(packagePathResolver.produce('github.com/user/package')).thenReturn(of(vcsPackage))
         // when
         parser.parse(notation)
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'only VcsGolangPackage and UnrecognizedGolangPackage can be parsed'() {
+        // given
+        when(packagePathResolver.produce('fmt')).thenReturn(of(StandardGolangPackage.of('fmt')))
+        parser.parse([name: 'fmt'])
     }
 }

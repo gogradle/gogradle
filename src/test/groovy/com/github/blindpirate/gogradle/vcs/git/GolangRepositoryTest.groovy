@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git
 
+import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.junit.Test
 
 class GolangRepositoryTest {
@@ -38,6 +40,11 @@ class GolangRepositoryTest {
             return name + url
         }
         assert repository.substitute('name', 'url') == 'nameurl'
+
+        repository.url { a, b, c ->
+            return 'ShouldNotTakeEffect'
+        }
+        assert repository.substitute('name', 'url') == 'url'
     }
 
     @Test
@@ -61,5 +68,11 @@ class GolangRepositoryTest {
     @Test(expected = IllegalStateException)
     void 'exception should be thrown if url and name both blank'() {
         repository.match('')
+    }
+
+    @Test
+    void 'global GolangRepository singleton should be read-only'() {
+        ReflectionUtils.testUnsupportedMethods(GolangRepository.EMPTY_INSTANCE,
+                GolangRepository, ['substitute', 'match'])
     }
 }

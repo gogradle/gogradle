@@ -146,12 +146,6 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
-    public void run(List<String> args, Map<String, String> env) {
-        run(args, env, null, null, null);
-
-    }
-
-    @Override
     public void go(List<String> args,
                    Map<String, String> env,
                    Consumer<String> stdoutLineConsumer,

@@ -44,12 +44,8 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
     public abstract void clone(String url, File directory);
 
     protected void run(File workingDir, List<String> cmds) {
-        run(workingDir, cmds, emptyMap());
-    }
-
-    protected void run(File workingDir, List<String> cmds, Map<String, String> env) {
-        run(workingDir, cmds, env, result -> null, result -> {
-            throw BuildException.processInteractionFailed(cmds, env, workingDir, result);
+        run(workingDir, cmds, emptyMap(), result -> null, result -> {
+            throw BuildException.processInteractionFailed(cmds, emptyMap(), workingDir, result);
         });
     }
 
@@ -112,6 +108,9 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
             new SubprocessReader(process::getInputStream, stdoutLineConsumer, latch).start();
 
             latch.await();
+
+            stderrLineConsumer.complete();
+            stdoutLineConsumer.complete();
 
             if (process.waitFor() != 0) {
                 throw BuildException.processInteractionFailed(cmds, env, workingDir, process.waitFor());

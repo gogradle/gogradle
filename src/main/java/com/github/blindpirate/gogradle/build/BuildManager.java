@@ -22,8 +22,6 @@ public interface BuildManager {
 
     void go(List<String> args, Map<String, String> env);
 
-    void run(List<String> args, Map<String, String> env);
-
     void go(List<String> args,
             Map<String, String> env,
             Consumer<String> stdoutLineConsumer,

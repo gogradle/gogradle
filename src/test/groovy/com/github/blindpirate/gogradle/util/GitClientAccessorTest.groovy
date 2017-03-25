@@ -11,6 +11,12 @@ import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
+import org.mockito.Mockito
+
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.*
+import static org.mockito.Mockito.mock
 
 @RunWith(GogradleRunner)
 @WithResource("test-for-gogradle.zip")
@@ -86,6 +92,14 @@ class GitClientAccessorTest {
     @Before
     void setUp() {
         accessor = new GitClientAccessor(new ProcessUtils())
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'client should be considered as inexistent if error occurs'() {
+        ProcessUtils processUtils = mock(ProcessUtils)
+        accessor = new GitClientAccessor(processUtils)
+        when(processUtils.runAndGetStdout(['git', 'version'] as String[])).thenThrow(IOException)
+        accessor.ensureClientExists()
     }
 
     @Test

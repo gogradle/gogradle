@@ -57,4 +57,9 @@ class GlobalCachePackagePathResolverTest {
         assert info.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 
+    @Test
+    void 'empty result should be returned if all subpaths are not found'() {
+        assert !resolver.produce('inexistent').isPresent()
+    }
+
 }
