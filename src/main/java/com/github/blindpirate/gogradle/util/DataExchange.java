@@ -36,6 +36,10 @@ public class DataExchange {
         return parseWithMapper(YAML_MAPPER, file, clazz);
     }
 
+    public static <T> T parseYaml(String s, Class<T> clazz) {
+        return parseWithMapper(YAML_MAPPER, s, clazz);
+    }
+
     public static <T> T parseXml(File file, Class<T> clazz) {
         return parseWithMapper(xmlMapper, file, clazz);
     }
