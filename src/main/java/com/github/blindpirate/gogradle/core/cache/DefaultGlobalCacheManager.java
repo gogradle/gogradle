@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
-import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -41,14 +40,11 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     private final GolangPluginSetting setting;
 
-    private final PackagePathResolver packagePathResolver;
-
     private final ThreadLocal<FileChannel> fileChannels = new ThreadLocal<>();
 
     @Inject
-    public DefaultGlobalCacheManager(GolangPluginSetting setting, PackagePathResolver packagePathResolver) {
+    public DefaultGlobalCacheManager(GolangPluginSetting setting) {
         this.setting = setting;
-        this.packagePathResolver = packagePathResolver;
     }
 
     private Path gradleHome = GradleUserHomeLookup.gradleUserHome().toPath();
@@ -184,12 +180,12 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     private GlobalCacheMetadata newMetadata(NotationDependency dependency) {
-        VcsGolangPackage pkg = (VcsGolangPackage) packagePathResolver.produce(dependency.getName()).get();
+        VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
         return GlobalCacheMetadata.newMetadata(pkg);
     }
 
     private GlobalCacheMetadata updatedMetaData(NotationDependency dependency) {
-        VcsGolangPackage pkg = (VcsGolangPackage) packagePathResolver.produce(dependency.getName()).get();
+        VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
         Path cacheRoot = getGlobalPackageCachePath(pkg.getRootPathString());
 
         String url = pkg.getVcsType().getAccessor().getRemoteUrl(cacheRoot.toFile());

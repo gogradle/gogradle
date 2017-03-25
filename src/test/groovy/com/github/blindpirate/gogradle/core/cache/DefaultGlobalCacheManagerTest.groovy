@@ -43,8 +43,6 @@ class DefaultGlobalCacheManagerTest {
     @Mock
     GolangPluginSetting setting
     @Mock
-    PackagePathResolver packagePathResolver
-    @Mock
     GitMercurialNotationDependency notationDependency
     @Mock
     GitMercurialResolvedDependency resolvedDependency
@@ -59,10 +57,10 @@ class DefaultGlobalCacheManagerTest {
 
     @Before
     void setUp() {
-        cacheManager = new DefaultGlobalCacheManager(setting, packagePathResolver)
+        cacheManager = new DefaultGlobalCacheManager(setting)
         when(notationDependency.getName()).thenReturn(pkg.getPathString())
         when(notationDependency.getUrls()).thenReturn(pkg.getUrls())
-        when(packagePathResolver.produce(pkg.getRootPathString())).thenReturn(Optional.of(pkg))
+        when(notationDependency.getPackage()).thenReturn(pkg)
         when(GogradleGlobal.getInstance((Key) any(Key))).thenReturn(accessor)
         ReflectionUtils.setField(cacheManager, "gradleHome", resource.toPath())
     }

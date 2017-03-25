@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.cache;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.common.WithApiVersion;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
