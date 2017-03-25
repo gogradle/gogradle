@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.common.WithApiVersion;
 import com.google.common.collect.ImmutableMap;
 

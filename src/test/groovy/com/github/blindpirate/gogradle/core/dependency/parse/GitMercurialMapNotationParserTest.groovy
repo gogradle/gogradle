@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -17,14 +17,14 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 class GitMercurialMapNotationParserTest {
     @Mock
-    GolangPackage packageInfo
+    VcsGolangPackage pkg
 
     GitMercurialMapNotationParser parser = new GitMercurialMapNotationParser()
 
     @Before
     void setUp() {
-        when(packageInfo.getUrls()).thenReturn(['url'])
-        when(packageInfo.getVcsType()).thenReturn(VcsType.GIT)
+        when(pkg.getUrls()).thenReturn(['url'])
+        when(pkg.getVcsType()).thenReturn(VcsType.GIT)
     }
 
     void assertWithNameAndUrl(GitMercurialNotationDependency dependency) {
@@ -42,7 +42,7 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'map notation with tag should be parsed correctly'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', tag: 'v1.0.0', package: pkg])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'commit')
@@ -64,7 +64,7 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'url in map notation should not be overwritten'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: pkg])
         // then
         assert dependency.name == 'github.com/a/b'
         assertEmpty(dependency, 'tag',)
@@ -75,7 +75,7 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'map notation with version should be parsed correctly'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', version: '1fc81', package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', version: '1fc81', package: pkg])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag')
@@ -86,7 +86,7 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'map notation with commit should be parsed correctly'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', commit: 'commitId', package: pkg])
         // then
         assertWithNameAndUrl(dependency)
         assertEmpty(dependency, 'tag')
@@ -97,7 +97,7 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'map notation without version should be filled with NEWEST_VERSION'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', package: pkg])
 
         // then
         assertEmpty(dependency, 'tag', 'url')
@@ -107,13 +107,13 @@ class GitMercurialMapNotationParserTest {
 
     @Test
     void 'map notation without packageInfo should not cause an exception'() {
-        assert parser.parse([name: 'github.com/a/b', package: packageInfo])
+        assert parser.parse([name: 'github.com/a/b', package: pkg])
     }
 
     @Test
     void 'map notation with unexpected properties should not cause an exception'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', x: 1, y: 2, package: pkg])
 
         // then
         assertWithNameAndUrl(dependency)
@@ -122,7 +122,7 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'map notation with extra properties should be set'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', transitive: false, package: packageInfo])
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', transitive: false, package: pkg])
 
         // then
         assert !getExclusionSpecs(dependency).isEmpty()

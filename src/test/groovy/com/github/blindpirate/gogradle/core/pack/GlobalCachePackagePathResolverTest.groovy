@@ -54,7 +54,7 @@ class GlobalCachePackagePathResolverTest {
         assert info.vcsType == VcsType.GIT
         assert info.pathString == 'github.com/user/package/a/b'
         assert info.rootPathString == 'github.com/user/package'
-        assert info.url == 'https://github.com/user/package.git'
+        assert info.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 
 }

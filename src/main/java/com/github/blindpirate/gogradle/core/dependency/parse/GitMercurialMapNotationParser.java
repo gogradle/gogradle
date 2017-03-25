@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
-import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.Assert;

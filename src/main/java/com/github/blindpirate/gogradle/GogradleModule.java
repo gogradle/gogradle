@@ -46,7 +46,6 @@ import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
 import com.github.blindpirate.gogradle.vcs.Bazaar;
 import com.github.blindpirate.gogradle.vcs.Git;
-import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.Mercurial;
 import com.github.blindpirate.gogradle.vcs.Svn;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
@@ -110,11 +109,11 @@ public class GogradleModule extends AbstractModule {
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMercurialMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitMercurialNotationConverter.class);
-        bind(GitMercurialAccessor.class).annotatedWith(Git.class).to(GitClientAccessor.class);
+        bind(VcsAccessor.class).annotatedWith(Git.class).to(GitClientAccessor.class);
 
         bind(MapNotationParser.class).annotatedWith(Mercurial.class).to(GitMercurialMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Mercurial.class).to(GitMercurialNotationConverter.class);
-        bind(GitMercurialAccessor.class).annotatedWith(Mercurial.class).to(HgClientAccessor.class);
+        bind(VcsAccessor.class).annotatedWith(Mercurial.class).to(HgClientAccessor.class);
 
         bind(MapNotationParser.class).annotatedWith(Svn.class).to(SvnMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Svn.class).to(SvnNotationConverter.class);
