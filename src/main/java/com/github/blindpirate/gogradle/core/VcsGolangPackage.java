@@ -6,6 +6,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
@@ -135,5 +136,25 @@ public class VcsGolangPackage extends GolangPackage {
                 + ", vcsType=" + vcsType
                 + ", url='" + urls + '\''
                 + '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        VcsGolangPackage that = (VcsGolangPackage) o;
+        return Objects.equals(getPath(), that.getPath())
+                && Objects.equals(rootPath, that.rootPath)
+                && vcsType == that.vcsType
+                && Objects.equals(urls, that.urls);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getPath(), rootPath, vcsType, urls);
     }
 }
