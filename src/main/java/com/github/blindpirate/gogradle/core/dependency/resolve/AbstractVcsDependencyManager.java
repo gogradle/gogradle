@@ -99,7 +99,8 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     @Override
     public void install(ResolvedDependency dependency, File targetDirectory) {
         try {
-            globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
+            ResolvedDependency realDependency = determineResolvedDependency(dependency);
+            globalCacheManager.runWithGlobalCacheLock(realDependency, () -> {
                 installUnderLock(dependency, targetDirectory);
                 return null;
             });
@@ -107,7 +108,6 @@ public abstract class AbstractVcsDependencyManager<VERSION>
             throw DependencyInstallationException.cannotResetResolvedDependency(dependency, e);
         }
     }
-
 
     private void installUnderLock(ResolvedDependency dependency, File targetDirectory) {
         ResolvedDependency realDependency = determineResolvedDependency(dependency);
