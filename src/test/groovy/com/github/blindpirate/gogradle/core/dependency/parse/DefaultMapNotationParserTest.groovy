@@ -1,19 +1,25 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.GolangRepositoryHandler
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsType
+import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static org.mockito.Matchers.eq
+import static java.util.Optional.of
+import static org.mockito.ArgumentMatchers.anyMap
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -30,11 +36,16 @@ class DefaultMapNotationParserTest {
     @Mock
     MapNotationParser vcsMapNotationParser
     @Mock
-    GolangDependency dependency
+    GitMercurialNotationDependency dependency
+    @Mock
+    GolangRepositoryHandler repositoryHandler
 
     @Before
     void setUp() {
-        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver)
+        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver, repositoryHandler)
+        when(repositoryHandler.findMatchedRepository(anyString())).thenReturn(GolangRepository.EMPTY_INSTANCE)
+        when(vcsMapNotationParser.parse(anyMap())).thenReturn(dependency)
+        when(dependency.getName()).thenReturn('name')
     }
 
     @Test(expected = Exception)
@@ -71,15 +82,44 @@ class DefaultMapNotationParserTest {
                 .withPath('path')
                 .withRootPath('path')
                 .withVcsType(VcsType.GIT)
+                .withUrl('url')
                 .build()
-        when(packagePathResolver.produce('path')).thenReturn(Optional.of(vcsPackage))
+        when(packagePathResolver.produce('path')).thenReturn(of(vcsPackage))
         MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
 
         // when
         parser.parse(notation)
 
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'path', 'package': vcsPackage, vcs: '']))
+        verify(vcsMapNotationParser).parse([name: 'path', 'package': vcsPackage, vcs: ''])
+    }
+
+    @Test
+    @WithMockInjector
+    void 'urls in notation should be substituted'() {
+        // given
+        Map notation = [name: 'path', vcs: '']
+        VcsGolangPackage vcsPackage = VcsGolangPackage.builder()
+                .withPath('path')
+                .withRootPath('path')
+                .withVcsType(VcsType.GIT)
+                .withUrls(['oldUrl1', 'oldUrl2'])
+                .build()
+        when(packagePathResolver.produce('path')).thenReturn(of(vcsPackage))
+        when(repositoryHandler.findMatchedRepository(anyString())).thenReturn(new GolangRepository() {
+            @Override
+            String substitute(String name, String url) {
+                return url.replace('old', 'new')
+            }
+        })
+        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
+
+        // when
+        parser.parse(notation)
+
+        // then
+        verify(vcsMapNotationParser).parse([name: 'path', 'package': vcsPackage, vcs: ''])
+        verify(dependency).setUrls(['newUrl1', 'newUrl2'])
     }
 
     @Test
@@ -91,15 +131,108 @@ class DefaultMapNotationParserTest {
                 .withPath('root/path')
                 .withRootPath('root')
                 .withVcsType(VcsType.GIT)
+                .withUrl('url')
                 .build()
-        when(packagePathResolver.produce('root/path')).thenReturn(Optional.of(vcsPackage))
+        when(packagePathResolver.produce('root/path')).thenReturn(of(vcsPackage))
         MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
 
         // when
         parser.parse(notation)
 
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'root', 'package': vcsPackage]))
+        verify(vcsMapNotationParser).parse([name: 'root', 'package': vcsPackage])
+    }
+
+    @Test
+    @WithMockInjector
+    void 'unrecognized with url should be parsed successfully'() {
+        // given
+        Map notation = [name: 'unrecognized', url: 'url']
+        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
+        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
+        // when
+        parser.parse(notation)
+        // then
+        VcsGolangPackage pkg = VcsGolangPackage.builder()
+                .withPath('unrecognized')
+                .withRootPath('unrecognized')
+                .withUrl('url')
+                .withVcsType(VcsType.GIT)
+                .build()
+
+        verify(vcsMapNotationParser).parse([name: 'unrecognized', url: 'url', vcs: 'git', 'package': pkg])
+    }
+
+    @Test
+    @WithMockInjector
+    void 'unrecognized package with url and vcs should be parsed successfully'() {
+        // given
+        Map notation = [name: 'unrecognized', url: 'url', vcs: 'hg']
+        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
+        MockUtils.mockVcsService(MapNotationParser, Mercurial, vcsMapNotationParser)
+        // when
+        parser.parse(notation)
+        // then
+        VcsGolangPackage pkg = VcsGolangPackage.builder()
+                .withPath('unrecognized')
+                .withRootPath('unrecognized')
+                .withUrl('url')
+                .withVcsType(VcsType.MERCURIAL)
+                .build()
+
+        verify(vcsMapNotationParser).parse([name: 'unrecognized', url: 'url', vcs: 'hg', 'package': pkg])
+    }
+
+    @Test
+    @WithMockInjector
+    void 'unrecognized package with url substitution should be parsed successfully'() {
+        // given
+        Map notation = [name: 'unrecognized']
+        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
+        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
+        when(repositoryHandler.findMatchedRepository(anyString())).thenReturn(new GolangRepository() {
+            @Override
+            String substitute(String name, String url) {
+                return 'url'
+            }
+        })
+        // when
+        parser.parse(notation)
+        // then
+        VcsGolangPackage pkg = VcsGolangPackage.builder()
+                .withPath('unrecognized')
+                .withRootPath('unrecognized')
+                .withUrl('url')
+                .withVcsType(VcsType.GIT)
+                .build()
+
+        verify(vcsMapNotationParser).parse([name: 'unrecognized', vcs: 'git', 'package': pkg])
+    }
+
+    @Test
+    @WithMockInjector
+    void 'url in unrecognized package will not be substituted'() {
+        // given
+        Map notation = [name: 'unrecognized', url: 'url1']
+        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
+        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
+        when(repositoryHandler.findMatchedRepository(anyString())).thenReturn(new GolangRepository() {
+            @Override
+            String substitute(String name, String url) {
+                return 'url2'
+            }
+        })
+        // when
+        parser.parse(notation)
+        // then
+        VcsGolangPackage pkg = VcsGolangPackage.builder()
+                .withPath('unrecognized')
+                .withRootPath('unrecognized')
+                .withUrl('url1')
+                .withVcsType(VcsType.GIT)
+                .build()
+
+        verify(vcsMapNotationParser).parse([name: 'unrecognized', url: 'url1', vcs: 'git', 'package': pkg])
     }
 
     @Test(expected = IllegalStateException)
@@ -107,7 +240,7 @@ class DefaultMapNotationParserTest {
         // given
         Map notation = [name: 'github.com/user/package', vcs: 'svn']
         VcsGolangPackage vcsPackage = MockUtils.mockVcsPackage()
-        when(packagePathResolver.produce('github.com/user/package')).thenReturn(Optional.of(vcsPackage))
+        when(packagePathResolver.produce('github.com/user/package')).thenReturn(of(vcsPackage))
         // when
         parser.parse(notation)
     }

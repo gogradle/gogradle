@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.vcs.Git
+import com.github.blindpirate.gogradle.vcs.Mercurial
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -53,15 +54,17 @@ class DefaultNotationConverterTest {
         verify(gitConverter).convert('root/package#1.0.0')
     }
 
-    @Test(expected = IllegalStateException)
-    void 'converting an unrecognized notation should result in an exception'() {
+    @Test
+    void 'unrecognized notation should be converted successfully'() {
         // given
         when(resolver.produce("unrecognized")).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
-        // then
+        // when
         converter.convert('unrecognized')
+        // then
+        verify(gitConverter).convert("unrecognized")
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = IllegalArgumentException)
     void 'converting a standard package should result in an exception'() {
         // given
         when(resolver.produce(eq('standard'))).thenReturn(of(StandardGolangPackage.of('standard')))

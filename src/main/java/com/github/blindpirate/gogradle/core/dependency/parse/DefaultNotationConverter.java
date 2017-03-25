@@ -1,9 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
@@ -30,8 +30,14 @@ public class DefaultNotationConverter implements NotationConverter {
     private VcsType extractVcs(String notation) {
         String packagePath = extractPackagePath(notation);
         GolangPackage packageInfo = packagePathResolver.produce(packagePath).get();
-        Assert.isTrue(packageInfo instanceof VcsGolangPackage, "Package must be from vcs!");
-        return VcsGolangPackage.class.cast(packageInfo).getVcsType();
+        if (packageInfo instanceof VcsGolangPackage) {
+            return VcsGolangPackage.class.cast(packageInfo).getVcsType();
+        } else if (packageInfo instanceof UnrecognizedGolangPackage) {
+            // Git is the default vcs
+            return VcsType.GIT;
+        } else {
+            throw new IllegalArgumentException("Cannot covert " + notation);
+        }
     }
 
 
