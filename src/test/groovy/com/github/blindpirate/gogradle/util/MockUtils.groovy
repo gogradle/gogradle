@@ -25,7 +25,16 @@ class MockUtils {
         return VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user/package')
-                .withUrl('https://github.com/user/package.git')
+                .withUrls(['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withVcsType(VcsType.GIT)
+                .build()
+    }
+
+    static VcsGolangPackage mockRootVcsPackage() {
+        return VcsGolangPackage.builder()
+                .withPath('github.com/user/package')
+                .withRootPath('github.com/user/package')
+                .withUrls(['git@github.com:user/package.git', 'https://github.com/user/package.git'])
                 .withVcsType(VcsType.GIT)
                 .build()
     }
