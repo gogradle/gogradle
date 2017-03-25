@@ -5,8 +5,6 @@ before_build:
   cmd: mkdir C:\gogs && git clone https://github.com/gogits/gogs.git C:\gogs
 build_script:
   - gradlew check --info --no-daemon --stacktrace
-cache:
-  - C:\Users\appveyor\.gradle
 environment:
   JAVA_TOOL_OPTIONS: -Dfile.encoding=UTF8
   JAVA_OPTS: -Xmx1800m -XX:MaxPermSize=256m
