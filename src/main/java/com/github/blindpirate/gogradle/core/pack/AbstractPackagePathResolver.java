@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.IncompleteGolangPackage;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 
-import java.nio.file.Paths;
 import java.util.Optional;
 
 public abstract class AbstractPackagePathResolver implements PackagePathResolver {
