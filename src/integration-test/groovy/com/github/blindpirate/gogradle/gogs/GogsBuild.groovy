@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.gogs
 
-import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
@@ -11,8 +10,6 @@ import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
-import com.github.blindpirate.gogradle.vcs.git.GitAccessor
-import org.eclipse.jgit.lib.Repository
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -20,11 +17,9 @@ import java.nio.file.Path
 
 @RunWith(GogradleRunner)
 @WithMockInjector
-@OnlyWhen("System.getenv('GOGS_DIR')!=null")
+@OnlyWhen("System.getenv('GOGS_DIR')!=null&&'git version'.execute()")
 class GogsBuild extends IntegrationTestSupport {
     File resource = new File(System.getenv('GOGS_DIR'))
-
-    GitAccessor gitAccessor = new GitAccessor(new GolangRepositoryHandler())
 
     ProcessUtils processUtils = new ProcessUtils()
 
@@ -50,9 +45,8 @@ vet {
     @Test
     @AccessWeb
     void 'gogs should be built successfully'() {
-        Repository repository = gitAccessor.getRepository(resource)
         // v0.9.113
-        gitAccessor.checkout(repository, '114c179e5a50e3313f7a5894100693805e64e440')
+        new ProcessUtils().run(['git', 'checkout', '114c179e5a50e3313f7a5894100693805e64e440'], null, resource)
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
