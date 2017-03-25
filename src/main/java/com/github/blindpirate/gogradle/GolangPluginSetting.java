@@ -73,7 +73,6 @@ public class GolangPluginSetting {
     }
 
 
-
     public String getGoVersion() {
         return goVersion;
     }
@@ -109,6 +108,6 @@ public class GolangPluginSetting {
     }
 
     private void verifyPackagePath() {
-        Assert.isTrue(isNotBlank(packagePath), "Package name must be specified!");
+        Assert.isTrue(isNotBlank(packagePath), "Package's import path must be specified!");
     }
 }
