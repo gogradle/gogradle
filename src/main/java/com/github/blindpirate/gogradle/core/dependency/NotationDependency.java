@@ -7,7 +7,6 @@ import org.gradle.api.specs.Spec;
 import java.util.Set;
 
 public interface NotationDependency extends GolangDependency {
-
     GolangPackage getPackage();
 
     DependencyProduceStrategy getStrategy();
