@@ -54,10 +54,6 @@ public class ProcessUtils {
         return run(Arrays.asList(args), null, null);
     }
 
-    public Process run(List<String> args, Map<String, String> envs) {
-        return run(args, envs, null);
-    }
-
     public ProcessResult getResult(Process process) {
         try {
             return new ProcessResult(process);
@@ -83,7 +79,7 @@ public class ProcessUtils {
     }
 
     // this should be moved to test source set since it's only used in test
-    ProcessResult runProcessWithCurrentClasspath(Class mainClass,
+    public ProcessResult runProcessWithCurrentClasspath(Class mainClass,
                                                  List<String> args,
                                                  Map<String, String> envs) {
         String currentClasspath = System.getProperty("java.class.path");

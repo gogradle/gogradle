@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core
 
+import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Test
 
@@ -10,7 +11,15 @@ class GolangConfigurationTest {
     void 'explicit exception should be thrown when invoking unsupported methods'() {
         ReflectionUtils.testUnsupportedMethods(configuration, GolangConfiguration,
                 ['getDependencyRegistry', 'getName', 'getDependencies', 'getDescription', 'getAllDependencies',
-                 'getArtifacts', 'getAllArtifacts','setCanBeConsumed','isCanBeConsumed','setCanBeResolved','isCanBeResolved'])
+                 'getArtifacts', 'getAllArtifacts'])
+    }
+
+    @Test
+    void 'dependency registry should be isolated'() {
+        GolangConfiguration build = new GolangConfiguration('build')
+        GolangConfiguration test = new GolangConfiguration('test')
+        assert build.dependencyRegistry instanceof DefaultDependencyRegistry
+        assert !build.dependencyRegistry.is(test.dependencyRegistry)
     }
 
     @Test

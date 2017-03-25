@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
-import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DataExchange
@@ -22,6 +21,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.channels.FileChannel
+import java.nio.channels.FileLock
+import java.nio.file.Paths
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
@@ -125,6 +127,26 @@ lastUpdated:
     }
 
     @Test
+    void 'dependency should be considered as out-of-date if url not match current url in repo'() {
+        // given
+        when(notationDependency.getUrls()).thenReturn(['another url'])
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+vcs:
+  git
+lastUpdated:
+  time: ${System.currentTimeMillis()}
+  url: https://github.com/user/package.git
+""")
+        // then
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            assert cacheManager.currentDependencyIsOutOfDate(notationDependency)
+        } as Callable)
+    }
+
+    @Test
     void 'dependency should be considered as up-to-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
@@ -142,6 +164,70 @@ lastUpdated:
         cacheManager.runWithGlobalCacheLock(notationDependency, {
             assert !cacheManager.currentDependencyIsOutOfDate(notationDependency)
         } as Callable)
+    }
+
+    @Test
+    void 'getting metadata of a package should succeed'() {
+        // given
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+vcs:
+  git
+lastUpdated:
+  time: 123
+  url: https://github.com/user/package.git
+""")
+        // when
+        GlobalCacheMetadata metadata = cacheManager.getMetadata(Paths.get('github.com/user/package')).get()
+        // then
+        assert metadata.lastUpdateTime == 123L
+        assert metadata.lastUpdateUrl == 'https://github.com/user/package.git'
+        assert metadata.vcs == 'git'
+        assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+    }
+
+    @Test
+    void 'empty result should be returned if metadata not exist'() {
+        assert !cacheManager.getMetadata(Paths.get('inexistent')).isPresent()
+    }
+
+    @Test
+    void 'empty result should be returned if it is locked by another process'() {
+        // given
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', '----\n')
+        Thread.start {
+            new ProcessUtils().runProcessWithCurrentClasspath(LockProcess,
+                    [new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage').getAbsolutePath()],
+                    [:])
+        }
+
+        // wait for another process to start and lock
+        Thread.sleep(1000)
+
+        assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
+    }
+
+    class LockProcess {
+        static void main(String[] args) {
+            FileChannel channel = null
+            FileLock lock = null
+            File lockFile = new File(args[0])
+            try {
+                channel = new RandomAccessFile(lockFile, "rw").getChannel()
+                lock = channel.lock()
+                Thread.sleep(2000)
+            } finally {
+                if (lock != null) {
+                    println("${new Date()}: release ${lockFile.absolutePath}")
+                    lock.release()
+                }
+                if (channel != null) {
+                    channel.close()
+                }
+            }
+        }
     }
 
     @Test

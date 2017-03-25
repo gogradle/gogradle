@@ -78,7 +78,7 @@ vet {
         }
         IOUtils.chmodAddX(gogsBinPath)
 
-        Process process = processUtils.run([gogsBinPath.toFile().absolutePath], [:])
+        Process process = processUtils.run(gogsBinPath.toFile().absolutePath)
         assert processUtils.getResult(process).stdout.contains('Gogs')
 
     }

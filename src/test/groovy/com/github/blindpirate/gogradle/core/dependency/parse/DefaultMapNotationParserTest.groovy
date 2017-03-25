@@ -17,6 +17,8 @@ import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.Mock
 
 import static java.util.Optional.of
@@ -41,6 +43,8 @@ class DefaultMapNotationParserTest {
     GitMercurialNotationDependency dependency
     @Mock
     GolangRepositoryHandler repositoryHandler
+    @Captor
+    ArgumentCaptor captor
 
     @Before
     void setUp() {
@@ -162,7 +166,21 @@ class DefaultMapNotationParserTest {
                 .withVcsType(VcsType.GIT)
                 .build()
 
-        verify(vcsMapNotationParser).parse([name: 'unrecognized', url: 'url', vcs: 'git', 'package': pkg])
+        verify(vcsMapNotationParser).parse(captor.capture())
+        assertCaptorValue(captor.value, [name: 'unrecognized', url: 'url', vcs: 'git', 'package': pkg])
+    }
+
+    void assertCaptorValue(Map actual, Map expected) {
+        assert actual.name == expected.name
+        assert actual.url == expected.url
+        assert actual.vcs == expected.vcs
+
+        def actualPkg = actual.'package'
+        def expectedPkg = expected.'package'
+        assert actualPkg.path == expectedPkg.path
+        assert actualPkg.rootPath == expectedPkg.rootPath
+        assert actualPkg.urls == expectedPkg.urls
+        assert actualPkg.vcsType == expectedPkg.vcsType
     }
 
     @Test
@@ -182,7 +200,8 @@ class DefaultMapNotationParserTest {
                 .withVcsType(VcsType.MERCURIAL)
                 .build()
 
-        verify(vcsMapNotationParser).parse([name: 'unrecognized', url: 'url', vcs: 'hg', 'package': pkg])
+        verify(vcsMapNotationParser).parse(captor.capture())
+        assertCaptorValue(captor.value, [name: 'unrecognized', url: 'url', vcs: 'hg', 'package': pkg])
     }
 
     @Test
@@ -208,7 +227,8 @@ class DefaultMapNotationParserTest {
                 .withVcsType(VcsType.GIT)
                 .build()
 
-        verify(vcsMapNotationParser).parse([name: 'unrecognized', vcs: 'git', 'package': pkg])
+        verify(vcsMapNotationParser).parse(captor.capture())
+        assertCaptorValue(captor.value, [name: 'unrecognized', vcs: 'git', 'package': pkg])
     }
 
     @Test
@@ -234,7 +254,8 @@ class DefaultMapNotationParserTest {
                 .withVcsType(VcsType.GIT)
                 .build()
 
-        verify(vcsMapNotationParser).parse([name: 'unrecognized', url: 'url1', vcs: 'git', 'package': pkg])
+        verify(vcsMapNotationParser).parse(captor.capture())
+        assertCaptorValue(captor.value, [name: 'unrecognized', url: 'url1', vcs: 'git', 'package': pkg])
     }
 
     @Test(expected = IllegalStateException)

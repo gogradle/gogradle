@@ -7,6 +7,7 @@ class DateUtilsTest {
     void 'getting ms from second should succeed'() {
         assert DateUtils.toMilliseconds(1) == 1000
     }
+
     @Test
     void 'getting ms from double second should succeed'() {
         assert DateUtils.toMilliseconds(1d) == 1000L
@@ -17,5 +18,10 @@ class DateUtilsTest {
         String now = DateUtils.formatNow('yyyyMMddHHmmss')
         Date date = Date.parse('yyyyMMddHHmmss', now)
         assert new Date().getTime() - date.getTime() < 1000
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if time is invalid'() {
+        DateUtils.parseRaw('1481274259')
     }
 }

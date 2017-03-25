@@ -16,4 +16,8 @@ class IncompleteGolangPackageTest {
         assert of('incomplete/a').resolve('incomplete').get() instanceof IncompleteGolangPackage
     }
 
+    @Test
+    void 'toString should succeed'(){
+       assert of('incomplete/a').toString()=="IncompleteGolangPackage{path='incomplete/a'}"
+    }
 }

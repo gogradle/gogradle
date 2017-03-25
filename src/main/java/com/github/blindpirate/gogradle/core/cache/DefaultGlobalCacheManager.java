@@ -66,6 +66,10 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         return gradleHome.resolve(GO_BINARAY_CACHE_PATH).resolve(relativePath);
     }
 
+    private Path getGlobalMetadata(String packagePath) {
+        return gradleHome.resolve(GO_METADATA_PATH).resolve(IOUtils.encodeInternally(packagePath));
+    }
+
     @Override
     public Optional<GlobalCacheMetadata> getMetadata(Path packagePath) {
         try {
@@ -76,12 +80,12 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     private Optional<GlobalCacheMetadata> doGetMetadata(Path packagePath) throws IOException {
-        Path lockfilePath = getGlobalPackageCachePath(StringUtils.toUnixString(packagePath));
+        Path lockfilePath = getGlobalMetadata(StringUtils.toUnixString(packagePath));
         if (Files.exists(lockfilePath)) {
             FileChannel channel = null;
             FileLock lock = null;
             try {
-                channel = new RandomAccessFile(lockfilePath.toFile(), "r").getChannel();
+                channel = new RandomAccessFile(lockfilePath.toFile(), "rw").getChannel();
                 // Here we must use tryLock to avoid dead-lock
                 lock = channel.tryLock();
                 if (lock == null) {
@@ -168,11 +172,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     private File createLockFileIfNecessary(GolangDependency dependency) {
-        String lockFileName = IOUtils.encodeInternally(dependency.getName());
-        File lockFile = gradleHome
-                .resolve(GO_METADATA_PATH)
-                .resolve(lockFileName)
-                .toFile();
+        File lockFile = getGlobalMetadata(dependency.getName()).toFile();
         if (!lockFile.exists()) {
             write(lockFile, toYaml(newMetadata((NotationDependency) dependency)));
         }

@@ -64,4 +64,39 @@ class GoTest extends TaskTest {
         task.continueWhenFail = true
         assert ReflectionUtils.getField(task, 'continueWhenFail')
     }
+
+    @Test
+    void 'consuming stdout and stderr should succeed'() {
+        boolean stdoutIsVisited, stderrIsVisited
+        task.run('golint -v -a', { stdout, stderr ->
+            stdoutIsVisited = true
+            stderrIsVisited = true
+        })
+
+        assert stderrIsVisited
+        assert stdoutIsVisited
+    }
+
+    @Test
+    void 'consuming stdout should succeed'() {
+        boolean stdoutIsVisited, stderrIsVisited
+        task.run('golint -v -a', { stdout ->
+            stdoutIsVisited = true
+        })
+
+        assert !stderrIsVisited
+        assert stdoutIsVisited
+    }
+
+    @Test
+    void 'closure with more than 2 args should be ignored'() {
+        boolean stdoutIsVisited, stderrIsVisited
+        task.run('golint -v -a', { a, b, c ->
+            stdoutIsVisited = true
+            stderrIsVisited = true
+        })
+
+        assert !stderrIsVisited
+        assert !stdoutIsVisited
+    }
 }
