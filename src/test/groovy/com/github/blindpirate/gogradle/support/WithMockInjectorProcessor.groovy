@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GogradleGlobal
-import com.github.blindpirate.gogradle.core.dependency.resolve.LoggerProgressMonitor
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.git.GitClientLineConsumer
 import com.google.inject.Injector
 import org.gradle.internal.logging.progress.ProgressLogger
 import org.gradle.internal.logging.progress.ProgressLoggerFactory
@@ -21,7 +21,7 @@ class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector
         ProgressLoggerFactory mockLoggerFactory = mock(ProgressLoggerFactory)
         when(injector.getInstance(ServiceRegistry)).thenReturn(mockServiceRegistry)
         when(mockServiceRegistry.get(ProgressLoggerFactory)).thenReturn(mockLoggerFactory)
-        when(mockLoggerFactory.newOperation(LoggerProgressMonitor)).thenReturn(mockLogger)
+        when(mockLoggerFactory.newOperation(GitClientLineConsumer)).thenReturn(mockLogger)
     }
 
     @Override

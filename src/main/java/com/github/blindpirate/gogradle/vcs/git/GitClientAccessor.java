@@ -120,13 +120,18 @@ public class GitClientAccessor extends GitMercurialAccessor {
 
     @Override
     public void pull(File repoRoot) {
-        run(repoRoot, asList("git", "pull"));
+        runWithProgress(repoRoot,
+                asList("git", "pull", "--progress"),
+                GitClientLineConsumer.NO_OP,
+                GitClientLineConsumer.of("Pulling in " + repoRoot.getAbsolutePath()));
         run(repoRoot, asList("git", "submodule", "update", "--init", "--recursive"));
     }
 
     @Override
     @SuppressWarnings("checkstyle:linelenght")
     public void clone(String url, File directory) {
-        run(new File("."), asList("git", "clone", "--recursive", url, directory.getAbsolutePath()));
+        runWithProgress(asList("git", "clone", "--recursive", "--progress", url, directory.getAbsolutePath()),
+                GitClientLineConsumer.NO_OP,
+                GitClientLineConsumer.of("Cloning " + url + " to " + directory.getAbsolutePath()));
     }
 }
