@@ -1,17 +1,15 @@
 package com.github.blindpirate.gogradle.dependencytest
 
-import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.vcs.git.GitAccessor
+import com.github.blindpirate.gogradle.util.StringUtils
+import com.github.blindpirate.gogradle.vcs.GitMercurialCommit
+import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
-import com.github.blindpirate.gogradle.vcs.git.RevCommitUtils
 import org.apache.commons.io.FileUtils
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.revwalk.RevCommit
 
-import static org.mockito.Mockito.mock
+import java.nio.file.Path
 
-class MockGitAccessor extends GitAccessor {
+class MockGitAccessor extends GitClientAccessor {
 
     File mockGitRepo
     // [github.com/a/b:[commit1,commit2,commit3]]
@@ -20,11 +18,11 @@ class MockGitAccessor extends GitAccessor {
     Map tags = ['github.com/firstlevel/c@1.0.0': 'commit3']
 
     MockGitAccessor(String mockGitRepoPath) {
-        super(mock(GolangRepositoryHandler))
+        super(null)
         this.mockGitRepo = new File(mockGitRepoPath)
         if (mockGitRepo.list() != null) {
             packages = mockGitRepo.list().collect {
-                directoryNameToPackageNameAndCommit(it)
+                repoDirNameToPkgNameAndCommit(it)
             }.groupBy {
                 it.packageName
             }.collectEntries { packageName, packageNameAndCommits ->
@@ -34,13 +32,24 @@ class MockGitAccessor extends GitAccessor {
         }
     }
 
-    static directoryNameToPackageNameAndCommit(String dirName) {
+    @Override
+    protected void ensureClientExists() {
+
+    }
+
+    static repoDirNameToPkgNameAndCommit(String dirName) {
         int lastUnderscore = dirName.lastIndexOf('_')
-        return [packageName: directoryNameToPackageName(dirName[0..lastUnderscore - 1]),
+        return [packageName: repoDirNameToPackageName(dirName[0..lastUnderscore - 1]),
                 commit     : dirName[lastUnderscore + 1..-1]]
     }
 
-    static directoryNameToPackageName(String dirName) {
+    static globalCacheDirToRootPkgName(File repoRoot) {
+        Path repoPath = repoRoot.toPath()
+        // github.com/a/b
+        return StringUtils.toUnixString(repoPath.subpath(repoPath.nameCount - 3, repoPath.nameCount))
+    }
+
+    static repoDirNameToPackageName(String dirName) {
         return dirName.replaceAll('_', '/')
     }
 
@@ -50,11 +59,8 @@ class MockGitAccessor extends GitAccessor {
     }
 
     String getLatestCommit(String packageName) {
+        println("package:${packageName}")
         return packages[packageName][-1]
-    }
-
-    static directoryToPackageName(File dir) {
-        return directoryNameToPackageName(dir.name)
     }
 
     File packageNameAndCommitToDir(String packageName, String commit) {
@@ -62,19 +68,7 @@ class MockGitAccessor extends GitAccessor {
     }
 
     @Override
-    String getRemoteUrl(File directory) {
-        return [getRemoteUrl(new MockRepository(directory))]
-    }
-
-    Repository getRepository(File directory) {
-        return new MockRepository(directory)
-    }
-
-    Set<String> getRemoteUrls(Repository repository) {
-        return [getRemoteUrl(repository)] as Set
-    }
-
-    void clone(String name, String url, File directory) {
+    void clone(String url, File directory) {
         String packageName = urlToPackageName(url)
         copyLatestCommitTo(packageName, directory)
     }
@@ -86,50 +80,52 @@ class MockGitAccessor extends GitAccessor {
         IOUtils.copyDirectory(latestCommitDirectory, directory)
     }
 
-    Optional<RevCommit> headCommitOfBranch(Repository repository, String branch) {
-        String packageName = repository.packageName
+    @Override
+    GitMercurialCommit headCommitOfBranch(File repository, String branch) {
+        String packageName = globalCacheDirToRootPkgName(repository)
         // commit1
         String latestCommit = getLatestCommit(packageName)
         // 000000000..01
-        return Optional.of(commitXToCommitSha(repository, latestCommit))
+        return commitXToCommitSha(repository, latestCommit)
     }
 
-    RevCommit commitXToCommitSha(Repository repository, String commitX) {
+    GitMercurialCommit commitXToCommitSha(File repository, String commitX) {
         // commit2 -> 200000..0
         int x = commitX[-1].toInteger()
-        return RevCommitUtils.of(commitX[-1] + '0' * 39, x)
+        return GitMercurialCommit.of(commitX[-1] + '0' * 39, x * 1000L)
     }
 
-    void checkout(Repository repository, String commitSha) {
+    void checkout(File repository, String commitSha) {
         if (commitSha == GitDependencyManager.DEFAULT_BRANCH) {
             return
         }
 
-        FileUtils.cleanDirectory(repository.root)
+        FileUtils.cleanDirectory(repository)
         // 100000..0 -> commit1
         String realCommitId = 'commit' + commitSha[0]
-        File directoryOfThatCommit = packageNameAndCommitToDir(repository.packageName, realCommitId)
-        IOUtils.copyDirectory(directoryOfThatCommit, repository.root)
+        File directoryOfThatCommit = packageNameAndCommitToDir(globalCacheDirToRootPkgName(repository), realCommitId)
+        IOUtils.copyDirectory(directoryOfThatCommit, repository)
     }
 
     //github.com/a/b -> https://github.com/a/b.git
-    String getRemoteUrl(Repository repository) {
-        String tmp = repository.packageName.replaceFirst("/", ":")
+    String getRemoteUrl(File repository) {
+        String tmp = globalCacheDirToRootPkgName(repository).replaceFirst("/", ":")
         return "git@${tmp}.git"
     }
 
-    Optional<RevCommit> findCommit(Repository repository, String commitX) {
-        List commits = packages[repository.packageName]
+    Optional<GitMercurialCommit> findCommit(File repository, String commitX) {
+        List commits = packages[globalCacheDirToRootPkgName(repository)]
         return commits.contains(commitX) ? Optional.of(commitXToCommitSha(repository, commitX)) : Optional.empty()
     }
 
-    Repository hardResetAndPull(String name, Repository repository) {
-        copyLatestCommitTo(repository.packageName, repository.root)
-        return repository
+    @Override
+    void pull(File repository) {
+        copyLatestCommitTo(globalCacheDirToRootPkgName(repository), repository)
     }
 
-    Optional<RevCommit> findCommitByTag(Repository repository, String tag) {
-        String packageName = repository.packageName
+    @Override
+    Optional<GitMercurialCommit> findCommitByTag(File repository, String tag) {
+        String packageName = globalCacheDirToRootPkgName(repository)
         String key = "${packageName}@${tag}"
 
         if (tags.containsKey(key)) {
@@ -140,9 +136,15 @@ class MockGitAccessor extends GitAccessor {
         }
     }
 
-    long lastCommitTimeOfPath(Repository repository, String path) {
-        // MockRepository
-        return 1000 * repository.getUpdateTime(path)
+    @Override
+    long lastCommitTimeOfPath(File repository, String path) {
+        try {
+            // Unix second
+            int seconds = new File(repository, "${path}/updateTime").getText().toInteger()
+            return 1000 * seconds
+        } catch (Exception e) {
+            return 0
+        }
     }
 
 }

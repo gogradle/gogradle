@@ -35,8 +35,13 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
     @Test
     void 'resolving dependencies of a complicated package should success'() {
         // given
-        newBuild { build ->
-            build.forTasks('installBuildDependencies')
+        try {
+            newBuild { build ->
+                build.forTasks('installBuildDependencies')
+            }
+        }finally {
+            println(stderr)
+            println(stdout)
         }
 
         // then
