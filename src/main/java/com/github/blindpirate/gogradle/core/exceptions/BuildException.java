@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.exceptions;
 
+import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
@@ -41,7 +42,36 @@ public class BuildException extends RuntimeException {
 
         return new BuildException("Build failed due to return code " + result.getCode()
                 + " of cmd: " + String.join(" ", cmds)
+                + "\nstderr: " + result.getStderr()
+                + "\nstdout: " + result.getStdout()
                 + "\nin: " + workingDir.getAbsolutePath()
                 + "\nwith env:\n" + StringUtils.formatEnv(env));
+    }
+
+    public static BuildException processInteractionFailed(List<String> cmds,
+                                                          Map<String, String> env,
+                                                          File workingDir,
+                                                          int retcode) {
+        env = new HashMap<>(env);
+        env.put("PATH", System.getenv("PATH"));
+
+        return new BuildException("Build failed due to return code " + retcode
+                + " of cmd: " + String.join(" ", cmds)
+                + "\nin: " + workingDir.getAbsolutePath()
+                + "\nwith env:\n" + StringUtils.formatEnv(env));
+    }
+
+    public static BuildException processInteractionFailed(List<String> cmds,
+                                                          Map<String, String> env,
+                                                          File workingDir,
+                                                          Throwable e) {
+        env = new HashMap<>(env);
+        env.put("PATH", System.getenv("PATH"));
+
+        return new BuildException("Build failed due to exception"
+                + " of cmd: " + String.join(" ", cmds)
+                + "\nin: " + workingDir.getAbsolutePath()
+                + "\nwith env:\n" + StringUtils.formatEnv(env)
+                + "\nexception:" + ExceptionHandler.getStackTrace(e));
     }
 }
