@@ -116,6 +116,7 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
                 throw BuildException.processInteractionFailed(cmds, env, workingDir, process.waitFor());
             }
         } catch (Exception e) {
+            e.printStackTrace();
             throw BuildException.processInteractionFailed(cmds, env, workingDir, e);
         }
     }

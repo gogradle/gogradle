@@ -28,7 +28,7 @@ public class GitClientLineConsumer implements Consumer<String> {
     private GitClientLineConsumer() {
     }
 
-    private GitClientLineConsumer(String desc) {
+    protected GitClientLineConsumer(String desc) {
         ProgressLoggerFactory progressLoggerFactory =
                 GogradleGlobal.getInstance(ServiceRegistry.class).get(ProgressLoggerFactory.class);
         logger = progressLoggerFactory.newOperation(this.getClass());

@@ -2,12 +2,15 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import com.github.blindpirate.gogradle.vcs.git.GitClientLineConsumer
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.ProcessUtils.*
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
@@ -19,30 +22,44 @@ class GitMercurialAccessorTest {
     ProcessUtils processUtils
     @Mock
     Process process
+    @Mock
+    ProcessResult result
 
     GitMercurialAccessor accessor
 
     @Before
     void setUp() {
         accessor = new TestGitMercurialAccessor(processUtils)
+        result = mock(ProcessResult)
+        when(processUtils.run(anyList(), anyMap(), any(File))).thenReturn(process)
+        when(processUtils.getResult(process)).thenReturn(result)
     }
 
     @Test(expected = BuildException)
     void 'exception should be thrown if process ret code is not zero'() {
         // given
-        ProcessUtils.ProcessResult result = mock(ProcessUtils.ProcessResult)
         when(result.getCode()).thenReturn(1)
-        when(processUtils.run(anyList(), anyMap(), any(File))).thenReturn(process)
-        when(processUtils.getResult(process)).thenReturn(result)
         // when
         accessor.run(new File('.'), [])
     }
 
-//    @Test(expected = BuildException)
-//    void 'exception should be thrown if ret code is not zero when running with progress'() {
-//        // given
-//        when()
-//    }
+    @Test(expected = BuildException)
+    void 'exception should be thrown if ret code is not zero when running with progress'() {
+        when(process.waitFor()).thenReturn(1)
+        accessor.runWithProgress([], GitClientLineConsumer.NO_OP, GitClientLineConsumer.NO_OP)
+    }
+
+    @Test(expected = BuildException)
+    @WithMockInjector
+    void 'exception should be thrown if error occurs in running with progress'() {
+        when(process.waitFor()).thenReturn(1)
+        accessor.runWithProgress([], GitClientLineConsumer.NO_OP, new GitClientLineConsumer('') {
+            @Override
+            void accept(String s) {
+                throw new IOException()
+            }
+        })
+    }
 
 
     class TestGitMercurialAccessor extends GitMercurialAccessor {

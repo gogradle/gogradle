@@ -8,6 +8,11 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mockito
+
+import java.time.Instant
+
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
@@ -18,9 +23,29 @@ class HgClientAccessorTest {
 
     HgClientAccessor accessor = new HgClientAccessor(new ProcessUtils())
 
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if hg client not exists'() {
+        // given
+        ProcessUtils processUtils = mock(ProcessUtils)
+        accessor = new HgClientAccessor(processUtils)
+        when(processUtils.runAndGetStdout('hg', 'version')).thenThrow(IOException)
+
+        // then
+        accessor.ensureClientExists()
+    }
+
     @Test
     void 'getting remote url should succeed'() {
         assert accessor.getRemoteUrl(resource) == 'https://bitbucket.org/blindpirate/test-for-gogradle'
+    }
+
+    @Test
+    void 'getting tag list should succeed'() {
+        List tags = accessor.getAllTags(resource)
+        assert tags.size() == 1
+        assert tags[0].tag == 'commit2_tag'
+        assert tags[0].id.startsWith('1eae')
+        assert Instant.ofEpochMilli(tags[0].commitTime).toString().startsWith('2017-02-16')
     }
 
     @Test

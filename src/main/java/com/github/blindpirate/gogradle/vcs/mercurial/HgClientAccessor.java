@@ -97,7 +97,7 @@ public class HgClientAccessor extends GitMercurialAccessor {
     @Override
     public List<GitMercurialCommit> getAllTags(File repository) {
         return run(repository,
-                asList("hg", "log", "--rev='tag()'", "--template", "{node}:{tags}:{date|hgdate}\\n"),
+                asList("hg", "log", "--rev=tag()", "--template", "{node}:{tags}:{date|hgdate}\\n"),
                 result ->
                         Stream.of(result.getStdout().split("\\n"))
                                 .map(this::extractOne)
