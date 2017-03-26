@@ -53,6 +53,10 @@ public class GolangConfiguration implements Configuration {
         return name;
     }
 
+    public GolangDependencySet getGolangDependencies() {
+        return dependencies;
+    }
+
     @Override
     public DependencySet getDependencies() {
         return dependencies.toDependencySet();

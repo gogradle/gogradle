@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.build;
 
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -19,6 +20,8 @@ public interface BuildManager {
     String getBuildGopath();
 
     String getTestGopath();
+
+    Path getInstallationDirectory(String configuration);
 
     void go(List<String> args, Map<String, String> env);
 

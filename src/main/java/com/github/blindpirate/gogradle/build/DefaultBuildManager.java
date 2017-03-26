@@ -110,7 +110,7 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    private Path getGopathDir(String configuration) {
+    public Path getInstallationDirectory(String configuration) {
         String gopathDirName = String.format(GOPATH, configuration);
         return getGogradleBuildDir().resolve(gopathDirName);
     }
@@ -240,7 +240,7 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(PROJECT_GOPATH)
                 .toAbsolutePath()
                 .toString();
-        String buildGopath = getGopathDir(BUILD)
+        String buildGopath = getInstallationDirectory(BUILD)
                 .toAbsolutePath()
                 .toString();
 
@@ -248,7 +248,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     public String getTestGopath() {
-        String testGopath = getGopathDir(TEST)
+        String testGopath = getInstallationDirectory(TEST)
                 .toAbsolutePath()
                 .toString();
 
@@ -257,7 +257,7 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void installDependency(ResolvedDependency dependency, String configuration) {
-        File targetDir = getGopathDir(configuration)
+        File targetDir = getInstallationDirectory(configuration)
                 .resolve(SRC)
                 .resolve(dependency.getName())
                 .toFile();
