@@ -17,6 +17,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.Consumer;
@@ -71,6 +72,23 @@ public class GolangDependencySet implements Set<GolangDependency>, Serializable 
 
     public static GolangDependencySet empty() {
         return new GolangDependencySet();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GolangDependencySet that = (GolangDependencySet) o;
+        return Objects.equals(container, that.container);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(container);
     }
 
     @Override

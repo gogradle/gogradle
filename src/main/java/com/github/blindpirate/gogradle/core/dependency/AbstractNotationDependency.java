@@ -57,5 +57,4 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         return transitiveDepExclusions;
     }
 
-
 }

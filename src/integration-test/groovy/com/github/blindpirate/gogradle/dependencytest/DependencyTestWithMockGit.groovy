@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithMockGo
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -34,12 +35,13 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
 
     @Test
     void 'resolving dependencies of a complicated package should success'() {
+        IOUtils.write(resource, 'project/1.go', '')
         // given
         try {
             newBuild { build ->
-                build.forTasks('installBuildDependencies')
+                build.forTasks('resolveBuildDependencies')
             }
-        }finally {
+        } finally {
             println(stderr)
             println(stdout)
         }
@@ -72,6 +74,20 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
                 'github.com/external/e'      : 'commit3',
 
         ])
+
+        buildAgain()
+    }
+
+    void buildAgain() {
+        try {
+            newBuild { build ->
+                build.forTasks('resolveBuildDependencies')
+            }
+        } finally {
+            println(stderr)
+            println(stdout)
+            assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
+        }
     }
 
     @Override

@@ -51,13 +51,17 @@ public class BuildException extends RuntimeException {
     public static BuildException processInteractionFailed(List<String> cmds,
                                                           Map<String, String> env,
                                                           File workingDir,
-                                                          int retcode) {
+                                                          int retcode,
+                                                          String stdout,
+                                                          String stderr) {
         env = new HashMap<>(env);
         env.put("PATH", System.getenv("PATH"));
 
         return new BuildException("Build failed due to return code " + retcode
                 + " of cmd: " + String.join(" ", cmds)
                 + "\nin: " + workingDir.getAbsolutePath()
+                + "\nstderr: " + stderr
+                + "\nstdout: " + stdout
                 + "\nwith env:\n" + StringUtils.formatEnv(env));
     }
 

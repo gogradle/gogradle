@@ -5,6 +5,8 @@ import org.gradle.internal.logging.progress.ProgressLogger;
 import org.gradle.internal.logging.progress.ProgressLoggerFactory;
 import org.gradle.internal.service.ServiceRegistry;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.function.Consumer;
 
 public class GitClientLineConsumer implements Consumer<String> {
@@ -20,6 +22,8 @@ public class GitClientLineConsumer implements Consumer<String> {
     };
 
     private ProgressLogger logger;
+
+    private List<String> lines = new ArrayList<>();
 
     public static GitClientLineConsumer of(String desc) {
         return new GitClientLineConsumer(desc);
@@ -38,6 +42,11 @@ public class GitClientLineConsumer implements Consumer<String> {
     @Override
     public void accept(String s) {
         logger.progress(s);
+        lines.add(s);
+    }
+
+    public String getOutput() {
+        return String.join("\n", lines);
     }
 
     public void complete() {
