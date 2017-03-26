@@ -31,8 +31,8 @@ import java.util.List;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.go.GoCoverTask.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
@@ -68,8 +68,8 @@ public class GoTestTask extends Go {
     private boolean coverageProfileGenerated = false;
 
     public GoTestTask() {
-        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
-                INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
+                RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
     }
 
     public boolean isGenerateCoverageProfile() {

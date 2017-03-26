@@ -54,7 +54,7 @@ public class GoBuildTask extends Go {
     }
 
     public GoBuildTask() {
-        dependsOn(GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
+        dependsOn(GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
     @Override
