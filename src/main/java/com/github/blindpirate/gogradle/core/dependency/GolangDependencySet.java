@@ -8,30 +8,30 @@ import org.gradle.api.DomainObjectCollection;
 import org.gradle.api.DomainObjectSet;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.artifacts.DependencySet;
-import org.gradle.api.internal.DefaultNamedDomainObjectSet;
 import org.gradle.api.specs.Spec;
 import org.gradle.api.tasks.TaskDependency;
-import org.gradle.internal.reflect.DirectInstantiator;
-import org.gradle.internal.reflect.Instantiator;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.function.Consumer;
+import java.util.function.Function;
 
-public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDependency> {
+public class GolangDependencySet implements Set<GolangDependency>, Serializable {
+
+    private TreeSet<GolangDependency> container = new TreeSet<>(
+            Comparator.comparing((Serializable & Function<GolangDependency, String>) GolangDependency::getName));
+
     public GolangDependencySet(Collection<? extends GolangDependency> dependencies) {
-        this();
-        addAll(dependencies);
+        container.addAll(dependencies);
     }
 
     public GolangDependencySet() {
-        this(GolangDependency.class, DirectInstantiator.INSTANCE);
-    }
-
-    public GolangDependencySet(Class<? extends GolangDependency> type, Instantiator instantiator) {
-        super(type, instantiator, GolangDependency.Namer.INSTANCE);
     }
 
     public static GolangDependencySet merge(GolangDependencySet... sets) {
@@ -48,164 +48,238 @@ public class GolangDependencySet extends DefaultNamedDomainObjectSet<GolangDepen
 
     public List<GolangDependency> flatten() {
         List<GolangDependency> result = new ArrayList<>();
-        this.forEach(dependency -> dfs(dependency, result, 0));
+        this.forEach((Serializable & Consumer<GolangDependency>)
+                dependency -> dfs(dependency, result, 0));
         return result;
     }
 
     private void dfs(GolangDependency dependency, List<GolangDependency> result, int depth) {
         Assert.isTrue(depth < GogradleGlobal.MAX_DFS_DEPTH);
         result.add(dependency);
+
         if (dependency instanceof ResolvedDependency) {
             ResolvedDependency.class.cast(dependency)
                     .getDependencies()
-                    .forEach(subDependency -> dfs(subDependency, result, depth + 1));
+                    .forEach((Serializable & Consumer<GolangDependency>)
+                            subDependency -> dfs(subDependency, result, depth + 1));
         }
     }
 
     public DependencySet toDependencySet() {
-        return new DependencySetFacade();
+        return new DependencySetFacade(this);
     }
 
     public static GolangDependencySet empty() {
         return new GolangDependencySet();
     }
 
+    @Override
+    public int size() {
+        return container.size();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return container.isEmpty();
+    }
+
+    @Override
+    public boolean contains(Object o) {
+        return container.contains(o);
+    }
+
+    @Override
+    public Iterator<GolangDependency> iterator() {
+        return container.iterator();
+    }
+
+    @Override
+    public Object[] toArray() {
+        return container.toArray();
+    }
+
+    @Override
+    public <T> T[] toArray(T[] a) {
+        return container.toArray(a);
+    }
+
+    @Override
+    public boolean add(GolangDependency dependency) {
+        return container.add(dependency);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return container.remove(o);
+    }
+
+    @Override
+    public boolean containsAll(Collection<?> c) {
+        return container.containsAll(c);
+    }
+
+    @Override
+    public boolean addAll(Collection<? extends GolangDependency> c) {
+        return container.addAll(c);
+    }
+
+    @Override
+    public boolean retainAll(Collection<?> c) {
+        return container.retainAll(c);
+    }
+
+    @Override
+    public boolean removeAll(Collection<?> c) {
+        return container.removeAll(c);
+    }
+
+    @Override
+    public void clear() {
+        container.clear();
+    }
+
     @SuppressWarnings("unchecked")
-    public class DependencySetFacade implements DependencySet {
+    public static class DependencySetFacade implements DependencySet, Serializable {
+
+        private final GolangDependencySet outerInstance;
+
+        private DependencySetFacade(GolangDependencySet outerInstance) {
+            this.outerInstance = outerInstance;
+        }
 
         public GolangDependencySet toGolangDependencies() {
-            return GolangDependencySet.this;
+            return outerInstance;
         }
 
         @Override
         public <S extends Dependency> DomainObjectSet<S> withType(Class<S> type) {
-            return (DomainObjectSet) GolangDependencySet.this.withType((Class) type);
+            throw new UnsupportedOperationException("Unsupported method withType is invoked!");
         }
 
         @Override
         public <S extends Dependency> DomainObjectCollection<S> withType(Class<S> type,
                                                                          Action<? super S> configureAction) {
-            return (DomainObjectSet) GolangDependencySet.this.withType((Class) type, configureAction);
+            throw new UnsupportedOperationException("Unsupported method withType is invoked!");
         }
 
         @Override
         public <S extends Dependency> DomainObjectCollection<S> withType(Class<S> type, Closure configureClosure) {
-            return (DomainObjectSet) GolangDependencySet.this.withType((Class) type, configureClosure);
+            throw new UnsupportedOperationException("Unsupported method withType is invoked!");
         }
 
         @Override
         public DomainObjectSet<Dependency> matching(Spec<? super Dependency> spec) {
-            return (DomainObjectSet) GolangDependencySet.this.matching((Spec) spec);
+            throw new UnsupportedOperationException("Unsupported method matching is invoked!");
         }
 
         @Override
         public DomainObjectSet<Dependency> matching(Closure spec) {
-            return (DomainObjectSet) GolangDependencySet.this.matching(spec);
+            throw new UnsupportedOperationException("Unsupported method matching is invoked!");
         }
 
         @Override
         public Action<? super Dependency> whenObjectAdded(Action<? super Dependency> action) {
-            return (Action) GolangDependencySet.this.whenObjectAdded(action);
+            throw new UnsupportedOperationException("Unsupported method whenObjectAdded is invoked!");
         }
 
         @Override
         public void whenObjectAdded(Closure action) {
-            GolangDependencySet.this.whenObjectAdded(action);
+            throw new UnsupportedOperationException("Unsupported method whenObjectAdded is invoked!");
         }
 
         @Override
         public Action<? super Dependency> whenObjectRemoved(Action<? super Dependency> action) {
-            return (Action) GolangDependencySet.this.whenObjectRemoved(action);
+            throw new UnsupportedOperationException("Unsupported method whenObjectRemoved is invoked!");
         }
 
         @Override
         public void whenObjectRemoved(Closure action) {
-            GolangDependencySet.this.whenObjectRemoved(action);
+            throw new UnsupportedOperationException("Unsupported method whenObjectRemoved is invoked!");
         }
 
         @Override
         public void all(Action<? super Dependency> action) {
-            GolangDependencySet.this.all(action);
+            throw new UnsupportedOperationException("Unsupported method all is invoked!");
         }
 
         @Override
         public void all(Closure action) {
-            GolangDependencySet.this.all(action);
+            throw new UnsupportedOperationException("Unsupported method all is invoked!");
         }
 
         @Override
         public Set<Dependency> findAll(Closure spec) {
-            return (Set) GolangDependencySet.this.findAll(spec);
+            throw new UnsupportedOperationException("Unsupported method findAll is invoked!");
         }
 
         @Override
         public TaskDependency getBuildDependencies() {
-            throw new UnsupportedOperationException();
+            throw new UnsupportedOperationException("Unsupported method getBuildDependencies is invoked!");
         }
 
         @Override
         public int size() {
-            return GolangDependencySet.this.size();
+            return outerInstance.size();
         }
 
         @Override
         public boolean isEmpty() {
-            return GolangDependencySet.this.isEmpty();
+            return outerInstance.isEmpty();
         }
 
         @Override
         public boolean contains(Object o) {
-            return GolangDependencySet.this.contains(o);
+            return outerInstance.contains(o);
         }
 
         @Override
         public Iterator<Dependency> iterator() {
-            return (Iterator) GolangDependencySet.this.iterator();
+            return (Iterator) outerInstance.iterator();
         }
 
         @Override
         public Object[] toArray() {
-            return GolangDependencySet.this.toArray();
+            return outerInstance.toArray();
         }
 
         @Override
         public <T> T[] toArray(T[] a) {
-            return GolangDependencySet.this.toArray(a);
+            return outerInstance.toArray(a);
         }
 
         @Override
         public boolean add(Dependency dependency) {
-            return GolangDependencySet.this.add((GolangDependency) dependency);
+            return outerInstance.add((GolangDependency) dependency);
         }
 
         @Override
         public boolean remove(Object o) {
-            return GolangDependencySet.this.remove(o);
+            return outerInstance.remove(o);
         }
 
         @Override
         public boolean containsAll(Collection<?> c) {
-            return GolangDependencySet.this.containsAll(c);
+            return outerInstance.containsAll(c);
         }
 
         @Override
         public boolean addAll(Collection<? extends Dependency> c) {
-            return GolangDependencySet.this.addAll((Collection) c);
+            return outerInstance.addAll((Collection) c);
         }
 
         @Override
         public boolean removeAll(Collection<?> c) {
-            return GolangDependencySet.this.removeAll(c);
+            return outerInstance.removeAll(c);
         }
 
         @Override
         public boolean retainAll(Collection<?> c) {
-            return GolangDependencySet.this.retainAll(c);
+            return outerInstance.retainAll(c);
         }
 
         @Override
         public void clear() {
-            GolangDependencySet.this.clear();
+            outerInstance.clear();
         }
     }
 

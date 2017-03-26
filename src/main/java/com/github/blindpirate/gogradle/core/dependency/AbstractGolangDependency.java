@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.util.ConfigureUtils;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.specs.Spec;
 
+import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -69,7 +70,7 @@ public abstract class AbstractGolangDependency implements GolangDependency {
         }
     }
 
-    public static class PropertiesExclusionSpec implements Spec<GolangDependency> {
+    public static class PropertiesExclusionSpec implements Spec<GolangDependency>, Serializable {
         private Map<String, Object> properties;
 
         public static PropertiesExclusionSpec of(Map<String, Object> properties) {

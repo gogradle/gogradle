@@ -39,51 +39,51 @@ class GolangDependencySetTest {
         set.flatten()
     }
 
+    void assertUnsupport(Closure closure) {
+        try {
+            closure.call()
+        }
+        catch (UnsupportedOperationException e) {
+            return
+        }
+        assert false
+    }
+
     @Test
     void 'all methods of facade should be delegated to itself'() {
         GolangDependencySet set = new GolangDependencySet()
         DependencySet facade = set.toDependencySet()
         GolangDependencySet mockDependencySet = mock(GolangDependencySet)
-        ReflectionUtils.setField(facade, 'this$0', mockDependencySet)
+        ReflectionUtils.setField(facade, 'outerInstance', mockDependencySet)
 
-        facade.withType(String)
-        verify(mockDependencySet).withType(String)
+        assertUnsupport { facade.withType(String) }
 
         Action action = mock(Action)
-        facade.withType(String, action)
-        verify(mockDependencySet).withType(String, action)
+        assertUnsupport { facade.withType(String, action) }
 
         Closure closure = mock(Closure)
-        facade.withType(String, closure)
-        verify(mockDependencySet).withType(String, closure)
+        assertUnsupport { facade.withType(String, closure) }
 
         Spec spec = mock(Spec)
-        facade.matching(spec)
-        verify(mockDependencySet).matching(spec)
+        assertUnsupport { facade.matching(spec) }
 
-        facade.matching(closure)
-        verify(mockDependencySet).matching(closure)
+        assertUnsupport { facade.matching(closure) }
 
-        facade.whenObjectAdded(action)
-        verify(mockDependencySet).whenObjectAdded(action)
+        assertUnsupport { facade.whenObjectAdded(action) }
 
-        facade.whenObjectAdded(closure)
-        verify(mockDependencySet).whenObjectAdded(closure)
+        assertUnsupport { facade.whenObjectAdded(closure) }
 
-        facade.whenObjectRemoved(action)
-        verify(mockDependencySet).whenObjectRemoved(action)
+        assertUnsupport { facade.whenObjectRemoved(action) }
 
-        facade.whenObjectRemoved(closure)
-        verify(mockDependencySet).whenObjectRemoved(closure)
+        assertUnsupport { facade.whenObjectRemoved(closure) }
 
-        facade.all(action)
-        verify(mockDependencySet).all(action)
+        assertUnsupport { facade.all(action) }
 
-        facade.all(closure)
-        verify(mockDependencySet).all(closure)
+        assertUnsupport { facade.all(closure) }
 
-        facade.findAll(closure)
-        verify(mockDependencySet).findAll(closure)
+        assertUnsupport { facade.findAll(closure) }
+
+        assertUnsupport { facade.getBuildDependencies() }
 
         facade.isEmpty()
         verify(mockDependencySet).isEmpty()

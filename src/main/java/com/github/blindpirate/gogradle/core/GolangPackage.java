@@ -3,26 +3,29 @@ package com.github.blindpirate.gogradle.core;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
-public abstract class GolangPackage {
-    private Path path;
+public abstract class GolangPackage implements Serializable {
+    // java.io.NotSerializableException: sun.nio.fs.UnixPath
+    private String pathString;
 
     public GolangPackage(Path path) {
-        this.path = path;
+        this.pathString = StringUtils.toUnixString(path);
     }
 
     public Path getPath() {
-        return path;
+        return Paths.get(pathString);
     }
 
     public String getPathString() {
-        return StringUtils.toUnixString(path);
+        return pathString;
     }
 
     public Optional<GolangPackage> resolve(Path packagePath) {
+        Path path = getPath();
         Assert.isTrue(packagePath.startsWith(path) || path.startsWith(packagePath));
         if (path.equals(packagePath)) {
             return Optional.of(this);

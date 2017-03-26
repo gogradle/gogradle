@@ -25,7 +25,8 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     private ResolvedDependency hostDependency;
 
-    private Path relativePathToHost;
+    // java.io.NotSerializableException: sun.nio.fs.UnixPath
+    private String relativePathToHost;
 
     public static VendorResolvedDependency fromParent(String name,
                                                       ResolvedDependency parent,
@@ -52,13 +53,14 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         super(name, version, updateTime);
 
         this.hostDependency = hostDependency;
-        this.relativePathToHost = relativePathToHost;
+        this.relativePathToHost = toUnixString(relativePathToHost);
     }
 
     private static Path calculateRootPathToHost(ResolvedDependency parent, String packagePath) {
         if (parent instanceof VendorResolvedDependency) {
             VendorResolvedDependency parentVendorResolvedDependency = (VendorResolvedDependency) parent;
-            return parentVendorResolvedDependency.relativePathToHost.resolve(VENDOR_DIRECTORY).resolve(packagePath);
+            return Paths.get(parentVendorResolvedDependency.relativePathToHost)
+                    .resolve(VENDOR_DIRECTORY).resolve(packagePath);
         } else {
             return Paths.get(VENDOR_DIRECTORY).resolve(packagePath);
         }
@@ -77,7 +79,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
     }
 
     public Path getRelativePathToHost() {
-        return relativePathToHost;
+        return Paths.get(relativePathToHost);
     }
 
     @Override

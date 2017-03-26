@@ -68,21 +68,29 @@ a
     }
 
     ResolvedDependency withNameAndVersion(String name, String version) {
-        return new AbstractResolvedDependency(name, version, 0) {
-            @Override
-            protected Class<? extends DependencyInstaller> getInstallerClass() {
-                return null
-            }
+        return new Temp(name, version, 0L)
+    }
 
-            @Override
-            Map<String, Object> toLockedNotation() {
-                return null
-            }
+    static class Temp extends AbstractResolvedDependency {
+        private static final int serialVersionUID = 1
 
-            @Override
-            String formatVersion() {
-                return getVersion()
-            }
+        protected Temp(String name, String version, long updateTime) {
+            super(name, version, updateTime)
+        }
+
+        @Override
+        protected Class<? extends DependencyInstaller> getInstallerClass() {
+            return null
+        }
+
+        @Override
+        Map<String, Object> toLockedNotation() {
+            return null
+        }
+
+        @Override
+        String formatVersion() {
+            return getVersion()
         }
     }
 

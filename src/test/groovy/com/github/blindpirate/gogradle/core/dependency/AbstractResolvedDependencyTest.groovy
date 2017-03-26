@@ -102,6 +102,8 @@ class AbstractResolvedDependencyTest {
     }
 
     static class ResolvedDependencyForTest extends AbstractResolvedDependency {
+        private static final long serialVersionUID = 1
+
         protected ResolvedDependencyForTest(String name, String version, long updateTime) {
             super(name, version, updateTime)
         }
