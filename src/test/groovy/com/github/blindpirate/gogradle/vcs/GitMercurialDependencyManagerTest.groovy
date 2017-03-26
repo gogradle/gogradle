@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.MockOffline
@@ -49,7 +48,7 @@ class GitMercurialDependencyManagerTest {
     @Mock
     GolangDependencySet dependencySet
     @Mock
-    DependencyProduceStrategy strategy
+    DependencyVisitor visitor
     @Mock
     Set exclusionSpecs
     @Mock
@@ -77,7 +76,7 @@ class GitMercurialDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(resource, '.git', '')
 
-        manager = new TestGitMercurialDependencyManager(cacheManager, mock(DependencyVisitor), accessor)
+        manager = new TestGitMercurialDependencyManager(cacheManager, visitor, accessor)
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
@@ -89,8 +88,9 @@ class GitMercurialDependencyManagerTest {
         when(commit.getCommitTime()).thenReturn(123000L)
 
         when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
-        when(notationDependency.getStrategy()).thenReturn(strategy)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencySet)
+        when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
+        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(new GolangDependencySet())
+        when(visitor.visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
 
         when(notationDependency.getTransitiveDepExclusions()).thenReturn(exclusionSpecs)
 
@@ -139,7 +139,8 @@ class GitMercurialDependencyManagerTest {
         // given
         VendorResolvedDependency vendorResolvedDependency = mockWithName(VendorResolvedDependency, 'vendorResolvedDependency')
         GolangDependencySet dependencies = DependencyUtils.asGolangDependencySet(vendorResolvedDependency)
-        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(dependencies)
+        when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(dependencies)
+        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File),)).thenReturn(dependencies)
         when(vendorResolvedDependency.getHostDependency()).thenReturn(resolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/path/to/vendor'))
         when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())

@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
 
@@ -59,7 +60,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
                 .withRepoUrl(getAccessor().getRemoteUrl(repoRoot))
                 .withCommitTime(commit.getCommitTime())
                 .build();
-        GolangDependencySet dependencies = dependency.getStrategy().produce(ret, repoRoot, dependencyVisitor, BUILD);
+        GolangDependencySet dependencies = DEFAULT_STRATEGY.produce(ret, repoRoot, dependencyVisitor, BUILD);
         ret.setDependencies(dependencies);
 
         setVendorUpdateTimeIfNecessary(repoRoot, dependencies);
