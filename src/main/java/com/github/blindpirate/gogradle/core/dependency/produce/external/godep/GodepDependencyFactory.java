@@ -17,7 +17,7 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
 @Singleton
 public class GodepDependencyFactory extends ExternalDependencyFactory {
 
-    protected String identityFileName() {
+    public String identityFileName() {
         return "Godeps/Godeps.json";
     }
 

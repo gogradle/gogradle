@@ -63,7 +63,7 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     }
 
     @Override
-    protected String identityFileName() {
+    public String identityFileName() {
         return LOCK_FILE;
     }
 

@@ -18,7 +18,7 @@ import static com.github.blindpirate.gogradle.util.DataExchange.parseJson;
 public class GovendorDependencyFactory extends ExternalDependencyFactory {
 
     @Override
-    protected String identityFileName() {
+    public String identityFileName() {
         return "vendor/vendor.json";
     }
 

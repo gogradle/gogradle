@@ -18,7 +18,7 @@ public class GopmDependencyFactory extends ExternalDependencyFactory {
     private GopmfileParser gopmfileParser = new GopmfileParser();
 
     @Override
-    protected String identityFileName() {
+    public String identityFileName() {
         return ".gopmfile";
     }
 

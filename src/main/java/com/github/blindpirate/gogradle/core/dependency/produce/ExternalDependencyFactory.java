@@ -37,7 +37,7 @@ public abstract class ExternalDependencyFactory {
      *
      * @return name of that file
      */
-    protected abstract String identityFileName();
+    public abstract String identityFileName();
 
     @SuppressWarnings("unchecked")
     public Optional<GolangDependencySet> produce(File rootDir, String configuration) {
