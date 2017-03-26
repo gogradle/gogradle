@@ -36,10 +36,6 @@ class GolangIdeaModuleTest {
     @Mock
     TaskInternal resolveTestDependenciesTask
     @Mock
-    TaskInternal installBuildDependenciesTask
-    @Mock
-    TaskInternal installTestDependenciesTask
-    @Mock
     TaskInternal renameVendorTask
 
 
@@ -56,8 +52,6 @@ class GolangIdeaModuleTest {
         when(taskContainer.getByName(PREPARE_TASK_NAME)).thenReturn(prepareTask)
         when(taskContainer.getByName(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)).thenReturn(resolveBuildDependenciesTask)
         when(taskContainer.getByName(RESOLVE_TEST_DEPENDENCIES_TASK_NAME)).thenReturn(resolveTestDependenciesTask)
-        when(taskContainer.getByName(INSTALL_BUILD_DEPENDENCIES_TASK_NAME)).thenReturn(installBuildDependenciesTask)
-        when(taskContainer.getByName(INSTALL_TEST_DEPENDENCIES_TASK_NAME)).thenReturn(installTestDependenciesTask)
         when(taskContainer.getByName(RENAME_VENDOR_TASK_NAME)).thenReturn(renameVendorTask)
 
     }
@@ -75,8 +69,6 @@ class GolangIdeaModuleTest {
     void 'task should be executed in order'() {
         // given
         InOrder order = Mockito.inOrder(prepareTask,
-                installBuildDependenciesTask,
-                installTestDependenciesTask,
                 resolveBuildDependenciesTask,
                 resolveTestDependenciesTask,
                 renameVendorTask)
@@ -86,7 +78,5 @@ class GolangIdeaModuleTest {
         order.verify(prepareTask).execute()
         order.verify(resolveBuildDependenciesTask).execute()
         order.verify(resolveTestDependenciesTask).execute()
-        order.verify(installBuildDependenciesTask).execute()
-        order.verify(installTestDependenciesTask).execute()
     }
 }

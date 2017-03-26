@@ -7,8 +7,6 @@ import org.gradle.plugins.ide.idea.model.IdeaModule;
 import java.util.Collections;
 import java.util.Set;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RENAME_VENDOR_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
@@ -44,8 +42,6 @@ public class GolangIdeaModule extends IdeaModule {
         TaskUtil.runTask(getProject(), PREPARE_TASK_NAME);
         TaskUtil.runTask(getProject(), RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
         TaskUtil.runTask(getProject(), RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
-        TaskUtil.runTask(getProject(), INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
-        TaskUtil.runTask(getProject(), INSTALL_TEST_DEPENDENCIES_TASK_NAME);
         TaskUtil.runTask(getProject(), RENAME_VENDOR_TASK_NAME);
 
         return Collections.emptySet();
