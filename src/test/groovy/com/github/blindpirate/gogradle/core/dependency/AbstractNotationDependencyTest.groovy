@@ -46,16 +46,8 @@ class AbstractNotationDependencyTest {
         assert dependency.package == pkg
     }
 
-    @Test
-    void 'setting strategy should succeed'() {
-        def dependency = new NotationDependencyForTest()
-        DependencyProduceStrategy strategy = mock(DependencyProduceStrategy)
-
-        dependency.strategy = strategy
-        assert dependency.strategy == strategy
-    }
-
     static class NotationDependencyForTest extends AbstractNotationDependency {
+        private static final long serialVersionUID = 1
         @Override
         protected Class<? extends DependencyResolver> getResolverClass() {
             return null

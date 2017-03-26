@@ -3,14 +3,11 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import org.gradle.api.specs.Spec;
 
 import java.util.Map;
 import java.util.Set;
-
-import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 
 /**
  * All implementations must override equals() and hashCode()
@@ -18,8 +15,6 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.D
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
 
     public static final String VERSION_KEY = "version";
-
-    private DependencyProduceStrategy strategy = DEFAULT_STRATEGY;
 
     private ResolvedDependency resolvedDependency;
 
@@ -31,15 +26,6 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
 
     public void setPackage(GolangPackage golangPackage) {
         this.golangPackage = golangPackage;
-    }
-
-    @Override
-    public DependencyProduceStrategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(DependencyProduceStrategy strategy) {
-        this.strategy = strategy;
     }
 
     @Override
