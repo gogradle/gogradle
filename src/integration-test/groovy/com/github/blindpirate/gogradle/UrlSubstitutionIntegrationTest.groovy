@@ -45,7 +45,7 @@ dependencies {
         IOUtils.write(resource, 'build.gradle', buildDotGradle)
         try {
             newBuild {
-                it.forTasks('installBuildDependencies')
+                it.forTasks('resolveBuildDependencies')
             }
         } finally {
             println(stderr)
