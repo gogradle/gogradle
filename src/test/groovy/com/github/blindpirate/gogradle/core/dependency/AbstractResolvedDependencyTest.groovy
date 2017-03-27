@@ -14,6 +14,7 @@ class AbstractResolvedDependencyTest {
     GolangDependency a = mockDependency('a')
     GolangDependency b = mockDependency('b')
     GolangDependency c = mockDependency('c')
+    GolangDependency aa = mockDependency('a/a')
 
     AbstractResolvedDependency dependency = new ResolvedDependencyForTest('', '', 0)
 
@@ -39,6 +40,14 @@ class AbstractResolvedDependencyTest {
 
         // then
         assert dependency.getDependencies().isEmpty()
+    }
+
+    @Test
+    void 'name matched by prefix should be excluded'() {
+        // given
+        dependency.setDependencies(asGolangDependencySet(aa, b, c))
+        // then
+        'specific dependencies should be excluded'()
     }
 
     @Test

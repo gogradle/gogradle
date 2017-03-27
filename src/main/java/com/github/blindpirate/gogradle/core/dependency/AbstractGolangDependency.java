@@ -1,11 +1,14 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
+import com.github.blindpirate.gogradle.util.MapUtils;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.specs.Spec;
 
 import java.io.Serializable;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -81,7 +84,14 @@ public abstract class AbstractGolangDependency implements GolangDependency {
 
         @Override
         public boolean isSatisfiedBy(GolangDependency dependency) {
-            return ConfigureUtils.match(properties, dependency);
+            Map<String, Object> tmp = new HashMap<>(properties);
+            String name = MapUtils.getString(tmp, MapNotationParser.NAME_KEY);
+            tmp.remove(MapNotationParser.NAME_KEY);
+            if (name != null) {
+                return dependency.getName().startsWith(name) && ConfigureUtils.match(tmp, dependency);
+            } else {
+                return ConfigureUtils.match(tmp, dependency);
+            }
         }
 
         @Override
