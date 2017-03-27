@@ -12,6 +12,7 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
@@ -168,6 +169,17 @@ class AbstractVcsDependencyManagerTest {
         manager.resolve(configuration, hostNotationDependency)
         // then
         verify(cacheManager).updateCurrentDependencyLock()
+    }
+
+    @Test
+    void 'host dependency should be locked when installing'() {
+        // when
+        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenReturn(null)
+        manager.install(vendorResolvedDependency, resource)
+        ArgumentCaptor<GolangDependency> captor = ArgumentCaptor.forClass(GolangDependency)
+        // then
+        verify(cacheManager).runWithGlobalCacheLock(captor.capture(), any(Callable))
+        assert captor.getValue().is(hostResolvedDependency)
     }
 
 
