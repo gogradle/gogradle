@@ -17,7 +17,7 @@ public class GolangRepository {
         }
 
         @Override
-        public void url(Object urlOrClosure) {
+        public void urlSubstitution(Object urlOrClosure) {
             throw new UnsupportedOperationException();
         }
 
@@ -35,7 +35,7 @@ public class GolangRepository {
         namePattern = name;
     }
 
-    public void url(Object urlOrClosure) {
+    public void urlSubstitution(Object urlOrClosure) {
         urlSubstitution = urlOrClosure;
     }
 

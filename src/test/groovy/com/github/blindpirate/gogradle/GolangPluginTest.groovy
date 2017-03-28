@@ -168,12 +168,12 @@ class GolangPluginTest {
         project.repositories {
             golang {
                 name { it.endsWith('b') }
-                url 'bbbbb'
+                urlSubstitution 'bbbbb'
             }
 
             golang {
                 name ~/.*d/
-                url { name, url ->
+                urlSubstitution { name, url ->
                     name + url
                 }
             }

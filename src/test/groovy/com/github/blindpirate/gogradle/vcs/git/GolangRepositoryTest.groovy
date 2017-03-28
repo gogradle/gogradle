@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import org.gradle.api.artifacts.dsl.DependencyHandler
 import org.junit.Test
 
 class GolangRepositoryTest {
@@ -22,26 +21,26 @@ class GolangRepositoryTest {
 
     @Test
     void 'substitute url should succeed'() {
-        repository.url('123')
+        repository.urlSubstitution('123')
         assert repository.substitute(null, null) == '123'
 
-        repository.url {
+        repository.urlSubstitution {
             return '456'
         }
 
         assert repository.substitute(null, null) == '456'
 
-        repository.url { name ->
+        repository.urlSubstitution { name ->
             return name + '789'
         }
         assert repository.substitute('name', null) == 'name789'
 
-        repository.url { name, url ->
+        repository.urlSubstitution { name, url ->
             return name + url
         }
         assert repository.substitute('name', 'url') == 'nameurl'
 
-        repository.url { a, b, c ->
+        repository.urlSubstitution { a, b, c ->
             return 'ShouldNotTakeEffect'
         }
         assert repository.substitute('name', 'url') == 'url'
