@@ -9,9 +9,12 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.InOrder
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.inOrder
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -112,6 +115,18 @@ class DependencyTreeFactoryTest {
         assertChildrenOfNodeAre(rootNode.children[0], d)
         assertChildrenOfNodeAre(rootNode.children[1], a2)
         assertChildrenOfNodeAre(rootNode.children[0].children[0], a2)
+    }
+
+    @Test
+    void 'resolution order should be BFS instead of DFS'() {
+        'dependency conflict should be resolved'()
+        InOrder order = inOrder(rootProject, a1, a2, a3, b, c, d)
+        order.verify(a1).resolve(any(GolangConfiguration))
+        order.verify(b).resolve(any(GolangConfiguration))
+        order.verify(c).resolve(any(GolangConfiguration))
+        order.verify(a2).resolve(any(GolangConfiguration))
+        order.verify(d).resolve(any(GolangConfiguration))
+        order.verify(a3).resolve(any(GolangConfiguration))
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {

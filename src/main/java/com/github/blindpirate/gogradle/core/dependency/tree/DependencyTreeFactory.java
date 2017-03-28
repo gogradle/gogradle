@@ -6,7 +6,9 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import javax.inject.Singleton;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * Resolve all dependencies including transitive ones of a package and build a tree.
@@ -45,9 +47,13 @@ public class DependencyTreeFactory {
             // current dependency is older
             return;
         }
-        for (GolangDependency unresolvedChild : resolvedDependency.getDependencies()) {
-            ResolvedDependency resolvedChild = unresolvedChild.resolve(configuration);
-            resolve(configuration, resolvedChild);
-        }
+
+        // BFS order
+        List<ResolvedDependency> resolvedDependencies = resolvedDependency.getDependencies()
+                .stream()
+                .map(dependency -> dependency.resolve(configuration))
+                .collect(Collectors.toList());
+
+        resolvedDependencies.forEach(dependency -> resolve(configuration, dependency));
     }
 }
