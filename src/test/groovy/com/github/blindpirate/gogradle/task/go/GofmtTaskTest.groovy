@@ -41,6 +41,7 @@ class GofmtTaskTest extends TaskTest {
         IOUtils.write(resource, 'a.go', '')
         IOUtils.write(resource, '.a.go', '')
         IOUtils.mkdir(resource, 'b')
+        IOUtils.mkdir(resource, 'vendor')
     }
 
     @Test

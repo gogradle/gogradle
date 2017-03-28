@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
+import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
@@ -30,6 +31,7 @@ public class GofmtTask extends Go {
         return IOUtils.safeListFiles(getProject().getRootDir())
                 .stream()
                 .filter(file -> !file.getName().startsWith("."))
+                .filter(file -> !VendorDependencyFactory.VENDOR_DIRECTORY.equals(file.getName()))
                 .filter(file -> file.isDirectory() || file.getName().endsWith(".go"))
                 .map(file -> toUnixString(file.getAbsolutePath()))
                 .collect(Collectors.toList());
