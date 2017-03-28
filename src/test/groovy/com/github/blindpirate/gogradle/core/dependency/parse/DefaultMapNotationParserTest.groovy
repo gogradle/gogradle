@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.GolangRepositoryHandler
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -258,12 +259,15 @@ class DefaultMapNotationParserTest {
         assertCaptorValue(captor.value, [name: 'unrecognized', url: 'url1', vcs: 'git', 'package': pkg])
     }
 
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if unrecognized and no url specified'() {
+    @Test
+    void 'unrecognized notation dependency should be returned if unrecognized and no url specified'() {
         // given
-        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('recognized')))
+        when(packagePathResolver.produce('unrecognized')).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
         // when
-        parser.parse([name: 'unrecognized'])
+        def result = parser.parse([name: 'unrecognized'])
+        // then
+        assert result instanceof UnrecognizedPackageNotationDependency
+        assert result.name == 'unrecognized'
     }
 
     @Test(expected = IllegalStateException)

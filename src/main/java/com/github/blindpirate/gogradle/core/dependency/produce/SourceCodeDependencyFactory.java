@@ -8,14 +8,11 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.util.StringUtils;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.nio.file.Path;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -81,12 +78,12 @@ public class SourceCodeDependencyFactory {
         }
 
         if (info instanceof UnrecognizedGolangPackage) {
-            throw DependencyProductionException.cannotRecognizePackage(importPath);
+            return Optional.of(importPath);
         }
 
-        Path rootPath = VcsGolangPackage.class.cast(info).getRootPath();
+        String rootPath = VcsGolangPackage.class.cast(info).getRootPathString();
 
-        return Optional.of(StringUtils.toUnixString(rootPath));
+        return Optional.of(rootPath);
     }
 
     private boolean isRelativePath(String importPath) {

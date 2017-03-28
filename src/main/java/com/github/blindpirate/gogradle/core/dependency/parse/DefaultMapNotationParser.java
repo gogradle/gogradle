@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -67,23 +68,30 @@ public class DefaultMapNotationParser implements MapNotationParser {
             substituteUrls(ret, vcsGolangPackage);
             return ret;
         } else if (pkg instanceof UnrecognizedGolangPackage) {
-            VcsGolangPackage vcsGolangPackage = adaptAsVcsPackage(notation,
-                    UnrecognizedGolangPackage.class.cast(pkg));
-            return parseVcsPackage(notation, vcsGolangPackage);
+            return parseUnrecognizedPackage(notation, (UnrecognizedGolangPackage) pkg);
         } else {
             throw DependencyResolutionException.cannotParseNotation(notation);
         }
     }
 
-    private VcsGolangPackage adaptAsVcsPackage(Map<String, Object> notation, UnrecognizedGolangPackage pkg) {
+    private NotationDependency parseUnrecognizedPackage(Map<String, Object> notation,
+                                                        UnrecognizedGolangPackage pkg) {
         Optional<String> url = tryGetUrl(notation, pkg);
-        Assert.isTrue(url.isPresent(), "Cannot get url of dependency: " + pkg.getPathString());
+        if (url.isPresent()) {
+            return parseVcsPackage(notation, adaptAsVcsPackage(notation, pkg, url.get()));
+        } else {
+            return UnrecognizedPackageNotationDependency.of(pkg);
+        }
+    }
 
+    private VcsGolangPackage adaptAsVcsPackage(Map<String, Object> notation,
+                                               UnrecognizedGolangPackage pkg,
+                                               String url) {
         return VcsGolangPackage.builder()
                 .withVcsType(determineVcs(notation))
                 .withPath(pkg.getPath())
                 .withRootPath(pkg.getPath())
-                .withUrl(url.get())
+                .withUrl(url)
                 .build();
 
     }
