@@ -25,7 +25,7 @@ class GitMercurialResolvedDependencyTest {
     }
 
     GitMercurialResolvedDependency newResolvedDependency() {
-        return GitMercurialResolvedDependency.gitBuilder()
+        return GitMercurialResolvedDependency.builder()
                 .withName("package")
                 .withCommitId('commitId')
                 .withCommitTime(42L)

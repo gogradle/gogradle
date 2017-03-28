@@ -42,12 +42,8 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
         }
     }
 
-    public static GitMercurialResolvedDependencyBuilder gitBuilder() {
-        return new GitMercurialResolvedDependencyBuilder(VcsType.GIT);
-    }
-
-    public static GitMercurialResolvedDependencyBuilder mercurialBuilder() {
-        return new GitMercurialResolvedDependencyBuilder(VcsType.MERCURIAL);
+    public static GitMercurialResolvedDependencyBuilder builder(VcsType vcsType) {
+        return new GitMercurialResolvedDependencyBuilder(vcsType);
     }
 
     public static final class GitMercurialResolvedDependencyBuilder {
@@ -94,7 +90,7 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
         }
 
         public GitMercurialResolvedDependency build() {
-            GitMercurialResolvedDependency ret = null;
+            GitMercurialResolvedDependency ret;
             Assert.isTrue(vcsType == VcsType.GIT || vcsType == VcsType.MERCURIAL);
             if (vcsType == VcsType.GIT) {
                 ret = new GitResolvedDependency(name, commitId, commitTime);

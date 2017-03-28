@@ -52,7 +52,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
                                                           GitMercurialCommit commit) {
         VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
 
-        GitMercurialResolvedDependency ret = GitMercurialResolvedDependency.gitBuilder()
+        GitMercurialResolvedDependency ret = GitMercurialResolvedDependency.builder(getVcsType())
                 .withNotationDependency(dependency)
                 .withName(pkg.getRootPathString())
                 .withCommitId(commit.getId())
@@ -66,6 +66,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         setVendorUpdateTimeIfNecessary(repoRoot, dependencies);
         return ret;
     }
+
+    protected abstract VcsType getVcsType();
 
     private void setVendorUpdateTimeIfNecessary(File repoRoot, GolangDependencySet dependencies) {
         dependencies.flatten().stream()

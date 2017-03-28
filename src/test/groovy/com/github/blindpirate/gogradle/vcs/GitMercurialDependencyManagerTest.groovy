@@ -321,6 +321,11 @@ class GitMercurialDependencyManagerTest {
         protected GitMercurialAccessor getAccessor() {
             return accessor
         }
+
+        @Override
+        protected VcsType getVcsType() {
+            return VcsType.GIT
+        }
     }
 
     @Test
