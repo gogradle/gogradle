@@ -16,9 +16,10 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         // given
         externalDependencies()
         vendorDependencies()
+        sourceCodeDependencies()
 
         // when
-        strategy.produce(resolvedDependency, rootDir, visitor, 'build')
+        assert strategy.produce(resolvedDependency, rootDir, visitor, 'build').isEmpty()
 
         //then
         verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')

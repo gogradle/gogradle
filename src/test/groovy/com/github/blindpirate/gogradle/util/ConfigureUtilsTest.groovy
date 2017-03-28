@@ -34,8 +34,8 @@ class ConfigureUtilsTest {
     }
 
     @Test
-    void 'empty properties should be considered unmatched'() {
-        assert !ConfigureUtils.match([:], bean)
+    void 'empty properties should be considered matched'() {
+        assert ConfigureUtils.match([:], bean)
     }
 
     @Test(expected = GroovyCastException)
