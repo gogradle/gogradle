@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
 import com.google.common.collect.ImmutableMap;
 
+import java.util.HashSet;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
@@ -103,7 +104,7 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
             ret.repoUrl = this.repoUrl;
             ret.tag = this.tag;
             ret.setFirstLevel(notationDependency.isFirstLevel());
-            ret.transitiveDepExclusions = notationDependency.getTransitiveDepExclusions();
+            ret.transitiveDepExclusions = new HashSet<>(notationDependency.getTransitiveDepExclusions());
             return ret;
         }
     }

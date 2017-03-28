@@ -24,7 +24,7 @@ import java.io.File;
  * a scan for external dependency management tools will be performed.
  */
 @Singleton
-public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
+public class GogradleRootProduceStrategy extends ExclusionInheritanceProduceStrategry {
 
     private final GolangPluginSetting settings;
     private final ConfigurationContainer configurationContainer;
@@ -41,10 +41,10 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     }
 
     @DebugLog
-    public GolangDependencySet produce(ResolvedDependency dependency,
-                                       File rootDir,
-                                       DependencyVisitor visitor,
-                                       String configuration) {
+    public GolangDependencySet doProduce(ResolvedDependency dependency,
+                                         File rootDir,
+                                         DependencyVisitor visitor,
+                                         String configuration) {
         // Here we can just fetch them from internal container
         GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
         GolangDependencySet lockedDependencies = getLockedDependencies(dependency, rootDir, visitor, configuration);

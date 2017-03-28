@@ -4,10 +4,8 @@ import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
-import org.gradle.api.specs.Spec;
 
 import java.util.Map;
-import java.util.Set;
 
 /**
  * All implementations must override equals() and hashCode()
@@ -31,14 +29,17 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
     @Override
     public ResolvedDependency resolve(GolangConfiguration configuration) {
         if (resolvedDependency == null) {
-            DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
-            resolvedDependency = resolver.resolve(configuration, this);
+            resolvedDependency = doResolve(configuration);
         }
         return resolvedDependency;
     }
 
-    protected abstract Class<? extends DependencyResolver> getResolverClass();
+    protected ResolvedDependency doResolve(GolangConfiguration configuration) {
+        DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
+        return resolver.resolve(configuration, this);
+    }
 
+    protected abstract Class<? extends DependencyResolver> getResolverClass();
 
     public void exclude(Map<String, Object> map) {
         transitiveDepExclusions.add(PropertiesExclusionSpec.of(map));
@@ -50,11 +51,6 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         } else {
             transitiveDepExclusions.add(NO_TRANSITIVE_DEP_SPEC);
         }
-    }
-
-    @Override
-    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
-        return transitiveDepExclusions;
     }
 
 }

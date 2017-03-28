@@ -27,6 +27,15 @@ public abstract class AbstractGolangDependency implements GolangDependency {
     }
 
     @Override
+    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
+        return transitiveDepExclusions;
+    }
+
+    public void inheritExclusions(GolangDependency upstream) {
+        this.transitiveDepExclusions.addAll(upstream.getTransitiveDepExclusions());
+    }
+
+    @Override
     public boolean isFirstLevel() {
         return firstLevel;
     }

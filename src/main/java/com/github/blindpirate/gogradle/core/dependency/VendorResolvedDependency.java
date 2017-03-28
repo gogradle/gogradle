@@ -12,6 +12,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
@@ -54,6 +55,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
         this.hostDependency = hostDependency;
         this.relativePathToHost = toUnixString(relativePathToHost);
+        this.transitiveDepExclusions = new HashSet<>(hostDependency.getTransitiveDepExclusions());
     }
 
     private static Path calculateRootPathToHost(ResolvedDependency parent, String packagePath) {

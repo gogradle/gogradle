@@ -2,8 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import org.gradle.api.artifacts.Dependency;
+import org.gradle.api.specs.Spec;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * A {@link GolangDependency} represents a dependency
@@ -32,15 +34,6 @@ public interface GolangDependency extends Dependency, Serializable {
 
     boolean isFirstLevel();
 
-    enum Namer implements org.gradle.api.Namer<GolangDependency> {
-
-        INSTANCE;
-
-        @Override
-        public String determineName(GolangDependency dependency) {
-            return dependency.getName();
-        }
-    }
-
+    Set<Spec<GolangDependency>> getTransitiveDepExclusions();
 }
 
