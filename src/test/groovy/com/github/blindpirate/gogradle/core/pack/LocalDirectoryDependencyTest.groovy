@@ -2,8 +2,12 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
@@ -11,11 +15,14 @@ import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Mockito
 
 import java.time.Instant
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
+import static org.mockito.Mockito.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -33,7 +40,26 @@ class LocalDirectoryDependencyTest {
 
     @Test
     void 'local directory should be resolved to itself'() {
-        assert dependency.resolve().is(dependency)
+        // given
+        DependencyVisitor visitor = mock(DependencyVisitor)
+        GolangConfiguration configuration = mock(GolangConfiguration)
+        when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
+        when(visitor.visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
+        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(new GolangDependencySet())
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(visitor)
+        when(configuration.getName()).thenReturn(GolangConfiguration.TEST)
+        // when
+        def result = dependency.resolve(configuration)
+        // then
+        assert result.is(dependency)
+        ArgumentCaptor captor = ArgumentCaptor.forClass(String)
+
+        verify(visitor).visitExternalDependencies(any(ResolvedDependency), any(File), captor.capture())
+        assert captor.value == 'test'
+
+        verify(visitor).visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())
+        verify(visitor).visitVendorDependencies(any(ResolvedDependency), any(File))
+
     }
 
     @Test

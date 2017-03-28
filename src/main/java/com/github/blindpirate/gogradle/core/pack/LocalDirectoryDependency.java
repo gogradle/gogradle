@@ -6,22 +6,28 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependenc
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
 import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
+    private static final long serialVersionUID = 1;
+
     private long updateTime;
 
     private File rootDir;
 
-    private GolangDependencySet dependencies = GolangDependencySet.empty();
+    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
+    private transient GolangDependencySet dependencies = GolangDependencySet.empty();
 
     public static LocalDirectoryDependency fromLocal(String name, File rootDir) {
         LocalDirectoryDependency ret = new LocalDirectoryDependency();
@@ -47,7 +53,9 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
-    public ResolvedDependency resolve(GolangConfiguration configuration) {
+    public ResolvedDependency doResolve(GolangConfiguration configuration) {
+        DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
+        this.dependencies = DEFAULT_STRATEGY.produce(this, rootDir, visitor, configuration.getName());
         return this;
     }
 
