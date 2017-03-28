@@ -1,16 +1,25 @@
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.gradle.api.Action
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.specs.Spec
 import org.junit.Test
+import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.*
 
+@RunWith(GogradleRunner)
 class GolangDependencySetTest {
+
+    File resource
 
     @Test
     void 'flattening should succeed'() {
@@ -120,5 +129,62 @@ class GolangDependencySetTest {
     @Test(expected = UnsupportedOperationException)
     void 'exception should be thrown when invoking some methods'() {
         new GolangDependencySet().toDependencySet().getBuildDependencies()
+    }
+
+    @Test
+    @WithResource('')
+    void 'serialization and deserialization should succeed'() {
+        // given
+        File output = new File(resource, 'output.bin')
+        IOUtils.touch(output)
+
+        GolangDependencySet set = new GolangDependencySet()
+        set.add(newGitDependency())
+        set.add(LocalDirectoryDependency.fromLocal('resource', resource))
+        set.add(newVendorDependency())
+
+        // when
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output))
+        oos.writeObject(set)
+
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output))
+        def result = ois.readObject()
+
+        // then
+        assert result instanceof GolangDependencySet
+
+        def gitDependency = result.find { it instanceof GitNotationDependency }
+        assert gitDependency.name == 'gitDependency'
+        assert gitDependency.commit == 'commit'
+        assert gitDependency.urls == ['url']
+        assert gitDependency.firstLevel
+
+        def vendorDependency = result.find { it instanceof VendorNotationDependency }
+        assert vendorDependency.name == 'vendorDependency'
+        assert vendorDependency.hostNotationDependency.commit == 'commit'
+        assert vendorDependency.hostNotationDependency.urls == ['url']
+        assert vendorDependency.hostNotationDependency.firstLevel
+        assert vendorDependency.vendorPath == 'vendor/path'
+
+        def localDependency = result.find { it instanceof LocalDirectoryDependency }
+        assert localDependency.name == 'resource'
+        assert localDependency.rootDir == resource
+    }
+
+    VendorNotationDependency newVendorDependency() {
+        VendorNotationDependency ret = new VendorNotationDependency()
+        ret.name = 'vendorDependency'
+        ret.hostNotationDependency = newGitDependency()
+        ret.vendorPath = 'vendor/path'
+        return ret
+    }
+
+    GitNotationDependency newGitDependency() {
+        GitNotationDependency ret = new GitNotationDependency()
+        ret.name = 'gitDependency'
+        ret.commit = 'commit'
+        ret.url = 'url'
+        ret.firstLevel = true
+        return ret
     }
 }
