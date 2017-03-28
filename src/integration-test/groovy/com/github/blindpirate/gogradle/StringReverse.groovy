@@ -25,9 +25,9 @@ class StringReverse extends IntegrationTestSupport {
 
     @Test
     @AccessWeb
-    void 'a simple test with real go code'() {
+    void 'build string reverse example should succeed'() {
         newBuild { build ->
-            build.forTasks('dependencies')
+            build.forTasks('dependencies build')
         }
 
         assertDependencyOutput()

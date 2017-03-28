@@ -12,7 +12,6 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 class UnrecognizedPackageTest extends IntegrationTestSupport {
-    File resource
 
     String unrecognized1Go = """
 package main

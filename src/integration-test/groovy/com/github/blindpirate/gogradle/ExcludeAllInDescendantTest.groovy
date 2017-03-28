@@ -10,7 +10,6 @@ import org.junit.runner.RunWith
 @WithResource('exclude-descendants.zip')
 // There should be a test with network access instead of vendor access
 class ExcludeAllInDescendantTest extends IntegrationTestSupport {
-    File resource
     /*
         rootProject
             └── a exclude e

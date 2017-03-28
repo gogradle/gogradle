@@ -11,8 +11,6 @@ import org.junit.runner.RunWith
 @WithResource('')
 class UrlSubstitutionIntegrationTest extends IntegrationTestSupport {
 
-    File resource
-
     @Override
     File getProjectRoot() {
         return resource

@@ -10,8 +10,6 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 class CustomizedGoTaskIntegrationTest extends IntegrationTestSupport {
-    File resource
-
     String lsCmd = Os.getHostOs() == Os.WINDOWS ? 'dir' : 'ls'
 
     String buildDotGradle = """

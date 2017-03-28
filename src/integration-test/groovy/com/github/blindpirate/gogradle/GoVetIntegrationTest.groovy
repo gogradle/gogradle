@@ -11,7 +11,6 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 class GoVetIntegrationTest extends IntegrationTestSupport {
-    File resource
 
     String mainDotGo = """
 package main

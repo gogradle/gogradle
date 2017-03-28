@@ -17,8 +17,6 @@ import java.nio.file.Path
 @WithResource('')
 class GoBuildIntegrationTest extends IntegrationTestSupport {
 
-    File resource
-
     ProcessUtils processUtils = new ProcessUtils()
 
     String buildDotGradle = """

@@ -13,8 +13,6 @@ import org.junit.runner.RunWith
 @OnlyWhen(value = '"golint".execute()', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
 class GolintIntegrationTest extends IntegrationTestSupport {
 
-    File resource
-
     String buildDotGradle = """
 ${buildDotGradleBase}
 

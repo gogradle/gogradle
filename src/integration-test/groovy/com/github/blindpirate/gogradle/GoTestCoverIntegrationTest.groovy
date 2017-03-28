@@ -14,7 +14,6 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('go-test-cover.zip')
 class GoTestCoverIntegrationTest extends IntegrationTestSupport {
-    File resource
 
     String buildDotGradle = """
 ${buildDotGradleBase}
