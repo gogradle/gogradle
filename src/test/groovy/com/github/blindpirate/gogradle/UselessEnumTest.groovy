@@ -18,7 +18,6 @@ class UselessEnumTest {
          Arch,
          AbstractGolangDependency.NoTransitiveSpec,
          DependencyInstallFileFilter,
-         GolangDependency.Namer,
          GogradleGlobal].each(this.&doUselessTest)
     }
 
