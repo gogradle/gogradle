@@ -30,6 +30,40 @@ class StringReverse extends IntegrationTestSupport {
             build.forTasks('dependencies')
         }
 
+        assertDependencyOutput()
+
+        buildAgain()
+
+        buildAgainAndAgain()
+    }
+
+    void buildAgain() {
+        initStdoutStderr()
+
+        newBuild { build ->
+            build.forTasks('dependencies')
+        }
+
+        assertDependencyOutput()
+
+        assert stdout.toString().contains(":resolveBuildDependencies UP-TO-DATE")
+    }
+
+    void buildAgainAndAgain() {
+        initStdoutStderr()
+
+        IOUtils.write(resource, 'hello.go', helloDotGo + " ")
+
+        newBuild { build ->
+            build.forTasks('dependencies')
+        }
+
+        assertDependencyOutput()
+
+        assert !stdout.toString().contains(":resolveBuildDependencies UP-TO-DATE")
+    }
+
+    void assertDependencyOutput() {
         // "golang.org/x/tools:0d047c8 √" -> "golang.org/x/tools √"
         assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/, '').contains('''
 sample
@@ -37,6 +71,7 @@ sample
     └── golang.org/x/tools √
 ''')
     }
+
 
     String helloDotGo = '''
 package main
