@@ -7,7 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
-@WithResource('exclude-descendants')
+@WithResource('exclude-descendants.zip')
 // There should be a test with network access instead of vendor access
 class ExcludeAllInDescendantTest extends IntegrationTestSupport {
     File resource

@@ -34,6 +34,8 @@ class WithResourceProcessor extends GogradleRunnerProcessor<WithResource> {
             decompressResourceToDir(resourceName, destDir)
         } else if (resourceName != '') {
             copyResourceToDir(resourceName, destDir)
+        } else {
+            throw new IllegalArgumentException("Cannot use resource: " + resourceName)
         }
 
         resourceDir = destDir
