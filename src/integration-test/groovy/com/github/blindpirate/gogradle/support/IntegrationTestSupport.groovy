@@ -3,16 +3,17 @@ package com.github.blindpirate.gogradle.support
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.tooling.*
+import org.junit.Before
 
 abstract class IntegrationTestSupport {
     File resource
 
     File userhome
 
-    ByteArrayOutputStream stdout = new ByteArrayOutputStream()
-    PrintStream stdoutPs = new PrintStream(stdout)
-    ByteArrayOutputStream stderr = new ByteArrayOutputStream()
-    PrintStream stderrPs = new PrintStream(stderr)
+    ByteArrayOutputStream stdout
+    PrintStream stdoutPs
+    ByteArrayOutputStream stderr
+    PrintStream stderrPs
 
     // We use real go by default
     String goBinPath = ''
@@ -29,6 +30,18 @@ golang {
     goExecutable = '${goBinPath}'
 }
 '''
+
+    @Before
+    void baseSetUp() {
+        initStdoutStderr()
+    }
+
+    void initStdoutStderr() {
+        stdout = new ByteArrayOutputStream()
+        stdoutPs = new PrintStream(stdout)
+        stderr = new ByteArrayOutputStream()
+        stderrPs = new PrintStream(stderr)
+    }
 
     void writeBuildAndSettingsDotGradle(String buildDotGradle) {
         writeBuildAndSettingsDotGradle(buildDotGradle, '')
