@@ -50,13 +50,13 @@ class GitMercurialDependencyManagerTest {
     @Mock
     DependencyVisitor visitor
     @Mock
-    Set exclusionSpecs
-    @Mock
     GolangConfiguration configuration
     @Mock
     DependencyRegistry dependencyRegistry
     @Mock
     GitMercurialCommit commit
+
+    Set exclusionSpecs = [AbstractGolangDependency.NO_TRANSITIVE_DEP_SPEC] as Set
 
     GitMercurialDependencyManager manager
 
@@ -118,7 +118,8 @@ class GitMercurialDependencyManagerTest {
         assert result.version == commitId
         assert result.updateTime == 123000L
         assert result.firstLevel
-        assert ReflectionUtils.getField(result, 'transitiveDepExclusions').is(exclusionSpecs)
+        assert !ReflectionUtils.getField(result, 'transitiveDepExclusions').is(exclusionSpecs)
+        assert ReflectionUtils.getField(result, 'transitiveDepExclusions') == exclusionSpecs
     }
 
     @Test
