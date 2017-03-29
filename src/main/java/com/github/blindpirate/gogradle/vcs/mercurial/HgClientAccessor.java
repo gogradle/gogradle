@@ -3,13 +3,13 @@ package com.github.blindpirate.gogradle.vcs.mercurial;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.GitMercurialCommit;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.regex.Matcher;
@@ -17,6 +17,8 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static com.github.blindpirate.gogradle.util.StringUtils.trimToNull;
 import static java.util.Arrays.asList;
 
 @Singleton
@@ -60,9 +62,9 @@ public class HgClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public long lastCommitTimeOfPath(File repoRoot, String relativePath) {
+    public long lastCommitTimeOfPath(File repoRoot, Path relativePath) {
         return run(repoRoot,
-                asList("hg", "log", relativePath, "--limit", "1", "--template", "{date|hgdate}"),
+                asList("hg", "log", toUnixString(relativePath), "--limit", "1", "--template", "{date|hgdate}"),
                 result -> DateUtils.parseRaw(result.getStdout())
         );
     }
@@ -88,7 +90,7 @@ public class HgClientAccessor extends GitMercurialAccessor {
         Assert.isTrue(commitTagAndTime.length == 3);
 
         String id = commitTagAndTime[0];
-        String tag = StringUtils.trimToNull(commitTagAndTime[1]);
+        String tag = trimToNull(commitTagAndTime[1]);
         long time = DateUtils.parseRaw(commitTagAndTime[2]);
 
         return GitMercurialCommit.of(id, tag, time);

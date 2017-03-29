@@ -10,6 +10,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.file.Path
+
 import static com.github.blindpirate.gogradle.util.ProcessUtils.*
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.mock
@@ -78,7 +80,7 @@ class GitMercurialAccessorTest {
         }
 
         @Override
-        long lastCommitTimeOfPath(File repoRoot, String relativePath) {
+        long lastCommitTimeOfPath(File repoRoot, Path relativePath) {
             return 0
         }
 

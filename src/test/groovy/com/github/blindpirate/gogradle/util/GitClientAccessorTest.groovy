@@ -14,6 +14,8 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 
+import java.nio.file.Paths
+
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 import static org.mockito.Mockito.mock
@@ -181,14 +183,14 @@ class GitClientAccessorTest {
     @Test
     void 'getting commit time of path should succeed'() {
         // 2016/12/4 23:17:38 UTC+8
-        assert accessor.lastCommitTimeOfPath(resource, 'helloworld.go') == 1480864658000L
+        assert accessor.lastCommitTimeOfPath(resource, Paths.get('helloworld.go')) == 1480864658000L
     }
 
     @Test
     void 'commit time should be the nearest time to current repo snapshot'() {
-        long t0 = accessor.lastCommitTimeOfPath(resource, 'README.md')
+        long t0 = accessor.lastCommitTimeOfPath(resource, Paths.get('README.md'))
         accessor.checkout(resource, '1002ec6')
-        long t1 = accessor.lastCommitTimeOfPath(resource, 'README.md')
+        long t1 = accessor.lastCommitTimeOfPath(resource, Paths.get('README.md'))
         assert t0 > t1
     }
 
@@ -196,7 +198,7 @@ class GitClientAccessorTest {
     void 'getting path at a commit when it does not exist should throw an exception'() {
         // helloworld.go didn't exist in initial commit
         accessor.checkout(resource, INITIAL_COMMIT)
-        accessor.lastCommitTimeOfPath(resource, 'helloworld.go')
+        accessor.lastCommitTimeOfPath(resource, Paths.get('helloworld.go'))
     }
 
 

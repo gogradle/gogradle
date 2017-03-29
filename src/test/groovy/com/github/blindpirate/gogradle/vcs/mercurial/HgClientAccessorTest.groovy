@@ -10,6 +10,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mockito
 
+import java.nio.file.Paths
 import java.time.Instant
 
 import static org.mockito.Mockito.*
@@ -51,7 +52,7 @@ class HgClientAccessorTest {
     @Test
     void 'getting latest commit should succeed'() {
         // 2017/2/16 21:45:31 UTC+8
-        assert accessor.lastCommitTimeOfPath(resource, 'commit1') == 1487252731000
+        assert accessor.lastCommitTimeOfPath(resource, Paths.get('commit1')) == 1487252731000
     }
 
     @Test

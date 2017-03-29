@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.vcs.git.GitClientLineConsumer;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,8 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
     @Override
     public abstract String getRemoteUrl(File repoRoot);
 
-    public abstract long lastCommitTimeOfPath(File repoRoot, String relativePath);
+    @Override
+    public abstract long lastCommitTimeOfPath(File repoRoot, Path relativePath);
 
     public abstract Optional<GitMercurialCommit> findCommitByTag(File repository, String tag);
 

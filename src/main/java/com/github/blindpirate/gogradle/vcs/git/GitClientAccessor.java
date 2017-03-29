@@ -9,6 +9,7 @@ import com.github.blindpirate.gogradle.vcs.GitMercurialCommit;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -16,6 +17,7 @@ import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Arrays.asList;
 import static java.util.Optional.of;
 
@@ -56,9 +58,9 @@ public class GitClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public long lastCommitTimeOfPath(File repoRoot, String relativePath) {
+    public long lastCommitTimeOfPath(File repoRoot, Path relativePath) {
         return run(repoRoot,
-                asList("git", "log", "-1", "--pretty=format:%ct", relativePath),
+                asList("git", "log", "-1", "--pretty=format:%ct", toUnixString(relativePath)),
                 result -> toMilliseconds(Long.valueOf(result.getStdout().trim())));
     }
 
