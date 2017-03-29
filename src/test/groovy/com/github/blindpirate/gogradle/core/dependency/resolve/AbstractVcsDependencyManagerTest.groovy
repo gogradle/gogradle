@@ -9,6 +9,8 @@ import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -51,8 +53,8 @@ class AbstractVcsDependencyManagerTest {
     GolangConfiguration configuration
 
 
-    ResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(ResolvedDependency, 'host')
-    NotationDependency hostNotationDependency = DependencyUtils.mockWithName(NotationDependency, 'host')
+    VcsResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(VcsResolvedDependency, 'host')
+    GitMercurialNotationDependency hostNotationDependency = DependencyUtils.mockWithName(GitMercurialNotationDependency, 'host')
 
     File resource
 
@@ -66,8 +68,8 @@ class AbstractVcsDependencyManagerTest {
         manager = new TestAbstractVcsDependencyManager(cacheManager)
 
         when(subclassDelegate.determineVersion(resource, hostNotationDependency)).thenReturn('version')
+        when(subclassDelegate.getCurrentRepositoryRemoteUrl(resource)).thenReturn('url')
         when(subclassDelegate.createResolvedDependency(hostNotationDependency, resource, 'version')).thenReturn(hostResolvedDependency)
-        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(true)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
@@ -78,6 +80,10 @@ class AbstractVcsDependencyManagerTest {
         when(vendorNotationDependency.getName()).thenReturn('thisisvendor')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')
         when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(resource.toPath())
+
+        when(hostNotationDependency.getUrls()).thenReturn(['url'])
+        when(hostResolvedDependency.getUrl()).thenReturn('url')
+
     }
 
     @Test
@@ -163,7 +169,7 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'lock file should be updated after repository being initialized'() {
         // given
-        when(subclassDelegate.repositoryMatch(resource, hostNotationDependency)).thenReturn(false)
+        when(subclassDelegate.getCurrentRepositoryRemoteUrl(resource)).thenReturn('anotherUrl')
         // when
         manager.resolve(configuration, hostNotationDependency)
         // then
@@ -213,13 +219,13 @@ class AbstractVcsDependencyManagerTest {
         }
 
         @Override
-        protected void initRepository(NotationDependency dependency, File repoRoot) {
-            subclassDelegate.initRepository(dependency, repoRoot)
+        protected void initRepository(String name, List<String> urls, File repoRoot) {
+            subclassDelegate.initRepository(name, urls, repoRoot)
         }
 
         @Override
-        protected boolean repositoryMatch(File directory, NotationDependency dependency) {
-            return subclassDelegate.repositoryMatch(directory, dependency)
+        protected String getCurrentRepositoryRemoteUrl(File globalCacheRepoRoot) {
+            return subclassDelegate.getCurrentRepositoryRemoteUrl(globalCacheRepoRoot)
         }
     }
 }

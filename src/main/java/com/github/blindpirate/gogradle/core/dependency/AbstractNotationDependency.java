@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
-import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 
 import java.util.Map;
@@ -14,17 +13,7 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
 
     public static final String VERSION_KEY = "version";
 
-    private ResolvedDependency resolvedDependency;
-
-    private GolangPackage golangPackage;
-
-    public GolangPackage getPackage() {
-        return golangPackage;
-    }
-
-    public void setPackage(GolangPackage golangPackage) {
-        this.golangPackage = golangPackage;
-    }
+    private transient ResolvedDependency resolvedDependency;
 
     @Override
     public ResolvedDependency resolve(GolangConfiguration configuration) {

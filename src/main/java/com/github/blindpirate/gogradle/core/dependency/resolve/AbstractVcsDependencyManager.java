@@ -12,12 +12,16 @@ import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstall
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -101,6 +105,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         try {
             ResolvedDependency realDependency = determineResolvedDependency(dependency);
             globalCacheManager.runWithGlobalCacheLock(realDependency, () -> {
+                restoreRepository(realDependency, targetDirectory);
                 installUnderLock(dependency, targetDirectory);
                 return null;
             });
@@ -146,10 +151,22 @@ public abstract class AbstractVcsDependencyManager<VERSION>
 
     protected abstract VERSION determineVersion(File repository, NotationDependency dependency);
 
+    private void restoreRepository(ResolvedDependency dependency, File repoRoot) {
+        String url = VcsResolvedDependency.class.cast(dependency).getUrl();
+        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, Arrays.asList(url));
+        if (repositoryNeedInit) {
+            IOUtils.clearDirectory(repoRoot);
+            initRepository(dependency.getName(), Arrays.asList(url), repoRoot);
+            globalCacheManager.updateCurrentDependencyLock(dependency);
+        }
+    }
+
     private void resolveRepository(NotationDependency dependency, File repoRoot) {
-        boolean repositoryIsMatched = globalCacheRepositoryMatch(dependency, repoRoot);
-        if (!repositoryIsMatched) {
-            initRepository(dependency, repoRoot);
+        List<String> expectedUrls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
+        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, expectedUrls);
+        if (repositoryNeedInit) {
+            IOUtils.clearDirectory(repoRoot);
+            initRepository(dependency.getName(), expectedUrls, repoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
         } else if (globalCacheManager.currentDependencyIsOutOfDate(dependency)) {
             if (GogradleGlobal.isOffline()) {
@@ -166,30 +183,24 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     protected abstract void updateRepository(NotationDependency dependency,
                                              File repoRoot);
 
-    protected abstract void initRepository(NotationDependency dependency, File repoRoot);
+    protected abstract void initRepository(String name, List<String> urls, File repoRoot);
 
 
-    private boolean globalCacheRepositoryMatch(NotationDependency dependency, File globalCacheRepoRoot) {
+    private boolean globalCacheRepositoryNeedInit(File globalCacheRepoRoot,
+                                                  List<String> expectedUrls) {
         if (IOUtils.dirIsEmpty(globalCacheRepoRoot)) {
-            return false;
+            return true;
         } else {
-            boolean match = repositoryMatch(globalCacheRepoRoot, dependency);
-            if (match) {
-                return true;
+            String url = getCurrentRepositoryRemoteUrl(globalCacheRepoRoot);
+            if (expectedUrls.contains(url)) {
+                return false;
             } else {
                 LOGGER.warn("Repo " + globalCacheRepoRoot.getAbsolutePath()
                         + "doesn't match url declared in dependency, it will be cleared.");
-                return false;
+                return true;
             }
         }
     }
 
-    /**
-     * Checks if a non-empty directory matches the dependency.
-     *
-     * @param directory  the directory
-     * @param dependency the dependency
-     * @return {@code Optional.of()} if matched, {@code Optional.empty()} otherwise.
-     */
-    protected abstract boolean repositoryMatch(File directory, NotationDependency dependency);
+    protected abstract String getCurrentRepositoryRemoteUrl(File globalCacheRepoRoot);
 }

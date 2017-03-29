@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
@@ -21,6 +22,16 @@ public abstract class AbstractGolangDependency implements GolangDependency {
      * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.
      */
     protected Set<Spec<GolangDependency>> transitiveDepExclusions = new HashSet<>();
+
+    private GolangPackage golangPackage;
+
+    public GolangPackage getPackage() {
+        return golangPackage;
+    }
+
+    public void setPackage(GolangPackage golangPackage) {
+        this.golangPackage = golangPackage;
+    }
 
     protected boolean shouldNotBeExcluded(GolangDependency dependency) {
         return transitiveDepExclusions.stream().noneMatch(spec -> spec.isSatisfiedBy(dependency));
