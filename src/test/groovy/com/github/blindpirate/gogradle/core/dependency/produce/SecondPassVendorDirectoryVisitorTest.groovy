@@ -10,12 +10,20 @@ import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.vcs.Git
+import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
+import com.github.blindpirate.gogradle.vcs.VcsType
+import com.google.inject.Key
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.file.Path
+
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -26,16 +34,21 @@ class SecondPassVendorDirectoryVisitorTest {
     @Mock
     VendorOnlyProduceStrategy vendorOnlyProduceStrategy
     @Mock
-    ResolvedDependency hostDependency
+    VcsResolvedDependency hostDependency
     @Mock
     DependencyVisitor dependencyVisitor
+    @Mock
+    VcsAccessor vcsAccessor
 
     File resource
 
     @Before
     void setUp() {
+        when(hostDependency.getVcsType()).thenReturn(VcsType.GIT)
         when(GogradleGlobal.INSTANCE.injector.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
         when(GogradleGlobal.INSTANCE.injector.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
+        when(GogradleGlobal.INSTANCE.injector.getInstance(Key.get(VcsAccessor, Git))).thenReturn(vcsAccessor)
+        when(vcsAccessor.lastCommitTimeOfPath(any(File), any(Path))).thenReturn(123L)
         IOUtils.write(resource, 'vendor/a/main.go', '')
         IOUtils.write(resource, 'vendor/b/vendor/c/main.go', '')
     }
@@ -47,9 +60,10 @@ class SecondPassVendorDirectoryVisitorTest {
         assert visitor.dependencies.size() == 2
         VendorResolvedDependency a = visitor.dependencies.find { it.name == 'a' }
         VendorResolvedDependency b = visitor.dependencies.find { it.name == 'b' }
-        assert [a, b].every {
-            it instanceof VendorResolvedDependency
-            it.hostDependency == hostDependency
+        [a, b].each {
+            assert it instanceof VendorResolvedDependency
+            assert it.hostDependency == hostDependency
+            assert it.updateTime == 123L
         }
         assert toUnixString(a.relativePathToHost) == 'vendor/a'
         assert toUnixString(b.relativePathToHost) == 'vendor/b'
