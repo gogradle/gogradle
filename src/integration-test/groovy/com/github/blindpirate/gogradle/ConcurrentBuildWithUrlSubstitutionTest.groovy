@@ -3,9 +3,6 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
-import org.eclipse.jgit.api.Git
-import org.eclipse.jgit.lib.Repository
-import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.junit.After
 import org.junit.Before
 import org.junit.Test
@@ -44,26 +41,10 @@ class ConcurrentBuildWithUrlSubstitutionTest {
     void setUpAndStartGitServer() {
         IOUtils.mkdir(resource, 'git-repo/repo1')
         IOUtils.mkdir(resource, 'git-repo/repo2')
-        createRepository(new File(resource, 'git-repo/repo1'), '1.go')
-        createRepository(new File(resource, 'git-repo/repo2'), '2.go')
+        GitServer.createRepository(new File(resource, 'git-repo/repo1'), '1.go')
+        GitServer.createRepository(new File(resource, 'git-repo/repo2'), '2.go')
         gitServer = GitServer.newServer(new File(resource, 'git-repo'))
         gitServer.start(GitServer.DEFAULT_PORT)
-    }
-
-    void createRepository(File dir, String fileName) {
-        Repository repository = FileRepositoryBuilder.create(new File(dir, '.git'))
-        repository.create()
-        Git git
-        try {
-            git = new Git(repository)
-            new File(dir, fileName).createNewFile()
-            git.add().addFilepattern(fileName).call()
-            git.commit().setMessage('commit').call()
-        } finally {
-            if (git != null) {
-                git.close()
-            }
-        }
     }
 
     @After

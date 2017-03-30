@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.support
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletHandler
 import org.eclipse.jetty.servlet.ServletHolder
+import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.http.server.GitServlet
 import org.eclipse.jgit.lib.Repository
@@ -69,11 +70,27 @@ class GitServer {
         return gs
     }
 
-    private Repository newRepository(File dir) throws IOException {
+    static Repository newRepository(File dir) throws IOException {
         return new FileRepositoryBuilder().setGitDir(new File(dir, ".git"))
                 .readEnvironment()
                 .findGitDir()
                 .build()
+    }
+
+    static void createRepository(File dir, String fileName) {
+        Repository repository = FileRepositoryBuilder.create(new File(dir, '.git'))
+        repository.create()
+        Git git
+        try {
+            git = new Git(repository)
+            new File(dir, fileName).createNewFile()
+            git.add().addFilepattern(fileName).call()
+            git.commit().setMessage('commit').call()
+        } finally {
+            if (git != null) {
+                git.close()
+            }
+        }
     }
 
 }
