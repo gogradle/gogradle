@@ -72,9 +72,9 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
     public String toString() {
         return getClass().getSimpleName() + "{"
                 + "name='" + getName() + '\''
-                + ", commit='" + commit + '\''
+                + (commit == null ? "" : ", commit='" + commit + '\'')
                 + (tag == null ? "" : ", tag='" + tag + '\'')
-                + (url == null ? "" : ", url='" + url + '\'')
+                + (getUrls() == null ? "" : ", urls='" + getUrls() + '\'')
                 + '}';
     }
 
