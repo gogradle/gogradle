@@ -26,7 +26,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
     }
 
     @Test
-    void 'vendor dependencies should have priority over external dependencies'() {
+    void 'external dependencies should have priority over vendor dependencies'() {
         // given
         vendorDependencies(a1, b1)
         externalDependencies(a2, c2)
@@ -34,10 +34,10 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         // when
         def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
         // then
-        assert result.any { it.is(a1) }
-        assert result.any { it.is(b1) }
+        assert !result.any { it.is(a1) }
+        assert !result.any { it.is(b1) }
         assert result.any { it.is(c2) }
-        assert !result.any { it.is(a2) }
+        assert result.any { it.is(a2) }
         verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
@@ -60,7 +60,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         vendorDependencies()
         externalDependencies(a2)
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor,'build')
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
         // then
         assert result.size() == 1
         assert result.any { it.is(a2) }

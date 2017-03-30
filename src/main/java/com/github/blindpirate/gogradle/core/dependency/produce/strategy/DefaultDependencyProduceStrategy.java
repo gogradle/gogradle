@@ -23,17 +23,19 @@ public class DefaultDependencyProduceStrategy extends ExclusionInheritanceProduc
                                          File rootDir,
                                          DependencyVisitor visitor,
                                          String configuration) {
-        GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency,
+        GolangDependencySet candidate = visitor.visitExternalDependencies(dependency,
                 rootDir, configuration);
 
-        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
-
-        GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
-
-        if (candidate.isEmpty()) {
-            candidate = visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
+        if (!candidate.isEmpty()) {
+            return candidate;
         }
 
-        return candidate;
+        candidate = visitor.visitVendorDependencies(dependency, rootDir);
+
+        if (!candidate.isEmpty()) {
+            return candidate;
+        }
+
+        return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
     }
 }
