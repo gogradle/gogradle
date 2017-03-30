@@ -87,9 +87,9 @@ public class GitClientAccessor extends GitMercurialAccessor {
     @Override
     public List<GitMercurialCommit> getAllTags(File repository) {
         // git for-each-ref --sort=-committerdate --format '%(objectname):%(refname:short):%(committerdate:iso)' refs/tags
-        // 5ddaee09d704261aa360068cdcafff1e5f188ece:v3.4.1:2017-03-03 14:45:52 -0500
+        // 5ddaee09d704261aa360068cdcafff1e5f188ece:v3.4.1:1481274259 +0800
         return run(repository,
-                asList("git", "for-each-ref", "--sort=-taggerdate", "--format", "%(objectname):%(refname:short):%(taggerdate:raw)", "refs/tags"),
+                asList("git", "for-each-ref", "--sort=-creatordate", "--format", "%(objectname):%(refname:short):%(creatordate:raw)", "refs/tags"),
                 this::convertToCommits);
     }
 

@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.vcs.GitMercurialCommit
 import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -144,7 +145,7 @@ class GitClientAccessorTest {
     @Test
     @WithResource('')
     void 'empty list should be returned if there is no tag'() {
-        "git init ${StringUtils.toUnixString(resource)}".execute()
+        FileRepositoryBuilder.create(new File(resource, '.git')).create()
         assert accessor.getAllTags(resource) == []
     }
 
