@@ -17,6 +17,8 @@ class IncrementalBuildTest extends IntegrationTestSupport {
         return resource
     }
 
+    String buildDotGradle
+
     String gogradleDotLock =
             """---
 apiVersion: \"${GogradleGlobal.GOGRADLE_VERSION}\"
@@ -24,16 +26,15 @@ dependencies:
   build: []
   test: []
 """
-    String buildDotGradle = """
+
+    @Before
+    void setUp() {
+        buildDotGradle = """
 ${buildDotGradleBase}
 golang {
     packagePath='my/project'
 }
 """
-
-
-    @Before
-    void setUp() {
         IOUtils.write(resource, 'gogradle.lock', gogradleDotLock)
         IOUtils.write(resource, 'a.go', '')
         IOUtils.write(resource, 'a_test.go', '')

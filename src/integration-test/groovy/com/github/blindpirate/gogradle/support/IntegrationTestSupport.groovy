@@ -18,21 +18,21 @@ abstract class IntegrationTestSupport {
     // We use real go by default
     String goBinPath = ''
 
-    String buildDotGradleBase = """ 
+    String buildDotGradleBase
+
+    @Before
+    void baseSetUp() {
+        buildDotGradleBase = """ 
 buildscript {
     dependencies {
         classpath files(new File(rootDir, '../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
-""" + '''
 golang {
     goExecutable = '${goBinPath}'
 }
-'''
-
-    @Before
-    void baseSetUp() {
+"""
         initStdoutStderr()
     }
 
@@ -92,10 +92,6 @@ golang {
     ProjectConnection newProjectConnection() {
         GradleConnector connector = GradleConnector.newConnector()
                 .forProjectDirectory(getProjectRoot())
-
-        if (userhome != null) {
-            connector.useGradleUserHomeDir(userhome)
-        }
 
         if (System.getProperty('GRADLE_DIST_HOME') != null) {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))

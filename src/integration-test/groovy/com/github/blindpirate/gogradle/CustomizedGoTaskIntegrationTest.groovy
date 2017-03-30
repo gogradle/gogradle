@@ -12,7 +12,9 @@ import org.junit.runner.RunWith
 class CustomizedGoTaskIntegrationTest extends IntegrationTestSupport {
     String lsCmd = Os.getHostOs() == Os.WINDOWS ? 'dir' : 'ls'
 
-    String buildDotGradle = """
+    @Before
+    void setUp() {
+        String buildDotGradle = """
 ${buildDotGradleBase}
 
 golang {
@@ -26,9 +28,6 @@ task ls(type: com.github.blindpirate.gogradle.Go){
     }
 }
 """
-
-    @Before
-    void setUp() {
         writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
@@ -39,6 +38,7 @@ task ls(type: com.github.blindpirate.gogradle.Go){
                 it.forTasks('ls')
             }
         } finally {
+            println(stderr)
             assert stdout.toString().contains('go version')
             assert stdout.toString().contains('settings.gradle')
         }

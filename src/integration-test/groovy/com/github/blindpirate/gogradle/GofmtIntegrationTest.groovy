@@ -11,7 +11,14 @@ import org.junit.runner.RunWith
 @WithResource('')
 class GofmtIntegrationTest extends IntegrationTestSupport {
 
-    String mainDotGo = '''\
+    String mainDotGo
+    String subDotGo
+    String buildDotGradle
+
+
+    @Before
+    void setUp() {
+        mainDotGo = '''\
 package main
 
 import "fmt"
@@ -21,7 +28,7 @@ fmt.Printf("hello world")
 return 0
 }
 '''
-    String subDotGo = '''\
+        subDotGo = '''\
 package sub 
 
 import "fmt"
@@ -32,15 +39,12 @@ return 0
 }
 '''
 
-    String buildDotGradle = """
+        buildDotGradle = """
 ${buildDotGradleBase}
 golang {
     packagePath="github.com/my/package"
 }
 """
-
-    @Before
-    void setUp() {
         IOUtils.write(resource, 'main.go', mainDotGo)
         IOUtils.write(resource, 'sub/sub.go', subDotGo)
         writeBuildAndSettingsDotGradle(buildDotGradle)
