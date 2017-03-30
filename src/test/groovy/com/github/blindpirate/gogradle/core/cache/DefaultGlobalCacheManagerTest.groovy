@@ -64,6 +64,7 @@ class DefaultGlobalCacheManagerTest {
         when(notationDependency.getUrls()).thenReturn(pkg.getUrls())
         when(notationDependency.getPackage()).thenReturn(pkg)
         when(GogradleGlobal.getInstance((Key) any(Key))).thenReturn(accessor)
+        when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('url')
         ReflectionUtils.setField(cacheManager, "gradleHome", resource.toPath())
     }
 
@@ -98,7 +99,11 @@ class DefaultGlobalCacheManagerTest {
     void 'lock file should be updated successfully'() {
         // when
         cacheManager.runWithGlobalCacheLock(notationDependency, {
+            // create
             cacheManager.updateCurrentDependencyLock(notationDependency)
+
+            // a shorter data (with fewer bytes may cause issue)
+            when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('u')
             cacheManager.updateCurrentDependencyLock(notationDependency)
         } as Callable)
         // then

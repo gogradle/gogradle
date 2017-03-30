@@ -163,8 +163,9 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         try {
             // On windows we have to write file like this
             FileChannel currentLockFile = fileChannels.get();
-            currentLockFile.position(0);
             byte[] bytesToWrite = toYaml(updatedMetaData(dependency)).getBytes(DEFAULT_CHARSET);
+            currentLockFile.position(0);
+            currentLockFile.truncate(bytesToWrite.length);
             currentLockFile.write(ByteBuffer.wrap(bytesToWrite));
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
