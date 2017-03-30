@@ -1,9 +1,18 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.Mercurial
+import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository
+import com.github.blindpirate.gogradle.vcs.mercurial.HgClientAccessor
+import com.github.blindpirate.gogradle.vcs.mercurial.MercurialDependencyManager
+import com.google.inject.Key
 import org.gradle.api.Project
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.junit.Before
@@ -186,7 +195,20 @@ class GolangPluginTest {
         repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d')
         assert repository.substitute('name', 'url') == 'nameurl'
 
-        repository=GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('something else')
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('something else')
         assert repository.is(GolangRepository.EMPTY_INSTANCE)
+    }
+
+    @Test
+    void 'getting instance from injector should succeed'() {
+        assert GogradleGlobal.getInstance(Key.get(DependencyInstaller, Git)) instanceof GitDependencyManager
+        assert GogradleGlobal.getInstance(Key.get(DependencyInstaller, Mercurial)) instanceof MercurialDependencyManager
+        assert GogradleGlobal.getInstance(Key.get(VcsAccessor, Git)) instanceof GitClientAccessor
+        assert GogradleGlobal.getInstance(Key.get(VcsAccessor, Mercurial)) instanceof HgClientAccessor
+    }
+
+    @Test
+    void 'getting root dir from injector should succeed'() {
+        assert GogradleGlobal.getInstance(Project).getRootDir()
     }
 }
