@@ -142,6 +142,13 @@ class GitClientAccessorTest {
     }
 
     @Test
+    @WithResource('')
+    void 'empty list should be returned if there is no tag'() {
+        "git init ${StringUtils.toUnixString(resource)}".execute()
+        assert accessor.getAllTags(resource) == []
+    }
+
+    @Test
     @AccessWeb
     @WithResource('')
     @WithMockInjector

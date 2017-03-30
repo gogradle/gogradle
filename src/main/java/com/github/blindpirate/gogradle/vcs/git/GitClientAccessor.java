@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.GitMercurialCommit;
 
@@ -93,13 +94,15 @@ public class GitClientAccessor extends GitMercurialAccessor {
     }
 
     private List<GitMercurialCommit> convertToCommits(ProcessResult result) {
-        return Stream.of(result.getStdout().split("\\n")).map(line -> {
-            String[] commitTagAndTime = line.split(":");
-            String commit = commitTagAndTime[0];
-            String tag = commitTagAndTime[1];
-            long ms = DateUtils.parseRaw(commitTagAndTime[2]);
-            return GitMercurialCommit.of(commit, tag, ms);
-        }).collect(Collectors.toList());
+        return Stream.of(result.getStdout().split("\\n"))
+                .filter(StringUtils::isNotBlank)
+                .map(line -> {
+                    String[] commitTagAndTime = line.split(":");
+                    String commit = commitTagAndTime[0];
+                    String tag = commitTagAndTime[1];
+                    long ms = DateUtils.parseRaw(commitTagAndTime[2]);
+                    return GitMercurialCommit.of(commit, tag, ms);
+                }).collect(Collectors.toList());
     }
 
     @Override
