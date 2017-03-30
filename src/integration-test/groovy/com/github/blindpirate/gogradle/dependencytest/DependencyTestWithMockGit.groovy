@@ -1,41 +1,89 @@
 package com.github.blindpirate.gogradle.dependencytest
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.support.IntegrationTestSupport
-import com.github.blindpirate.gogradle.support.WithMockGo
-import com.github.blindpirate.gogradle.support.WithProject
-import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
-@WithProject
-@WithResource('dependency-test-with-mock-git.zip')
 @WithMockGo
+@WithGitServer('git-repo.zip')
+@WithResource('')
+@WithIsolatedUserhome
 class DependencyTestWithMockGit extends IntegrationTestSupport {
-
-    File globalCache
-
-    File fsRoot
-
-    File mockGitRepo
+    File resource
 
     File projectRoot
 
+    File localDependencyRoot
+
     @Before
     void setUp() {
-        globalCache = new File(resource, 'global-cache')
-        projectRoot = new File(resource, 'project')
-        fsRoot = new File(resource, 'mock-fs-root')
-        mockGitRepo = new File(resource, 'mock-git-repo')
+        localDependencyRoot = new File(resource, 'localDependency')
+        IOUtils.write(localDependencyRoot, 'main.go', '')
+        IOUtils.write(localDependencyRoot, 'vendor/unrecognized/main.go', '')
+
+        projectRoot = new File(resource, 'projectRoot')
+
+        String buildDotGradle = """
+buildscript {
+    dependencies {
+        classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
+    }
+}
+apply plugin: 'com.github.blindpirate.gogradle'
+
+golang {
+    buildMode = 'DEVELOP'
+    packagePath = 'github.com/my/project'
+    goVersion = '1.7.1'
+    globalCacheFor 0,'second'
+    goExecutable = '${goBinPath}'
+}
+
+repositories {
+    golang {
+        name {it.startsWith('github')}
+        urlSubstitution {
+            def array=it.split('/')
+            return 'http://localhost:8080/'+array[1]+'-'+array[2]
+        }
+    }
+}
+
+
+dependencies {
+    build 'github.com/firstlevel/a'
+    build(
+            [name: 'github.com/firstlevel/b', version: '67b0cfae52118d8044c03c1564fd2845ba1b81e1'], // commit3
+            'github.com/firstlevel/c@1.0.0'
+    )
+
+    build('github.com/firstlevel/d') {
+        transitive = false
+    }
+
+    
+    build(name: 'github.com/firstlevel/e', commit: '95907c7d') { // commit5
+        transitive = true
+        exclude name: 'github.com/external/e'
+    }
+
+    build name: 'github.com/firstlevel/f', dir: "${StringUtils.toUnixString(localDependencyRoot)}"
+}
+
+"""
+
+        writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
 
     @Test
     void 'resolving dependencies of a complicated package should success'() {
-        IOUtils.write(resource, 'project/1.go', '')
         // given
         try {
             newBuild { build ->
@@ -55,9 +103,8 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
                 'github.com/firstlevel/e'    : 'commit5',
 
                 // vendorexternal/a#1 and vendorexternal/a#2 exist in firstlevel/a#2's dependencies
-                // and vendorexternal/a#1 wins because it is in vendor directory
-                // even though vendorexternal/a#2 is newer
-                'github.com/vendorexternal/a': 'commit1',
+                // and vendorexternal/a#2 wins because it is in lockfiles
+                'github.com/vendorexternal/a': 'commit2',
                 'github.com/vendorexternal/b': 'commit2',
 
                 'github.com/vendoronly/a'    : 'commit2',
@@ -88,14 +135,6 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
             println(stdout)
             assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
         }
-    }
-
-    @Override
-    List<String> buildArguments() {
-        return super.buildArguments() + ["-PmockFsRoot=${fsRoot.absolutePath}",
-                                         "-PmockGitRepo=${mockGitRepo.absolutePath}",
-                                         "-Puserhome=${userhome.absolutePath}",
-                                         "-Pclasspath=${System.getProperty('java.class.path').replace('\\', '/')}"]
     }
 
     @Override
