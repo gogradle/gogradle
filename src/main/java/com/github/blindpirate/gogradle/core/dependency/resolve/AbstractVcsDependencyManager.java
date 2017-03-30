@@ -155,7 +155,6 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         String url = VcsResolvedDependency.class.cast(dependency).getUrl();
         boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, Arrays.asList(url));
         if (repositoryNeedInit) {
-            IOUtils.clearDirectory(repoRoot);
             initRepository(dependency.getName(), Arrays.asList(url), repoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
         }
@@ -165,7 +164,6 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         List<String> expectedUrls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
         boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, expectedUrls);
         if (repositoryNeedInit) {
-            IOUtils.clearDirectory(repoRoot);
             initRepository(dependency.getName(), expectedUrls, repoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
         } else if (globalCacheManager.currentDependencyIsOutOfDate(dependency)) {
