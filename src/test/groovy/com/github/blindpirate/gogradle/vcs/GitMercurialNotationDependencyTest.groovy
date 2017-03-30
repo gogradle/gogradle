@@ -31,6 +31,7 @@ class GitMercurialNotationDependencyTest {
     void setUp() {
         dependency.name = 'github.com/a/b'
         dependency.commit = 'commitId'
+        dependency.url = 'url'
     }
 
     @Test
@@ -44,7 +45,7 @@ class GitMercurialNotationDependencyTest {
     }
 
     @Test
-    void 'git dependencies with same name and commit should be equal'() {
+    void 'git dependencies with same name and commit but not url should not be equal'() {
         // when
         GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
         GitMercurialNotationDependency dependency2 = withNameAndCommit('name', 'NEWEST_COMMIT')
@@ -54,7 +55,7 @@ class GitMercurialNotationDependencyTest {
         // when
         dependency1.setUrl('git@github.com:a/b.git')
         dependency2.setUrl('https://github.com/a/b.git')
-        assert dependency1 == dependency2
+        assert dependency1 != dependency2
     }
 
     @Test
@@ -68,7 +69,6 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'toString should succeed'() {
-        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId'}"
         dependency.url = 'https://github.com/a/b.git'
         assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', url='https://github.com/a/b.git'}"
         dependency.tag = '1.0.0'
@@ -84,8 +84,13 @@ class GitMercurialNotationDependencyTest {
         GitMercurialNotationDependency dependency2 = new GitNotationDependency()
         dependency2.name = 'github.com/a/b'
         dependency2.commit = 'commitId'
+        dependency2.url = 'url'
         assert dependency == dependency2
 
+        dependency2.url = 'anotherurl'
+        assert dependency != dependency2
+
+        dependency2.url = 'url'
         dependency2.name = 'github.com/a/c'
         assert dependency != dependency2
 
@@ -97,7 +102,7 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'hashCode should succeed'() {
-        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false)
+        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false, ['url'])
     }
 
     GitMercurialNotationDependency withNameAndCommit(String name, String commit) {
