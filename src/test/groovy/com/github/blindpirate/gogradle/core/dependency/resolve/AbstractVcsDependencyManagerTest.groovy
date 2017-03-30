@@ -58,18 +58,24 @@ class AbstractVcsDependencyManagerTest {
 
     File resource
 
+    File repoRoot
+
+    File targetDir
+
     @Before
     void setUp() {
+        repoRoot = IOUtils.mkdir(resource, 'repo')
+        targetDir = IOUtils.mkdir(resource, 'target')
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
-        IOUtils.write(resource, '.git', '')
+        IOUtils.write(repoRoot, 'vendor/root/package/main.go', 'This is main.go')
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         manager = new TestAbstractVcsDependencyManager(cacheManager)
 
-        when(subclassDelegate.determineVersion(resource, hostNotationDependency)).thenReturn('version')
-        when(subclassDelegate.getCurrentRepositoryRemoteUrl(resource)).thenReturn('url')
-        when(subclassDelegate.createResolvedDependency(hostNotationDependency, resource, 'version')).thenReturn(hostResolvedDependency)
+        when(subclassDelegate.determineVersion(repoRoot, hostNotationDependency)).thenReturn('version')
+        when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('url')
+        when(subclassDelegate.createResolvedDependency(hostNotationDependency, repoRoot, 'version')).thenReturn(hostResolvedDependency)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
@@ -79,7 +85,7 @@ class AbstractVcsDependencyManagerTest {
 
         when(vendorNotationDependency.getName()).thenReturn('thisisvendor')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')
-        when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(resource.toPath())
+        when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(repoRoot.toPath())
 
         when(hostNotationDependency.getUrls()).thenReturn(['url'])
         when(hostResolvedDependency.getUrl()).thenReturn('url')
@@ -89,15 +95,11 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'installing a vendor dependency hosting in vcs dependency should succeed'() {
         // given
-        File src = IOUtils.mkdir(resource, 'src')
-        File dest = IOUtils.mkdir(resource, 'dest')
-        IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
         when(hostResolvedDependency.getName()).thenReturn('host')
-        when(cacheManager.getGlobalPackageCachePath('host')).thenReturn(src.toPath())
         // when
-        manager.install(vendorResolvedDependency, dest)
+        manager.install(vendorResolvedDependency, targetDir)
         // then
-        assert new File(dest, 'main.go').getText() == 'This is main.go'
+        assert new File(targetDir, 'main.go').getText() == 'This is main.go'
     }
 
     @Test
@@ -142,7 +144,7 @@ class AbstractVcsDependencyManagerTest {
     void 'updating repository should be skipped if it is up-to-date'() {
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
-        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, resource)
+        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repoRoot)
     }
 
     @Test
@@ -152,7 +154,7 @@ class AbstractVcsDependencyManagerTest {
         when(cacheManager.currentDependencyIsOutOfDate(hostNotationDependency)).thenReturn(true)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(cacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
-        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, resource)
+        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repoRoot)
     }
 
     @Test
@@ -162,14 +164,14 @@ class AbstractVcsDependencyManagerTest {
         // when
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         // then
-        verify(subclassDelegate).updateRepository(hostNotationDependency, resource)
+        verify(subclassDelegate).updateRepository(hostNotationDependency, repoRoot)
         verify(cacheManager).updateCurrentDependencyLock(hostNotationDependency)
     }
 
     @Test
     void 'lock file should be updated after repository being initialized'() {
         // given
-        when(subclassDelegate.getCurrentRepositoryRemoteUrl(resource)).thenReturn('anotherUrl')
+        when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('anotherUrl')
         // when
         manager.resolve(configuration, hostNotationDependency)
         // then
@@ -180,11 +182,24 @@ class AbstractVcsDependencyManagerTest {
     void 'host dependency should be locked when installing'() {
         // when
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenReturn(null)
-        manager.install(vendorResolvedDependency, resource)
+        manager.install(vendorResolvedDependency, targetDir)
         ArgumentCaptor<GolangDependency> captor = ArgumentCaptor.forClass(GolangDependency)
         // then
         verify(cacheManager).runWithGlobalCacheLock(captor.capture(), any(Callable))
         assert captor.getValue().is(hostResolvedDependency)
+    }
+
+    @Test
+    void 'global cache dir should be re-initialized if it does not match url of resolved dependency'() {
+        // given
+        when(hostResolvedDependency.getUrl()).thenReturn('anotherUrl')
+
+        // when
+        manager.install(vendorResolvedDependency, resource)
+
+        // then
+        verify(subclassDelegate).initRepository(hostResolvedDependency.getName(), ['anotherUrl'], repoRoot)
+        verify(cacheManager).updateCurrentDependencyLock(hostResolvedDependency)
     }
 
 

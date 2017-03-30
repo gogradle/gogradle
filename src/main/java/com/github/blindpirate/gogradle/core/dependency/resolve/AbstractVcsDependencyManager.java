@@ -105,7 +105,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         try {
             ResolvedDependency realDependency = determineResolvedDependency(dependency);
             globalCacheManager.runWithGlobalCacheLock(realDependency, () -> {
-                restoreRepository(realDependency, targetDirectory);
+                restoreRepository(realDependency);
                 installUnderLock(dependency, targetDirectory);
                 return null;
             });
@@ -151,11 +151,13 @@ public abstract class AbstractVcsDependencyManager<VERSION>
 
     protected abstract VERSION determineVersion(File repository, NotationDependency dependency);
 
-    private void restoreRepository(ResolvedDependency dependency, File repoRoot) {
+    private void restoreRepository(ResolvedDependency dependency) {
+        File globalCacheRepoRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
+
         String url = VcsResolvedDependency.class.cast(dependency).getUrl();
-        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, Arrays.asList(url));
+        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(globalCacheRepoRoot, Arrays.asList(url));
         if (repositoryNeedInit) {
-            initRepository(dependency.getName(), Arrays.asList(url), repoRoot);
+            initRepository(dependency.getName(), Arrays.asList(url), globalCacheRepoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
         }
     }
@@ -193,8 +195,8 @@ public abstract class AbstractVcsDependencyManager<VERSION>
             if (expectedUrls.contains(url)) {
                 return false;
             } else {
-                LOGGER.warn("Repo " + globalCacheRepoRoot.getAbsolutePath()
-                        + "doesn't match url declared in dependency, it will be cleared.");
+                LOGGER.warn("Global cache " + globalCacheRepoRoot.getAbsolutePath()
+                        + " doesn't match url in dependency, it will be cleared.");
                 return true;
             }
         }
