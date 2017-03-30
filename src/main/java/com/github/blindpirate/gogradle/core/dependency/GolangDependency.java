@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import org.gradle.api.artifacts.Dependency;
 import org.gradle.api.specs.Spec;
 
@@ -29,6 +30,8 @@ public interface GolangDependency extends Dependency, Serializable {
      */
     @Override
     String getVersion();
+
+    GolangPackage getPackage();
 
     ResolvedDependency resolve(GolangConfiguration configuration);
 
