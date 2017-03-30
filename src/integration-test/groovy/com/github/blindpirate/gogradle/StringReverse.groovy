@@ -19,6 +19,15 @@ import org.junit.runner.RunWith
 class StringReverse extends IntegrationTestSupport {
     @Before
     void setUp() {
+        String buildDotGradle = """
+${buildDotGradleBase}
+golang {
+    packagePath='sample'
+}
+dependencies {
+    build 'github.com/golang/example'
+}
+"""
         IOUtils.write(resource, 'hello.go', helloDotGo)
         writeBuildAndSettingsDotGradle(buildDotGradle)
     }
@@ -27,7 +36,7 @@ class StringReverse extends IntegrationTestSupport {
     @AccessWeb
     void 'build string reverse example should succeed'() {
         newBuild { build ->
-            build.forTasks('dependencies build')
+            build.forTasks('dependencies', 'build')
         }
 
         assertDependencyOutput()
@@ -86,15 +95,7 @@ func main() {
     fmt.Println(stringutil.Reverse("!selpmaxe oG ,olleH"))
 }
 '''
-    String buildDotGradle = """
-${buildDotGradleBase}
-golang {
-    packagePath='sample'
-}
-dependencies {
-    build 'github.com/golang/example'
-}
-"""
+
 
     @Override
     File getProjectRoot() {
