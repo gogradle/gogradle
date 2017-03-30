@@ -16,15 +16,17 @@ import java.lang.annotation.Annotation
 class GogradleRunner extends BlockJUnit4ClassRunner {
 
     private Map annoToProcessorMap = [
-            (AccessWeb)       : AccessWebProcessor,
-            (MockOffline)     : MockOfflineProcessor,
-            (WithProject)     : WithProjectProcessor,
-            (WithResource)    : WithResourceProcessor,
-            (WithMockInjector): WithMockInjectorProcessor,
-            (WithMockGo)      : WithMockGoProcessor,
-            (OnlyWhen)        : OnlyWhenProcessor,
-            (OnlyOnPosix)     : OnlyOnPosixProcessor,
-            (OnlyOnWindows)   : OnlyOnWindowsProcessor
+            (AccessWeb)           : AccessWebProcessor,
+            (MockOffline)         : MockOfflineProcessor,
+            (WithProject)         : WithProjectProcessor,
+            (WithResource)        : WithResourceProcessor,
+            (WithMockInjector)    : WithMockInjectorProcessor,
+            (WithMockGo)          : WithMockGoProcessor,
+            (WithGitServer)       : WithGitServerProcessor,
+            (WithIsolatedUserhome): WithIsolatedUserhomeProcessor,
+            (OnlyWhen)            : OnlyWhenProcessor,
+            (OnlyOnPosix)         : OnlyOnPosixProcessor,
+            (OnlyOnWindows)       : OnlyOnWindowsProcessor
     ]
 
     private List<AnnotationAndProcessor> processors
