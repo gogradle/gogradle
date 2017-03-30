@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
@@ -9,27 +10,41 @@ import com.google.common.collect.ImmutableMap;
 
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VCS_KEY;
 
-public abstract class GitMercurialResolvedDependency extends AbstractResolvedDependency {
+public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
     private static final int COMMIT_PREFIX_LENGTH = 7;
     private String tag;
-    private String repoUrl;
+    private String url;
 
-    protected GitMercurialResolvedDependency(String name, String commitId, long commitTime) {
+    protected VcsResolvedDependency(String name,
+                                    String url,
+                                    String commitId,
+                                    long commitTime) {
         super(name, commitId, commitTime);
+        this.url = url;
     }
 
-    protected abstract VcsType getVcsType();
+    public abstract VcsType getVcsType();
+
+    public String getUrl() {
+        return url;
+    }
+
+    @Override
+    protected DependencyInstaller getInstaller() {
+        return getVcsType().getService(DependencyInstaller.class);
+    }
 
     @Override
     public Map<String, Object> toLockedNotation() {
         return ImmutableMap.of(
                 NAME_KEY, getName(),
                 VCS_KEY, getVcsType().getName(),
-                GitMercurialNotationDependency.URL_KEY, repoUrl,
+                GitMercurialNotationDependency.URL_KEY, getUrl(),
                 GitMercurialNotationDependency.COMMIT_KEY, getVersion());
     }
 
@@ -42,6 +57,25 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        VcsResolvedDependency that = (VcsResolvedDependency) o;
+        return Objects.equals(getVersion(), that.getVersion())
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(url, that.url);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(url, getVersion(), getName());
+    }
+
     public static GitMercurialResolvedDependencyBuilder builder(VcsType vcsType) {
         return new GitMercurialResolvedDependencyBuilder(vcsType);
     }
@@ -49,7 +83,7 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
     public static final class GitMercurialResolvedDependencyBuilder {
         private VcsType vcsType;
         private NotationDependency notationDependency;
-        private String repoUrl;
+        private String url;
         private String tag;
         private String commitId;
         private long commitTime;
@@ -59,8 +93,8 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
             this.vcsType = vcsType;
         }
 
-        public GitMercurialResolvedDependencyBuilder withRepoUrl(String repoUrl) {
-            this.repoUrl = repoUrl;
+        public GitMercurialResolvedDependencyBuilder withUrl(String repoUrl) {
+            this.url = repoUrl;
             return this;
         }
 
@@ -89,17 +123,17 @@ public abstract class GitMercurialResolvedDependency extends AbstractResolvedDep
             return this;
         }
 
-        public GitMercurialResolvedDependency build() {
-            GitMercurialResolvedDependency ret;
+        public VcsResolvedDependency build() {
+            VcsResolvedDependency ret;
             Assert.isTrue(vcsType == VcsType.GIT || vcsType == VcsType.MERCURIAL);
             if (vcsType == VcsType.GIT) {
-                ret = new GitResolvedDependency(name, commitId, commitTime);
+                ret = new GitResolvedDependency(name, url, commitId, commitTime);
             } else {
-                ret = new MercurialResolvedDependency(name, commitId, commitTime);
+                ret = new MercurialResolvedDependency(name, url, commitId, commitTime);
             }
-            ret.repoUrl = this.repoUrl;
             ret.tag = this.tag;
             ret.setFirstLevel(notationDependency.isFirstLevel());
+            ret.setPackage(notationDependency.getPackage());
             ret.transitiveDepExclusions = new HashSet<>(notationDependency.getTransitiveDepExclusions());
             return ret;
         }
