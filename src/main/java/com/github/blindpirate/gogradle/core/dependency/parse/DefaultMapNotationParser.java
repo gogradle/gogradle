@@ -134,6 +134,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
         GolangRepository repository = repositoryHandler.findMatchedRepository(dependency.getName());
         List<String> substitutedUrls = pkg.getUrls().stream()
                 .map(url -> repository.substitute(dependency.getName(), url))
+                .distinct()
                 .collect(Collectors.toList());
 
         dependency.setUrls(substitutedUrls);
