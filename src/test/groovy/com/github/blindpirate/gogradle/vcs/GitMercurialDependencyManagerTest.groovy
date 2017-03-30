@@ -37,7 +37,7 @@ import static org.mockito.Mockito.*
 class GitMercurialDependencyManagerTest {
 
     GitMercurialNotationDependency notationDependency = mockWithName(GitMercurialNotationDependency, 'github.com/a/b')
-    GitMercurialResolvedDependency resolvedDependency = mockWithName(GitMercurialResolvedDependency, 'github.com/a/b')
+    VcsResolvedDependency resolvedDependency = mockWithName(VcsResolvedDependency, 'github.com/a/b')
 
     String DEFAULT_BRANCH = 'DEFAULT_BRANCH'
 
@@ -113,7 +113,7 @@ class GitMercurialDependencyManagerTest {
     void assertResolvedDependency(ResolvedDependency result) {
         assert result.name == 'github.com/a/b'
         assert result.dependencies.isEmpty()
-        assert ReflectionUtils.getField(result, 'repoUrl') == repoUrl
+        assert ReflectionUtils.getField(result, 'url') == repoUrl
         assert ReflectionUtils.getField(result, 'tag') == 'tag'
         assert result.version == commitId
         assert result.updateTime == 123000L
@@ -133,23 +133,6 @@ class GitMercurialDependencyManagerTest {
         ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit)
         // then
         assertResolvedDependency(result)
-    }
-
-    @Test
-    void 'update time of vendor dependency should be set to last commit time of that directory'() {
-        // given
-        VendorResolvedDependency vendorResolvedDependency = mockWithName(VendorResolvedDependency, 'vendorResolvedDependency')
-        GolangDependencySet dependencies = DependencyUtils.asGolangDependencySet(vendorResolvedDependency)
-        when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(dependencies)
-        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File),)).thenReturn(dependencies)
-        when(vendorResolvedDependency.getHostDependency()).thenReturn(resolvedDependency)
-        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/path/to/vendor'))
-        when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
-        when(accessor.lastCommitTimeOfPath(resource, 'vendor/path/to/vendor')).thenReturn(456L)
-        // when
-        manager.resolve(configuration, notationDependency)
-        // then
-        verify(vendorResolvedDependency).setUpdateTime(456L)
     }
 
     @Test
@@ -227,11 +210,10 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown when every url has been tried'() {
         // given
-        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
         when(accessor.clone('url1', resource)).thenThrow(new IllegalStateException())
         when(accessor.clone('url2', resource)).thenThrow(new IllegalStateException())
         // when
-        manager.initRepository(notationDependency, resource)
+        manager.initRepository('notationDependency', ['url1', 'url2'], resource)
     }
 
     @Test
@@ -257,6 +239,14 @@ class GitMercurialDependencyManagerTest {
     void 'trying to resolve an inexistent commit should result in an exception'() {
         // given
         when(notationDependency.getCommit()).thenReturn('inexistent')
+        // when
+        manager.resolve(configuration, notationDependency)
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'trying to resolve an inexistent tag should result in an exception'() {
+        // given
+        when(notationDependency.getTag()).thenReturn('inexistent')
         // when
         manager.resolve(configuration, notationDependency)
     }

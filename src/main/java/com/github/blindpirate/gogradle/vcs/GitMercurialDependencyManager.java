@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -22,7 +21,6 @@ import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
 
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
@@ -42,8 +40,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
-        GitMercurialResolvedDependency gitMercurialResolvedDependency = (GitMercurialResolvedDependency) dependency;
-        getAccessor().checkout(globalCachePath.toFile(), gitMercurialResolvedDependency.getVersion());
+        VcsResolvedDependency vcsResolvedDependency = (VcsResolvedDependency) dependency;
+        getAccessor().checkout(globalCachePath.toFile(), vcsResolvedDependency.getVersion());
     }
 
     @Override
@@ -52,32 +50,21 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
                                                           GitMercurialCommit commit) {
         VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
 
-        GitMercurialResolvedDependency ret = GitMercurialResolvedDependency.builder(getVcsType())
+        VcsResolvedDependency ret = VcsResolvedDependency.builder(getVcsType())
                 .withNotationDependency(dependency)
                 .withName(pkg.getRootPathString())
                 .withCommitId(commit.getId())
                 .withTag(GitMercurialNotationDependency.class.cast(dependency).getTag())
-                .withRepoUrl(getAccessor().getRemoteUrl(repoRoot))
+                .withUrl(getAccessor().getRemoteUrl(repoRoot))
                 .withCommitTime(commit.getCommitTime())
                 .build();
         GolangDependencySet dependencies = DEFAULT_STRATEGY.produce(ret, repoRoot, dependencyVisitor, BUILD);
         ret.setDependencies(dependencies);
 
-        setVendorUpdateTimeIfNecessary(repoRoot, dependencies);
         return ret;
     }
 
     protected abstract VcsType getVcsType();
-
-    private void setVendorUpdateTimeIfNecessary(File repoRoot, GolangDependencySet dependencies) {
-        dependencies.flatten().stream()
-                .filter(dependency -> dependency instanceof VendorResolvedDependency)
-                .map(dependency -> (VendorResolvedDependency) dependency)
-                .forEach(dependency -> {
-                    String relativePath = toUnixString(dependency.getRelativePathToHost());
-                    dependency.setUpdateTime(getAccessor().lastCommitTimeOfPath(repoRoot, relativePath));
-                });
-    }
 
     @Override
     protected void resetToSpecificVersion(File repository, GitMercurialCommit commit) {
@@ -97,6 +84,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
             commit = findCommitBySemVersion(repository, notationDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
+            } else {
+                throw DependencyResolutionException.cannotFindGitTag(dependency, notationDependency.getTag());
             }
         }
 
@@ -146,13 +135,16 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     }
 
     @Override
-    protected void initRepository(NotationDependency dependency, File repoRoot) {
-        tryCloneWithUrls(dependency, repoRoot);
+    protected void initRepository(String dependencyName, List<String> urls, File repoRoot) {
+        tryCloneWithUrls(dependencyName, urls, repoRoot);
     }
 
-    private void tryCloneWithUrls(NotationDependency dependency, File directory) {
-        List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
-        Assert.isNotEmpty(urls, "Urls of " + dependency + " should not be empty!");
+    protected String getCurrentRepositoryRemoteUrl(File globalCacheRepoRoot) {
+        return getAccessor().getRemoteUrl(globalCacheRepoRoot);
+    }
+
+    private void tryCloneWithUrls(String name, List<String> urls, File directory) {
+        Assert.isNotEmpty(urls, "Urls of " + name + " should not be empty!");
         for (int i = 0; i < urls.size(); ++i) {
             IOUtils.clearDirectory(directory);
 
@@ -163,18 +155,10 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
             } catch (Throwable e) {
                 LOGGER.quiet("Cloning with url {} failed, the cause is {}", url, e.getMessage());
                 if (i == urls.size() - 1) {
-                    throw DependencyResolutionException.cannotCloneRepository(dependency, e);
+                    throw DependencyResolutionException.cannotCloneRepository(name, e);
                 }
             }
         }
     }
-
-    @Override
-    protected boolean repositoryMatch(File repoRoot, NotationDependency dependency) {
-        String remoteUrl = getAccessor().getRemoteUrl(repoRoot);
-        List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
-        return urls.contains(remoteUrl);
-    }
-
 
 }
