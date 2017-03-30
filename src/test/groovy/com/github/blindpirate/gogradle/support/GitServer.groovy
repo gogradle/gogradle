@@ -1,0 +1,80 @@
+package com.github.blindpirate.gogradle.support
+
+import org.eclipse.jetty.server.Server
+import org.eclipse.jetty.servlet.ServletHandler
+import org.eclipse.jetty.servlet.ServletHolder
+import org.eclipse.jgit.errors.RepositoryNotFoundException
+import org.eclipse.jgit.http.server.GitServlet
+import org.eclipse.jgit.lib.Repository
+import org.eclipse.jgit.storage.file.FileRepositoryBuilder
+import org.eclipse.jgit.transport.ServiceMayNotContinueException
+import org.eclipse.jgit.transport.resolver.RepositoryResolver
+import org.eclipse.jgit.transport.resolver.ServiceNotAuthorizedException
+import org.eclipse.jgit.transport.resolver.ServiceNotEnabledException
+
+import javax.servlet.http.HttpServletRequest
+
+class GitServer {
+    public static final int DEFAULT_PORT = 8080
+    private Map<String, Repository> repos = [:]
+
+    private Server server
+
+    static GitServer newServer() {
+        return new GitServer()
+    }
+
+    static GitServer newServer(File repos) {
+        GitServer ret = new GitServer()
+        if (new File(repos, ".git").exists()) {
+            ret.addRepo(repos.getName(), repos)
+        } else {
+            repos.listFiles().each {
+                ret.addRepo(it.name, it)
+            }
+        }
+        return ret
+    }
+
+    void addRepo(String path, File repo) throws IOException {
+        repos.put(path, newRepository(repo))
+    }
+
+    void start(int port) throws Exception {
+        server = new Server(port)
+
+        ServletHandler handler = new ServletHandler()
+        server.setHandler(handler)
+
+        GitServlet gs = newServlet()
+        handler.addServletWithMapping(new ServletHolder(gs), "/*")
+        server.start()
+    }
+
+    void stop() throws Exception {
+        server.stop()
+    }
+
+    private GitServlet newServlet() {
+        GitServlet gs = new GitServlet()
+        gs.setRepositoryResolver(new RepositoryResolver<HttpServletRequest>() {
+            @Override
+            Repository open(HttpServletRequest req, String name) throws RepositoryNotFoundException,
+                    ServiceNotAuthorizedException, ServiceNotEnabledException, ServiceMayNotContinueException {
+                Repository repository = repos.get(name)
+                repository.incrementOpen()
+                return repository
+            }
+        })
+        return gs
+    }
+
+    private Repository newRepository(File dir) throws IOException {
+        return new FileRepositoryBuilder().setGitDir(new File(dir, ".git"))
+                .readEnvironment()
+                .findGitDir()
+                .build()
+    }
+
+}
+
