@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.tooling.*
 import org.junit.Before
 
@@ -33,6 +34,10 @@ golang {
     goExecutable = '${goBinPath}'
 }
 """
+        if (userhome != null) {
+            buildDotGradleBase = "System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')" + buildDotGradleBase
+        }
+
         initStdoutStderr()
     }
 
@@ -100,7 +105,7 @@ golang {
     }
 
     List<String> buildArguments() {
-        return ["-PgoBinPath=${getGoBinPath()}", "--stacktrace"]
+        return ["--stacktrace"]
     }
 
     abstract File getProjectRoot()

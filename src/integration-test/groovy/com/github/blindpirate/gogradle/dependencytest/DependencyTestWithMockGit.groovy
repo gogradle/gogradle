@@ -35,6 +35,8 @@ buildscript {
         classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
     }
 }
+System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
+
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
