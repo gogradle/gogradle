@@ -9,6 +9,7 @@ public interface DependencyResolver {
      * Resolves a dependency.
      * During this process, right version will be determined by VCS.
      *
+     * @param configuration configuration this dependency in
      * @param dependency dependency to be resolved
      * @return the resolved dependency
      */
