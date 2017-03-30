@@ -12,6 +12,8 @@ import org.junit.runner.RunWith
 import javax.inject.Inject
 import java.nio.file.Paths
 
+import static org.mockito.Mockito.when
+
 @RunWith(GogradleRunner)
 @WithResource('vendor_test.zip')
 class VendorWalkTest extends GogradleModuleSupport {
@@ -24,6 +26,7 @@ class VendorWalkTest extends GogradleModuleSupport {
     @Test
     void 'create cascading vendor package should succeed'() {
         // when
+        when(project.getRootDir()).thenReturn(resource)
         LocalDirectoryDependency localPackage = LocalDirectoryDependency.fromLocal('testpackage', resource);
         GolangDependencySet dependencies = factory.produce(localPackage, resource)
         // then
