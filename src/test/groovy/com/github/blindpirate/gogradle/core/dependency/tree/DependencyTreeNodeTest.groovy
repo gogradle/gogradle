@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import groovy.transform.EqualsAndHashCode
 import org.junit.Before
 import org.junit.Test
 
@@ -71,6 +72,7 @@ a
         return new Temp(name, version, 0L)
     }
 
+    @EqualsAndHashCode(includes = ['name', 'version'])
     static class Temp extends AbstractResolvedDependency {
         private static final int serialVersionUID = 1
 
@@ -79,7 +81,7 @@ a
         }
 
         @Override
-        protected Class<? extends DependencyInstaller> getInstallerClass() {
+        protected DependencyInstaller getInstaller() {
             return null
         }
 

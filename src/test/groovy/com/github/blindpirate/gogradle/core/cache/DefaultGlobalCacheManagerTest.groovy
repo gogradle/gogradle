@@ -11,7 +11,7 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
-import com.github.blindpirate.gogradle.vcs.GitMercurialResolvedDependency
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.google.inject.Key
 import org.apache.commons.io.FileUtils
@@ -47,7 +47,7 @@ class DefaultGlobalCacheManagerTest {
     @Mock
     GitMercurialNotationDependency notationDependency
     @Mock
-    GitMercurialResolvedDependency resolvedDependency
+    VcsResolvedDependency resolvedDependency
     @Mock
     Project project
     @Mock

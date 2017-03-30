@@ -159,7 +159,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public void updateCurrentDependencyLock(NotationDependency dependency) {
+    public void updateCurrentDependencyLock(GolangDependency dependency) {
         try {
             // On windows we have to write file like this
             FileChannel currentLockFile = fileChannels.get();
@@ -174,17 +174,17 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     private File createLockFileIfNecessary(GolangDependency dependency) {
         File lockFile = getGlobalMetadata(dependency.getName()).toFile();
         if (!lockFile.exists()) {
-            write(lockFile, toYaml(newMetadata((NotationDependency) dependency)));
+            write(lockFile, toYaml(newMetadata(dependency)));
         }
         return lockFile;
     }
 
-    private GlobalCacheMetadata newMetadata(NotationDependency dependency) {
+    private GlobalCacheMetadata newMetadata(GolangDependency dependency) {
         VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
         return GlobalCacheMetadata.newMetadata(pkg);
     }
 
-    private GlobalCacheMetadata updatedMetaData(NotationDependency dependency) {
+    private GlobalCacheMetadata updatedMetaData(GolangDependency dependency) {
         VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
         Path cacheRoot = getGlobalPackageCachePath(pkg.getRootPathString());
 

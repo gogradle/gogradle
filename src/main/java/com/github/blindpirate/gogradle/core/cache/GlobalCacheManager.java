@@ -34,5 +34,5 @@ public interface GlobalCacheManager {
 
     boolean currentDependencyIsOutOfDate(NotationDependency dependency);
 
-    void updateCurrentDependencyLock(NotationDependency dependency);
+    void updateCurrentDependencyLock(GolangDependency dependency);
 }
