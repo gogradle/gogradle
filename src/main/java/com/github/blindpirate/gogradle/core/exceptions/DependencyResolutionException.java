@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.exceptions;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
@@ -17,8 +18,8 @@ public final class DependencyResolutionException extends GradleException {
         super(message, cause);
     }
 
-    public static DependencyResolutionException cannotCloneRepository(GolangDependency dependency, Throwable e) {
-        return new DependencyResolutionException("Cloning repository of " + dependency.getName() + " failed.", e);
+    public static DependencyResolutionException cannotCloneRepository(String name, Throwable e) {
+        return new DependencyResolutionException("Cloning repository of " + name + " failed.", e);
     }
 
     public static DependencyResolutionException cannotParseNotation(Object notation) {
@@ -30,7 +31,7 @@ public final class DependencyResolutionException extends GradleException {
         return new DependencyResolutionException("Cannot find commit " + gitMercurialNotationDependency.getCommit()
                 + " in repository of "
                 + gitMercurialNotationDependency.getName()
-                + ", did they force to delete this commit?");
+                + ", did they delete this commit?");
     }
 
     public static DependencyResolutionException cannotResolveDependency(
@@ -47,5 +48,12 @@ public final class DependencyResolutionException extends GradleException {
                                                                ResolvedDependency resolvedDependency) {
         return new DependencyResolutionException("vendor dependency " + vendorNotationDependency.toString()
                 + " does not exist in transitive dependencies in " + resolvedDependency);
+    }
+
+    public static DependencyResolutionException cannotFindGitTag(NotationDependency dependency, String tag) {
+        return new DependencyResolutionException("Cannot find tag " + tag
+                + " in repository of "
+                + GitMercurialNotationDependency.class.cast(dependency).getName()
+                + ", did they delete this tag?");
     }
 }
