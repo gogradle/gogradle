@@ -14,13 +14,6 @@ import org.junit.runner.RunWith
 class IdeaPluginIntegrationTest extends IntegrationTestSupport implements Serializable {
     static final long serialVersionUID = 1L
 
-    String buildDotGradle = """
-${buildDotGradleBase}
-golang {
-    packagePath='test'
-}
-"""
-
     @Override
     File getProjectRoot() {
         return resource
@@ -28,6 +21,12 @@ golang {
 
     @Before
     void setUp() {
+        String buildDotGradle = """
+${buildDotGradleBase}
+golang {
+    packagePath='test'
+}
+"""
         writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
