@@ -71,6 +71,10 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
+    testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.1.201703071140-r'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.2.v20170220'
+    testCompile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.2.v20170220'
+    testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '4.6.1.201703071140-r'
 }
 /************** test **************/
 // Define integration test task
