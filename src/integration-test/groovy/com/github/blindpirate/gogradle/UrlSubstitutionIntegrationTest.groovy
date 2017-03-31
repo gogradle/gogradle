@@ -1,11 +1,11 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.support.GitServer
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
+import com.github.blindpirate.gogradle.support.WithGitRepo
+import com.github.blindpirate.gogradle.support.WithIsolatedUserhome
 import com.github.blindpirate.gogradle.support.WithMockGo
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.IOUtils
-import org.junit.After
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -13,18 +13,17 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockGo
+@WithIsolatedUserhome
+@WithGitRepo(repoName = 'myawesomeproject', fileName = 'main.go')
 class UrlSubstitutionIntegrationTest extends IntegrationTestSupport {
-
-    File projectRoot
-    File repoRoot
-    GitServer server
 
     @Before
     void setUp() {
         String buildDotGradle = """
+System.setProperty('gradle.user.home',"${StringUtils.toUnixString(userhome)}")
 buildscript {
     dependencies {
-        classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
+        classpath files(new File(rootDir, '../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
     }
 }
 
@@ -48,25 +47,12 @@ dependencies {
     build 'my/awesome/project'
 }
 """
-        projectRoot = IOUtils.mkdir(resource, 'projectRoot')
-        repoRoot = IOUtils.mkdir(resource, 'repoRoot')
-
-        GitServer.createRepository(repoRoot, 'main.go')
-        server = GitServer.newServer()
-        server.addRepo('myawesomeproject', repoRoot)
-        server.start(GitServer.DEFAULT_PORT)
-
-        IOUtils.write(projectRoot, 'build.gradle', buildDotGradle)
-    }
-
-    @After
-    void clearUp() {
-        server.stop()
+        writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
     @Override
     File getProjectRoot() {
-        return projectRoot
+        return resource
     }
 
 
@@ -81,6 +67,6 @@ dependencies {
             println(stdout)
         }
 
-        assert new File(projectRoot, ".gogradle/build_gopath/src/my/awesome/project/main.go").exists()
+        assert new File(resource, ".gogradle/build_gopath/src/my/awesome/project/main.go").exists()
     }
 }

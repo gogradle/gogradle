@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
+import com.github.blindpirate.gogradle.support.WithGitRepo
+import com.github.blindpirate.gogradle.support.WithIsolatedUserhome
+import com.github.blindpirate.gogradle.support.WithMockGo
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
@@ -11,7 +13,9 @@ import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class UnrecognizedPackageTest extends IntegrationTestSupport {
+@WithIsolatedUserhome
+@WithMockGo
+class UnrecognizedPackageIntegrationTest extends IntegrationTestSupport {
 
     String unrecognized1Go = """
 package main
@@ -46,6 +50,7 @@ import (
     @Test
     void 'build should succeed if unrecognized package is excluded'() {
         writeBuildAndSettingsDotGradle("""
+System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
 buildscript {
     dependencies {
         classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
@@ -54,6 +59,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath='my/project'
+    goExecutable='${goBinPath}'
 }
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
@@ -68,9 +74,10 @@ dependencies {
     }
 
     @Test
-    @AccessWeb
+    @WithGitRepo(repoName = 'helloworld', fileName = 'helloworld.go')
     void 'build should succeed if url of unrecognized package is provided'() {
         writeBuildAndSettingsDotGradle("""
+System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
 buildscript {
     dependencies {
         classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
@@ -79,11 +86,12 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath='my/project'
+    goExecutable='${goBinPath}'
 }
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')
-    
-    build (name:'unrecognized2', url: 'https://github.com/blindpirate/test-for-gogradle')
+
+    build (name:'unrecognized2', url: 'http://localhost:8080/helloworld')
 }
 
 """)
@@ -96,6 +104,7 @@ dependencies {
     @Test
     void 'build should succeed if unrecognized package is provided as dir'() {
         writeBuildAndSettingsDotGradle("""
+System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
 buildscript {
     dependencies {
         classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
@@ -104,6 +113,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath='my/project'
+    goExecutable='${goBinPath}'
 }
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')
