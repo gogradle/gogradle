@@ -22,6 +22,10 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
             ResolvedDependency existent = retrieve(dependencyToResolve.getName());
             if (existent == null) {
                 return registerSucceed(dependencyToResolve);
+            } else if (existent == dependencyToResolve) {
+                // in case when an unrecognized package is resolved at top-level
+                // all its sub package will be resolved as itself
+                return false;
             } else if (isPrefix(existent.getName(), dependencyToResolve.getName())) {
                 throw new IllegalStateException("Package " + existent.getName()
                         + " conflict with " + dependencyToResolve.getName());

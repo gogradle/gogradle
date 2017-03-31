@@ -29,7 +29,7 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
         for (int i = path.getNameCount(); i > 0; i--) {
             Path subpath = path.subpath(0, i);
             Optional<GlobalCacheMetadata> metadata = globalCacheManager.getMetadata(subpath);
-            if (metadata.isPresent()) {
+            if (metadata.isPresent() && !metadata.get().isTemp()) {
                 VcsGolangPackage pkg = VcsGolangPackage.builder()
                         .withPath(packagePath)
                         .withRootPath(subpath)

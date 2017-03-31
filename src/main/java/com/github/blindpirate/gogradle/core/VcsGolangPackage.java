@@ -15,8 +15,13 @@ public class VcsGolangPackage extends GolangPackage {
     private String rootPathString;
     private VcsType vcsType;
     private List<String> urls;
+    private boolean temp;
 
-    private VcsGolangPackage(Path path) {
+    public boolean isTemp() {
+        return temp;
+    }
+
+    protected VcsGolangPackage(Path path) {
         super(path);
     }
 
@@ -35,7 +40,6 @@ public class VcsGolangPackage extends GolangPackage {
     public VcsType getVcsType() {
         return vcsType;
     }
-
 
     public String getUrl() {
         return isEmpty(urls) ? null : urls.get(0);
@@ -71,7 +75,6 @@ public class VcsGolangPackage extends GolangPackage {
                 .build();
     }
 
-
     public static Builder builder() {
         return new Builder();
     }
@@ -79,8 +82,9 @@ public class VcsGolangPackage extends GolangPackage {
     public static final class Builder {
         private Path path;
         private Path rootPath;
-        private VcsType vcsType;
+        private VcsType vcsType = VcsType.GIT;
         private List<String> urls;
+        private boolean temp = false;
 
         private Builder() {
         }
@@ -118,11 +122,17 @@ public class VcsGolangPackage extends GolangPackage {
             return this;
         }
 
+        public Builder withTemp(boolean temp) {
+            this.temp = temp;
+            return this;
+        }
+
         public VcsGolangPackage build() {
             VcsGolangPackage vcsGolangPackage = new VcsGolangPackage(path);
             vcsGolangPackage.rootPathString = StringUtils.toUnixString(this.rootPath);
             vcsGolangPackage.urls = this.urls;
             vcsGolangPackage.vcsType = this.vcsType;
+            vcsGolangPackage.temp = this.temp;
             return vcsGolangPackage;
         }
     }
@@ -138,3 +148,4 @@ public class VcsGolangPackage extends GolangPackage {
     }
 
 }
+

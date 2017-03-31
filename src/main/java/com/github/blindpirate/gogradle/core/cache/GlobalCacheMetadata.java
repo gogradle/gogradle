@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.common.WithApiVersion;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class GlobalCacheMetadata extends WithApiVersion {
     @JsonProperty("originalUrls")
-    private List<String> originalUrls;
+    private List<String> originalUrls = new ArrayList<>();
 
     @JsonProperty("lastUpdated")
     private LastUpdated lastUpdated;
@@ -35,18 +36,27 @@ public class GlobalCacheMetadata extends WithApiVersion {
         return lastUpdated.time;
     }
 
+    @JsonIgnore
+    public boolean isTemp() {
+        return vcs == null;
+    }
+
     public static GlobalCacheMetadata newMetadata(VcsGolangPackage pkg) {
         GlobalCacheMetadata metadata = new GlobalCacheMetadata();
-        metadata.originalUrls = pkg.getUrls();
-        metadata.vcs = pkg.getVcsType().getName();
+        if (!pkg.isTemp()) {
+            metadata.originalUrls = pkg.getUrls();
+            metadata.vcs = pkg.getVcsType().getName();
+        }
         metadata.lastUpdated = new LastUpdated();
         return metadata;
     }
 
     public static GlobalCacheMetadata updatedMetadata(VcsGolangPackage pkg, String currentUrl) {
         GlobalCacheMetadata metadata = new GlobalCacheMetadata();
-        metadata.originalUrls = pkg.getUrls();
-        metadata.vcs = pkg.getVcsType().getName();
+        if (!pkg.isTemp()) {
+            metadata.originalUrls = pkg.getUrls();
+            metadata.vcs = pkg.getVcsType().getName();
+        }
         metadata.lastUpdated = new LastUpdated();
         metadata.lastUpdated.time = System.currentTimeMillis();
         metadata.lastUpdated.url = currentUrl;
