@@ -11,6 +11,7 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
@@ -25,7 +26,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 
 /**
  * Converts a map notation to a {@link NotationDependency}
@@ -64,7 +65,9 @@ public class DefaultMapNotationParser implements MapNotationParser {
                 return resultInCache.get();
             }
             NotationDependency ret = doParse(notation, pkg);
-            unresolvedPackageResultCache.put(Paths.get(ret.getName()), ret);
+            if (!(ret instanceof UnrecognizedPackageNotationDependency)) {
+                unresolvedPackageResultCache.put(Paths.get(ret.getName()), ret);
+            }
             return ret;
         } else {
             return doParse(notation, pkg);
@@ -152,7 +155,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
 
     private VcsType determineVcs(Map<String, Object> notation) {
         String vcs = MapUtils.getString(notation, VCS_KEY);
-        if (vcs == null) {
+        if (StringUtils.isBlank(vcs)) {
             notation.put(VCS_KEY, VcsType.GIT.getName());
             return VcsType.GIT;
         } else {
