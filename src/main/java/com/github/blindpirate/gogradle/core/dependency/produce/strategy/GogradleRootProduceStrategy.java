@@ -24,7 +24,7 @@ import java.io.File;
  * a scan for external dependency management tools will be performed.
  */
 @Singleton
-public class GogradleRootProduceStrategy extends ExclusionInheritanceProduceStrategry {
+public class GogradleRootProduceStrategy extends ExclusionInheritanceProduceStrategy {
 
     private final GolangPluginSetting settings;
     private final ConfigurationContainer configurationContainer;

@@ -16,7 +16,7 @@ import java.io.File;
  * Otherwise, as a fallback, it will scan source code to get dependencies.
  */
 @Singleton
-public class DefaultDependencyProduceStrategy extends ExclusionInheritanceProduceStrategry {
+public class DefaultDependencyProduceStrategy extends ExclusionInheritanceProduceStrategy {
     @Override
     @DebugLog
     public GolangDependencySet doProduce(ResolvedDependency dependency,

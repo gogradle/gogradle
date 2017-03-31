@@ -7,7 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 
 import java.io.File;
 
-public abstract class ExclusionInheritanceProduceStrategry implements DependencyProduceStrategy {
+public abstract class ExclusionInheritanceProduceStrategy implements DependencyProduceStrategy {
     @Override
     public GolangDependencySet produce(ResolvedDependency dependency,
                                        File rootDir,

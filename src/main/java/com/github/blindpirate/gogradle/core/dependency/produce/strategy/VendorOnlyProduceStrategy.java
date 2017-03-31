@@ -9,7 +9,7 @@ import javax.inject.Singleton;
 import java.io.File;
 
 @Singleton
-public class VendorOnlyProduceStrategy extends ExclusionInheritanceProduceStrategry {
+public class VendorOnlyProduceStrategy extends ExclusionInheritanceProduceStrategy {
     @Override
     @DebugLog
     public GolangDependencySet doProduce(ResolvedDependency dependency,
