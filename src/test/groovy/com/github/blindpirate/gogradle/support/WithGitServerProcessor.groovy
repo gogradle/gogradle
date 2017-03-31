@@ -9,7 +9,6 @@ import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
 import static com.github.blindpirate.gogradle.util.IOUtils.deleteQuitely
 
 class WithGitServerProcessor extends GogradleRunnerProcessor<WithGitServer> {
-    private static final int DEFAULT_PORT = 8080
     File resourceDir
     GitServer gitServer = GitServer.newServer()
 
@@ -37,7 +36,7 @@ class WithGitServerProcessor extends GogradleRunnerProcessor<WithGitServer> {
             }
         }
 
-        gitServer.start(DEFAULT_PORT)
+        gitServer.start(GitServer.DEFAULT_PORT)
     }
 
     def decompressResourceToDir(String resourceName, File destDir) {
