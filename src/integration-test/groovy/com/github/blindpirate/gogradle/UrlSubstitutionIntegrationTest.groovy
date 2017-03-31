@@ -20,18 +20,9 @@ class UrlSubstitutionIntegrationTest extends IntegrationTestSupport {
     @Before
     void setUp() {
         String buildDotGradle = """
-System.setProperty('gradle.user.home',"${StringUtils.toUnixString(userhome)}")
-buildscript {
-    dependencies {
-        classpath files(new File(rootDir, '../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
-    }
-}
-
-apply plugin: 'com.github.blindpirate.gogradle'
-
+${buildDotGradleBase}
 golang {
     packagePath='my/project'
-    goExecutable='${goBinPath}'
 }
 
 repositories {
