@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -39,7 +40,7 @@ golang {
     packagePath='my/project'
 }
 dependencies {
-    build (name:'a', dir: '${new File(resource, "a")}'){
+    build (name:'a', dir: '${StringUtils.toUnixString(new File(resource, "a"))}'){
         exclude name:'e'
     }
 }
