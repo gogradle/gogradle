@@ -8,18 +8,18 @@ import org.junit.runners.model.FrameworkMethod
 import static com.github.blindpirate.gogradle.GogradleRunner.tmpRandomDirectory
 import static com.github.blindpirate.gogradle.util.IOUtils.deleteQuitely
 
-class WithGitServerProcessor extends GogradleRunnerProcessor<WithGitServer> {
+class WithGitReposProcessor extends GogradleRunnerProcessor<WithGitRepos> {
     File resourceDir
     GitServer gitServer = GitServer.newServer()
 
     @Override
-    void beforeTest(Object instance, FrameworkMethod method, WithGitServer annotation) {
+    void beforeTest(Object instance, FrameworkMethod method, WithGitRepos annotation) {
         setUpGitServer(annotation.value())
         ReflectionUtils.setFieldSafely(instance, 'repositories', resourceDir)
     }
 
     @Override
-    void afterTest(Object instance, FrameworkMethod method, WithGitServer annotation) {
+    void afterTest(Object instance, FrameworkMethod method, WithGitRepos annotation) {
         gitServer.stop()
         deleteQuitely(resourceDir)
     }
