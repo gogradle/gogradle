@@ -44,7 +44,7 @@ golang {
     packagePath = 'github.com/my/project'
     goVersion = '1.7.1'
     globalCacheFor 0,'second'
-    goExecutable = '${goBinPath}'
+    goExecutable = '${StringUtils.toUnixString(goBinPath)}'
 }
 
 repositories {

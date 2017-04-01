@@ -59,7 +59,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath='my/project'
-    goExecutable='${goBinPath}'
+    goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
@@ -86,7 +86,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath='my/project'
-    goExecutable='${goBinPath}'
+    goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')
@@ -113,7 +113,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath='my/project'
-    goExecutable='${goBinPath}'
+    goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')

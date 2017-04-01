@@ -118,7 +118,7 @@ dependencies {
     build name:'github.com/my/project',url:'${repoUrl}'
 }
 golang {
-    goExecutable = '${goBinPath}'
+    goExecutable = '${StringUtils.toUnixString(goBinPath)}'
 }
 """
             writeBuildAndSettingsDotGradle(buildDotGradle)

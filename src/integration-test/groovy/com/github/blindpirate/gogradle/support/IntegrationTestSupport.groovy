@@ -31,7 +31,7 @@ buildscript {
 }
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
-    goExecutable = '${goBinPath}'
+    goExecutable = '${StringUtils.toUnixString(goBinPath)}'
 }
 """
         if (userhome != null) {
