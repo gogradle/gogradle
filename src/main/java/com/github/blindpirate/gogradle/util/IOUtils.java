@@ -203,6 +203,9 @@ public final class IOUtils {
 
     public static void clearDirectory(File dir) {
         try {
+            if (dir == null || !dir.exists()) {
+                return;
+            }
             FileUtils.cleanDirectory(dir);
         } catch (IOException e) {
             throw ExceptionHandler.uncheckException(e);
