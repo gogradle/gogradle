@@ -78,7 +78,7 @@ class HgClientAccessorTest {
     @Test
     @AccessWeb
     void 'pulling should succeed'() {
-        accessor.pull(resource)
+        accessor.update(resource)
         assert new File(resource, 'commit3').exists()
     }
 

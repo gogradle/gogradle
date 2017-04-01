@@ -75,6 +75,11 @@ class GitMercurialAccessorTest {
         }
 
         @Override
+        String getDefaultBranch(File repoRoot) {
+            return null
+        }
+
+        @Override
         String getRemoteUrl(File repoRoot) {
             return null
         }
@@ -105,7 +110,7 @@ class GitMercurialAccessorTest {
         }
 
         @Override
-        void pull(File repoRoot) {
+        void update(File repoRoot) {
 
         }
 

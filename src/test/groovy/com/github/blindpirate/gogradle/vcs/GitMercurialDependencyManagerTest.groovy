@@ -88,6 +88,7 @@ class GitMercurialDependencyManagerTest {
         when(commit.getCommitTime()).thenReturn(123000L)
 
         when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
+        when(accessor.getDefaultBranch(resource)).thenReturn(DEFAULT_BRANCH)
         when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
         when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(new GolangDependencySet())
         when(visitor.visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
@@ -143,7 +144,7 @@ class GitMercurialDependencyManagerTest {
         // when:
         manager.resolve(configuration, notationDependency)
         // then:
-        verify(accessor).pull(resource)
+        verify(accessor).update(resource)
     }
 
     @Test
@@ -162,7 +163,7 @@ class GitMercurialDependencyManagerTest {
         // when:
         manager.resolve(configuration, notationDependency)
         // then:
-        verify(accessor, times(0)).pull(resource)
+        verify(accessor, times(0)).update(resource)
     }
 
     @Test
@@ -302,10 +303,6 @@ class GitMercurialDependencyManagerTest {
             this.accessor = accessor
         }
 
-        @Override
-        protected String getDefaultBranchName() {
-            return DEFAULT_BRANCH
-        }
 
         @Override
         protected GitMercurialAccessor getAccessor() {

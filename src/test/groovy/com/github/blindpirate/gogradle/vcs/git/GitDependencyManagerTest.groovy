@@ -19,11 +19,6 @@ class GitDependencyManagerTest {
     }
 
     @Test
-    void 'default branch of git is master'() {
-        assert manager.defaultBranchName == 'master'
-    }
-
-    @Test
     void 'getting accessor should succeed'() {
         assert manager.accessor == accessor
     }

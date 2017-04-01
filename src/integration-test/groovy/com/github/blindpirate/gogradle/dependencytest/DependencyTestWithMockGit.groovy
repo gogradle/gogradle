@@ -11,7 +11,7 @@ import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithMockGo
-@WithGitServer('git-repo.zip')
+@WithGitRepos('git-repo.zip')
 @WithResource('')
 @WithIsolatedUserhome
 class DependencyTestWithMockGit extends IntegrationTestSupport {
