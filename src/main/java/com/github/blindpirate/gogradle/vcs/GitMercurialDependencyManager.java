@@ -151,7 +151,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
                 getAccessor().clone(url, directory);
                 return;
             } catch (Throwable e) {
-                LOGGER.quiet("Cloning with url {} failed, the cause is {}", url, e.getMessage());
+                LOGGER.debug("Cloning with url {} failed, the cause is {}", url, e.getMessage());
                 if (i == urls.size() - 1) {
                     throw DependencyResolutionException.cannotCloneRepository(name, e);
                 }
