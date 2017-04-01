@@ -15,7 +15,6 @@ import org.junit.runner.RunWith
  */
 @RunWith(GogradleRunner)
 @WithResource('')
-@WithProject
 class StringReverse extends IntegrationTestSupport {
     @Before
     void setUp() {

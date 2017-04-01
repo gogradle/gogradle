@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
-import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Test
@@ -16,7 +15,6 @@ import org.junit.runner.RunWith
 import java.nio.file.Path
 
 @RunWith(GogradleRunner)
-@WithMockInjector
 @OnlyWhen("System.getenv('GOGS_DIR')!=null&&'git version'.execute()")
 class GogsBuild extends IntegrationTestSupport {
     File resource = new File(System.getenv('GOGS_DIR'))
