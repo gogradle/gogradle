@@ -11,9 +11,6 @@ import javax.inject.Singleton;
 
 @Singleton
 public class GitDependencyManager extends GitMercurialDependencyManager {
-
-    public static final String DEFAULT_BRANCH = "master";
-
     private final GitClientAccessor gitAccessor;
 
     @Inject
@@ -22,11 +19,6 @@ public class GitDependencyManager extends GitMercurialDependencyManager {
                                 GitClientAccessor gitAccessor) {
         super(cacheManager, dependencyVisitor);
         this.gitAccessor = gitAccessor;
-    }
-
-    @Override
-    protected String getDefaultBranchName() {
-        return DEFAULT_BRANCH;
     }
 
     @Override

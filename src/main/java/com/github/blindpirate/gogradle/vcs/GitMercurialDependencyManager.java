@@ -34,8 +34,6 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         this.dependencyVisitor = dependencyVisitor;
     }
 
-    protected abstract String getDefaultBranchName();
-
     protected abstract GitMercurialAccessor getAccessor();
 
     @Override
@@ -99,7 +97,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         }
 
         // use HEAD of master branch
-        return getAccessor().headCommitOfBranch(repository, getDefaultBranchName());
+        return getAccessor().headCommitOfBranch(repository, getAccessor().getDefaultBranch(repository));
     }
 
     private Optional<GitMercurialCommit> findCommitBySemVersion(File repository, String semVersionExpression) {
@@ -125,13 +123,11 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected void updateRepository(NotationDependency dependency, File repoRoot) {
-        getAccessor().checkout(repoRoot, getDefaultBranchName());
-
         String url = getAccessor().getRemoteUrl(repoRoot);
 
         LOGGER.info("Pulling {} from {}", dependency, url);
 
-        getAccessor().pull(repoRoot);
+        getAccessor().update(repoRoot);
     }
 
     @Override

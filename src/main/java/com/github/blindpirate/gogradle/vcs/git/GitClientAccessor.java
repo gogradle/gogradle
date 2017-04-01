@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.DateUtils;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
@@ -11,6 +12,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -24,6 +26,7 @@ import static java.util.Optional.of;
 
 @Singleton
 public class GitClientAccessor extends GitMercurialAccessor {
+    private static final String MASTER_BRANCH = "master";
     private Boolean gitClientExists;
 
     @Inject
@@ -47,6 +50,21 @@ public class GitClientAccessor extends GitMercurialAccessor {
     @Override
     public void checkout(File repoRoot, String version) {
         run(repoRoot, asList("git", "checkout", version));
+    }
+
+    @Override
+    public String getDefaultBranch(File repoRoot) {
+        File refsHeads = new File(repoRoot, ".git/refs/heads");
+        if (new File(refsHeads, MASTER_BRANCH).exists()) {
+            return MASTER_BRANCH;
+        }
+        List<File> files = IOUtils.safeListFiles(refsHeads).stream()
+                .filter(File::isFile)
+                .collect(Collectors.toList());
+
+        Assert.isNotEmpty(files, "Cannot found any files in " + StringUtils.toUnixString(refsHeads));
+        files.sort(Comparator.comparing(File::lastModified).reversed());
+        return files.get(0).getName();
     }
 
 
@@ -124,12 +142,14 @@ public class GitClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public void pull(File repoRoot) {
+    public void update(File repoRoot) {
         runWithProgress(repoRoot,
-                asList("git", "pull", "--progress"),
+                asList("git", "pull", "--all", "--progress"),
                 GitClientLineConsumer.NO_OP,
-                GitClientLineConsumer.of("Pulling in " + repoRoot.getAbsolutePath()));
+                GitClientLineConsumer.of("Updating " + repoRoot.getAbsolutePath()));
         run(repoRoot, asList("git", "submodule", "update", "--init", "--recursive"));
+
+        checkout(repoRoot, getDefaultBranch(repoRoot));
     }
 
     @Override

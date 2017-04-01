@@ -25,7 +25,9 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
         this.processUtils = processUtils;
     }
 
-    public abstract void checkout(File repoRoot, String version);
+    public abstract void checkout(File repoRoot, String branchOrCommit);
+
+    public abstract String getDefaultBranch(File repoRoot);
 
     @Override
     public abstract String getRemoteUrl(File repoRoot);
@@ -41,7 +43,7 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
 
     public abstract GitMercurialCommit headCommitOfBranch(File repository, String branch);
 
-    public abstract void pull(File repoRoot);
+    public abstract void update(File repoRoot);
 
     public abstract void clone(String url, File directory);
 
@@ -123,7 +125,6 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
                         stderrLineConsumer.getOutput());
             }
         } catch (Exception e) {
-            e.printStackTrace();
             throw BuildException.processInteractionFailed(cmds, env, workingDir, e);
         }
     }
