@@ -22,7 +22,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             (WithResource)        : WithResourceProcessor,
             (WithMockInjector)    : WithMockInjectorProcessor,
             (WithMockGo)          : WithMockGoProcessor,
-            (WithGitServer)       : WithGitServerProcessor,
+            (WithGitRepos)        : WithGitReposProcessor,
             (WithGitRepo)         : WithGitRepoProcessor,
             (WithIsolatedUserhome): WithIsolatedUserhomeProcessor,
             (OnlyWhen)            : OnlyWhenProcessor,
