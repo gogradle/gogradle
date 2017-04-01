@@ -23,6 +23,7 @@ import static java.util.Arrays.asList;
 
 @Singleton
 public class HgClientAccessor extends GitMercurialAccessor {
+    private static final String DEFAULT_BRANCH = "default";
     private static final Pattern DEFAULT_URL_PATTERN = Pattern.compile("default\\s*=\\s*(\\S+)");
     // tip                                2:620889544e2d
     // commit2_tag                        1:1eaebd519f4c
@@ -50,6 +51,11 @@ public class HgClientAccessor extends GitMercurialAccessor {
     @Override
     public void checkout(File repoRoot, String version) {
         run(repoRoot, asList("hg", "checkout", version, "--clean"));
+    }
+
+    @Override
+    public String getDefaultBranch(File repoRoot) {
+        return DEFAULT_BRANCH;
     }
 
     @Override
@@ -122,7 +128,7 @@ public class HgClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public void pull(File repoRoot) {
+    public void update(File repoRoot) {
         run(repoRoot, asList("hg", "pull", "-u"));
     }
 

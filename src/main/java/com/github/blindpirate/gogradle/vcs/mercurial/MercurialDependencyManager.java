@@ -24,11 +24,6 @@ public class MercurialDependencyManager extends GitMercurialDependencyManager {
     }
 
     @Override
-    protected String getDefaultBranchName() {
-        return DEFAULT_BRANCH;
-    }
-
-    @Override
     protected GitMercurialAccessor getAccessor() {
         return accessor;
     }

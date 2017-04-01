@@ -123,6 +123,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected void updateRepository(NotationDependency dependency, File repoRoot) {
+        getAccessor().checkout(repoRoot, getAccessor().getDefaultBranch(repoRoot));
+
         String url = getAccessor().getRemoteUrl(repoRoot);
 
         LOGGER.info("Pulling {} from {}", dependency, url);
