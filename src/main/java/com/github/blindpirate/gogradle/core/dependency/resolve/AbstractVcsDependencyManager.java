@@ -1,9 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
@@ -38,25 +38,25 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     }
 
     @Override
-    public ResolvedDependency resolve(GolangConfiguration configuration, NotationDependency dependency) {
-        Optional<ResolvedDependency> resultInCache = configuration.getDependencyRegistry().getFromCache(dependency);
+    public ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {
+        Optional<ResolvedDependency> resultInCache = context.getDependencyRegistry().getFromCache(dependency);
         if (resultInCache.isPresent()) {
             return resultInCache.get();
         }
-        ResolvedDependency ret = doResolve(dependency);
+        ResolvedDependency ret = doResolve(dependency, context);
 
-        configuration.getDependencyRegistry().putIntoCache(dependency, ret);
+        context.getDependencyRegistry().putIntoCache(dependency, ret);
         return ret;
     }
 
-    private ResolvedDependency doResolve(NotationDependency dependency) {
+    private ResolvedDependency doResolve(NotationDependency dependency, ResolveContext context) {
         LOGGER.quiet("Resolving {}", dependency);
         try {
             NotationDependency vcsNotationDependency = extractVcsHostDependency(dependency);
 
             return globalCacheManager.runWithGlobalCacheLock(vcsNotationDependency, () -> {
                 File vcsRoot = globalCacheManager.getGlobalPackageCachePath(vcsNotationDependency.getName()).toFile();
-                ResolvedDependency vcsResolvedDependency = resolveVcs(vcsNotationDependency, vcsRoot);
+                ResolvedDependency vcsResolvedDependency = resolveVcs(vcsNotationDependency, vcsRoot, context);
                 return extractVendorDependencyIfNecessary(dependency, vcsResolvedDependency);
             });
         } catch (Exception e) {
@@ -93,11 +93,11 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         }
     }
 
-    private ResolvedDependency resolveVcs(NotationDependency dependency, File vcsRoot) {
+    private ResolvedDependency resolveVcs(NotationDependency dependency, File vcsRoot, ResolveContext context) {
         resolveRepository(dependency, vcsRoot);
         VERSION version = determineVersion(vcsRoot, dependency);
         resetToSpecificVersion(vcsRoot, version);
-        return createResolvedDependency(dependency, vcsRoot, version);
+        return createResolvedDependency(dependency, vcsRoot, version, context);
     }
 
     @Override
@@ -145,7 +145,8 @@ public abstract class AbstractVcsDependencyManager<VERSION>
 
     protected abstract ResolvedDependency createResolvedDependency(NotationDependency dependency,
                                                                    File repoRoot,
-                                                                   VERSION version);
+                                                                   VERSION version,
+                                                                   ResolveContext context);
 
     protected abstract void resetToSpecificVersion(File repository, VERSION version);
 

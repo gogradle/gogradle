@@ -6,13 +6,11 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
@@ -48,15 +46,13 @@ class GitMercurialDependencyManagerTest {
     @Mock
     GolangDependencySet dependencySet
     @Mock
-    DependencyVisitor visitor
-    @Mock
     GolangConfiguration configuration
     @Mock
     DependencyRegistry dependencyRegistry
     @Mock
     GitMercurialCommit commit
-
-    Set exclusionSpecs = [AbstractGolangDependency.NO_TRANSITIVE_DEP_SPEC] as Set
+    @Mock
+    ResolveContext resolveContext
 
     GitMercurialDependencyManager manager
 
@@ -65,8 +61,7 @@ class GitMercurialDependencyManagerTest {
     GolangPackage thePackage = VcsGolangPackage.builder()
             .withPath('github.com/a/b')
             .withRootPath('github.com/a/b')
-            .withVcsType(VcsType.GIT)
-            .withUrl(repoUrl)
+            .withOriginalVcsInfo(VcsType.GIT, [repoUrl])
             .build()
 
     File resource
@@ -76,7 +71,7 @@ class GitMercurialDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(resource, '.git', '')
 
-        manager = new TestGitMercurialDependencyManager(cacheManager, visitor, accessor)
+        manager = new TestGitMercurialDependencyManager(cacheManager, accessor)
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
@@ -89,15 +84,12 @@ class GitMercurialDependencyManagerTest {
 
         when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
         when(accessor.getDefaultBranch(resource)).thenReturn(DEFAULT_BRANCH)
-        when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
-        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(new GolangDependencySet())
-        when(visitor.visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
-
-        when(notationDependency.getTransitiveDepExclusions()).thenReturn(exclusionSpecs)
 
         when(notationDependency.getUrls()).thenReturn([repoUrl])
         when(notationDependency.getCommit()).thenReturn(commitId)
         when(notationDependency.getPackage()).thenReturn(thePackage)
+
+        when(resolveContext.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
     }
 
     @Test
@@ -106,21 +98,19 @@ class GitMercurialDependencyManagerTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(notationDependency.isFirstLevel()).thenReturn(true)
         // when
-        ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit)
+        ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit, resolveContext)
         // then
+        verify(resolveContext).produceTransitiveDependencies(result, resource)
         assertResolvedDependency(result)
     }
 
     void assertResolvedDependency(ResolvedDependency result) {
         assert result.name == 'github.com/a/b'
-        assert result.dependencies.isEmpty()
         assert ReflectionUtils.getField(result, 'url') == repoUrl
         assert ReflectionUtils.getField(result, 'tag') == 'tag'
         assert result.version == commitId
         assert result.updateTime == 123000L
         assert result.firstLevel
-        assert !ReflectionUtils.getField(result, 'transitiveDepExclusions').is(exclusionSpecs)
-        assert ReflectionUtils.getField(result, 'transitiveDepExclusions') == exclusionSpecs
     }
 
     @Test
@@ -131,8 +121,9 @@ class GitMercurialDependencyManagerTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(notationDependency.isFirstLevel()).thenReturn(true)
         // when
-        ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit)
+        ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit, resolveContext)
         // then
+        verify(resolveContext).produceTransitiveDependencies(result, resource)
         assertResolvedDependency(result)
     }
 
@@ -142,7 +133,7 @@ class GitMercurialDependencyManagerTest {
         when(cacheManager.currentDependencyIsOutOfDate(notationDependency)).thenReturn(true)
         when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
         // when:
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
         // then:
         verify(accessor).update(resource)
     }
@@ -152,7 +143,7 @@ class GitMercurialDependencyManagerTest {
         // given
         IOUtils.clearDirectory(resource)
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
         // then
         verify(accessor).clone(repoUrl, resource)
     }
@@ -161,7 +152,7 @@ class GitMercurialDependencyManagerTest {
     @MockOffline
     void 'pull should not be executed if offline'() {
         // when:
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
         // then:
         verify(accessor, times(0)).update(resource)
     }
@@ -172,7 +163,7 @@ class GitMercurialDependencyManagerTest {
         when(notationDependency.getTag()).thenReturn('tag')
         when(accessor.findCommitByTag(resource, 'tag')).thenReturn(of(commit))
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
         // then
         verify(accessor).checkout(resource, commitId)
     }
@@ -223,7 +214,7 @@ class GitMercurialDependencyManagerTest {
         when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
         when(accessor.clone('url1', resource)).thenThrow(IOException)
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
         // then
         verify(accessor).clone('url2', resource)
     }
@@ -241,7 +232,7 @@ class GitMercurialDependencyManagerTest {
         // given
         when(notationDependency.getCommit()).thenReturn('inexistent')
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -249,7 +240,7 @@ class GitMercurialDependencyManagerTest {
         // given
         when(notationDependency.getTag()).thenReturn('inexistent')
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
     }
 
     @Test(expected = DependencyResolutionException)
@@ -258,7 +249,7 @@ class GitMercurialDependencyManagerTest {
         when(cacheManager.runWithGlobalCacheLock(any(GitMercurialNotationDependency), any(Callable)))
                 .thenThrow(new IOException())
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
     }
 
     @Test
@@ -267,7 +258,7 @@ class GitMercurialDependencyManagerTest {
         when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
         IOUtils.write(resource, 'some file', 'file content')
         // when
-        manager.resolve(configuration, notationDependency)
+        manager.resolve(resolveContext, notationDependency)
         // then
         assert IOUtils.dirIsEmpty(resource)
     }
@@ -297,9 +288,8 @@ class GitMercurialDependencyManagerTest {
         GitMercurialAccessor accessor
 
         TestGitMercurialDependencyManager(GlobalCacheManager cacheManager,
-                                          DependencyVisitor dependencyVisitor,
                                           GitMercurialAccessor accessor) {
-            super(cacheManager, dependencyVisitor)
+            super(cacheManager)
             this.accessor = accessor
         }
 

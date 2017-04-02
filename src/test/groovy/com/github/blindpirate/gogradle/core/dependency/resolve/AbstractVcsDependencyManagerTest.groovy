@@ -50,7 +50,7 @@ class AbstractVcsDependencyManagerTest {
     @Mock
     DependencyRegistry dependencyRegistry
     @Mock
-    GolangConfiguration configuration
+    ResolveContext context
 
 
     VcsResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(VcsResolvedDependency, 'host')
@@ -69,13 +69,14 @@ class AbstractVcsDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(repoRoot, 'vendor/root/package/main.go', 'This is main.go')
 
-        when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
+        when(context.getDependencyRegistry()).thenReturn(dependencyRegistry)
+
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
         manager = new TestAbstractVcsDependencyManager(cacheManager)
 
         when(subclassDelegate.determineVersion(repoRoot, hostNotationDependency)).thenReturn('version')
         when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('url')
-        when(subclassDelegate.createResolvedDependency(hostNotationDependency, repoRoot, 'version')).thenReturn(hostResolvedDependency)
+        when(subclassDelegate.createResolvedDependency(hostNotationDependency, repoRoot, 'version', context)).thenReturn(hostResolvedDependency)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
@@ -111,7 +112,7 @@ class AbstractVcsDependencyManagerTest {
         when(vendorNotationDependency.getVendorPath()).thenReturn('vendor/root/package')
 
         // when
-        ResolvedDependency result = manager.resolve(configuration, vendorNotationDependency)
+        ResolvedDependency result = manager.resolve(context, vendorNotationDependency)
         // then
         assert result.is(vendorResolvedDependency)
     }
@@ -121,7 +122,7 @@ class AbstractVcsDependencyManagerTest {
         // given
         when(hostResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
         // then
-        manager.resolve(configuration, vendorNotationDependency)
+        manager.resolve(context, vendorNotationDependency)
     }
 
     @Test
@@ -130,7 +131,7 @@ class AbstractVcsDependencyManagerTest {
         when(dependencyRegistry.getFromCache(vendorNotationDependency))
                 .thenReturn(Optional.of(vendorResolvedDependency))
         // then
-        assert manager.resolve(configuration, vendorNotationDependency).is(vendorResolvedDependency)
+        assert manager.resolve(context, vendorNotationDependency).is(vendorResolvedDependency)
         verify(cacheManager, times(0)).runWithGlobalCacheLock(any(GolangDependency), any(Callable))
     }
 
@@ -173,7 +174,7 @@ class AbstractVcsDependencyManagerTest {
         // given
         when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('anotherUrl')
         // when
-        manager.resolve(configuration, hostNotationDependency)
+        manager.resolve(context, hostNotationDependency)
         // then
         verify(cacheManager).updateCurrentDependencyLock(hostNotationDependency)
     }
@@ -214,8 +215,8 @@ class AbstractVcsDependencyManagerTest {
         }
 
         @Override
-        protected ResolvedDependency createResolvedDependency(NotationDependency dependency, File repoRoot, Object o) {
-            return subclassDelegate.createResolvedDependency(dependency, repoRoot, o)
+        protected ResolvedDependency createResolvedDependency(NotationDependency dependency, File repoRoot, Object o, ResolveContext context) {
+            return subclassDelegate.createResolvedDependency(dependency, repoRoot, o, context)
         }
 
         @Override

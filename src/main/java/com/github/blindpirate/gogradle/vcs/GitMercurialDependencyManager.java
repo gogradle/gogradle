@@ -4,8 +4,8 @@ import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManager;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -19,19 +19,13 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
-import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
 
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
     protected static final Logger LOGGER = Logging.getLogger(GitMercurialDependencyManager.class);
 
-    private final DependencyVisitor dependencyVisitor;
-
-    public GitMercurialDependencyManager(GlobalCacheManager cacheManager,
-                                         DependencyVisitor dependencyVisitor) {
+    public GitMercurialDependencyManager(GlobalCacheManager cacheManager) {
         super(cacheManager);
-        this.dependencyVisitor = dependencyVisitor;
     }
 
     protected abstract GitMercurialAccessor getAccessor();
@@ -45,7 +39,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     @Override
     protected ResolvedDependency createResolvedDependency(NotationDependency dependency,
                                                           File repoRoot,
-                                                          GitMercurialCommit commit) {
+                                                          GitMercurialCommit commit,
+                                                          ResolveContext context) {
         VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
 
         VcsResolvedDependency ret = VcsResolvedDependency.builder(getVcsType())
@@ -56,7 +51,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
                 .withUrl(getAccessor().getRemoteUrl(repoRoot))
                 .withCommitTime(commit.getCommitTime())
                 .build();
-        GolangDependencySet dependencies = DEFAULT_STRATEGY.produce(ret, repoRoot, dependencyVisitor, BUILD);
+
+        GolangDependencySet dependencies = context.produceTransitiveDependencies(ret, repoRoot);
         ret.setDependencies(dependencies);
 
         return ret;
