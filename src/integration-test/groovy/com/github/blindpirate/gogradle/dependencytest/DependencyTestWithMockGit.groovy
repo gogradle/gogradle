@@ -49,8 +49,8 @@ golang {
 
 repositories {
     golang {
-        root {it.startsWith('github')}
-        urlSubstitution {
+        root {it ==~ /github\\.com\\/\\w+\\/\\w+/)}
+        url {
             def array=it.split('/')
             return 'http://localhost:8080/'+array[1]+'-'+array[2]
         }

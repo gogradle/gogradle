@@ -28,7 +28,7 @@ golang {
 repositories {
     golang {
         all()
-        urlSubstitution {
+        url {
             'http://localhost:8080/myawesomeproject'
         }
     }
