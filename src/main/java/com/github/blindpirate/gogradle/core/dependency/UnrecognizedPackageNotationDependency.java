@@ -32,11 +32,11 @@ public class UnrecognizedPackageNotationDependency extends AbstractGolangDepende
 
     @Override
     public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
-        throw new UnsupportedOperationException();
+        throw new UnsupportedOperationException("Unrecognized package: " + getName());
     }
 
     @Override
     public ResolvedDependency resolve(ResolveContext context) {
-        throw new UnsupportedOperationException("Cannot resolve package: " + getName());
+        throw new UnsupportedOperationException("Unrecognized package: " + getName());
     }
 }
