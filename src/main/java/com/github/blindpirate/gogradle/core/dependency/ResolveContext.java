@@ -9,7 +9,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.function.Predicate;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.*;
+import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 import static java.util.Collections.emptySet;
 
 public class ResolveContext {
