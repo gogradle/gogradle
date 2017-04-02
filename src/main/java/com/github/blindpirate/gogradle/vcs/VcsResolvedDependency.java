@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
 import com.google.common.collect.ImmutableMap;
 
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 
@@ -134,7 +133,6 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
             ret.tag = this.tag;
             ret.setFirstLevel(notationDependency.isFirstLevel());
             ret.setPackage(notationDependency.getPackage());
-            ret.transitiveDepExclusions = new HashSet<>(notationDependency.getTransitiveDepExclusions());
             return ret;
         }
     }

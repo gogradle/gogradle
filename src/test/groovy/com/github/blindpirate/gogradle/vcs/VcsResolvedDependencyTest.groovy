@@ -51,13 +51,6 @@ class VcsResolvedDependencyTest {
     }
 
     @Test
-    void 'notation\'s specs should be copied into resolved dependency'() {
-        // given
-        VcsResolvedDependency dependency = newResolvedDependency()
-        assert DependencyUtils.getExclusionSpecs(dependency).contains(exclusionSpec)
-    }
-
-    @Test
     @WithMockInjector
     void 'getInstallerClass() should succeed'() {
         DependencyInstaller installer = Mockito.mock(DependencyInstaller)
