@@ -11,8 +11,8 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
-import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.google.inject.Key
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
@@ -55,6 +55,8 @@ class DefaultGlobalCacheManagerTest {
 
     VcsGolangPackage pkg = MockUtils.mockRootVcsPackage()
 
+    VcsGolangPackage substitutedPkg = MockUtils.mockSubstitutedRootVcsPackage()
+
     ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
     @Before
@@ -91,24 +93,57 @@ class DefaultGlobalCacheManagerTest {
         GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
         assert metadata.lastUpdateTime == 0
         assert metadata.lastUpdateUrl == null
-        assert metadata.vcs == 'git'
+        assert metadata.originalVcs == 'git'
         assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 
     @Test
-    void 'lock file should be updated successfully'() {
+    void 'lock file should be initialized properly if no original urls provided'() {
+        // given
+        when(notationDependency.getPackage()).thenReturn(substitutedPkg)
         // when
+        cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
+        // then
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+        assert metadata.lastUpdateTime == 0
+        assert metadata.lastUpdateUrl == null
+        assert metadata.originalVcs == null
+        assert metadata.originalUrls == []
+    }
+
+    @Test
+    void 'lock file should be updated successfully'() {
+        // create
         cacheManager.runWithGlobalCacheLock(notationDependency, {
             // create
             cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
 
-            // a shorter data (with fewer bytes may cause issue)
-            when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('u')
+        GlobalCacheMetadata old = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+
+        // update1
+        // a shorter data (with fewer bytes) may cause issue
+        when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('u')
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
             cacheManager.updateCurrentDependencyLock(notationDependency)
         } as Callable)
+        GlobalCacheMetadata updated1 = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+
+        // update2
+        when(notationDependency.getPackage()).thenReturn(substitutedPkg)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
+        GlobalCacheMetadata updated2 = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+
         // then
-        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
-        assert (-1000L..1000L).contains(metadata.getLastUpdateTime() - System.currentTimeMillis())
+        assert old.originalVcs == updated1.originalVcs
+        assert old.originalUrls == updated1.originalUrls
+        assert (-1000L..1000L).contains(updated1.getLastUpdateTime() - System.currentTimeMillis())
+        assert old.originalVcs == updated2.originalVcs
+        assert old.originalUrls == updated2.originalUrls
+
+
     }
 
     @Test
@@ -119,7 +154,7 @@ class DefaultGlobalCacheManagerTest {
 originalUrls:
   - git@github.com:user/package.git
   - https://github.com/user/package.git
-vcs:
+originalVcs:
   git
 lastUpdated:
   time: ${System.currentTimeMillis() - 2000}
@@ -139,7 +174,7 @@ lastUpdated:
 originalUrls:
   - git@github.com:user/package.git
   - https://github.com/user/package.git
-vcs:
+originalVcs:
   git
 lastUpdated:
   time: ${System.currentTimeMillis()}
@@ -159,7 +194,7 @@ lastUpdated:
 originalUrls:
   - git@github.com:user/package.git
   - https://github.com/user/package.git
-vcs:
+originalVcs:
   git
 lastUpdated:
   time: ${System.currentTimeMillis()}
@@ -178,7 +213,7 @@ lastUpdated:
 originalUrls:
   - git@github.com:user/package.git
   - https://github.com/user/package.git
-vcs:
+originalVcs:
   git
 lastUpdated:
   time: 123
@@ -189,7 +224,7 @@ lastUpdated:
         // then
         assert metadata.lastUpdateTime == 123L
         assert metadata.lastUpdateUrl == 'https://github.com/user/package.git'
-        assert metadata.vcs == 'git'
+        assert metadata.originalVcs == 'git'
         assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 

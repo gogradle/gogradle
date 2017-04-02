@@ -185,12 +185,14 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         return GlobalCacheMetadata.newMetadata(pkg);
     }
 
-    private GlobalCacheMetadata updatedMetaData(GolangDependency dependency) {
+    private GlobalCacheMetadata updatedMetaData(GolangDependency dependency) throws IOException {
+        GlobalCacheMetadata oldMetadata = readFile(fileChannels.get());
         VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
         Path cacheRoot = getGlobalPackageCachePath(pkg.getRootPathString());
 
         String url = pkg.getVcsType().getAccessor().getRemoteUrl(cacheRoot.toFile());
-        return GlobalCacheMetadata.updatedMetadata(pkg, url);
+        oldMetadata.update(url);
+        return oldMetadata;
     }
 
     private void createPackageDirectoryIfNecessary(GolangDependency dependency) {
