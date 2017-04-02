@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
@@ -19,7 +19,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.PropertiesExclusionSpec
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
 
 @RunWith(GogradleRunner)
@@ -155,7 +155,7 @@ class GolangPluginTest {
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0-RELEASE'
         assert getExclusionSpecs(ab).size() == 1
-        assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionSpec
+        assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionPredicate
 
         def cd = findFirstInDependencies('github.com/c/d')
         assert cd.urls == ['https://github.com/c/d.git']
@@ -176,24 +176,24 @@ class GolangPluginTest {
     void 'configuring repository should succeed'() {
         project.repositories {
             golang {
-                name { it.endsWith('b') }
-                urlSubstitution 'bbbbb'
+                root { it.endsWith('b') }
+                url 'bbbbb'
             }
 
             golang {
-                name ~/.*d/
-                urlSubstitution { name, url ->
-                    name + url
+                root ~/.*d/
+                url { name ->
+                    'http://' + name
                 }
             }
         }
 
         GolangRepository repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b')
 
-        assert repository.substitute(null, null) == 'bbbbb'
+        assert repository.getUrl(null) == 'bbbbb'
 
         repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d')
-        assert repository.substitute('name', 'url') == 'nameurl'
+        assert repository.getUrl('name') == 'http://name'
 
         repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('something else')
         assert repository.is(GolangRepository.EMPTY_INSTANCE)

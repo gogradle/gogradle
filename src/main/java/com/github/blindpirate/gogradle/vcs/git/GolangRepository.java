@@ -1,8 +1,11 @@
 package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.vcs.VcsType;
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerHelper;
+
+import java.util.Optional;
 
 public class GolangRepository {
     public static final GolangRepository EMPTY_INSTANCE = new GolangRepository() {
@@ -12,46 +15,76 @@ public class GolangRepository {
         }
 
         @Override
-        public void name(Object name) {
+        public void root(Object root) {
             throw new UnsupportedOperationException();
         }
 
         @Override
-        public void urlSubstitution(Object urlOrClosure) {
+        public void url(Object urlOrClosure) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void dir(Object urlOrClosure) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void vcs(String vcs) {
             throw new UnsupportedOperationException();
         }
 
     };
 
     private boolean all;
-    private Object namePattern;
+    private Object rootPathPattern;
     private Object urlSubstitution;
+    private Object dir;
+    private VcsType vcsType = VcsType.GIT;
 
     public void all() {
         this.all = true;
     }
 
-    public void name(Object name) {
-        namePattern = name;
+    public void root(Object root) {
+        rootPathPattern = root;
     }
 
-    public void urlSubstitution(Object urlOrClosure) {
+    public void dir(Object urlOrClosure) {
+        dir = urlOrClosure;
+    }
+
+    public void url(Object urlOrClosure) {
         urlSubstitution = urlOrClosure;
     }
 
-    public String substitute(String name, String url) {
-        if (urlSubstitution instanceof String) {
-            return (String) urlSubstitution;
+    public void vcs(String vcs) {
+        Optional<VcsType> vcsOptional = VcsType.of(vcs);
+        Assert.isTrue(vcsOptional.isPresent(), "Unknown vcs type: " + vcs);
+        this.vcsType = vcsOptional.get();
+    }
+
+    public VcsType getVcsType() {
+        return vcsType;
+    }
+
+    public String getUrl(String name) {
+        return substitute(name, urlSubstitution);
+    }
+
+    private String substitute(String name, Object valueOrClousure) {
+        if (valueOrClousure instanceof String) {
+            return (String) valueOrClousure;
+        } else if (valueOrClousure instanceof Closure) {
+            Closure closure = (Closure) valueOrClousure;
+            return (String) closure.call(name);
+        } else {
+            return null;
         }
-        if (urlSubstitution instanceof Closure) {
-            Closure closure = (Closure) urlSubstitution;
-            if (closure.getMaximumNumberOfParameters() == 1) {
-                return (String) closure.call(name);
-            } else if (closure.getMaximumNumberOfParameters() == 2) {
-                return (String) closure.call(name, url);
-            }
-        }
-        return url;
+    }
+
+    public String getDir(String name) {
+        return substitute(name, dir);
     }
 
 
@@ -60,12 +93,13 @@ public class GolangRepository {
             return true;
         }
 
-        Assert.isTrue(namePattern != null);
+        Assert.isTrue(rootPathPattern != null);
 
         return nameMatch(name);
     }
 
     private boolean nameMatch(String name) {
-        return (Boolean) InvokerHelper.invokeMethod(namePattern, "isCase", name);
+        return (Boolean) InvokerHelper.invokeMethod(rootPathPattern, "isCase", name);
     }
+
 }

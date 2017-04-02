@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.git
 
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
 class GolangRepositoryTest {
@@ -14,41 +15,62 @@ class GolangRepositoryTest {
 
     @Test
     void 'a repository with string name should match'() {
-        repository.name('github.com/a/b')
+        repository.root('github.com/a/b')
         assert repository.match('github.com/a/b')
         assert !repository.match('github.com/c/d')
     }
 
     @Test
-    void 'substitute url should succeed'() {
-        repository.urlSubstitution('123')
-        assert repository.substitute(null, null) == '123'
+    void 'getting url should succeed'() {
+        repository.url('123')
+        assert repository.getUrl(null) == '123'
 
-        repository.urlSubstitution {
+        repository.url {
             return '456'
         }
 
-        assert repository.substitute(null, null) == '456'
+        assert repository.getUrl(null) == '456'
 
-        repository.urlSubstitution { name ->
+        repository.url { name ->
             return name + '789'
         }
-        assert repository.substitute('name', null) == 'name789'
+        assert repository.getUrl('name') == 'name789'
 
-        repository.urlSubstitution { name, url ->
-            return name + url
-        }
-        assert repository.substitute('name', 'url') == 'nameurl'
+        repository.url(1)
+        assert repository.getUrl('name') == null
+    }
 
-        repository.urlSubstitution { a, b, c ->
-            return 'ShouldNotTakeEffect'
+    @Test
+    void 'getting dir should succeed'() {
+        repository.dir('123')
+        assert repository.getDir(null) == '123'
+
+        repository.dir {
+            return '456'
         }
-        assert repository.substitute('name', 'url') == 'url'
+
+        assert repository.getDir(null) == '456'
+
+        repository.dir { name ->
+            return name + '789'
+        }
+        assert repository.getDir('name') == 'name789'
+
+        repository.dir(1)
+        assert repository.getDir('name') == null
+    }
+
+    @Test
+    void 'getting vcs should succeed'() {
+        assert repository.getVcsType() == VcsType.GIT
+
+        repository.vcs 'hg'
+        assert repository.getVcsType() == VcsType.MERCURIAL
     }
 
     @Test
     void 'a repository with pattern name should match'() {
-        repository.name(~/github\.com.*/)
+        repository.root(~/github\.com.*/)
         assert repository.match('github.com/a/b')
         assert repository.match('github.com/c/d')
         assert !repository.match('www.github.com/a/b')
@@ -56,7 +78,7 @@ class GolangRepositoryTest {
 
     @Test
     void 'a repository with closure name should match'() {
-        repository.name {
+        repository.root {
             it.endsWith('b')
         }
         assert repository.match('b')
@@ -72,6 +94,6 @@ class GolangRepositoryTest {
     @Test
     void 'global GolangRepository singleton should be read-only'() {
         ReflectionUtils.testUnsupportedMethods(GolangRepository.EMPTY_INSTANCE,
-                GolangRepository, ['substitute', 'match'])
+                GolangRepository, ['getUrl', 'match', 'getDir', 'getVcsType'])
     }
 }
