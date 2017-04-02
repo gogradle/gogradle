@@ -17,7 +17,7 @@ abstract class IntegrationTestSupport {
     PrintStream stderrPs
 
     // We use real go by default
-    String goBinPath = ''
+    String goBinPath = 'go'
 
     String buildDotGradleBase
 
