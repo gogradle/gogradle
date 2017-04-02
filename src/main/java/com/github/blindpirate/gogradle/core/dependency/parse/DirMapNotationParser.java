@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 
 import javax.inject.Singleton;
 
