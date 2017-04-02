@@ -38,6 +38,7 @@ import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.IBMDevOpsPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.RepositoryHandlerPathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver;
 import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
@@ -169,6 +170,7 @@ public class GogradleModule extends AbstractModule {
     @Singleton
     @DefaultPackagePathResolver.PackagePathResolvers
     public List<PackagePathResolver> packagePathResolvers(
+            RepositoryHandlerPathResolver repositoryHandlerPathResolver,
             GithubPackagePathResolver githubPackagePathResolver,
             BitbucketPackagePathResolver bitbucketPackagePathResolver,
             IBMDevOpsPackagePathResolver ibmDevOpsPackagePathResolver,
@@ -177,6 +179,7 @@ public class GogradleModule extends AbstractModule {
             MetadataPackagePathResolver metadataPackagePathResolver,
             UnrecognizedPackagePathResolver unrecognizedPackagePathResolver) {
         return CollectionUtils.immutableList(
+                repositoryHandlerPathResolver,
                 standardPackagePathResolver,
                 githubPackagePathResolver,
                 bitbucketPackagePathResolver,
