@@ -4,9 +4,11 @@ import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -29,6 +31,7 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
+@WithMockInjector
 class ResolveTaskTest extends TaskTest {
     ResolveBuildDependenciesTask resolveBuildDependenciesTask
     ResolveTestDependenciesTask resolveTestDependenciesTask
@@ -40,17 +43,24 @@ class ResolveTaskTest extends TaskTest {
     Path rootPath
     @Mock
     GolangConfiguration configuration
+    @Mock
+    DependencyVisitor dependencyVisitor
+
     ResolvedDependency resolvedDependency = mockResolvedDependency('notationDependency')
 
     @Before
     void setUp() {
         resolveBuildDependenciesTask = buildTask(ResolveBuildDependenciesTask)
         resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
+
         when(configurationManager.getByName(anyString())).thenReturn(configuration)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
+
         when(rootPath.toFile()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn("package")
         when(project.getRootDir()).thenReturn(resource)
-        when(dependencyTreeFactory.getTree(any(GolangConfiguration), any(LocalDirectoryDependency))).thenReturn(tree)
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
+        when(dependencyTreeFactory.getTree(any(ResolveContext), any(LocalDirectoryDependency))).thenReturn(tree)
         GolangDependencySet dependencies = asGolangDependencySet(resolvedDependency)
         when(tree.flatten()).thenReturn(dependencies)
     }
@@ -58,6 +68,7 @@ class ResolveTaskTest extends TaskTest {
     @Test
     void 'build dependency resolution should succeed'() {
         // when
+        when(configuration.getName()).thenReturn('build')
         resolveBuildDependenciesTask.resolve()
         // then
         verify(buildManager).installDependency(resolvedDependency, 'build')
@@ -67,6 +78,7 @@ class ResolveTaskTest extends TaskTest {
     @Test
     void 'test dependency resolution should succeed'() {
         // when
+        when(configuration.getName()).thenReturn('test')
         resolveTestDependenciesTask.resolve()
         // then
         verify(buildManager).installDependency(resolvedDependency, 'test')
@@ -74,7 +86,6 @@ class ResolveTaskTest extends TaskTest {
     }
 
     @Test
-    @WithMockInjector
     void 'checking for external files should succeed'() {
         when(GogradleGlobal.INSTANCE.getInjector().getInstance((Class) any(Class))).thenAnswer(new Answer<Object>() {
             @Override

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.tree;
 
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import javax.inject.Singleton;
@@ -16,9 +17,9 @@ import java.util.stream.Collectors;
  */
 @Singleton
 public class DependencyTreeFactory {
-    public DependencyTreeNode getTree(GolangConfiguration configuration, ResolvedDependency rootProject) {
-        resolve(configuration, rootProject);
-        return getSubTree(configuration, rootProject, new HashSet<>());
+    public DependencyTreeNode getTree(ResolveContext context, ResolvedDependency rootProject) {
+        resolve(rootProject, context);
+        return getSubTree(context.getConfiguration(), rootProject, new HashSet<>());
     }
 
     private DependencyTreeNode getSubTree(GolangConfiguration configuration,
@@ -36,14 +37,15 @@ public class DependencyTreeFactory {
         if (!hasExistedInTree) {
             existedDependenciesInTree.add(finalDependency);
             for (GolangDependency dependency : finalDependency.getDependencies()) {
-                node.addChild(getSubTree(configuration, dependency.resolve(configuration), existedDependenciesInTree));
+                // 'cause it has been cached in AbstractNotationDependency
+                node.addChild(getSubTree(configuration, dependency.resolve(null), existedDependenciesInTree));
             }
         }
         return node;
     }
 
-    private void resolve(GolangConfiguration configuration, ResolvedDependency resolvedDependency) {
-        if (!configuration.getDependencyRegistry().register(resolvedDependency)) {
+    private void resolve(ResolvedDependency resolvedDependency, ResolveContext context) {
+        if (!context.getDependencyRegistry().register(resolvedDependency)) {
             // current dependency is older
             return;
         }
@@ -51,9 +53,11 @@ public class DependencyTreeFactory {
         // BFS order
         List<ResolvedDependency> resolvedDependencies = resolvedDependency.getDependencies()
                 .stream()
-                .map(dependency -> dependency.resolve(configuration))
+                .map(dependency -> dependency.resolve(context))
                 .collect(Collectors.toList());
 
-        resolvedDependencies.forEach(dependency -> resolve(configuration, dependency));
+        resolvedDependencies
+                .forEach(dependency -> resolve(dependency, context.createSubContext(dependency)));
+
     }
 }

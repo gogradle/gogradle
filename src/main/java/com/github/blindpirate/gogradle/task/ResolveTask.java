@@ -7,9 +7,10 @@ import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager;
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor;
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory;
@@ -23,7 +24,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.Tr
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
@@ -48,9 +48,6 @@ public abstract class ResolveTask extends DefaultTask {
 
     @Inject
     private DependencyTreeFactory dependencyTreeFactory;
-
-    @Inject
-    private DependencyVisitor visitor;
 
     @Inject
     private GogradleRootProduceStrategy strategy;
@@ -145,10 +142,10 @@ public abstract class ResolveTask extends DefaultTask {
                 setting.getPackagePath(),
                 rootDir);
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
-
-        GolangDependencySet dependencies = strategy.produce(rootProject, rootDir, visitor, getConfigurationName());
+        ResolveContext rootContext = ResolveContext.root(configuration, strategy);
+        GolangDependencySet dependencies = rootContext.produceTransitiveDependencies(rootProject, rootDir);
         rootProject.setDependencies(dependencies);
-        dependencyTree = dependencyTreeFactory.getTree(configuration, rootProject);
+        dependencyTree = dependencyTreeFactory.getTree(rootContext, rootProject);
     }
 
     public DependencyTreeNode getDependencyTree() {

@@ -3,7 +3,9 @@ package com.github.blindpirate.gogradle.core.dependency.tree
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
@@ -14,6 +16,7 @@ import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.inOrder
 import static org.mockito.Mockito.when
 
@@ -24,6 +27,8 @@ class DependencyTreeFactoryTest {
     @Mock
     DependencyRegistry registry
 
+    @Mock
+    ResolveContext context
     @Mock
     GolangConfiguration configuration
 
@@ -46,7 +51,8 @@ class DependencyTreeFactoryTest {
     @Before
     void setUp() {
         [rootProject, a1, a2, a3, b, c, d].each {
-            when(it.resolve(configuration)).thenReturn(it)
+            when(it.resolve(isNull())).thenReturn(it)
+            when(it.resolve(any(ResolveContext))).thenReturn(it)
             when(it.getDependencies()).thenReturn(GolangDependencySet.empty())
             when(registry.register(it)).thenReturn(true)
         }
@@ -58,6 +64,9 @@ class DependencyTreeFactoryTest {
             return ReflectionUtils.getField(delegate, 'finalDependency')
         }
 
+        when(context.getDependencyRegistry()).thenReturn(registry)
+        when(context.getConfiguration()).thenReturn(configuration)
+        when(context.createSubContext(any(GolangDependency))).thenReturn(context)
         when(configuration.getDependencyRegistry()).thenReturn(registry)
     }
 
@@ -109,7 +118,7 @@ class DependencyTreeFactoryTest {
         bindDependencies(a2, d)
         bindDependencies(d, a3)
         // when
-        DependencyTreeNode rootNode = factory.getTree(configuration, rootProject)
+        DependencyTreeNode rootNode = factory.getTree(context, rootProject)
         // then
         assertChildrenOfNodeAre(rootNode, a2, b)
         assertChildrenOfNodeAre(rootNode.children[0], d)
@@ -121,12 +130,12 @@ class DependencyTreeFactoryTest {
     void 'resolution order should be BFS instead of DFS'() {
         'dependency conflict should be resolved'()
         InOrder order = inOrder(rootProject, a1, a2, a3, b, c, d)
-        order.verify(a1).resolve(any(GolangConfiguration))
-        order.verify(b).resolve(any(GolangConfiguration))
-        order.verify(c).resolve(any(GolangConfiguration))
-        order.verify(a2).resolve(any(GolangConfiguration))
-        order.verify(d).resolve(any(GolangConfiguration))
-        order.verify(a3).resolve(any(GolangConfiguration))
+        order.verify(a1).resolve(any(ResolveContext))
+        order.verify(b).resolve(any(ResolveContext))
+        order.verify(c).resolve(any(ResolveContext))
+        order.verify(a2).resolve(any(ResolveContext))
+        order.verify(d).resolve(any(ResolveContext))
+        order.verify(a3).resolve(any(ResolveContext))
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {
