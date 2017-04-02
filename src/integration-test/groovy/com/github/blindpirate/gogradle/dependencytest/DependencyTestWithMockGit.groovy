@@ -49,7 +49,7 @@ golang {
 
 repositories {
     golang {
-        root {it ==~ /github\\.com\\/\\w+\\/\\w+/)}
+        root {it ==~ /github\\.com\\/\\w+\\/\\w+/}
         url {
             def array=it.split('/')
             return 'http://localhost:8080/'+array[1]+'-'+array[2]

@@ -88,10 +88,18 @@ golang {
     packagePath='my/project'
     goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
-dependencies {
-    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')
 
-    build (name:'unrecognized2', url: 'http://localhost:8080/helloworld')
+repositories {
+    golang {
+        root 'unrecognized2'
+        url 'http://localhost:8080/helloworld'
+    }
+}
+
+dependencies {
+    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}') 
+
+//    build (name:'unrecognized2', url: 'http://localhost:8080/helloworld')
 }
 
 """)
@@ -115,6 +123,14 @@ golang {
     packagePath='my/project'
     goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
+
+repositories {
+    golang {
+        root 'unrecognized2'
+        dir '${getResourceDir("unrecognized2")}'
+    }
+}
+
 dependencies {
     build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')
     
