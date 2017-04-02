@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.install;
 
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import javax.inject.Singleton;

@@ -1,12 +1,7 @@
-package com.github.blindpirate.gogradle.core.pack;
+package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
-import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
@@ -16,7 +11,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -53,9 +47,8 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
-    public ResolvedDependency doResolve(GolangConfiguration configuration) {
-        DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
-        this.dependencies = DEFAULT_STRATEGY.produce(this, rootDir, visitor, configuration.getName());
+    public ResolvedDependency doResolve(ResolveContext context) {
+        this.dependencies = context.produceTransitiveDependencies(this, rootDir);
         return this;
     }
 

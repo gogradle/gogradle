@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstall
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
@@ -16,7 +15,6 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Objects;
 
@@ -58,7 +56,6 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                 hostDependency,
                 relativePathToHost);
         ret.setFirstLevel(isRoot(hostDependency));
-        ret.transitiveDepExclusions = new HashSet<>(hostDependency.getTransitiveDepExclusions());
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
         VendorOnlyProduceStrategy strategy = GogradleGlobal.getInstance(VendorOnlyProduceStrategy.class);

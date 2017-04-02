@@ -5,6 +5,8 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -16,13 +18,11 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
-import org.mockito.Mockito
 
 import java.time.Instant
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
-import static org.mockito.Mockito.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -41,25 +41,11 @@ class LocalDirectoryDependencyTest {
     @Test
     void 'local directory should be resolved to itself'() {
         // given
-        DependencyVisitor visitor = mock(DependencyVisitor)
-        GolangConfiguration configuration = mock(GolangConfiguration)
-        when(visitor.visitExternalDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
-        when(visitor.visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(new GolangDependencySet())
-        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(new GolangDependencySet())
-        when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(visitor)
-        when(configuration.getName()).thenReturn(GolangConfiguration.TEST)
+        ResolveContext context = mock(ResolveContext)
         // when
-        def result = dependency.resolve(configuration)
+        dependency.resolve(context)
         // then
-        assert result.is(dependency)
-        ArgumentCaptor captor = ArgumentCaptor.forClass(String)
-
-        verify(visitor).visitExternalDependencies(any(ResolvedDependency), any(File), captor.capture())
-        assert captor.value == 'test'
-
-        verify(visitor).visitSourceCodeDependencies(any(ResolvedDependency), any(File), anyString())
-        verify(visitor).visitVendorDependencies(any(ResolvedDependency), any(File))
-
+        verify(context).produceTransitiveDependencies(dependency, resource)
     }
 
     @Test
