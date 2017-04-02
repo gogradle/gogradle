@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.GogradleModuleSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Test
