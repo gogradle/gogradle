@@ -1,9 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
-import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -81,7 +81,7 @@ public class SourceCodeDependencyFactory {
             return Optional.of(importPath);
         }
 
-        String rootPath = VcsGolangPackage.class.cast(info).getRootPathString();
+        String rootPath = ResolvableGolangPackage.class.cast(info).getRootPathString();
 
         return Optional.of(rootPath);
     }

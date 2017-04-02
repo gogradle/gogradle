@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import java.io.Serializable;
@@ -12,25 +11,12 @@ import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 
-public class VcsGolangPackage extends GolangPackage {
-    private String rootPathString;
+public class VcsGolangPackage extends ResolvableGolangPackage {
     private VcsInfo originalVcsInfo;
     private VcsInfo substitutedVcsInfo;
 
-    protected VcsGolangPackage(Path path) {
-        super(path);
-    }
-
-    public boolean isRoot() {
-        return rootPathString.equals(getPathString());
-    }
-
-    public Path getRootPath() {
-        return Paths.get(rootPathString);
-    }
-
-    public String getRootPathString() {
-        return rootPathString;
+    protected VcsGolangPackage(Path rootPath, Path path) {
+        super(rootPath, path);
     }
 
     public VcsType getVcsType() {
@@ -54,6 +40,10 @@ public class VcsGolangPackage extends GolangPackage {
 
     public VcsInfo getOriginalVcsInfo() {
         return originalVcsInfo;
+    }
+
+    public VcsInfo getSubstitutedVcsInfo() {
+        return substitutedVcsInfo;
     }
 
     @Override
@@ -135,8 +125,7 @@ public class VcsGolangPackage extends GolangPackage {
 
 
         public VcsGolangPackage build() {
-            VcsGolangPackage ret = new VcsGolangPackage(path);
-            ret.rootPathString = StringUtils.toUnixString(this.rootPath);
+            VcsGolangPackage ret = new VcsGolangPackage(rootPath, path);
 
             ret.originalVcsInfo = originalVcsInfo;
             ret.substitutedVcsInfo = substitutedVcsInfo;
@@ -151,7 +140,7 @@ public class VcsGolangPackage extends GolangPackage {
     public String toString() {
         return "VcsGolangPackage{"
                 + "path='" + getPathString() + '\''
-                + ", rootPath='" + rootPathString + '\''
+                + ", rootPath='" + getRootPathString() + '\''
                 + ", vcsType=" + getVcsType()
                 + ", urls='" + getUrls() + '\''
                 + '}';

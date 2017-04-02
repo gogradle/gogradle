@@ -40,8 +40,6 @@ class DefaultMapNotationParserTest {
     MapNotationParser gitMapNotationParser
     @Mock
     MapNotationParser mercurialMapNotationParser
-    @Mock
-    File dir
     @Captor
     ArgumentCaptor captor
 
@@ -69,7 +67,7 @@ class DefaultMapNotationParserTest {
                             .withSubstitutedVcsInfo(VcsType.GIT, ['substitutedUrl'])
                             .build())
                 } else if (path.startsWith('local')) {
-                    return of(LocalDirectoryGolangPackage.of('local', path, dir))
+                    return of(LocalDirectoryGolangPackage.of('local', path, 'dir'))
                 } else {
                     assert false
                 }
@@ -103,7 +101,7 @@ class DefaultMapNotationParserTest {
         assert captor.value.package instanceof LocalDirectoryGolangPackage
         assert captor.value.package.rootPathString == 'local'
         assert captor.value.package.pathString == 'local'
-        assert captor.value.package.dir == dir
+        assert captor.value.package.dir == 'dir'
     }
 
     @Test
@@ -116,7 +114,7 @@ class DefaultMapNotationParserTest {
         assert captor.value.package instanceof LocalDirectoryGolangPackage
         assert captor.value.package.rootPathString == 'local'
         assert captor.value.package.pathString == 'local/sub'
-        assert captor.value.package.dir == dir
+        assert captor.value.package.dir == 'dir'
     }
 
     @Test
