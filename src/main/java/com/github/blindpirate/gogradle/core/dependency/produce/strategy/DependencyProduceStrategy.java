@@ -18,5 +18,5 @@ public interface DependencyProduceStrategy {
     GolangDependencySet produce(ResolvedDependency dependency,
                                 File rootDir,
                                 DependencyVisitor visitor,
-                                String configuration);
+                                String configurationName);
 }
