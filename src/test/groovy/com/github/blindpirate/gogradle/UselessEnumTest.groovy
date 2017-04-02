@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter
 import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.crossplatform.Arch
@@ -16,7 +15,7 @@ class UselessEnumTest {
         [BuildMode,
          Os,
          Arch,
-         AbstractGolangDependency.NoTransitiveSpec,
+         AbstractNotationDependency.NoTransitiveSpec,
          DependencyInstallFileFilter,
          GogradleGlobal].each(this.&doUselessTest)
     }

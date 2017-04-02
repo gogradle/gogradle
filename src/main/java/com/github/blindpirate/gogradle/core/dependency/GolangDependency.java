@@ -1,12 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.specs.Spec;
 
 import java.io.Serializable;
-import java.util.Set;
 
 /**
  * A {@link GolangDependency} represents a dependency
@@ -33,10 +30,10 @@ public interface GolangDependency extends Dependency, Serializable {
 
     GolangPackage getPackage();
 
-    ResolvedDependency resolve(GolangConfiguration configuration);
+    ResolvedDependency resolve(ResolveContext context);
 
     boolean isFirstLevel();
 
-    Set<Spec<GolangDependency>> getTransitiveDepExclusions();
+
 }
 

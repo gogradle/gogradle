@@ -1,12 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
-import org.gradle.api.specs.Spec;
 
 import java.util.Set;
+import java.util.function.Predicate;
 
 public class UnrecognizedPackageNotationDependency extends AbstractGolangDependency implements NotationDependency {
 
@@ -33,18 +31,12 @@ public class UnrecognizedPackageNotationDependency extends AbstractGolangDepende
     }
 
     @Override
-    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
+    public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
         throw new UnsupportedOperationException();
     }
 
     @Override
-    public ResolvedDependency resolve(GolangConfiguration configuration) {
-        DependencyRegistry registry = GogradleGlobal.getInstance(DependencyRegistry.class);
-        ResolvedDependency resolvedDependency = registry.retrieve(getName());
-        if (resolvedDependency != null) {
-            return resolvedDependency;
-        } else {
-            throw new UnsupportedOperationException("Cannot resolve package: " + getName());
-        }
+    public ResolvedDependency resolve(ResolveContext context) {
+        throw new UnsupportedOperationException("Cannot resolve package: " + getName());
     }
 }
