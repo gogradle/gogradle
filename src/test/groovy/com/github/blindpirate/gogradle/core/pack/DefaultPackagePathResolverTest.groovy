@@ -60,7 +60,7 @@ class DefaultPackagePathResolverTest {
         GolangPackage info = VcsGolangPackage.builder()
                 .withPath('github.com/a/b/c')
                 .withRootPath('github.com/a/b')
-                .withVcsType(VcsType.GIT)
+                .withOriginalVcsInfo(VcsType.GIT, ['url'])
                 .build()
         when(resolver1.produce('github.com/a/b/c')).thenReturn(of(info))
         // when
@@ -86,7 +86,7 @@ class DefaultPackagePathResolverTest {
         GolangPackage rootInfo = VcsGolangPackage.builder()
                 .withPath('github.com/a/b')
                 .withRootPath('github.com/a/b')
-                .withVcsType(VcsType.GIT)
+                .withOriginalVcsInfo(VcsType.GIT, ['url'])
                 .build()
         getField(resolver, 'cache').put('github.com', IncompleteGolangPackage.of('github.com'))
         getField(resolver, 'cache').put('github.com/a', IncompleteGolangPackage.of('github.com/a'))

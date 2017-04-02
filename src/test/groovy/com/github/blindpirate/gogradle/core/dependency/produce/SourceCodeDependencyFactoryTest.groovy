@@ -11,6 +11,7 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionExcep
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -55,7 +56,11 @@ class SourceCodeDependencyFactoryTest {
             Object answer(InvocationOnMock invocation) throws Throwable {
                 String name = invocation.getArgument(0)
                 if (name.startsWith('github.com')) {
-                    GolangPackage ret = VcsGolangPackage.builder().withPath(name).withRootPath('github.com/a/b').build()
+                    GolangPackage ret = VcsGolangPackage.builder()
+                            .withPath(name)
+                            .withRootPath('github.com/a/b')
+                            .withOriginalVcsInfo(VcsType.GIT, ['https://github.com/a/b.git'])
+                            .build()
                     return Optional.of(ret)
                 } else {
                     GolangPackage standardPackage = StandardGolangPackage.of(name)
