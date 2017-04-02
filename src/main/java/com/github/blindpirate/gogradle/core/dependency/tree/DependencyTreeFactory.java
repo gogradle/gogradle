@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Singleton;
 import java.util.HashSet;
@@ -51,13 +52,19 @@ public class DependencyTreeFactory {
         }
 
         // BFS order
-        List<ResolvedDependency> resolvedDependencies = resolvedDependency.getDependencies()
+        List<Pair<ResolveContext, ResolvedDependency>> contextAndResults = resolvedDependency.getDependencies()
                 .stream()
-                .map(dependency -> dependency.resolve(context))
+                .map(dependency -> createContextAndResolve(dependency, context))
                 .collect(Collectors.toList());
 
-        resolvedDependencies
-                .forEach(dependency -> resolve(dependency, context.createSubContext(dependency)));
+        contextAndResults
+                .forEach(contextAndResult -> resolve(contextAndResult.getRight(), contextAndResult.getLeft()));
+    }
 
+    private Pair<ResolveContext, ResolvedDependency> createContextAndResolve(GolangDependency dependency,
+                                                                             ResolveContext parentContext) {
+        ResolveContext subContext = parentContext.createSubContext(dependency);
+        ResolvedDependency resolvedDependency = dependency.resolve(subContext);
+        return Pair.of(subContext, resolvedDependency);
     }
 }

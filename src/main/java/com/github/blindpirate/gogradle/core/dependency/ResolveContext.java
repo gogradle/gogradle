@@ -9,6 +9,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.*;
 import static java.util.Collections.emptySet;
 
 public class ResolveContext {
@@ -33,9 +34,10 @@ public class ResolveContext {
         if (dependency instanceof NotationDependency) {
             return new ResolveContext(this,
                     configuration,
-                    NotationDependency.class.cast(dependency).getTransitiveDepExclusions());
+                    NotationDependency.class.cast(dependency).getTransitiveDepExclusions(),
+                    DEFAULT_STRATEGY);
         } else {
-            return new ResolveContext(this, configuration, emptySet());
+            return new ResolveContext(this, configuration, emptySet(), DEFAULT_STRATEGY);
         }
     }
 
@@ -54,11 +56,6 @@ public class ResolveContext {
         this.dependencyProduceStrategy = strategy;
     }
 
-    private ResolveContext(ResolveContext parent,
-                           GolangConfiguration configuration,
-                           Set<Predicate<GolangDependency>> transitiveDepExclusions) {
-        this(parent, configuration, transitiveDepExclusions, DependencyProduceStrategy.DEFAULT_STRATEGY);
-    }
 
     public GolangDependencySet produceTransitiveDependencies(ResolvedDependency dependency,
                                                              File rootDir) {

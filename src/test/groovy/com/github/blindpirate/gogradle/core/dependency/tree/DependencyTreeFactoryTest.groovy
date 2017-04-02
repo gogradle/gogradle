@@ -130,12 +130,30 @@ class DependencyTreeFactoryTest {
     void 'resolution order should be BFS instead of DFS'() {
         'dependency conflict should be resolved'()
         InOrder order = inOrder(rootProject, a1, a2, a3, b, c, d)
-        order.verify(a1).resolve(any(ResolveContext))
-        order.verify(b).resolve(any(ResolveContext))
-        order.verify(c).resolve(any(ResolveContext))
-        order.verify(a2).resolve(any(ResolveContext))
-        order.verify(d).resolve(any(ResolveContext))
-        order.verify(a3).resolve(any(ResolveContext))
+        order.verify(a1).resolve(context)
+        order.verify(b).resolve(context)
+        order.verify(c).resolve(context)
+        order.verify(a2).resolve(context)
+        order.verify(d).resolve(context)
+        order.verify(a3).resolve(context)
+    }
+
+    @Test
+    void 'sub context should be created before resolution'() {
+        'dependency conflict should be resolved'()
+        InOrder order = inOrder(context, a1, a2, a3, b, c, d)
+        order.verify(context).createSubContext(a1)
+        order.verify(a1).resolve(context)
+        order.verify(context).createSubContext(b)
+        order.verify(b).resolve(context)
+        order.verify(context).createSubContext(c)
+        order.verify(c).resolve(context)
+        order.verify(context).createSubContext(a2)
+        order.verify(a2).resolve(context)
+        order.verify(context).createSubContext(d)
+        order.verify(d).resolve(context)
+        order.verify(context).createSubContext(a3)
+        order.verify(a3).resolve(context)
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {
