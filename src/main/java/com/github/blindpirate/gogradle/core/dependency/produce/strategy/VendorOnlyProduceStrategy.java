@@ -9,13 +9,13 @@ import javax.inject.Singleton;
 import java.io.File;
 
 @Singleton
-public class VendorOnlyProduceStrategy extends ExclusionInheritanceProduceStrategy {
+public class VendorOnlyProduceStrategy implements DependencyProduceStrategy {
     @Override
     @DebugLog
-    public GolangDependencySet doProduce(ResolvedDependency dependency,
-                                         File rootDir,
-                                         DependencyVisitor visitor,
-                                         String configuration) {
+    public GolangDependencySet produce(ResolvedDependency dependency,
+                                       File rootDir,
+                                       DependencyVisitor visitor,
+                                       String configuration) {
         return visitor.visitVendorDependencies(dependency, rootDir);
     }
 }

@@ -16,13 +16,13 @@ import java.io.File;
  * Otherwise, as a fallback, it will scan source code to get dependencies.
  */
 @Singleton
-public class DefaultDependencyProduceStrategy extends ExclusionInheritanceProduceStrategy {
+public class DefaultDependencyProduceStrategy implements DependencyProduceStrategy {
     @Override
     @DebugLog
-    public GolangDependencySet doProduce(ResolvedDependency dependency,
-                                         File rootDir,
-                                         DependencyVisitor visitor,
-                                         String configuration) {
+    public GolangDependencySet produce(ResolvedDependency dependency,
+                                       File rootDir,
+                                       DependencyVisitor visitor,
+                                       String configuration) {
         GolangDependencySet candidate = visitor.visitExternalDependencies(dependency,
                 rootDir, configuration);
 
