@@ -46,10 +46,9 @@ public class BitbucketPackagePathResolver extends AbstractPackagePathResolver {
                 .map(BitbucketApiModel.LinksBean.CloneBean::getHref)
                 .collect(Collectors.toList());
         return VcsGolangPackage.builder()
-                .withUrls(urls)
+                .withOriginalVcsInfo(VcsType.of(packageInfo.scm).get(), urls)
                 .withPath(path)
                 .withRootPath(path.subpath(0, 3))
-                .withVcsType(VcsType.of(packageInfo.scm).get())
                 .build();
     }
 

@@ -1,11 +1,12 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
+import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,13 +14,8 @@ import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 
 public class VcsGolangPackage extends GolangPackage {
     private String rootPathString;
-    private VcsType vcsType;
-    private List<String> urls;
-    private boolean temp;
-
-    public boolean isTemp() {
-        return temp;
-    }
+    private VcsInfo originalVcsInfo;
+    private VcsInfo substitutedVcsInfo;
 
     protected VcsGolangPackage(Path path) {
         super(path);
@@ -38,15 +34,26 @@ public class VcsGolangPackage extends GolangPackage {
     }
 
     public VcsType getVcsType() {
-        return vcsType;
+        return determineVcs().vcsType;
     }
 
     public String getUrl() {
-        return isEmpty(urls) ? null : urls.get(0);
+        return isEmpty(getUrls()) ? null : getUrls().get(0);
     }
 
     public List<String> getUrls() {
-        return urls;
+        return determineVcs().urls;
+    }
+
+    private VcsInfo determineVcs() {
+        if (substitutedVcsInfo != null) {
+            return substitutedVcsInfo;
+        }
+        return originalVcsInfo;
+    }
+
+    public VcsInfo getOriginalVcsInfo() {
+        return originalVcsInfo;
     }
 
     @Override
@@ -70,8 +77,8 @@ public class VcsGolangPackage extends GolangPackage {
     private GolangPackage sameRoot(Path packagePath) {
         return builder().withPath(packagePath)
                 .withRootPath(getRootPath())
-                .withVcsType(vcsType)
-                .withUrls(urls)
+                .withOriginalVcsInfo(originalVcsInfo)
+                .withSubstitutedVcsInfo(substitutedVcsInfo)
                 .build();
     }
 
@@ -82,9 +89,8 @@ public class VcsGolangPackage extends GolangPackage {
     public static final class Builder {
         private Path path;
         private Path rootPath;
-        private VcsType vcsType = VcsType.GIT;
-        private List<String> urls;
-        private boolean temp = false;
+        private VcsInfo originalVcsInfo;
+        private VcsInfo substitutedVcsInfo;
 
         private Builder() {
         }
@@ -107,33 +113,37 @@ public class VcsGolangPackage extends GolangPackage {
             return this;
         }
 
-        public Builder withVcsType(VcsType vcsType) {
-            this.vcsType = vcsType;
+        public Builder withOriginalVcsInfo(VcsType vcsType, List<String> urls) {
+            this.originalVcsInfo = new VcsInfo(vcsType, urls);
             return this;
         }
 
-        public Builder withUrl(String url) {
-            this.urls = Arrays.asList(url);
+        public Builder withSubstitutedVcsInfo(VcsType vcsType, List<String> urls) {
+            this.substitutedVcsInfo = new VcsInfo(vcsType, urls);
             return this;
         }
 
-        public Builder withUrls(List<String> urls) {
-            this.urls = urls;
+        public Builder withOriginalVcsInfo(VcsInfo originalVcsInfo) {
+            this.originalVcsInfo = originalVcsInfo;
             return this;
         }
 
-        public Builder withTemp(boolean temp) {
-            this.temp = temp;
+        public Builder withSubstitutedVcsInfo(VcsInfo substitutedVcsInfo) {
+            this.substitutedVcsInfo = substitutedVcsInfo;
             return this;
         }
+
 
         public VcsGolangPackage build() {
-            VcsGolangPackage vcsGolangPackage = new VcsGolangPackage(path);
-            vcsGolangPackage.rootPathString = StringUtils.toUnixString(this.rootPath);
-            vcsGolangPackage.urls = this.urls;
-            vcsGolangPackage.vcsType = this.vcsType;
-            vcsGolangPackage.temp = this.temp;
-            return vcsGolangPackage;
+            VcsGolangPackage ret = new VcsGolangPackage(path);
+            ret.rootPathString = StringUtils.toUnixString(this.rootPath);
+
+            ret.originalVcsInfo = originalVcsInfo;
+            ret.substitutedVcsInfo = substitutedVcsInfo;
+
+            Assert.isTrue(originalVcsInfo != null || substitutedVcsInfo != null);
+
+            return ret;
         }
     }
 
@@ -142,10 +152,27 @@ public class VcsGolangPackage extends GolangPackage {
         return "VcsGolangPackage{"
                 + "path='" + getPathString() + '\''
                 + ", rootPath='" + rootPathString + '\''
-                + ", vcsType=" + vcsType
-                + ", url='" + urls + '\''
+                + ", vcsType=" + getVcsType()
+                + ", urls='" + getUrls() + '\''
                 + '}';
     }
 
+    public static class VcsInfo implements Serializable {
+        private VcsType vcsType = VcsType.GIT;
+        private List<String> urls;
+
+        private VcsInfo(VcsType vcsType, List<String> urls) {
+            this.vcsType = vcsType;
+            this.urls = urls;
+        }
+
+        public VcsType getVcsType() {
+            return vcsType;
+        }
+
+        public List<String> getUrls() {
+            return urls;
+        }
+    }
 }
 

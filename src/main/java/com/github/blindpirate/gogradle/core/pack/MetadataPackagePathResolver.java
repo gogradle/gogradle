@@ -19,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -80,9 +81,8 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
     private GolangPackage buildPackageInfo(String packagePath, GoImportMetaTag metaTag) {
         return VcsGolangPackage.builder()
                 .withPath(Paths.get(packagePath))
-                .withVcsType(metaTag.vcs)
+                .withOriginalVcsInfo(metaTag.vcs, Arrays.asList(metaTag.repoUrl))
                 .withRootPath(Paths.get(metaTag.rootPath))
-                .withUrl(metaTag.repoUrl)
                 .build();
     }
 
