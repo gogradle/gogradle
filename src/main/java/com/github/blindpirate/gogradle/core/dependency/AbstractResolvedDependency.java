@@ -1,10 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 
 import java.io.File;
-import java.util.stream.Collectors;
 
 /**
  * Represents some code at a specific version.
@@ -27,7 +25,7 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
     }
 
     @Override
-    public ResolvedDependency resolve(GolangConfiguration configuration) {
+    public ResolvedDependency resolve(ResolveContext context) {
         return this;
     }
 
@@ -43,10 +41,7 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
 
     @Override
     public GolangDependencySet getDependencies() {
-        return dependencies
-                .stream()
-                .filter(super::shouldNotBeExcluded)
-                .collect(Collectors.toCollection(GolangDependencySet::new));
+        return dependencies;
     }
 
     @Override
