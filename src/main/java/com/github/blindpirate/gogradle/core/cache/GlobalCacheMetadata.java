@@ -15,11 +15,11 @@ public class GlobalCacheMetadata extends WithApiVersion {
     @JsonProperty("lastUpdated")
     private LastUpdated lastUpdated;
 
-    @JsonProperty("vcs")
-    private String vcs;
+    @JsonProperty("originalVcs")
+    private String originalVcs;
 
-    public String getVcs() {
-        return vcs;
+    public String getOriginalVcs() {
+        return originalVcs;
     }
 
     public List<String> getOriginalUrls() {
@@ -36,31 +36,21 @@ public class GlobalCacheMetadata extends WithApiVersion {
         return lastUpdated.time;
     }
 
-    @JsonIgnore
-    public boolean isTemp() {
-        return vcs == null;
-    }
 
     public static GlobalCacheMetadata newMetadata(VcsGolangPackage pkg) {
         GlobalCacheMetadata metadata = new GlobalCacheMetadata();
-        if (!pkg.isTemp()) {
-            metadata.originalUrls = pkg.getUrls();
-            metadata.vcs = pkg.getVcsType().getName();
+        if (pkg.getOriginalVcsInfo() != null) {
+            metadata.originalUrls = pkg.getOriginalVcsInfo().getUrls();
+            metadata.originalVcs = pkg.getOriginalVcsInfo().getVcsType().getName();
         }
         metadata.lastUpdated = new LastUpdated();
         return metadata;
     }
 
-    public static GlobalCacheMetadata updatedMetadata(VcsGolangPackage pkg, String currentUrl) {
-        GlobalCacheMetadata metadata = new GlobalCacheMetadata();
-        if (!pkg.isTemp()) {
-            metadata.originalUrls = pkg.getUrls();
-            metadata.vcs = pkg.getVcsType().getName();
-        }
-        metadata.lastUpdated = new LastUpdated();
-        metadata.lastUpdated.time = System.currentTimeMillis();
-        metadata.lastUpdated.url = currentUrl;
-        return metadata;
+    public void update(String currentUrl) {
+        lastUpdated = new LastUpdated();
+        lastUpdated.time = System.currentTimeMillis();
+        lastUpdated.url = currentUrl;
     }
 
     private static class LastUpdated {

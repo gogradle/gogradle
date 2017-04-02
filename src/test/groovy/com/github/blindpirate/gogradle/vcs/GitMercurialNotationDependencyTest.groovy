@@ -2,8 +2,8 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
@@ -25,7 +25,7 @@ class GitMercurialNotationDependencyTest {
     GitDependencyManager gitDependencyManager
 
     @Mock
-    GolangConfiguration configuration
+    ResolveContext context
 
     @Before
     void setUp() {
@@ -39,9 +39,9 @@ class GitMercurialNotationDependencyTest {
         // given
         when(GogradleGlobal.INSTANCE.getInstance(GitDependencyManager)).thenReturn(gitDependencyManager)
         // when
-        dependency.resolve(configuration)
+        dependency.resolve(context)
         // then
-        verify(gitDependencyManager).resolve(configuration, dependency)
+        verify(gitDependencyManager).resolve(context, dependency)
     }
 
     @Test
