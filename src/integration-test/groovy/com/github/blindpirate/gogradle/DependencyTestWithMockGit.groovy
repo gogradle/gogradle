@@ -1,7 +1,5 @@
-package com.github.blindpirate.gogradle.dependencytest
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GogradleGlobal
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils

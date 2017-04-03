@@ -1,6 +1,5 @@
-package com.github.blindpirate.gogradle.ide
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import org.gradle.tooling.BuildController
