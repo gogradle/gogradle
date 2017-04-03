@@ -71,7 +71,9 @@ repositories {
             newBuild {
                 it.forTasks('dependencies')
             }
-            assert stdout.toString().contains("""
+
+            String actualOutput = stdout.toString().replaceAll('\\r', '')
+            String expectedOutput = """
 build:
 github.com/my/project
 └── a:${StringUtils.toUnixString(resource)}/a √
@@ -81,7 +83,9 @@ test:
 github.com/my/project
 └── c:${StringUtils.toUnixString(resource)}/c √
     └── d:${StringUtils.toUnixString(resource)}/d √
-""")
+""".replaceAll('\\r', '')
+
+            assert actualOutput.concat(expectedOutput)
         } finally {
             println(stdout)
             println(stderr)

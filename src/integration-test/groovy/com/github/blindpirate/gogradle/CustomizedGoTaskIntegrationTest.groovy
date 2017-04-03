@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 class CustomizedGoTaskIntegrationTest extends IntegrationTestSupport {
-    String lsCmd = Os.getHostOs() == Os.WINDOWS ? 'dir' : 'ls'
+    String lsCmd = Os.getHostOs() == Os.WINDOWS ? 'cmd /C dir' : 'ls'
 
     @Before
     void setUp() {
