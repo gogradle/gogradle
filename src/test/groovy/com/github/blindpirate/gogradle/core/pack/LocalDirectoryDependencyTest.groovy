@@ -74,20 +74,6 @@ class LocalDirectoryDependencyTest {
         LocalDirectoryDependency.fromLocal('', resource)
     }
 
-    @Test
-    void 'transitive dependency exclusion should take effect'() {
-        // given
-        dependency.exclude(name: 'a')
-        GolangDependency a = mockDependency('a')
-        GolangDependency b = mockDependency('b')
-
-        // when
-        dependency.setDependencies(asGolangDependencySet(a, b))
-
-        // then
-        assert dependency.dependencies.size() == 1
-        assert dependency.dependencies.first().name == 'b'
-    }
 
     @Test
     void 'local dependency should be installed successfully'() {

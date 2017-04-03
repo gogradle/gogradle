@@ -9,7 +9,6 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.time.Instant;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
@@ -63,10 +62,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public GolangDependencySet getDependencies() {
-        return dependencies
-                .stream()
-                .filter(this::shouldNotBeExcluded)
-                .collect(Collectors.toCollection(GolangDependencySet::new));
+        return dependencies;
     }
 
     @Override
