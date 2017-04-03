@@ -132,9 +132,7 @@ repositories {
 }
 
 dependencies {
-    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}')
-    
-    build (name:'unrecognized2', dir:'${getResourceDir("unrecognized2")}'){
+    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
         exclude name:'unrecognized3'
     }
 }
