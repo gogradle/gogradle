@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.crossplatform;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.CompressUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.HttpUtils;
@@ -104,7 +105,11 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         }
         determineGoBinaryAndVersion();
         // $GOROOT/bin/go -> $GOROOT
-        goroot = toRealPath(binaryPath).resolve("../..").normalize();
+        if (setting.getGoRoot() != null) {
+            goroot = Paths.get(setting.getGoRoot());
+        } else {
+            goroot = toRealPath(binaryPath).resolve("../..").normalize();
+        }
         resolved = true;
     }
 
@@ -153,7 +158,9 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     private Optional<Pair<Path, String>> tryGivenGoExecutable() {
         Path givenGoExecutablePath = Paths.get(setting.getGoExecutable());
-        return tryInvokeGoVersion(givenGoExecutablePath);
+        Optional<Pair<Path, String>> ret = tryInvokeGoVersion(givenGoExecutablePath);
+        Assert.isTrue(ret.isPresent(), "Failed to run given go executable: " + setting.getGoExecutable());
+        return ret;
     }
 
     @SuppressWarnings({"checkstyle:localvariablename"})
@@ -183,7 +190,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            LOGGER.debug("Encountered exception when running go version", e);
+            LOGGER.debug("Encountered exception when running go version via: " + executablePath.toAbsolutePath(), e);
             return Optional.empty();
         }
     }

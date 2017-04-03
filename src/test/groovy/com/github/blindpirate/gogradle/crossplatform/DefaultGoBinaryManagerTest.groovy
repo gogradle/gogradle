@@ -80,10 +80,10 @@ class DefaultGoBinaryManagerTest {
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
 
-    @Test
+    @Test(expected = IllegalStateException)
     void 'user-specified go binary should be ignored if it cannot be executed'() {
         // given
-        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
+        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(IOException)
         when(setting.getGoExecutable()).thenReturn('/unexistent/go')
         // then
         'the newest stable version will be used if local binary not exist and no version specified'()
