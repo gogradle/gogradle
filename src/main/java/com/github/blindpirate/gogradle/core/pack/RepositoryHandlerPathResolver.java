@@ -11,7 +11,6 @@ import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
 import groovy.lang.Singleton;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -58,7 +57,7 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
                     .withSubstitutedVcsInfo(vcsType, singletonList(url))
                     .build();
         } else {
-            return LocalDirectoryGolangPackage.of(rootPath, path, new File(dir));
+            return LocalDirectoryGolangPackage.of(rootPath, path, dir);
         }
     }
 }

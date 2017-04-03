@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.util.StringUtils;
+
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
@@ -19,12 +21,16 @@ public class LocalDirectoryGolangPackage extends ResolvableGolangPackage {
 
     @Override
     protected Optional<GolangPackage> longerPath(Path packagePath) {
-        return Optional.of(of(getRootPathString(), getPathString(), dir));
+        return Optional.of(of(getRootPath(), packagePath, dir));
     }
 
     @Override
     protected Optional<GolangPackage> shorterPath(Path packagePath) {
-        return Optional.of(IncompleteGolangPackage.of(packagePath));
+        if (StringUtils.toUnixString(packagePath).length() < getRootPathString().length()) {
+            return Optional.of(IncompleteGolangPackage.of(packagePath));
+        } else {
+            return Optional.of(of(getRootPath(), packagePath, dir));
+        }
     }
 
     public static LocalDirectoryGolangPackage of(Path rootPath, Path path, String dir) {
