@@ -1,9 +1,12 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
@@ -73,11 +76,12 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public void installTo(File targetDirectory) {
         GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
+        IOUtils.write(targetDirectory, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE, formatVersion());
     }
 
     @Override
     public String formatVersion() {
-        return rootDir.getAbsolutePath().replace('\\', '/');
+        return StringUtils.toUnixString(rootDir);
     }
 
     @Override

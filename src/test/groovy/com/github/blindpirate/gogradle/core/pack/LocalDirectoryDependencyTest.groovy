@@ -8,11 +8,13 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
@@ -76,15 +78,22 @@ class LocalDirectoryDependencyTest {
 
 
     @Test
+    @WithResource('')
     void 'local dependency should be installed successfully'() {
         // given
+        IOUtils.mkdir(resource, 'src')
+        IOUtils.mkdir(resource, 'dest')
+        File src = new File(resource, 'src')
+        File dest = new File(resource, 'dest')
+
+        dependency = LocalDirectoryDependency.fromLocal('name', src)
         LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
-        File targetDirectory = mock(File)
         when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
         // when
-        dependency.installTo(targetDirectory)
+        dependency.installTo(dest)
         // then
-        verify(installer).install(dependency, targetDirectory)
+        verify(installer).install(dependency, dest)
+        assert new File(dest, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
     }
 
     @Test(expected = UnsupportedOperationException)
