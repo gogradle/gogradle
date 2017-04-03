@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -92,6 +93,11 @@ class DefaultMapNotationParserTest {
     }
 
     @Test
+    void 'unrecognized notation dependency should be generated if url not specified'() {
+        assert parser.parse([name: 'unrecognized', useless: 'useless']) instanceof UnrecognizedPackageNotationDependency
+    }
+
+    @Test
     void 'local directory package should be delegated to DirMapNotationParser'() {
         // when
         parser.parse([name: 'local'])
@@ -118,7 +124,7 @@ class DefaultMapNotationParserTest {
     }
 
     @Test
-    void 'unrecognized dependency should be parsed successfully if url is provided'() {
+    void 'unrecognized dependency should be parsed successfully if url and vcs is provided'() {
         // when
         parser.parse([name: 'unrecognized', url: 'url', vcs: 'hg'])
         // then
@@ -130,6 +136,22 @@ class DefaultMapNotationParserTest {
         assert captor.value.package.pathString == 'unrecognized'
         assert captor.value.package.rootPathString == 'unrecognized'
         assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.MERCURIAL
+        assert captor.value.package.substitutedVcsInfo.urls == ['url']
+    }
+
+    @Test
+    void 'unrecognized dependency should be parsed successfully if only url is provided'() {
+        // when
+        parser.parse([name: 'unrecognized', url: 'url'])
+        // then
+        verify(gitMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'unrecognized'
+        assert captor.value.url == 'url'
+        assert captor.value.package instanceof VcsGolangPackage
+        assert captor.value.package.originalVcsInfo == null
+        assert captor.value.package.pathString == 'unrecognized'
+        assert captor.value.package.rootPathString == 'unrecognized'
+        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.GIT
         assert captor.value.package.substitutedVcsInfo.urls == ['url']
     }
 

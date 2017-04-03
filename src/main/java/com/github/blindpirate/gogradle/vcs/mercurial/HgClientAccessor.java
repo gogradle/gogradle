@@ -93,7 +93,7 @@ public class HgClientAccessor extends GitMercurialAccessor {
     private GitMercurialCommit extractOne(String line) {
         // 6e7786086f774483c392827fd358523ebbf7bb5c:v1.2m2:1375988692 -7200
         String[] commitTagAndTime = line.split(":");
-        Assert.isTrue(commitTagAndTime.length == 3);
+        Assert.isTrue(commitTagAndTime.length == 3, "Unrecognized line: " + line);
 
         String id = commitTagAndTime[0];
         String tag = trimToNull(commitTagAndTime[1]);

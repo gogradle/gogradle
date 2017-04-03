@@ -8,12 +8,12 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 
 import java.nio.file.Paths
 import java.time.Instant
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
@@ -33,6 +33,11 @@ class HgClientAccessorTest {
 
         // then
         accessor.ensureClientExists()
+    }
+
+    @Test
+    void "default branch is 'default'"() {
+        assert accessor.getDefaultBranch(resource) == 'default'
     }
 
     @Test

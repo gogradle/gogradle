@@ -16,4 +16,9 @@ class UnrecognizedGolangPackageTest {
     void 'path shorter than unrecognized package should also be unrecognized'() {
         assert unrecognizedGolangPackage.resolve('golang').get() instanceof UnrecognizedGolangPackage
     }
+
+    @Test
+    void 'toString() should succeed'() {
+        assert unrecognizedGolangPackage.toString() == "UnrecognizedGolangPackage{path='golang/x'}"
+    }
 }
