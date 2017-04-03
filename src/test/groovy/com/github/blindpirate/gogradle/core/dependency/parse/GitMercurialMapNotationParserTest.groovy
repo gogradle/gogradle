@@ -16,16 +16,13 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GitMercurialMapNotationParserTest {
-    @Mock
-    VcsGolangPackage pkg
+    VcsGolangPackage pkg = VcsGolangPackage.builder()
+            .withPath('github.com/a/b')
+            .withRootPath('github.com/a/b')
+            .withOriginalVcsInfo(VcsType.GIT, ['url'])
+            .build()
 
     GitMercurialMapNotationParser parser = new GitMercurialMapNotationParser()
-
-    @Before
-    void setUp() {
-        when(pkg.getUrls()).thenReturn(['url'])
-        when(pkg.getVcsType()).thenReturn(VcsType.GIT)
-    }
 
     void assertWithNameAndUrl(GitMercurialNotationDependency dependency) {
         assert dependency instanceof GitNotationDependency
@@ -52,12 +49,17 @@ class GitMercurialMapNotationParserTest {
     @Test
     void 'mercurial map notation should be parsed correctly'() {
         // when
-        GitMercurialNotationDependency dependency = parser.parse([name: 'bitbucket.org/a/b', version: 'v1.0.0', vcs: 'hg'])
+        pkg = VcsGolangPackage.builder()
+                .withRootPath('bitbucket.org/a/b')
+                .withPath('bitbucket.org/a/b')
+                .withOriginalVcsInfo(VcsType.MERCURIAL, ['url'])
+                .build()
+        GitMercurialNotationDependency dependency = parser.parse([name: 'bitbucket.org/a/b', version: 'v1.0.0', vcs: 'hg', package: pkg])
         // then
         assert dependency instanceof GitMercurialNotationDependency
         assert dependency.name == 'bitbucket.org/a/b'
         assert !dependency.tag
-        assert !dependency.urls
+        assert dependency.urls == ['url']
         assert dependency.commit == 'v1.0.0'
     }
 
@@ -69,6 +71,22 @@ class GitMercurialMapNotationParserTest {
         assert dependency.name == 'github.com/a/b'
         assertEmpty(dependency, 'tag',)
         assert dependency.urls == ['specifiedUrl']
+        assert dependency.commit == GitMercurialNotationDependency.NEWEST_COMMIT
+    }
+
+    @Test
+    void 'url in map notation should be removed when urls have already been substituted'() {
+        // when
+        pkg = VcsGolangPackage.builder()
+                .withRootPath('github.com/a/b')
+                .withPath('github.com/a/b')
+                .withSubstitutedVcsInfo(VcsType.GIT, ['url'])
+                .build()
+        GitMercurialNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: pkg])
+        // then
+        assert dependency.name == 'github.com/a/b'
+        assertEmpty(dependency, 'tag', 'url')
+        assert dependency.urls == ['url']
         assert dependency.commit == GitMercurialNotationDependency.NEWEST_COMMIT
     }
 

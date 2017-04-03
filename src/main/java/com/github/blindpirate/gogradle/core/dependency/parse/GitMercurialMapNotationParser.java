@@ -19,6 +19,7 @@ import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URLS_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URL_KEY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.VERSION_KEY;
 
 @Singleton
@@ -30,8 +31,11 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         String commit = getString(notation, COMMIT_KEY);
 
         VcsGolangPackage pkg = MapUtils.getValue(notation, PACKAGE_KEY, VcsGolangPackage.class);
-        if (pkg != null) {
-            notation.put(URLS_KEY, pkg.getUrls());
+        notation.put(URLS_KEY, pkg.getUrls());
+
+        if (pkg.getSubstitutedVcsInfo() != null) {
+            // Remove url in map since url has been specified in repositories
+            notation.remove(URL_KEY);
         }
 
         if (allBlank(version, tag, commit)) {
