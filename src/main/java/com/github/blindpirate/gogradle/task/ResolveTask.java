@@ -11,6 +11,7 @@ import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager;
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor;
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory;
@@ -24,7 +25,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.Tr
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
-import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
@@ -41,6 +41,8 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
+import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
+import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 
 public abstract class ResolveTask extends DefaultTask {
     @Inject
@@ -57,6 +59,9 @@ public abstract class ResolveTask extends DefaultTask {
 
     @Inject
     private BuildManager buildManager;
+
+    @Inject
+    private DependencyVisitor visitor;
 
     private DependencyTreeNode dependencyTree;
 
@@ -106,7 +111,7 @@ public abstract class ResolveTask extends DefaultTask {
     @InputFiles
     public Collection<File> getGoSourceFiles() {
         GoSourceCodeFilter filter = GoImportExtractor.FILTERS.get(getConfigurationName());
-        return IOUtils.filterFilesRecursively(getProject().getRootDir(), filter);
+        return filterFilesRecursively(getProject().getRootDir(), filter);
     }
 
 //    @InputFiles
@@ -130,6 +135,7 @@ public abstract class ResolveTask extends DefaultTask {
     }
 
     private void installDependencies() {
+        clearDirectory(buildManager.getInstallationDirectory(getConfigurationName()).toFile());
         dependencyTree.flatten()
                 .stream()
                 .map(dependency -> (ResolvedDependency) dependency)
@@ -141,10 +147,14 @@ public abstract class ResolveTask extends DefaultTask {
         LocalDirectoryDependency rootProject = LocalDirectoryDependency.fromLocal(
                 setting.getPackagePath(),
                 rootDir);
+
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
-        ResolveContext rootContext = ResolveContext.root(configuration, strategy);
-        GolangDependencySet dependencies = rootContext.produceTransitiveDependencies(rootProject, rootDir);
-        rootProject.setDependencies(dependencies);
+        ResolveContext rootContext = ResolveContext.root(configuration);
+        rootProject.setDependencies(strategy.produce(rootProject,
+                rootDir,
+                visitor,
+                getConfigurationName()));
+
         dependencyTree = dependencyTreeFactory.getTree(rootContext, rootProject);
     }
 

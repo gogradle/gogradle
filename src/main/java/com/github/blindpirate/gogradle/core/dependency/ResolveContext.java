@@ -35,15 +35,14 @@ public class ResolveContext {
             return new ResolveContext(this,
                     configuration,
                     NotationDependency.class.cast(dependency).getTransitiveDepExclusions(),
-                    DEFAULT_STRATEGY);
+                    dependencyProduceStrategy);
         } else {
-            return new ResolveContext(this, configuration, emptySet(), DEFAULT_STRATEGY);
+            return new ResolveContext(this, configuration, emptySet(), dependencyProduceStrategy);
         }
     }
 
-    public static ResolveContext root(GolangConfiguration configuration,
-                                      DependencyProduceStrategy strategy) {
-        return new ResolveContext(null, configuration, emptySet(), strategy);
+    public static ResolveContext root(GolangConfiguration configuration) {
+        return new ResolveContext(null, configuration, emptySet(), DEFAULT_STRATEGY);
     }
 
     private ResolveContext(ResolveContext parent,
@@ -63,7 +62,7 @@ public class ResolveContext {
         GolangDependencySet ret = dependencyProduceStrategy.produce(dependency,
                 rootDir,
                 visitor,
-                configuration.getName());
+                GolangConfiguration.BUILD);
 
         return filterRecursively(ret);
     }

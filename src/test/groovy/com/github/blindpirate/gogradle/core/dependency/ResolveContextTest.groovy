@@ -3,10 +3,10 @@ package com.github.blindpirate.gogradle.core.dependency
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
+import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.support.WithMockInjector
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
@@ -39,18 +39,26 @@ class ResolveContextTest {
     @Mock
     NotationDependency notationDependency
     @Mock
-    GolangConfiguration configuration
+    GolangConfiguration buildConfiguration
+    @Mock
+    GolangConfiguration testConfiguration
     @Mock
     DependencyProduceStrategy strategy
+    @Mock
+    GolangConfigurationManager configurationManager
 
     ResolveContext root
 
     @Before
     void setUp() {
-        root = ResolveContext.root(configuration, strategy)
+        root = ResolveContext.root(buildConfiguration)
+        ReflectionUtils.setField(root, 'dependencyProduceStrategy', strategy)
 
-        when(configuration.getName()).thenReturn('build')
+        when(buildConfiguration.getName()).thenReturn('build')
         when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(mock(DependencyVisitor))
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance(GolangConfigurationManager)).thenReturn(configurationManager)
+        when(configurationManager.getByName('build')).thenReturn(buildConfiguration)
+        when(configurationManager.getByName('test')).thenReturn(testConfiguration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString()))
                 .thenReturn(dependencySet)
     }
@@ -110,8 +118,8 @@ class ResolveContextTest {
         ResolveContext sub = root.createSubContext(notationDependency)
         // then
         assert sub.parent == root
-        assert sub.configuration == configuration
-        assert sub.dependencyProduceStrategy == DependencyProduceStrategy.DEFAULT_STRATEGY
+        assert sub.configuration == buildConfiguration
+        assert sub.dependencyProduceStrategy == root.dependencyProduceStrategy
         assert sub.transitiveDepExclusions == [mockPredicate] as Set
     }
 

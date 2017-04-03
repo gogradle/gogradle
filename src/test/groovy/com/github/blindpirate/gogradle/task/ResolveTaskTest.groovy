@@ -56,6 +56,9 @@ class ResolveTaskTest extends TaskTest {
         when(configurationManager.getByName(anyString())).thenReturn(configuration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
 
+        when(buildManager.getInstallationDirectory('build')).thenReturn(new File(resource, '.gogradle/build_gopath').toPath())
+        when(buildManager.getInstallationDirectory('test')).thenReturn(new File(resource, '.gogradle/test_gopath').toPath())
+
         when(rootPath.toFile()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn("package")
         when(project.getRootDir()).thenReturn(resource)
