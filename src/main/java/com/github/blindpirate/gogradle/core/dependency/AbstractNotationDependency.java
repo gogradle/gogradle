@@ -29,11 +29,6 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
      */
     protected Set<Predicate<GolangDependency>> transitiveDepExclusions = new HashSet<>();
 
-    protected boolean shouldNotBeExcluded(GolangDependency dependency) {
-        return transitiveDepExclusions.stream().noneMatch(spec -> spec.test(dependency));
-    }
-
-
     @Override
     public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
         return transitiveDepExclusions;
