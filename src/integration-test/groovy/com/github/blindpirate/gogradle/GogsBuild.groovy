@@ -1,7 +1,5 @@
-package com.github.blindpirate.gogradle.gogs
+package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GogradleGlobal
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.AccessWeb
@@ -9,6 +7,7 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -53,33 +52,56 @@ vet {
             writeBuildAndSettingsDotGradle(buildDotGradle)
         }
 
+        firstBuild()
+
+        File firstBuildResult = getOutputExecutable()
+        long lastModified = firstBuildResult.lastModified()
+        String md5 = DigestUtils.md5Hex(new FileInputStream(firstBuildResult))
+        assert processUtils.getStdout(processUtils.run(firstBuildResult.absolutePath)).contains('Gogs')
+        assert new File(resource, 'gogradle.lock').exists()
+
+        secondBuild()
+
+        File secondBuildResult = getOutputExecutable()
+        assert secondBuildResult.lastModified() > lastModified
+        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
+    }
+
+    void firstBuild() {
         try {
             newBuild {
-                it.forTasks('build', 'check')
+                it.forTasks('build', 'check', 'lock')
             }
         } catch (Exception e) {
-            new File(resource, ".gogradle/reports/test/packages").listFiles().each {
-                println(it.text)
-            }
-            new File(resource, ".gogradle/reports/test/classes").listFiles().each {
-                println(it.text)
-            }
             throw e
         } finally {
             println(stdout)
             println(stderr)
         }
+    }
 
+    void secondBuild() {
+        try {
+            newBuild {
+                it.forTasks('build', 'check')
+            }
+        } catch (Exception e) {
+            throw e
+        } finally {
+            println(stdout)
+            println(stderr)
+        }
+    }
+
+    File getOutputExecutable() {
         Path gogsBinPath = resource.toPath().resolve(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_gogs")
         if (Os.getHostOs() == Os.WINDOWS) {
             gogsBinPath.renameTo(gogsBinPath.toString() + '.exe')
         }
         IOUtils.chmodAddX(gogsBinPath)
-
-        Process process = processUtils.run(gogsBinPath.toFile().absolutePath)
-        assert processUtils.getResult(process).stdout.contains('Gogs')
-
+        return gogsBinPath.toFile()
     }
+
 
     @Override
     File getProjectRoot() {
