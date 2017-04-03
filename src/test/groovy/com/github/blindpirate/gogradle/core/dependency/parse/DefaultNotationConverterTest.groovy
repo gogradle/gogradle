@@ -58,17 +58,7 @@ class DefaultNotationConverterTest {
     void 'unrecognized notation should be converted successfully'() {
         // given
         when(resolver.produce("unrecognized")).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
-        // when
-        converter.convert('unrecognized')
         // then
-        verify(gitConverter).convert("unrecognized")
-    }
-
-    @Test(expected = IllegalArgumentException)
-    void 'converting a standard package should result in an exception'() {
-        // given
-        when(resolver.produce(eq('standard'))).thenReturn(of(StandardGolangPackage.of('standard')))
-        // then
-        converter.convert('standard')
+        assert converter.convert('unrecognized') == [name: 'unrecognized']
     }
 }
