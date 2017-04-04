@@ -114,23 +114,39 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     private void determineGoBinaryAndVersion() {
-        Optional<Pair<Path, String>> binPathAndVersionOnHost = getGoBinPathAndVersionOnHost();
-
-        if (binPathAndVersionOnHost.isPresent()) {
-            Path goBinPath = binPathAndVersionOnHost.get().getLeft();
-            String version = binPathAndVersionOnHost.get().getRight();
-            if (setting.getGoVersion() == null || setting.getGoVersion().equals(version)) {
-                useGoExecutableOnHost(goBinPath, version);
-            } else {
-                fetchSpecifiedVersion(setting.getGoVersion());
-            }
+        if (goExecutableIsSpecified()) {
+            Optional<Pair<Path, String>> pathAndVersion = tryGivenGoExecutable();
+            Assert.isTrue(pathAndVersion.isPresent(), "Cannot execute given go binary: " + setting.getGoExecutable());
+            Assert.isTrue(versionMatch(pathAndVersion.get().getRight()),
+                    "Version not match: required is " + setting.getGoVersion()
+                            + ", given is " + pathAndVersion.get().getRight());
+            useGoExecutableOnHost(pathAndVersion.get().getLeft(), pathAndVersion.get().getRight());
         } else {
-            if (setting.getGoVersion() == null) {
-                fetchNewestStableVersion();
+            Optional<Pair<Path, String>> binPathAndVersionOnHost = findGoBinAndVersionInPATH();
+            if (binPathAndVersionOnHost.isPresent()) {
+                Path goBinPath = binPathAndVersionOnHost.get().getLeft();
+                String version = binPathAndVersionOnHost.get().getRight();
+                if (versionMatch(version)) {
+                    useGoExecutableOnHost(goBinPath, version);
+                } else {
+                    fetchSpecifiedVersion(setting.getGoVersion());
+                }
             } else {
-                fetchSpecifiedVersion(setting.getGoVersion());
+                if (setting.getGoVersion() == null) {
+                    fetchNewestStableVersion();
+                } else {
+                    fetchSpecifiedVersion(setting.getGoVersion());
+                }
             }
         }
+    }
+
+    private boolean versionMatch(String actualVersion) {
+        return setting.getGoVersion() == null || setting.getGoVersion().equals(actualVersion);
+    }
+
+    private boolean goExecutableIsSpecified() {
+        return !"go".equals(setting.getGoExecutable());
     }
 
     private void useGoExecutableOnHost(Path goBinPathOnHost, String versionOnHost) {
@@ -148,13 +164,6 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         }
     }
 
-    private Optional<Pair<Path, String>> getGoBinPathAndVersionOnHost() {
-        if ("go".equals(setting.getGoExecutable())) {
-            return findGoBinAndVersionInPATH();
-        } else {
-            return tryGivenGoExecutable();
-        }
-    }
 
     private Optional<Pair<Path, String>> tryGivenGoExecutable() {
         Path givenGoExecutablePath = Paths.get(setting.getGoExecutable());
