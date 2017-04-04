@@ -197,19 +197,22 @@ class GolangDependencySetTest {
     }
 
     @Test
-    void 'equals should succeed'() {
+    void 'equals and hashCode should succeed'() {
         GolangDependencySet set1 = GolangDependencySet.empty()
         GolangDependencySet set2 = GolangDependencySet.empty()
 
+        assert set1 == set1
         assert set1 != null
         assert set1 != []
         assert set1 == set2
+        assert set1.hashCode() == set2.hashCode()
 
         GolangDependency d = DependencyUtils.mockWithName(GolangDependency, 'name')
         set1.add(d)
         set2.add(d)
 
         assert set1 == set2
+        assert set1.hashCode() == set2.hashCode()
     }
 
     @Test(expected = UnsupportedOperationException)
