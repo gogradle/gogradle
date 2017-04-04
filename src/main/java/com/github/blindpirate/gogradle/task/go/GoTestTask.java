@@ -72,8 +72,8 @@ public class GoTestTask extends Go {
                 RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
     }
 
-    public boolean isGenerateCoverageProfile() {
-        return generateCoverageProfile;
+    public boolean isCoverageProfileGenerated() {
+        return coverageProfileGenerated;
     }
 
     public void setGenerateCoverageProfile(boolean generateCoverageProfile) {
@@ -206,19 +206,6 @@ public class GoTestTask extends Go {
             reportErrorIfNecessary(testResults, reportDir);
         }
 
-        private void rewritePackageName(File reportDir) {
-            Collection<File> htmlFiles = filterFilesRecursively(
-                    reportDir,
-                    new SuffixFileFilter(".html"),
-                    TrueFileFilter.INSTANCE);
-            String rewriteScript = IOUtils.toString(
-                    GoTestTask.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
-            htmlFiles.forEach(htmlFile -> {
-                String content = IOUtils.toString(htmlFile);
-                content = content.replace("</body>", "</body>" + rewriteScript);
-                IOUtils.write(htmlFile, content);
-            });
-        }
 
         private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
             int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
@@ -280,6 +267,20 @@ public class GoTestTask extends Go {
         private int failureCount(List<TestClassResult> results) {
             return results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
         }
+    }
+
+    private void rewritePackageName(File reportDir) {
+        Collection<File> htmlFiles = filterFilesRecursively(
+                reportDir,
+                new SuffixFileFilter(".html"),
+                TrueFileFilter.INSTANCE);
+        String rewriteScript = IOUtils.toString(
+                GoTestTask.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
+        htmlFiles.forEach(htmlFile -> {
+            String content = IOUtils.toString(htmlFile);
+            content = content.replace("</body>", "</body>" + rewriteScript);
+            IOUtils.write(htmlFile, content);
+        });
     }
 
 
