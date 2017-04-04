@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
@@ -55,6 +56,62 @@ class GolangDependencySetTest {
             return
         }
         assert false
+    }
+
+    @Test
+    void 'all methods should be delegated to container'() {
+        GolangDependencySet set = GolangDependencySet.empty()
+        TreeSet container = mock(TreeSet)
+        ReflectionUtils.setField(set, 'container', container)
+
+        reset(container)
+        set.size()
+        verify(container).size()
+
+        reset(container)
+        set.isEmpty()
+        verify(container).isEmpty()
+
+        reset(container)
+        set.contains(0)
+        verify(container).contains(0)
+
+        reset(container)
+        set.iterator()
+        verify(container).iterator()
+
+        reset(container)
+        set.toArray()
+        verify(container).toArray()
+
+        reset(container)
+        int[] array = [] as int[]
+        set.toArray(array)
+        verify(container).toArray(array)
+
+        reset(container)
+        set.add(null)
+        verify(container).add(null)
+
+        reset(container)
+        set.remove(1)
+        verify(container).remove(1)
+
+        reset(container)
+        set.containsAll([])
+        verify(container).containsAll([])
+
+        reset(container)
+        set.addAll([])
+        verify(container).addAll([])
+
+        reset(container)
+        set.retainAll([])
+        verify(container).retainAll([])
+
+        reset(container)
+        set.removeAll([])
+        verify(container).removeAll([])
     }
 
     @Test
@@ -123,6 +180,36 @@ class GolangDependencySetTest {
 
         facade.clear()
         verify(mockDependencySet).clear()
+    }
+
+    @Test
+    void 'dependencies should be identified by names'() {
+        GolangDependency d1 = DependencyUtils.mockWithName(GolangDependency, 'name')
+        GolangDependency d2 = DependencyUtils.mockWithName(GolangDependency, 'name')
+
+        GolangDependencySet set = GolangDependencySet.empty()
+        set.add(d1)
+        set.add(d2)
+
+        assert set.size() == 1
+        assert set.contains(d1)
+        assert set.contains(d2)
+    }
+
+    @Test
+    void 'equals should succeed'() {
+        GolangDependencySet set1 = GolangDependencySet.empty()
+        GolangDependencySet set2 = GolangDependencySet.empty()
+
+        assert set1 != null
+        assert set1 != []
+        assert set1 == set2
+
+        GolangDependency d = DependencyUtils.mockWithName(GolangDependency, 'name')
+        set1.add(d)
+        set2.add(d)
+
+        assert set1 == set2
     }
 
     @Test(expected = UnsupportedOperationException)
