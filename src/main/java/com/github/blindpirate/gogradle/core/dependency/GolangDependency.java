@@ -3,13 +3,11 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import org.gradle.api.artifacts.Dependency;
 
-import java.io.Serializable;
-
 /**
  * A {@link GolangDependency} represents a dependency
  * such as a specific version of source code or a local directory.
  */
-public interface GolangDependency extends Dependency, Serializable {
+public interface GolangDependency extends Dependency {
     /**
      * The dependency's import path, e.g., golang.org/x/crypto/cmd.
      * <p>

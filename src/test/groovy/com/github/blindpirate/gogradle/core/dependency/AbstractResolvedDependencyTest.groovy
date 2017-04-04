@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.support.WithResource
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
@@ -41,8 +42,8 @@ class AbstractResolvedDependencyTest {
         return new ResolvedDependencyForTest(name, version, 0)
     }
 
+    @SuppressFBWarnings(['SE_BAD_FIELD_INNER_CLASS', 'SE_NO_SERIALVERSIONID'])
     class ResolvedDependencyForTest extends AbstractResolvedDependency {
-        private static final long serialVersionUID = 1
 
         protected ResolvedDependencyForTest(String name, String version, long updateTime) {
             super(name, version, updateTime)

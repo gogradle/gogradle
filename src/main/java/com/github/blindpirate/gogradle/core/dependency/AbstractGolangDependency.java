@@ -3,7 +3,9 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import org.gradle.api.artifacts.Dependency;
 
-public abstract class AbstractGolangDependency implements GolangDependency {
+import java.io.Serializable;
+
+public abstract class AbstractGolangDependency implements GolangDependency, Serializable {
     private String name;
     private boolean firstLevel;
 
