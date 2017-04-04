@@ -2,15 +2,12 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
@@ -19,7 +16,6 @@ import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 
 import java.time.Instant
 
@@ -74,6 +70,15 @@ class LocalDirectoryDependencyTest {
     @Test
     void 'notation with valid dir should be resolved successfully'() {
         LocalDirectoryDependency.fromLocal('', resource)
+    }
+
+    @Test
+    void 'dependencies should be set and got successfully'() {
+        GolangDependency d = mockDependency('d')
+        GolangDependencySet dependencySet = asGolangDependencySet(d)
+
+        dependency.setDependencies(dependencySet)
+        assert dependency.getDependencies().is(dependencySet)
     }
 
 
