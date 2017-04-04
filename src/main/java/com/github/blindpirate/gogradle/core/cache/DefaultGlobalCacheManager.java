@@ -39,6 +39,9 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     public static final String GO_BINARAY_CACHE_PATH = "go/binary";
     public static final String GO_METADATA_PATH = "go/metadata";
     private static final Logger LOGGER = Logging.getLogger(DefaultGlobalCacheManager.class);
+    private static final int DEFAULT_CREATE_LOCKFILE_RETRY_COUNT = 10;
+
+    private boolean initialized = false;
 
     private final GolangPluginSetting setting;
 
@@ -53,27 +56,35 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     @Override
     public void ensureGlobalCacheExistAndWritable() {
+        if (initialized) {
+            return;
+        }
         ensureDirExistAndWritable(gradleHome, GOPATH_CACHE_PATH);
         ensureDirExistAndWritable(gradleHome, GO_BINARAY_CACHE_PATH);
         ensureDirExistAndWritable(gradleHome, GO_METADATA_PATH);
+        initialized = true;
     }
 
     @Override
     public Path getGlobalPackageCachePath(String packagePath) {
+        ensureGlobalCacheExistAndWritable();
         return gradleHome.resolve(GOPATH_CACHE_PATH).resolve(packagePath);
     }
 
     @Override
     public Path getGlobalGoBinCache(String relativePath) {
+        ensureGlobalCacheExistAndWritable();
         return gradleHome.resolve(GO_BINARAY_CACHE_PATH).resolve(relativePath);
     }
 
     private Path getGlobalMetadata(String packagePath) {
+        ensureGlobalCacheExistAndWritable();
         return gradleHome.resolve(GO_METADATA_PATH).resolve(IOUtils.encodeInternally(packagePath));
     }
 
     @Override
     public Optional<GlobalCacheMetadata> getMetadata(Path packagePath) {
+        ensureGlobalCacheExistAndWritable();
         try {
             return doGetMetadata(packagePath);
         } catch (IOException e) {
@@ -109,6 +120,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     @Override
     public synchronized <T> T runWithGlobalCacheLock(GolangDependency dependency, Callable<T> callable)
             throws Exception {
+        ensureGlobalCacheExistAndWritable();
         FileChannel channel = null;
         FileLock lock = null;
         createPackageDirectoryIfNecessary(dependency);
@@ -130,6 +142,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     @Override
     public boolean currentDependencyIsOutOfDate(NotationDependency dependency) {
+        ensureGlobalCacheExistAndWritable();
         try {
             // On windows we have to read file like this
             Optional<GlobalCacheMetadata> metadata = getMetadataFromFile(fileChannels.get());
@@ -167,6 +180,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     @Override
     public void updateCurrentDependencyLock(GolangDependency dependency) {
+        ensureGlobalCacheExistAndWritable();
         try {
             // On windows we have to write file like this
             FileChannel currentLockFile = fileChannels.get();
@@ -181,7 +195,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     private FileChannel createLockFileIfNecessary(GolangDependency dependency) {
         File lockFile = getGlobalMetadata(dependency.getName()).toFile();
-        int retryCount = 10;
+        int retryCount = DEFAULT_CREATE_LOCKFILE_RETRY_COUNT;
         while (retryCount-- > 0) {
             try {
                 return new RandomAccessFile(lockFile, "rwd").getChannel();
