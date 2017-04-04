@@ -23,19 +23,17 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
                                        File rootDir,
                                        DependencyVisitor visitor,
                                        String configuration) {
-        GolangDependencySet candidate = visitor.visitExternalDependencies(dependency,
+        GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency,
                 rootDir, configuration);
 
-        if (!candidate.isEmpty()) {
-            return candidate;
+        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
+
+        GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
+
+        if (candidate.isEmpty()) {
+            candidate = visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         }
 
-        candidate = visitor.visitVendorDependencies(dependency, rootDir);
-
-        if (!candidate.isEmpty()) {
-            return candidate;
-        }
-
-        return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
+        return candidate;
     }
 }

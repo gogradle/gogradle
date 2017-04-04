@@ -34,10 +34,10 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         // when
         def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
         // then
-        assert !result.any { it.is(a1) }
-        assert !result.any { it.is(b1) }
+        assert result.any { it.is(a1) }
+        assert result.any { it.is(b1) }
         assert result.any { it.is(c2) }
-        assert result.any { it.is(a2) }
+        assert !result.any { it.is(a2) }
         verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 
