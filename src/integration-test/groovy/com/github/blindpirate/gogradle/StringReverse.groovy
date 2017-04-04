@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
-import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before

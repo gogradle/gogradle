@@ -2,12 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.vcs.Git
-import com.github.blindpirate.gogradle.vcs.Mercurial
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -16,7 +14,6 @@ import org.mockito.Mock
 import static com.github.blindpirate.gogradle.util.MockUtils.mockVcsPackage
 import static com.github.blindpirate.gogradle.util.MockUtils.mockVcsService
 import static java.util.Optional.of
-import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 

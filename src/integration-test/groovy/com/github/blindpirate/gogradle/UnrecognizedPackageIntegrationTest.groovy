@@ -1,10 +1,6 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.support.IntegrationTestSupport
-import com.github.blindpirate.gogradle.support.WithGitRepo
-import com.github.blindpirate.gogradle.support.WithIsolatedUserhome
-import com.github.blindpirate.gogradle.support.WithMockGo
-import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before

@@ -12,7 +12,7 @@ import org.mockito.Mock
 
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.util.ProcessUtils.*
+import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when

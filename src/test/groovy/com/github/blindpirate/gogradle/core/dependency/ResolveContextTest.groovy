@@ -17,12 +17,9 @@ import java.util.function.Predicate
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate.of
 import static com.github.blindpirate.gogradle.util.DependencyUtils.*
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
-import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

@@ -5,27 +5,16 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata
-import com.github.blindpirate.gogradle.support.WithMockInjector
-import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.MockUtils
-import com.github.blindpirate.gogradle.vcs.Git
-import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
-import com.google.inject.Injector
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 
 import java.nio.file.Paths
 
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
-import static java.util.Optional.*
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.anyString
+import static java.util.Optional.of
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

@@ -20,10 +20,10 @@ import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.util.Path
 import org.junit.Before
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 @WithMockInjector
 abstract class TaskTest {

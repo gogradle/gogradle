@@ -24,7 +24,9 @@ import org.mockito.stubbing.Answer
 
 import java.util.function.Consumer
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

@@ -6,13 +6,10 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
-import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GitMercurialMapNotationParserTest {
