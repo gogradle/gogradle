@@ -12,6 +12,7 @@ import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import org.gradle.api.artifacts.DependencySet
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,6 +27,7 @@ import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDepen
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -89,7 +91,7 @@ class ResolveTaskTest extends TaskTest {
     }
 
     @Test
-    void 'checking for external files should succeed'() {
+    void 'checking external files should succeed'() {
         when(GogradleGlobal.INSTANCE.getInjector().getInstance((Class) any(Class))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
@@ -115,4 +117,45 @@ class ResolveTaskTest extends TaskTest {
         assertTaskDependsOn(resolveTestDependenciesTask, PREPARE_TASK_NAME)
     }
 
+    @Test
+    void 'checking dependencies should succeed'() {
+        when(configurationManager.getByName('build')).thenReturn(configuration)
+        when(configuration.getGolangDependencies()).thenReturn(mock(GolangDependencySet))
+        assert resolveBuildDependenciesTask.getDependencies().is(configuration.getGolangDependencies())
+    }
+
+    @Test
+    void 'checking vendor should succeed'() {
+        IOUtils.mkdir(resource, 'vendor')
+        assert resolveBuildDependenciesTask.vendorDirectory == [new File(resource, 'vendor')]
+    }
+
+    @Test
+    void 'checking vendor should succeed if vendor not exist'() {
+        assert resolveBuildDependenciesTask.vendorDirectory == []
+    }
+
+    @Test
+    void 'checking go source files should succeed'() {
+        IOUtils.write(resource, 'main.go', '')
+        IOUtils.write(resource, 'main_test.go', '')
+        assert resolveBuildDependenciesTask.goSourceFiles == [new File(resource, 'main.go')]
+        assert resolveTestDependenciesTask.goSourceFiles == [new File(resource, 'main_test.go')]
+    }
+
+    @Test
+    void 'checking installation directory should succeed'() {
+        assert resolveBuildDependenciesTask.installationDirectory == new File(resource, '.gogradle/build_gopath')
+        assert resolveTestDependenciesTask.installationDirectory == new File(resource, '.gogradle/test_gopath')
+    }
+
+    @Test
+    void 'resolution should be executed if it is skipped'() {
+        when(configuration.getName()).thenReturn('build')
+
+        DependencyTreeNode tree = resolveBuildDependenciesTask.getDependencyTree()
+        assert tree == resolveBuildDependenciesTask.getDependencyTree()
+
+        verify(buildManager).installDependency(resolvedDependency, 'build')
+    }
 }

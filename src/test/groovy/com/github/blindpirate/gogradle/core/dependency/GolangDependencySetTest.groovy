@@ -12,6 +12,8 @@ import org.gradle.api.specs.Spec
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import java.lang.reflect.Method
+
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.*
@@ -201,18 +203,23 @@ class GolangDependencySetTest {
         GolangDependencySet set1 = GolangDependencySet.empty()
         GolangDependencySet set2 = GolangDependencySet.empty()
 
-        assert set1 == set1
-        assert set1 != null
-        assert set1 != []
-        assert set1 == set2
+        assert callEqualsViaReflection(set1, set1)
+        assert callEqualsViaReflection(set1, set2)
+        assert !callEqualsViaReflection(set1, null)
+        assert !callEqualsViaReflection(set1, [])
         assert set1.hashCode() == set2.hashCode()
 
         GolangDependency d = DependencyUtils.mockWithName(GolangDependency, 'name')
         set1.add(d)
         set2.add(d)
 
-        assert set1 == set2
+        assert callEqualsViaReflection(set1, set2)
         assert set1.hashCode() == set2.hashCode()
+    }
+
+    boolean callEqualsViaReflection(GolangDependencySet set1, Object set2) {
+        Method m = GolangDependencySet.class.getMethod('equals', Object)
+        m.invoke(set1, [set2] as Object[])
     }
 
     @Test(expected = UnsupportedOperationException)

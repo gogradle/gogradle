@@ -188,4 +188,18 @@ class GoTestTaskTest extends TaskTest {
         // then
         verify(mockLogger, times(2)).warn('WARNING: test report is not supported in customized test action.')
     }
+
+    @Test
+    void 'rewriting html reports should succeed'() {
+        // given
+        String html = '<body></body>'
+        List files = ['index.html', 'sub/index.html', 'sub/sub/index.html', 'sub/sub/index.nohtml']
+        files.each { IOUtils.write(resource, it, html) }
+        // when
+        task.addDefaultActionIfNoCustomActions()
+        task.rewritePackageName(resource)
+        // then
+        files[0..2].each { assert new File(resource, it).text.contains('<script>') }
+        assert new File(resource, 'sub/sub/index.nohtml').text == html
+    }
 }
