@@ -41,7 +41,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
-    packagePath = 'your/package/path' // 欲构建项目的path
+    packagePath = 'github.com/your/package' // 欲构建项目的path
 }
 
 ```
@@ -184,6 +184,8 @@ golang {
     
     // 默认为"go"。若go不在$PATH中，可以使用此配置指定其位置
     goExecutable = '/path/to/go/executable'
+    // 默认为<go程序所在目录>/..
+    goRoot = '/path/to/my/goroot'
     
     // 即build constraint。详见 https://golang.org/pkg/go/build/#hdr-Build_Constraints
     buildTags = ['appengine','anothertag']

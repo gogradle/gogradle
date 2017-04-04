@@ -25,7 +25,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Project-scope build, needless to set `GOPATH`
 - Full-featured package management
   - Needless to install dependency packages manually, all you need to do is specifying the version
-  - Four VCS supported without installation: Git/Svn/Mercurial/Bazaar (Currently only Git and Mercurial is implemented)
+  - VCS supported: Git/Mercurial
   - Transitive dependency management
   - Resolve package conflict automatically
   - Support dependency lock
@@ -36,6 +36,7 @@ Gogradle is a gradle plugin which provides support for building golang.
   - Support flattening dependencies (Inspired by [glide](https://github.com/Masterminds/glide))
   - Support renaming local packages
   - Support private repository
+  - Support automatic repository url substitution
   - `build`/`test` dependencies are managed separately
   - Support dependency tree visualization
 - Support build/test/single-test/wildcard-test/cross-compile
@@ -45,7 +46,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Support shadowsocks proxy 
 - IDE support (IntelliJIDEA/Gogland/Webstorm/PhpStorm/PyCharm/RubyMine/CLion/Vim)
 - Test and coverage report generation
-- Support incremental build (developing)
+- Incremental build (experimental)
 
 ## Highlight
 

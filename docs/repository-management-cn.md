@@ -1,63 +1,68 @@
-# 仓库管理
+# Repository Management 
 
-Gogradle支持私有仓库。你可以在`build.gradle`文件的`repositories`中声明仓库的相关设置。
+Gogradle支持私有仓库和仓库url替换。这实际上支持了仓库的镜像。你可以在`build.gradle`的`repositories`中声明一个仓库。
 
-默认情况下，Gogradle在执行Git相关操作时会读取本机的ssh相关目录。如果你的ssh文件没有放在默认目录`~/.ssh`，则需要通过以下设置：
-
-```
-repositories {
-    git {
-        all()
-        credentials {
-            privateKeyFile '/path/to/private/key'
-        }
-    }
-}
-```
-
-你可能希望对某些Git仓库应用不同的身份验证信息，那么可以这样：
+例如，你想要把一个特定的包替换成自己的实现，可以这样做：
 
 ```
 repositories{
-    git {
-        url 'http://my-repo.com/my/project.git'
-        credentials {
-            username ''
-            password ''
-        }
-
-    git {
-        name 'import/path/of/anotherpackage'
-        credentials {
-            privateKeyFile '/path/to/private/key'
-        }
+    golang {
+        root 'github.com/package/to-be-hacked' 
+        vcs 'hg' // optional, git by default
+        url 'http://my-repo.com/my/implementation.git'
     }    
 }
 ```
 
-其中，`name`和`url`中的参数并非只能是字符串，还可以是任何对象。Gogradle通过Groovy语言内建的[`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html)方法判定一个仓库声明是否生效。
-例如，你可以在其中使用正则：
+在上面的DSK中，`root` and `url`并不一定要是字符串，它可以是任意对象。Gogradle使用Groovy内建的[`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html)方法来判定一个包的路径是否匹配该仓库的声明。
+
+这意味着你可以使用正则表达式和闭包。下面的例子展示了如何使用一个`github.com`的镜像仓库。
 
 ```
-    git {
-        url ~/.*github\.com.*/
-        credentials {
-            privateKeyFile '/path/to/private/key'
+repositories {
+    golang {
+        root ~/github\.com\/[\w-]+\/[\w-]+/
+        url { path->
+            def split = path.split('/')
+           "https://my-repo.com/${split[1]}/${split[2]}" 
         }
     }
+}    
 ```
 
-甚至闭包：
+另外一个应用场景是`bitbucket`的私有仓库。Go本身不支持`bitbucket.org`的私有仓库，因为Go需要通过无验证的http方法获取仓库的vcs类型和url，详见[这里](https://groups.google.com/forum/#!msg/golang-nuts/li8J9a-Tbz0/sGqklQcSR8cJ) 
+Gogradle优雅地解决了此问题：
 
 ```
-    git {
-        name {it->it.startsWith('github.com')}
-        credentials {
-            privateKeyFile '/path/to/private/key'
+repositories {
+    golang {
+        root ~/bitbucket\.org\/myprivaterepo\/[\w-]+/
+        vcs 'hg'
+        url { 
+            "ssh://hg@bitbucket.org/myprivaterepo/${it.split('/')[2]}" 
         }
+        
     }
+}    
+```
+此外，你还可以声明一个位于本地目录中的依赖包。
+
+```
+repositories {
+    golang {
+        root '/the/repo/root' 
+        dir '/path/to/my/own/implmentation'
+    }
+}    
 ```
 
-若一个仓库匹配某个仓库声明，那么该声明中的身份验证信息将会被用于拉取代码。Gogradle当前只支持Git仓库，身份验证信息可以使用户名/密码（http协议）或者ssh私钥（ssh协议）。
+需要注意的是，`root`必须只匹配包的根路径。不要声明一个既能匹配根路径又能匹配子路径的`root`，如下所示：
 
-对其他版本控制系统仓库的开发正在进行中，敬请期待。
+```
+repositories {
+    golang {
+        root {it.startsWith('github.com')} // DONOT DO THIS!
+        ...
+    }
+}  
+``` 

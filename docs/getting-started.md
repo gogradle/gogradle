@@ -157,6 +157,8 @@ golang {
     
     // Default value is "go". Modify this when go is not in $PATH
     goExecutable = '/path/to/go/executable'
+    // If not set, GOROOT will be <directory of go binary>/..
+    goRoot = '/path/to/my/goroot'
     
     // aka. build constraint. See https://golang.org/pkg/go/build/#hdr-Build_Constraints
     buildTags = ['appengine','anothertag']

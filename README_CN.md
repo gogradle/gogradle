@@ -11,6 +11,8 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 > 2017-02-12 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](http://github-rank.com/star?language=Go)中的526个！
 >
 > 2017-02-26 现在Gogradle已经与IDE深度集成，安装IDE后，无需设置GOPATH，无需预先安装Go即可开始开发！
+>
+> 2017-03-20 现在Gogradle已经能够生成HTML格式的测试/覆盖率报告了！
 
 ## 功能特性
 
@@ -20,7 +22,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - 项目级的依赖隔离，无需设置`GOPATH`
 - 完善的包管理
   - 无需手工安装依赖包，只需指定版本
-  - 无需安装即可支持Go语言默认支持的四种版本控制工具：Git/Svn/Mercurial/Bazzar （当前只实现了Git和Mercurial）
+  - 安装两种版本控制工具：Git/Mercurial
   - 支持传递性依赖
   - 支持自定义传递性依赖策略
   - 自动解决冲突 
@@ -32,6 +34,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
   - 支持依赖的扁平化 （受[glide](https://github.com/Masterminds/glide)启发）
   - 支持本地包重命名
   - 支持私有仓库
+  - 支持仓库url替换
   - 构建、测试依赖分别管理
   - 支持依赖树可视化
 - 支持构建、测试、单个/通配符测试、交叉编译  
@@ -41,7 +44,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - Shadowsocks支持
 - IDE支持（IntelliJIDEA/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim）
 - 测试和覆盖率报告生成
-- 增量构建（开发中）
+- 增量构建（实验性功能）
 
 ## 优势
 

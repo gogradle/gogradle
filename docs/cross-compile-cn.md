@@ -12,7 +12,7 @@ build {
     
     // 输出文件的路径，可以是绝对路径（相对于项目目录）或者相对路径
     // 其中的${}占位符会在交叉编译时被渲染
-    outputLocation = './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'
+    outputLocation = './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'
 }
 ```
 

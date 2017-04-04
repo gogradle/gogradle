@@ -6,8 +6,6 @@ A task unit executed independently is usually called [Task](https://docs.gradle.
 - resolveBuildDependencies
 - resolveTestDependencies
 - dependencies
-- installBuildDependencies
-- installTestDependencies
 - build
 - test
 - fmt 
@@ -24,15 +22,12 @@ Do some preparation, for example, verifying `build.gradle` and installing golang
 
 ## resolveBuildDependencies/resolveTestDependencies
 
-Resolve `build` and `test` dependencies to dependency trees. Conflicts will also be resolved in this task.
+- Resolve `build` and `test` dependencies to dependency trees. Conflicts will also be resolved in this task.
+- Flatten resolved `build` and `test` dependencies and install them into `.gogradle` directory respectively so that the future build can use them.
 
 ## dependencies
 
 Display the dependency tree of current project. It's very useful when you need to resolve package conflict manually.
-
-## installBuildDependencies/installTestDependencies
-
-Flatten resolved `build` and `test` dependencies and install them into `.gogradle` directory respectively so that the future build can use them.
 
 ## build
 

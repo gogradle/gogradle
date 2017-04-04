@@ -111,7 +111,7 @@ IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来�
 
 ## Vim
 
-由于Vim是直接通过环境变量来读取GOPATH的，因此可以通过`gradlew showGopathGoroot`或者`gradlew sGG`命令获取项目级的GOPATH和GOROOT：
+由于Vim是直接通过环境变量来读取GOPATH的，因此可以通过`gradlew showGopathGoroot`或者`gradlew sGG`命令获取项目级的GOPATH和GOROOT
 
 
 

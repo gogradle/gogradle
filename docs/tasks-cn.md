@@ -26,15 +26,12 @@
 
 ## resolveBuildDependencies/resolveTestDependencies
 
-分别解析`build`和`test`的依赖，生成依赖树。在这个过程中会解决相关依赖之间的冲突。
+- 分别解析`build`和`test`的依赖，生成依赖树。在这个过程中会解决相关依赖之间的冲突。
+- 将解析完成的`build`和`test`进行扁平化，然后安装到项目目录的`.gogradle`文件夹中，以备构建使用。
 
 ## dependencies
 
 显示当前项目的依赖树。这对于包冲突的解决非常有用。
-
-## installBuildDependencies/installTestDependencies
-
-将解析完成的`build`和`test`进行扁平化，然后安装到项目目录的`.gogradle`文件夹中，以备构建使用。
 
 ## build
 

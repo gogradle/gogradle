@@ -12,7 +12,7 @@ build {
     // Location of build output 
     // It can be absolute or relative (to project root)
     // ${} will be rendered when cross compiling
-    outputLocation = './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'
+    outputLocation = './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'
 }
 ```
 
