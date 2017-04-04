@@ -68,6 +68,8 @@ class DefaultGlobalCacheManagerTest {
         when(GogradleGlobal.getInstance((Key) any(Key))).thenReturn(accessor)
         when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('url')
         ReflectionUtils.setField(cacheManager, "gradleHome", resource.toPath())
+
+        cacheManager.ensureGlobalCacheExistAndWritable()
     }
 
     @Test
@@ -88,7 +90,10 @@ class DefaultGlobalCacheManagerTest {
     @Test
     void 'lock file should be initialized'() {
         // when
-        cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
+
         // then
         GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
         assert metadata.lastUpdateTime == 0
@@ -102,7 +107,9 @@ class DefaultGlobalCacheManagerTest {
         // given
         when(notationDependency.getPackage()).thenReturn(substitutedPkg)
         // when
-        cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
         // then
         GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
         assert metadata.lastUpdateTime == 0
