@@ -22,6 +22,7 @@ import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependenc
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -61,6 +62,14 @@ class ResolveContextTest {
         when(configurationManager.getByName('test')).thenReturn(testConfiguration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString()))
                 .thenReturn(dependencySet)
+    }
+
+    @Test
+    void 'getting dependency registry should be delegated to configutaion'() {
+        // when
+        when(buildConfiguration.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
+        // then
+        assert root.dependencyRegistry == buildConfiguration.dependencyRegistry
     }
 
     @Test
@@ -115,12 +124,18 @@ class ResolveContextTest {
         Predicate mockPredicate = mock(Predicate)
         when(notationDependency.getTransitiveDepExclusions()).thenReturn([mockPredicate] as Set)
         // when
-        ResolveContext sub = root.createSubContext(notationDependency)
+        ResolveContext sub1 = root.createSubContext(notationDependency)
+        ResolveContext sub2 = root.createSubContext(resolvedDependency)
         // then
-        assert sub.parent == root
-        assert sub.configuration == buildConfiguration
-        assert sub.dependencyProduceStrategy == root.dependencyProduceStrategy
-        assert sub.transitiveDepExclusions == [mockPredicate] as Set
+        assert sub1.parent == root
+        assert sub1.configuration == buildConfiguration
+        assert sub1.dependencyProduceStrategy == root.dependencyProduceStrategy
+        assert sub1.transitiveDepExclusions == [mockPredicate] as Set
+
+        assert sub2.parent == root
+        assert sub2.configuration == buildConfiguration
+        assert sub2.dependencyProduceStrategy == root.dependencyProduceStrategy
+        assert sub2.transitiveDepExclusions == [] as Set
     }
 
     @Test
