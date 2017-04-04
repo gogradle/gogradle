@@ -15,6 +15,7 @@ import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
+import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -90,6 +91,24 @@ class VendorResolvedDependencyTest {
     }
 
     @Test
+    void 'update time of vendor resolved dependency in local directory should be the dir\'s last modified time'() {
+        // given
+        Project project = mock(Project)
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance(Project)).thenReturn(project)
+        when(project.getRootDir()).thenReturn(resource)
+        LocalDirectoryDependency hostDependency = LocalDirectoryDependency.fromLocal('local', resource)
+        dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
+        // then
+        assert dependency.updateTime == new File(resource, 'vendor/github.com/a/b').lastModified()
+        assert dependency.isFirstLevel()
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'host dependency must be local or vcs'() {
+        VendorResolvedDependency.fromParent('github.com/a/b', mock(ResolvedDependency), new File(resource, 'vendor/github.com/a/b'))
+    }
+
+    @Test
     void 'installing a vendor dependency should succeed'() {
         assert dependency.installer.is(hostDependencyInstaller)
     }
@@ -110,4 +129,14 @@ class VendorResolvedDependencyTest {
         ReflectionUtils.setField(dependency, 'hostDependency', mock(LocalDirectoryDependency))
         assert dependency.getInstaller().is(installer)
     }
+
+    @Test
+    void 'equals and hashCode should be correct'() {
+        assert dependency == dependency
+        assert dependency != null
+        assert dependency != mock(GolangDependency)
+        assert dependency == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
+        assert dependency.hashCode() == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b')).hashCode()
+    }
+
 }
