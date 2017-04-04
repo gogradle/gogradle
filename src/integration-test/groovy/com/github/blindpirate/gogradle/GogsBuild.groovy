@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
-import org.apache.commons.codec.digest.DigestUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -43,7 +42,7 @@ vet {
     @AccessWeb
     void 'gogs should be built successfully'() {
         // v0.9.113
-        new ProcessUtils().run(['git', 'checkout', '114c179e5a50e3313f7a5894100693805e64e440'], null, resource)
+        assert processUtils.run(['git', 'checkout', '114c179e5a50e3313f7a5894100693805e64e440'], null, resource).waitFor() == 0
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
@@ -54,15 +53,16 @@ vet {
 
         firstBuild()
 
-//        File firstBuildResult = getOutputExecutable()
+        File firstBuildResult = getOutputExecutable()
 //        long lastModified = firstBuildResult.lastModified()
 //        String md5 = DigestUtils.md5Hex(new FileInputStream(firstBuildResult))
-//        assert processUtils.getStdout(processUtils.run(firstBuildResult.absolutePath)).contains('Gogs')
+        assert processUtils.getStdout(processUtils.run(firstBuildResult.absolutePath)).contains('Gogs')
         assert new File(resource, 'gogradle.lock').exists()
 
         secondBuild()
 
-//        File secondBuildResult = getOutputExecutable()
+        File secondBuildResult = getOutputExecutable()
+        assert processUtils.getStdout(processUtils.run(secondBuildResult.absolutePath)).contains('Gogs')
 //        assert secondBuildResult.lastModified() > lastModified
 //        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
     }
