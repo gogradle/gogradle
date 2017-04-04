@@ -72,8 +72,7 @@ public abstract class ResolveTask extends DefaultTask {
     // INPUT 1: dependencies declared in build.gradle
     @Input
     public GolangDependencySet getDependencies() {
-        GolangConfiguration configuration =
-                (GolangConfiguration) getProject().getConfigurations().getByName(getConfigurationName());
+        GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
         return configuration.getGolangDependencies();
     }
 
