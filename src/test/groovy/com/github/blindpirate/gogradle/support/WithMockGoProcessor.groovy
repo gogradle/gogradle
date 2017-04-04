@@ -23,12 +23,12 @@ echo go version go1.7.1 windows/amd64
         tmpDir = GogradleRunner.tmpRandomDirectory('go')
         if (Os.getHostOs() == Os.WINDOWS) {
             IOUtils.write(tmpDir, 'go.bat', mockGoBat)
+            ReflectionUtils.setField(instance, 'goBinPath', StringUtils.toUnixString(new File(tmpDir, 'go.bat')))
         } else {
             IOUtils.write(tmpDir, 'go', mockGo)
             IOUtils.chmodAddX(tmpDir.toPath().resolve('go'))
+            ReflectionUtils.setField(instance, 'goBinPath', StringUtils.toUnixString(new File(tmpDir, 'go')))
         }
-
-        ReflectionUtils.setField(instance, 'goBinPath', StringUtils.toUnixString(new File(tmpDir, 'go')))
     }
 
     @Override
