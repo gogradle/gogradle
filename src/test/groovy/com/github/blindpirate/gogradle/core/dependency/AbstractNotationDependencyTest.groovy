@@ -1,30 +1,55 @@
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.GogradleGlobal
+import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver
-import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.MockUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static org.mockito.Mockito.*
 
+
+@RunWith(GogradleRunner)
 class AbstractNotationDependencyTest {
-    AbstractNotationDependency depedency = mock(AbstractNotationDependency, CALLS_REAL_METHODS)
+    AbstractNotationDependency dependency = mock(AbstractNotationDependency, CALLS_REAL_METHODS)
 
     @Before
     void setUp() {
-        DependencyUtils.setExclusionSpecs(depedency, [] as Set)
+        when(dependency.getResolverClass()).thenReturn(DependencyResolver)
+        ReflectionUtils.setField(dependency, 'transitiveDepExclusions', [] as Set)
+    }
+
+    @Test
+    @WithMockInjector
+    void 'resolved result should be cached'() {
+        // given
+        ResolveContext context = mock(ResolveContext)
+        DependencyResolver resolver = mock(DependencyResolver)
+        when(resolver.resolve(context, dependency)).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return mock(ResolvedDependency)
+            }
+        })
+        when(GogradleGlobal.INSTANCE.getInstance(DependencyResolver)).thenReturn(resolver)
+        assert dependency.resolve(context).is(dependency.resolve(context))
     }
 
     @Test
     void 'setting transitive should succeed'() {
         // when
-        depedency.setTransitive(false)
+        dependency.setTransitive(false)
         // then
         // exclude any transitive dependencis
-        assert depedency.getTransitiveDepExclusions().first().isSatisfiedBy(null)
+        assert dependency.getTransitiveDepExclusions().first().test(null)
     }
 
     @Test
@@ -33,9 +58,20 @@ class AbstractNotationDependencyTest {
         GolangDependency dependency = mock(GolangDependency)
         when(dependency.getName()).thenReturn('a')
         // when
-        depedency.exclude([name: 'a'])
+        this.dependency.exclude([name: 'a'])
         // then
-        assert depedency.getTransitiveDepExclusions().first().isSatisfiedBy(dependency)
+        assert this.dependency.getTransitiveDepExclusions().first().test(dependency)
+    }
+
+    @Test
+    void 'exclude non-name properties should succeed'() {
+        // given
+        GolangDependency dependency = mock(GolangDependency)
+        when(dependency.getVersion()).thenReturn('version')
+        // when
+        this.dependency.exclude([version: 'version'])
+        // then
+        assert this.dependency.getTransitiveDepExclusions().first().test(dependency)
     }
 
     @Test
@@ -46,19 +82,22 @@ class AbstractNotationDependencyTest {
         assert dependency.package == pkg
     }
 
-    @Test
-    void 'setting strategy should succeed'() {
-        def dependency = new NotationDependencyForTest()
-        DependencyProduceStrategy strategy = mock(DependencyProduceStrategy)
-
-        dependency.strategy = strategy
-        assert dependency.strategy == strategy
-    }
-
     static class NotationDependencyForTest extends AbstractNotationDependency {
+        private static final long serialVersionUID = 1
+
         @Override
         protected Class<? extends DependencyResolver> getResolverClass() {
             return null
         }
+    }
+
+    @Test
+    void 'multiple PropertiesExclusionSpec should be compared properly'() {
+        PropertiesExclusionPredicate spec1 = PropertiesExclusionPredicate.of([name: 'name'])
+        PropertiesExclusionPredicate spec2 = PropertiesExclusionPredicate.of([name: 'name'] as TreeMap)
+        assert spec1.equals(spec2)
+        assert spec1.equals(spec1)
+        assert !spec1.equals(null)
+        assert spec1.hashCode() == spec2.hashCode()
     }
 }

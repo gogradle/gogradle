@@ -28,11 +28,11 @@ public class PrepareTask extends DefaultTask {
 
     @TaskAction
     public void prepare() {
+        setting.verify();
         goBinaryManager.getBinaryPath();
         buildManager.ensureDotVendorDirNotExist();
         buildManager.prepareSymbolicLinks();
         buildConstraintManager.prepareConstraints();
-        setting.verify();
     }
 
 }

@@ -24,8 +24,8 @@ import org.mockito.stubbing.Answer
 
 import java.util.function.Consumer
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
@@ -76,8 +76,8 @@ class GoTestTaskTest extends TaskTest {
 
     @Test
     void 'test task should depend on install task'() {
-        assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task, RESOLVE_TEST_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)
     }
 
     @Test
@@ -189,5 +189,19 @@ class GoTestTaskTest extends TaskTest {
         task.doLast {}
         // then
         verify(mockLogger, times(2)).warn('WARNING: test report is not supported in customized test action.')
+    }
+
+    @Test
+    void 'rewriting html reports should succeed'() {
+        // given
+        String html = '<body></body>'
+        List files = ['index.html', 'sub/index.html', 'sub/sub/index.html', 'sub/sub/index.nohtml']
+        files.each { IOUtils.write(resource, it, html) }
+        // when
+        task.addDefaultActionIfNoCustomActions()
+        task.rewritePackageName(resource)
+        // then
+        files[0..2].each { assert new File(resource, it).text.contains('<script>') }
+        assert new File(resource, 'sub/sub/index.nohtml').text == html
     }
 }

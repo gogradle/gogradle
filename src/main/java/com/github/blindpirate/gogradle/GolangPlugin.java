@@ -120,9 +120,9 @@ public class GolangPlugin implements Plugin<Project> {
 
     private void overwriteRepositoryHandler(Project project) {
 
-        GitRepositoryHandler repositoryHandler = injector.getInstance(GitRepositoryHandler.class);
+        GolangRepositoryHandler repositoryHandler = injector.getInstance(GolangRepositoryHandler.class);
 
-        ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("git", repositoryHandler);
+        ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("golang", repositoryHandler);
 
     }
 

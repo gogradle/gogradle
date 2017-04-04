@@ -2,8 +2,8 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
@@ -25,12 +25,13 @@ class GitMercurialNotationDependencyTest {
     GitDependencyManager gitDependencyManager
 
     @Mock
-    GolangConfiguration configuration
+    ResolveContext context
 
     @Before
     void setUp() {
         dependency.name = 'github.com/a/b'
         dependency.commit = 'commitId'
+        dependency.url = 'url'
     }
 
     @Test
@@ -38,13 +39,13 @@ class GitMercurialNotationDependencyTest {
         // given
         when(GogradleGlobal.INSTANCE.getInstance(GitDependencyManager)).thenReturn(gitDependencyManager)
         // when
-        dependency.resolve(configuration)
+        dependency.resolve(context)
         // then
-        verify(gitDependencyManager).resolve(configuration, dependency)
+        verify(gitDependencyManager).resolve(context, dependency)
     }
 
     @Test
-    void 'git dependencies with same name and commit should be equal'() {
+    void 'git dependencies with same name and commit but not url should not be equal'() {
         // when
         GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
         GitMercurialNotationDependency dependency2 = withNameAndCommit('name', 'NEWEST_COMMIT')
@@ -54,7 +55,7 @@ class GitMercurialNotationDependencyTest {
         // when
         dependency1.setUrl('git@github.com:a/b.git')
         dependency2.setUrl('https://github.com/a/b.git')
-        assert dependency1 == dependency2
+        assert dependency1 != dependency2
     }
 
     @Test
@@ -68,11 +69,12 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'toString should succeed'() {
-        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId'}"
         dependency.url = 'https://github.com/a/b.git'
-        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', url='https://github.com/a/b.git'}"
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', urls='[https://github.com/a/b.git]'}"
         dependency.tag = '1.0.0'
-        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', tag='1.0.0', url='https://github.com/a/b.git'}"
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', commit='commitId', tag='1.0.0', urls='[https://github.com/a/b.git]'}"
+        dependency.commit = null
+        assert dependency.toString() == "GitNotationDependency{name='github.com/a/b', tag='1.0.0', urls='[https://github.com/a/b.git]'}"
     }
 
     @Test
@@ -84,8 +86,13 @@ class GitMercurialNotationDependencyTest {
         GitMercurialNotationDependency dependency2 = new GitNotationDependency()
         dependency2.name = 'github.com/a/b'
         dependency2.commit = 'commitId'
+        dependency2.url = 'url'
         assert dependency == dependency2
 
+        dependency2.url = 'anotherurl'
+        assert dependency != dependency2
+
+        dependency2.url = 'url'
         dependency2.name = 'github.com/a/c'
         assert dependency != dependency2
 
@@ -97,7 +104,7 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'hashCode should succeed'() {
-        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false)
+        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false, ['url'])
     }
 
     GitMercurialNotationDependency withNameAndCommit(String name, String commit) {

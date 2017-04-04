@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import groovy.transform.EqualsAndHashCode
 import org.junit.Before
 import org.junit.Test
 
@@ -68,21 +69,30 @@ a
     }
 
     ResolvedDependency withNameAndVersion(String name, String version) {
-        return new AbstractResolvedDependency(name, version, 0) {
-            @Override
-            protected Class<? extends DependencyInstaller> getInstallerClass() {
-                return null
-            }
+        return new Temp(name, version, 0L)
+    }
 
-            @Override
-            Map<String, Object> toLockedNotation() {
-                return null
-            }
+    @EqualsAndHashCode(includes = ['name', 'version'])
+    static class Temp extends AbstractResolvedDependency {
+        private static final int serialVersionUID = 1
 
-            @Override
-            String formatVersion() {
-                return getVersion()
-            }
+        protected Temp(String name, String version, long updateTime) {
+            super(name, version, updateTime)
+        }
+
+        @Override
+        protected DependencyInstaller getInstaller() {
+            return null
+        }
+
+        @Override
+        Map<String, Object> toLockedNotation() {
+            return null
+        }
+
+        @Override
+        String formatVersion() {
+            return getVersion()
         }
     }
 

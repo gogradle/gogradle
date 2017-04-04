@@ -17,7 +17,7 @@ public class TrashDependencyFactory extends ExternalDependencyFactory {
     private VendorDotConfParser parser = new VendorDotConfParser();
 
     @Override
-    protected String identityFileName() {
+    public String identityFileName() {
         return "vendor.conf";
     }
 

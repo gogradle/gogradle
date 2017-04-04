@@ -55,8 +55,8 @@ class MetadataPackagePathResolverTest {
         // then
         assert info.url == 'https://code.org/r/p/exproj'
         assert info.vcsType == VcsType.GIT
-        assert info.path == packagePath
-        assert info.rootPath == 'example.org'
+        assert info.pathString == packagePath
+        assert info.rootPathString == 'example.org'
     }
 
     @Test
@@ -115,8 +115,8 @@ class MetadataPackagePathResolverTest {
         // when
         GolangPackage pkg = resolver.produce(packagePath).get()
         // then
-        assert pkg.path == 'bazil.org/fuse/fs'
-        assert pkg.rootPath == 'bazil.org/fuse'
+        assert pkg.pathString == 'bazil.org/fuse/fs'
+        assert pkg.rootPathString == 'bazil.org/fuse'
         assert pkg.vcsType == VcsType.GIT
     }
 

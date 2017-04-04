@@ -1,75 +1,113 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
-import com.github.blindpirate.gogradle.core.GolangPackage;
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
-import org.gradle.api.specs.Spec;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.ConfigureUtils;
+import com.github.blindpirate.gogradle.util.MapUtils;
 
+import java.io.Serializable;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-
-import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
+import java.util.function.Predicate;
 
 /**
  * All implementations must override equals() and hashCode()
  */
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
+    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
 
     public static final String VERSION_KEY = "version";
 
-    private DependencyProduceStrategy strategy = DEFAULT_STRATEGY;
+    private transient ResolvedDependency resolvedDependency;
 
-    private ResolvedDependency resolvedDependency;
+    /**
+     * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.
+     */
+    protected Set<Predicate<GolangDependency>> transitiveDepExclusions = new HashSet<>();
 
-    private GolangPackage golangPackage;
-
-    public GolangPackage getPackage() {
-        return golangPackage;
-    }
-
-    public void setPackage(GolangPackage golangPackage) {
-        this.golangPackage = golangPackage;
+    @Override
+    public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
+        return transitiveDepExclusions;
     }
 
     @Override
-    public DependencyProduceStrategy getStrategy() {
-        return strategy;
-    }
-
-    public void setStrategy(DependencyProduceStrategy strategy) {
-        this.strategy = strategy;
-    }
-
-    @Override
-    public ResolvedDependency resolve(GolangConfiguration configuration) {
+    public ResolvedDependency resolve(ResolveContext context) {
         if (resolvedDependency == null) {
-            DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
-            resolvedDependency = resolver.resolve(configuration, this);
+            resolvedDependency = doResolve(context);
         }
         return resolvedDependency;
     }
 
+    protected ResolvedDependency doResolve(ResolveContext context) {
+        DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
+        return resolver.resolve(context, this);
+    }
+
     protected abstract Class<? extends DependencyResolver> getResolverClass();
 
-
     public void exclude(Map<String, Object> map) {
-        transitiveDepExclusions.add(PropertiesExclusionSpec.of(map));
+        transitiveDepExclusions.add(PropertiesExclusionPredicate.of(map));
     }
 
     public void setTransitive(boolean transitive) {
         if (transitive) {
-            transitiveDepExclusions.remove(NO_TRANSITIVE_DEP_SPEC);
+            transitiveDepExclusions.remove(NO_TRANSITIVE_DEP_PREDICATE);
         } else {
-            transitiveDepExclusions.add(NO_TRANSITIVE_DEP_SPEC);
+            transitiveDepExclusions.add(NO_TRANSITIVE_DEP_PREDICATE);
         }
     }
 
-    @Override
-    public Set<Spec<GolangDependency>> getTransitiveDepExclusions() {
-        return transitiveDepExclusions;
+    public enum NoTransitiveSpec implements Predicate<GolangDependency> {
+        NO_TRANSITIVE_SPEC;
+
+        @Override
+        public boolean test(GolangDependency dependency) {
+            return true;
+        }
     }
 
+    public static class PropertiesExclusionPredicate implements Predicate<GolangDependency>, Serializable {
+        private Map<String, Object> properties;
+
+        public static PropertiesExclusionPredicate of(Map<String, Object> properties) {
+            PropertiesExclusionPredicate ret = new PropertiesExclusionPredicate();
+            ret.properties = Assert.isNotNull(properties);
+            return ret;
+        }
+
+        @Override
+        public boolean test(GolangDependency dependency) {
+            Map<String, Object> tmp = new HashMap<>(properties);
+            String name = MapUtils.getString(tmp, MapNotationParser.NAME_KEY);
+            tmp.remove(MapNotationParser.NAME_KEY);
+            if (name != null) {
+                return dependency.getName().startsWith(name) && ConfigureUtils.match(tmp, dependency);
+            } else {
+                return ConfigureUtils.match(tmp, dependency);
+            }
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            PropertiesExclusionPredicate that = (PropertiesExclusionPredicate) o;
+
+            return properties.equals(that.properties);
+        }
+
+        @Override
+        public int hashCode() {
+            return properties.hashCode();
+        }
+    }
 
 }

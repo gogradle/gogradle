@@ -3,10 +3,15 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
@@ -33,7 +38,12 @@ class LocalDirectoryDependencyTest {
 
     @Test
     void 'local directory should be resolved to itself'() {
-        assert dependency.resolve().is(dependency)
+        // given
+        ResolveContext context = mock(ResolveContext)
+        // when
+        dependency.resolve(context)
+        // then
+        verify(context).produceTransitiveDependencies(dependency, resource)
     }
 
     @Test
@@ -63,30 +73,32 @@ class LocalDirectoryDependencyTest {
     }
 
     @Test
-    void 'transitive dependency exclusion should take effect'() {
-        // given
-        dependency.exclude(name: 'a')
-        GolangDependency a = mockDependency('a')
-        GolangDependency b = mockDependency('b')
+    void 'dependencies should be set and got successfully'() {
+        GolangDependency d = mockDependency('d')
+        GolangDependencySet dependencySet = asGolangDependencySet(d)
 
-        // when
-        dependency.setDependencies(asGolangDependencySet(a, b))
-
-        // then
-        assert dependency.dependencies.size() == 1
-        assert dependency.dependencies.first().name == 'b'
+        dependency.setDependencies(dependencySet)
+        assert dependency.getDependencies().is(dependencySet)
     }
 
+
     @Test
+    @WithResource('')
     void 'local dependency should be installed successfully'() {
         // given
+        IOUtils.mkdir(resource, 'src')
+        IOUtils.mkdir(resource, 'dest')
+        File src = new File(resource, 'src')
+        File dest = new File(resource, 'dest')
+
+        dependency = LocalDirectoryDependency.fromLocal('name', src)
         LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
-        File targetDirectory = mock(File)
         when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
         // when
-        dependency.installTo(targetDirectory)
+        dependency.installTo(dest)
         // then
-        verify(installer).install(dependency, targetDirectory)
+        verify(installer).install(dependency, dest)
+        assert new File(dest, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
     }
 
     @Test(expected = UnsupportedOperationException)

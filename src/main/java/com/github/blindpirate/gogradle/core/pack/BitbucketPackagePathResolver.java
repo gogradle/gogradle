@@ -45,11 +45,12 @@ public class BitbucketPackagePathResolver extends AbstractPackagePathResolver {
         List<String> urls = packageInfo.links.clone.stream()
                 .map(BitbucketApiModel.LinksBean.CloneBean::getHref)
                 .collect(Collectors.toList());
+        // make sure https:// is in front of ssh://
+        urls.sort(String::compareTo);
         return VcsGolangPackage.builder()
-                .withUrls(urls)
-                .withPath(toUnixString(path))
-                .withRootPath(toUnixString(path.subpath(0, 3)))
-                .withVcsType(VcsType.of(packageInfo.scm).get())
+                .withOriginalVcsInfo(VcsType.of(packageInfo.scm).get(), urls)
+                .withPath(path)
+                .withRootPath(path.subpath(0, 3))
                 .build();
     }
 

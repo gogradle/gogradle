@@ -32,6 +32,13 @@ class DefaultDependencyRegistryTest {
         assert registry.register(resolvedDependency1)
     }
 
+    @Test(expected = IllegalStateException)
+    void 'a dependency should not be put if its prefix exists'() {
+        registry.register(resolvedDependency1)
+        when(resolvedDependency2.getName()).thenReturn('resolvedDependency/sub')
+        registry.register(resolvedDependency2)
+    }
+
     @Test
     void 'newer dependency should be put'() {
         // given

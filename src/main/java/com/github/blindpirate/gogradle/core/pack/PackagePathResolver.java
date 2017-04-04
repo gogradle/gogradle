@@ -1,8 +1,8 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 
-import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.common.Factory;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 
 import java.util.Optional;
 

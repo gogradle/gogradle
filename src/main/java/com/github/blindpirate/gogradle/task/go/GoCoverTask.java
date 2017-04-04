@@ -72,7 +72,7 @@ public class GoCoverTask extends AbstractGolangTask {
     }
 
     private boolean profileGeneratedInTest() {
-        return getTask(GoTestTask.class).isGenerateCoverageProfile();
+        return getTask(GoTestTask.class).isCoverageProfileGenerated();
     }
 
     private void copyStaticResources() {

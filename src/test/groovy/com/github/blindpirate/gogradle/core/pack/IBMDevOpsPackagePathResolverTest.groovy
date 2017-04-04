@@ -24,8 +24,8 @@ class IBMDevOpsPackagePathResolverTest {
     @Test
     void 'package should be resolved correctly'() {
         GolangPackage pkg = resolver.produce('hub.jazz.net/git/user/package/submodule').get()
-        assert pkg.path == 'hub.jazz.net/git/user/package/submodule'
-        assert pkg.rootPath == 'hub.jazz.net/git/user/package'
+        assert pkg.pathString == 'hub.jazz.net/git/user/package/submodule'
+        assert pkg.rootPathString == 'hub.jazz.net/git/user/package'
         assert pkg.vcsType == VcsType.GIT
         assert pkg.urls == ['https://hub.jazz.net/git/user/package']
     }

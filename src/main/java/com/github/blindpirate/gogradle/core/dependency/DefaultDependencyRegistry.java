@@ -1,9 +1,14 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
+
+import static com.github.blindpirate.gogradle.util.StringUtils.isPrefix;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class DefaultDependencyRegistry implements DependencyRegistry {
 
@@ -12,20 +17,23 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
     private ConcurrentHashMap<NotationDependency, ResolvedDependency> cache = new ConcurrentHashMap<>();
 
     @Override
-    public boolean register(ResolvedDependency resolvedDependency) {
+    public boolean register(ResolvedDependency dependencyToResolve) {
         synchronized (packages) {
-            ResolvedDependency existent = packages.get(resolvedDependency.getName());
+            ResolvedDependency existent = retrieve(dependencyToResolve.getName());
             if (existent == null) {
-                return registerSucceed(resolvedDependency);
-            } else if (theyAreAllFirstLevel(existent, resolvedDependency)) {
-                throw new IllegalStateException("First-level package " + resolvedDependency.getName()
+                return registerSucceed(dependencyToResolve);
+            } else if (isPrefix(existent.getName(), dependencyToResolve.getName())) {
+                throw new IllegalStateException("Package " + existent.getName()
+                        + " conflict with " + dependencyToResolve.getName());
+            } else if (theyAreAllFirstLevel(existent, dependencyToResolve)) {
+                throw new IllegalStateException("First-level package " + dependencyToResolve.getName()
                         + " conflict!");
             } else if (existent.isFirstLevel()) {
                 return false;
-            } else if (resolvedDependency.isFirstLevel()) {
-                return registerSucceed(resolvedDependency);
-            } else if (existentDependencyIsOutOfDate(existent, resolvedDependency)) {
-                return registerSucceed(resolvedDependency);
+            } else if (dependencyToResolve.isFirstLevel()) {
+                return registerSucceed(dependencyToResolve);
+            } else if (existentDependencyIsOutOfDate(existent, dependencyToResolve)) {
+                return registerSucceed(dependencyToResolve);
             } else {
                 return false;
             }
@@ -39,7 +47,15 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
     @Override
     public ResolvedDependency retrieve(String name) {
-        return packages.get(name);
+        Path path = Paths.get(name);
+        for (int i = path.getNameCount(); i > 0; i--) {
+            Path subpath = path.subpath(0, i);
+            ResolvedDependency ret = packages.get(toUnixString(subpath));
+            if (ret != null) {
+                return ret;
+            }
+        }
+        return null;
     }
 
     @Override

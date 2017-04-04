@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
-import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.HttpUtils;
@@ -18,6 +18,8 @@ import org.jsoup.select.Elements;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.IOException;
+import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 
@@ -78,10 +80,9 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
     private GolangPackage buildPackageInfo(String packagePath, GoImportMetaTag metaTag) {
         return VcsGolangPackage.builder()
-                .withPath(packagePath)
-                .withVcsType(metaTag.vcs)
-                .withRootPath(metaTag.rootPath)
-                .withUrl(metaTag.repoUrl)
+                .withPath(Paths.get(packagePath))
+                .withOriginalVcsInfo(metaTag.vcs, Arrays.asList(metaTag.repoUrl))
+                .withRootPath(Paths.get(metaTag.rootPath))
                 .build();
     }
 

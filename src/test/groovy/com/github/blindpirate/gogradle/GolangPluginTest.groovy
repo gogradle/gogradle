@@ -1,16 +1,25 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
-import com.github.blindpirate.gogradle.vcs.git.GitRepository
+import com.github.blindpirate.gogradle.vcs.Mercurial
+import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
+import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
+import com.github.blindpirate.gogradle.vcs.git.GolangRepository
+import com.github.blindpirate.gogradle.vcs.mercurial.HgClientAccessor
+import com.github.blindpirate.gogradle.vcs.mercurial.MercurialDependencyManager
+import com.google.inject.Key
 import org.gradle.api.Project
 import org.gradle.plugins.ide.idea.IdeaPlugin
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency.PropertiesExclusionSpec
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
 
 @RunWith(GogradleRunner)
@@ -29,7 +38,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'integration with idea plugin should succeed'(){
+    void 'integration with idea plugin should succeed'() {
         project.pluginManager.apply(IdeaPlugin)
     }
 
@@ -146,7 +155,7 @@ class GolangPluginTest {
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0-RELEASE'
         assert getExclusionSpecs(ab).size() == 1
-        assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionSpec
+        assert getExclusionSpecs(ab).first() instanceof PropertiesExclusionPredicate
 
         def cd = findFirstInDependencies('github.com/c/d')
         assert cd.urls == ['https://github.com/c/d.git']
@@ -166,28 +175,40 @@ class GolangPluginTest {
     @Test
     void 'configuring repository should succeed'() {
         project.repositories {
-            git {
-                url 'https://github.com/a/b.git'
-                credentials {
-                    username 'username'
-                    password 'password'
-                }
+            golang {
+                root { it.endsWith('b') }
+                url 'bbbbb'
             }
 
-            git {
-                name { it.endsWith('d') }
-                credentials {
-                    privateKeyFile 'path'
+            golang {
+                root ~/.*d/
+                url { name ->
+                    'http://' + name
                 }
             }
         }
 
-        GitRepository repository = GogradleGlobal.getInstance(GitRepositoryHandler).findMatchedRepository('github.com/a/b', 'https://github.com/a/b.git').get()
+        GolangRepository repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b')
 
-        assert repository.username == 'username'
-        assert repository.password == 'password'
+        assert repository.getUrl(null) == 'bbbbb'
 
-        repository = GogradleGlobal.getInstance(GitRepositoryHandler).findMatchedRepository('github.com/c/d', null).get()
-        assert repository.privateKeyFilePath == 'path'
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d')
+        assert repository.getUrl('name') == 'http://name'
+
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('something else')
+        assert repository.is(GolangRepository.EMPTY_INSTANCE)
+    }
+
+    @Test
+    void 'getting instance from injector should succeed'() {
+        assert GogradleGlobal.getInstance(Key.get(DependencyInstaller, Git)) instanceof GitDependencyManager
+        assert GogradleGlobal.getInstance(Key.get(DependencyInstaller, Mercurial)) instanceof MercurialDependencyManager
+        assert GogradleGlobal.getInstance(Key.get(VcsAccessor, Git)) instanceof GitClientAccessor
+        assert GogradleGlobal.getInstance(Key.get(VcsAccessor, Mercurial)) instanceof HgClientAccessor
+    }
+
+    @Test
+    void 'getting root dir from injector should succeed'() {
+        assert GogradleGlobal.getInstance(Project).getRootDir()
     }
 }

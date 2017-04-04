@@ -10,6 +10,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static java.util.Collections.singletonList;
 
 @Singleton
 public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
@@ -20,10 +21,9 @@ public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
         Path path = Paths.get(packagePath);
         Path rootPath = path.subpath(0, 4);
         GolangPackage pkg = VcsGolangPackage.builder()
-                .withPath(packagePath)
-                .withRootPath(toUnixString(rootPath))
-                .withVcsType(VcsType.GIT)
-                .withUrl(HTTPS + toUnixString(rootPath))
+                .withPath(path)
+                .withRootPath(rootPath)
+                .withOriginalVcsInfo(VcsType.GIT, singletonList(HTTPS + toUnixString(rootPath)))
                 .build();
         return Optional.of(pkg);
     }

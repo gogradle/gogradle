@@ -35,10 +35,19 @@ public class GolangPluginSetting {
     // e.g 1.1/1.7/1.7.3/1.8beta1
     private String goVersion;
     private String goExecutable;
+    private String goRoot;
 
     // if true, the plugin will make its best effort to bypass the GFW
     // designed for Chinese developer
     private boolean fuckGfw;
+
+    public String getGoRoot() {
+        return goRoot;
+    }
+
+    public void setGoRoot(String goRoot) {
+        this.goRoot = goRoot;
+    }
 
     public String getGoExecutable() {
         return goExecutable == null ? "go" : goExecutable;
@@ -71,7 +80,6 @@ public class GolangPluginSetting {
     public void setBuildTags(List<String> buildTags) {
         this.buildTags = buildTags;
     }
-
 
 
     public String getGoVersion() {
@@ -109,6 +117,6 @@ public class GolangPluginSetting {
     }
 
     private void verifyPackagePath() {
-        Assert.isTrue(isNotBlank(packagePath), "Package name must be specified!");
+        Assert.isTrue(isNotBlank(packagePath), "Package's import path must be specified!");
     }
 }

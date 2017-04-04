@@ -2,6 +2,10 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
+import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
 
@@ -25,8 +29,32 @@ class MockUtils {
         return VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user/package')
-                .withUrl('https://github.com/user/package.git')
-                .withVcsType(VcsType.GIT)
+                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
                 .build()
+    }
+
+    static VcsGolangPackage mockRootVcsPackage() {
+        return VcsGolangPackage.builder()
+                .withPath('github.com/user/package')
+                .withRootPath('github.com/user/package')
+                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .build()
+    }
+
+    static VcsGolangPackage mockSubstitutedRootVcsPackage() {
+        return VcsGolangPackage.builder()
+                .withPath('github.com/user/package')
+                .withRootPath('github.com/user/package')
+                .withSubstitutedVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .build()
+    }
+
+    static DependencyProduceStrategy mockDependencyProduceStrategy() {
+        return new DependencyProduceStrategy() {
+            @Override
+            GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor, String configurationName) {
+                return GolangDependencySet.empty()
+            }
+        }
     }
 }

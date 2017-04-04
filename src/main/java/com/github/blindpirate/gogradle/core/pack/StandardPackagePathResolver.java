@@ -19,7 +19,7 @@ public class StandardPackagePathResolver implements PackagePathResolver {
     public Optional<GolangPackage> produce(String packagePath) {
         Path path = Paths.get(packagePath);
         if (isStandardPackage(path)) {
-            return Optional.of(StandardGolangPackage.of(packagePath));
+            return Optional.of(StandardGolangPackage.of(path));
         } else {
             return Optional.empty();
         }
@@ -79,5 +79,5 @@ public class StandardPackagePathResolver implements PackagePathResolver {
                     // workaround
                     "appengine",
                     "appengine_internal"
-                    );
+            );
 }

@@ -6,10 +6,12 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
 
 import java.util.function.Consumer
 
-import static org.mockito.Mockito.mock
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
@@ -24,8 +26,12 @@ class GoTest extends TaskTest {
 
     @Test
     void 'go command on ToolTask should succeed'() {
+        // when
         task.go('build -o "output name"')
-        verify(buildManager).go(['build', '-o', 'output name'], null, null, null, null)
+        // then
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
+        verify(buildManager).go(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        assert captor.getValue() == ['build', '-o', 'output name']
     }
 
     @Test(expected = MissingMethodException)
@@ -35,8 +41,12 @@ class GoTest extends TaskTest {
 
     @Test
     void 'run command on ToolTask should succeed'() {
+        // when
         task.run('golint -v -a')
-        verify(buildManager).run(['golint', '-v', '-a'], null, null, null, null)
+        // then
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
+        verify(buildManager).run(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        assert captor.getValue() == ['golint', '-v', '-a']
     }
 
     @Test(expected = MissingMethodException)
@@ -53,5 +63,40 @@ class GoTest extends TaskTest {
     void 'setting continueWhenFail should succeed'() {
         task.continueWhenFail = true
         assert ReflectionUtils.getField(task, 'continueWhenFail')
+    }
+
+    @Test
+    void 'consuming stdout and stderr should succeed'() {
+        boolean stdoutIsVisited, stderrIsVisited
+        task.run('golint -v -a', { stdout, stderr ->
+            stdoutIsVisited = true
+            stderrIsVisited = true
+        })
+
+        assert stderrIsVisited
+        assert stdoutIsVisited
+    }
+
+    @Test
+    void 'consuming stdout should succeed'() {
+        boolean stdoutIsVisited, stderrIsVisited
+        task.run('golint -v -a', { stdout ->
+            stdoutIsVisited = true
+        })
+
+        assert !stderrIsVisited
+        assert stdoutIsVisited
+    }
+
+    @Test
+    void 'closure with more than 2 args should be ignored'() {
+        boolean stdoutIsVisited, stderrIsVisited
+        task.run('golint -v -a', { a, b, c ->
+            stdoutIsVisited = true
+            stderrIsVisited = true
+        })
+
+        assert !stderrIsVisited
+        assert !stdoutIsVisited
     }
 }

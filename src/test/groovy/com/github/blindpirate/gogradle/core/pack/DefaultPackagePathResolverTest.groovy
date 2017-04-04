@@ -60,7 +60,7 @@ class DefaultPackagePathResolverTest {
         GolangPackage info = VcsGolangPackage.builder()
                 .withPath('github.com/a/b/c')
                 .withRootPath('github.com/a/b')
-                .withVcsType(VcsType.GIT)
+                .withOriginalVcsInfo(VcsType.GIT, ['url'])
                 .build()
         when(resolver1.produce('github.com/a/b/c')).thenReturn(of(info))
         // when
@@ -86,7 +86,7 @@ class DefaultPackagePathResolverTest {
         GolangPackage rootInfo = VcsGolangPackage.builder()
                 .withPath('github.com/a/b')
                 .withRootPath('github.com/a/b')
-                .withVcsType(VcsType.GIT)
+                .withOriginalVcsInfo(VcsType.GIT, ['url'])
                 .build()
         getField(resolver, 'cache').put('github.com', IncompleteGolangPackage.of('github.com'))
         getField(resolver, 'cache').put('github.com/a', IncompleteGolangPackage.of('github.com/a'))
@@ -100,8 +100,8 @@ class DefaultPackagePathResolverTest {
         // then
         verify(resolver1, times(0)).produce(anyString())
         assert result1 == rootInfo
-        assert result2.path == 'github.com/a/b/c'
-        assert result3.path == 'github.com/a/b/c/d'
+        assert result2.pathString == 'github.com/a/b/c'
+        assert result3.pathString == 'github.com/a/b/c/d'
         assert allFieldsEquals(result2, rootInfo, ['vcsType', 'url', 'rootPath'])
         assert allFieldsEquals(result3, rootInfo, ['vcsType', 'url', 'rootPath'])
     }

@@ -12,10 +12,12 @@ import org.junit.runner.RunWith
 @WithResource('')
 @OnlyWhen(value = '"golint".execute()', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
 class GolintIntegrationTest extends IntegrationTestSupport {
+    String buildDotGradle
+    String mainDotGo
 
-    File resource
-
-    String buildDotGradle = """
+    @Before
+    void setUp() {
+        buildDotGradle = """
 ${buildDotGradleBase}
 
 golang {
@@ -28,7 +30,7 @@ task golint(type: com.github.blindpirate.gogradle.Go){
     }
 }
 """
-    String mainDotGo = '''
+        mainDotGo = '''
 package main
 
 import . "fmt"
@@ -37,9 +39,6 @@ func main(){
 fmt.Printf("Hello")
 }
 '''
-
-    @Before
-    void setUp() {
         writeBuildAndSettingsDotGradle(buildDotGradle)
         IOUtils.write(resource, 'main.go', mainDotGo)
     }

@@ -5,11 +5,12 @@ import com.github.blindpirate.gogradle.core.*
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,7 +55,11 @@ class SourceCodeDependencyFactoryTest {
             Object answer(InvocationOnMock invocation) throws Throwable {
                 String name = invocation.getArgument(0)
                 if (name.startsWith('github.com')) {
-                    GolangPackage ret = VcsGolangPackage.builder().withPath(name).withRootPath('github.com/a/b').build()
+                    GolangPackage ret = VcsGolangPackage.builder()
+                            .withPath(name)
+                            .withRootPath('github.com/a/b')
+                            .withOriginalVcsInfo(VcsType.GIT, ['https://github.com/a/b.git'])
+                            .build()
                     return Optional.of(ret)
                 } else {
                     GolangPackage standardPackage = StandardGolangPackage.of(name)
@@ -232,18 +237,20 @@ func main(){}
         assert factory.produce(resolvedDependency, resource, 'test').isEmpty()
     }
 
-    @Test(expected = DependencyProductionException)
+    @Test
     void 'exception should be thrown if import package cannot be recognized'() {
         // given
         IOUtils.write(resource, 'main.go', mainDotGo)
-        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                return Optional.of(UnrecognizedGolangPackage.of(invocation.getArgument(0)))
-            }
-        })
+        ['github.com/a/b', 'github.com/a/b/c', 'github.com/a/b/c/d'].each {
+            when(packagePathResolver.produce(it)).thenReturn(Optional.of(UnrecognizedGolangPackage.of(it)))
+            when(notationParser.parse(it)).thenReturn(UnrecognizedPackageNotationDependency.of(UnrecognizedGolangPackage.of(it)))
+        }
         // then
-        factory.produce(resolvedDependency, resource, 'build')
+        def result = factory.produce(resolvedDependency, resource, 'build')
+        assert result.size() == 3
+        assert result.collect {
+            it.name
+        }.minus(['github.com/a/b', 'github.com/a/b/c', 'github.com/a/b/c/d']).isEmpty()
     }
 
     String mainDotGo = '''

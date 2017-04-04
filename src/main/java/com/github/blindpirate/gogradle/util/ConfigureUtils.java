@@ -24,9 +24,6 @@ public class ConfigureUtils {
     }
 
     public static boolean match(Map<String, Object> properties, Object target) {
-        if (properties.isEmpty()) {
-            return false;
-        }
         DynamicObject dynamicObject = DynamicObjectUtil.asDynamicObject(target);
         return properties.entrySet().stream()
                 .allMatch((entry) -> entryMatch(entry, dynamicObject));

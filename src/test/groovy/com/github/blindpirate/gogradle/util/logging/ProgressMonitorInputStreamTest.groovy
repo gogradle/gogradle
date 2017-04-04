@@ -26,7 +26,9 @@ class ProgressMonitorInputStreamTest {
 
     @Before
     void setUp() {
-        when(GogradleGlobal.getInstance(ServiceRegistry.class).get(ProgressLoggerFactory.class).newOperation(ProgressMonitorInputStream))
+        when(GogradleGlobal.getInstance(ServiceRegistry.class)
+                .get(ProgressLoggerFactory.class)
+                .newOperation(ProgressMonitorInputStream))
                 .thenReturn(logger)
         pmis = new ProgressMonitorInputStream('url', is)
     }

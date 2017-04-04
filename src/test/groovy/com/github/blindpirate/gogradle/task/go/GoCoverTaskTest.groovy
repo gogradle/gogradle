@@ -33,7 +33,7 @@ class GoCoverTaskTest extends TaskTest {
         when(project.getRootDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
 
-        when(golangTaskContainer.get(GoTestTask).isGenerateCoverageProfile()).thenReturn(true)
+        when(golangTaskContainer.get(GoTestTask).isCoverageProfileGenerated()).thenReturn(true)
 
         when(project.getName()).thenReturn(resource.getName())
         when(buildManager.go(anyList(), isNull())).thenAnswer(new Answer<Object>() {
@@ -116,6 +116,17 @@ class GoCoverTaskTest extends TaskTest {
 
         // static resources
         assert new File(projectRoot, '.gogradle/reports/coverage/static').listFiles().size() > 4
+    }
+
+    @Test
+    void 'coverage task should be skipped if no coverfile generated'() {
+        // given
+        when(golangTaskContainer.get(GoTestTask).isCoverageProfileGenerated()).thenReturn(false)
+        // when
+        task.coverage()
+        // then
+        // no htmls generated
+        assert !new File(resource, '.gogradle/reports/coverage').list().any { it.endsWith('html') }
     }
 
     @Test(expected = IllegalStateException)

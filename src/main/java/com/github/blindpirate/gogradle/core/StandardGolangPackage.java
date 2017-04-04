@@ -1,49 +1,47 @@
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.vcs.VcsType;
+import com.github.blindpirate.gogradle.util.StringUtils;
 
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class StandardGolangPackage extends GolangPackage {
 
-    private StandardGolangPackage(String path) {
+    private StandardGolangPackage(Path path) {
         super(path);
     }
 
-    @Override
-    public String getRootPath() {
+    public Path getRootPath() {
         return getPath();
     }
 
-    @Override
-    public VcsType getVcsType() {
-        throw new UnsupportedOperationException(toString());
+    public String getRootPathString() {
+        return StringUtils.toUnixString(getPath());
     }
 
     @Override
-    public List<String> getUrls() {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    @Override
-    protected Optional<GolangPackage> longerPath(String packagePath) {
+    protected Optional<GolangPackage> longerPath(Path packagePath) {
         return Optional.of(of(packagePath));
     }
 
     @Override
-    protected Optional<GolangPackage> shorterPath(String packagePath) {
+    protected Optional<GolangPackage> shorterPath(Path packagePath) {
         return Optional.of(of(packagePath));
+    }
+
+    public static StandardGolangPackage of(Path path) {
+        return new StandardGolangPackage(path);
     }
 
     public static StandardGolangPackage of(String path) {
-        return new StandardGolangPackage(path);
+        return new StandardGolangPackage(Paths.get(path));
     }
 
     @Override
     public String toString() {
         return "StandardGolangPackage{"
-                + "path='" + getPath() + '\''
+                + "path='" + getPathString() + '\''
                 + '}';
     }
 }

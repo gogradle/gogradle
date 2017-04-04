@@ -1,9 +1,9 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory
-import com.github.blindpirate.gogradle.core.pack.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.support.GogradleModuleSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Test
@@ -11,6 +11,8 @@ import org.junit.runner.RunWith
 
 import javax.inject.Inject
 import java.nio.file.Paths
+
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('vendor_test.zip')
@@ -24,6 +26,7 @@ class VendorWalkTest extends GogradleModuleSupport {
     @Test
     void 'create cascading vendor package should succeed'() {
         // when
+        when(project.getRootDir()).thenReturn(resource)
         LocalDirectoryDependency localPackage = LocalDirectoryDependency.fromLocal('testpackage', resource);
         GolangDependencySet dependencies = factory.produce(localPackage, resource)
         // then

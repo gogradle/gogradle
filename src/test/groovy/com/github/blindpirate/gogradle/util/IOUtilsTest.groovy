@@ -62,6 +62,12 @@ class IOUtilsTest {
     }
 
     @Test
+    void 'safeListFiles should succeed when File.listFiles() return null'() {
+        when(mockFile.listFiles()).thenReturn(null)
+        assert IOUtils.safeListFiles(mockFile) == []
+    }
+
+    @Test
     void 'safeList should succeed'() {
         IOUtils.mkdir(resource, 'a')
         assert IOUtils.safeList(resource) == ['a']

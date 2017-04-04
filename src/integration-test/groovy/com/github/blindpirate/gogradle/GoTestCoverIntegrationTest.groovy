@@ -14,17 +14,17 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('go-test-cover.zip')
 class GoTestCoverIntegrationTest extends IntegrationTestSupport {
-    File resource
 
-    String buildDotGradle = """
+    String buildDotGradle
+
+    @Before
+    void setUp() {
+        buildDotGradle = """
 ${buildDotGradleBase}
 golang {
     packagePath='github.com/my/project'
 }
 """
-
-    @Before
-    void setUp() {
         writeBuildAndSettingsDotGradle(buildDotGradle)
         IOUtils.clearDirectory(new File(resource, '.gogradle'))
     }

@@ -2,24 +2,26 @@ package com.github.blindpirate.gogradle.core
 
 import org.junit.Test
 
+import java.nio.file.Paths
+
 import static com.github.blindpirate.gogradle.core.StandardGolangPackage.of
 
 class StandardGolangPackageTest {
-    StandardGolangPackage standardGolangPackage = of('go/ast')
-
-    @Test(expected = UnsupportedOperationException)
-    void 'getVcsType should throw exception'() {
-        of('incomplete').vcsType
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'getUrl should throw exception'() {
-        of('incomplete').urls
-    }
+    StandardGolangPackage standardGolangPackage = of(Paths.get('go/ast'))
 
     @Test
     void 'rootPath of a standard package should be itself'() {
-        assert standardGolangPackage.rootPath == 'go/ast'
+        assert standardGolangPackage.rootPathString == 'go/ast'
+    }
+
+    @Test
+    void 'root path of standard package should be identical to path'() {
+        assert standardGolangPackage.rootPath == standardGolangPackage.path
+    }
+
+    @Test
+    void 'toString should succeed'() {
+        assert standardGolangPackage.toString() == "StandardGolangPackage{path='go/ast'}"
     }
 
     @Test

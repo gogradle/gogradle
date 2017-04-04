@@ -7,8 +7,11 @@ import org.junit.Test
 class AutoConfigureMapNotationParserTest {
 
     static class WithoutDefaultConstructor extends AbstractNotationDependency {
+        private static final long serialVersionUID = 1
+
         private WithoutDefaultConstructor() {
         }
+
         @Override
         Class<? extends DependencyResolver> getResolverClass() {
             return null
@@ -16,6 +19,8 @@ class AutoConfigureMapNotationParserTest {
     }
 
     static class WithDefaultConstructor extends AbstractNotationDependency {
+        private static final long serialVersionUID = 1
+
         @Override
         Class<? extends DependencyResolver> getResolverClass() {
             return null

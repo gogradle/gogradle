@@ -24,6 +24,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 @Singleton
 public class DefaultPackagePathResolver implements PackagePathResolver {
+    // if a VcsGolangPackage is cached, its urls must be original instead of converted
     private Map<String, GolangPackage> cache = new ConcurrentHashMap<>();
 
     private final List<PackagePathResolver> delegates;
@@ -46,22 +47,30 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
     }
 
     private void updateCache(String packagePath, GolangPackage golangPackage) {
+        // if github.com/a/b/c is resolved, then all its subpath are resolved:
+        // github.com/a/b
+        // github.com/a
+        // github.com
         Path path = Paths.get(packagePath);
         for (int i = path.getNameCount(); i > 0; --i) {
             Path current = path.subpath(0, i);
             String currentPathStr = toUnixString(current);
-            cache.put(currentPathStr, golangPackage.resolve(currentPathStr).get());
+            cache.put(currentPathStr, golangPackage.resolve(current).get());
         }
     }
 
     private Optional<GolangPackage> tryToFetchFromCache(String packagePath) {
+        // when github.com/a/b/c not found, fetch its subpath in order:
+        // github.com/a/b
+        // github.com/a
+        // github.com
         Path path = Paths.get(packagePath);
         for (int i = path.getNameCount(); i > 0; --i) {
             Path current = path.subpath(0, i);
             GolangPackage existentPackage = cache.get(toUnixString(current));
 
             if (existentPackage != null) {
-                return existentPackage.resolve(packagePath);
+                return existentPackage.resolve(path);
             }
         }
         return Optional.empty();

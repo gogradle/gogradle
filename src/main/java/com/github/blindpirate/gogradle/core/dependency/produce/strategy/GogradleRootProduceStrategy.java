@@ -41,6 +41,7 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     }
 
     @DebugLog
+    @Override
     public GolangDependencySet produce(ResolvedDependency dependency,
                                        File rootDir,
                                        DependencyVisitor visitor,

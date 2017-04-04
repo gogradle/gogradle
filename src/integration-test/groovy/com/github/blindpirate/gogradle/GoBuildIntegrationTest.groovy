@@ -17,23 +17,30 @@ import java.nio.file.Path
 @WithResource('')
 class GoBuildIntegrationTest extends IntegrationTestSupport {
 
-    File resource
-
     ProcessUtils processUtils = new ProcessUtils()
 
-    String buildDotGradle = """
+    String buildDotGradle
+    String settingDotGradle
+    String subMainDotGo
+    String printDotGo
+    String mainDotGo
+
+    @Before
+    void setUp() {
+        buildDotGradle = """
 ${buildDotGradleBase}
 golang {
     packagePath='github.com/my/package'
+    goVersion='1.8'
 }
 build {
     targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
 }
 """
-    String settingDotGradle = '''
+        settingDotGradle = '''
 rootProject.name="myPackage"
 '''
-    String mainDotGo = '''
+        mainDotGo = '''
 package main
 
 import "github.com/my/package/print"
@@ -42,7 +49,7 @@ func main(){
     print.PrintHello() 
 }
 '''
-    String printDotGo = '''
+        printDotGo = '''
 package print 
 
 import "fmt"
@@ -54,7 +61,7 @@ func PrintWorld(){
     fmt.Printf("World")
 }
 '''
-    String subMainDotGo = '''
+        subMainDotGo = '''
 package main
 import "github.com/my/package/print"
 
@@ -63,8 +70,6 @@ func main(){
 }
 '''
 
-    @Before
-    void setUp() {
         IOUtils.write(resource, 'main.go', mainDotGo)
         IOUtils.write(resource, 'print/print.go', printDotGo)
         IOUtils.write(resource, 'sub/main.go', subMainDotGo)

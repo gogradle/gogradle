@@ -68,7 +68,13 @@ public class StringUtils {
     }
 
     public static String toUnixString(File file) {
-        return toUnixString(file.toPath());
+        return toUnixString(file.getAbsolutePath());
+    }
+
+    public static boolean isPrefix(String a, String b) {
+        Assert.isNotNull(a);
+        Assert.isNotNull(b);
+        return !a.equals(b) && b.startsWith(a);
     }
 
     public static String toUnixString(Path path) {
@@ -99,5 +105,9 @@ public class StringUtils {
 
     public static int lastIndexOf(String s, String substr) {
         return org.apache.commons.lang3.StringUtils.lastIndexOf(s, substr);
+    }
+
+    public static String trimToNull(String str) {
+        return org.apache.commons.lang3.StringUtils.trimToNull(str);
     }
 }

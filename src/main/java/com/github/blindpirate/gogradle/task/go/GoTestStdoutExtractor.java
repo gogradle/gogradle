@@ -226,10 +226,6 @@ public class GoTestStdoutExtractor {
             return message;
         }
 
-        public void setMessage(String message) {
-            this.message = message;
-        }
-
         public GoTestMethodResult(long id,
                                   String name,
                                   TestResult.ResultType resultType,

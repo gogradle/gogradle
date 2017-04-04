@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -15,7 +14,6 @@ import org.mockito.Mock
 import static com.github.blindpirate.gogradle.util.MockUtils.mockVcsPackage
 import static com.github.blindpirate.gogradle.util.MockUtils.mockVcsService
 import static java.util.Optional.of
-import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -53,19 +51,11 @@ class DefaultNotationConverterTest {
         verify(gitConverter).convert('root/package#1.0.0')
     }
 
-    @Test(expected = IllegalStateException)
-    void 'converting an unrecognized notation should result in an exception'() {
+    @Test
+    void 'unrecognized notation should be converted successfully'() {
         // given
         when(resolver.produce("unrecognized")).thenReturn(of(UnrecognizedGolangPackage.of('unrecognized')))
         // then
-        converter.convert('unrecognized')
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'converting a standard package should result in an exception'() {
-        // given
-        when(resolver.produce(eq('standard'))).thenReturn(of(StandardGolangPackage.of('standard')))
-        // then
-        converter.convert('standard')
+        assert converter.convert('unrecognized') == [name: 'unrecognized']
     }
 }

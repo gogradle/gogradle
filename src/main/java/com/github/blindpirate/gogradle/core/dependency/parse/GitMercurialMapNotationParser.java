@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
-import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -19,6 +19,7 @@ import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URLS_KEY;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URL_KEY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.VERSION_KEY;
 
 @Singleton
@@ -29,9 +30,12 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         String tag = getString(notation, TAG_KEY);
         String commit = getString(notation, COMMIT_KEY);
 
-        GolangPackage info = MapUtils.getValue(notation, PACKAGE_KEY, GolangPackage.class);
-        if (info != null) {
-            notation.put(URLS_KEY, info.getUrls());
+        VcsGolangPackage pkg = MapUtils.getValue(notation, PACKAGE_KEY, VcsGolangPackage.class);
+        notation.put(URLS_KEY, pkg.getUrls());
+
+        if (pkg.getSubstitutedVcsInfo() != null) {
+            // Remove url in map since url has been specified in repositories
+            notation.remove(URL_KEY);
         }
 
         if (allBlank(version, tag, commit)) {
@@ -55,7 +59,7 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         if (vcsType.isPresent()) {
             return vcsType.get();
         } else {
-            GolangPackage pkg = MapUtils.getValue(notationMap, PACKAGE_KEY, GolangPackage.class);
+            VcsGolangPackage pkg = MapUtils.getValue(notationMap, PACKAGE_KEY, VcsGolangPackage.class);
             Assert.isTrue(pkg != null, "Cannot found vcs in " + notationMap);
             return pkg.getVcsType();
         }

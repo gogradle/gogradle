@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.crossplatform;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.CompressUtils;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.HttpUtils;
@@ -104,28 +105,48 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         }
         determineGoBinaryAndVersion();
         // $GOROOT/bin/go -> $GOROOT
-        goroot = toRealPath(binaryPath).resolve("../..").normalize();
+        if (setting.getGoRoot() != null) {
+            goroot = Paths.get(setting.getGoRoot());
+        } else {
+            goroot = toRealPath(binaryPath).resolve("../..").normalize();
+        }
         resolved = true;
     }
 
     private void determineGoBinaryAndVersion() {
-        Optional<Pair<Path, String>> binPathAndVersionOnHost = getGoBinPathAndVersionOnHost();
-
-        if (binPathAndVersionOnHost.isPresent()) {
-            Path goBinPath = binPathAndVersionOnHost.get().getLeft();
-            String version = binPathAndVersionOnHost.get().getRight();
-            if (setting.getGoVersion() == null || setting.getGoVersion().equals(version)) {
-                useGoExecutableOnHost(goBinPath, version);
-            } else {
-                fetchSpecifiedVersion(setting.getGoVersion());
-            }
+        if (goExecutableIsSpecified()) {
+            Optional<Pair<Path, String>> pathAndVersion = tryGivenGoExecutable();
+            Assert.isTrue(pathAndVersion.isPresent(), "Cannot execute given go binary: " + setting.getGoExecutable());
+            Assert.isTrue(versionMatch(pathAndVersion.get().getRight()),
+                    "Version not match: required is " + setting.getGoVersion()
+                            + ", given is " + pathAndVersion.get().getRight());
+            useGoExecutableOnHost(pathAndVersion.get().getLeft(), pathAndVersion.get().getRight());
         } else {
-            if (setting.getGoVersion() == null) {
-                fetchNewestStableVersion();
+            Optional<Pair<Path, String>> binPathAndVersionOnHost = findGoBinAndVersionInPATH();
+            if (binPathAndVersionOnHost.isPresent()) {
+                Path goBinPath = binPathAndVersionOnHost.get().getLeft();
+                String version = binPathAndVersionOnHost.get().getRight();
+                if (versionMatch(version)) {
+                    useGoExecutableOnHost(goBinPath, version);
+                } else {
+                    fetchSpecifiedVersion(setting.getGoVersion());
+                }
             } else {
-                fetchSpecifiedVersion(setting.getGoVersion());
+                if (setting.getGoVersion() == null) {
+                    fetchNewestStableVersion();
+                } else {
+                    fetchSpecifiedVersion(setting.getGoVersion());
+                }
             }
         }
+    }
+
+    private boolean versionMatch(String actualVersion) {
+        return setting.getGoVersion() == null || setting.getGoVersion().equals(actualVersion);
+    }
+
+    private boolean goExecutableIsSpecified() {
+        return !"go".equals(setting.getGoExecutable());
     }
 
     private void useGoExecutableOnHost(Path goBinPathOnHost, String versionOnHost) {
@@ -143,17 +164,12 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         }
     }
 
-    private Optional<Pair<Path, String>> getGoBinPathAndVersionOnHost() {
-        if ("go".equals(setting.getGoExecutable())) {
-            return findGoBinAndVersionInPATH();
-        } else {
-            return tryGivenGoExecutable();
-        }
-    }
 
     private Optional<Pair<Path, String>> tryGivenGoExecutable() {
         Path givenGoExecutablePath = Paths.get(setting.getGoExecutable());
-        return tryInvokeGoVersion(givenGoExecutablePath);
+        Optional<Pair<Path, String>> ret = tryInvokeGoVersion(givenGoExecutablePath);
+        Assert.isTrue(ret.isPresent(), "Failed to run given go executable: " + setting.getGoExecutable());
+        return ret;
     }
 
     @SuppressWarnings({"checkstyle:localvariablename"})
@@ -183,7 +199,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
                 return Optional.empty();
             }
         } catch (Exception e) {
-            LOGGER.debug("Encountered exception when running go version", e);
+            LOGGER.debug("Encountered exception when running go version via: " + executablePath.toAbsolutePath(), e);
             return Optional.empty();
         }
     }

@@ -70,6 +70,12 @@ class GolangPluginSettingTest {
     }
 
     @Test
+    void 'setting goroot should succeed'() {
+        setting.goRoot = 'goroot'
+        assert setting.goRoot == 'goroot'
+    }
+
+    @Test
     void 'setting global cache time should succeed'() {
         assertCacheTimeEquals(1, 'second', 1)
         assertCacheTimeEquals(1, 'second', 1)

@@ -5,8 +5,8 @@ import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 
 public class GoVetTask extends Go {
     public GoVetTask() {
-        dependsOn(GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
-                GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
+                GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
     }
 
     protected void doAddDefaultAction() {

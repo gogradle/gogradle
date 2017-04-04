@@ -5,22 +5,6 @@ import org.junit.Test
 import static com.github.blindpirate.gogradle.core.IncompleteGolangPackage.of
 
 class IncompleteGolangPackageTest {
-
-    @Test(expected = UnsupportedOperationException)
-    void 'getVcsType should throw exception'() {
-        of('incomplete').vcsType
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'getUrl should throw exception'() {
-        of('incomplete').urls
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'getRootPath should throw exception'() {
-        of('incomplete').rootPath
-    }
-
     @Test
     void 'empty result should be returned when an incomplete package resolves a longer path'() {
         assert !of('incomplete/a').resolve('incomplete/a/b').isPresent()
@@ -32,4 +16,8 @@ class IncompleteGolangPackageTest {
         assert of('incomplete/a').resolve('incomplete').get() instanceof IncompleteGolangPackage
     }
 
+    @Test
+    void 'toString should succeed'(){
+       assert of('incomplete/a').toString()=="IncompleteGolangPackage{path='incomplete/a'}"
+    }
 }

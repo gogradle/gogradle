@@ -1,6 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangConfiguration;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import org.gradle.api.artifacts.Dependency;
 
 /**
@@ -26,19 +26,12 @@ public interface GolangDependency extends Dependency {
     @Override
     String getVersion();
 
-    ResolvedDependency resolve(GolangConfiguration configuration);
+    GolangPackage getPackage();
+
+    ResolvedDependency resolve(ResolveContext context);
 
     boolean isFirstLevel();
 
-    enum Namer implements org.gradle.api.Namer<GolangDependency> {
-
-        INSTANCE;
-
-        @Override
-        public String determineName(GolangDependency dependency) {
-            return dependency.getName();
-        }
-    }
 
 }
 

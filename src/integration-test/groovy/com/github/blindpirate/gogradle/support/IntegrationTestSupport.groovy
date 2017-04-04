@@ -2,33 +2,51 @@ package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.tooling.*
+import org.junit.Before
 
 abstract class IntegrationTestSupport {
     File resource
 
     File userhome
 
-    ByteArrayOutputStream stdout = new ByteArrayOutputStream()
-    PrintStream stdoutPs = new PrintStream(stdout)
-    ByteArrayOutputStream stderr = new ByteArrayOutputStream()
-    PrintStream stderrPs = new PrintStream(stderr)
+    ByteArrayOutputStream stdout
+    PrintStream stdoutPs
+    ByteArrayOutputStream stderr
+    PrintStream stderrPs
 
     // We use real go by default
-    String goBinPath = ''
+    String goBinPath = 'go'
 
-    String buildDotGradleBase = """ 
+    String buildDotGradleBase
+
+    @Before
+    void baseSetUp() {
+        buildDotGradleBase = """ 
 buildscript {
     dependencies {
         classpath files(new File(rootDir, '../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
-""" + '''
 golang {
-    goExecutable = '${goBinPath}'
+    goExecutable = '${StringUtils.toUnixString(goBinPath)}'
 }
-'''
+"""
+        if (userhome != null) {
+            buildDotGradleBase = "System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')" + buildDotGradleBase
+        }
+
+        initStdoutStderr()
+    }
+
+    void initStdoutStderr() {
+        stdout = new ByteArrayOutputStream()
+        stdoutPs = new PrintStream(stdout)
+        stderr = new ByteArrayOutputStream()
+        stderrPs = new PrintStream(stderr)
+    }
 
     void writeBuildAndSettingsDotGradle(String buildDotGradle) {
         writeBuildAndSettingsDotGradle(buildDotGradle, '')
@@ -80,10 +98,6 @@ golang {
         GradleConnector connector = GradleConnector.newConnector()
                 .forProjectDirectory(getProjectRoot())
 
-        if (userhome != null) {
-            connector.useGradleUserHomeDir(userhome)
-        }
-
         if (System.getProperty('GRADLE_DIST_HOME') != null) {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
         }
@@ -91,7 +105,7 @@ golang {
     }
 
     List<String> buildArguments() {
-        return ["-PgoBinPath=${getGoBinPath()}", "--stacktrace"]
+        return ["--stacktrace"]
     }
 
     abstract File getProjectRoot()

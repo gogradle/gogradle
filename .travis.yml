@@ -3,7 +3,6 @@ cache:
   directories:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
-    - $HOME/.gradle/go/
 env:
   global:
     - GOGS_DIR=/home/travis/gogs
@@ -34,6 +33,9 @@ before_install:
 
 after_failure:
   - free -mt
+  - cat /home/travis/gogs/.gogradle/reports/test/packages/*
+  - cat /home/travis/gogs/.gogradle/reports/test/classes/*
+  - cat /home/travis/gogs/.gogradle/reports/test/index.html
 
 
 

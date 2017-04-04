@@ -1,33 +1,17 @@
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.vcs.VcsType;
-
-import java.util.List;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
 public class UnrecognizedGolangPackage extends GolangPackage {
 
-    private UnrecognizedGolangPackage(String path) {
+    private UnrecognizedGolangPackage(Path path) {
         super(path);
     }
 
     @Override
-    public String getRootPath() {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    @Override
-    public VcsType getVcsType() {
-        throw new UnsupportedOperationException(getPath() + " is unrecognized!");
-    }
-
-    @Override
-    public List<String> getUrls() {
-        throw new UnsupportedOperationException(toString());
-    }
-
-    @Override
-    protected Optional<GolangPackage> longerPath(String packagePath) {
+    protected Optional<GolangPackage> longerPath(Path packagePath) {
         // I cannot foresee the future
         // for example, I am `golang.org` and I am unrecognized
         // but `golang.org/x/tools` can be recognized
@@ -35,18 +19,22 @@ public class UnrecognizedGolangPackage extends GolangPackage {
     }
 
     @Override
-    protected Optional<GolangPackage> shorterPath(String packagePath) {
+    protected Optional<GolangPackage> shorterPath(Path packagePath) {
         return Optional.of(of(packagePath));
     }
 
-    public static UnrecognizedGolangPackage of(String packagePath) {
+    public static UnrecognizedGolangPackage of(Path packagePath) {
         return new UnrecognizedGolangPackage(packagePath);
+    }
+
+    public static UnrecognizedGolangPackage of(String packagePath) {
+        return of(Paths.get(packagePath));
     }
 
     @Override
     public String toString() {
         return "UnrecognizedGolangPackage{"
-                + "path='" + getPath() + '\''
+                + "path='" + getPathString() + '\''
                 + '}';
     }
 }

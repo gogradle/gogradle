@@ -110,7 +110,7 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    private Path getGopathDir(String configuration) {
+    public Path getInstallationDirectory(String configuration) {
         String gopathDirName = String.format(GOPATH, configuration);
         return getGogradleBuildDir().resolve(gopathDirName);
     }
@@ -143,12 +143,6 @@ public class DefaultBuildManager implements BuildManager {
     @Override
     public void go(List<String> args, Map<String, String> env) {
         go(args, env, null, null, null);
-    }
-
-    @Override
-    public void run(List<String> args, Map<String, String> env) {
-        run(args, env, null, null, null);
-
     }
 
     @Override
@@ -220,7 +214,7 @@ public class DefaultBuildManager implements BuildManager {
                     + String.join(" ", args)
                     + "\nEnv:\n"
                     + StringUtils.formatEnv(env);
-            throw BuildException.processReturnNonZero(retcode, message);
+            throw BuildException.processInteractionFailed(retcode, message);
         }
     }
 
@@ -246,7 +240,7 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(PROJECT_GOPATH)
                 .toAbsolutePath()
                 .toString();
-        String buildGopath = getGopathDir(BUILD)
+        String buildGopath = getInstallationDirectory(BUILD)
                 .toAbsolutePath()
                 .toString();
 
@@ -254,7 +248,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     public String getTestGopath() {
-        String testGopath = getGopathDir(TEST)
+        String testGopath = getInstallationDirectory(TEST)
                 .toAbsolutePath()
                 .toString();
 
@@ -263,7 +257,7 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public void installDependency(ResolvedDependency dependency, String configuration) {
-        File targetDir = getGopathDir(configuration)
+        File targetDir = getInstallationDirectory(configuration)
                 .resolve(SRC)
                 .resolve(dependency.getName())
                 .toFile();

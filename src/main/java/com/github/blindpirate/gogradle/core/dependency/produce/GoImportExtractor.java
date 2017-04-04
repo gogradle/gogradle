@@ -35,7 +35,7 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 public class GoImportExtractor {
     private final BuildConstraintManager buildConstraintManager;
 
-    private static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
+    public static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
             BUILD, GoSourceCodeFilter.BUILD_GO_FILTER,
             TEST, GoSourceCodeFilter.TEST_GO_FILTER
     );

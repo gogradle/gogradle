@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -80,13 +81,45 @@ class DefaultGoBinaryManagerTest {
         when(processResult.getStdout()).thenReturn('go version go1.7.1 darwin/amd64')
     }
 
-    @Test
-    void 'user-specified go binary should be ignored if it cannot be executed'() {
+    @Test(expected = IllegalStateException)
+    void 'user-specified go binary should cause an exception if it cannot be executed'() {
         // given
-        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(new IllegalStateException())
+        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(IOException)
         when(setting.getGoExecutable()).thenReturn('/unexistent/go')
         // then
         'the newest stable version will be used if local binary not exist and no version specified'()
+    }
+
+    @Test
+    void 'goroot should be used if it is specified'() {
+        // given
+        turnOnMockGo()
+        when(setting.getGoRoot()).thenReturn(resource.absolutePath)
+        // then
+        assert manager.getGoroot() == resource.toPath()
+    }
+
+    @Test
+    void 'user-specific go binary should be used if it match specific version'() {
+        // given
+        turnOnMockGo()
+        File mockGo = new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}")
+        when(setting.getGoExecutable()).thenReturn(StringUtils.toUnixString(mockGo))
+        when(setting.getGoVersion()).thenReturn('1.7.1')
+        // then
+        assert manager.getGoVersion() == '1.7.1'
+        assert manager.getBinaryPath() == mockGo.toPath()
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be throw if user-specific go version not match required version'() {
+        // given
+        turnOnMockGo()
+        File mockGo = new File(resource, "go/bin/go${Os.getHostOs().exeExtension()}")
+        when(setting.getGoExecutable()).thenReturn(StringUtils.toUnixString(mockGo))
+        when(setting.getGoVersion()).thenReturn('1.8')
+        // then
+        manager.getGoVersion()
     }
 
     @Test

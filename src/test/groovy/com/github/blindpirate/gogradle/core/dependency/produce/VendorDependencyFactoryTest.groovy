@@ -15,13 +15,18 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
+import com.github.blindpirate.gogradle.vcs.VcsType
+import com.google.inject.Key
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
+import java.nio.file.Paths
+
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
@@ -42,13 +47,17 @@ class VendorDependencyFactoryTest {
     DependencyVisitor visitor
 
     @Mock
-    ResolvedDependency resolvedDependency
+    VcsAccessor accessor
+
+    @Mock
+    VcsResolvedDependency resolvedDependency
 
     GolangPackage golangPackage = MockUtils.mockVcsPackage()
 
     @Before
     void setUp() {
         when(GogradleGlobal.INSTANCE.getInstance(VendorOnlyProduceStrategy)).thenReturn(new VendorOnlyProduceStrategy())
+        when(resolvedDependency.getVcsType()).thenReturn(VcsType.GIT)
     }
 
     @Test
@@ -62,6 +71,7 @@ class VendorDependencyFactoryTest {
         when(resolver.produce('root')).thenReturn(of(IncompleteGolangPackage.of('root')))
         when(resolver.produce('root/package')).thenReturn(of(golangPackage))
         when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(visitor)
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance((Key) any(Key))).thenReturn(accessor)
         when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File)))
                 .thenReturn(GolangDependencySet.empty())
         IOUtils.write(resource, 'vendor/root/package/main.go', '')
@@ -72,12 +82,7 @@ class VendorDependencyFactoryTest {
         GolangDependency dependency = set.first()
         assert dependency instanceof VendorResolvedDependency
         assert ReflectionUtils.getField(dependency, 'hostDependency').is(resolvedDependency)
-        assert toUnixString(ReflectionUtils.getField(dependency, 'relativePathToHost')) == 'vendor/root/package'
+        assert ReflectionUtils.getField(dependency, 'relativePathToHost') == Paths.get('vendor/root/package')
     }
 
-    @Test
-//(expected = DependencyProductionException)
-    void 'IOException should be reported'() {
-        factory.produce(resolvedDependency, new File('inexistence'))
-    }
 }

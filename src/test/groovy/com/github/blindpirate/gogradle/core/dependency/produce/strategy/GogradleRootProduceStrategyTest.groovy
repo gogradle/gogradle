@@ -120,9 +120,10 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         dependenciesInBuildDotGradle()
         lockedDependencies()
         vendorDependencies()
+        sourceCodeDependencies()
 
         // when
-        strategy.produce(resolvedDependency, rootDir, visitor, 'build')
+        assert strategy.produce(resolvedDependency, rootDir, visitor, 'build').isEmpty()
 
         // then
         verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')

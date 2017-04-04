@@ -1,16 +1,27 @@
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.gradle.api.Action
 import org.gradle.api.artifacts.DependencySet
 import org.gradle.api.specs.Spec
 import org.junit.Test
+import org.junit.runner.RunWith
+
+import java.lang.reflect.Method
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.*
 
+@RunWith(GogradleRunner)
 class GolangDependencySetTest {
+
+    File resource
 
     @Test
     void 'flattening should succeed'() {
@@ -39,51 +50,107 @@ class GolangDependencySetTest {
         set.flatten()
     }
 
+    void assertUnsupport(Closure closure) {
+        try {
+            closure.call()
+        }
+        catch (UnsupportedOperationException e) {
+            return
+        }
+        assert false
+    }
+
+    @Test
+    void 'all methods should be delegated to container'() {
+        GolangDependencySet set = GolangDependencySet.empty()
+        TreeSet container = mock(TreeSet)
+        ReflectionUtils.setField(set, 'container', container)
+
+        reset(container)
+        set.size()
+        verify(container).size()
+
+        reset(container)
+        set.isEmpty()
+        verify(container).isEmpty()
+
+        reset(container)
+        set.contains(0)
+        verify(container).contains(0)
+
+        reset(container)
+        set.iterator()
+        verify(container).iterator()
+
+        reset(container)
+        set.toArray()
+        verify(container).toArray()
+
+        reset(container)
+        int[] array = [] as int[]
+        set.toArray(array)
+        verify(container).toArray(array)
+
+        reset(container)
+        set.add(null)
+        verify(container).add(null)
+
+        reset(container)
+        set.remove(1)
+        verify(container).remove(1)
+
+        reset(container)
+        set.containsAll([])
+        verify(container).containsAll([])
+
+        reset(container)
+        set.addAll([])
+        verify(container).addAll([])
+
+        reset(container)
+        set.retainAll([])
+        verify(container).retainAll([])
+
+        reset(container)
+        set.removeAll([])
+        verify(container).removeAll([])
+    }
+
     @Test
     void 'all methods of facade should be delegated to itself'() {
         GolangDependencySet set = new GolangDependencySet()
         DependencySet facade = set.toDependencySet()
         GolangDependencySet mockDependencySet = mock(GolangDependencySet)
-        ReflectionUtils.setField(facade, 'this$0', mockDependencySet)
+        ReflectionUtils.setField(facade, 'outerInstance', mockDependencySet)
 
-        facade.withType(String)
-        verify(mockDependencySet).withType(String)
+        assertUnsupport { facade.withType(String) }
 
         Action action = mock(Action)
-        facade.withType(String, action)
-        verify(mockDependencySet).withType(String, action)
+        assertUnsupport { facade.withType(String, action) }
 
         Closure closure = mock(Closure)
-        facade.withType(String, closure)
-        verify(mockDependencySet).withType(String, closure)
+        assertUnsupport { facade.withType(String, closure) }
 
         Spec spec = mock(Spec)
-        facade.matching(spec)
-        verify(mockDependencySet).matching(spec)
+        assertUnsupport { facade.matching(spec) }
 
-        facade.matching(closure)
-        verify(mockDependencySet).matching(closure)
+        assertUnsupport { facade.matching(closure) }
 
-        facade.whenObjectAdded(action)
-        verify(mockDependencySet).whenObjectAdded(action)
+        assertUnsupport { facade.whenObjectAdded(action) }
 
-        facade.whenObjectAdded(closure)
-        verify(mockDependencySet).whenObjectAdded(closure)
+        assertUnsupport { facade.whenObjectAdded(closure) }
 
-        facade.whenObjectRemoved(action)
-        verify(mockDependencySet).whenObjectRemoved(action)
+        assertUnsupport { facade.whenObjectRemoved(action) }
 
-        facade.whenObjectRemoved(closure)
-        verify(mockDependencySet).whenObjectRemoved(closure)
+        assertUnsupport { facade.whenObjectRemoved(closure) }
 
-        facade.all(action)
-        verify(mockDependencySet).all(action)
+        assertUnsupport { facade.all(action) }
 
-        facade.all(closure)
-        verify(mockDependencySet).all(closure)
+        assertUnsupport { facade.all(closure) }
 
-        facade.findAll(closure)
-        verify(mockDependencySet).findAll(closure)
+        assertUnsupport { facade.findAll(closure) }
+
+        assertUnsupport { facade.getBuildDependencies() }
 
         facade.isEmpty()
         verify(mockDependencySet).isEmpty()
@@ -117,8 +184,103 @@ class GolangDependencySetTest {
         verify(mockDependencySet).clear()
     }
 
+    @Test
+    void 'dependencies should be identified by names'() {
+        GolangDependency d1 = DependencyUtils.mockWithName(GolangDependency, 'name')
+        GolangDependency d2 = DependencyUtils.mockWithName(GolangDependency, 'name')
+
+        GolangDependencySet set = GolangDependencySet.empty()
+        set.add(d1)
+        set.add(d2)
+
+        assert set.size() == 1
+        assert set.contains(d1)
+        assert set.contains(d2)
+    }
+
+    @Test
+    void 'equals and hashCode should succeed'() {
+        GolangDependencySet set1 = GolangDependencySet.empty()
+        GolangDependencySet set2 = GolangDependencySet.empty()
+
+        assert callEqualsViaReflection(set1, set1)
+        assert callEqualsViaReflection(set1, set2)
+        assert !callEqualsViaReflection(set1, null)
+        assert !callEqualsViaReflection(set1, [])
+        assert set1.hashCode() == set2.hashCode()
+
+        GolangDependency d = DependencyUtils.mockWithName(GolangDependency, 'name')
+        set1.add(d)
+        set2.add(d)
+
+        assert callEqualsViaReflection(set1, set2)
+        assert set1.hashCode() == set2.hashCode()
+    }
+
+    boolean callEqualsViaReflection(GolangDependencySet set1, Object set2) {
+        Method m = GolangDependencySet.class.getMethod('equals', Object)
+        m.invoke(set1, [set2] as Object[])
+    }
+
     @Test(expected = UnsupportedOperationException)
     void 'exception should be thrown when invoking some methods'() {
         new GolangDependencySet().toDependencySet().getBuildDependencies()
+    }
+
+    @Test
+    @WithResource('')
+    void 'serialization and deserialization should succeed'() {
+        // given
+        File output = new File(resource, 'output.bin')
+        IOUtils.touch(output)
+
+        GolangDependencySet set = new GolangDependencySet()
+        set.add(newGitDependency())
+        set.add(LocalDirectoryDependency.fromLocal('resource', resource))
+        set.add(newVendorDependency())
+
+        // when
+        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output))
+        oos.writeObject(set)
+
+        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output))
+        def result = ois.readObject()
+
+        // then
+        assert result instanceof GolangDependencySet
+
+        def gitDependency = result.find { it instanceof GitNotationDependency }
+        assert gitDependency.name == 'gitDependency'
+        assert gitDependency.commit == 'commit'
+        assert gitDependency.urls == ['url']
+        assert gitDependency.firstLevel
+
+        def vendorDependency = result.find { it instanceof VendorNotationDependency }
+        assert vendorDependency.name == 'vendorDependency'
+        assert vendorDependency.hostNotationDependency.commit == 'commit'
+        assert vendorDependency.hostNotationDependency.urls == ['url']
+        assert vendorDependency.hostNotationDependency.firstLevel
+        assert vendorDependency.vendorPath == 'vendor/path'
+
+        def localDependency = result.find { it instanceof LocalDirectoryDependency }
+        assert localDependency.name == 'resource'
+        assert localDependency.rootDir == resource
+    }
+
+    VendorNotationDependency newVendorDependency() {
+        VendorNotationDependency ret = new VendorNotationDependency()
+        ret.name = 'vendorDependency'
+        ret.hostNotationDependency = newGitDependency()
+        ret.vendorPath = 'vendor/path'
+        return ret
+    }
+
+    GitNotationDependency newGitDependency() {
+        GitNotationDependency ret = new GitNotationDependency()
+        ret.name = 'gitDependency'
+        ret.commit = 'commit'
+        ret.url = 'url'
+        ret.firstLevel = true
+        return ret
     }
 }

@@ -1,23 +1,33 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
+import com.github.blindpirate.gogradle.core.StandardGolangPackage
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
+import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.Mock
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
-import static org.mockito.Matchers.eq
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static java.util.Optional.of
+import static org.mockito.ArgumentMatchers.anyString
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
+@WithMockInjector
 class DefaultMapNotationParserTest {
 
     DefaultMapNotationParser parser
@@ -28,87 +38,198 @@ class DefaultMapNotationParserTest {
     @Mock
     PackagePathResolver packagePathResolver
     @Mock
-    MapNotationParser vcsMapNotationParser
+    MapNotationParser gitMapNotationParser
     @Mock
-    GolangDependency dependency
+    MapNotationParser mercurialMapNotationParser
+    @Captor
+    ArgumentCaptor captor
 
     @Before
     void setUp() {
         parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver)
+        MockUtils.mockVcsService(MapNotationParser, Git, gitMapNotationParser)
+        MockUtils.mockVcsService(MapNotationParser, Mercurial, mercurialMapNotationParser)
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                String path = invocation.getArgument(0)
+                if (path.startsWith('unrecognized')) {
+                    return of(UnrecognizedGolangPackage.of(path))
+                } else if (path.startsWith("original")) {
+                    return of(VcsGolangPackage.builder()
+                            .withPath(path)
+                            .withRootPath('original')
+                            .withOriginalVcsInfo(VcsType.GIT, ['originalUrl'])
+                            .build())
+                } else if (path.startsWith('substituted')) {
+                    return of(VcsGolangPackage.builder()
+                            .withPath(path)
+                            .withRootPath('substituted')
+                            .withSubstitutedVcsInfo(VcsType.GIT, ['substitutedUrl'])
+                            .build())
+                } else if (path.startsWith('local')) {
+                    return of(LocalDirectoryGolangPackage.of('local', path, 'dir'))
+                } else {
+                    assert false
+                }
+            }
+        })
     }
 
-    @Test(expected = Exception)
+    @Test(expected = IllegalStateException)
     void 'notation without name should be rejected'() {
         parser.parse([:])
     }
 
     @Test
-    void 'notation with dir should be delegated to DirMapNotationParser'() {
-        // given
-        def notation = [name: 'path', dir: 'dir']
+    void 'unrecognized package with dir should be delegated to DirMapNotationParser'() {
         // when
-        parser.parse(notation)
+        parser.parse([name: 'unrecognized', dir: 'dir'])
         // then
-        verify(dirMapNotationParser).parse(notation)
+        verify(dirMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'unrecognized'
+        assert captor.value.dir == 'dir'
+        assert captor.value.package instanceof UnrecognizedGolangPackage
     }
 
     @Test
-    void 'notation with vendorPath should be delegated to VendorMapNotationParser'() {
-        // given
-        def notation = [name: 'path', vendorPath: '/vendor/github.com/a/b']
-        // when
-        parser.parse(notation)
-        // then
-        verify(vendorMapNotationParser).parse(notation)
+    void 'unrecognized notation dependency should be generated if url not specified'() {
+        assert parser.parse([name: 'unrecognized', useless: 'useless']) instanceof UnrecognizedPackageNotationDependency
     }
 
     @Test
-    @WithMockInjector
-    void 'notation should be delegated to vcs parser'() {
-        // given
-        Map notation = [name: 'path', vcs: '']
-        VcsGolangPackage vcsPackage = VcsGolangPackage.builder()
-                .withPath('path')
-                .withRootPath('path')
-                .withVcsType(VcsType.GIT)
-                .build()
-        when(packagePathResolver.produce('path')).thenReturn(Optional.of(vcsPackage))
-        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
-
+    void 'local directory package should be delegated to DirMapNotationParser'() {
         // when
-        parser.parse(notation)
-
+        parser.parse([name: 'local'])
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'path', 'package': vcsPackage, vcs: '']))
+        verify(dirMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'local'
+        assert captor.value.package instanceof LocalDirectoryGolangPackage
+        assert captor.value.package.rootPathString == 'local'
+        assert captor.value.package.pathString == 'local'
+        assert captor.value.package.dir == 'dir'
     }
 
     @Test
-    @WithMockInjector
-    void 'sub package declaration should be normalized'() {
-        // given
-        Map notation = [name: 'root/path']
-        VcsGolangPackage vcsPackage = VcsGolangPackage.builder()
-                .withPath('root/path')
-                .withRootPath('root')
-                .withVcsType(VcsType.GIT)
-                .build()
-        when(packagePathResolver.produce('root/path')).thenReturn(Optional.of(vcsPackage))
-        MockUtils.mockVcsService(MapNotationParser, Git, vcsMapNotationParser)
-
+    void 'local/sub directory package should be delegated to DirMapNotationParser'() {
         // when
-        parser.parse(notation)
-
+        parser.parse([name: 'local/sub'])
         // then
-        verify(vcsMapNotationParser).parse(eq([name: 'root', 'package': vcsPackage]))
+        verify(dirMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'local'
+        assert captor.value.package instanceof LocalDirectoryGolangPackage
+        assert captor.value.package.rootPathString == 'local'
+        assert captor.value.package.pathString == 'local/sub'
+        assert captor.value.package.dir == 'dir'
+    }
+
+    @Test
+    void 'unrecognized dependency should be parsed successfully if url and vcs is provided'() {
+        // when
+        parser.parse([name: 'unrecognized', url: 'url', vcs: 'hg'])
+        // then
+        verify(mercurialMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'unrecognized'
+        assert captor.value.url == 'url'
+        assert captor.value.package instanceof VcsGolangPackage
+        assert captor.value.package.originalVcsInfo == null
+        assert captor.value.package.pathString == 'unrecognized'
+        assert captor.value.package.rootPathString == 'unrecognized'
+        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.MERCURIAL
+        assert captor.value.package.substitutedVcsInfo.urls == ['url']
+    }
+
+    @Test
+    void 'unrecognized dependency should be parsed successfully if only url is provided'() {
+        // when
+        parser.parse([name: 'unrecognized', url: 'url'])
+        // then
+        verify(gitMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'unrecognized'
+        assert captor.value.url == 'url'
+        assert captor.value.package instanceof VcsGolangPackage
+        assert captor.value.package.originalVcsInfo == null
+        assert captor.value.package.pathString == 'unrecognized'
+        assert captor.value.package.rootPathString == 'unrecognized'
+        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.GIT
+        assert captor.value.package.substitutedVcsInfo.urls == ['url']
+    }
+
+    @Test
+    void 'vcs package should be parsed successfully'() {
+        // when
+        parser.parse([name: 'original'])
+        // then
+        verify(gitMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'original'
+        assert captor.value.package instanceof VcsGolangPackage
+        assert captor.value.package.pathString == 'original'
+        assert captor.value.package.rootPathString == 'original'
+        assert captor.value.package.originalVcsInfo.vcsType == VcsType.GIT
+        assert captor.value.package.originalVcsInfo.urls == ['originalUrl']
+        assert captor.value.package.substitutedVcsInfo == null
+    }
+
+    @Test
+    void 'vcs sub package should be parsed successfully'() {
+        // when
+        parser.parse([name: 'original/sub'])
+        // then
+        verify(gitMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'original'
+        assert captor.value.package instanceof VcsGolangPackage
+        assert captor.value.package.pathString == 'original/sub'
+        assert captor.value.package.rootPathString == 'original'
+        assert captor.value.package.originalVcsInfo.vcsType == VcsType.GIT
+        assert captor.value.package.originalVcsInfo.urls == ['originalUrl']
+        assert captor.value.package.substitutedVcsInfo == null
+    }
+
+    @Test
+    void 'vcs package with url and vcs should be parsed successfully'() {
+        // given
+        reset(packagePathResolver)
+        when(packagePathResolver.produce(anyString())).thenReturn(of(
+                VcsGolangPackage.builder()
+                        .withRootPath('substituted')
+                        .withPath('substituted')
+                        .withSubstitutedVcsInfo(VcsType.MERCURIAL, ['substitutedUrl'])
+                        .build()
+        ))
+        // when
+        parser.parse([name: 'substituted', vcs: 'hg', url: 'url'])
+        // then
+        verify(mercurialMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'substituted'
+        assert captor.value.package instanceof VcsGolangPackage
+        assert captor.value.package.pathString == 'substituted'
+        assert captor.value.package.rootPathString == 'substituted'
+        assert captor.value.package.originalVcsInfo == null
+        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.MERCURIAL
+        assert captor.value.package.substitutedVcsInfo.urls == ['substitutedUrl']
+    }
+
+    @Test
+    void 'unrecognized notation with vendorPath should be delegated to VendorMapNotationParser'() {
+        // when
+        parser.parse([name: 'unrecognized', vendorPath: 'vendor/unrecognized'])
+        // then
+        verify(vendorMapNotationParser).parse(captor.capture())
+        assert captor.value.name == 'unrecognized'
+        assert captor.value.vendorPath == 'vendor/unrecognized'
+        assert captor.value.package instanceof UnrecognizedGolangPackage
     }
 
     @Test(expected = IllegalStateException)
     void 'notation with mismatched vcs should result in an exception'() {
+        parser.parse([name: 'original', vcs: 'svn'])
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'only VcsGolangPackage and UnrecognizedGolangPackage can be parsed'() {
         // given
-        Map notation = [name: 'github.com/user/package', vcs: 'svn']
-        VcsGolangPackage vcsPackage = MockUtils.mockVcsPackage()
-        when(packagePathResolver.produce('github.com/user/package')).thenReturn(Optional.of(vcsPackage))
-        // when
-        parser.parse(notation)
+        reset(packagePathResolver)
+        when(packagePathResolver.produce('fmt')).thenReturn(of(StandardGolangPackage.of('fmt')))
+        parser.parse([name: 'fmt'])
     }
 }

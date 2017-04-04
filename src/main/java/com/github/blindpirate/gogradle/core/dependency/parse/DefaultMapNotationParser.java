@@ -1,17 +1,25 @@
 package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage;
+import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
+
+import static java.util.Collections.singletonList;
 
 /**
  * Converts a map notation to a {@link NotationDependency}
@@ -35,43 +43,80 @@ public class DefaultMapNotationParser implements MapNotationParser {
     @Override
     public NotationDependency parse(Map<String, Object> notation) {
         Assert.isTrue(notation.containsKey(NAME_KEY), "Name must be specified!");
-        if (notation.containsKey(DIR_KEY)) {
-            return dirMapNotationParser.parse(notation);
+
+        String packagePath = MapUtils.getString(notation, NAME_KEY);
+        GolangPackage pkg = packagePathResolver.produce(packagePath).get();
+        notation.put(PACKAGE_KEY, pkg);
+
+        if (notation.containsKey(DIR_KEY) || pkg instanceof LocalDirectoryGolangPackage) {
+            return parseDirDependency(notation, pkg);
         } else if (notation.containsKey(VENDOR_PATH_KEY)) {
             return vendorMapNotationParser.parse(notation);
         } else {
-            return parseWithVcs(notation);
+            return parseWithVcs(notation, pkg);
         }
     }
 
-    private NotationDependency parseWithVcs(Map<String, Object> notation) {
-        String packagePath = MapUtils.getString(notation, NAME_KEY);
-        GolangPackage golangPackage = packagePathResolver.produce(packagePath).get();
-        notation.put(PACKAGE_KEY, golangPackage);
-
-        normalize(notation, golangPackage);
-
-        verifyVcs(notation, golangPackage);
-
-        MapNotationParser parser =
-                golangPackage.getVcsType().getService(MapNotationParser.class);
-
-        return parser.parse(notation);
+    private NotationDependency parseDirDependency(Map<String, Object> notation, GolangPackage pkg) {
+        if (pkg instanceof LocalDirectoryGolangPackage) {
+            notation.put(NAME_KEY, LocalDirectoryGolangPackage.class.cast(pkg).getRootPathString());
+        }
+        return dirMapNotationParser.parse(notation);
     }
 
-    private void normalize(Map<String, Object> notation, GolangPackage golangPackage) {
-        if (golangPackage instanceof VcsGolangPackage) {
-            VcsGolangPackage vcsGolangPackage = VcsGolangPackage.class.cast(golangPackage);
-            if (!vcsGolangPackage.isRoot()) {
-                notation.put(NAME_KEY, vcsGolangPackage.getRootPath());
-            }
+    private NotationDependency parseWithVcs(Map<String, Object> notation, GolangPackage pkg) {
+        if (pkg instanceof VcsGolangPackage) {
+            return parseVcsPackage(notation, (VcsGolangPackage) pkg);
+        } else if (pkg instanceof UnrecognizedGolangPackage) {
+            return parseUnrecognizedPackage(notation, (UnrecognizedGolangPackage) pkg);
+        } else {
+            throw DependencyResolutionException.cannotParseNotation(notation);
         }
     }
 
-    private void verifyVcs(Map<String, Object> notation, GolangPackage golangPackage) {
+    private NotationDependency parseUnrecognizedPackage(Map<String, Object> notation,
+                                                        UnrecognizedGolangPackage pkg) {
+        String url = MapUtils.getString(notation, GitMercurialNotationDependency.URL_KEY);
+        if (url == null) {
+            return UnrecognizedPackageNotationDependency.of(pkg);
+        } else {
+            return parseVcsPackage(notation, adaptAsVcsPackage(notation, pkg, url));
+        }
+    }
+
+    private VcsGolangPackage adaptAsVcsPackage(Map<String, Object> notation,
+                                               UnrecognizedGolangPackage pkg,
+                                               String url) {
+        return VcsGolangPackage.builder()
+                .withSubstitutedVcsInfo(determineVcs(notation), singletonList(url))
+                .withPath(pkg.getPath())
+                .withRootPath(pkg.getPath())
+                .build();
+    }
+
+    private NotationDependency parseVcsPackage(Map<String, Object> notation, VcsGolangPackage pkg) {
+        verifyVcs(notation, pkg);
+
+        notation.put(NAME_KEY, pkg.getRootPathString());
+        notation.put(PACKAGE_KEY, pkg);
+
+        return pkg.getVcsType().getService(MapNotationParser.class).parse(notation);
+    }
+
+    private VcsType determineVcs(Map<String, Object> notation) {
+        String vcs = MapUtils.getString(notation, VCS_KEY);
+        if (vcs == null) {
+            notation.put(VCS_KEY, VcsType.GIT.getName());
+            return VcsType.GIT;
+        } else {
+            return VcsType.of(vcs).get();
+        }
+    }
+
+    private void verifyVcs(Map<String, Object> notation, VcsGolangPackage pkg) {
         String declaredVcs = MapUtils.getString(notation, VCS_KEY);
         if (StringUtils.isNotBlank(declaredVcs)) {
-            String actualVcs = golangPackage.getVcsType().getName();
+            String actualVcs = pkg.getVcsType().getName();
             Assert.isTrue(declaredVcs.equals(actualVcs),
                     "Vcs type not match: declared is " + declaredVcs + " but actual is " + actualVcs);
         }

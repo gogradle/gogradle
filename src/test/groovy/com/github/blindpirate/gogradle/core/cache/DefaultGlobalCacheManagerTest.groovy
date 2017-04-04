@@ -1,12 +1,19 @@
 package com.github.blindpirate.gogradle.core.cache
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.DataExchange
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
+import com.google.inject.Key
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
 import org.junit.Before
@@ -14,18 +21,22 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.channels.FileChannel
+import java.nio.channels.FileLock
+import java.nio.file.Paths
 import java.util.concurrent.Callable
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
-import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_LOCKFILES_PATH
-import static com.github.blindpirate.gogradle.util.IOUtils.toString
+import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_METADATA_PATH
 import static com.github.blindpirate.gogradle.util.IOUtils.write
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
+@WithMockInjector
 class DefaultGlobalCacheManagerTest {
 
     File resource
@@ -34,19 +45,31 @@ class DefaultGlobalCacheManagerTest {
     @Mock
     GolangPluginSetting setting
     @Mock
-    NotationDependency notationDependency
+    GitMercurialNotationDependency notationDependency
     @Mock
-    ResolvedDependency resolvedDependency
+    VcsResolvedDependency resolvedDependency
     @Mock
     Project project
+    @Mock
+    VcsAccessor accessor
+
+    VcsGolangPackage pkg = MockUtils.mockRootVcsPackage()
+
+    VcsGolangPackage substitutedPkg = MockUtils.mockSubstitutedRootVcsPackage()
 
     ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
     @Before
     void setUp() {
         cacheManager = new DefaultGlobalCacheManager(setting)
-        when(notationDependency.getName()).thenReturn("dependency")
+        when(notationDependency.getName()).thenReturn(pkg.getPathString())
+        when(notationDependency.getUrls()).thenReturn(pkg.getUrls())
+        when(notationDependency.getPackage()).thenReturn(pkg)
+        when(GogradleGlobal.getInstance((Key) any(Key))).thenReturn(accessor)
+        when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('url')
         ReflectionUtils.setField(cacheManager, "gradleHome", resource.toPath())
+
+        cacheManager.ensureGlobalCacheExistAndWritable()
     }
 
     @Test
@@ -61,36 +84,112 @@ class DefaultGlobalCacheManagerTest {
         // then
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
-        assert new File(resource, GO_LOCKFILES_PATH).exists()
+        assert new File(resource, GO_METADATA_PATH).exists()
     }
 
     @Test
-    void 'lock file should be initialized as 0'() {
+    void 'lock file should be initialized'() {
         // when
-        cacheManager.runWithGlobalCacheLock(notationDependency, {} as Callable)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
+
         // then
-        assert toString(new File(resource, 'go/lockfiles/dependency')) == '0'
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+        assert metadata.lastUpdateTime == 0
+        assert metadata.lastUpdateUrl == null
+        assert metadata.originalVcs == 'git'
+        assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+    }
+
+    @Test
+    void 'lock file should be initialized properly if no original urls provided'() {
+        // given
+        when(notationDependency.getPackage()).thenReturn(substitutedPkg)
+        // when
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
+        // then
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+        assert metadata.lastUpdateTime == 0
+        assert metadata.lastUpdateUrl == null
+        assert metadata.originalVcs == null
+        assert metadata.originalUrls == []
     }
 
     @Test
     void 'lock file should be updated successfully'() {
-        // when
+        // create
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateCurrentDependencyLock()
-            cacheManager.updateCurrentDependencyLock()
+            // create
+            cacheManager.updateCurrentDependencyLock(notationDependency)
         } as Callable)
+
+        GlobalCacheMetadata old = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+
+        // update1
+        // a shorter data (with fewer bytes) may cause issue
+        when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('u')
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
+        GlobalCacheMetadata updated1 = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+
+        // update2
+        when(notationDependency.getPackage()).thenReturn(substitutedPkg)
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            cacheManager.updateCurrentDependencyLock(notationDependency)
+        } as Callable)
+        GlobalCacheMetadata updated2 = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+
         // then
-        assert (-1000L..1000L).contains(toString(new File(resource, 'go/lockfiles/dependency')).toLong() - System.currentTimeMillis())
+        assert old.originalVcs == updated1.originalVcs
+        assert old.originalUrls == updated1.originalUrls
+        assert (-1000L..1000L).contains(updated1.getLastUpdateTime() - System.currentTimeMillis())
+        assert old.originalVcs == updated2.originalVcs
+        assert old.originalUrls == updated2.originalUrls
+
+
     }
 
     @Test
     void 'dependency should be considered as out-of-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis() - 2000}")
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+originalVcs:
+  git
+lastUpdated:
+  time: ${System.currentTimeMillis() - 2000}
+  url: https://github.com/user/package.git
+""")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert cacheManager.currentDependencyIsOutOfDate()
+            assert cacheManager.currentDependencyIsOutOfDate(notationDependency)
+        } as Callable)
+    }
+
+    @Test
+    void 'dependency should be considered as out-of-date if url not match current url in repo'() {
+        // given
+        when(notationDependency.getUrls()).thenReturn(['another url'])
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+originalVcs:
+  git
+lastUpdated:
+  time: ${System.currentTimeMillis()}
+  url: https://github.com/user/package.git
+""")
+        // then
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            assert cacheManager.currentDependencyIsOutOfDate(notationDependency)
         } as Callable)
     }
 
@@ -98,11 +197,84 @@ class DefaultGlobalCacheManagerTest {
     void 'dependency should be considered as up-to-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        write(resource, 'go/lockfiles/dependency', "${System.currentTimeMillis()}")
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+originalVcs:
+  git
+lastUpdated:
+  time: ${System.currentTimeMillis()}
+  url: https://github.com/user/package.git
+""")
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.currentDependencyIsOutOfDate()
+            assert !cacheManager.currentDependencyIsOutOfDate(notationDependency)
         } as Callable)
+    }
+
+    @Test
+    void 'getting metadata of a package should succeed'() {
+        // given
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
+originalUrls:
+  - git@github.com:user/package.git
+  - https://github.com/user/package.git
+originalVcs:
+  git
+lastUpdated:
+  time: 123
+  url: https://github.com/user/package.git
+""")
+        // when
+        GlobalCacheMetadata metadata = cacheManager.getMetadata(Paths.get('github.com/user/package')).get()
+        // then
+        assert metadata.lastUpdateTime == 123L
+        assert metadata.lastUpdateUrl == 'https://github.com/user/package.git'
+        assert metadata.originalVcs == 'git'
+        assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+    }
+
+    @Test
+    void 'empty result should be returned if metadata not exist'() {
+        assert !cacheManager.getMetadata(Paths.get('inexistent')).isPresent()
+    }
+
+    @Test
+    void 'empty result should be returned if it is locked by another process'() {
+        // given
+        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', '----\n')
+        Thread.start {
+            new ProcessUtils().runProcessWithCurrentClasspath(LockProcess,
+                    [new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage').getAbsolutePath()],
+                    [:])
+        }
+
+        // wait for another process to start and lock
+        Thread.sleep(1000)
+
+        assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
+    }
+
+    class LockProcess {
+        static void main(String[] args) {
+            FileChannel channel = null
+            FileLock lock = null
+            File lockFile = new File(args[0])
+            try {
+                channel = new RandomAccessFile(lockFile, "rw").getChannel()
+                lock = channel.lock()
+                Thread.sleep(2000)
+            } finally {
+                if (lock != null) {
+                    println("${new Date()}: release ${lockFile.absolutePath}")
+                    lock.release()
+                }
+                if (channel != null) {
+                    channel.close()
+                }
+            }
+        }
     }
 
     @Test

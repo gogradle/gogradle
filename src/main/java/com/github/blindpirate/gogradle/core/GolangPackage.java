@@ -1,29 +1,31 @@
 package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.vcs.VcsType;
+import com.github.blindpirate.gogradle.util.StringUtils;
 
-import java.util.List;
+import java.io.Serializable;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Optional;
 
-public abstract class GolangPackage {
-    private String path;
+public abstract class GolangPackage implements Serializable {
+    // java.io.NotSerializableException: sun.nio.fs.UnixPath
+    private String pathString;
 
-    public GolangPackage(String path) {
-        this.path = path;
+    public GolangPackage(Path path) {
+        this.pathString = StringUtils.toUnixString(path);
     }
 
-    public String getPath() {
-        return path;
+    public Path getPath() {
+        return Paths.get(pathString);
     }
 
-    public abstract String getRootPath();
+    public String getPathString() {
+        return pathString;
+    }
 
-    public abstract VcsType getVcsType();
-
-    public abstract List<String> getUrls();
-
-    public Optional<GolangPackage> resolve(String packagePath) {
+    public Optional<GolangPackage> resolve(Path packagePath) {
+        Path path = getPath();
         Assert.isTrue(packagePath.startsWith(path) || path.startsWith(packagePath));
         if (path.equals(packagePath)) {
             return Optional.of(this);
@@ -34,9 +36,13 @@ public abstract class GolangPackage {
         }
     }
 
-    protected abstract Optional<GolangPackage> longerPath(String packagePath);
+    public Optional<GolangPackage> resolve(String packagePath) {
+        return resolve(Paths.get(packagePath));
+    }
 
-    protected abstract Optional<GolangPackage> shorterPath(String packagePath);
+    protected abstract Optional<GolangPackage> longerPath(Path packagePath);
+
+    protected abstract Optional<GolangPackage> shorterPath(Path packagePath);
 
 
 }

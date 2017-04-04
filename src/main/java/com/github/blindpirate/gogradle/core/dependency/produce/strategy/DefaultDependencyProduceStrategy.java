@@ -31,10 +31,9 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
         GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
 
         if (candidate.isEmpty()) {
-            return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
-        } else {
-            return candidate;
+            candidate = visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         }
 
+        return candidate;
     }
 }

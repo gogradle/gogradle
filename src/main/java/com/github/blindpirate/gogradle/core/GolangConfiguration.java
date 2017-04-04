@@ -53,6 +53,10 @@ public class GolangConfiguration implements Configuration {
         return name;
     }
 
+    public GolangDependencySet getGolangDependencies() {
+        return dependencies;
+    }
+
     @Override
     public DependencySet getDependencies() {
         return dependencies.toDependencySet();
@@ -287,22 +291,22 @@ public class GolangConfiguration implements Configuration {
 
     @Override
     public void setCanBeConsumed(boolean b) {
-
+        throw new UnsupportedOperationException("Unsupported method setCanBeConsumed is invoked!");
     }
 
     @Override
     public boolean isCanBeConsumed() {
-        return false;
+        throw new UnsupportedOperationException("Unsupported method isCanBeConsumed is invoked!");
     }
 
     @Override
     public void setCanBeResolved(boolean b) {
-
+        throw new UnsupportedOperationException("Unsupported method setCanBeResolved is invoked!");
     }
 
     @Override
     public boolean isCanBeResolved() {
-        return false;
+        throw new UnsupportedOperationException("Unsupported method isCanBeResolved is invoked!");
     }
 
     @Override

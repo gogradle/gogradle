@@ -1,16 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackage;
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
-import org.gradle.api.specs.Spec;
-
+import java.io.Serializable;
 import java.util.Set;
+import java.util.function.Predicate;
 
-public interface NotationDependency extends GolangDependency {
-
-    GolangPackage getPackage();
-
-    DependencyProduceStrategy getStrategy();
-
-    Set<Spec<GolangDependency>> getTransitiveDepExclusions();
+public interface NotationDependency extends GolangDependency, Serializable {
+    Set<Predicate<GolangDependency>> getTransitiveDepExclusions();
 }

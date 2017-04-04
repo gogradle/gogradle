@@ -9,10 +9,7 @@ import java.io.File;
 /**
  * Direct how to generate dependencies of an existing golang package module.
  */
-// ExternalOnly/VendorOnly/SourceCodeOnly/GogradleDevelop/GogradleReproducible
 // Default: if external exist, use it; else if vendor exist, use it; else scan source
-// GogradleDevelop: external>vendor
-// GogradleReproducible: vendor>external
 
 public interface DependencyProduceStrategy {
 
@@ -21,5 +18,5 @@ public interface DependencyProduceStrategy {
     GolangDependencySet produce(ResolvedDependency dependency,
                                 File rootDir,
                                 DependencyVisitor visitor,
-                                String configuration);
+                                String configurationName);
 }

@@ -1,13 +1,13 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.exceptions.DependencyProductionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 
 import javax.inject.Inject;
@@ -50,7 +50,7 @@ public class SourceCodeDependencyFactory {
         Set<String> rootPackagePaths =
                 importPaths.stream()
                         .filter(path -> !path.startsWith(resolvedDependency.getName()))
-                        .map(importPath -> importPathToDependency(resolvedDependency, importPath))
+                        .map(this::getRootPath)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
                         .collect(Collectors.toSet());
@@ -64,7 +64,7 @@ public class SourceCodeDependencyFactory {
 
     }
 
-    private Optional<String> importPathToDependency(ResolvedDependency resolvedDependency, String importPath) {
+    private Optional<String> getRootPath(String importPath) {
         if (isBlank(importPath)) {
             return Optional.empty();
         }
@@ -78,10 +78,12 @@ public class SourceCodeDependencyFactory {
         }
 
         if (info instanceof UnrecognizedGolangPackage) {
-            throw DependencyProductionException.cannotRecognizePackage(importPath);
+            return Optional.of(importPath);
         }
 
-        return Optional.of(info.getRootPath());
+        String rootPath = ResolvableGolangPackage.class.cast(info).getRootPathString();
+
+        return Optional.of(rootPath);
     }
 
     private boolean isRelativePath(String importPath) {

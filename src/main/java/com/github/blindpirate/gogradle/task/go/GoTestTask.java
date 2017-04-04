@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.task.go;
 import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
+import com.github.blindpirate.gogradle.common.LineCollector;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
@@ -28,11 +29,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Consumer;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.go.GoCoverTask.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
@@ -68,12 +68,12 @@ public class GoTestTask extends Go {
     private boolean coverageProfileGenerated = false;
 
     public GoTestTask() {
-        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
-                INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
+                RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
     }
 
-    public boolean isGenerateCoverageProfile() {
-        return generateCoverageProfile;
+    public boolean isCoverageProfileGenerated() {
+        return coverageProfileGenerated;
     }
 
     public void setGenerateCoverageProfile(boolean generateCoverageProfile) {
@@ -206,19 +206,6 @@ public class GoTestTask extends Go {
             reportErrorIfNecessary(testResults, reportDir);
         }
 
-        private void rewritePackageName(File reportDir) {
-            Collection<File> htmlFiles = filterFilesRecursively(
-                    reportDir,
-                    new SuffixFileFilter(".html"),
-                    TrueFileFilter.INSTANCE);
-            String rewriteScript = IOUtils.toString(
-                    GoTestTask.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
-            htmlFiles.forEach(htmlFile -> {
-                String content = IOUtils.toString(htmlFile);
-                content = content.replace("</body>", "</body>" + rewriteScript);
-                IOUtils.write(htmlFile, content);
-            });
-        }
 
         private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
             int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
@@ -236,7 +223,7 @@ public class GoTestTask extends Go {
         }
 
         private List<String> doSingleTest(File parentDir, List<File> testFiles) {
-            StdoutStderrCollector lineConsumer = new StdoutStderrCollector();
+            LineCollector lineCollector = new LineCollector();
             String importPath = dirToImportPath(parentDir);
             List<String> args;
 
@@ -256,9 +243,9 @@ public class GoTestTask extends Go {
                 coverageProfileGenerated = true;
             }
 
-            buildManager.go(args, null, lineConsumer, lineConsumer, code -> {
+            buildManager.go(args, null, lineCollector, lineCollector, code -> {
             });
-            return lineConsumer.getStdoutStderr();
+            return lineCollector.getLines();
         }
 
 
@@ -282,16 +269,19 @@ public class GoTestTask extends Go {
         }
     }
 
-    private static class StdoutStderrCollector implements Consumer<String> {
-        private List<String> lines = new ArrayList<>();
-
-        @Override
-        public synchronized void accept(String s) {
-            lines.add(s);
-        }
-
-        public List<String> getStdoutStderr() {
-            return lines;
-        }
+    private void rewritePackageName(File reportDir) {
+        Collection<File> htmlFiles = filterFilesRecursively(
+                reportDir,
+                new SuffixFileFilter(".html"),
+                TrueFileFilter.INSTANCE);
+        String rewriteScript = IOUtils.toString(
+                GoTestTask.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
+        htmlFiles.forEach(htmlFile -> {
+            String content = IOUtils.toString(htmlFile);
+            content = content.replace("</body>", "</body>" + rewriteScript);
+            IOUtils.write(htmlFile, content);
+        });
     }
+
+
 }

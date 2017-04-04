@@ -11,9 +11,12 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 class GoVetIntegrationTest extends IntegrationTestSupport {
-    File resource
+    String mainDotGo
+    String buildDotGradle
 
-    String mainDotGo = """
+    @Before
+    void setUp() {
+        mainDotGo = """
 package main
 
 import "fmt"
@@ -23,15 +26,12 @@ func main() {
     fmt.Println(os.Stderr, fmt.Errorf("error msg"))
 }
 """
-    String buildDotGradle = """
+        buildDotGradle = """
 ${buildDotGradleBase}
 golang {
     packagePath="github.com/my/package"
 }
 """
-
-    @Before
-    void setUp() {
         IOUtils.write(resource, 'main.go', mainDotGo)
     }
 

@@ -17,7 +17,7 @@ public class GlockDependencyFactory extends ExternalDependencyFactory {
     private GlockfileParser parser = new GlockfileParser();
 
     @Override
-    protected String identityFileName() {
+    public String identityFileName() {
         return "GLOCKFILE";
     }
 

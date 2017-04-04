@@ -1,25 +1,23 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.ConfigureUtils;
+import com.github.blindpirate.gogradle.core.GolangPackage;
 import org.gradle.api.artifacts.Dependency;
-import org.gradle.api.specs.Spec;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
+import java.io.Serializable;
 
-public abstract class AbstractGolangDependency implements GolangDependency {
-    public static final Spec<GolangDependency> NO_TRANSITIVE_DEP_SPEC = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
+public abstract class AbstractGolangDependency implements GolangDependency, Serializable {
     private String name;
     private boolean firstLevel;
-    /**
-     * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.
-     */
-    protected Set<Spec<GolangDependency>> transitiveDepExclusions = new HashSet<>();
 
-    protected boolean shouldNotBeExcluded(GolangDependency dependency) {
-        return transitiveDepExclusions.stream().noneMatch(spec -> spec.isSatisfiedBy(dependency));
+
+    private GolangPackage golangPackage;
+
+    public GolangPackage getPackage() {
+        return golangPackage;
+    }
+
+    public void setPackage(GolangPackage golangPackage) {
+        this.golangPackage = golangPackage;
     }
 
     @Override
@@ -60,45 +58,5 @@ public abstract class AbstractGolangDependency implements GolangDependency {
         throw new UnsupportedOperationException("Unsupported method copy is invoked!");
     }
 
-    public enum NoTransitiveSpec implements Spec<GolangDependency> {
-        NO_TRANSITIVE_SPEC;
 
-        @Override
-        public boolean isSatisfiedBy(GolangDependency dependency) {
-            return true;
-        }
-    }
-
-    public static class PropertiesExclusionSpec implements Spec<GolangDependency> {
-        private Map<String, Object> properties;
-
-        public static PropertiesExclusionSpec of(Map<String, Object> properties) {
-            PropertiesExclusionSpec ret = new PropertiesExclusionSpec();
-            ret.properties = Assert.isNotNull(properties);
-            return ret;
-        }
-
-        @Override
-        public boolean isSatisfiedBy(GolangDependency dependency) {
-            return ConfigureUtils.match(properties, dependency);
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            PropertiesExclusionSpec that = (PropertiesExclusionSpec) o;
-
-            return properties.equals(that.properties);
-        }
-
-        @Override
-        public int hashCode() {
-            return properties.hashCode();
-        }
-    }
 }
