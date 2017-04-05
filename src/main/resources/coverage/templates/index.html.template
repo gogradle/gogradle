@@ -423,7 +423,7 @@
     <tr>
         <td>Total</td>
         <td class="bar">${totalMissedLines} of ${totalLines}</td>
-        <td class="ctr2">${totalCoverageRate}</td>
+        <td class="ctr2">${totalCoverageRate}%</td>
     </tr>
     </tfoot>
     <tbody>
