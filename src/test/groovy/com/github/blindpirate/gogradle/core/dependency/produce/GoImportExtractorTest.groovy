@@ -39,6 +39,37 @@ func generate(ch chan<- int) {
     }
 
     @Test
+    void 'extracting code with comment between package import should succeed'() {
+        assert extractor.extract('''
+package goserbench
+
+// AUTO GENERATED - DO NOT EDIT
+
+import (
+\tmath "math"
+\tcapnp "zombiezen.com/go/capnproto2"
+)
+''') == ['math', 'zombiezen.com/go/capnproto2']
+    }
+
+    @Test
+    void 'source code with comments in import statements should be parsed correctly'() {
+        assert extractor.extract('''
+package unsnap
+
+import (
+        "encoding/binary"
+
+        // no c lib dependency
+        snappy "github.com/golang/snappy"
+        // or, use the C wrapper for speed
+        //snappy "github.com/dgryski/go-csnappy"
+)
+
+''') == ['encoding/binary', 'github.com/golang/snappy']
+    }
+
+    @Test
     void 'source code with package in comment should be parsed correctly'() {
         assert extractor.extract('''
 // package main
