@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolve
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
 import java.io.File;
@@ -16,6 +17,7 @@ import java.util.Map;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
+    private static final File EMPTY_DIR = null;
     private static final long serialVersionUID = 1;
 
     private long updateTime;
@@ -37,7 +39,9 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     public void setDir(String dir) {
-        setDir(new File(dir));
+        if (!GolangRepository.EMPTY_DIR.equals(dir)) {
+            setDir(new File(dir));
+        }
     }
 
     private void setDir(File rootDir) {
@@ -50,7 +54,9 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public ResolvedDependency doResolve(ResolveContext context) {
-        this.dependencies = context.produceTransitiveDependencies(this, rootDir);
+        if (rootDir != EMPTY_DIR) {
+            this.dependencies = context.produceTransitiveDependencies(this, rootDir);
+        }
         return this;
     }
 
@@ -75,13 +81,15 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public void installTo(File targetDirectory) {
-        GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
-        IOUtils.write(targetDirectory, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE, formatVersion());
+        if (rootDir != EMPTY_DIR) {
+            GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
+            IOUtils.write(targetDirectory, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE, formatVersion());
+        }
     }
 
     @Override
     public String formatVersion() {
-        return StringUtils.toUnixString(rootDir);
+        return rootDir == EMPTY_DIR ? "" : StringUtils.toUnixString(rootDir);
     }
 
     @Override
