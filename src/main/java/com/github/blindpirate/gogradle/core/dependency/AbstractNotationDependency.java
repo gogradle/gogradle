@@ -113,8 +113,12 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         AbstractNotationDependency that = (AbstractNotationDependency) o;
         return Objects.equals(transitiveDepExclusions, that.transitiveDepExclusions)
                 && Objects.equals(getName(), that.getName())

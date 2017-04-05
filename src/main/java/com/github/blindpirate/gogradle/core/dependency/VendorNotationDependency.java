@@ -33,9 +33,15 @@ public class VendorNotationDependency extends AbstractNotationDependency {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         VendorNotationDependency that = (VendorNotationDependency) o;
         return Objects.equals(hostNotationDependency, that.hostNotationDependency)
                 && Objects.equals(vendorPath, that.vendorPath);

@@ -86,7 +86,9 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        if (!super.equals(o)) return false;
+        if (!super.equals(o)) {
+            return false;
+        }
         GitMercurialNotationDependency that = (GitMercurialNotationDependency) o;
         return Objects.equals(commit, that.commit)
                 && Objects.equals(getUrls(), that.getUrls());

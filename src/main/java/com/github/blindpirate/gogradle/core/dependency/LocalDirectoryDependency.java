@@ -106,9 +106,15 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        if (!super.equals(o)) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
         LocalDirectoryDependency that = (LocalDirectoryDependency) o;
         return Objects.equals(rootDir, that.rootDir);
     }
