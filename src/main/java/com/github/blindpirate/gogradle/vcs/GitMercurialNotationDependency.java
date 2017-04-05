@@ -86,15 +86,14 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
+        if (!super.equals(o)) return false;
         GitMercurialNotationDependency that = (GitMercurialNotationDependency) o;
         return Objects.equals(commit, that.commit)
-                && Objects.equals(getName(), that.getName())
-                && Objects.equals(getUrls(), that.getUrls())
-                && Objects.equals(isFirstLevel(), that.isFirstLevel());
+                && Objects.equals(getUrls(), that.getUrls());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(commit, getName(), isFirstLevel(), getUrls());
+        return Objects.hash(commit, getUrls(), super.hashCode());
     }
 }

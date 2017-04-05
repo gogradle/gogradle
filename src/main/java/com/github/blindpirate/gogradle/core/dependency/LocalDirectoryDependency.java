@@ -13,6 +13,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import java.io.File;
 import java.time.Instant;
 import java.util.Map;
+import java.util.Objects;
 
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
@@ -101,5 +102,19 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public String getVersion() {
         return Instant.ofEpochMilli(getUpdateTime()).toString();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        if (!super.equals(o)) return false;
+        LocalDirectoryDependency that = (LocalDirectoryDependency) o;
+        return Objects.equals(rootDir, that.rootDir);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(rootDir, super.hashCode());
     }
 }

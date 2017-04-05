@@ -104,7 +104,7 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'hashCode should succeed'() {
-        assert dependency.hashCode() == Objects.hash('commitId', 'github.com/a/b', false, ['url'])
+        assert dependency.hashCode() == Objects.hash('commitId', ['url'], Objects.hash([] as Set, 'github.com/a/b', false))
     }
 
     GitMercurialNotationDependency withNameAndCommit(String name, String commit) {
