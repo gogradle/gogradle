@@ -35,7 +35,11 @@ class GolangConfigurationTest {
             assert it.getFiles().isEmpty()
             assert it.getBuildDependencies() == null
         }
+    }
 
+    @Test
+    void 'getting dependencies should succeed'() {
+        assert configuration.getGolangDependencies().isEmpty()
     }
 
 }

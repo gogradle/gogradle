@@ -23,10 +23,6 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
         return determineVcs().vcsType;
     }
 
-    public String getUrl() {
-        return isEmpty(getUrls()) ? null : getUrls().get(0);
-    }
-
     public List<String> getUrls() {
         return determineVcs().urls;
     }
