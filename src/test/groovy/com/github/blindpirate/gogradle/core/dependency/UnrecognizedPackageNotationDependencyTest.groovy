@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
+import com.github.blindpirate.gogradle.core.exceptions.UnrecognizedPackageException
 import org.junit.Test
 
 class UnrecognizedPackageNotationDependencyTest {
@@ -14,12 +15,12 @@ class UnrecognizedPackageNotationDependencyTest {
         dependency.isFirstLevel()
     }
 
-    @Test(expected = UnsupportedOperationException)
+    @Test(expected = UnrecognizedPackageException)
     void 'getTransitiveDepExclusions is not supported'() {
         dependency.getTransitiveDepExclusions()
     }
 
-    @Test(expected = UnsupportedOperationException)
+    @Test(expected = UnrecognizedPackageException)
     void 'resolve is not supported'() {
         dependency.resolve(null)
     }
