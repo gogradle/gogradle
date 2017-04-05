@@ -58,6 +58,9 @@ class GolangRepositoryTest {
 
         repository.dir(1)
         assert repository.getDir('name') == null
+
+        repository.emptyDir()
+        assert repository.getDir(null) == GolangRepository.EMPTY_DIR
     }
 
     @Test

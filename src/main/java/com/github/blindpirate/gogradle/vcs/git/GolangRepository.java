@@ -8,6 +8,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import java.util.Optional;
 
 public class GolangRepository {
+    public static final String EMPTY_DIR = "GOGRADLE_EMPTY_DIR";
     public static final GolangRepository EMPTY_INSTANCE = new GolangRepository() {
         @Override
         public void all() {
@@ -31,6 +32,11 @@ public class GolangRepository {
 
         @Override
         public void vcs(String vcs) {
+            throw new UnsupportedOperationException();
+        }
+
+        @Override
+        public void emptyDir() {
             throw new UnsupportedOperationException();
         }
 
@@ -62,6 +68,10 @@ public class GolangRepository {
         Optional<VcsType> vcsOptional = VcsType.of(vcs);
         Assert.isTrue(vcsOptional.isPresent(), "Unknown vcs type: " + vcs);
         this.vcsType = vcsOptional.get();
+    }
+
+    public void emptyDir() {
+        dir = EMPTY_DIR;
     }
 
     public VcsType getVcsType() {
