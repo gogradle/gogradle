@@ -26,7 +26,8 @@ import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDepen
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -116,9 +117,12 @@ class ResolveTaskTest extends TaskTest {
 
     @Test
     void 'checking dependencies should succeed'() {
+        GolangDependencySet set = GolangDependencySet.empty()
+        set.add(LocalDirectoryDependency.fromLocal('local', resource))
+
         when(configurationManager.getByName('build')).thenReturn(configuration)
-        when(configuration.getGolangDependencies()).thenReturn(mock(GolangDependencySet))
-        assert resolveBuildDependenciesTask.getDependencies().is(configuration.getGolangDependencies())
+        when(configuration.getGolangDependencies()).thenReturn(set)
+        assert resolveBuildDependenciesTask.getDependencies().containsAll(configuration.getGolangDependencies())
     }
 
     @Test
