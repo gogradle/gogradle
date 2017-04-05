@@ -133,6 +133,12 @@ class ResolveTaskTest extends TaskTest {
     }
 
     @Test
+    void 'checking build tags should succeed'() {
+        when(setting.getBuildTags()).thenReturn([''])
+        assert resolveBuildDependenciesTask.buildTags == ['']
+    }
+
+    @Test
     void 'checking go source files should succeed'() {
         IOUtils.write(resource, 'main.go', '')
         IOUtils.write(resource, 'main_test.go', '')

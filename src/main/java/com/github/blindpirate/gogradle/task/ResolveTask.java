@@ -113,6 +113,11 @@ public abstract class ResolveTask extends DefaultTask {
         return filterFilesRecursively(getProject().getRootDir(), filter);
     }
 
+    @Input
+    public List<String> getBuildTags() {
+        return setting.getBuildTags();
+    }
+
 //    @InputFiles
 //    public List<File> getLocalDirDependencies() {
 //        return getDependencies().stream()
