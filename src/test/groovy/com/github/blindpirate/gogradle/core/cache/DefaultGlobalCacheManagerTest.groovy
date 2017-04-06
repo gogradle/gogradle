@@ -264,7 +264,7 @@ lastUpdated:
             try {
                 channel = new RandomAccessFile(lockFile, "rw").getChannel()
                 lock = channel.lock()
-                Thread.sleep(2000)
+                Thread.sleep(3000)
             } finally {
                 if (lock != null) {
                     println("${new Date()}: release ${lockFile.absolutePath}")
