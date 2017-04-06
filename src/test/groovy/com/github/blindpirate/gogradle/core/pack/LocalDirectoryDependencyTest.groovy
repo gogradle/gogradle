@@ -109,7 +109,7 @@ class LocalDirectoryDependencyTest {
 
     @Test
     void 'formatting should succeed'() {
-        assert dependency.formatVersion() == resource.absolutePath
+        assert dependency.formatVersion() == StringUtils.toUnixString(resource)
     }
 
     @Test
