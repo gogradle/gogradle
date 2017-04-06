@@ -10,11 +10,11 @@
 
 Gogradle is a gradle plugin which provides support for building golang.
 
-> 2017-02-12 Now Gogradle can build 526 of [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) **WITHOUT** any extra configuration!
->
-> 2017-02-26 Now Gogradle can integrate with IDE perfectly!
+> 2017-04-06 Now Gogradle can build 666 of [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) **WITHOUT** any extra configuration!
 >
 > 2017-03-20 Now Gogradle can generate HTML reports for test and coverage! 
+>
+> 2017-02-26 Now Gogradle can integrate with IDE perfectly!
 
 ## Feature
 
