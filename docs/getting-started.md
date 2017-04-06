@@ -7,7 +7,7 @@
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.4.0'
+    id 'com.github.blindpirate.gogradle' version '0.4.1'
 }
 
 golang {

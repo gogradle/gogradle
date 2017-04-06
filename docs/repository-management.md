@@ -59,6 +59,17 @@ repositories {
 }    
 ```
 
+Sometimes, we need to ignore a package globally, for example, `appengine`. You can use `emptyDir()` to achieve this:
+ 
+```
+repositories {
+    golang {
+        root 'appengine'
+        emptyDir()
+    }
+}
+```
+
 NOTE the `root` declaration must match root path only. You can't declare a `root` matching both root path and non-root path:
 
 ```

@@ -58,6 +58,17 @@ repositories {
 }    
 ```
 
+有时，可能希望简单地忽略某个包，例如`appengine`，可以使用`emptyDir`：
+
+```
+repositories {
+    golang {
+        root 'appengine'
+        emptyDir()
+    }
+}
+```
+
 需要注意的是，`root`必须只匹配包的根路径。不要声明一个既能匹配根路径又能匹配子路径的`root`，如下所示：
 
 ```
