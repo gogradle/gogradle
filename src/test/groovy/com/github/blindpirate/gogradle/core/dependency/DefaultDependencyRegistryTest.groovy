@@ -1,11 +1,15 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -111,4 +115,19 @@ class DefaultDependencyRegistryTest {
         assert registry.retrieve('resolvedDependency').is(resolvedDependency1)
     }
 
+    @Test
+    void 'duplicated first-level vendor package should be registered successfully'() {
+        // given
+        VendorResolvedDependency dependency1 = DependencyUtils.mockWithName(VendorResolvedDependency, 'name')
+        VendorResolvedDependency dependency2 = DependencyUtils.mockWithName(VendorResolvedDependency, 'name')
+        when(dependency1.isFirstLevel()).thenReturn(true)
+        when(dependency2.isFirstLevel()).thenReturn(true)
+
+        // then
+        assert registry.register(dependency1)
+        assert !registry.register(dependency2)
+
+        when(dependency2.getUpdateTime()).thenReturn(1L)
+        assert registry.register(dependency2)
+    }
 }

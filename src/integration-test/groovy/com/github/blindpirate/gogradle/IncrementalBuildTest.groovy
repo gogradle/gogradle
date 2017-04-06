@@ -50,7 +50,6 @@ golang {
     @Test
     void 'second build should be UP-TO-DATE'() {
         build()
-        initStdoutStderr()
         build()
         assertUpToDate()
     }
@@ -60,6 +59,7 @@ golang {
     }
 
     void build() {
+        initStdoutStderr()
         newBuild {
             it.forTasks('resolveBuildDependencies')
         }
@@ -68,7 +68,6 @@ golang {
     @Test
     void 'modification to external lock file should make dependencies updated'() {
         build()
-        initStdoutStderr()
         IOUtils.write(resource, 'gogradle.lock', gogradleDotLock + '\n')
         build()
         assertNotUpToDate()
@@ -81,7 +80,6 @@ golang {
     @Test
     void 'modification to normal go files should make dependencies updated'() {
         build()
-        initStdoutStderr()
         IOUtils.write(resource, 'a.go', 'modified')
         build()
         assertNotUpToDate()
@@ -90,8 +88,19 @@ golang {
     @Test
     void 'modification to vendor should make dependencies updated'() {
         build()
-        initStdoutStderr()
         IOUtils.write(resource, 'vendor/a/b/c.go', 'modified')
+        build()
+        assertNotUpToDate()
+    }
+
+    @Test
+    void 'modification to buildTags should make dependencies updated'() {
+        build()
+        IOUtils.write(resource, 'build.gradle', buildDotGradle + """
+golang{
+    buildTags=['tag']
+}
+""")
         build()
         assertNotUpToDate()
     }
@@ -99,11 +108,20 @@ golang {
     @Test
     void 'modification to dependencies should make dependencies updated'() {
         build()
-        initStdoutStderr()
         IOUtils.mkdir(resource, '.tmp')
         IOUtils.write(resource, 'build.gradle', buildDotGradle + """
 dependencies {
     build name:'tmp', dir: '${StringUtils.toUnixString(new File(resource, '.tmp'))}'
+}
+""")
+        build()
+        assertNotUpToDate()
+
+        IOUtils.write(resource, 'build.gradle', buildDotGradle + """
+dependencies {
+    build(name:'tmp', dir: '${StringUtils.toUnixString(new File(resource, '.tmp'))}'){
+        exclude name:'xxx'
+    }
 }
 """)
         build()
@@ -113,7 +131,6 @@ dependencies {
     @Test
     void 'modification to testdata/_/. go files should not make dependencies updated'() {
         build()
-        initStdoutStderr()
         IOUtils.write(resource, '.hidden/a.go', 'modified')
         IOUtils.write(resource, '_hidden/a.go', 'modified')
         IOUtils.write(resource, '.a.go', 'modified')

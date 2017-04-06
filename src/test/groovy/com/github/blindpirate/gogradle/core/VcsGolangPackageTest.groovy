@@ -45,6 +45,13 @@ class VcsGolangPackageTest {
         assertRootPathAndSoOn(rootPackage)
     }
 
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if both originalInfo and substitutedInfo are null'() {
+        VcsGolangPackage.builder().withPath('root')
+                .withRootPath('root')
+                .build()
+    }
+
     void assertRootPathAndSoOn(GolangPackage golangPackage) {
         assert golangPackage instanceof VcsGolangPackage
         assert golangPackage.rootPathString == 'github.com/user/package'

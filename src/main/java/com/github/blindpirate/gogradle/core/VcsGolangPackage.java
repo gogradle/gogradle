@@ -9,8 +9,6 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
-import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
-
 public class VcsGolangPackage extends ResolvableGolangPackage {
     private VcsInfo originalVcsInfo;
     private VcsInfo substitutedVcsInfo;
@@ -21,10 +19,6 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
 
     public VcsType getVcsType() {
         return determineVcs().vcsType;
-    }
-
-    public String getUrl() {
-        return isEmpty(getUrls()) ? null : getUrls().get(0);
     }
 
     public List<String> getUrls() {

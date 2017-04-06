@@ -13,6 +13,7 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
+import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -106,8 +107,23 @@ class LocalDirectoryDependencyTest {
         dependency.getResolverClass()
     }
 
+    @Test
     void 'formatting should succeed'() {
-        assert dependency.formatVersion() == resource.absolutePath
+        assert dependency.formatVersion() == StringUtils.toUnixString(resource)
+    }
+
+    @Test
+    void 'empty dir should be handled successfully'() {
+        // given
+        dependency = new LocalDirectoryDependency()
+        dependency.setDir(GolangRepository.EMPTY_DIR)
+
+        // then
+        assert dependency.resolve(null).is(dependency)
+        assert dependency.formatVersion() == ''
+
+        // nothing happens
+        dependency.installTo(null)
     }
 
 }

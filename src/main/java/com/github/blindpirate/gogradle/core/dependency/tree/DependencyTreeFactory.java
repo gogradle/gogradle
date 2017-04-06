@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.exceptions.UnrecognizedPackageException;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Singleton;
@@ -51,14 +52,19 @@ public class DependencyTreeFactory {
             return;
         }
 
-        // BFS order
-        List<Pair<ResolveContext, ResolvedDependency>> contextAndResults = resolvedDependency.getDependencies()
-                .stream()
-                .map(dependency -> createContextAndResolve(dependency, context))
-                .collect(Collectors.toList());
+        try {
+            // BFS order
+            List<Pair<ResolveContext, ResolvedDependency>> contextAndResults = resolvedDependency.getDependencies()
+                    .stream()
+                    .map(dependency -> createContextAndResolve(dependency, context))
+                    .collect(Collectors.toList());
 
-        contextAndResults
-                .forEach(contextAndResult -> resolve(contextAndResult.getRight(), contextAndResult.getLeft()));
+            contextAndResults
+                    .forEach(contextAndResult -> resolve(contextAndResult.getRight(), contextAndResult.getLeft()));
+        } catch (UnrecognizedPackageException e) {
+            throw new IllegalStateException("Cannot recognize " + e.getPkg().getPathString()
+                    + " in " + resolvedDependency.getName());
+        }
     }
 
     private Pair<ResolveContext, ResolvedDependency> createContextAndResolve(GolangDependency dependency,

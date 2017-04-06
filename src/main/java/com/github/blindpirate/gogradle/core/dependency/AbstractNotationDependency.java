@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -110,4 +111,22 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AbstractNotationDependency that = (AbstractNotationDependency) o;
+        return Objects.equals(transitiveDepExclusions, that.transitiveDepExclusions)
+                && Objects.equals(getName(), that.getName())
+                && Objects.equals(isFirstLevel(), that.isFirstLevel());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(transitiveDepExclusions, getName(), isFirstLevel());
+    }
 }

@@ -40,14 +40,30 @@ class TestTop1000Task extends DefaultTask {
         String dirName = path.getFileName()
         String[] userAndProject = dirName.split(/_/)
         String buildDotGradle = """
-plugins {
-    id 'com.github.blindpirate.gogradle' version '0.4.0'
+buildscript {
+    dependencies {
+        classpath files('${getProject().getRootDir().absolutePath}/build/libs/gogradle-0.4.0-all.jar')
+    }
 }
+apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
     packagePath = "github.com/${userAndProject[0]}/${userAndProject[1]}" // path of project to be built 
 }
 """
+        if (path.resolve('build.gradle.ext').toFile().exists()) {
+            stdout.append('Found extend build.gradle\n')
+            stderr.append('Found extend build.gradle\n')
+            buildDotGradle += path.resolve('build.gradle.ext').toFile().text
+        } else if (!path.toFile().list().any { it.endsWith('.go') }) {
+            buildDotGradle += '''
+build {
+    doLast {
+        go 'build ./...'
+    }
+}
+'''
+        }
         write(new File(path.toFile(), 'build.gradle'), buildDotGradle)
         write(new File(path.toFile(), 'settings.gradle'), '')
 
@@ -61,9 +77,9 @@ golang {
         Files.createSymbolicLink(gradlewLink, getProject().getRootDir().toPath().resolve('gradlew'))
 
         stdout.append("Start building ${path}\n")
-        stderr.append("Start building ${path}\n:")
+        stderr.append("Start building ${path}\n")
 
-        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'build', '--stacktrace').directory(path.toFile())
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'clean', 'build', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 

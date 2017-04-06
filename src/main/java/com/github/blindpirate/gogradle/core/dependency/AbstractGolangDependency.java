@@ -9,7 +9,6 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
     private String name;
     private boolean firstLevel;
 
-
     private GolangPackage golangPackage;
 
     public GolangPackage getPackage() {

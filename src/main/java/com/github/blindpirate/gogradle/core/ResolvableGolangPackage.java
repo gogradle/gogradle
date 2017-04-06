@@ -13,10 +13,6 @@ public abstract class ResolvableGolangPackage extends GolangPackage {
         this.rootPathString = StringUtils.toUnixString(rootPath);
     }
 
-    public boolean isRoot() {
-        return rootPathString.equals(getPathString());
-    }
-
     public String getRootPathString() {
         return rootPathString;
     }

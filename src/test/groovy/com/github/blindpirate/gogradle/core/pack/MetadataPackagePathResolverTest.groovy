@@ -53,7 +53,7 @@ class MetadataPackagePathResolverTest {
         GolangPackage info = resolver.produce(packagePath).get()
 
         // then
-        assert info.url == 'https://code.org/r/p/exproj'
+        assert info.urls == ['https://code.org/r/p/exproj']
         assert info.vcsType == VcsType.GIT
         assert info.pathString == packagePath
         assert info.rootPathString == 'example.org'

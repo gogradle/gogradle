@@ -26,8 +26,16 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
                 throw new IllegalStateException("Package " + existent.getName()
                         + " conflict with " + dependencyToResolve.getName());
             } else if (theyAreAllFirstLevel(existent, dependencyToResolve)) {
-                throw new IllegalStateException("First-level package " + dependencyToResolve.getName()
-                        + " conflict!");
+                if (theyAreAllVendor(existent, dependencyToResolve)) {
+                    if (existentDependencyIsOutOfDate(existent, dependencyToResolve)) {
+                        return registerSucceed(dependencyToResolve);
+                    } else {
+                        return false;
+                    }
+                } else {
+                    throw new IllegalStateException("First-level package " + dependencyToResolve.getName()
+                            + " conflict!");
+                }
             } else if (existent.isFirstLevel()) {
                 return false;
             } else if (dependencyToResolve.isFirstLevel()) {
@@ -75,5 +83,10 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
     private boolean theyAreAllFirstLevel(ResolvedDependency existedModule, ResolvedDependency resolvedDependency) {
         return existedModule.isFirstLevel() && resolvedDependency.isFirstLevel();
+    }
+
+    private boolean theyAreAllVendor(ResolvedDependency existedDependency, ResolvedDependency dependencyToRegister) {
+        return existedDependency instanceof VendorResolvedDependency
+                && dependencyToRegister instanceof VendorResolvedDependency;
     }
 }

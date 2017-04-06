@@ -34,7 +34,7 @@ grammar GolangBuildInfo;
 
 //SourceFile       = PackageClause ";" { ImportDecl ";" } { TopLevelDecl ";" } .
 sourceFile
-    : commentLine* packageClause ';'? ( importDecl ';'? )* .*
+    : commentLine* packageClause ';'? commentLine* ( importDecl ';'? )* .*
     ;
 
 //PackageClause  = "package" PackageName .
@@ -48,7 +48,7 @@ importDecl
     ;
 
 importSpec
-    : NEWLINE* ( '.' | IDENTIFIER )? importPath NEWLINE*
+    : commentLine* NEWLINE* ( '.' | IDENTIFIER )? importPath commentLine* NEWLINE*
     ;
 
 importPath

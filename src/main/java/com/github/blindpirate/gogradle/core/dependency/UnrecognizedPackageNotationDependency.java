@@ -1,18 +1,16 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
+import com.github.blindpirate.gogradle.core.exceptions.UnrecognizedPackageException;
 
 import java.util.Set;
 import java.util.function.Predicate;
 
 public class UnrecognizedPackageNotationDependency extends AbstractGolangDependency implements NotationDependency {
 
-    private UnrecognizedGolangPackage pkg;
-
     public static UnrecognizedPackageNotationDependency of(UnrecognizedGolangPackage pkg) {
         UnrecognizedPackageNotationDependency ret = new UnrecognizedPackageNotationDependency();
-        ret.pkg = pkg;
+        ret.setPackage(pkg);
         ret.setName(pkg.getPathString());
         return ret;
     }
@@ -26,17 +24,12 @@ public class UnrecognizedPackageNotationDependency extends AbstractGolangDepende
     }
 
     @Override
-    public GolangPackage getPackage() {
-        return pkg;
-    }
-
-    @Override
     public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
-        throw new UnsupportedOperationException("Unrecognized package: " + getName());
+        throw UnrecognizedPackageException.cannotRecognizePackage((UnrecognizedGolangPackage) getPackage());
     }
 
     @Override
     public ResolvedDependency resolve(ResolveContext context) {
-        throw new UnsupportedOperationException("Unrecognized package: " + getName());
+        throw UnrecognizedPackageException.cannotRecognizePackage((UnrecognizedGolangPackage) getPackage());
     }
 }
