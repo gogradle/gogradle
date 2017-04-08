@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.GolangConfigurationManager
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.support.WithProject
@@ -56,22 +58,30 @@ class GolangPluginTest {
     @Test
     void 'adding a dependency to configuration should succeed'() {
         project.dependencies {
-            build 'github.com/a/b'
+            golang {
+                build 'github.com/a/b'
+            }
         }
 
-        assert project.configurations.build.dependencies.size() == 1
+        assert getDependencySet('build').size() == 1
 
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
     }
 
+    private GolangDependencySet getDependencySet(String configurationName) {
+        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName(configurationName).dependencies
+    }
+
     @Test
     void 'adding a dependency in form of map should succeed'() {
         project.dependencies {
-            build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: 'commitId', vcs: 'git'
+            golang {
+                build name: 'github.com/a/b', commit: 'commitId', tag: '1.0.0', version: 'commitId', vcs: 'git'
+            }
         }
 
-        assert project.configurations.build.dependencies.size() == 1
+        assert getDependencySet('build').size() == 1
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
         assert dependency.commit == 'commitId'
@@ -80,26 +90,30 @@ class GolangPluginTest {
     }
 
     def findFirstInDependencies() {
-        return project.configurations.build.dependencies.find { true }
+        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName('build').dependencies.first()
     }
 
     def findFirstInDependencies(String name) {
-        return project.configurations.build.dependencies.find { it.name == name }
+        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName('build').dependencies.find {
+            it.name == name
+        }
     }
 
     @Test
     void 'adding some dependencies should succeed'() {
         project.dependencies {
-            build 'github.com/a/b@1.0.0',
-                    'github.com/c/d#2.0.0'
+            golang {
+                build 'github.com/a/b@1.0.0',
+                        'github.com/c/d#2.0.0'
 
-            build(
-                    [name: 'github.com/e/f', commit: 'commitId'],
-                    [name: 'github.com/g/h', commit: 'commitId', vcs: 'git']
-            )
+                build(
+                        [name: 'github.com/e/f', commit: 'commitId'],
+                        [name: 'github.com/g/h', commit: 'commitId', vcs: 'git']
+                )
+            }
         }
 
-        assert project.configurations.build.dependencies.size() == 4
+        assert getDependencySet('build').size() == 4
 
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0'
@@ -118,7 +132,9 @@ class GolangPluginTest {
     @Test
     void 'adding a directory dependency should succeed'() {
         project.dependencies {
-            build name: 'github.com/a/b', dir: project.rootDir.absolutePath
+            golang {
+                build name: 'github.com/a/b', dir: project.rootDir.absolutePath
+            }
         }
 
         def dependency = findFirstInDependencies()
@@ -129,8 +145,10 @@ class GolangPluginTest {
     @Test
     void 'adding and configuring a directory dependency should succeed'() {
         project.dependencies {
-            build(name: 'github.com/a/b', dir: project.rootDir.absolutePath) {
-                transitive = false
+            golang {
+                build(name: 'github.com/a/b', dir: project.rootDir.absolutePath) {
+                    transitive = false
+                }
             }
         }
 
@@ -142,13 +160,15 @@ class GolangPluginTest {
     @Test
     void 'configuring a dependency should succeed'() {
         project.dependencies {
-            build('github.com/a/b@1.0.0-RELEASE') {
-                transitive = true
-                exclude name: 'github.com/c/d'
-            }
+            golang {
+                build('github.com/a/b@1.0.0-RELEASE') {
+                    transitive = true
+                    exclude name: 'github.com/c/d'
+                }
 
-            build(name: 'github.com/c/d', url: 'https://github.com/c/d.git') {
-                transitive = false
+                build(name: 'github.com/c/d', url: 'https://github.com/c/d.git') {
+                    transitive = false
+                }
             }
         }
 
@@ -166,7 +186,9 @@ class GolangPluginTest {
     @Test
     void 'configuring via params should succeed'() {
         project.dependencies {
-            build name: 'github.com/a/b', transitive: false
+            golang {
+                build name: 'github.com/a/b', transitive: false
+            }
         }
 
         assert !getExclusionSpecs(findFirstInDependencies()).isEmpty()

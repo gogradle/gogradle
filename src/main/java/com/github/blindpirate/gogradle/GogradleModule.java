@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.build.DefaultBuildManager;
 import com.github.blindpirate.gogradle.common.operations.SerialBuildOperationProcessor;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.core.DefaultBuildConstraintManager;
-import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
 import com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
@@ -66,10 +65,8 @@ import com.google.inject.Provides;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import org.gradle.api.Project;
-import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.internal.operations.BuildOperationProcessor;
-import org.gradle.internal.reflect.Instantiator;
 import org.gradle.internal.service.ServiceRegistry;
 
 import javax.inject.Inject;
@@ -82,19 +79,16 @@ import java.util.List;
  */
 public class GogradleModule extends AbstractModule {
     private final Project project;
-    private final Instantiator instantiator;
     private final ServiceRegistry serviceRegistry;
 
-    public GogradleModule(Project project, Instantiator instantiator) {
+    public GogradleModule(Project project) {
         this.project = new ProjectDecorator(project);
-        this.instantiator = instantiator;
         this.serviceRegistry = DefaultProject.class.cast(project).getServices();
     }
 
     @Override
     protected void configure() {
         bind(Project.class).toInstance(project);
-        bind(Instantiator.class).toInstance(instantiator);
         bind(ServiceRegistry.class).toInstance(serviceRegistry);
 
         bind(NotationParser.class).to(DefaultNotationParser.class);
@@ -102,7 +96,6 @@ public class GogradleModule extends AbstractModule {
         bind(GoBinaryManager.class).to(DefaultGoBinaryManager.class);
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
         bind(GlobalCacheManager.class).to(DefaultGlobalCacheManager.class);
-        bind(ConfigurationContainer.class).to(GolangConfigurationContainer.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
         bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
