@@ -46,7 +46,7 @@ goVet {
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
-            writeBuildAndSettingsDotGradle(buildDotGradle + 'test.enabled = false')
+            writeBuildAndSettingsDotGradle(buildDotGradle + 'goTest.enabled = false')
         } else {
             writeBuildAndSettingsDotGradle(buildDotGradle)
         }
