@@ -1,27 +1,15 @@
 package com.github.blindpirate.gogradle.core
 
-import com.github.blindpirate.gogradle.GogradleRunner
-import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
-import org.mockito.Mockito
 
-@RunWith(GogradleRunner)
 class GolangConfigurationManagerTest {
-    @Mock
-    Project project
-    @Mock
-    ConfigurationContainer configurationContainer
+
+    GolangConfigurationManager manager = new GolangConfigurationManager()
 
     @Test
-    void 'getByName should be delegated to project'() {
-        // given
-        Mockito.when(project.getConfigurations()).thenReturn(configurationContainer)
-        // when
-        new GolangConfigurationManager(project).getByName('build')
-        // then
-        Mockito.verify(configurationContainer).getByName('build')
+    void 'getByName should succeed'() {
+        assert manager.getByName('build').name == 'build'
+        assert manager.getByName('test').name == 'test'
+        assert manager.getByName('unexistent') == null
     }
 }

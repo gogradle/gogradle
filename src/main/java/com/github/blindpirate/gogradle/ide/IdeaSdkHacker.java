@@ -45,8 +45,8 @@ public class IdeaSdkHacker {
     private static final String GO_SDK = "Go SDK";
     private static final Map<String, List<String>> PRODUCTS = ImmutableMap
             .<String, List<String>>builder()
-            .put("IntelliJIdea", asList("2016.1", "2016.2", "2016.3"))
-            .put("IdeaIC", asList("2016.1", "2016.2", "2016.3"))
+            .put("IntelliJIdea", asList("2016.1", "2016.2", "2016.3", "2017.1"))
+            .put("IdeaIC", asList("2016.1", "2016.2", "2016.3", "2017.1"))
             .build();
 
     // See https://intellij-support.jetbrains.com/hc/en-us/articles/206544519-Directories-used-by-the-IDE-to-store-settings-caches-plugins-and-logs
@@ -58,14 +58,14 @@ public class IdeaSdkHacker {
     private List<File> getExistentFiles() {
         return PRODUCTS.entrySet().stream()
                 .map(entry -> asList(asList(entry.getKey()), entry.getValue()))
-                // [[Idea, 2016.1][Idea,2016.2],[Idea,2016.3]]
+                // [[IdeaIC, 2016.1][IdeaIC,2016.2],[IdeaIC,2016.3],[IdeaIC,2017.1]]
                 .map(Lists::cartesianProduct)
-                // [<Idea,2016.1>,<Idea,2016.2>,<Idea,2016.3>]
+                // [<IdeaIC,2016.1>,<IdeaIC,2016.2>,<IdeaIC,2016.3>,<IdeaIC,2017.1>]
                 .map(this::listListToPairList)
-                // [[<Idea,2016.1>,<Idea,2016.2>,<Idea,2016.3>],[<WebStorm,2016.1>, ... ], ...]
+                // [[<IdeaIC,2016.1>,<IdeaIC,2016.2>,<IdeaIC,2016.3>],[IntelliJIdea,2016.1>, ... ], ...]
                 .collect(Collectors.toList())
                 .stream()
-                // flatten: [<Idea,2016.1>,<Idea,2016.2>,...]
+                // flatten: [<IdeaIC,2016.1>,<IdeaIC,2016.2>,...]
                 .collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll)
                 .stream()
                 .map(obj -> (Pair<String, String>) obj)

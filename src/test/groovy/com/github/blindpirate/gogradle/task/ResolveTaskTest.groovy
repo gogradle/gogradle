@@ -121,8 +121,8 @@ class ResolveTaskTest extends TaskTest {
         set.add(LocalDirectoryDependency.fromLocal('local', resource))
 
         when(configurationManager.getByName('build')).thenReturn(configuration)
-        when(configuration.getGolangDependencies()).thenReturn(set)
-        assert resolveBuildDependenciesTask.getDependencies().containsAll(configuration.getGolangDependencies())
+        when(configuration.getDependencies()).thenReturn(set)
+        assert resolveBuildDependenciesTask.getDependencies().containsAll(configuration.getDependencies())
     }
 
     @Test

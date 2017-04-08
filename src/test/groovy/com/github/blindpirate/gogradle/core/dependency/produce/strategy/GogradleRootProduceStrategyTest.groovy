@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.GolangConfiguration
+import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
@@ -29,7 +30,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Mock
     LockedDependencyManager lockedDependencyManager
     @Mock
-    ConfigurationContainer configurationContainer
+    GolangConfigurationManager configurationManager
     @Mock
     GolangConfiguration configuration
     @Mock
@@ -38,19 +39,18 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
     @Before
     void setUp() {
-        when(project.getConfigurations()).thenReturn(configurationContainer)
 
         strategy = new GogradleRootProduceStrategy(
                 golangPluginSetting,
-                project,
+                configurationManager,
                 lockedDependencyManager)
-        when(configurationContainer.getByName(anyString()))
+        when(configurationManager.getByName(anyString()))
                 .thenReturn(configuration)
     }
 
     void dependenciesInBuildDotGradle(GolangDependency... dependencies) {
         GolangDependencySet result = asGolangDependencySet(dependencies)
-        when(configuration.getDependencies()).thenReturn(result.toDependencySet())
+        when(configuration.getDependencies()).thenReturn(result)
     }
 
     void lockedDependencies(GolangDependency... dependencies) {
