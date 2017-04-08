@@ -33,7 +33,7 @@ golang {
     packagePath='github.com/my/package'
     goVersion='1.8'
 }
-build {
+goBuild {
     targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
 }
 """
@@ -79,7 +79,7 @@ func main(){
     @Test
     void 'build should succeed'() {
         newBuild {
-            it.forTasks('build')
+            it.forTasks('goBuild')
         }
 
         ["darwin_amd64_myPackage", 'windows_amd64_myPackage', 'linux_386_myPackage'].each {
@@ -103,7 +103,7 @@ func main(){
     @Test
     void 'customized build should succeed'() {
         writeBuildAndSettingsDotGradle(buildDotGradle + '''
-build {
+goBuild {
     doLast {
         go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
     }
@@ -111,7 +111,7 @@ build {
 ''')
         try {
             newBuild {
-                it.forTasks('build')
+                it.forTasks('goBuild')
             }
         } catch (Exception e) {
             println(stderr)

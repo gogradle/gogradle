@@ -69,7 +69,7 @@ repositories {
     void 'dependencies should be resolved correctly'() {
         try {
             newBuild {
-                it.forTasks('dependencies')
+                it.forTasks('goDependencies')
             }
 
             String actualOutput = stdout.toString().replaceAll('\\r', '')

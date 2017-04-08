@@ -32,7 +32,7 @@ golang {
     goVersion='1.8'
 }
 
-vet {
+goVet {
     continueWhenFail = true
 }
 
@@ -70,7 +70,7 @@ vet {
     void firstBuild() {
         try {
             newBuild {
-                it.forTasks('build', 'check', 'lock', 'dependencies')
+                it.forTasks('goBuild', 'goCheck', 'goLock', 'goDependencies')
             }
         } catch (Exception e) {
             throw e
@@ -83,7 +83,7 @@ vet {
     void secondBuild() {
         try {
             newBuild {
-                it.forTasks('build', 'check', 'dependencies')
+                it.forTasks('goBuild', 'goCheck', 'goDependencies')
             }
         } catch (Exception e) {
             throw e

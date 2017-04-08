@@ -33,7 +33,7 @@ golang {
     void 'test and coverage report should be generated successfully'() {
         try {
             newBuild {
-                it.forTasks('check')
+                it.forTasks('goCheck')
             }
         } finally {
             println(stderr)
@@ -61,7 +61,7 @@ golang {
 
         try {
             newBuild {
-                it.forTasks('check')
+                it.forTasks('goCheck')
             }
         } catch (BuildException e) {
             println(stderr)

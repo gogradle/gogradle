@@ -18,22 +18,20 @@ import java.util.Map;
 @Singleton
 public class GolangTaskContainer {
     // prepare everything
-    public static final String PREPARE_TASK_NAME = "prepare";
+    public static final String PREPARE_TASK_NAME = "goPrepare";
     // produce all dependencies by analyzing build.gradle
     public static final String RESOLVE_BUILD_DEPENDENCIES_TASK_NAME = "resolveBuildDependencies";
     public static final String RESOLVE_TEST_DEPENDENCIES_TASK_NAME = "resolveTestDependencies";
     // show dependencies tree
-    public static final String DEPENDENCIES_TASK_NAME = "dependencies";
+    public static final String DEPENDENCIES_TASK_NAME = "goDependencies";
 
-    public static final String CHECK_TASK_NAME = "check";
-    public static final String LOCK_TASK_NAME = "lock";
-    public static final String BUILD_TASK_NAME = "build";
-    public static final String CLEAN_TASK_NAME = "clean";
-    //    public static final String INSTALL_BUILD_DEPENDENCIES_TASK_NAME = "installBuildDependencies";
-//    public static final String INSTALL_TEST_DEPENDENCIES_TASK_NAME = "installTestDependencies";
-    public static final String TEST_TASK_NAME = "test";
-    public static final String VENDOR_TASK_NAME = "vendor";
-    public static final String IDEA_TASK_NAME = "ideaGolang";
+    public static final String CHECK_TASK_NAME = "goCheck";
+    public static final String LOCK_TASK_NAME = "goLock";
+    public static final String BUILD_TASK_NAME = "goBuild";
+    public static final String CLEAN_TASK_NAME = "goClean";
+    public static final String TEST_TASK_NAME = "goTest";
+    public static final String VENDOR_TASK_NAME = "goVendor";
+    public static final String IDEA_TASK_NAME = "goIdea";
     public static final String GOGLAND_TASK_NAME = "gogland";
     public static final String WEBSTORM_TASK_NAME = "webStorm";
     public static final String PHPSTORM_TASK_NAME = "phpStorm";
@@ -42,9 +40,9 @@ public class GolangTaskContainer {
     private static final String CLION_TASK_NAME = "cLion";
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
     public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
-    public static final String COVERAGE_TASK_NAME = "cover";
-    public static final String GOFMT_TASK_NAME = "fmt";
-    public static final String GOVET_TASK_NAME = "vet";
+    public static final String COVERAGE_TASK_NAME = "goCover";
+    public static final String GOFMT_TASK_NAME = "gofmt";
+    public static final String GOVET_TASK_NAME = "goVet";
 
 
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
