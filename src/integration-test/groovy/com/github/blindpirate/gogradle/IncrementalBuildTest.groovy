@@ -111,7 +111,9 @@ golang{
         IOUtils.mkdir(resource, '.tmp')
         IOUtils.write(resource, 'build.gradle', buildDotGradle + """
 dependencies {
-    build name:'tmp', dir: '${StringUtils.toUnixString(new File(resource, '.tmp'))}'
+    golang {
+        build name:'tmp', dir: '${StringUtils.toUnixString(new File(resource, '.tmp'))}'
+    }
 }
 """)
         build()
@@ -119,8 +121,10 @@ dependencies {
 
         IOUtils.write(resource, 'build.gradle', buildDotGradle + """
 dependencies {
-    build(name:'tmp', dir: '${StringUtils.toUnixString(new File(resource, '.tmp'))}'){
-        exclude name:'xxx'
+    golang {
+        build(name:'tmp', dir: '${StringUtils.toUnixString(new File(resource, '.tmp'))}'){
+            exclude name:'xxx'
+        }
     }
 }
 """)

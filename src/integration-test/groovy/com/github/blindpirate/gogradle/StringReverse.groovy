@@ -23,7 +23,9 @@ golang {
     packagePath='sample'
 }
 dependencies {
-    build 'github.com/golang/example'
+    golang {
+        build 'github.com/golang/example'
+    }
 }
 """
         IOUtils.write(resource, 'hello.go', helloDotGo)

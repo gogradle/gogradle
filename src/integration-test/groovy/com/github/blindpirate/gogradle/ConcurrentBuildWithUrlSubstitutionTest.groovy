@@ -115,7 +115,9 @@ golang {
 }
 
 dependencies {
-    build name:'github.com/my/project',url:'${repoUrl}'
+    golang {
+        build name:'github.com/my/project',url:'${repoUrl}'
+    }
 }
 golang {
     goExecutable = '${StringUtils.toUnixString(goBinPath)}'

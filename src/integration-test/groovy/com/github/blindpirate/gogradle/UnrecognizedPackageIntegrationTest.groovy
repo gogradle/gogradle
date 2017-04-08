@@ -58,8 +58,10 @@ golang {
     goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
 dependencies {
-    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
-        exclude name:'unrecognized2'
+    golang {
+        build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
+            exclude name:'unrecognized2'
+       }
     }
 }
 """)
@@ -93,9 +95,9 @@ repositories {
 }
 
 dependencies {
-    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}') 
-
-//    build (name:'unrecognized2', url: 'http://localhost:8080/helloworld')
+    golang {
+        build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}') 
+    }
 }
 
 """)
@@ -128,8 +130,10 @@ repositories {
 }
 
 dependencies {
-    build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
-        exclude name:'unrecognized3'
+    golang {
+        build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
+            exclude name:'unrecognized3'
+        }
     }
 }
 
