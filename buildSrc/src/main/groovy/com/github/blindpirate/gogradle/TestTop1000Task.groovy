@@ -42,7 +42,7 @@ class TestTop1000Task extends DefaultTask {
         String buildDotGradle = """
 buildscript {
     dependencies {
-        classpath files('${getProject().getRootDir().absolutePath}/build/libs/gogradle-0.4.1-all.jar')
+        classpath files('${getProject().getRootDir().absolutePath}/build/libs/gogradle-0.4.2-all.jar')
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
@@ -57,7 +57,7 @@ golang {
             buildDotGradle += path.resolve('build.gradle.ext').toFile().text
         } else if (!path.toFile().list().any { it.endsWith('.go') }) {
             buildDotGradle += '''
-build {
+goBuild {
     doLast {
         go 'build ./...'
     }
