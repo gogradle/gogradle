@@ -24,15 +24,17 @@ Some examples are as follows:
 
 ```groovy
 dependencies {
-    build 'github.com/user/project'  // No specific version, the latest will be used
-    build name:'github.com/user/project' // Equivalent to last line
+    golang {
+        build 'github.com/user/project'  // No specific version, the latest will be used
+        build name:'github.com/user/project' // Equivalent to last line
     
-    build 'github.com/user/project@1.0.0-RELEASE' // Specify a version(tag in Git)
-    build name:'github.com/user/project', tag:'1.0.0-RELEASE' // Equivalent to last line
-    build name:'github.com/user/project', version:'1.0.0-RELEASE' // Equivalent to last line
+        build 'github.com/user/project@1.0.0-RELEASE' // Specify a version(tag in Git)
+        build name:'github.com/user/project', tag:'1.0.0-RELEASE' // Equivalent to last line
+        build name:'github.com/user/project', version:'1.0.0-RELEASE' // Equivalent to last line
     
-    test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
-    test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
+        test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
+        test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
+    }
 }
 ```
 
@@ -40,16 +42,18 @@ dependencies {
 
 ```groovy
 dependencies {
-    build 'github.com/user/project@1.*'  // Equivalent to >=1.0.0 & <2.0.0
-    build 'github.com/user/project@1.x'  // Equivalent to last line
-    build 'github.com/user/project@1.X'  // Equivalent to last line
+    golang {
+        build 'github.com/user/project@1.*'  // Equivalent to >=1.0.0 & <2.0.0
+        build 'github.com/user/project@1.x'  // Equivalent to last line
+        build 'github.com/user/project@1.X'  // Equivalent to last line
 
-    build 'github.com/user/project@~1.5' // Equivalent to >=1.5.0 & <1.6.0
-    build 'github.com/user/project@1.0-2.0' // Equivalent to >=1.0.0 & <=2.0.0
-    build 'github.com/user/project@^0.2.3' // Equivalent to >=0.2.3 & <0.3.0
-    build 'github.com/user/project@1' // Equivalent to 1.X or >=1.0.0 & <2.0.0
-    build 'github.com/user/project@!(1.x)' // Equivalent to <1.0.0 & >=2.0.0
-    build 'github.com/user/project@ ~1.3 | (1.4.* & !=1.4.5) | ~2' // Very complicated expression
+        build 'github.com/user/project@~1.5' // Equivalent to >=1.5.0 & <1.6.0
+        build 'github.com/user/project@1.0-2.0' // Equivalent to >=1.0.0 & <=2.0.0
+        build 'github.com/user/project@^0.2.3' // Equivalent to >=0.2.3 & <0.3.0
+        build 'github.com/user/project@1' // Equivalent to 1.X or >=1.0.0 & <2.0.0
+        build 'github.com/user/project@!(1.x)' // Equivalent to <1.0.0 & >=2.0.0
+        build 'github.com/user/project@ ~1.3 | (1.4.* & !=1.4.5) | ~2' // Very complicated expression
+    }
 }
 ```
 
@@ -57,8 +61,10 @@ You can specify a url in declaration, which is extremely useful in case of priva
 
 ```groovy
 dependencies {
-    build name: 'github.com/user/project', url:'https://github.com/user/project.git', tag:'v1.0.0'
-    build name: 'github.com/user/project', url:'git@github.com:user/project.git', tag:'v2.0.0'
+    golang {
+        build name: 'github.com/user/project', url:'https://github.com/user/project.git', tag:'v1.0.0'
+        build name: 'github.com/user/project', url:'git@github.com:user/project.git', tag:'v2.0.0'
+    }
 }
 ```
 
@@ -66,10 +72,12 @@ Multiple dependencies can be declared at the same time:
 
 ```groovy
 dependencies {
-    build 'github.com/a/b@1.0.0', 'github.com/c/d@2.0.0', 'github.com/e/f#commitId'
+    golang {
+        build 'github.com/a/b@1.0.0', 'github.com/c/d@2.0.0', 'github.com/e/f#commitId'
     
-    build([name: 'github.com/g/h', version: '2.5'],
-          [name: 'github.com/i/j', commit: 'commitId'])
+        build([name: 'github.com/g/h', version: '2.5'],
+               [name: 'github.com/i/j', commit: 'commitId'])
+    }
 }
 ```
 
@@ -77,8 +85,10 @@ Gogradle provides support for transitive dependencies. For example, the followin
 
 ```groovy
 dependencies {
-    build('github.com/user/project') {
-        transitive = false
+    golang {
+        build('github.com/user/project') {
+            transitive = false
+        }
     }
 }
 ```
@@ -87,9 +97,11 @@ What's more, you can exclude some specific transitive dependencies. For example,
 
 ```groovy
 dependencies {
-    build('github.com/a/b') {
-        exclude name:'github.com/c/d'
-        exclude name:'github.com/c/d', tag: 'v1.0.0'
+    golang {
+        build('github.com/a/b') {
+            exclude name:'github.com/c/d'
+            exclude name:'github.com/c/d', tag: 'v1.0.0'
+        }
     }
 }
 ```
@@ -98,7 +110,9 @@ If you have some packages in local directory, you can declare them with:
 
 ```groovy
 dependencies {
-    build name: 'a/local/package', dir: 'path/to/local/package' // It must be absolute
+    golang {
+        build name: 'a/local/package', dir: 'path/to/local/package' // It must be absolute
+    }
 }
 ```
 
@@ -156,7 +170,13 @@ Gogradle can lock the dependencies in current build. A file named `gogradle.lock
 You can use
 
 ```
-gradlew lock
+gradlew goLock
+```
+
+or
+
+```
+gradlew gL
 ```
 
 to generate this file.
@@ -166,7 +186,13 @@ to generate this file.
 Vendor mechanism is introduced by golang 1.5. It is fully supported but not encouraged by Gogradle. To install dependencies into vendor directory, run:
 
 ```
-gradlew vendor
+gradlew goVendor
+```
+
+or
+
+```
+gradlew gV 
 ```
 
 This task will copy all resolved `build` dependencies into vendor directory. Note that `test` dependencies won't be copied.

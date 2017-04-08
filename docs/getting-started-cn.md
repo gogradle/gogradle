@@ -51,9 +51,17 @@ golang {
 进入项目目录，运行
 
 ```
-./gradlew build # *nix
+./gradlew goBuild # *nix
 
-gradlew build # Windows
+gradlew goBuild # Windows
+```
+
+或者
+
+```
+./gradlew gB # *nix
+
+gradlew gB # Windows
 ```
 
 在下文中，`gradlew`命令将以统一的`gradlew <task>`形式给出，不再区分平台。
@@ -64,7 +72,7 @@ gradlew build # Windows
 若你的main包不在根目录，则需要在`build.gradle`中添加如下代码
 
 ```groovy
-build {
+goBuild {
     doLast {
         go 'build -o ./gogradle/output github.com/my/package/my/subpackage'
     }
@@ -80,14 +88,20 @@ build {
 进入项目目录，运行 
 
 ```
-gradlew test
+gradlew goTest
+```
+
+或者
+
+```
+gradlew gT
 ```
 
 测试指定文件：
 
 ```
-gradlew test --tests main_test.go // 指定一个测试文件
-gradlew test --tests *_test.go // 通配符测试
+gradlew goTest --tests main_test.go // 指定一个测试文件
+gradlew goTest --tests *_test.go // 通配符测试
 ```
 
 若希望构建在测试完成之后进行，只需在`build.gradle`中添加
@@ -104,8 +118,10 @@ HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`�
 
 ```groovy
 dependencies {
-    build 'github.com/a/b@v1.0.0' 
-    test 'github.com/c/d#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80'
+    golang {
+        build 'github.com/a/b@v1.0.0' 
+        test 'github.com/c/d#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80'
+    }
 }
 ```
 
@@ -116,7 +132,13 @@ dependencies {
 ## 查看依赖
 
 ```
-gradlew dependencies
+gradlew goDependencies
+```
+
+或者
+
+```
+gradlew gD
 ```
 
 输出如下：
@@ -150,7 +172,13 @@ github.com/gogits/gogs
 ## 依赖锁定
 
 ```
-gradlew lock
+gradlew goLock
+```
+
+或者
+
+```
+gradlew gL
 ```
 
 这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。

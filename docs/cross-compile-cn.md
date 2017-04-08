@@ -6,7 +6,7 @@
 此外，Go1.5之后引入了方便的[交叉编译](https://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5)，因此，Gogradle能够在一次构建中输出多个平台下的构建结果。
 
 ```
-build {
+goBuild {
     // 交叉编译的输出选项，注意，要求go 1.5+
     targetPlatform = 'windows-amd64, linux-amd64, linux-386'
     

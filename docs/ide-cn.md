@@ -76,6 +76,12 @@ IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来�
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
+
+>
+> **注意** 在上述过程中，如果你是第一次使用Gogradle，你可能需要重启IDEA来使其生效。Gogradle会在构建的最后提示：
+>
+> `you need to restart the IDE to make it come into effect`
+
 ## Gogland
 
 在项目目录下执行`gradlew gogland`
@@ -99,15 +105,6 @@ IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来�
 ## CLion
 
 在项目目录下执行`gradlew cLine`或者`gradlew cL`
-
-
-
-
-
->
-> **注意** 在上述过程中，如果你是第一次使用Gogradle，或者下载了一个新版的Go，你可能需要重启IDE来使其生效。Gogradle会在构建的最后提示：
->
-> `you need to restart the IDE to make it come into effect`
 
 ## Vim
 

@@ -8,6 +8,8 @@
 
 Gogradle是一个提供Go语言构建支持的Gradle插件。
 
+> # 注意：0.4.2版本中包含breaking change。一些任务的名字发生了变更以避免冲突。请参阅详细文档。
+>
 > 2017-04-06 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](http://github-rank.com/star?language=Go)中的666个！
 >
 > 2017-03-20 现在Gogradle已经能够生成HTML格式的测试/覆盖率报告了！

@@ -16,7 +16,7 @@ repositories{
 }
 ```
 
-In the DSL above, `root` and `url` can be any object other than string. Gogradle will use built-in Groovy method [`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html) to test if it matches the declaration.
+In the DSL above, `root` and `url` can be any object, not only string. Gogradle will use built-in Groovy method [`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html) to test if it matches the declaration.
 
 Actually, you can use regular expressions and closures. The following example demonstrates how to use a mirror registry of `github.com`.
 

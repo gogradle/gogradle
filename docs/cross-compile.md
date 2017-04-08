@@ -5,7 +5,7 @@ By default, Gogradle will place the build output into `${projectRoot}/.gogradle`
 Moreover, Go1.5+ introduce convenient [cross compile](https://dave.cheney.net/2015/08/22/cross-compilation-with-go-1-5), which enable Gogradle to output results available on multiple platform in a single build.
 
 ```
-build {
+goBuild {
     // For cross compile, go 1.5+ required
     targetPlatform = 'windows-amd64, linux-amd64, linux-386'
     

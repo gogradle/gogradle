@@ -72,14 +72,21 @@ Place `gradlew`/`gradle`/`build.gradle` as documented in [Getting Started](./get
 
 ## IntelliJIDEA
 
-- 1st method: run `gradlew idea` in project root directory, then do `File`-`Open` to the project root.
-- 2nd method: use `File`-`Open` to open `build.gradle` and select `Open as Project` as follows.
+- First way: run `gradlew goIdea` in project root directory, then do `File`-`Open` to the project root.
+- Second way: use `File`-`Open` to open `build.gradle` and select `Open as Project` as follows.
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/openproject.png)
 
 IDEA has Gradle integrated, so you can enable it via `View > ToolWindows > Gradle` and sync your project with button on that tool window:
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
+
+
+>
+> **NOTE** If you're using Gogradle for the first time,
+> you probably need to restart your IDEA to make it come into effect. Gogradle will display a tip line at the end of output:
+>
+> `you need to restart the IDE to make it come into effect`
 
 ## Gogland
 
@@ -105,12 +112,6 @@ Run `gradlew rubyMine` or `gradlew rM` in project root directory.
 
 Run `gradlew cLion` or `gradlew cL` in project root directory.
 
-
->
-> **NOTE** If you're using Gogradle for the first time or you have downloaded Golang in the process above,
-> you probably need to restart your IDE to make it come into effect. Gogradle will display a tip line at the end of output:
->
-> `you need to restart the IDE to make it come into effect`
 
 ## Vim
 

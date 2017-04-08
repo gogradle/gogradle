@@ -22,10 +22,19 @@ If you are using one of glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash, 
 Enter root directory of the project and run:
 
 ```
-./gradlew build # *nix
+./gradlew goBuild # *nix
 
-gradlew build # Windows
+gradlew goBuild # Windows
 ```
+
+or
+
+```
+./gradlew gB # *nix
+
+gradlew gB # Windows
+```
+
 
 Hereinafter, we will use with uniform command form `gradlew <task>` on both `*nix` and `Windows`.
 
@@ -34,7 +43,7 @@ The command is equivalent to `go build` in project root directory with proper `G
 If your main package is not located in root directory, add following code into your `build.gradle`
 
 ```groovy
-build {
+goBuild {
     doLast {
         go 'build -o ./gogradle/output github.com/my/package/my/subpackage'
     }
@@ -49,20 +58,26 @@ Note the quote is necessary.
 Enter root directory of the project and run:
 
 ```
-gradlew test
+gradlew goTest 
+```
+
+or
+
+```
+gradlew gT
 ```
 
 If you want to specify some tests:
 
 ```
-gradlew test --tests main_test.go // Specify a single test
-gradlew test --tests *_test.go // Wildcard test
+gradlew goTest --tests main_test.go // Specify a single test
+gradlew goTest --tests *_test.go // Wildcard test
 ```
 
 If you want to let build depend on test, just add the following line to `build.gradle`:
 
 ```groovy
-build.dependsOn test
+goBuild.dependsOn goTest
 ```
 
 Test reports will be generated in `<project root>/.gogradle/reports/test`.
@@ -73,8 +88,10 @@ To add a dependency package, just add its name and version into `dependencies` b
 
 ```groovy
 dependencies {
-    build 'github.com/a/b@v1.0.0' 
-    test 'github.com/c/d#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80'
+    golang {
+        build 'github.com/a/b@v1.0.0' 
+        test 'github.com/c/d#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80'
+    }    
 }
 ```
 
@@ -85,7 +102,13 @@ To learn more details about dependency, see [Dependency Management](./dependency
 ## Display Dependencies
 
 ```
-gradlew dependencies
+gradlew goDependencies
+```
+
+or 
+
+```
+gradlew gD
 ```
 
 The output is as follows:
@@ -118,7 +141,13 @@ Tick mark `√` indicates that the dependency is the final resolved version; arr
 ## Dependency Lock
 
 ```
-gradlew lock
+gradlew goLock
+```
+
+or
+
+```
+gradlew gL
 ```
 
 This command will let Gogradle generate a `gogradle.lock` file in project root directory, which records all dependencies of this project. 

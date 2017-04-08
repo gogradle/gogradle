@@ -25,15 +25,17 @@ Gogradle管理的依赖包声明于`dependencies`中。当前只支持Git管理�
 
 ```groovy
 dependencies {
-    build 'github.com/user/project'  // 未指定版本，将获取最新版本
-    build name:'github.com/user/project' // 与上一行等价
+    golang {
+        build 'github.com/user/project'  // No specific version, the latest will be used
+        build name:'github.com/user/project' // Equivalent to last line
     
-    build 'github.com/user/project@1.0.0-RELEASE' // 指定版本（Git的tag）
-    build name:'github.com/user/project', tag:'1.0.0-RELEASE' // 与上一行等价
-    build name:'github.com/user/project', version:'1.0.0-RELEASE' // 与上一行等价
+        build 'github.com/user/project@1.0.0-RELEASE' // Specify a version(tag in Git)
+        build name:'github.com/user/project', tag:'1.0.0-RELEASE' // Equivalent to last line
+        build name:'github.com/user/project', version:'1.0.0-RELEASE' // Equivalent to last line
     
-    test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // 指定commit
-    test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // 与上一行等价
+        test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
+        test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
+    }
 }
 ```
 
@@ -41,16 +43,18 @@ dependencies {
 
 ```groovy
 dependencies {
-    build 'github.com/user/project@1.*'  // 等价于 >=1.0.0 & <2.0.0
-    build 'github.com/user/project@1.x'  // 与上一行等价
-    build 'github.com/user/project@1.X'  // 与上一行等价
-    
-    build 'github.com/user/project@~1.5' // 等价于 >=1.5.0 & <1.6.0
-    build 'github.com/user/project@1.0-2.0' // 等价于 >=1.0.0 & <=2.0.0
-    build 'github.com/user/project@^0.2.3' // 等价于 >=0.2.3 & <0.3.0
-    build 'github.com/user/project@1' // 等价于 1.X 或者 >=1.0.0 & <2.0.0
-    build 'github.com/user/project@!(1.x)' // 等价于 <1.0.0 & >=2.0.0
-    build 'github.com/user/project@ ~1.3 | (1.4.* & !=1.4.5) | ~2' //复杂表达式
+    golang {
+        build 'github.com/user/project@1.*'  // Equivalent to >=1.0.0 & <2.0.0
+        build 'github.com/user/project@1.x'  // Equivalent to last line
+        build 'github.com/user/project@1.X'  // Equivalent to last line
+
+        build 'github.com/user/project@~1.5' // Equivalent to >=1.5.0 & <1.6.0
+        build 'github.com/user/project@1.0-2.0' // Equivalent to >=1.0.0 & <=2.0.0
+        build 'github.com/user/project@^0.2.3' // Equivalent to >=0.2.3 & <0.3.0
+        build 'github.com/user/project@1' // Equivalent to 1.X or >=1.0.0 & <2.0.0
+        build 'github.com/user/project@!(1.x)' // Equivalent to <1.0.0 & >=2.0.0
+        build 'github.com/user/project@ ~1.3 | (1.4.* & !=1.4.5) | ~2' // Very complicated expression
+    }
 }
 ```
 
@@ -58,8 +62,10 @@ dependencies {
 
 ```groovy
 dependencies {
-    build name: 'github.com/user/project', url:'https://github.com/user/project.git', tag:'v1.0.0'
-    build name: 'github.com/user/project', url:'git@github.com:user/project.git', tag:'v2.0.0'
+    golang {
+        build name: 'github.com/user/project', url:'https://github.com/user/project.git', tag:'v1.0.0'
+        build name: 'github.com/user/project', url:'git@github.com:user/project.git', tag:'v2.0.0'
+    }
 }
 ```
 
@@ -67,10 +73,12 @@ dependencies {
 
 ```groovy
 dependencies {
-    build 'github.com/a/b@1.0.0', 'github.com/c/d@2.0.0', 'github.com/e/f#commitId'
+    golang {
+        build 'github.com/a/b@1.0.0', 'github.com/c/d@2.0.0', 'github.com/e/f#commitId'
     
-    build([name: 'github.com/g/h', version: '2.5'],
-          [name: 'github.com/i/j', commit: 'commitId'])
+        build([name: 'github.com/g/h', version: '2.5'],
+               [name: 'github.com/i/j', commit: 'commitId'])
+    }
 }
 ```
 
@@ -78,8 +86,10 @@ Gogradle支持对传递性依赖的管理。例如，下列声明禁止了`githu
 
 ```groovy
 dependencies {
-    build('github.com/user/project') {
-        transitive = false
+    golang {
+        build('github.com/user/project') {
+            transitive = false
+        }
     }
 }
 ```
@@ -88,9 +98,11 @@ dependencies {
 
 ```groovy
 dependencies {
-    build('github.com/a/b') {
-        exclude name:'github.com/c/d'
-        exclude name:'github.com/c/d', tag: 'v1.0.0'
+    golang {
+        build('github.com/a/b') {
+            exclude name:'github.com/c/d'
+            exclude name:'github.com/c/d', tag: 'v1.0.0'
+        }
     }
 }
 ```
@@ -99,7 +111,9 @@ dependencies {
 
 ```groovy
 dependencies {
-    build name: 'a/local/package', dir: 'path/to/local/package' // 必须为绝对路径
+    golang {
+        build name: 'a/local/package', dir: 'path/to/local/package' // It must be absolute
+    }
 }
 ```
 
@@ -166,7 +180,13 @@ Gogradle解决依赖的策略是：
 Gogradle推荐将此文件提交到源代码管理系统中。可以通过
 
 ```
-gradlew lock
+gradlew goLock 
+```
+
+或
+
+```
+gradlew gL
 ```
 生成依赖锁定文件。
 
@@ -175,7 +195,14 @@ gradlew lock
 Go语言1.5之后支持vendor机制，Gogradle也提供了支持（尽管并不推荐）。欲将当前构建的依赖安装到vendor目录，可运行
 
 ```
-gradlew vendor
+gradlew goVendor
 ```
+
+或
+
+```
+gradlew gV
+```
+
 这会将解析完成的`build`依赖拷贝到vendor目录中。注意，`test`依赖不会被拷贝。
 
