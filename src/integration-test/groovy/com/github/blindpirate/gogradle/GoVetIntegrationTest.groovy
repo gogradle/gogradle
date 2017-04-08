@@ -40,24 +40,24 @@ golang {
         writeBuildAndSettingsDotGradle(buildDotGradle)
         try {
             newBuild {
-                it.forTasks('vet')
+                it.forTasks('goVet')
             }
         } catch (BuildException e) {
             assert stderr.toString().contains('first argument to Println is os.Stderr')
             assert stderr.toString().contains('exit status 1')
-            assert stdout.toString().contains('vet FAILED')
+            assert stdout.toString().contains('goVet FAILED')
         }
     }
 
     @Test
     void 'exception should be suppressed if continueWhenFail=true'() {
         writeBuildAndSettingsDotGradle(buildDotGradle + '''
-vet {
+goVet {
     continueWhenFail = true
 }
 ''')
         newBuild {
-            it.forTasks('vet')
+            it.forTasks('goVet')
         }
     }
 

@@ -1,6 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangConfiguration
+import com.github.blindpirate.gogradle.core.GolangConfigurationManager
+import com.github.blindpirate.gogradle.core.GolangDependencyHandler
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
 import com.github.blindpirate.gogradle.task.GolangTaskContainer
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -23,31 +26,24 @@ import static org.mockito.Mockito.*
 class GolangDependencyHandlerTest {
 
     @Mock
-    ConfigurationContainer configurationContainer
+    GolangConfigurationManager configurationManager
     @Mock
-    Configuration configuration
+    GolangConfiguration configuration
     @Mock
     AbstractGolangDependency dependency
     @Mock
     NotationParser notationParser
     @Mock
-    DependencySet dependencies
-    @Mock
-    Project project
+    GolangDependencySet dependencies
 
     GolangDependencyHandler handler
 
     @Before
     void setUp() {
-        handler = new GolangDependencyHandler(configurationContainer, notationParser, project)
-        when(configurationContainer.findByName('build')).thenReturn(configuration)
+        handler = new GolangDependencyHandler(configurationManager, notationParser)
+        when(configurationManager.getByName('build')).thenReturn(configuration)
         when(notationParser.parse('notation')).thenReturn(dependency)
         when(configuration.getDependencies()).thenReturn(dependencies)
-    }
-
-    @Test
-    void 'unsupported method should all throw UnsupportedException'() {
-        ReflectionUtils.testUnsupportedMethods(handler, DependencyHandler, ['create', 'add', 'createArtifactResolutionQuery'])
     }
 
     @Test(expected = MissingMethodException)
@@ -63,29 +59,6 @@ class GolangDependencyHandlerTest {
 
     @Test
     void 'creating dependency should succeed'() {
-        assert handler.create('notation').is(dependency)
-    }
-
-    @Test
-    void 'hacking idea should succeed'() {
-        // given
-        TaskContainer taskContainer = mock(TaskContainer)
-        TaskInternal task = mock(TaskInternal)
-        when(project.getTasks()).thenReturn(taskContainer)
-        when(taskContainer.getByName(GolangTaskContainer.IDEA_TASK_NAME)).thenReturn(task)
-        // when
-        ArtifactResolutionQuery query = handler.createArtifactResolutionQuery()
-        // then
-        assert query.forComponents([])
-                .forComponents()
-                .withArtifacts(null)
-                .execute()
-                .getComponents().isEmpty()
-        assert query.forComponents([])
-                .forComponents()
-                .withArtifacts(null)
-                .execute()
-                .getResolvedComponents().isEmpty()
-        verify(task).execute()
+        assert handler.create('notation', null).is(dependency)
     }
 }

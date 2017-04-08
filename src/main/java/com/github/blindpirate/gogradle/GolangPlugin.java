@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle;
 
-import com.github.blindpirate.gogradle.core.GolangConfigurationContainer;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencyHandler;
-import com.github.blindpirate.gogradle.core.dependency.parse.DefaultNotationParser;
+import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
@@ -14,9 +12,7 @@ import org.gradle.api.Task;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
-import org.gradle.internal.reflect.Instantiator;
 
-import javax.inject.Inject;
 import java.util.Arrays;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
@@ -30,10 +26,6 @@ import static java.util.Arrays.asList;
 
 
 public class GolangPlugin implements Plugin<Project> {
-
-    // injected by gradle
-    private final Instantiator instantiator;
-
     private Injector injector;
     private GolangPluginSetting settings;
     private GolangTaskContainer golangTaskContainer;
@@ -46,13 +38,9 @@ public class GolangPlugin implements Plugin<Project> {
     };
 
     // This is invoked by gradle, not our Guice.
-    @Inject
-    public GolangPlugin(Instantiator instantiator) {
-        this.instantiator = instantiator;
-    }
 
     private Injector initGuice() {
-        return Guice.createInjector(new GogradleModule(project, instantiator));
+        return Guice.createInjector(new GogradleModule(project));
     }
 
     @Override
@@ -77,6 +65,7 @@ public class GolangPlugin implements Plugin<Project> {
         this.injector = initGuice();
         this.settings = injector.getInstance(GolangPluginSetting.class);
         this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
+        project.getExtensions().add("gogradleInjector", this.injector);
     }
 
     private void configureGlobalInjector() {
@@ -97,33 +86,13 @@ public class GolangPlugin implements Plugin<Project> {
 
     }
 
-    /**
-     * Here we cannot use Guice since we need GroovyObject to be mixed in
-     * See {@link org.gradle.api.internal.AbstractClassGenerator}
-     */
     private void customizeProjectInternalServices(Project project) {
-        DefaultNotationParser parser = injector.getInstance(DefaultNotationParser.class);
-
-        GolangConfigurationContainer configurationContainer =
-                instantiator.newInstance(GolangConfigurationContainer.class,
-                        instantiator);
-        project.setProperty("configurationContainer", configurationContainer);
-
-        project.setProperty("dependencyHandler",
-                instantiator.newInstance(GolangDependencyHandler.class,
-                        configurationContainer,
-                        parser,
-                        project));
-
-        overwriteRepositoryHandler(project);
+        bindCustomizedService(project.getRepositories(), injector.getInstance(GolangRepositoryHandler.class));
+        bindCustomizedService(project.getDependencies(), injector.getInstance(GolangDependencyHandler.class));
     }
 
-    private void overwriteRepositoryHandler(Project project) {
-
-        GolangRepositoryHandler repositoryHandler = injector.getInstance(GolangRepositoryHandler.class);
-
-        ExtensionAware.class.cast(project.getRepositories()).getExtensions().add("golang", repositoryHandler);
-
+    private void bindCustomizedService(Object target, Object customizedService) {
+        ExtensionAware.class.cast(target).getExtensions().add("golang", customizedService);
     }
 
     private void configureConfigurations(Project project) {

@@ -30,7 +30,9 @@ repositories {
 }
 
 dependencies {
-    build 'my/awesome/project'
+    golang {
+        build 'my/awesome/project'
+    }
 }
 """
         writeBuildAndSettingsDotGradle(buildDotGradle)

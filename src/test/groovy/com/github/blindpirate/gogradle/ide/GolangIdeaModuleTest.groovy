@@ -37,6 +37,8 @@ class GolangIdeaModuleTest {
     TaskInternal resolveTestDependenciesTask
     @Mock
     TaskInternal renameVendorTask
+    @Mock
+    TaskInternal ideaTask
 
 
     @Before
@@ -53,6 +55,7 @@ class GolangIdeaModuleTest {
         when(taskContainer.getByName(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)).thenReturn(resolveBuildDependenciesTask)
         when(taskContainer.getByName(RESOLVE_TEST_DEPENDENCIES_TASK_NAME)).thenReturn(resolveTestDependenciesTask)
         when(taskContainer.getByName(RENAME_VENDOR_TASK_NAME)).thenReturn(renameVendorTask)
+        when(taskContainer.getByName(IDEA_TASK_NAME)).thenReturn(ideaTask)
 
     }
 
@@ -71,12 +74,15 @@ class GolangIdeaModuleTest {
         InOrder order = Mockito.inOrder(prepareTask,
                 resolveBuildDependenciesTask,
                 resolveTestDependenciesTask,
-                renameVendorTask)
+                renameVendorTask,
+                ideaTask)
         // when
         golangIdeaModule.resolveDependencies()
         // then
         order.verify(prepareTask).execute()
         order.verify(resolveBuildDependenciesTask).execute()
         order.verify(resolveTestDependenciesTask).execute()
+        order.verify(renameVendorTask).execute()
+        order.verify(ideaTask).execute()
     }
 }

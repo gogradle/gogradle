@@ -8,13 +8,6 @@ class GolangConfigurationTest {
     GolangConfiguration configuration = new GolangConfiguration('build')
 
     @Test
-    void 'explicit exception should be thrown when invoking unsupported methods'() {
-        ReflectionUtils.testUnsupportedMethods(configuration, GolangConfiguration,
-                ['getDependencyRegistry', 'getName', 'getDependencies', 'getDescription', 'getAllDependencies',
-                 'getArtifacts', 'getAllArtifacts', 'getGolangDependencies'])
-    }
-
-    @Test
     void 'dependency registry should be isolated'() {
         GolangConfiguration build = new GolangConfiguration('build')
         GolangConfiguration test = new GolangConfiguration('test')
@@ -23,23 +16,8 @@ class GolangConfigurationTest {
     }
 
     @Test
-    void 'get description should succeed'() {
-        assert configuration.getDescription() == 'build configuration'
-    }
-
-    @Test
-    void 'hacker method invocation should succeed'() {
-        assert configuration.getAllDependencies().isEmpty()
-
-        [configuration.getArtifacts(), configuration.getAllArtifacts()].each {
-            assert it.getFiles().isEmpty()
-            assert it.getBuildDependencies() == null
-        }
-    }
-
-    @Test
     void 'getting dependencies should succeed'() {
-        assert configuration.getGolangDependencies().isEmpty()
+        assert configuration.getDependencies().isEmpty()
     }
 
 }

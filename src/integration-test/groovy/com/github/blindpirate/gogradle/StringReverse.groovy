@@ -23,7 +23,9 @@ golang {
     packagePath='sample'
 }
 dependencies {
-    build 'github.com/golang/example'
+    golang {
+        build 'github.com/golang/example'
+    }
 }
 """
         IOUtils.write(resource, 'hello.go', helloDotGo)
@@ -34,7 +36,7 @@ dependencies {
     @AccessWeb
     void 'build string reverse example should succeed'() {
         newBuild { build ->
-            build.forTasks('dependencies', 'build')
+            build.forTasks('goDependencies', 'goBuild')
         }
 
         assertDependencyOutput()
@@ -48,7 +50,7 @@ dependencies {
         initStdoutStderr()
 
         newBuild { build ->
-            build.forTasks('dependencies')
+            build.forTasks('goDependencies')
         }
 
         assertDependencyOutput()
@@ -62,7 +64,7 @@ dependencies {
         IOUtils.write(resource, 'hello.go', helloDotGo + " ")
 
         newBuild { build ->
-            build.forTasks('dependencies')
+            build.forTasks('goDependencies')
         }
 
         assertDependencyOutput()

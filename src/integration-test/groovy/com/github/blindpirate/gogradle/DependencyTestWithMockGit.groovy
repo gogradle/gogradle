@@ -57,23 +57,26 @@ repositories {
 
 
 dependencies {
-    build 'github.com/firstlevel/a'
-    build(
+    golang{
+        build 'github.com/firstlevel/a'
+        build(
             [name: 'github.com/firstlevel/b', version: '67b0cfae52118d8044c03c1564fd2845ba1b81e1'], // commit3
             'github.com/firstlevel/c@1.0.0'
-    )
+        )
 
-    build('github.com/firstlevel/d') {
-        transitive = false
-    }
+        build('github.com/firstlevel/d') {
+            transitive = false
+        }
 
     
-    build(name: 'github.com/firstlevel/e', commit: '95907c7d') { // commit5
-        transitive = true
-        exclude name: 'github.com/external/e'
-    }
+        build(name: 'github.com/firstlevel/e', commit: '95907c7d') { // commit5
+            transitive = true
+            exclude name: 'github.com/external/e'
+        }
 
-    build name: 'github.com/firstlevel/f', dir: "${StringUtils.toUnixString(localDependencyRoot)}"
+        build name: 'github.com/firstlevel/f', dir: "${StringUtils.toUnixString(localDependencyRoot)}"
+
+    }
 }
 
 """

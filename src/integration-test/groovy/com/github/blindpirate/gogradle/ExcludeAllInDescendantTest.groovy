@@ -40,8 +40,10 @@ golang {
     packagePath='my/project'
 }
 dependencies {
-    build (name:'a', dir: '${StringUtils.toUnixString(new File(resource, "a"))}'){
-        exclude name:'e'
+    golang {
+        build (name:'a', dir: '${StringUtils.toUnixString(new File(resource, "a"))}'){
+            exclude name:'e'
+        }
     }
 }
 """)
@@ -51,7 +53,7 @@ dependencies {
     void 'exclusion in ancestor should succeed'() {
         try {
             newBuild {
-                it.forTasks('dependencies', 'resolveBuildDependencies')
+                it.forTasks('goDependencies', 'resolveBuildDependencies')
             }
         } finally {
             println(stderr)
