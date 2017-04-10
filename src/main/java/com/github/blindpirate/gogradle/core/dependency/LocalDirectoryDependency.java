@@ -3,23 +3,30 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
+import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller.*;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
     private static final File EMPTY_DIR = null;
     private static final long serialVersionUID = 1;
+    private static final Logger LOGGER = Logging.getLogger(LocalDirectoryDependency.class);
 
     private long updateTime;
 
@@ -77,14 +84,17 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        throw new UnsupportedOperationException();
+        LOGGER.warn("You are locking a dependency existed only on your local filesystem, " +
+                "which may cause issues on other one's computer.");
+        return ImmutableMap.of(MapNotationParser.NAME_KEY, getName(),
+                DirMapNotationParser.DIR_KEY, StringUtils.toUnixString(rootDir));
     }
 
     @Override
     public void installTo(File targetDirectory) {
         if (rootDir != EMPTY_DIR) {
             GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
-            IOUtils.write(targetDirectory, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE, formatVersion());
+            IOUtils.write(targetDirectory, CURRENT_VERSION_INDICATOR_FILE, formatVersion());
         }
     }
 

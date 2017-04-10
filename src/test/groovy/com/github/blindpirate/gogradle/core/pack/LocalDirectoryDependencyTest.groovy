@@ -52,9 +52,9 @@ class LocalDirectoryDependencyTest {
         assert dependency.formatVersion() == StringUtils.toUnixString(resource.toPath().toAbsolutePath())
     }
 
-    @Test(expected = UnsupportedOperationException)
+    @Test
     void 'locking a local dependency should cause an exception'() {
-        dependency.toLockedNotation()
+        assert dependency.toLockedNotation() == [name: 'name', dir: StringUtils.toUnixString(resource)]
     }
 
     @Test
