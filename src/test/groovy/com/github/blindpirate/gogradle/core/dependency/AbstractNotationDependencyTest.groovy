@@ -16,9 +16,8 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
-import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.ResolvedDependencyForTest
 import static org.mockito.Mockito.*
-
 
 @RunWith(GogradleRunner)
 class AbstractNotationDependencyTest {

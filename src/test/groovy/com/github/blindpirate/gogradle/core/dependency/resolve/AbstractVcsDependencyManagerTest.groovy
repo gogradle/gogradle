@@ -19,7 +19,6 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.util.concurrent.Callable
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet

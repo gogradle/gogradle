@@ -11,8 +11,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import java.nio.file.Paths
-
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

@@ -21,8 +21,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import java.nio.file.Paths
-
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString

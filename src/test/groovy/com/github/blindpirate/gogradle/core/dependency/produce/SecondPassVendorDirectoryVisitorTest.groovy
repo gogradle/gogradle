@@ -21,7 +21,6 @@ import org.mockito.Mock
 
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
 

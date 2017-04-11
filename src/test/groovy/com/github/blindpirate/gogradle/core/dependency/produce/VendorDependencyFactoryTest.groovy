@@ -25,8 +25,6 @@ import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 import org.mockito.Mock
 
-import java.nio.file.Paths
-
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when

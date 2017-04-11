@@ -10,7 +10,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import javax.inject.Inject
-import java.nio.file.Paths
 
 import static org.mockito.Mockito.when
 

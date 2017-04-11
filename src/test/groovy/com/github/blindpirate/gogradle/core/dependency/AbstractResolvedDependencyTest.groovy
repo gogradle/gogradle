@@ -7,14 +7,13 @@ import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class AbstractResolvedDependencyTest {

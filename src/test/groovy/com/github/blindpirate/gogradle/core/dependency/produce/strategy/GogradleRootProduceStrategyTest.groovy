@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
 import org.gradle.api.Project
-import org.gradle.api.artifacts.ConfigurationContainer
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
