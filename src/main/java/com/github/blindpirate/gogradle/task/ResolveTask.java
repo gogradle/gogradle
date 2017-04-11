@@ -16,7 +16,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.Gogradle
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFiles;
@@ -25,11 +24,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
