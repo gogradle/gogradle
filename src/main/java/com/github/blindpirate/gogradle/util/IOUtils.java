@@ -8,8 +8,12 @@ import org.apache.commons.io.filefilter.IOFileFilter;
 import java.io.File;
 import java.io.FileFilter;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -264,6 +268,26 @@ public final class IOUtils {
         try {
             FileUtils.copyURLToFile(url, dest);
         } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public static void serialize(Object obj, File file) {
+        if (!file.exists()) {
+            write(file, "");
+        }
+
+        try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
+            oos.writeObject(obj);
+        } catch (IOException e) {
+            throw ExceptionHandler.uncheckException(e);
+        }
+    }
+
+    public static Object deserialize(File file) {
+        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(file))) {
+            return ois.readObject();
+        } catch (IOException | ClassNotFoundException e) {
             throw ExceptionHandler.uncheckException(e);
         }
     }

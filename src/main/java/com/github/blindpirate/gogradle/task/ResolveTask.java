@@ -124,17 +124,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
     }
 
     private void writeToSerializationFile() {
-        File serializationFile = getSerializationFile();
-        try {
-            if (!serializationFile.exists()) {
-                IOUtils.write(serializationFile, "");
-            }
-            try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(serializationFile))) {
-                oos.writeObject(dependencyTree);
-            }
-        } catch (Exception e) {
-            throw ExceptionHandler.uncheckException(e);
-        }
+        IOUtils.serialize(dependencyTree, getSerializationFile());
     }
 
 
@@ -164,11 +154,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
     private void readFromSerializationFile() {
         File serializationFile = getSerializationFile();
         Assert.isTrue(serializationFile.exists());
-        try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(serializationFile))) {
-            dependencyTree = (DependencyTreeNode) ois.readObject();
-        } catch (Exception e) {
-            throw ExceptionHandler.uncheckException(e);
-        }
+        dependencyTree = (DependencyTreeNode) IOUtils.deserialize(serializationFile);
     }
 
 
