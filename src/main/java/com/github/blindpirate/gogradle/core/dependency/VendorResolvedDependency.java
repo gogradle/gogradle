@@ -35,10 +35,10 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                                      String version,
                                      long updateTime,
                                      ResolvedDependency hostDependency,
-                                     Path relativePathToHost) {
+                                     String relativePathToHost) {
         super(name, version, updateTime);
         this.hostDependency = hostDependency;
-        this.relativePathToHost = StringUtils.toUnixString(relativePathToHost);
+        this.relativePathToHost = relativePathToHost;
     }
 
     public static VendorResolvedDependency fromParent(String name,
@@ -54,7 +54,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                 version,
                 updateTime,
                 hostDependency,
-                relativePathToHost);
+                StringUtils.toUnixString(relativePathToHost));
         ret.setFirstLevel(isRoot(hostDependency));
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
@@ -119,8 +119,8 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         return hostDependency;
     }
 
-    public Path getRelativePathToHost() {
-        return Paths.get(relativePathToHost);
+    public String getRelativePathToHost() {
+        return relativePathToHost;
     }
 
     @Override

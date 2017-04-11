@@ -52,7 +52,7 @@ class LocalDirectoryDependencyInstallerTest {
     void 'installing a dependency hosting in local dependency should succeed'() {
         // given
         when(vendorResolvedDependency.getHostDependency()).thenReturn(dependency)
-        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn('vendor/root/package')
         IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
         // when
         installer.install(vendorResolvedDependency, dest)

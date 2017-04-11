@@ -78,10 +78,10 @@ class AbstractVcsDependencyManagerTest {
         when(subclassDelegate.createResolvedDependency(hostNotationDependency, repoRoot, 'version', context)).thenReturn(hostResolvedDependency)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
-        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn('vendor/root/package')
 
         when(vendorNotationDependency.getHostNotationDependency()).thenReturn(hostNotationDependency)
-        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn('vendor/root/package')
 
         when(vendorNotationDependency.getName()).thenReturn('thisisvendor')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')

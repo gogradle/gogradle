@@ -19,12 +19,9 @@ import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
-
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public abstract class AbstractVcsDependencyManager<VERSION>
         implements DependencyResolver, DependencyInstaller {
@@ -80,8 +77,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
                     .stream()
                     .filter(d -> d instanceof VendorResolvedDependency)
                     .map(d -> (VendorResolvedDependency) d)
-                    .filter(d ->
-                            toUnixString(d.getRelativePathToHost()).equals(vendorNotationDependency.getVendorPath()))
+                    .filter(d -> d.getRelativePathToHost().equals(vendorNotationDependency.getVendorPath()))
                     .findFirst();
             if (result.isPresent()) {
                 return result.get();
@@ -131,11 +127,11 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         }
     }
 
-    private Path determineRelativePath(ResolvedDependency dependency) {
+    private String determineRelativePath(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
             return VendorResolvedDependency.class.cast(dependency).getRelativePathToHost();
         } else {
-            return Paths.get(".");
+            return ".";
         }
     }
 

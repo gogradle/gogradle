@@ -64,8 +64,8 @@ class SecondPassVendorDirectoryVisitorTest {
             assert it.hostDependency == hostDependency
             assert it.updateTime == 123L
         }
-        assert toUnixString(a.relativePathToHost) == 'vendor/a'
-        assert toUnixString(b.relativePathToHost) == 'vendor/b'
+        assert a.relativePathToHost == 'vendor/a'
+        assert b.relativePathToHost == 'vendor/b'
     }
 
 }

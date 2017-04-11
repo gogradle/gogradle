@@ -83,7 +83,7 @@ class VendorResolvedDependencyTest {
         VendorResolvedDependency subDependency = VendorResolvedDependency.fromParent('github.com/b/c', dependency, dir)
         // then
         assert subDependency.hostDependency == hostDependency
-        assert toUnixString(subDependency.relativePathToHost) == 'vendor/github.com/a/b/vendor/github.com/b/c'
+        assert subDependency.relativePathToHost == 'vendor/github.com/a/b/vendor/github.com/b/c'
     }
 
     @Test

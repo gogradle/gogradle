@@ -8,7 +8,6 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 @Singleton
 public class LocalDirectoryDependencyInstaller implements DependencyInstaller {
@@ -29,11 +28,11 @@ public class LocalDirectoryDependencyInstaller implements DependencyInstaller {
         }
     }
 
-    private Path determineRelativePath(ResolvedDependency dependency) {
+    private String determineRelativePath(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
             return VendorResolvedDependency.class.cast(dependency).getRelativePathToHost();
         } else {
-            return Paths.get(".");
+            return ".";
         }
     }
 }

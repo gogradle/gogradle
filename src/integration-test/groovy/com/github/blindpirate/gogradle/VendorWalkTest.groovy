@@ -35,13 +35,13 @@ class VendorWalkTest extends GogradleModuleSupport {
         dependencies.each { assert it.hostDependency == localPackage }
 
         assert dependencies.any {
-            it.name == 'github.com/e/f' && it.relativePathToHost == Paths.get('vendor/github.com/e/f')
+            it.name == 'github.com/e/f' && it.relativePathToHost == 'vendor/github.com/e/f'
         }
         assert dependencies.any {
-            it.name == 'github.com/e/g' && it.relativePathToHost == Paths.get('vendor/github.com/e/g')
+            it.name == 'github.com/e/g' && it.relativePathToHost == 'vendor/github.com/e/g'
         }
         assert dependencies.any {
-            it.name == 'unrecognized/a' && it.relativePathToHost == Paths.get('vendor/unrecognized/a')
+            it.name == 'unrecognized/a' && it.relativePathToHost == 'vendor/unrecognized/a'
         }
 
         VendorResolvedDependency github_e_f = dependencies.find { it.name == 'github.com/e/f' }
@@ -49,7 +49,7 @@ class VendorWalkTest extends GogradleModuleSupport {
 
         VendorResolvedDependency github_j_k = github_e_f.dependencies.first()
         assert github_j_k.name == 'github.com/j/k'
-        assert github_j_k.relativePathToHost == Paths.get('vendor/github.com/e/f/vendor/github.com/j/k')
+        assert github_j_k.relativePathToHost == 'vendor/github.com/e/f/vendor/github.com/j/k'
         assert github_j_k.hostDependency == localPackage
 
         VendorResolvedDependency unrecognized_a = dependencies.find { it.name == 'unrecognized/a' }
