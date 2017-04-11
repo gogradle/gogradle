@@ -2,10 +2,8 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
-import com.github.blindpirate.gogradle.core.dependency.ResolveContext
+import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
+import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
@@ -20,6 +18,7 @@ import org.junit.runner.RunWith
 
 import java.time.Instant
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate.of
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
 import static org.mockito.Mockito.*
@@ -126,4 +125,47 @@ class LocalDirectoryDependencyTest {
         dependency.installTo(null)
     }
 
+    @Test
+    void 'serialization and deserialization should succeed'() {
+        // given
+        LocalDirectoryDependency d1 = createLocalDirectoryDependency('d1')
+        LocalDirectoryDependency d2 = createLocalDirectoryDependency('d2')
+        LocalDirectoryDependency d3 = createLocalDirectoryDependency('d3')
+
+        d1.dependencies.add(d2)
+        d2.dependencies.add(d3)
+
+        d1.exclude([name: 'excluded'])
+        d3.transitive = false
+
+        // when
+        IOUtils.serialize(d1, new File(resource, 'test.bin'))
+        LocalDirectoryDependency resultD1 = IOUtils.deserialize(new File(resource, 'test.bin'))
+        LocalDirectoryDependency resultD2 = resultD1.dependencies.first()
+        LocalDirectoryDependency resultD3 = resultD2.dependencies.first()
+        // then
+        assertResultIs(resultD1, 'd1')
+        assertResultIs(resultD2, 'd2')
+        assertResultIs(resultD3, 'd3')
+        assert resultD1.transitiveDepExclusions == [of([name: 'excluded'])] as Set
+        assert resultD3.transitiveDepExclusions == [AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE] as Set
+    }
+
+    void assertResultIs(LocalDirectoryDependency localDirectoryDependency, String name) {
+        assert localDirectoryDependency.name == name
+        assert localDirectoryDependency.rootDir == new File(resource, name)
+        assert localDirectoryDependency.package.pathString == name
+        assert localDirectoryDependency.package.rootPathString == name
+        assert localDirectoryDependency.package.dir == StringUtils.toUnixString(new File(resource, name))
+    }
+
+    LocalDirectoryDependency createLocalDirectoryDependency(String name) {
+        File rootDir = new File(resource, name)
+        assert rootDir.mkdir()
+        LocalDirectoryDependency ret = LocalDirectoryDependency.fromLocal(name, rootDir)
+
+        ret.name = name
+        ret.package = LocalDirectoryGolangPackage.of(name, name, StringUtils.toUnixString(rootDir))
+        return ret
+    }
 }

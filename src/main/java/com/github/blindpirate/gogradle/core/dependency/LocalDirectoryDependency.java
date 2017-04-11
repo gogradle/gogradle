@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
@@ -11,7 +10,6 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
 import com.google.common.collect.ImmutableMap;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -20,7 +18,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller.*;
+import static com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -28,12 +26,10 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     private static final long serialVersionUID = 1;
     private static final Logger LOGGER = Logging.getLogger(LocalDirectoryDependency.class);
 
-    private long updateTime;
 
     private File rootDir;
 
-    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
-    private transient GolangDependencySet dependencies = GolangDependencySet.empty();
+    private GolangDependencySet dependencies = GolangDependencySet.empty();
 
     public static LocalDirectoryDependency fromLocal(String name, File rootDir) {
         LocalDirectoryDependency ret = new LocalDirectoryDependency();
@@ -54,7 +50,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     private void setDir(File rootDir) {
         this.rootDir = rootDir;
-        this.updateTime = rootDir.lastModified();
         if (!isValidDirectory(rootDir)) {
             throw DependencyResolutionException.directoryIsInvalid(rootDir);
         }
@@ -70,7 +65,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public long getUpdateTime() {
-        return updateTime;
+        return rootDir.lastModified();
     }
 
     public void setDependencies(GolangDependencySet dependencies) {
@@ -84,8 +79,8 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        LOGGER.warn("You are locking a dependency existed only on your local filesystem, " +
-                "which may cause issues on other one's computer.");
+        LOGGER.warn("You are locking a dependency existed only on your local filesystem, "
+                + "which may cause issues on other one's computer.");
         return ImmutableMap.of(MapNotationParser.NAME_KEY, getName(),
                 DirMapNotationParser.DIR_KEY, StringUtils.toUnixString(rootDir));
     }
