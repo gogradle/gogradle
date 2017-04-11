@@ -4,7 +4,7 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 
 public class ResolveBuildDependenciesTask extends ResolveTask {
     @Override
-    protected String getConfigurationName() {
+    public String getConfigurationName() {
         return BUILD;
     }
 }
