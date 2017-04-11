@@ -9,6 +9,8 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.Dependen
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
 
+import java.nio.file.Paths
+
 import static org.mockito.Mockito.*
 
 class MockUtils {
@@ -31,6 +33,13 @@ class MockUtils {
                 .withRootPath('github.com/user/package')
                 .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
                 .build()
+    }
+
+    static boolean isMockVcsPackage(VcsGolangPackage pkg) {
+        return pkg.path == Paths.get('github.com/user/package/a') &&
+                pkg.rootPath == Paths.get('github.com/user/package') &&
+                pkg.originalVcsInfo.vcsType == VcsType.GIT &&
+                pkg.originalVcsInfo.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 
     static VcsGolangPackage mockRootVcsPackage() {
