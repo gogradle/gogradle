@@ -78,7 +78,7 @@ class VendorResolvedDependencyTest {
     @Test
     void 'creating a sub vendor dependency of vendor dependency should succeed'() {
         // when
-        ReflectionUtils.setField(dependency, 'relativePathToHost', Paths.get('vendor/github.com/a/b'))
+        ReflectionUtils.setField(dependency, 'relativePathToHost', 'vendor/github.com/a/b')
         File dir = IOUtils.mkdir(resource, 'vendor/github.com/a/b/vendor/github.com/b/c')
         VendorResolvedDependency subDependency = VendorResolvedDependency.fromParent('github.com/b/c', dependency, dir)
         // then

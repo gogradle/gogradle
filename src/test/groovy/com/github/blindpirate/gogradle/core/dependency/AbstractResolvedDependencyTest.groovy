@@ -79,6 +79,7 @@ class AbstractResolvedDependencyTest {
     }
 
     static class ResolvedDependencyForTest extends AbstractResolvedDependency {
+        private static final long serialVersionUID = 1
 
         AbstractResolvedDependency delegate
 

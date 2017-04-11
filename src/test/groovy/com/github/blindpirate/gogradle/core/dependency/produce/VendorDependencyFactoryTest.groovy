@@ -82,7 +82,7 @@ class VendorDependencyFactoryTest {
         GolangDependency dependency = set.first()
         assert dependency instanceof VendorResolvedDependency
         assert ReflectionUtils.getField(dependency, 'hostDependency').is(resolvedDependency)
-        assert ReflectionUtils.getField(dependency, 'relativePathToHost') == Paths.get('vendor/root/package')
+        assert ReflectionUtils.getField(dependency, 'relativePathToHost') == 'vendor/root/package'
     }
 
 }

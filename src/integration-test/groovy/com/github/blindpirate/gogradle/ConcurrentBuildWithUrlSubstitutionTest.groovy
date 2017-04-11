@@ -126,7 +126,7 @@ golang {
             writeBuildAndSettingsDotGradle(buildDotGradle)
             try {
                 newBuild {
-                    it.forTasks('resolveBuildDependencies')
+                    it.forTasks('installBuildDependencies')
                 }
             } catch (Exception e) {
                 e.printStackTrace()

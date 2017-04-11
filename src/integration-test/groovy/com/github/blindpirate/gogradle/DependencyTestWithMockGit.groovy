@@ -86,11 +86,11 @@ dependencies {
 
 
     @Test
-    void 'resolving dependencies of a complicated package should success'() {
+    void 'resolving dependencies of a complicated package should succeed'() {
         // given
         try {
             newBuild { build ->
-                build.forTasks('resolveBuildDependencies')
+                build.forTasks('installBuildDependencies')
             }
         } finally {
             println(stderr)
@@ -131,12 +131,13 @@ dependencies {
     void buildAgain() {
         try {
             newBuild { build ->
-                build.forTasks('resolveBuildDependencies')
+                build.forTasks('installBuildDependencies')
             }
         } finally {
             println(stderr)
             println(stdout)
             assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
+            assert stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
         }
     }
 
