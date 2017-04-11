@@ -9,8 +9,8 @@ import org.gradle.api.tasks.TaskAction;
 import java.io.File;
 import java.util.Arrays;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class ShowGopathGorootTask extends AbstractGolangTask {
@@ -20,7 +20,7 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
     private GoBinaryManager goBinaryManager;
 
     public ShowGopathGorootTask() {
-        dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, INSTALL_TEST_DEPENDENCIES_TASK_NAME);
     }
 
     @TaskAction

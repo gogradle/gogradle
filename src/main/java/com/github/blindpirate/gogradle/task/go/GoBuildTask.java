@@ -19,6 +19,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
@@ -54,7 +55,7 @@ public class GoBuildTask extends Go {
     }
 
     public GoBuildTask() {
-        dependsOn(GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
+        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
     @Override
