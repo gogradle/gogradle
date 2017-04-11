@@ -15,15 +15,12 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
-/**
- * All implementations must override equals() and hashCode()
- */
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
     public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
 
     public static final String VERSION_KEY = "version";
 
-    private transient ResolvedDependency resolvedDependency;
+    private ResolvedDependency resolvedDependency;
 
     /**
      * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.

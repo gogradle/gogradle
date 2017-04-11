@@ -5,6 +5,8 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
@@ -14,11 +16,14 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
+import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.*
 import static org.mockito.Mockito.*
 
 
 @RunWith(GogradleRunner)
 class AbstractNotationDependencyTest {
+    File resource
+
     AbstractNotationDependency dependency = mock(AbstractNotationDependency, CALLS_REAL_METHODS)
 
     @Before
@@ -48,7 +53,7 @@ class AbstractNotationDependencyTest {
         // when
         dependency.setTransitive(false)
         // then
-        // exclude any transitive dependencis
+        // exclude any transitive dependencies
         assert dependency.getTransitiveDepExclusions().first().test(null)
     }
 
@@ -82,15 +87,6 @@ class AbstractNotationDependencyTest {
         assert dependency.package == pkg
     }
 
-    static class NotationDependencyForTest extends AbstractNotationDependency {
-        private static final long serialVersionUID = 1
-
-        @Override
-        protected Class<? extends DependencyResolver> getResolverClass() {
-            return null
-        }
-    }
-
     @Test
     void 'multiple PropertiesExclusionSpec should be compared properly'() {
         PropertiesExclusionPredicate spec1 = PropertiesExclusionPredicate.of([name: 'name'])
@@ -99,5 +95,48 @@ class AbstractNotationDependencyTest {
         assert spec1.equals(spec1)
         assert !spec1.equals(null)
         assert spec1.hashCode() == spec2.hashCode()
+    }
+
+    @Test
+    @WithResource('')
+    void 'serialization and deserialization should succeed'() {
+        // given
+        AbstractNotationDependency dependency = new NotationDependencyForTest()
+        dependency.name = 'name'
+        dependency.firstLevel = true
+        dependency.exclude([name: 'excludedName', version: 'excludedVersion'])
+        dependency.transitive = false
+        dependency.package = MockUtils.mockVcsPackage()
+
+        ResolvedDependency resolvedDependency = new ResolvedDependencyForTest('name', 'version', 123L, null)
+        resolvedDependency.dependencies.add(LocalDirectoryDependency.fromLocal('local', resource))
+        ReflectionUtils.setField(dependency, 'resolvedDependency', resolvedDependency)
+
+        // when
+        IOUtils.serialize(dependency, new File(resource, 'out.bin'))
+        NotationDependencyForTest result = IOUtils.deserialize(new File(resource, 'out.bin'))
+        // then
+        assert result.name == 'name'
+        assert result.firstLevel
+        assert result.transitiveDepExclusions.size() == 2
+        assert result.transitiveDepExclusions.contains(PropertiesExclusionPredicate.of([name: 'excludedName', version: 'excludedVersion']))
+        assert result.transitiveDepExclusions.contains(AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE)
+        assert MockUtils.isMockVcsPackage(result.package)
+
+        ResolvedDependencyForTest resolvedDependencyInResult = ReflectionUtils.getField(dependency, 'resolvedDependency')
+        assert resolvedDependencyInResult.name == 'name'
+        assert resolvedDependencyInResult.version == 'version'
+        assert resolvedDependencyInResult.updateTime == 123L
+        assert resolvedDependencyInResult.dependencies.size() == 1
+        assert resolvedDependencyInResult.dependencies.first() == LocalDirectoryDependency.fromLocal('local', resource)
+    }
+
+    static class NotationDependencyForTest extends AbstractNotationDependency {
+        private static final long serialVersionUID = 1
+
+        @Override
+        protected Class<? extends DependencyResolver> getResolverClass() {
+            return null
+        }
     }
 }

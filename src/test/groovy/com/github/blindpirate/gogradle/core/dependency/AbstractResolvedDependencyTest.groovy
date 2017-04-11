@@ -3,20 +3,36 @@ package com.github.blindpirate.gogradle.core.dependency
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
+
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 class AbstractResolvedDependencyTest {
     @Mock
     DependencyInstaller dependencyInstaller
 
+    @Mock
+    AbstractResolvedDependency delegate
+
     File resource
 
-    AbstractResolvedDependency dependency = new ResolvedDependencyForTest('', '', 0)
+    AbstractResolvedDependency dependency
+
+    @Before
+    void setUp() {
+        dependency = new ResolvedDependencyForTest('name', 'version', 123L, delegate)
+        when(delegate.getInstaller()).thenReturn(dependencyInstaller)
+    }
 
     @Test
     void 'resolved dependency should be resolved to itself'() {
@@ -35,33 +51,58 @@ class AbstractResolvedDependencyTest {
         dependency.installTo(resource)
         // then
         assert new File(resource, '.CURRENT_VERSION').text == 'version'
-        Mockito.verify(dependencyInstaller).install(dependency, resource)
+        verify(dependencyInstaller).install(dependency, resource)
+    }
+
+    @Test
+    @WithResource('')
+    void 'serialization and deserialization should succeed'() {
+        // given
+        ReflectionUtils.setField(dependency, 'delegate', null)
+        dependency.dependencies.add(LocalDirectoryDependency.fromLocal('local', resource))
+        dependency.setPackage(MockUtils.mockVcsPackage())
+
+        // when
+        IOUtils.serialize(dependency, new File(resource, 'test.bin'))
+        ResolvedDependencyForTest result = IOUtils.deserialize(new File(resource, 'test.bin'))
+
+        // then
+        assert result.name == 'name'
+        assert result.version == 'version'
+        assert result.updateTime == 123L
+        assert result.dependencies == DependencyUtils.asGolangDependencySet(LocalDirectoryDependency.fromLocal('local', resource))
+        assert MockUtils.isMockVcsPackage(result.package)
     }
 
     AbstractResolvedDependency withNameAndVersion(String name, String version) {
-        return new ResolvedDependencyForTest(name, version, 0)
+        return new ResolvedDependencyForTest(name, version, 0, delegate)
     }
 
-    @SuppressFBWarnings(['SE_BAD_FIELD_INNER_CLASS', 'SE_NO_SERIALVERSIONID'])
-    class ResolvedDependencyForTest extends AbstractResolvedDependency {
+    static class ResolvedDependencyForTest extends AbstractResolvedDependency {
 
-        protected ResolvedDependencyForTest(String name, String version, long updateTime) {
+        AbstractResolvedDependency delegate
+
+        ResolvedDependencyForTest(String name,
+                                  String version,
+                                  long updateTime,
+                                  AbstractResolvedDependency delegate) {
             super(name, version, updateTime)
+            this.delegate = delegate
         }
 
         @Override
         protected DependencyInstaller getInstaller() {
-            return dependencyInstaller
+            return delegate.installer
         }
 
         @Override
         Map<String, Object> toLockedNotation() {
-            return null
+            return delegate.toLockedNotation()
         }
 
         @Override
         String formatVersion() {
-            return 'version'
+            return version
         }
     }
 }

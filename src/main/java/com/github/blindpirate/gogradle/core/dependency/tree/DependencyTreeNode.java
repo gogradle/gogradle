@@ -6,11 +6,12 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class DependencyTreeNode implements Comparable<DependencyTreeNode> {
+public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Serializable {
     private String name;
     private boolean star;
     private ResolvedDependency originalDependency;
