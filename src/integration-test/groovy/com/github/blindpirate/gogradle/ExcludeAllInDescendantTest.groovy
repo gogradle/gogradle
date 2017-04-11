@@ -53,7 +53,7 @@ dependencies {
     void 'exclusion in ancestor should succeed'() {
         try {
             newBuild {
-                it.forTasks('goDependencies', 'resolveBuildDependencies')
+                it.forTasks('goDependencies', 'installBuildDependencies')
             }
         } finally {
             println(stderr)

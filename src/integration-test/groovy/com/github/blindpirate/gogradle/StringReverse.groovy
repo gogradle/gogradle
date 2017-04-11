@@ -56,6 +56,7 @@ dependencies {
         assertDependencyOutput()
 
         assert stdout.toString().contains(":resolveBuildDependencies UP-TO-DATE")
+        assert stdout.toString().contains(":installBuildDependencies UP-TO-DATE")
     }
 
     void buildAgainAndAgain() {
@@ -70,6 +71,7 @@ dependencies {
         assertDependencyOutput()
 
         assert !stdout.toString().contains(":resolveBuildDependencies UP-TO-DATE")
+        assert stdout.toString().contains(":installBuildDependencies UP-TO-DATE")
     }
 
     void assertDependencyOutput() {

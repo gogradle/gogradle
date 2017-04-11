@@ -42,8 +42,11 @@ class AbstractResolvedDependencyTest {
         return new ResolvedDependencyForTest(name, version, 0)
     }
 
-    @SuppressFBWarnings(['SE_BAD_FIELD_INNER_CLASS', 'SE_NO_SERIALVERSIONID'])
-    class ResolvedDependencyForTest extends AbstractResolvedDependency {
+    static class ResolvedDependencyForTest extends AbstractResolvedDependency {
+        private static final long serialVersionUID = 1L
+
+        AbstractResolvedDependency delegate
+
 
         protected ResolvedDependencyForTest(String name, String version, long updateTime) {
             super(name, version, updateTime)

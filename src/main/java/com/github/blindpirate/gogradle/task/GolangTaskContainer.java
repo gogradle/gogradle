@@ -22,6 +22,8 @@ public class GolangTaskContainer {
     // produce all dependencies by analyzing build.gradle
     public static final String RESOLVE_BUILD_DEPENDENCIES_TASK_NAME = "resolveBuildDependencies";
     public static final String RESOLVE_TEST_DEPENDENCIES_TASK_NAME = "resolveTestDependencies";
+    public static final String INSTALL_BUILD_DEPENDENCIES_TASK_NAME = "installBuildDependencies";
+    public static final String INSTALL_TEST_DEPENDENCIES_TASK_NAME = "installTestDependencies";
     // show dependencies tree
     public static final String DEPENDENCIES_TASK_NAME = "goDependencies";
 
@@ -53,8 +55,8 @@ public class GolangTaskContainer {
             .put(BUILD_TASK_NAME, GoBuildTask.class)
             .put(TEST_TASK_NAME, GoTestTask.class)
             .put(VENDOR_TASK_NAME, VendorTask.class)
-//            .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
-//            .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
+            .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
+            .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
             .put(CLEAN_TASK_NAME, CleanTask.class)
             .put(CHECK_TASK_NAME, CheckTask.class)
             .put(LOCK_TASK_NAME, LockTask.class)
