@@ -47,7 +47,7 @@ class AbstractCacheTest {
         assert !result1.is(result2)
     }
 
-    static class GolangCloneableForTest implements GolangCloneable {
+    static class GolangCloneableForTest implements GolangCloneable, Serializable {
         int value
 
         Object clone() {
