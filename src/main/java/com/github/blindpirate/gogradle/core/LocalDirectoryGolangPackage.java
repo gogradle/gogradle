@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 
 public class LocalDirectoryGolangPackage extends ResolvableGolangPackage {
@@ -39,5 +40,19 @@ public class LocalDirectoryGolangPackage extends ResolvableGolangPackage {
 
     public static LocalDirectoryGolangPackage of(String rootPath, String path, String dir) {
         return new LocalDirectoryGolangPackage(Paths.get(rootPath), Paths.get(path), dir);
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        LocalDirectoryGolangPackage that = (LocalDirectoryGolangPackage) o;
+        return Objects.equals(dir, that.dir);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), dir);
     }
 }

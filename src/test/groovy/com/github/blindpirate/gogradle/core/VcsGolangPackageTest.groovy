@@ -52,6 +52,39 @@ class VcsGolangPackageTest {
                 .build()
     }
 
+    @Test
+    void 'equality check should succeed'() {
+        assert vcsGolangPackage != null
+        assert vcsGolangPackage == vcsGolangPackage
+        assert vcsGolangPackage != LocalDirectoryGolangPackage.of('github.com/user/package', 'github.com/user/pavkage/a', '')
+        assert vcsGolangPackage == MockUtils.mockVcsPackage()
+        assert vcsGolangPackage != VcsGolangPackage.builder()
+                .withPath('github.com/user/package/a')
+                .withRootPath('github.com/user/package')
+                .withOriginalVcsInfo(VcsType.MERCURIAL, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .build()
+        assert vcsGolangPackage != VcsGolangPackage.builder()
+                .withPath('github.com/user/package/a')
+                .withRootPath('github.com/user/package')
+                .withOriginalVcsInfo(VcsType.GIT, [])
+                .build()
+        assert vcsGolangPackage != VcsGolangPackage.builder()
+                .withPath('github.com/user/package/b')
+                .withRootPath('github.com/user/package')
+                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .build()
+        assert vcsGolangPackage != VcsGolangPackage.builder()
+                .withPath('github.com/user/package/a')
+                .withRootPath('github.com/user')
+                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .build()
+        assert vcsGolangPackage == VcsGolangPackage.builder()
+                .withPath('github.com/user/package/a')
+                .withRootPath('github.com/user/package')
+                .withSubstitutedVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .build()
+    }
+
     void assertRootPathAndSoOn(GolangPackage golangPackage) {
         assert golangPackage instanceof VcsGolangPackage
         assert golangPackage.rootPathString == 'github.com/user/package'
