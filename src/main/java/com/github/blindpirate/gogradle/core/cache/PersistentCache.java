@@ -36,15 +36,15 @@ public abstract class PersistentCache<K extends GolangCloneable, V extends Golan
         }
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    @SuppressWarnings(("unchecked"))
     public void hitCache(K key, V cachedItem) {
         hitCache.put((K) key.clone(), cachedItem);
     }
 
     public void save() {
+        File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
         try {
-            File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
             IOUtils.serialize(hitCache, persistenceFile);
         } catch (ExceptionHandler.UncheckedException e) {
             LOGGER.warn("Exception in serializing dependency cache, skip.");

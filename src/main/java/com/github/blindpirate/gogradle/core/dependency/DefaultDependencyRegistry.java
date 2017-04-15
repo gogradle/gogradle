@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.isPrefix;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;

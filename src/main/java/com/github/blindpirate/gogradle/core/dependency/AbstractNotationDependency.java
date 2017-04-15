@@ -15,8 +15,10 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NoTransitivePredicate.NO_TRANSITIVE_PREDICATE;
+
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
-    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NoTransitivePredicate.NO_TRANSITIVE_PREDICATE;
+    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NO_TRANSITIVE_PREDICATE;
 
     public static final String VERSION_KEY = "version";
 
