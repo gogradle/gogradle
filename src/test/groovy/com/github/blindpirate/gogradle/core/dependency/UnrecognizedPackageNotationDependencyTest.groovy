@@ -15,6 +15,11 @@ class UnrecognizedPackageNotationDependencyTest {
         dependency.isFirstLevel()
     }
 
+    @Test(expected = UnsupportedOperationException)
+    void 'isConcrete is not supported'() {
+        dependency.isFirstLevel()
+    }
+
     @Test(expected = UnrecognizedPackageException)
     void 'getTransitiveDepExclusions is not supported'() {
         dependency.getTransitiveDepExclusions()

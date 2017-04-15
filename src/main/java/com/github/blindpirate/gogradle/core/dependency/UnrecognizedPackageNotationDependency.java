@@ -29,6 +29,11 @@ public class UnrecognizedPackageNotationDependency extends AbstractGolangDepende
     }
 
     @Override
+    public boolean isConcrete() {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public ResolvedDependency resolve(ResolveContext context) {
         throw UnrecognizedPackageException.cannotRecognizePackage((UnrecognizedGolangPackage) getPackage());
     }
