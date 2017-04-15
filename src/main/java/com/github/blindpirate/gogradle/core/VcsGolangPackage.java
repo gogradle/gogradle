@@ -174,11 +174,15 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
 
         @Override
         public boolean equals(Object o) {
-            if (this == o) return true;
-            if (o == null || getClass() != o.getClass()) return false;
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
             VcsInfo vcsInfo = (VcsInfo) o;
-            return vcsType == vcsInfo.vcsType &&
-                    Objects.equals(urls, vcsInfo.urls);
+            return vcsType == vcsInfo.vcsType
+                    && Objects.equals(urls, vcsInfo.urls);
         }
 
         @Override
