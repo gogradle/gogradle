@@ -57,5 +57,12 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
         throw new UnsupportedOperationException("Unsupported method copy is invoked!");
     }
 
-
+    @Override
+    public Object clone() {
+        try {
+            return super.clone();
+        } catch (CloneNotSupportedException e) {
+            return null;
+        }
+    }
 }
