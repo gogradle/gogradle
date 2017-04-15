@@ -2,13 +2,14 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.install.VendorSupportDependencyInstallerMixin;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -24,29 +25,26 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractVcsDependencyManager<VERSION>
-        implements DependencyResolver, DependencyInstaller {
+        implements CacheEnabledDependencyResolverMixin, VendorSupportDependencyInstallerMixin {
 
     private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
 
     private final GlobalCacheManager globalCacheManager;
+    private final ProjectCacheManager projectCacheManager;
 
-    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
-        this.globalCacheManager = cacheManager;
+    public AbstractVcsDependencyManager(GlobalCacheManager globalCacheManager,
+                                        ProjectCacheManager projectCacheManager) {
+        this.globalCacheManager = globalCacheManager;
+        this.projectCacheManager = projectCacheManager;
     }
 
     @Override
-    public ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {
-        Optional<ResolvedDependency> resultInCache = context.getDependencyRegistry().getFromCache(dependency);
-        if (resultInCache.isPresent()) {
-            return resultInCache.get();
-        }
-        ResolvedDependency ret = doResolve(dependency, context);
-
-        context.getDependencyRegistry().putIntoCache(dependency, ret);
-        return ret;
+    public ProjectCacheManager getProjectCacheManager() {
+        return projectCacheManager;
     }
 
-    private ResolvedDependency doResolve(NotationDependency dependency, ResolveContext context) {
+    @Override
+    public ResolvedDependency doResolve(ResolveContext context, NotationDependency dependency) {
         LOGGER.quiet("Resolving {}", dependency);
         try {
             NotationDependency vcsNotationDependency = extractVcsHostDependency(dependency);
@@ -99,7 +97,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     @Override
     public void install(ResolvedDependency dependency, File targetDirectory) {
         try {
-            ResolvedDependency realDependency = determineResolvedDependency(dependency);
+            ResolvedDependency realDependency = determineDependency(dependency);
             globalCacheManager.runWithGlobalCacheLock(realDependency, () -> {
                 restoreRepository(realDependency);
                 installUnderLock(dependency, targetDirectory);
@@ -111,28 +109,12 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     }
 
     private void installUnderLock(ResolvedDependency dependency, File targetDirectory) {
-        ResolvedDependency realDependency = determineResolvedDependency(dependency);
+        ResolvedDependency realDependency = determineDependency(dependency);
         Path globalCachePath = globalCacheManager.getGlobalPackageCachePath(realDependency.getName());
         doReset(realDependency, globalCachePath);
 
         Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
         IOUtils.copyDirectory(srcPath.toFile(), targetDirectory, DependencyInstallFileFilter.INSTANCE);
-    }
-
-    private ResolvedDependency determineResolvedDependency(ResolvedDependency dependency) {
-        if (dependency instanceof VendorResolvedDependency) {
-            return VendorResolvedDependency.class.cast(dependency).getHostDependency();
-        } else {
-            return dependency;
-        }
-    }
-
-    private String determineRelativePath(ResolvedDependency dependency) {
-        if (dependency instanceof VendorResolvedDependency) {
-            return VendorResolvedDependency.class.cast(dependency).getRelativePathToHost();
-        } else {
-            return ".";
-        }
     }
 
 
