@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.core.GolangCloneable
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.junit.Before
 import org.junit.Test
 
@@ -48,10 +49,12 @@ class AbstractCacheTest {
     }
 
     static class GolangCloneableForTest implements GolangCloneable, Serializable {
+        private static final long serialVersionUID=1
         int value
 
+        @SuppressFBWarnings("CN_IDIOM_NO_SUPER_CALL")
         Object clone() {
-            return super.clone()
+            super.clone()
         }
     }
 }
