@@ -193,7 +193,7 @@ class DefaultGoBinaryManagerTest {
         verify(httpUtils).download(anyString(), any(Path))
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when specified version is invalid'() {
         // given
         when(setting.getGoVersion()).thenReturn('999.999.999')
@@ -202,7 +202,7 @@ class DefaultGoBinaryManagerTest {
         manager.getBinaryPath()
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when download fails'() {
         // given
         when(httpUtils.get(anyString())).thenReturn('1.7.4')
@@ -211,7 +211,7 @@ class DefaultGoBinaryManagerTest {
         manager.getBinaryPath()
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when getting version fails'() {
         // given
         when(httpUtils.get(anyString())).thenThrow(new IOException())

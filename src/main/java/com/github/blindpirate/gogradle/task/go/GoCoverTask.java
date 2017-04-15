@@ -21,6 +21,7 @@ import org.jsoup.select.Elements;
 import javax.inject.Inject;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -178,7 +179,7 @@ public class GoCoverTask extends AbstractGolangTask {
             ret.url = htmlFile.getName();
             return ret;
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

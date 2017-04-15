@@ -57,8 +57,8 @@ class GoTestResultsProviderTest {
         writer.write('failure message')
     }
 
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if writer throws IOException'(){
+    @Test(expected = UncheckedIOException)
+    void 'exception should be thrown if writer throws IOException'() {
         when(writer.write(anyString())).thenThrow(IOException)
         provider.writeAllOutput(1L, TestOutputEvent.Destination.StdOut, writer)
     }

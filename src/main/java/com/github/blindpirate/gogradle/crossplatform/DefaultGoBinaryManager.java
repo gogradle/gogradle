@@ -20,6 +20,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -160,7 +161,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
             String newestStableVersion = httpUtils.get(NEWEST_VERSION_URL).trim();
             fetchSpecifiedVersion(newestStableVersion);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -239,7 +240,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         try {
             httpUtils.download(url, goBinaryCachePath);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
         return goBinaryCachePath;
     }

@@ -26,7 +26,7 @@ class BitbucketPackagePathResolverTest {
         resolver = new BitbucketPackagePathResolver(httpUtils)
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if IOException occurs'() {
         when(httpUtils.get(anyString())).thenThrow(IOException)
         resolver = new BitbucketPackagePathResolver(httpUtils)
