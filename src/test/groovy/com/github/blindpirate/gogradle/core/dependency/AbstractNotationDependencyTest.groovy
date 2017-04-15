@@ -143,6 +143,7 @@ class AbstractNotationDependencyTest {
         setField(dependency, 'resolvedDependency', mock(ResolvedDependency))
         // when
         AbstractNotationDependency clone = dependency.clone()
+        assert clone.class == NotationDependencyForTest
         assert clone.name == 'name'
         assert clone.firstLevel
         assert MockUtils.isMockVcsPackage(clone.package)

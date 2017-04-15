@@ -60,5 +60,11 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
         return getName() + ":" + formatVersion();
     }
 
+    @Override
+    public Object clone() {
+        AbstractResolvedDependency ret = (AbstractResolvedDependency) super.clone();
+        ret.dependencies = GolangDependencySet.empty();
+        return ret;
+    }
 
 }

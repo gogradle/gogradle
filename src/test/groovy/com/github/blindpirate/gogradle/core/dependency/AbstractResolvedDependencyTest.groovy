@@ -73,6 +73,23 @@ class AbstractResolvedDependencyTest {
         assert MockUtils.isMockVcsPackage(result.package)
     }
 
+    @Test
+    void 'cloning should succeed'() {
+        // given
+        AbstractResolvedDependency dependency = new ResolvedDependencyForTest('name', 'version', 42L, null)
+        dependency.package = MockUtils.mockVcsPackage()
+        // when
+        AbstractResolvedDependency clone = dependency.clone()
+        // then
+        assert clone.class == ResolvedDependencyForTest
+        assert !clone.is(dependency)
+        assert clone.name == 'name'
+        assert clone.version == 'version'
+        assert clone.updateTime == 42L
+        assert clone.dependencies.isEmpty()
+        assert MockUtils.isMockVcsPackage(clone.package)
+    }
+
     AbstractResolvedDependency withNameAndVersion(String name, String version) {
         return new ResolvedDependencyForTest(name, version, 0, delegate)
     }
