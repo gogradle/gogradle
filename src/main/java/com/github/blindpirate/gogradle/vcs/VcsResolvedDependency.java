@@ -67,12 +67,13 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
         VcsResolvedDependency that = (VcsResolvedDependency) o;
         return Objects.equals(getVersion(), that.getVersion())
                 && Objects.equals(getName(), that.getName())
+                && Objects.equals(getVcsType(), that.getVcsType())
                 && Objects.equals(url, that.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, getVersion(), getName());
+        return Objects.hash(url, getVersion(), getName(), getVcsType());
     }
 
     public static GitMercurialResolvedDependencyBuilder builder(VcsType vcsType) {

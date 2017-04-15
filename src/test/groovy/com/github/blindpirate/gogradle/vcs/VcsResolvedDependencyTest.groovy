@@ -74,7 +74,7 @@ class VcsResolvedDependencyTest {
     }
 
     @Test
-    void 'dependencies should be equal if name/version/url equals'() {
+    void 'dependencies should be equal if name/version/url/vcs equals'() {
         assert newResolvedDependency(VcsType.GIT) != newResolvedDependency(VcsType.MERCURIAL)
 
         def dependency1 = newResolvedDependency(VcsType.GIT)
