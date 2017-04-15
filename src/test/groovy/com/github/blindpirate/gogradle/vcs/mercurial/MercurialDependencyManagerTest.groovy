@@ -16,7 +16,7 @@ class MercurialDependencyManagerTest {
 
     @Before
     void setUp() {
-        manager = new MercurialDependencyManager(hgClientAccessor, null)
+        manager = new MercurialDependencyManager(hgClientAccessor, null, null)
     }
 
     @Test
