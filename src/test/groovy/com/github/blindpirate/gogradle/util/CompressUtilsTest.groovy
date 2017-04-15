@@ -5,6 +5,8 @@ import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static com.github.blindpirate.gogradle.util.ExceptionHandler.*
+
 @RunWith(GogradleRunner)
 class CompressUtilsTest {
 
@@ -17,13 +19,13 @@ class CompressUtilsTest {
         CompressUtils.decompressZipOrTarGz(new File(resource, 'data.rar'), resource)
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedException)
     void 'exception should be thrown if error occurs in unzip process'() {
         CompressUtils.decompressZip(null, null)
     }
 
     @WithResource('')
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedException)
     void 'exception should be thrown if IOException occurs in untar process'() {
         CompressUtils.decompressTarGz(new File(resource, 'unexistent'), resource)
     }

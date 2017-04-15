@@ -2,6 +2,8 @@ package com.github.blindpirate.gogradle.util
 
 import org.junit.Test
 
+import static com.github.blindpirate.gogradle.util.ExceptionHandler.*
+
 class StringUtilsTest {
     @Test
     void 'splitting and trimming should succeed'() {
@@ -40,7 +42,7 @@ list.each {
 ''', [a: '1', list: [[name: 'name1', url: 'url1'], [name: 'name2', url: 'url2']]]) == '1\nname1url1name2url2\n'
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedException)
     void 'exception should be thrown if rendering fails'() {
         StringUtils.render('${Class.forName(/unexistent/)}', [:])
     }
