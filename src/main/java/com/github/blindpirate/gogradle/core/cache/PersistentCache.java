@@ -15,7 +15,6 @@ public abstract class PersistentCache<K extends GolangCloneable, V extends Golan
         extends AbstractCache<K, V> {
     private static final Logger LOGGER = Logging.getLogger(PersistentCache.class);
     private final Project project;
-    private final ConcurrentMap<K, V> hitCache = new ConcurrentHashMap<>();
 
     protected PersistentCache(Project project) {
         this.project = project;
@@ -36,16 +35,10 @@ public abstract class PersistentCache<K extends GolangCloneable, V extends Golan
         }
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public void hitCache(K key, V cachedItem) {
-        hitCache.put((K) key.clone(), cachedItem);
-    }
-
     public void save() {
         File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
         try {
-            IOUtils.serialize(hitCache, persistenceFile);
+            IOUtils.serialize(container, persistenceFile);
         } catch (ExceptionHandler.UncheckedException e) {
             LOGGER.warn("Exception in serializing dependency cache, skip.");
             LOGGER.info("", e);

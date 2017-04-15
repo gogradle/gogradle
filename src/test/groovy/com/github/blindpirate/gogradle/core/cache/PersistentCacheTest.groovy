@@ -13,6 +13,7 @@ import org.mockito.Mock
 import org.mockito.Mockito
 
 import java.util.concurrent.ConcurrentHashMap
+import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.GolangCloneableForTest
 
@@ -64,11 +65,14 @@ class PersistentCacheTest {
     }
 
     @Test
-    void 'only hit cache should be persisted'() {
-        // given
-        ReflectionUtils.setField(cache, 'container', prepareCacheMap())
+    void 'cache should be persisted'() {
         // when
-        assert cache.get(buildCloneable(1), null) == buildCloneable(1)
+        cache.get(buildCloneable(1), new Function() {
+            @Override
+            Object apply(Object o) {
+                buildCloneable(1)
+            }
+        })
         cache.save()
         cache.load()
         // then

@@ -15,15 +15,10 @@ public abstract class AbstractCache<K, V extends GolangCloneable> implements Cac
         if (cachedItem == null) {
             V ret = constructor.apply(key);
             cachedItem = (V) ret.clone();
-            hitCache(key, cachedItem);
             container.put(key, cachedItem);
             return ret;
         } else {
-            hitCache(key, cachedItem);
             return (V) cachedItem.clone();
         }
-    }
-
-    protected void hitCache(K key, V cachedItem) {
     }
 }
