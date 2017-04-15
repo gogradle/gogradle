@@ -22,6 +22,7 @@ class PrepareTaskTest extends TaskTest {
         // when
         task.prepare()
         // then
+        verify(projectCacheManager).loadPersistenceCache()
         verify(setting).verify()
         verify(goBinaryManager).getBinaryPath()
         verify(buildManager).ensureDotVendorDirNotExist()

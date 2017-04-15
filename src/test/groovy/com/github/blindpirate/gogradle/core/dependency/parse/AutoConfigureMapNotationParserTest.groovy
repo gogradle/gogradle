@@ -16,6 +16,11 @@ class AutoConfigureMapNotationParserTest {
         Class<? extends DependencyResolver> getResolverClass() {
             return null
         }
+
+        @Override
+        boolean isConcrete() {
+            return false
+        }
     }
 
     static class WithDefaultConstructor extends AbstractNotationDependency {
@@ -24,6 +29,11 @@ class AutoConfigureMapNotationParserTest {
         @Override
         Class<? extends DependencyResolver> getResolverClass() {
             return null
+        }
+
+        @Override
+        boolean isConcrete() {
+            return false
         }
     }
 
