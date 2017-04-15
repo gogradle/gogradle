@@ -8,15 +8,17 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.ResolvedDependencyForTest
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.getField
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.setField
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -28,7 +30,7 @@ class AbstractNotationDependencyTest {
     @Before
     void setUp() {
         when(dependency.getResolverClass()).thenReturn(DependencyResolver)
-        ReflectionUtils.setField(dependency, 'transitiveDepExclusions', [] as Set)
+        setField(dependency, 'transitiveDepExclusions', [] as Set)
     }
 
     @Test
@@ -109,7 +111,7 @@ class AbstractNotationDependencyTest {
 
         ResolvedDependency resolvedDependency = new ResolvedDependencyForTest('name', 'version', 123L, null)
         resolvedDependency.dependencies.add(LocalDirectoryDependency.fromLocal('local', resource))
-        ReflectionUtils.setField(dependency, 'resolvedDependency', resolvedDependency)
+        setField(dependency, 'resolvedDependency', resolvedDependency)
 
         // when
         IOUtils.serialize(dependency, new File(resource, 'out.bin'))
@@ -119,15 +121,34 @@ class AbstractNotationDependencyTest {
         assert result.firstLevel
         assert result.transitiveDepExclusions.size() == 2
         assert result.transitiveDepExclusions.contains(PropertiesExclusionPredicate.of([name: 'excludedName', version: 'excludedVersion']))
-        assert result.transitiveDepExclusions.contains(AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE)
+        assert result.transitiveDepExclusions.contains(NO_TRANSITIVE_DEP_PREDICATE)
         assert MockUtils.isMockVcsPackage(result.package)
 
-        ResolvedDependencyForTest resolvedDependencyInResult = ReflectionUtils.getField(dependency, 'resolvedDependency')
+        ResolvedDependencyForTest resolvedDependencyInResult = getField(dependency, 'resolvedDependency')
         assert resolvedDependencyInResult.name == 'name'
         assert resolvedDependencyInResult.version == 'version'
         assert resolvedDependencyInResult.updateTime == 123L
         assert resolvedDependencyInResult.dependencies.size() == 1
         assert resolvedDependencyInResult.dependencies.first() == LocalDirectoryDependency.fromLocal('local', resource)
+    }
+
+    @Test
+    void 'cloning should succeed'() {
+        // given
+        AbstractNotationDependency dependency = new NotationDependencyForTest()
+        dependency.name = 'name'
+        dependency.firstLevel = true
+        dependency.transitive = false
+        dependency.package = MockUtils.mockVcsPackage()
+        setField(dependency, 'resolvedDependency', mock(ResolvedDependency))
+        // when
+        AbstractNotationDependency clone = dependency.clone()
+        assert clone.name == 'name'
+        assert clone.firstLevel
+        assert MockUtils.isMockVcsPackage(clone.package)
+        assert clone.getTransitiveDepExclusions() == [NO_TRANSITIVE_DEP_PREDICATE] as Set
+        assert !getField(dependency, 'transitiveDepExclusions').is(getField(clone, 'transitiveDepExclusions'))
+        assert getField(clone, 'resolvedDependency') == null
     }
 
     static class NotationDependencyForTest extends AbstractNotationDependency {
@@ -136,6 +157,11 @@ class AbstractNotationDependencyTest {
         @Override
         protected Class<? extends DependencyResolver> getResolverClass() {
             return null
+        }
+
+        @Override
+        boolean isConcrete() {
+            return false
         }
     }
 }

@@ -16,7 +16,7 @@ import java.util.Set;
 import java.util.function.Predicate;
 
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
-    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
+    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NoTransitivePredicate.NO_TRANSITIVE_PREDICATE;
 
     public static final String VERSION_KEY = "version";
 
@@ -29,7 +29,7 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
 
     @Override
     public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
-        return transitiveDepExclusions;
+        return new HashSet<>(transitiveDepExclusions);
     }
 
     @Override
@@ -59,8 +59,16 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         }
     }
 
-    public enum NoTransitiveSpec implements Predicate<GolangDependency> {
-        NO_TRANSITIVE_SPEC;
+    @Override
+    public Object clone() {
+        AbstractNotationDependency ret = (AbstractNotationDependency) super.clone();
+        ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
+        ret.resolvedDependency = null;
+        return ret;
+    }
+
+    public enum NoTransitivePredicate implements Predicate<GolangDependency> {
+        NO_TRANSITIVE_PREDICATE;
 
         @Override
         public boolean test(GolangDependency dependency) {
