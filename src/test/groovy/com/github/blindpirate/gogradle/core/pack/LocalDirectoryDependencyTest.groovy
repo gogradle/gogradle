@@ -10,7 +10,6 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before

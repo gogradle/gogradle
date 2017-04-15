@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.install;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 
-public interface VendorSupportDependencyInstallerMixin extends DependencyInstaller {
+public interface VendorSupportMixin {
     default ResolvedDependency determineDependency(ResolvedDependency dependency) {
         if (dependency instanceof VendorResolvedDependency) {
             return VendorResolvedDependency.class.cast(dependency).getHostDependency();

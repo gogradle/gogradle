@@ -8,14 +8,12 @@ import org.junit.Test
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockWithName
 import static org.mockito.Mockito.when
 
-class VendorSupportDependencyInstallerMixinTest {
+class VendorSupportMixinTest {
     ResolvedDependency resolvedDependency = mockWithName(ResolvedDependency, 'resolved')
     ResolvedDependency hostDependency = mockWithName(ResolvedDependency, 'host')
     VendorResolvedDependency vendorResolvedDependency = mockWithName(VendorResolvedDependency, 'vendor')
 
-    VendorSupportDependencyInstallerMixin mixin = new VendorSupportDependencyInstallerMixin() {
-        @Override
-        void install(ResolvedDependency dependency, File targetDirectory) {}
+    VendorSupportMixin mixin = new VendorSupportMixin() {
     }
 
     @Before

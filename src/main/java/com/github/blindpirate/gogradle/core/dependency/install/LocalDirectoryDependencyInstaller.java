@@ -9,7 +9,7 @@ import java.io.File;
 import java.nio.file.Path;
 
 @Singleton
-public class LocalDirectoryDependencyInstaller implements VendorSupportDependencyInstallerMixin {
+public class LocalDirectoryDependencyInstaller implements VendorSupportMixin, DependencyInstaller {
     @Override
     public void install(ResolvedDependency dependency, File targetDirectory) {
         LocalDirectoryDependency realDependency = (LocalDirectoryDependency) determineDependency(dependency);

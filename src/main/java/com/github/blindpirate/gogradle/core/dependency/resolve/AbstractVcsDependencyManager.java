@@ -9,7 +9,8 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
-import com.github.blindpirate.gogradle.core.dependency.install.VendorSupportDependencyInstallerMixin;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.install.VendorSupportMixin;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -25,7 +26,7 @@ import java.util.List;
 import java.util.Optional;
 
 public abstract class AbstractVcsDependencyManager<VERSION>
-        implements CacheEnabledDependencyResolverMixin, VendorSupportDependencyInstallerMixin {
+        implements CacheEnabledDependencyResolverMixin, VendorSupportMixin, DependencyInstaller {
 
     private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
 
