@@ -12,4 +12,9 @@ public class BazaarNotationDependency extends AbstractNotationDependency {
     protected Class<? extends DependencyResolver> getResolverClass() {
         throw new UnsupportedOperationException("Bazaar is not implemented yet!");
     }
+
+    @Override
+    public boolean isConcrete() {
+        throw new UnsupportedOperationException("Bazaar is not implemented yet!");
+    }
 }

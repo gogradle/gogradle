@@ -12,4 +12,9 @@ public class SvnNotationDependency extends AbstractNotationDependency {
     protected Class<? extends DependencyResolver> getResolverClass() {
         throw new UnsupportedOperationException("Svn is not implemented yet!");
     }
+
+    @Override
+    public boolean isConcrete() {
+        throw new UnsupportedOperationException("Svn is not implemented yet!");
+    }
 }
