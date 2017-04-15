@@ -11,7 +11,7 @@ import static java.util.Collections.singletonList;
 
 public abstract class GitMercurialNotationDependency extends AbstractNotationDependency {
 
-    public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
+    public static final String LATEST_COMMIT = "LATEST_COMMIT";
 
     public static final String URL_KEY = "url";
     public static final String URLS_KEY = "urls";
@@ -67,6 +67,10 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
         return commit;
     }
 
+    @Override
+    public boolean isConcrete() {
+        return StringUtils.isNotBlank(commit) && !LATEST_COMMIT.equals(commit);
+    }
 
     @Override
     public String toString() {
