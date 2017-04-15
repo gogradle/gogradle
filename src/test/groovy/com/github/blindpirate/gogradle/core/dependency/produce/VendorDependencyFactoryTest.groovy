@@ -4,11 +4,11 @@ import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
@@ -50,11 +50,13 @@ class VendorDependencyFactoryTest {
     @Mock
     VcsResolvedDependency resolvedDependency
 
+    ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
+
     GolangPackage golangPackage = MockUtils.mockVcsPackage()
 
     @Before
     void setUp() {
-        when(GogradleGlobal.INSTANCE.getInstance(VendorOnlyProduceStrategy)).thenReturn(new VendorOnlyProduceStrategy())
+        when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(resolvedDependency.getVcsType()).thenReturn(VcsType.GIT)
     }
 

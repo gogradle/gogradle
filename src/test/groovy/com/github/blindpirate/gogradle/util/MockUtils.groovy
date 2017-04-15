@@ -2,18 +2,44 @@ package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
+import org.mockito.Mockito
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 import java.nio.file.Paths
+import java.util.function.Function
 
 import static org.mockito.Mockito.*
 
 class MockUtils {
+
+    static ProjectCacheManager projectCacheManagerWithoutCache() {
+        ProjectCacheManager ret = mock(ProjectCacheManager)
+        when(ret.produce(any(ResolvedDependency), any(Function))).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return invocation.getArgument(1).apply(invocation.getArgument(0))
+            }
+        })
+
+        when(ret.resolve(any(NotationDependency), any(Function))).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return invocation.getArgument(1).apply(invocation.getArgument(0))
+            }
+        })
+
+        return ret
+    }
+
     static void mockVcsService(Class serviceClass, Class annoClass, Object serviceInstance) {
         when(GogradleGlobal.INSTANCE.getInstance(Key.get(serviceClass, annoClass))).thenReturn(serviceInstance)
     }

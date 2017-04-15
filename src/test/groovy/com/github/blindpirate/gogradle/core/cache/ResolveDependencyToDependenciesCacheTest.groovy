@@ -10,12 +10,12 @@ import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
@@ -30,7 +30,6 @@ import java.util.concurrent.ConcurrentHashMap
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -45,17 +44,17 @@ class ResolveDependencyToDependenciesCacheTest {
     Project project
     @Mock
     DependencyVisitor dependencyVisitor
-    @Mock
-    VendorOnlyProduceStrategy vendorOnlyProduceStrategy
+
+    ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
 
     ResolveDependencyToDependenciesCache cache
 
     @Before
     void setUp() {
         when(GogradleGlobal.INSTANCE.getInstance(Project)).thenReturn(project)
+        when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(GogradleGlobal.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
-        when(GogradleGlobal.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
-        when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
+        when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(GolangDependencySet.empty())
         when(project.getRootDir()).thenReturn(resource)
 
 
