@@ -2,10 +2,12 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage;
+import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
@@ -46,22 +48,22 @@ public class DefaultMapNotationParser implements MapNotationParser {
 
         String packagePath = MapUtils.getString(notation, NAME_KEY);
         GolangPackage pkg = packagePathResolver.produce(packagePath).get();
-        notation.put(PACKAGE_KEY, pkg);
+
+        if (pkg instanceof ResolvableGolangPackage) {
+            String rootPathString = ResolvableGolangPackage.class.cast(pkg).getRootPathString();
+            notation.put(NAME_KEY, rootPathString);
+            notation.put(PACKAGE_KEY, ResolvableGolangPackage.class.cast(pkg).resolve(rootPathString).get());
+        } else {
+            notation.put(PACKAGE_KEY, pkg);
+        }
 
         if (notation.containsKey(DIR_KEY) || pkg instanceof LocalDirectoryGolangPackage) {
-            return parseDirDependency(notation, pkg);
+            return dirMapNotationParser.parse(notation);
         } else if (notation.containsKey(VENDOR_PATH_KEY)) {
             return vendorMapNotationParser.parse(notation);
         } else {
             return parseWithVcs(notation, pkg);
         }
-    }
-
-    private NotationDependency parseDirDependency(Map<String, Object> notation, GolangPackage pkg) {
-        if (pkg instanceof LocalDirectoryGolangPackage) {
-            notation.put(NAME_KEY, LocalDirectoryGolangPackage.class.cast(pkg).getRootPathString());
-        }
-        return dirMapNotationParser.parse(notation);
     }
 
     private NotationDependency parseWithVcs(Map<String, Object> notation, GolangPackage pkg) {
@@ -80,7 +82,9 @@ public class DefaultMapNotationParser implements MapNotationParser {
         if (url == null) {
             return UnrecognizedPackageNotationDependency.of(pkg);
         } else {
-            return parseVcsPackage(notation, adaptAsVcsPackage(notation, pkg, url));
+            VcsGolangPackage vcsPkg = adaptAsVcsPackage(notation, pkg, url);
+            notation.put(PACKAGE_KEY, vcsPkg);
+            return parseVcsPackage(notation, vcsPkg);
         }
     }
 
@@ -96,9 +100,6 @@ public class DefaultMapNotationParser implements MapNotationParser {
 
     private NotationDependency parseVcsPackage(Map<String, Object> notation, VcsGolangPackage pkg) {
         verifyVcs(notation, pkg);
-
-        notation.put(NAME_KEY, pkg.getRootPathString());
-        notation.put(PACKAGE_KEY, pkg);
 
         return pkg.getVcsType().getService(MapNotationParser.class).parse(notation);
     }

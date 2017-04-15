@@ -119,7 +119,7 @@ class DefaultMapNotationParserTest {
         assert captor.value.name == 'local'
         assert captor.value.package instanceof LocalDirectoryGolangPackage
         assert captor.value.package.rootPathString == 'local'
-        assert captor.value.package.pathString == 'local/sub'
+        assert captor.value.package.pathString == 'local'
         assert captor.value.package.dir == 'dir'
     }
 
@@ -178,7 +178,7 @@ class DefaultMapNotationParserTest {
         verify(gitMapNotationParser).parse(captor.capture())
         assert captor.value.name == 'original'
         assert captor.value.package instanceof VcsGolangPackage
-        assert captor.value.package.pathString == 'original/sub'
+        assert captor.value.package.pathString == 'original'
         assert captor.value.package.rootPathString == 'original'
         assert captor.value.package.originalVcsInfo.vcsType == VcsType.GIT
         assert captor.value.package.originalVcsInfo.urls == ['originalUrl']
