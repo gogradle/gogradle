@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
@@ -71,7 +72,7 @@ class GitMercurialDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(resource, '.git', '')
 
-        manager = new TestGitMercurialDependencyManager(cacheManager, accessor)
+        manager = new GitMercurialDependencyManagerForTest(cacheManager, null, accessor)
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
@@ -192,7 +193,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'NEWEST_COMMIT should be recognized properly'() {
         // given
-        when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.NEWEST_COMMIT)
+        when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.LATEST_COMMIT)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -284,15 +285,20 @@ class GitMercurialDependencyManagerTest {
         manager.install(resolvedDependency, resource)
     }
 
-    class TestGitMercurialDependencyManager extends GitMercurialDependencyManager {
+    class GitMercurialDependencyManagerForTest extends GitMercurialDependencyManager {
         GitMercurialAccessor accessor
 
-        TestGitMercurialDependencyManager(GlobalCacheManager cacheManager,
-                                          GitMercurialAccessor accessor) {
-            super(cacheManager)
+        GitMercurialDependencyManagerForTest(GlobalCacheManager globalCacheManager,
+                                             ProjectCacheManager projectCacheManager,
+                                             GitMercurialAccessor accessor) {
+            super(globalCacheManager, projectCacheManager)
             this.accessor = accessor
         }
 
+        @Override
+        ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {
+            return super.doResolve(context, dependency)
+        }
 
         @Override
         protected GitMercurialAccessor getAccessor() {

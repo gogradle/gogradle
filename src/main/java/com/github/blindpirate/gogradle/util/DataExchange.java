@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.ctc.wstx.stax.WstxInputFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
@@ -11,7 +10,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 
 import static com.ctc.wstx.api.WstxInputProperties.PARSING_MODE_DOCUMENTS;
-import static com.github.blindpirate.gogradle.util.ExceptionHandler.uncheckException;
 
 public class DataExchange {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();

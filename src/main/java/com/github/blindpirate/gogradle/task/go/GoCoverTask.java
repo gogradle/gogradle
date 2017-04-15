@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.NumberUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
@@ -19,13 +20,14 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.LATEST_COMMIT;
 
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
     protected static final Logger LOGGER = Logging.getLogger(GitMercurialDependencyManager.class);
 
-    public GitMercurialDependencyManager(GlobalCacheManager cacheManager) {
-        super(cacheManager);
+    public GitMercurialDependencyManager(GlobalCacheManager globalCacheManager,
+                                         ProjectCacheManager projectCacheManager) {
+        super(globalCacheManager, projectCacheManager);
     }
 
     protected abstract GitMercurialAccessor getAccessor();
@@ -114,7 +116,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
 
     private boolean isConcreteCommit(String commit) {
-        return commit != null && !NEWEST_COMMIT.equals(commit);
+        return commit != null && !LATEST_COMMIT.equals(commit);
     }
 
     @Override

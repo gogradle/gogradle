@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.task.go;
 
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.Action;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
