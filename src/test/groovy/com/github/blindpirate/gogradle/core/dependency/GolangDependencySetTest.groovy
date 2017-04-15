@@ -6,9 +6,6 @@ import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
-import org.gradle.api.Action
-import org.gradle.api.artifacts.DependencySet
-import org.gradle.api.specs.Spec
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -117,74 +114,6 @@ class GolangDependencySetTest {
     }
 
     @Test
-    void 'all methods of facade should be delegated to itself'() {
-        GolangDependencySet set = new GolangDependencySet()
-        DependencySet facade = set.toDependencySet()
-        GolangDependencySet mockDependencySet = mock(GolangDependencySet)
-        ReflectionUtils.setField(facade, 'outerInstance', mockDependencySet)
-
-        assertUnsupport { facade.withType(String) }
-
-        Action action = mock(Action)
-        assertUnsupport { facade.withType(String, action) }
-
-        Closure closure = mock(Closure)
-        assertUnsupport { facade.withType(String, closure) }
-
-        Spec spec = mock(Spec)
-        assertUnsupport { facade.matching(spec) }
-
-        assertUnsupport { facade.matching(closure) }
-
-        assertUnsupport { facade.whenObjectAdded(action) }
-
-        assertUnsupport { facade.whenObjectAdded(closure) }
-
-        assertUnsupport { facade.whenObjectRemoved(action) }
-
-        assertUnsupport { facade.whenObjectRemoved(closure) }
-
-        assertUnsupport { facade.all(action) }
-
-        assertUnsupport { facade.all(closure) }
-
-        assertUnsupport { facade.findAll(closure) }
-
-        assertUnsupport { facade.getBuildDependencies() }
-
-        facade.isEmpty()
-        verify(mockDependencySet).isEmpty()
-
-        facade.contains('')
-        verify(mockDependencySet).contains('')
-
-        facade.toArray()
-        verify(mockDependencySet).toArray()
-
-        Object[] array = [] as Object[]
-        facade.toArray(array)
-        verify(mockDependencySet).toArray(array)
-
-        facade.remove('')
-        verify(mockDependencySet).remove('')
-
-        facade.containsAll([])
-        verify(mockDependencySet).containsAll([])
-
-        facade.removeAll([])
-        verify(mockDependencySet).removeAll([])
-
-        facade.retainAll([])
-        verify(mockDependencySet).retainAll([])
-
-        facade.addAll([])
-        verify(mockDependencySet).addAll([])
-
-        facade.clear()
-        verify(mockDependencySet).clear()
-    }
-
-    @Test
     void 'dependencies should be identified by names'() {
         GolangDependency d1 = DependencyUtils.mockWithName(GolangDependency, 'name')
         GolangDependency d2 = DependencyUtils.mockWithName(GolangDependency, 'name')
@@ -222,33 +151,44 @@ class GolangDependencySetTest {
         m.invoke(set1, [set2] as Object[])
     }
 
-    @Test(expected = UnsupportedOperationException)
-    void 'exception should be thrown when invoking some methods'() {
-        new GolangDependencySet().toDependencySet().getBuildDependencies()
-    }
 
     @Test
     @WithResource('')
     void 'serialization and deserialization should succeed'() {
         // given
         File output = new File(resource, 'output.bin')
-        IOUtils.touch(output)
-
-        GolangDependencySet set = new GolangDependencySet()
-        set.add(newGitDependency())
-        set.add(LocalDirectoryDependency.fromLocal('resource', resource))
-        set.add(newVendorDependency())
+        GolangDependencySet set = buildADependencySet()
 
         // when
-        ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(output))
-        oos.writeObject(set)
-
-        ObjectInputStream ois = new ObjectInputStream(new FileInputStream(output))
-        def result = ois.readObject()
+        IOUtils.serialize(set, output)
+        def result = IOUtils.deserialize(output)
 
         // then
         assert result instanceof GolangDependencySet
+        verifyResult(result)
+    }
 
+    @Test
+    @WithResource('')
+    void 'cloning should succeed'() {
+        // when
+        GolangDependencySet oldSet = buildADependencySet()
+        GolangDependencySet newSet = oldSet.clone()
+
+        // then
+        assert oldSet == newSet
+        assert !oldSet.is(newSet)
+        assert !findInDependencies(oldSet, GitNotationDependency).is(findInDependencies(newSet, GitNotationDependency))
+        assert !findInDependencies(oldSet, VendorNotationDependency).is(findInDependencies(newSet, VendorNotationDependency))
+        assert !findInDependencies(oldSet, LocalDirectoryDependency).is(findInDependencies(newSet, LocalDirectoryDependency))
+        verifyResult(newSet)
+    }
+
+    def findInDependencies(GolangDependencySet set, Class clazz) {
+        return set.find { it.class == clazz }
+    }
+
+    private void verifyResult(GolangDependencySet result) {
         def gitDependency = result.find { it instanceof GitNotationDependency }
         assert gitDependency.name == 'gitDependency'
         assert gitDependency.commit == 'commit'
@@ -265,6 +205,14 @@ class GolangDependencySetTest {
         def localDependency = result.find { it instanceof LocalDirectoryDependency }
         assert localDependency.name == 'resource'
         assert localDependency.rootDir == resource
+    }
+
+    private GolangDependencySet buildADependencySet() {
+        GolangDependencySet set = new GolangDependencySet()
+        set.add(newGitDependency())
+        set.add(LocalDirectoryDependency.fromLocal('resource', resource))
+        set.add(newVendorDependency())
+        set
     }
 
     VendorNotationDependency newVendorDependency() {
