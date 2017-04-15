@@ -30,12 +30,7 @@ class AbstractGolangDependencyTest {
     @Test
     void 'cloning should succeed'() {
         // given
-        AbstractGolangDependency dependency = new AbstractGolangDependency() {
-            @Override
-            ResolvedDependency resolve(ResolveContext context) {
-                return null
-            }
-        }
+        AbstractGolangDependency dependency = new AbstractGolangDependencyForTest()
         dependency.name = 'name'
         dependency.package = MockUtils.mockVcsPackage()
         dependency.firstLevel = true
@@ -46,5 +41,14 @@ class AbstractGolangDependencyTest {
         assert clone.name == 'name'
         assert clone.firstLevel
         assert MockUtils.isMockVcsPackage(dependency.package)
+    }
+
+    static class AbstractGolangDependencyForTest extends AbstractGolangDependency {
+        private static final long serialVersionUID = 1L
+
+        @Override
+        ResolvedDependency resolve(ResolveContext context) {
+            return null
+        }
     }
 }
