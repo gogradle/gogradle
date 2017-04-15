@@ -86,14 +86,6 @@ class DefaultDependencyRegistryTest {
         assert !registry.register(resolvedDependency1)
     }
 
-    @Test
-    void 'resolved dependency should be put into cache'() {
-        // when
-        registry.putIntoCache(notationDependency, resolvedDependency1)
-        // then
-        assert registry.getFromCache(notationDependency).get().is(resolvedDependency1)
-    }
-
     @Test(expected = IllegalStateException)
     void 'exception should be thrown if first-level dependencies conflict'() {
         // given
