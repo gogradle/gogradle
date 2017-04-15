@@ -10,6 +10,7 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before
@@ -18,9 +19,11 @@ import org.junit.runner.RunWith
 
 import java.time.Instant
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.*
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate.of
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -126,6 +129,25 @@ class LocalDirectoryDependencyTest {
     }
 
     @Test
+    void 'cloning should succeed'() {
+        // given
+        LocalDirectoryDependency d = createLocalDirectoryDependency('d')
+        d.firstLevel = true
+        d.transitive = false
+        d.dependencies = asGolangDependencySet(createLocalDirectoryDependency('sub'))
+        // when
+        LocalDirectoryDependency clone = d.clone()
+        // then
+        assert !clone.is(d)
+        assert clone.dependencies.isEmpty()
+        assert clone.name == 'd'
+        assert clone.firstLevel
+        assert !getField(d, 'transitiveDepExclusions').is(getField(clone, 'transitiveDepExclusions'))
+        assert clone.transitiveDepExclusions.size() == 1
+        assert clone.transitiveDepExclusions == [NO_TRANSITIVE_DEP_PREDICATE] as Set
+    }
+
+    @Test
     void 'serialization and deserialization should succeed'() {
         // given
         LocalDirectoryDependency d1 = createLocalDirectoryDependency('d1')
@@ -148,7 +170,7 @@ class LocalDirectoryDependencyTest {
         assertResultIs(resultD2, 'd2')
         assertResultIs(resultD3, 'd3')
         assert resultD1.transitiveDepExclusions == [of([name: 'excluded'])] as Set
-        assert resultD3.transitiveDepExclusions == [AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE] as Set
+        assert resultD3.transitiveDepExclusions == [NO_TRANSITIVE_DEP_PREDICATE] as Set
     }
 
     void assertResultIs(LocalDirectoryDependency localDirectoryDependency, String name) {

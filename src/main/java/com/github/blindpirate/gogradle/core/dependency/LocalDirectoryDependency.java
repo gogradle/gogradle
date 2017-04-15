@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParse
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
@@ -25,7 +26,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     private static final File EMPTY_DIR = null;
     private static final long serialVersionUID = 1;
     private static final Logger LOGGER = Logging.getLogger(LocalDirectoryDependency.class);
-
 
     private File rootDir;
 
@@ -49,6 +49,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     private void setDir(File rootDir) {
+        Assert.isTrue(this.rootDir == null, "rootDir can be set only once!");
         this.rootDir = rootDir;
         if (!isValidDirectory(rootDir)) {
             throw DependencyResolutionException.directoryIsInvalid(rootDir);
@@ -127,5 +128,18 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public int hashCode() {
         return Objects.hash(rootDir, super.hashCode());
+    }
+
+    @Override
+    public boolean isConcrete() {
+        return true;
+    }
+
+    @Override
+    public Object clone() {
+        LocalDirectoryDependency ret = (LocalDirectoryDependency) super.clone();
+        ret.dependencies = GolangDependencySet.empty();
+        ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
+        return ret;
     }
 }
