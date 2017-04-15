@@ -10,6 +10,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static com.github.blindpirate.gogradle.util.ExceptionHandler.UncheckedException
 import static org.apache.commons.lang3.StringUtils.countMatches
 
 @RunWith(GogradleRunner)
@@ -152,7 +153,7 @@ class IdeaSdkHackerTest {
         assert loadFileContents() == fileContents
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedException)
     void 'exceptions should be thrown if xml is corrupted'() {
         writeInto('IdeaIC', '2016.1', '<badxml><')
         hacker.ensureSpecificSdkExist('1.7.1', resource.toPath())
