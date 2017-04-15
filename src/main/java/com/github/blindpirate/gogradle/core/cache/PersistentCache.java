@@ -9,11 +9,13 @@ import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
-public abstract class PersistentCache<K, V extends GolangCloneable> extends AbstractCache<K, V> {
-
+public abstract class PersistentCache<K extends GolangCloneable, V extends GolangCloneable>
+        extends AbstractCache<K, V> {
     private static final Logger LOGGER = Logging.getLogger(PersistentCache.class);
     private final Project project;
+    private final ConcurrentMap<K, V> hitCache = new ConcurrentHashMap<>();
 
     protected PersistentCache(Project project) {
         this.project = project;
@@ -31,6 +33,22 @@ public abstract class PersistentCache<K, V extends GolangCloneable> extends Abst
             }
         } else {
             LOGGER.info("Cache {} not found, skip.", getClass().getSimpleName());
+        }
+    }
+
+    @Override
+    @SuppressWarnings(("unchecked"))
+    public void hitCache(K key, V cachedItem) {
+        hitCache.put((K) key.clone(), cachedItem);
+    }
+
+    public void save() {
+        try {
+            File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
+            IOUtils.serialize(hitCache, persistenceFile);
+        } catch (ExceptionHandler.UncheckedException e) {
+            LOGGER.warn("Exception in serializing dependency cache, skip.");
+            LOGGER.info("", e);
         }
     }
 }

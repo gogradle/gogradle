@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangCloneable
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -13,7 +14,7 @@ import org.mockito.Mockito
 
 import java.util.concurrent.ConcurrentHashMap
 
-import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.*
+import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.GolangCloneableForTest
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -34,20 +35,19 @@ class PersistentCacheTest {
         Mockito.when(project.getRootDir()).thenReturn(resource)
     }
 
-    void prepareSerializationFile() {
+    Map prepareCacheMap() {
         ConcurrentHashMap map = new ConcurrentHashMap()
-        map[1] = new GolangCloneableForTest(value: 1)
-        map[2] = new GolangCloneableForTest(value: 2)
-
-        IOUtils.serialize(map, storageFile)
+        map[buildCloneable(1)] = buildCloneable(1)
+        map[buildCloneable(2)] = buildCloneable(2)
+        return map
     }
 
     @Test
     void 'loading from serialization file should succeed'() {
-        prepareSerializationFile()
+        IOUtils.serialize(prepareCacheMap(), storageFile)
         cache.load()
-        assert cache.get(1, null).value == 1
-        assert cache.get(2, null).value == 2
+        assert cache.get(buildCloneable(1), null) == buildCloneable(1)
+        assert cache.get(buildCloneable(2), null) == buildCloneable(2)
     }
 
     @Test
@@ -63,7 +63,24 @@ class PersistentCacheTest {
         assert ReflectionUtils.getField(cache, 'container').isEmpty()
     }
 
-    class PersistentCacheForTest extends PersistentCache<Integer, GolangCloneableForTest> {
+    @Test
+    void 'only hit cache should be persisted'() {
+        // given
+        ReflectionUtils.setField(cache, 'container', prepareCacheMap())
+        // when
+        assert cache.get(buildCloneable(1), null) == buildCloneable(1)
+        cache.save()
+        cache.load()
+        // then
+        assert ReflectionUtils.getField(cache, 'container').size() == 1
+        assert cache.get(buildCloneable(1), null) == buildCloneable(1)
+    }
+
+    GolangCloneable buildCloneable(int value) {
+        return new GolangCloneableForTest(value: value);
+    }
+
+    class PersistentCacheForTest extends PersistentCache<GolangCloneableForTest, GolangCloneableForTest> {
         PersistentCacheForTest() {
             super(PersistentCacheTest.this.project)
         }
