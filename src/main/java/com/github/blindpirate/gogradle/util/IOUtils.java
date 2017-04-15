@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.UncheckedIOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
@@ -44,7 +45,7 @@ public final class IOUtils {
         try {
             FileUtils.forceMkdir(directory);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -60,7 +61,7 @@ public final class IOUtils {
                 FileUtils.forceDelete(file);
             }
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -89,7 +90,7 @@ public final class IOUtils {
         try {
             org.apache.commons.io.FileUtils.copyDirectory(src, dest);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -105,7 +106,7 @@ public final class IOUtils {
         try {
             FileUtils.copyDirectory(srcDir, destDir, filter);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -113,7 +114,7 @@ public final class IOUtils {
         try {
             FileUtils.copyFile(src, dest);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -121,7 +122,7 @@ public final class IOUtils {
         try {
             org.apache.commons.io.FileUtils.touch(file);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -129,7 +130,7 @@ public final class IOUtils {
         try {
             org.apache.commons.io.FileUtils.write(file, data, DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -145,7 +146,7 @@ public final class IOUtils {
         try (InputStream is = new FileInputStream(file)) {
             return org.apache.commons.io.IOUtils.toString(is, DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -167,7 +168,7 @@ public final class IOUtils {
         try {
             return org.apache.commons.io.IOUtils.toString(inputStream, DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -184,7 +185,7 @@ public final class IOUtils {
         try {
             return org.apache.commons.io.IOUtils.readLines(is, GogradleGlobal.DEFAULT_CHARSET);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -192,7 +193,7 @@ public final class IOUtils {
         try {
             Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DFS_DEPTH, visitor);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -211,7 +212,7 @@ public final class IOUtils {
             }
             FileUtils.cleanDirectory(dir);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -221,7 +222,7 @@ public final class IOUtils {
                 Files.setPosixFilePermissions(filePath, PosixFilePermissions.fromString("rwx------"));
             }
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -229,7 +230,7 @@ public final class IOUtils {
         try {
             return path.toRealPath();
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -241,7 +242,7 @@ public final class IOUtils {
         try {
             return URLEncoder.encode(s, "UTF8");
         } catch (UnsupportedEncodingException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -249,7 +250,7 @@ public final class IOUtils {
         try {
             return URLDecoder.decode(encoded, "UTF8");
         } catch (UnsupportedEncodingException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -259,7 +260,7 @@ public final class IOUtils {
         try (Stream<String> lines = Files.lines(path)) {
             return lines.count();
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -267,7 +268,7 @@ public final class IOUtils {
         try {
             FileUtils.copyURLToFile(url, dest);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -279,7 +280,7 @@ public final class IOUtils {
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(file))) {
             oos.writeObject(obj);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

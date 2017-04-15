@@ -29,7 +29,7 @@ class IOUtilsTest {
 
     File unexistent = new File('/gogradle_unexistent')
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when forceMkdir fails'() {
         IOUtils.write(resource, 'dir', '')
         IOUtils.forceMkdir(new File(resource, 'dir'))
@@ -40,7 +40,7 @@ class IOUtilsTest {
         IOUtils.forceDelete(null)
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'deleting unexistent file should throw exception'() {
         IOUtils.forceDelete(unexistent)
     }
@@ -97,12 +97,12 @@ class IOUtilsTest {
         assert new File(resource, 'dest/file').exists()
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when copying src or dest is invalid'() {
         IOUtils.copyDirectory(new File(resource, 'invalid'), new File(resource, 'invalid'))
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when copying src or dest is invalid 2'() {
         IOUtils.copyDirectory(new File(resource, 'invalid'), new File(resource, 'invalid'), TrueFileFilter.INSTANCE)
     }
@@ -113,19 +113,19 @@ class IOUtilsTest {
         assert new File(resource, 'newFile').exists()
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when touching fails'() {
         when(mockFile.exists()).thenReturn(true)
         when(mockFile.setLastModified(any(long))).thenReturn(false)
         IOUtils.touch(mockFile)
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when writing to data fails'() {
         IOUtils.write(resource, '')
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when trying to get text from invalid file'() {
         IOUtils.toString(new File(resource, 'invalid'))
     }
@@ -145,7 +145,7 @@ class IOUtilsTest {
         assert file.delete()
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if IOException occurs'() {
         InputStream is = mock(InputStream)
         when(is.read()).thenThrow(new IOException())
@@ -158,19 +158,19 @@ class IOUtilsTest {
         assert IOUtils.readLines(new File(resource, 'file')) == []
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown when walking file tree fails'() {
         IOUtils.walkFileTreeSafely(resource.toPath().resolve('invalid'), new SimpleFileVisitor<Path>())
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if clearing directory fails'() {
         when(mockFile.isDirectory()).thenReturn(true)
         when(mockFile.exists()).thenReturn(true)
         IOUtils.clearDirectory(mockFile)
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     @OnlyOnPosix
     void 'exception should be thrown when chmod +x fails'() {
         IOUtils.chmodAddX(resource.toPath().resolve('unexistent'))
@@ -210,17 +210,17 @@ class IOUtilsTest {
         assert new File(resource, 'a/b/c').getText() == 'content'
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'tracking an unexistent path should fail'() {
         IOUtils.toRealPath(unexistent.toPath())
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if copyFile fails'() {
         IOUtils.copyFile(unexistent, unexistent)
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if readLines fails'() {
         // given
         InputStream is = mock(InputStream)
@@ -229,12 +229,12 @@ class IOUtilsTest {
         IOUtils.readLines(is)
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if countLines fails'() {
         IOUtils.countLines(unexistent.toPath())
     }
 
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if copyURLToFile fails'() {
         IOUtils.copyURLToFile(new URL('http://unexistent'), unexistent)
     }

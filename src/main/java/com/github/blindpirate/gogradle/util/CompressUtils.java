@@ -11,6 +11,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.zip.GZIPInputStream;
 
 public class CompressUtils {
@@ -44,7 +45,7 @@ public class CompressUtils {
             }
             tin.close();
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

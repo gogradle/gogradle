@@ -25,7 +25,7 @@ class CompressUtilsTest {
     }
 
     @WithResource('')
-    @Test(expected = UncheckedException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if IOException occurs in untar process'() {
         CompressUtils.decompressTarGz(new File(resource, 'unexistent'), resource)
     }
