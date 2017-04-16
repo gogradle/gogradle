@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.core.GolangCloneable
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import groovy.transform.EqualsAndHashCode
+import org.apache.commons.collections4.map.LRUMap
 import org.junit.Before
 import org.junit.Test
 
@@ -20,7 +21,7 @@ class AbstractCacheTest {
 
     @Before
     void setUp() {
-        ReflectionUtils.setField(cache, 'container', new ConcurrentHashMap())
+        ReflectionUtils.setField(cache, 'container', new LRUMap())
     }
 
     @Test

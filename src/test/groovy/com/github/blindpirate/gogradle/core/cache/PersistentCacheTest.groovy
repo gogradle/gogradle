@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangCloneable
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.apache.commons.collections4.map.LRUMap
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
@@ -37,7 +38,7 @@ class PersistentCacheTest {
     }
 
     Map prepareCacheMap() {
-        ConcurrentHashMap map = new ConcurrentHashMap()
+        LRUMap map = new LRUMap()
         map[buildCloneable(1)] = buildCloneable(1)
         map[buildCloneable(2)] = buildCloneable(2)
         return map

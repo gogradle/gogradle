@@ -8,8 +8,8 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.File;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 public abstract class PersistentCache<K extends GolangCloneable, V extends GolangCloneable>
         extends AbstractCache<K, V> {
@@ -25,7 +25,7 @@ public abstract class PersistentCache<K extends GolangCloneable, V extends Golan
         File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
         if (persistenceFile.exists()) {
             try {
-                container = (ConcurrentHashMap) IOUtils.deserialize(persistenceFile);
+                container = (Map) IOUtils.deserialize(persistenceFile);
             } catch (ExceptionHandler.UncheckedException e) {
                 LOGGER.warn("Exception in deserializing dependency cache, skip.");
                 LOGGER.info("", e);
