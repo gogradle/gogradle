@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.vcs;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
@@ -20,8 +21,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.LATEST_COMMIT;
-
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
     protected static final Logger LOGGER = Logging.getLogger(GitMercurialDependencyManager.class);
 
@@ -34,8 +33,14 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected void doReset(ResolvedDependency dependency, Path globalCachePath) {
+        File repoRoot = globalCachePath.toFile();
+
         VcsResolvedDependency vcsResolvedDependency = (VcsResolvedDependency) dependency;
-        getAccessor().checkout(globalCachePath.toFile(), vcsResolvedDependency.getVersion());
+        if (!getAccessor().findCommit(repoRoot, vcsResolvedDependency.getVersion()).isPresent()) {
+            getAccessor().update(repoRoot);
+        }
+
+        getAccessor().checkout(repoRoot, vcsResolvedDependency.getVersion());
     }
 
     @Override
@@ -63,6 +68,14 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     protected abstract VcsType getVcsType();
 
     @Override
+    protected boolean concreteVersionExistInRepo(File repoRoot, GolangDependency dependency) {
+        String commit = dependency instanceof GitMercurialNotationDependency
+                ? GitMercurialNotationDependency.class.cast(dependency).getCommit()
+                : VcsResolvedDependency.class.cast(dependency).getVersion();
+        return getAccessor().findCommit(repoRoot, commit).isPresent();
+    }
+
+    @Override
     protected void resetToSpecificVersion(File repository, GitMercurialCommit commit) {
         getAccessor().checkout(repository, commit.getId());
     }
@@ -85,7 +98,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
             }
         }
 
-        if (isConcreteCommit(notationDependency.getCommit())) {
+        if (notationDependency.isConcrete()) {
             Optional<GitMercurialCommit> commit = getAccessor().findCommit(repository, notationDependency.getCommit());
             if (commit.isPresent()) {
                 return commit.get();
@@ -114,13 +127,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         return Optional.of(satisfiedTags.get(0));
     }
 
-
-    private boolean isConcreteCommit(String commit) {
-        return commit != null && !LATEST_COMMIT.equals(commit);
-    }
-
     @Override
-    protected void updateRepository(NotationDependency dependency, File repoRoot) {
+    protected void updateRepository(GolangDependency dependency, File repoRoot) {
         getAccessor().checkout(repoRoot, getAccessor().getDefaultBranch(repoRoot));
 
         String url = getAccessor().getRemoteUrl(repoRoot);

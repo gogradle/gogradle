@@ -88,6 +88,7 @@ class GitMercurialDependencyManagerTest {
 
         when(notationDependency.getUrls()).thenReturn([repoUrl])
         when(notationDependency.getCommit()).thenReturn(commitId)
+        when(notationDependency.isConcrete()).thenReturn(true)
         when(notationDependency.getPackage()).thenReturn(thePackage)
 
         when(resolveContext.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
@@ -129,14 +130,13 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    void 'existed repository should be updated'() {
+    void 'existed repository should not be updated'() {
         // given:
-        when(cacheManager.currentDependencyIsOutOfDate(notationDependency)).thenReturn(true)
-        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
+        when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
         // when:
         manager.resolve(resolveContext, notationDependency)
         // then:
-        verify(accessor).update(resource)
+        verify(accessor, times(0)).update(resource)
     }
 
     @Test
@@ -183,7 +183,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'commit will be searched if tag cannot be recognized'() {
         // given
-        when(notationDependency.getCommit()).thenReturn(null)
+        when(notationDependency.isConcrete()).thenReturn(false)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -191,9 +191,10 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    void 'NEWEST_COMMIT should be recognized properly'() {
+    void 'LATEST_COMMIT should be recognized properly'() {
         // given
         when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.LATEST_COMMIT)
+        when(notationDependency.isConcrete()).thenReturn(false)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
