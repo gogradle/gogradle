@@ -181,14 +181,6 @@ public final class IOUtils {
         }
     }
 
-    public static List<String> readLines(InputStream is) {
-        try {
-            return org.apache.commons.io.IOUtils.readLines(is, GogradleGlobal.DEFAULT_CHARSET);
-        } catch (IOException e) {
-            throw new UncheckedIOException(e);
-        }
-    }
-
     public static void walkFileTreeSafely(Path path, FileVisitor<? super Path> visitor) {
         try {
             Files.walkFileTree(path, EnumSet.noneOf(FileVisitOption.class), MAX_DFS_DEPTH, visitor);

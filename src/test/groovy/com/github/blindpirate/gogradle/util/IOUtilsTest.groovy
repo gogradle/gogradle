@@ -221,15 +221,6 @@ class IOUtilsTest {
     }
 
     @Test(expected = UncheckedIOException)
-    void 'exception should be thrown if readLines fails'() {
-        // given
-        InputStream is = mock(InputStream)
-        when(is.read()).thenThrow(IOException)
-        // when
-        IOUtils.readLines(is)
-    }
-
-    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if countLines fails'() {
         IOUtils.countLines(unexistent.toPath())
     }
@@ -238,4 +229,23 @@ class IOUtilsTest {
     void 'exception should be thrown if copyURLToFile fails'() {
         IOUtils.copyURLToFile(new URL('http://unexistent'), unexistent)
     }
+
+    @Test
+    void 'clearing an unexistent directory should succeed'() {
+        IOUtils.clearDirectory(null)
+        IOUtils.clearDirectory(new File('unexistent'))
+    }
+
+    @Test(expected = UncheckedIOException)
+    void 'exception should be thrown if IOException occurs in serializtion'() {
+        IOUtils.serialize(1, resource)
+    }
+
+    @Test
+    void 'existent file should be used as serialization file directly'() {
+        IOUtils.write(resource, 'file', '')
+        IOUtils.serialize(1, new File(resource, 'file'))
+        assert IOUtils.deserialize(new File(resource, 'file')) == 1
+    }
+
 }
