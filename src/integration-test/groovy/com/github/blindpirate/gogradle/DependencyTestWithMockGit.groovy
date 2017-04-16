@@ -9,7 +9,6 @@ import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithMockGo
-@WithGitRepos('git-repo.zip')
 @WithResource('')
 @WithIsolatedUserhome
 class DependencyTestWithMockGit extends IntegrationTestSupport {
@@ -18,6 +17,8 @@ class DependencyTestWithMockGit extends IntegrationTestSupport {
     File projectRoot
 
     File localDependencyRoot
+
+    File repositories
 
     @Before
     void setUp() {
@@ -86,18 +87,22 @@ dependencies {
 
 
     @Test
+    @WithGitRepos('git-repo.zip')
     void 'resolving dependencies of a complicated package should succeed'() {
-        // given
+        firstBuild()
+        secondBuildWithUpToDate()
+    }
+
+    void firstBuild() {
         try {
             newBuild { build ->
-                build.forTasks('installBuildDependencies')
+                build.forTasks('installBuildDependencies', 'goDependencies')
             }
         } finally {
             println(stderr)
             println(stdout)
         }
 
-        // then
         assertDependenciesAre([
                 'github.com/firstlevel/a'    : 'commit2',
                 'github.com/firstlevel/b'    : 'commit3',
@@ -124,11 +129,9 @@ dependencies {
                 'github.com/external/e'      : 'commit3',
 
         ])
-
-        buildAgain()
     }
 
-    void buildAgain() {
+    void secondBuildWithUpToDate() {
         try {
             newBuild { build ->
                 build.forTasks('installBuildDependencies')
@@ -139,6 +142,27 @@ dependencies {
             assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
             assert stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
         }
+    }
+
+    @Test
+    @WithGitRepos('git-repo.zip')
+    void 'project-level cache should be used in second resolution'() {
+        firstBuild()
+
+        IOUtils.clearDirectory(new File(projectRoot, '.gogradle/build_gopath'))
+        IOUtils.forceDelete(new File(projectRoot, '.gogradle/cache/build.bin'))
+        IOUtils.forceDelete(new File(projectRoot, '.gogradle/cache/test.bin'))
+        repositories.listFiles().each {
+            if (!['firstlevel-a', 'firstlevel-c', 'firstlevel-d'].contains(it.name)) {
+                IOUtils.forceDelete(it)
+            }
+        }
+        IOUtils.clearDirectory(repositories)
+
+        firstBuild()
+
+        assert !stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
+        assert !stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
     }
 
     @Override
