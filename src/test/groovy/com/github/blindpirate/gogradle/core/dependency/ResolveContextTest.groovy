@@ -4,9 +4,11 @@ import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
@@ -45,6 +47,8 @@ class ResolveContextTest {
     @Mock
     GolangConfigurationManager configurationManager
 
+    ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
+
     ResolveContext root
 
     @Before
@@ -55,6 +59,7 @@ class ResolveContextTest {
         when(buildConfiguration.getName()).thenReturn('build')
         when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(mock(DependencyVisitor))
         when(GogradleGlobal.INSTANCE.getInjector().getInstance(GolangConfigurationManager)).thenReturn(configurationManager)
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(configurationManager.getByName('build')).thenReturn(buildConfiguration)
         when(configurationManager.getByName('test')).thenReturn(testConfiguration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString()))
