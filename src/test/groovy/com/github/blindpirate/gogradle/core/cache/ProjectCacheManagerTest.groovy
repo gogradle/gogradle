@@ -1,26 +1,23 @@
 package com.github.blindpirate.gogradle.core.cache
 
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import org.junit.Test
 
 import java.util.function.Function
 
-import static org.mockito.ArgumentMatchers.isNull
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 class ProjectCacheManagerTest {
-    BuildScopedNotationCache buildScopedNotationCache = mock(BuildScopedNotationCache)
-    ConcreteNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache = mock(ConcreteNotationToResolvedDependencyCache)
+    BuildScopedVcsNotationCache buildScopedNotationCache = mock(BuildScopedVcsNotationCache)
+    ConcreteVcsNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache = mock(ConcreteVcsNotationToResolvedDependencyCache)
     ResolveDependencyToDependenciesCache resolveDependencyToDependenciesCache = mock(ResolveDependencyToDependenciesCache)
 
     ProjectCacheManager projectCacheManager = new ProjectCacheManager(buildScopedNotationCache,
             concreteNotationToResolvedDependencyCache,
             resolveDependencyToDependenciesCache)
 
-    NotationDependency notationDependency = mock(NotationDependency)
+    GitMercurialNotationDependency notationDependency = mock(GitMercurialNotationDependency)
     ResolvedDependency resolvedDependency = mock(ResolvedDependency)
     Function constructor = mock(Function)
 

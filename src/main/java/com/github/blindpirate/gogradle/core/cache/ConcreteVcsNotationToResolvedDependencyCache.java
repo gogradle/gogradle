@@ -8,10 +8,10 @@ import org.gradle.api.Project;
 import javax.inject.Inject;
 
 @Singleton
-public class ConcreteNotationToResolvedDependencyCache
+public class ConcreteVcsNotationToResolvedDependencyCache
         extends PersistentCache<NotationDependency, ResolvedDependency> {
     @Inject
-    public ConcreteNotationToResolvedDependencyCache(Project project) {
+    public ConcreteVcsNotationToResolvedDependencyCache(Project project) {
         super(project);
     }
 }

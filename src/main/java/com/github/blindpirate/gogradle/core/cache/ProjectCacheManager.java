@@ -10,35 +10,35 @@ import java.util.function.Function;
 
 @Singleton
 public class ProjectCacheManager {
-    private final BuildScopedNotationCache buildScopedNotationCache;
-    private final ConcreteNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache;
+    private final BuildScopedVcsNotationCache buildScopedVcsNotationCache;
+    private final ConcreteVcsNotationToResolvedDependencyCache concreteVcsNotationToResolvedDependencyCache;
     private final ResolveDependencyToDependenciesCache resolveDependencyToDependenciesCache;
 
     @Inject
-    public ProjectCacheManager(BuildScopedNotationCache buildScopedNotationCache,
-                               ConcreteNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache,
+    public ProjectCacheManager(BuildScopedVcsNotationCache buildScopedNotationCache,
+                               ConcreteVcsNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache,
                                ResolveDependencyToDependenciesCache resolveDependencyToDependenciesCache) {
-        this.buildScopedNotationCache = buildScopedNotationCache;
-        this.concreteNotationToResolvedDependencyCache = concreteNotationToResolvedDependencyCache;
+        this.buildScopedVcsNotationCache = buildScopedNotationCache;
+        this.concreteVcsNotationToResolvedDependencyCache = concreteNotationToResolvedDependencyCache;
         this.resolveDependencyToDependenciesCache = resolveDependencyToDependenciesCache;
     }
 
     public void loadPersistenceCache() {
-        concreteNotationToResolvedDependencyCache.load();
+        concreteVcsNotationToResolvedDependencyCache.load();
         resolveDependencyToDependenciesCache.load();
     }
 
     public void savePersistenceCache() {
-        concreteNotationToResolvedDependencyCache.save();
+        concreteVcsNotationToResolvedDependencyCache.save();
         resolveDependencyToDependenciesCache.save();
     }
 
     public ResolvedDependency resolve(NotationDependency notationDependency,
                                       Function<NotationDependency, ResolvedDependency> constructor) {
         if (notationDependency.isConcrete()) {
-            return concreteNotationToResolvedDependencyCache.get(notationDependency, constructor);
+            return concreteVcsNotationToResolvedDependencyCache.get(notationDependency, constructor);
         } else {
-            return buildScopedNotationCache.get(notationDependency, constructor);
+            return buildScopedVcsNotationCache.get(notationDependency, constructor);
         }
     }
 
