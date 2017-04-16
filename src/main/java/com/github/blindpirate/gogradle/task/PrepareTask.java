@@ -19,9 +19,6 @@ public class PrepareTask extends DefaultTask {
     private GoBinaryManager goBinaryManager;
 
     @Inject
-    private ProjectCacheManager projectCacheManager;
-
-    @Inject
     private BuildManager buildManager;
 
     @Inject
@@ -36,7 +33,6 @@ public class PrepareTask extends DefaultTask {
         goBinaryManager.getBinaryPath();
         buildManager.ensureDotVendorDirNotExist();
         buildManager.prepareSymbolicLinks();
-        projectCacheManager.loadPersistenceCache();
         buildConstraintManager.prepareConstraints();
     }
 

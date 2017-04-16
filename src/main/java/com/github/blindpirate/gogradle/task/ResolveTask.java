@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
@@ -50,6 +51,9 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     @Inject
     private DependencyVisitor visitor;
+
+    @Inject
+    private ProjectCacheManager projectCacheManager;
 
     @Inject
     @DefaultDependencyVisitor.ExternalDependencyFactories
@@ -114,8 +118,10 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     @TaskAction
     public void resolve() {
+        projectCacheManager.loadPersistenceCache();
         resolveDependencies();
         writeToSerializationFile();
+        projectCacheManager.savePersistenceCache();
     }
 
     private void writeToSerializationFile() {

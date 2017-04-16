@@ -35,6 +35,7 @@ import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDe
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
+import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -91,6 +92,8 @@ class ResolveTaskTest extends TaskTest {
         resolveBuildDependenciesTask.resolve()
         // then
         assert new File(resource, '.gogradle/cache/build.bin').exists()
+        verify(projectCacheManager).loadPersistenceCache()
+        verify(projectCacheManager).savePersistenceCache()
     }
 
     DependencyTreeNode buildDependencyTree(ResolvedDependency rootProject) {
