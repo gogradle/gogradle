@@ -38,7 +38,6 @@ golang {
             buildDotGradleBase = "System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')" + buildDotGradleBase
         }
 
-        initStdoutStderr()
     }
 
     void initStdoutStderr() {
@@ -59,6 +58,7 @@ golang {
 
 
     BuildLauncher newBuild(Closure closure) {
+        initStdoutStderr()
         ProjectConnection connection = newProjectConnection()
         try {
             BuildLauncher build = newProjectConnection().newBuild()

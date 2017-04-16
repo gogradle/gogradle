@@ -59,7 +59,6 @@ golang {
     }
 
     void build() {
-        initStdoutStderr()
         newBuild {
             it.forTasks('resolveBuildDependencies')
         }
