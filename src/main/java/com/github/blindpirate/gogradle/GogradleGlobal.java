@@ -36,6 +36,14 @@ public enum GogradleGlobal {
         return INSTANCE.offline;
     }
 
+    public static boolean isRefreshDependencies() {
+        if (INSTANCE.offline == null) {
+            Project project = INSTANCE.getInstance(Project.class);
+            INSTANCE.offline = project.getGradle().getStartParameter().isRefreshDependencies();
+        }
+        return INSTANCE.offline;
+    }
+
     public static <T> T getInstance(Key<T> key) {
         return INSTANCE.getInjector().getInstance(key);
     }
