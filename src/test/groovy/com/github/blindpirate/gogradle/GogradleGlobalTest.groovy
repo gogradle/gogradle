@@ -39,4 +39,17 @@ class GogradleGlobalTest {
         assert GogradleGlobal.isOffline()
         ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', oldValue)
     }
+
+    @Test
+    void 'refreshDependencies field should be injected if it is null'() {
+        // given
+        Project deepMock = mock(Project, Mockito.RETURNS_DEEP_STUBS)
+        when(GogradleGlobal.INSTANCE.getInstance(Project)).thenReturn(deepMock)
+        when(deepMock.getGradle().getStartParameter().isRefreshDependencies()).thenReturn(true)
+        Boolean oldValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'refreshDependencies')
+        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'refreshDependencies', null)
+        // then
+        assert GogradleGlobal.isRefreshDependencies()
+        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'refreshDependencies', oldValue)
+    }
 }

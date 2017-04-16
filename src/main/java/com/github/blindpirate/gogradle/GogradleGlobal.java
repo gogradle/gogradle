@@ -14,6 +14,8 @@ public enum GogradleGlobal {
 
     private Boolean offline;
 
+    private Boolean refreshDependencies;
+
     private Injector injector;
 
     public Injector getInjector() {
@@ -37,11 +39,11 @@ public enum GogradleGlobal {
     }
 
     public static boolean isRefreshDependencies() {
-        if (INSTANCE.offline == null) {
+        if (INSTANCE.refreshDependencies == null) {
             Project project = INSTANCE.getInstance(Project.class);
-            INSTANCE.offline = project.getGradle().getStartParameter().isRefreshDependencies();
+            INSTANCE.refreshDependencies = project.getGradle().getStartParameter().isRefreshDependencies();
         }
-        return INSTANCE.offline;
+        return INSTANCE.refreshDependencies;
     }
 
     public static <T> T getInstance(Key<T> key) {
