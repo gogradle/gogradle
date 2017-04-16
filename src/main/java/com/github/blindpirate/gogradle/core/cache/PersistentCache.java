@@ -9,7 +9,6 @@ import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public abstract class PersistentCache<K extends GolangCloneable, V extends GolangCloneable>
         extends AbstractCache<K, V> {
