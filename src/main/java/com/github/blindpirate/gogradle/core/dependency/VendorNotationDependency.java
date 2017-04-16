@@ -51,4 +51,9 @@ public class VendorNotationDependency extends AbstractNotationDependency {
     public int hashCode() {
         return Objects.hash(super.hashCode(), hostNotationDependency, vendorPath);
     }
+
+    @Override
+    public boolean isConcrete() {
+        return hostNotationDependency.isConcrete();
+    }
 }
