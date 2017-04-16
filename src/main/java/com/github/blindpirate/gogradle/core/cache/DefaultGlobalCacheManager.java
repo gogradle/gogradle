@@ -141,12 +141,12 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public boolean currentDependencyIsOutOfDate(NotationDependency dependency) {
+    public boolean currentRepositoryIsUpToDate(NotationDependency dependency) {
         ensureGlobalCacheExistAndWritable();
         try {
             // On windows we have to read file like this
             Optional<GlobalCacheMetadata> metadata = getMetadataFromFile(fileChannels.get());
-            return determineIfOutOfDate(dependency, metadata);
+            return determineIfUpToDate(dependency, metadata);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
@@ -165,16 +165,16 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         }
     }
 
-    private boolean determineIfOutOfDate(NotationDependency dependency, Optional<GlobalCacheMetadata> metadata) {
+    private boolean determineIfUpToDate(NotationDependency dependency, Optional<GlobalCacheMetadata> metadata) {
         if (!metadata.isPresent()) {
-            return true;
+            return false;
         }
         List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
         if (urls.contains(metadata.get().getLastUpdateUrl())) {
             long cacheSecond = setting.getGlobalCacheSecond();
-            return System.currentTimeMillis() - metadata.get().getLastUpdateTime() > toMilliseconds(cacheSecond);
+            return System.currentTimeMillis() - metadata.get().getLastUpdateTime() < toMilliseconds(cacheSecond);
         } else {
-            return true;
+            return false;
         }
     }
 

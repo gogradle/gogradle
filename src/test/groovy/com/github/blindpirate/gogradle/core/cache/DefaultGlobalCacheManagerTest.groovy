@@ -169,7 +169,7 @@ lastUpdated:
 """)
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert cacheManager.currentDependencyIsOutOfDate(notationDependency)
+            assert !cacheManager.currentRepositoryIsUpToDate(notationDependency)
         } as Callable)
     }
 
@@ -189,7 +189,7 @@ lastUpdated:
 """)
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert cacheManager.currentDependencyIsOutOfDate(notationDependency)
+            assert !cacheManager.currentRepositoryIsUpToDate(notationDependency)
         } as Callable)
     }
 
@@ -209,7 +209,7 @@ lastUpdated:
 """)
         // then
         cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.currentDependencyIsOutOfDate(notationDependency)
+            assert cacheManager.currentRepositoryIsUpToDate(notationDependency)
         } as Callable)
     }
 
