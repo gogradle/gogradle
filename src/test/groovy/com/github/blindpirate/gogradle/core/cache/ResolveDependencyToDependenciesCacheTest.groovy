@@ -19,13 +19,12 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import org.apache.commons.collections4.map.LRUMap
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-
-import java.util.concurrent.ConcurrentHashMap
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static java.util.Optional.of
@@ -64,7 +63,7 @@ class ResolveDependencyToDependenciesCacheTest {
         GitNotationDependency vcsDependency = vcsDependency('this/is/vcs')
         LocalDirectoryDependency local2 = localDependency('this/is/local2')
 
-        ConcurrentHashMap map = new ConcurrentHashMap()
+        LRUMap map = new LRUMap()
         map[local1] = DependencyUtils.asGolangDependencySet(vcsDependency, local2, vendor)
 
         IOUtils.serialize(map, new File(resource, ".gogradle/cache/${ResolveDependencyToDependenciesCache.simpleName}.bin"))
