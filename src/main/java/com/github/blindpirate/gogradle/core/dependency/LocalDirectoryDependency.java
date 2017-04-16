@@ -138,8 +138,15 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public Object clone() {
         LocalDirectoryDependency ret = (LocalDirectoryDependency) super.clone();
-        ret.dependencies = GolangDependencySet.empty();
         ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
+        ret.dependencies = this.dependencies.clone();
+        ret.dependencies.flatten().forEach(dependency -> resetVendorHostIfNecessary(dependency, ret));
         return ret;
+    }
+
+    private void resetVendorHostIfNecessary(GolangDependency dependency, ResolvedDependency clone) {
+        if (dependency instanceof VendorResolvedDependency) {
+            VendorResolvedDependency.class.cast(dependency).setHostDependency(clone);
+        }
     }
 }

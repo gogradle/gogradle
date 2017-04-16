@@ -7,10 +7,12 @@ import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
@@ -74,10 +76,12 @@ class AbstractResolvedDependencyTest {
     }
 
     @Test
+    @WithResource('')
     void 'cloning should succeed'() {
         // given
         AbstractResolvedDependency dependency = new ResolvedDependencyForTest('name', 'version', 42L, null)
         dependency.package = MockUtils.mockVcsPackage()
+        dependency.dependencies = buildDependencies(dependency)
         // when
         AbstractResolvedDependency clone = dependency.clone()
         // then
@@ -86,8 +90,45 @@ class AbstractResolvedDependencyTest {
         assert clone.name == 'name'
         assert clone.version == 'version'
         assert clone.updateTime == 42L
-        assert clone.dependencies.isEmpty()
         assert MockUtils.isMockVcsPackage(clone.package)
+        assertCloneDependencies(dependency, clone)
+    }
+
+    GolangDependency findInDependencies(ResolvedDependency dependency, String name) {
+        return dependency.dependencies.find { it.name == name }
+    }
+
+    void assertCloneDependencies(ResolvedDependency origin, ResolvedDependency clone) {
+        assert origin.dependencies.each { clone.dependencies.contains(it) }
+        assert !origin.dependencies.is(clone.dependencies)
+
+        LocalDirectoryDependency local = findInDependencies(clone, 'local')
+        assert !local.is(findInDependencies(origin, 'local'))
+
+        VendorResolvedDependency vendor1 = findInDependencies(clone, 'vendor1')
+        assert !vendor1.is(findInDependencies(origin, 'vendor1'))
+        assert vendor1.hostDependency.is(clone)
+        assert vendor1.dependencies.flatten().every() { it.name == 'vendor2' }
+        assert vendor1.dependencies.flatten().every() { it.hostDependency.is(clone) }
+
+        NotationDependency notation = findInDependencies(clone, 'notation')
+        assert !notation.is(findInDependencies(origin, 'notation'))
+        assert ReflectionUtils.getField(notation, 'resolvedDependency') == null
+    }
+
+    GolangDependencySet buildDependencies(ResolvedDependency resolvedDependency) {
+        LocalDirectoryDependency local = LocalDirectoryDependency.fromLocal('local', resource)
+
+        VendorResolvedDependency vendor1 = new VendorResolvedDependencyForTest('vendor1', 'version', 42L, local, 'vendor/vendor1')
+        VendorResolvedDependency vendor2 = new VendorResolvedDependencyForTest('vendor2', 'version', 42L, local, 'vendor/vendor1/vendor/vendor2')
+
+        vendor1.dependencies.add(vendor2)
+
+        NotationDependency notation = new GitNotationDependency()
+        notation.setName("notation")
+        ReflectionUtils.setField(notation, 'resolvedDependency', Mockito.mock(ResolvedDependency))
+
+        return DependencyUtils.asGolangDependencySet(local, vendor1, notation)
     }
 
     AbstractResolvedDependency withNameAndVersion(String name, String version) {
@@ -122,4 +163,5 @@ class AbstractResolvedDependencyTest {
             return version
         }
     }
+
 }

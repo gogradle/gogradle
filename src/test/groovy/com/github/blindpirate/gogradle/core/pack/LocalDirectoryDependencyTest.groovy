@@ -138,7 +138,10 @@ class LocalDirectoryDependencyTest {
         LocalDirectoryDependency clone = d.clone()
         // then
         assert !clone.is(d)
-        assert clone.dependencies.isEmpty()
+        assert clone.dependencies == d.dependencies
+        assert !clone.dependencies.is(d.dependencies)
+        assert clone.dependencies.first() == d.dependencies.first()
+        assert !clone.dependencies.first().is(d.dependencies.first())
         assert clone.name == 'd'
         assert clone.firstLevel
         assert !getField(d, 'transitiveDepExclusions').is(getField(clone, 'transitiveDepExclusions'))
