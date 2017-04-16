@@ -133,7 +133,7 @@ class AbstractVcsDependencyManagerTest {
     @MockOffline
     void 'updating repository should be skipped when offline'() {
         // given
-        when(globalCacheManager.currentDependencyIsOutOfDate(hostNotationDependency)).thenReturn(true)
+        when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(false)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(globalCacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repoRoot)
@@ -142,7 +142,8 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'lock file should be updated after resolving'() {
         // given
-        when(globalCacheManager.currentDependencyIsOutOfDate(hostNotationDependency)).thenReturn(true)
+        when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(false)
+        when(hostNotationDependency.isConcrete()).thenReturn(true)
         // when
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         // then
@@ -216,7 +217,12 @@ class AbstractVcsDependencyManagerTest {
         }
 
         @Override
-        protected void updateRepository(NotationDependency dependency, File repoRoot) {
+        protected boolean concreteVersionExistInRepo(File repoRoot, GolangDependency dependency) {
+            return subclassDelegate.concreteVersionExistInRepo(repoRoot, dependency)
+        }
+
+        @Override
+        protected void updateRepository(GolangDependency dependency, File repoRoot) {
             subclassDelegate.updateRepository(dependency, repoRoot)
         }
 

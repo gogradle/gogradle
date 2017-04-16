@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -21,9 +22,10 @@ import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+
+import static java.util.Arrays.asList;
 
 public abstract class AbstractVcsDependencyManager<VERSION>
         implements CacheEnabledDependencyResolverMixin, VendorSupportMixin, DependencyInstaller {
@@ -135,39 +137,54 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         File globalCacheRepoRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
 
         String url = VcsResolvedDependency.class.cast(dependency).getUrl();
-        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(globalCacheRepoRoot, Arrays.asList(url));
-        if (repositoryNeedInit) {
-            initRepository(dependency.getName(), Arrays.asList(url), globalCacheRepoRoot);
+        if (repositoryNeedInit(globalCacheRepoRoot, asList(url))) {
+            initRepository(dependency.getName(), asList(url), globalCacheRepoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
+        } else if (!concreteVersionExistInRepo(globalCacheRepoRoot, dependency)) {
+            updateRepository(dependency, globalCacheRepoRoot);
         }
     }
 
     private void resolveRepository(NotationDependency dependency, File repoRoot) {
         List<String> expectedUrls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
-        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, expectedUrls);
-        if (repositoryNeedInit) {
+        if (repositoryNeedInit(repoRoot, expectedUrls)) {
             initRepository(dependency.getName(), expectedUrls, repoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
-        } else if (globalCacheManager.currentDependencyIsOutOfDate(dependency)) {
-            if (GogradleGlobal.isOffline()) {
-                LOGGER.info("Cannot pull update {} since it is offline now.", dependency);
-            } else {
-                updateRepository(dependency, repoRoot);
-                globalCacheManager.updateCurrentDependencyLock(dependency);
-            }
-        } else {
-            LOGGER.info("Skipped updating {} since it is up-to-date.", dependency);
+        } else if (repositoryNeedUpdate(repoRoot, dependency)) {
+            updateRepository(dependency, repoRoot);
+            globalCacheManager.updateCurrentDependencyLock(dependency);
         }
     }
 
-    protected abstract void updateRepository(NotationDependency dependency,
+    protected boolean repositoryNeedUpdate(File repoRoot, NotationDependency dependency) {
+        if (GogradleGlobal.isOffline()) {
+            LOGGER.info("Cannot update {} in {} since it is offline now.", dependency, repoRoot);
+            return false;
+        } else if (globalCacheManager.currentRepositoryIsUpToDate(dependency)) {
+            LOGGER.info("Skip updating {} in {} since it is up-to-date.", dependency, repoRoot);
+            return false;
+        } else if (dependency.isConcrete() && !concreteVersionExistInRepo(repoRoot, dependency)) {
+            LOGGER.info("{} does not exist in {}, updating will be performed.", dependency, repoRoot);
+            return true;
+        } else if (GogradleGlobal.isRefreshDependencies()) {
+            LOGGER.info("Updating {} in {} since --refresh-dependencies is used.", dependency, repoRoot);
+            return true;
+        } else {
+            LOGGER.info("Skip updating {} in {}.", dependency, repoRoot);
+            return false;
+        }
+    }
+
+    protected abstract boolean concreteVersionExistInRepo(File repoRoot, GolangDependency dependency);
+
+    protected abstract void updateRepository(GolangDependency dependency,
                                              File repoRoot);
 
     protected abstract void initRepository(String name, List<String> urls, File repoRoot);
 
 
-    private boolean globalCacheRepositoryNeedInit(File globalCacheRepoRoot,
-                                                  List<String> expectedUrls) {
+    private boolean repositoryNeedInit(File globalCacheRepoRoot,
+                                       List<String> expectedUrls) {
         if (IOUtils.dirIsEmpty(globalCacheRepoRoot)) {
             return true;
         } else {
