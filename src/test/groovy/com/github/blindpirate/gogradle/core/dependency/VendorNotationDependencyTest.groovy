@@ -38,4 +38,10 @@ class VendorNotationDependencyTest {
         dependency.hostNotationDependency = hostNotationDependency
         assert dependency.resolverClass == GitDependencyManager
     }
+
+    @Test
+    void 'isConcrete should be delegated to hostDependency'() {
+        when(hostNotationDependency.isConcrete()).thenReturn(true)
+        assert dependency.isConcrete()
+    }
 }
