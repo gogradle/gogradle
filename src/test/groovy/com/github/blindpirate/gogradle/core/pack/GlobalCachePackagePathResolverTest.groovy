@@ -5,6 +5,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata
+import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
@@ -18,6 +19,7 @@ import static java.util.Optional.of
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
+@MockRefreshDependencies(false)
 class GlobalCachePackagePathResolverTest {
     @Mock
     GlobalCacheManager cacheManager

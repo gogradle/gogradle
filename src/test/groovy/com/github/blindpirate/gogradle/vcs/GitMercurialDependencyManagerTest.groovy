@@ -10,6 +10,7 @@ import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.MockOffline
+import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -130,13 +131,25 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    void 'existed repository should not be updated'() {
+    @MockRefreshDependencies(false)
+    void 'existed repository should not be updated if no --refresh-dependencies'() {
         // given:
         when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
         // when:
         manager.resolve(resolveContext, notationDependency)
         // then:
         verify(accessor, times(0)).update(resource)
+    }
+
+    @Test
+    @MockRefreshDependencies(true)
+    void 'existed repository should be updated if --refresh-dependencies'() {
+        // given:
+        when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
+        // when:
+        manager.resolve(resolveContext, notationDependency)
+        // then:
+        verify(accessor).update(resource)
     }
 
     @Test
@@ -159,6 +172,7 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
+    @MockRefreshDependencies(false)
     void 'dependency with tag should be resolved successfully'() {
         // given
         when(notationDependency.getTag()).thenReturn('tag')
