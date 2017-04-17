@@ -20,6 +20,8 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
@@ -30,8 +32,10 @@ import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_METADATA_PATH
+import static com.github.blindpirate.gogradle.util.IOUtils.mkdir
 import static com.github.blindpirate.gogradle.util.IOUtils.write
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -149,8 +153,18 @@ class DefaultGlobalCacheManagerTest {
         assert (-1000L..1000L).contains(updated1.getLastUpdateTime() - System.currentTimeMillis())
         assert old.originalVcs == updated2.originalVcs
         assert old.originalUrls == updated2.originalUrls
+    }
 
-
+    @Test(expected = UncheckedIOException)
+    void 'exception should be thrown if IOException occurs in updateing lock file'() {
+        FileChannel channel = mock(FileChannel, new Answer() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                throw new IOException()
+            }
+        })
+        ReflectionUtils.getField(cacheManager, 'fileChannels').set(channel)
+        cacheManager.updateCurrentDependencyLock(notationDependency)
     }
 
     @Test
@@ -214,6 +228,13 @@ lastUpdated:
     }
 
     @Test
+    void 'dependency should be considered as out-of-date if metadata does not exist'() {
+        cacheManager.runWithGlobalCacheLock(notationDependency, {
+            assert !cacheManager.currentRepositoryIsUpToDate(notationDependency)
+        } as Callable)
+    }
+
+    @Test
     void 'getting metadata of a package should succeed'() {
         // given
         write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
@@ -253,6 +274,12 @@ lastUpdated:
         // wait for another process to start and lock
         Thread.sleep(1000)
 
+        assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
+    }
+
+    @Test
+    void 'empty result should be returned if IOException occurs in metadata reading'() {
+        mkdir(resource, 'go/metadata/github.com%2Fuser%2Fpackage')
         assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
     }
 
