@@ -11,6 +11,7 @@ import org.mockito.ArgumentCaptor
 import java.util.function.Consumer
 
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyList
 import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.verify
 
@@ -22,6 +23,12 @@ class GoTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(Go)
+    }
+
+    @Test
+    void 'do-nothing-consumer should succeed'() {
+        Consumer c = ReflectionUtils.getStaticField(Go, 'DO_NOTHING')
+        c.accept(1)
     }
 
     @Test
@@ -61,14 +68,20 @@ class GoTest extends TaskTest {
 
     @Test
     void 'setting continueWhenFail should succeed'() {
+        // given
         task.continueWhenFail = true
-        assert ReflectionUtils.getField(task, 'continueWhenFail')
+        // when
+        task.go('test -v github.com/my/package')
+        // then
+        ArgumentCaptor<Consumer> captor = ArgumentCaptor.forClass(Consumer)
+        verify(buildManager).go(anyList(), isNull(), any(Consumer), any(Consumer), captor.capture())
+        assert captor.getValue().is(ReflectionUtils.getStaticField(Go,'DO_NOTHING'))
     }
 
     @Test
     void 'consuming stdout and stderr should succeed'() {
         boolean stdoutIsVisited, stderrIsVisited
-        task.run('golint -v -a', { stdout, stderr ->
+        task.go('test -v github.com/my/package', { stdout, stderr ->
             stdoutIsVisited = true
             stderrIsVisited = true
         })
@@ -80,7 +93,7 @@ class GoTest extends TaskTest {
     @Test
     void 'consuming stdout should succeed'() {
         boolean stdoutIsVisited, stderrIsVisited
-        task.run('golint -v -a', { stdout ->
+        task.go('test -v github.com/my/package', { stdout ->
             stdoutIsVisited = true
         })
 
