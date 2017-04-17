@@ -12,6 +12,9 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import java.nio.file.Path
+
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -38,18 +41,43 @@ class InstallTaskTest extends TaskTest {
     }
 
     @Test
+    void 'getting serialization file should succeed'() {
+        installBuildDependenciesTask.getSerializationFile()
+        installTestDependenciesTask.getSerializationFile()
+        verify(golangTaskContainer.get(ResolveBuildDependenciesTask)).getSerializationFile()
+        verify(golangTaskContainer.get(ResolveTestDependenciesTask)).getSerializationFile()
+    }
+
+    @Test
+    void 'getting installation directory should succeed'() {
+        // given
+        when(golangTaskContainer.get(ResolveBuildDependenciesTask).getConfigurationName()).thenReturn('build')
+        when(golangTaskContainer.get(ResolveTestDependenciesTask).getConfigurationName()).thenReturn('test')
+        Path buildGopath = mock(Path)
+        Path testGopath = mock(Path)
+        when(buildManager.getInstallationDirectory('build')).thenReturn(buildGopath)
+        when(buildManager.getInstallationDirectory('test')).thenReturn(testGopath)
+
+        // then
+        installBuildDependenciesTask.getInstallationDirectory()
+        verify(buildGopath).toFile()
+        installTestDependenciesTask.getInstallationDirectory()
+        verify(testGopath).toFile()
+    }
+
+    @Test
     void 'installing build dependencies should succeed'() {
         // given
         when(golangTaskContainer.get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(dependencyTree)
         when(golangTaskContainer.get(ResolveBuildDependenciesTask).getConfigurationName()).thenReturn('build')
         when(dependencyTree.flatten()).thenReturn(golangDependencySet)
         when(buildManager.getInstallationDirectory('build')).thenReturn(resource.toPath())
-        IOUtils.mkdir(resource,'toBeRemoved')
+        IOUtils.mkdir(resource, 'toBeRemoved')
         // when
         installBuildDependenciesTask.installDependencies()
         // then
         verify(buildManager).installDependency(resolvedDependency, 'build')
-        assert !new File(resource,'toBeRemoved').exists()
+        assert !new File(resource, 'toBeRemoved').exists()
     }
 
     @Test
@@ -59,12 +87,12 @@ class InstallTaskTest extends TaskTest {
         when(golangTaskContainer.get(ResolveTestDependenciesTask).getConfigurationName()).thenReturn('test')
         when(dependencyTree.flatten()).thenReturn(golangDependencySet)
         when(buildManager.getInstallationDirectory('test')).thenReturn(resource.toPath())
-        IOUtils.mkdir(resource,'toBeRemoved')
+        IOUtils.mkdir(resource, 'toBeRemoved')
         // when
         installTestDependenciesTask.installDependencies()
         // then
         verify(buildManager).installDependency(resolvedDependency, 'test')
-        assert !new File(resource,'toBeRemoved').exists()
+        assert !new File(resource, 'toBeRemoved').exists()
     }
 
 }
