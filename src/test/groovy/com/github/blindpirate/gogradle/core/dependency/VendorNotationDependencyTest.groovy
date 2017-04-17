@@ -42,6 +42,7 @@ class VendorNotationDependencyTest {
     @Test
     void 'isConcrete should be delegated to hostDependency'() {
         when(hostNotationDependency.isConcrete()).thenReturn(true)
+        dependency.hostNotationDependency = hostNotationDependency
         assert dependency.isConcrete()
     }
 }

@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.util;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
