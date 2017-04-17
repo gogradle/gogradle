@@ -152,8 +152,33 @@ class AbstractNotationDependencyTest {
         assert getField(clone, 'resolvedDependency') == null
     }
 
+    @Test
+    void 'equals should succeed'() {
+        AbstractNotationDependency test1 = new NotationDependencyForTest()
+        assert test1 != null
+        assert test1 != dependency
+        assert test1 == test1
+
+        PropertiesExclusionPredicate p = PropertiesExclusionPredicate.of([name: ''])
+
+        assert new NotationDependencyForTest('name', false, [NO_TRANSITIVE_DEP_PREDICATE] as Set) == new NotationDependencyForTest('name', false, [NO_TRANSITIVE_DEP_PREDICATE] as Set)
+        assert new NotationDependencyForTest('name', true, [] as Set) != new NotationDependencyForTest('name', false, [] as Set)
+        assert new NotationDependencyForTest('name', false, [NO_TRANSITIVE_DEP_PREDICATE] as Set) != new NotationDependencyForTest('name', false, [] as Set)
+        assert new NotationDependencyForTest('name', false, [null] as Set) != new NotationDependencyForTest('name', false, [] as Set)
+        assert new NotationDependencyForTest('name', false, [NO_TRANSITIVE_DEP_PREDICATE] as Set) != new NotationDependencyForTest('name', false, [p] as Set)
+    }
+
     static class NotationDependencyForTest extends AbstractNotationDependency {
         private static final long serialVersionUID = 1
+
+        NotationDependencyForTest() {
+        }
+
+        NotationDependencyForTest(String name, boolean firstLevel, Set transitiveDepExclusions) {
+            setName(name)
+            setFirstLevel(firstLevel)
+            this.transitiveDepExclusions = transitiveDepExclusions
+        }
 
         @Override
         protected Class<? extends DependencyResolver> getResolverClass() {
