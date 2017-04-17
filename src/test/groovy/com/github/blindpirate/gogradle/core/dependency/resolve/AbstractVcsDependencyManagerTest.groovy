@@ -22,6 +22,7 @@ import org.mockito.stubbing.Answer
 
 import java.nio.file.Path
 import java.util.concurrent.Callable
+import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static org.mockito.ArgumentMatchers.any
@@ -31,10 +32,17 @@ import static org.mockito.Mockito.*
 @WithResource('')
 class AbstractVcsDependencyManagerTest {
 
-    public static final Answer callCallableAnswer = new Answer() {
+    public static final Answer CALL_CALLABLE_ANSWER = new Answer() {
         @Override
         Object answer(InvocationOnMock invocation) throws Throwable {
             return invocation.getArgument(1).call()
+        }
+    }
+
+    public static final Answer APPLY_FUNCTION_ANSWER = new Answer() {
+        @Override
+        Object answer(InvocationOnMock invocation) throws Throwable {
+            return invocation.getArgument(1).apply(invocation.getArgument(0))
         }
     }
 
@@ -51,6 +59,8 @@ class AbstractVcsDependencyManagerTest {
     DependencyRegistry dependencyRegistry
     @Mock
     ResolveContext context
+    @Mock
+    ProjectCacheManager projectCacheManager
 
     VcsResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(VcsResolvedDependency, 'host')
     GitMercurialNotationDependency hostNotationDependency = DependencyUtils.mockWithName(GitMercurialNotationDependency, 'host')
@@ -70,8 +80,9 @@ class AbstractVcsDependencyManagerTest {
 
         when(context.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
-        when(globalCacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
-        manager = new AbstractVcsDependencyManagerForTest(globalCacheManager)
+        when(globalCacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(CALL_CALLABLE_ANSWER)
+        when(projectCacheManager.resolve(any(NotationDependency), any(Function))).thenAnswer(APPLY_FUNCTION_ANSWER)
+        manager = new AbstractVcsDependencyManagerForTest(globalCacheManager, projectCacheManager)
 
         when(subclassDelegate.determineVersion(repoRoot, hostNotationDependency)).thenReturn('version')
         when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('url')
@@ -208,13 +219,9 @@ class AbstractVcsDependencyManagerTest {
 
 
     class AbstractVcsDependencyManagerForTest extends AbstractVcsDependencyManager {
-        AbstractVcsDependencyManagerForTest(GlobalCacheManager globalCacheManager) {
-            super(globalCacheManager, mock(ProjectCacheManager))
-        }
-
-        @Override
-        ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {
-            return super.doResolve(context, dependency)
+        AbstractVcsDependencyManagerForTest(GlobalCacheManager globalCacheManager,
+                                            ProjectCacheManager projectCacheManager) {
+            super(globalCacheManager, projectCacheManager)
         }
 
         @Override

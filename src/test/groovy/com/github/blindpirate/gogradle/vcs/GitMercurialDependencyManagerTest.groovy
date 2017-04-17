@@ -22,8 +22,10 @@ import org.mockito.Mock
 
 import java.nio.file.Paths
 import java.util.concurrent.Callable
+import java.util.function.Function
 
-import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.callCallableAnswer
+import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.APPLY_FUNCTION_ANSWER
+import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.CALL_CALLABLE_ANSWER
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockWithName
 import static java.util.Optional.empty
 import static java.util.Optional.of
@@ -55,6 +57,8 @@ class GitMercurialDependencyManagerTest {
     GitMercurialCommit commit
     @Mock
     ResolveContext resolveContext
+    @Mock
+    ProjectCacheManager projectCacheManager
 
     GitMercurialDependencyManager manager
 
@@ -73,11 +77,12 @@ class GitMercurialDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(resource, '.git', '')
 
-        manager = new GitMercurialDependencyManagerForTest(cacheManager, null, accessor)
+        manager = new GitMercurialDependencyManagerForTest(cacheManager, projectCacheManager, accessor)
+        when(projectCacheManager.resolve(any(NotationDependency), any(Function))).thenAnswer(APPLY_FUNCTION_ANSWER)
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
-        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
+        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(CALL_CALLABLE_ANSWER)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
         when(accessor.findCommit(resource, commitId)).thenReturn(of(commit))
         when(accessor.headCommitOfBranch(resource, 'MockDefault')).thenReturn(commit)
@@ -308,11 +313,6 @@ class GitMercurialDependencyManagerTest {
                                              GitMercurialAccessor accessor) {
             super(globalCacheManager, projectCacheManager)
             this.accessor = accessor
-        }
-
-        @Override
-        ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {
-            return super.doResolve(context, dependency)
         }
 
         @Override
