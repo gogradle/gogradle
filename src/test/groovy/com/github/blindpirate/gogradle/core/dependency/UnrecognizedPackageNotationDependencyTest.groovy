@@ -17,7 +17,7 @@ class UnrecognizedPackageNotationDependencyTest {
 
     @Test(expected = UnsupportedOperationException)
     void 'isConcrete is not supported'() {
-        dependency.isFirstLevel()
+        dependency.isConcrete()
     }
 
     @Test(expected = UnrecognizedPackageException)
