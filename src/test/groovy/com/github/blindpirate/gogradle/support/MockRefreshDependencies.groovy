@@ -7,6 +7,6 @@ import java.lang.annotation.Target
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target([ElementType.METHOD, ElementType.TYPE])
-@interface MockOffline {
+@interface MockRefreshDependencies {
     boolean value() default false
 }

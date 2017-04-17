@@ -10,7 +10,7 @@ class MockOfflineProcessor extends GogradleRunnerProcessor<MockOffline> {
     @Override
     void beforeTest(Object instance, FrameworkMethod method, MockOffline annotation) {
         originalValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline')
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', true)
+        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', annotation.value())
     }
 
     @Override

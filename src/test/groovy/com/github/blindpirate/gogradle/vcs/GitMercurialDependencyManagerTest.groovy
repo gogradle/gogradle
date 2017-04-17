@@ -150,7 +150,7 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    @MockOffline
+    @MockOffline(true)
     void 'pull should not be executed if offline'() {
         // when:
         manager.resolve(resolveContext, notationDependency)
