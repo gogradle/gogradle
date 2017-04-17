@@ -7,6 +7,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -44,5 +45,20 @@ class VendorNotationDependencyTest {
         when(hostNotationDependency.isConcrete()).thenReturn(true)
         dependency.hostNotationDependency = hostNotationDependency
         assert dependency.isConcrete()
+    }
+
+    @Test
+    void 'equals should succeed'() {
+        assert dependency != null
+        assert vendorNotationDependency(hostNotationDependency, 'path1') == vendorNotationDependency(hostNotationDependency, 'path1')
+        assert vendorNotationDependency(hostNotationDependency, 'path1') != vendorNotationDependency(hostNotationDependency, 'path2')
+        assert vendorNotationDependency(hostNotationDependency, 'path1') != vendorNotationDependency(mock(NotationDependency), 'path1')
+    }
+
+    VendorNotationDependency vendorNotationDependency(NotationDependency host, String vendorPath) {
+        VendorNotationDependency ret = new VendorNotationDependency()
+        ret.vendorPath = vendorPath
+        ret.hostNotationDependency = host
+        return ret
     }
 }
