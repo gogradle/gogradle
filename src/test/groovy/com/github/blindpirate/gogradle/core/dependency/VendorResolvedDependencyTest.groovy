@@ -39,9 +39,9 @@ class VendorResolvedDependencyTest {
     @Mock
     DependencyVisitor dependencyVisitor
     @Mock
-    VendorResolvedDependency dependency
-    @Mock
     VcsAccessor accessor
+
+    VendorResolvedDependency dependency
 
     ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
 
@@ -135,6 +135,7 @@ class VendorResolvedDependencyTest {
         assert dependency != null
         assert dependency != mock(GolangDependency)
         assert dependency == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
+        assert dependency != VendorResolvedDependency.fromParent('github.com/a/c', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency.hashCode() == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b')).hashCode()
     }
 

@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.MockOffline
@@ -92,6 +93,11 @@ class AbstractVcsDependencyManagerTest {
     }
 
     @Test
+    void 'getting projectCacheManager should succeed'() {
+        assert manager.getProjectCacheManager()
+    }
+
+    @Test
     void 'installing a vendor dependency hosting in vcs dependency should succeed'() {
         // given
         when(hostResolvedDependency.getName()).thenReturn('host')
@@ -99,6 +105,17 @@ class AbstractVcsDependencyManagerTest {
         manager.install(vendorResolvedDependency, targetDir)
         // then
         assert new File(targetDir, 'main.go').getText() == 'This is main.go'
+        verify(subclassDelegate).updateRepository(hostResolvedDependency, repoRoot)
+    }
+
+    @Test
+    void 'repository should not be updated if version exist'() {
+        // given
+        when(subclassDelegate.concreteVersionExistInRepo(repoRoot, hostResolvedDependency)).thenReturn(true)
+        // when
+        manager.install(hostResolvedDependency, targetDir)
+        // then
+        verify(subclassDelegate, times(0)).updateRepository(hostResolvedDependency, repoRoot)
     }
 
     @Test
@@ -127,6 +144,7 @@ class AbstractVcsDependencyManagerTest {
     @Test
     @MockRefreshDependencies(false)
     void 'updating repository should be skipped if it is up-to-date'() {
+        when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(true)
         'resolving a vendor dependency hosting in vcs dependency should succeed'()
         verify(globalCacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
         verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repoRoot)
@@ -191,7 +209,7 @@ class AbstractVcsDependencyManagerTest {
 
     class AbstractVcsDependencyManagerForTest extends AbstractVcsDependencyManager {
         AbstractVcsDependencyManagerForTest(GlobalCacheManager globalCacheManager) {
-            super(globalCacheManager, null)
+            super(globalCacheManager, mock(ProjectCacheManager))
         }
 
         @Override

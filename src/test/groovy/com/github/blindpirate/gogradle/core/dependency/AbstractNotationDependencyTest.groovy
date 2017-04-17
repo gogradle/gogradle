@@ -155,8 +155,8 @@ class AbstractNotationDependencyTest {
     @Test
     void 'equals should succeed'() {
         AbstractNotationDependency test1 = new NotationDependencyForTest()
-        assert test1 != null
-        assert test1 != dependency
+        assert !test1.equals(null)
+        assert !test1.equals(dependency)
         assert test1 == test1
 
         PropertiesExclusionPredicate p = PropertiesExclusionPredicate.of([name: ''])

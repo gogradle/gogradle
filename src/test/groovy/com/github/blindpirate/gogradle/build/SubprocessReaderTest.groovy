@@ -35,6 +35,23 @@ class SubprocessReaderTest {
     }
 
     @Test
+    void 'input stream should be consumed line by line'() {
+        CountDownLatch latch = new CountDownLatch(1)
+        new SubprocessReader(
+                new Supplier<InputStream>() {
+                    @Override
+                    InputStream get() {
+                        return new ByteArrayInputStream('1\n2'.getBytes('UTF8'))
+                    }
+                },
+                consumer,
+                latch).run()
+        latch.await()
+        verify(consumer).accept('1')
+        verify(consumer).accept('2')
+    }
+
+    @Test
     void 'stacktrace of exception should be consumed'() {
         // given
         when(supplier.get()).thenReturn(inputStream)

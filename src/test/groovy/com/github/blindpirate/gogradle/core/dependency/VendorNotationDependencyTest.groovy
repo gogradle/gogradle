@@ -49,7 +49,7 @@ class VendorNotationDependencyTest {
 
     @Test
     void 'equals should succeed'() {
-        assert dependency != null
+        assert !dependency.equals(null)
         assert vendorNotationDependency(hostNotationDependency, 'path1') == vendorNotationDependency(hostNotationDependency, 'path1')
         assert vendorNotationDependency(hostNotationDependency, 'path1') != vendorNotationDependency(hostNotationDependency, 'path2')
         assert vendorNotationDependency(hostNotationDependency, 'path1') != vendorNotationDependency(mock(NotationDependency), 'path1')
