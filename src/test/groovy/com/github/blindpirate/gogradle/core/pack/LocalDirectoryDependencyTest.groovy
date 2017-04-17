@@ -48,6 +48,16 @@ class LocalDirectoryDependencyTest {
         verify(context).produceTransitiveDependencies(dependency, resource)
     }
 
+    @Test(expected = IllegalStateException)
+    void 'rootDir can be set only once'() {
+        dependency.setDir(StringUtils.toUnixString(resource))
+    }
+
+    @Test
+    void 'it should be concrete'() {
+        assert dependency.concrete
+    }
+
     @Test
     void 'version format of local directory should be its absolute path'() {
         assert dependency.formatVersion() == StringUtils.toUnixString(resource.toPath().toAbsolutePath())
@@ -133,20 +143,55 @@ class LocalDirectoryDependencyTest {
         LocalDirectoryDependency d = createLocalDirectoryDependency('d')
         d.firstLevel = true
         d.transitive = false
-        d.dependencies = asGolangDependencySet(createLocalDirectoryDependency('sub'))
+        d.dependencies.add(createLocalDirectoryDependency('sub'))
+        createVendor(d)
         // when
         LocalDirectoryDependency clone = d.clone()
         // then
-        assert !clone.is(d)
-        assert clone.dependencies == d.dependencies
-        assert !clone.dependencies.is(d.dependencies)
-        assert clone.dependencies.first() == d.dependencies.first()
-        assert !clone.dependencies.first().is(d.dependencies.first())
-        assert clone.name == 'd'
-        assert clone.firstLevel
-        assert !getField(d, 'transitiveDepExclusions').is(getField(clone, 'transitiveDepExclusions'))
-        assert clone.transitiveDepExclusions.size() == 1
-        assert clone.transitiveDepExclusions == [NO_TRANSITIVE_DEP_PREDICATE] as Set
+        assertLocalDependencyEqual(d, clone, true)
+        assertLocalDependencyEqual(
+                d.dependencies.find { it.name == 'sub' },
+                clone.dependencies.find { it.name == 'sub' }, false)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if cascading descebdant dependencies exist'() {
+        LocalDirectoryDependency d = createLocalDirectoryDependency('d')
+        LocalDirectoryDependency sub = createLocalDirectoryDependency('sub')
+        createVendor(d)
+        createVendor(sub)
+        d.dependencies.add(sub)
+        d.clone()
+    }
+
+    void assertLocalDependencyEqual(LocalDirectoryDependency old, LocalDirectoryDependency clone, boolean compareVendor) {
+        assert !old.is(clone)
+        assert old == clone
+        assert old.name == clone.name
+        assert !getField(old, 'transitiveDepExclusions').is(getField(clone, 'transitiveDepExclusions'))
+        assert getField(old, 'transitiveDepExclusions') == getField(clone, 'transitiveDepExclusions')
+        assert old.firstLevel == clone.firstLevel
+
+        if (compareVendor) {
+            VendorResolvedDependency vendor1InOld = old.dependencies.find { it.name == 'vendor1' }
+            VendorResolvedDependency vendor1InClone = clone.dependencies.find { it.name == 'vendor1' }
+            VendorResolvedDependency vendor2InOld = vendor1InOld.dependencies.find { it.name == 'vendor2' }
+            VendorResolvedDependency vendor2InClone = vendor1InClone.dependencies.find { it.name == 'vendor2' }
+
+            assert vendor1InClone == vendor1InOld
+            assert !vendor1InOld.is(vendor1InClone)
+            assert vendor2InClone == vendor2InOld
+            assert !vendor2InOld.is(vendor2InClone)
+            assert vendor1InClone.hostDependency.is(clone)
+            assert vendor2InClone.hostDependency.is(clone)
+        }
+    }
+
+    void createVendor(LocalDirectoryDependency local) {
+        VendorResolvedDependency vendor1 = new VendorResolvedDependencyForTest('vendor1', 'version', 1L, local, 'vendor/vendor1')
+        VendorResolvedDependency vendor2 = new VendorResolvedDependencyForTest('vendor2', 'version', 2L, local, 'vendor/vendor1/vendor/vendor2')
+        vendor1.dependencies.add(vendor2)
+        local.dependencies.add(vendor1)
     }
 
     @Test
@@ -190,6 +235,7 @@ class LocalDirectoryDependencyTest {
 
         ret.name = name
         ret.package = LocalDirectoryGolangPackage.of(name, name, StringUtils.toUnixString(rootDir))
+
         return ret
     }
 }

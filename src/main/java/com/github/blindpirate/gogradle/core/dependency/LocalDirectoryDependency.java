@@ -112,12 +112,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
         if (!super.equals(o)) {
             return false;
         }
@@ -139,6 +133,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     public Object clone() {
         LocalDirectoryDependency ret = (LocalDirectoryDependency) super.clone();
         ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
+        Assert.isTrue(onlyVendorDependenciesCanHaveDescendants());
         ret.dependencies = this.dependencies.clone();
         ret.dependencies.flatten().forEach(dependency -> resetVendorHostIfNecessary(dependency, ret));
         return ret;
@@ -148,5 +143,12 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
         if (dependency instanceof VendorResolvedDependency) {
             VendorResolvedDependency.class.cast(dependency).setHostDependency(clone);
         }
+    }
+
+    private boolean onlyVendorDependenciesCanHaveDescendants() {
+        return this.dependencies.stream().
+                filter(d -> (d instanceof ResolvedDependency) && !(d instanceof VendorResolvedDependency))
+                .map(d -> (ResolvedDependency) d)
+                .allMatch(d -> d.getDependencies().isEmpty());
     }
 }
