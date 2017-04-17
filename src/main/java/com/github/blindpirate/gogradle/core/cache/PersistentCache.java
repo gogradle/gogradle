@@ -8,6 +8,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.io.File;
+import java.io.UncheckedIOException;
 import java.util.Map;
 
 public abstract class PersistentCache<K extends GolangCloneable, V extends GolangCloneable>
@@ -38,7 +39,7 @@ public abstract class PersistentCache<K extends GolangCloneable, V extends Golan
         File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
         try {
             IOUtils.serialize(container, persistenceFile);
-        } catch (ExceptionHandler.UncheckedException e) {
+        } catch (UncheckedIOException e) {
             LOGGER.warn("Exception in serializing dependency cache, skip.");
             LOGGER.info("", e);
         }
