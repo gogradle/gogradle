@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
@@ -31,6 +32,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
@@ -104,6 +106,20 @@ public abstract class ResolveTask extends AbstractGolangTask {
     @Input
     public List<String> getBuildTags() {
         return setting.getBuildTags();
+    }
+
+    @Input
+    public String getBuildMode() {
+        return setting.getBuildMode().toString();
+    }
+
+    @Input
+    public String getRefreshDependenciesFlag() {
+        if (GogradleGlobal.isRefreshDependencies()) {
+            return UUID.randomUUID().toString();
+        } else {
+            return "";
+        }
     }
 
 //    @InputFiles
