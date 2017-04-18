@@ -48,7 +48,6 @@ public abstract class AbstractVcsDependencyManager<VERSION>
 
     @Override
     public ResolvedDependency doResolve(ResolveContext context, NotationDependency dependency) {
-        LOGGER.quiet("Resolving {}", dependency);
         try {
             NotationDependency vcsNotationDependency = extractVcsHostDependency(dependency);
 
