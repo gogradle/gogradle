@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.google.inject.Injector
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
@@ -45,20 +46,15 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     Object createTest() throws Exception {
         testInstance = super.createTest()
         MockitoAnnotations.initMocks(testInstance)
-        setOfflineIfNecessary()
         processors.each { it.processor.beforeTest(testInstance, testMethod, it.annotation) }
         return testInstance
-    }
-
-    def setOfflineIfNecessary() {
-        if (ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline') == null) {
-            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
-        }
     }
 
     @Override
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
         testMethod = method
+
+        Injector oldValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'injector')
 
         processors = annoToProcessorMap.entrySet().findResults { entry ->
             def anno = findAnno(method, entry.key)
@@ -78,6 +74,7 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             super.runChild(method, notifier)
         } finally {
             processors.each { it.processor.afterTest(testInstance, method, it.annotation) }
+            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', oldValue)
         }
     }
 

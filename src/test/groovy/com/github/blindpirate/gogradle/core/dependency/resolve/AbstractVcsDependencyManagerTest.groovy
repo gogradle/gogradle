@@ -131,6 +131,7 @@ class AbstractVcsDependencyManagerTest {
 
     @Test
     @MockRefreshDependencies(true)
+    @MockOffline(false)
     void 'resolving a vendor dependency hosting in vcs dependency should succeed'() {
         // given
         GolangDependencySet set = asGolangDependencySet(vendorResolvedDependency)
@@ -172,6 +173,7 @@ class AbstractVcsDependencyManagerTest {
     }
 
     @Test
+    @MockOffline(false)
     void 'lock file should be updated after resolving'() {
         // given
         when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(false)

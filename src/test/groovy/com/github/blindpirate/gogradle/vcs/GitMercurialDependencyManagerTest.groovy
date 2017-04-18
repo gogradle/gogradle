@@ -148,6 +148,7 @@ class GitMercurialDependencyManagerTest {
 
     @Test
     @MockRefreshDependencies(true)
+    @MockOffline(false)
     void 'existed repository should be updated if --refresh-dependencies'() {
         // given:
         when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)

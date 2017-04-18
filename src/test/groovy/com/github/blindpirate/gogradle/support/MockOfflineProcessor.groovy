@@ -1,20 +1,12 @@
 package com.github.blindpirate.gogradle.support
 
-import com.github.blindpirate.gogradle.GogradleGlobal
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import org.junit.runners.model.FrameworkMethod
+import org.gradle.StartParameter
 
-class MockOfflineProcessor extends GogradleRunnerProcessor<MockOffline> {
-    Boolean originalValue
+import static org.mockito.Mockito.when
 
+class MockOfflineProcessor extends GogradleGlobalProcessor<MockOffline> {
     @Override
-    void beforeTest(Object instance, FrameworkMethod method, MockOffline annotation) {
-        originalValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline')
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', annotation.value())
-    }
-
-    @Override
-    void afterTest(Object instance, FrameworkMethod method, MockOffline annotation) {
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', originalValue)
+    void doMock(StartParameter startParameter, MockOffline annotation) {
+        when(startParameter.isOffline()).thenReturn(annotation.value())
     }
 }
