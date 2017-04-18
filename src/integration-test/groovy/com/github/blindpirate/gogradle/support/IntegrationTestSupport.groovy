@@ -57,13 +57,13 @@ golang {
     }
 
 
-    BuildLauncher newBuild(Closure closure) {
+    BuildLauncher newBuild(Closure closure, List arguments) {
         initStdoutStderr()
         ProjectConnection connection = newProjectConnection()
         try {
             BuildLauncher build = newProjectConnection().newBuild()
 
-            configure(build)
+            configure(build, arguments)
 
             closure(build)
 
@@ -71,6 +71,10 @@ golang {
         } finally {
             connection.close()
         }
+    }
+
+    BuildLauncher newBuild(Closure closure) {
+        newBuild(closure, [])
     }
 
     Object buildAction(Closure closure) {
@@ -88,10 +92,10 @@ golang {
         }
     }
 
-    void configure(ConfigurableLauncher build) {
+    void configure(ConfigurableLauncher build, List arguments) {
         build.setStandardOutput(stdoutPs)
         build.setStandardError(stderrPs)
-        build.withArguments(buildArguments() as String[])
+        build.withArguments(['--stacktrace'] + arguments)
     }
 
     ProjectConnection newProjectConnection() {
@@ -102,10 +106,6 @@ golang {
             connector.useInstallation(new File(System.getProperty('GRADLE_DIST_HOME')))
         }
         return connector.connect()
-    }
-
-    List<String> buildArguments() {
-        return ["--stacktrace"]
     }
 
     abstract File getProjectRoot()
