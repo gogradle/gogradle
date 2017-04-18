@@ -48,7 +48,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 - Support shadowsocks proxy 
 - IDE support (IntelliJIDEA/Gogland/Webstorm/PhpStorm/PyCharm/RubyMine/CLion/Vim)
 - Test and coverage report generation
-- Incremental build (experimental)
+- Incremental build 
 
 ## Highlight
 

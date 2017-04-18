@@ -46,7 +46,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
 - Shadowsocks支持
 - IDE支持（IntelliJIDEA/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim）
 - 测试和覆盖率报告生成
-- 增量构建（实验性功能）
+- 增量构建
 
 ## 优势
 
