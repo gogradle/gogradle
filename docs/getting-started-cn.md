@@ -222,8 +222,5 @@ golang {
     // 开启此设置时，会使用墙内地址下载Go语言安装包
     // 默认为false
     fuckGfw = true
-    
-    // 全局缓存的时间，默认为24小时
-    globalCacheFor 24,'hours'
 }
 ```

@@ -195,8 +195,5 @@ golang {
     // Additional feature for users in mainland China,
     // ignore it if you are not
     fuckGfw = true
-    
-    // cache time for global cache, 24 hours by default
-    globalCacheFor 24,'hours'
 }
 ```
