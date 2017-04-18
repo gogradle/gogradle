@@ -171,6 +171,10 @@ public final class IOUtils {
         }
     }
 
+    public static void append(File file, String str) {
+        write(file, toString(file) + str);
+    }
+
     public static List<String> readLines(File file) {
         String content = toString(file);
         if (StringUtils.isEmpty(content)) {

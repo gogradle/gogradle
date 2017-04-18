@@ -93,5 +93,20 @@ class GitServer {
         }
     }
 
+    static void addFileToRepository(File dir, String fileName) {
+        Repository repository = FileRepositoryBuilder.create(new File(dir, '.git'))
+        Git git
+        try {
+            git = new Git(repository)
+            new File(dir, fileName).createNewFile()
+            git.add().addFilepattern(fileName).call()
+            git.commit().setMessage('commit').call()
+        } finally {
+            if (git != null) {
+                git.close()
+            }
+        }
+    }
+
 }
 
