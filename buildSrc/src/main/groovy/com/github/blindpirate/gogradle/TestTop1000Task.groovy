@@ -42,7 +42,7 @@ class TestTop1000Task extends DefaultTask {
         String buildDotGradle = """
 buildscript {
     dependencies {
-        classpath files('${getProject().getRootDir().absolutePath}/build/libs/gogradle-0.4.2-all.jar')
+        classpath files('${getProject().getRootDir().absolutePath}/build/libs/gogradle-0.4.3-all.jar')
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
@@ -79,7 +79,7 @@ goBuild {
         stdout.append("Start building ${path}\n")
         stderr.append("Start building ${path}\n")
 
-        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goClean', 'goBuild', '--stacktrace').directory(path.toFile())
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goBuild', 'goLock', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 
