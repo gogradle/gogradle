@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency.tree
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import groovy.transform.EqualsAndHashCode
@@ -81,7 +81,7 @@ a
         }
 
         @Override
-        protected DependencyInstaller getInstaller() {
+        protected DependencyManager getInstaller() {
             return null
         }
 

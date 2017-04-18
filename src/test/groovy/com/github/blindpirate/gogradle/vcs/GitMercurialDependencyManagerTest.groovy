@@ -4,6 +4,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
@@ -94,7 +95,7 @@ class GitMercurialDependencyManagerTest {
 
         when(notationDependency.getUrls()).thenReturn([repoUrl])
         when(notationDependency.getCommit()).thenReturn(commitId)
-        when(notationDependency.isConcrete()).thenReturn(true)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
         when(notationDependency.getPackage()).thenReturn(thePackage)
 
         when(resolveContext.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
@@ -203,7 +204,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'commit will be searched if tag cannot be recognized'() {
         // given
-        when(notationDependency.isConcrete()).thenReturn(false)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -214,7 +215,7 @@ class GitMercurialDependencyManagerTest {
     void 'LATEST_COMMIT should be recognized properly'() {
         // given
         when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.LATEST_COMMIT)
-        when(notationDependency.isConcrete()).thenReturn(false)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         // when
         manager.determineVersion(resource, notationDependency)
         // then

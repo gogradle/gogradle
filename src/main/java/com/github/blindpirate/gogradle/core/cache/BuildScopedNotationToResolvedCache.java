@@ -6,5 +6,5 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import javax.inject.Singleton;
 
 @Singleton
-public class BuildScopedVcsNotationCache extends AbstractCache<NotationDependency, ResolvedDependency> {
+public class BuildScopedNotationToResolvedCache extends AbstractCache<NotationDependency, ResolvedDependency> {
 }

@@ -5,6 +5,4 @@ import java.util.function.Predicate;
 
 public interface NotationDependency extends GolangDependency {
     Set<Predicate<GolangDependency>> getTransitiveDepExclusions();
-
-    boolean isConcrete();
 }

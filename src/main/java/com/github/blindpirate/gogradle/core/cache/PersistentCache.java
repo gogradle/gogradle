@@ -3,7 +3,6 @@ package com.github.blindpirate.gogradle.core.cache;
 import com.github.blindpirate.gogradle.core.GolangCloneable;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -14,15 +13,15 @@ import java.util.Map;
 public abstract class PersistentCache<K extends GolangCloneable, V extends GolangCloneable>
         extends AbstractCache<K, V> {
     private static final Logger LOGGER = Logging.getLogger(PersistentCache.class);
-    private final Project project;
 
-    protected PersistentCache(Project project) {
-        this.project = project;
+    private final File persistenceFile;
+
+    public PersistentCache(File persistenceFile) {
+        this.persistenceFile = persistenceFile;
     }
 
     @SuppressWarnings("unchecked")
     public void load() {
-        File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
         if (persistenceFile.exists()) {
             try {
                 container = (Map) IOUtils.deserialize(persistenceFile);
@@ -36,7 +35,6 @@ public abstract class PersistentCache<K extends GolangCloneable, V extends Golan
     }
 
     public void save() {
-        File persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + getClass().getSimpleName() + ".bin");
         try {
             IOUtils.serialize(container, persistenceFile);
         } catch (UncheckedIOException e) {

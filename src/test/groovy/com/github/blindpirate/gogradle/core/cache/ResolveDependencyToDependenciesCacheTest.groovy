@@ -29,6 +29,7 @@ import org.mockito.Mock
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -46,14 +47,14 @@ class ResolveDependencyToDependenciesCacheTest {
 
     ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
 
-    ResolveDependencyToDependenciesCache cache
+    PersistenceResolvedToDependenciesCache cache
 
     @Before
     void setUp() {
         when(GogradleGlobal.INSTANCE.getInstance(Project)).thenReturn(project)
         when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(GogradleGlobal.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
-        when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(GolangDependencySet.empty())
+        when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(GolangDependencySet.empty())
         when(project.getRootDir()).thenReturn(resource)
 
 
@@ -66,7 +67,7 @@ class ResolveDependencyToDependenciesCacheTest {
         LRUMap map = new LRUMap()
         map[local1] = DependencyUtils.asGolangDependencySet(vcsDependency, local2, vendor)
 
-        IOUtils.serialize(map, new File(resource, ".gogradle/cache/${ResolveDependencyToDependenciesCache.simpleName}.bin"))
+        IOUtils.serialize(map, new File(resource, ".gogradle/cache/${PersistenceResolvedToDependenciesCache.simpleName}.bin"))
 
 
         when(resolver.produce('this/is/local1')).thenReturn(of(LocalDirectoryGolangPackage.of('this/is/local1', 'this/is/local1', toUnixString(resource))))
@@ -79,7 +80,7 @@ class ResolveDependencyToDependenciesCacheTest {
         when(resolver.produce('this/is/vendor')).thenReturn(of(UnrecognizedGolangPackage.of('this/is/vendor')))
 
 
-        cache = new ResolveDependencyToDependenciesCache(project, resolver)
+        cache = new PersistenceResolvedToDependenciesCache(project, resolver)
     }
 
     @Test

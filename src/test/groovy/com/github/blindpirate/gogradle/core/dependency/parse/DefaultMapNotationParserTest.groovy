@@ -1,13 +1,12 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
-import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -15,7 +14,6 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsType
-import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -104,7 +102,7 @@ class DefaultMapNotationParserTest {
 
     @Test
     void 'unrecognized notation dependency should be generated if url not specified'() {
-        assert parser.parse([name: 'unrecognized', useless: 'useless']) instanceof UnrecognizedPackageNotationDependency
+        assert parser.parse([name: 'unrecognized', useless: 'useless']) instanceof UnrecognizedNotationDependency
     }
 
     @Test

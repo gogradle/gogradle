@@ -17,6 +17,7 @@ import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.GolangCloneableForTest
+import static com.github.blindpirate.gogradle.core.cache.PersistentCacheTest.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -32,8 +33,8 @@ class PersistentCacheTest {
 
     @Before
     void setUp() {
-        cache = new PersistentCacheForTest()
-        storageFile = new File(resource, ".gogradle/cache/${PersistentCacheForTest.simpleName}.bin")
+        storageFile = new File(resource, "cache.bin")
+        cache = new PersistentCacheForTest(storageFile)
         Mockito.when(project.getRootDir()).thenReturn(resource)
     }
 
@@ -86,8 +87,8 @@ class PersistentCacheTest {
     }
 
     class PersistentCacheForTest extends PersistentCache<GolangCloneableForTest, GolangCloneableForTest> {
-        PersistentCacheForTest() {
-            super(PersistentCacheTest.this.project)
+        PersistentCacheForTest(File file) {
+            super(file)
         }
     }
 }

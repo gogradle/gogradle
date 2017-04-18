@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Test
 import org.mockito.Mockito
@@ -48,6 +49,11 @@ class AbstractGolangDependencyTest {
 
         @Override
         ResolvedDependency resolve(ResolveContext context) {
+            return null
+        }
+
+        @Override
+        CacheScope getCacheScope() {
             return null
         }
     }

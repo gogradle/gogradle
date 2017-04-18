@@ -3,9 +3,10 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.*
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
@@ -15,6 +16,7 @@ import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 
 import java.time.Instant
 
@@ -33,19 +35,13 @@ class LocalDirectoryDependencyTest {
 
     LocalDirectoryDependency dependency
 
+    @Mock
+    LocalDirectoryDependencyManager manager
+
     @Before
     void setUp() {
         dependency = LocalDirectoryDependency.fromLocal('name', resource)
-    }
-
-    @Test
-    void 'local directory should be resolved to itself'() {
-        // given
-        ResolveContext context = mock(ResolveContext)
-        // when
-        dependency.resolve(context)
-        // then
-        verify(context).produceTransitiveDependencies(dependency, resource)
+        when(GogradleGlobal.getInstance(LocalDirectoryDependencyManager)).thenReturn(manager)
     }
 
     @Test(expected = IllegalStateException)
@@ -54,8 +50,8 @@ class LocalDirectoryDependencyTest {
     }
 
     @Test
-    void 'it should be concrete'() {
-        assert dependency.concrete
+    void 'its cache scope should be build'() {
+        assert dependency.cacheScope == CacheScope.BUILD
     }
 
     @Test
@@ -104,18 +100,13 @@ class LocalDirectoryDependencyTest {
         File dest = new File(resource, 'dest')
 
         dependency = LocalDirectoryDependency.fromLocal('name', src)
-        LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
-        when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
+        LocalDirectoryDependencyManager installer = mock(LocalDirectoryDependencyManager)
+        when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyManager)).thenReturn(installer)
         // when
         dependency.installTo(dest)
         // then
         verify(installer).install(dependency, dest)
-        assert new File(dest, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'local dependency does not support getResolverClass()'() {
-        dependency.getResolverClass()
+        assert new File(dest, DependencyManager.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
     }
 
     @Test
@@ -124,7 +115,19 @@ class LocalDirectoryDependencyTest {
     }
 
     @Test
-    void 'empty dir should be handled successfully'() {
+    void 'resolution and installation should be delegated to LocalDirectoryDependencyManager'() {
+        // given
+        dependency = new LocalDirectoryDependency()
+        dependency.setDir(resource)
+        ResolveContext context = mock(ResolveContext)
+        // when
+        dependency.resolve(context)
+        // then
+        verify(manager).resolve(context, dependency)
+    }
+
+    @Test
+    void 'empty dir should be handled properly'() {
         // given
         dependency = new LocalDirectoryDependency()
         dependency.setDir(GolangRepository.EMPTY_DIR)

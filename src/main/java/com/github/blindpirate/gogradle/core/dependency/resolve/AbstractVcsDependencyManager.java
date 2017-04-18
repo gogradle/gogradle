@@ -7,10 +7,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
 import com.github.blindpirate.gogradle.core.dependency.install.VendorSupportMixin;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -23,12 +20,12 @@ import org.gradle.api.logging.Logging;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.List;
-import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.core.cache.CacheScope.PERSISTENCE;
 import static java.util.Arrays.asList;
 
 public abstract class AbstractVcsDependencyManager<VERSION>
-        implements CacheEnabledDependencyResolverMixin, VendorSupportMixin, DependencyInstaller {
+        implements CacheEnabledDependencyResolverMixin, VendorSupportMixin, DependencyManager {
 
     private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
 
@@ -49,43 +46,12 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     @Override
     public ResolvedDependency doResolve(ResolveContext context, NotationDependency dependency) {
         try {
-            NotationDependency vcsNotationDependency = extractVcsHostDependency(dependency);
-
-            return globalCacheManager.runWithGlobalCacheLock(vcsNotationDependency, () -> {
-                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(vcsNotationDependency.getName()).toFile();
-                ResolvedDependency vcsResolvedDependency = resolveVcs(vcsNotationDependency, vcsRoot, context);
-                return extractVendorDependencyIfNecessary(dependency, vcsResolvedDependency);
+            return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
+                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
+                return resolveVcs(dependency, vcsRoot, context);
             });
         } catch (Exception e) {
             throw DependencyResolutionException.cannotResolveDependency(dependency, e);
-        }
-    }
-
-    private NotationDependency extractVcsHostDependency(NotationDependency dependency) {
-        if (dependency instanceof VendorNotationDependency) {
-            return VendorNotationDependency.class.cast(dependency).getHostNotationDependency();
-        } else {
-            return dependency;
-        }
-    }
-
-    private ResolvedDependency extractVendorDependencyIfNecessary(NotationDependency dependency,
-                                                                  ResolvedDependency resolvedDependency) {
-        if (dependency instanceof VendorNotationDependency) {
-            VendorNotationDependency vendorNotationDependency = (VendorNotationDependency) dependency;
-            Optional<VendorResolvedDependency> result = resolvedDependency.getDependencies().flatten()
-                    .stream()
-                    .filter(d -> d instanceof VendorResolvedDependency)
-                    .map(d -> (VendorResolvedDependency) d)
-                    .filter(d -> d.getRelativePathToHost().equals(vendorNotationDependency.getVendorPath()))
-                    .findFirst();
-            if (result.isPresent()) {
-                return result.get();
-            } else {
-                throw DependencyResolutionException.vendorNotExist(vendorNotationDependency, resolvedDependency);
-            }
-        } else {
-            return resolvedDependency;
         }
     }
 
@@ -162,7 +128,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         } else if (globalCacheManager.currentRepositoryIsUpToDate(dependency)) {
             LOGGER.info("Skip updating {} in {} since it is up-to-date.", dependency, repoRoot);
             return false;
-        } else if (dependency.isConcrete() && !concreteVersionExistInRepo(repoRoot, dependency)) {
+        } else if (dependency.getCacheScope() == PERSISTENCE && !concreteVersionExistInRepo(repoRoot, dependency)) {
             LOGGER.info("{} does not exist in {}, updating will be performed.", dependency, repoRoot);
             return true;
         } else if (GogradleGlobal.isRefreshDependencies()) {

@@ -1,10 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParser;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE;
+import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager.CURRENT_VERSION_INDICATOR_FILE;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -57,14 +57,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
-    public ResolvedDependency doResolve(ResolveContext context) {
-        if (rootDir != EMPTY_DIR) {
-            this.dependencies = context.produceTransitiveDependencies(this, rootDir);
-        }
-        return this;
-    }
-
-    @Override
     public long getUpdateTime() {
         return rootDir.lastModified();
     }
@@ -89,7 +81,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public void installTo(File targetDirectory) {
         if (rootDir != EMPTY_DIR) {
-            GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
+            GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
             IOUtils.write(targetDirectory, CURRENT_VERSION_INDICATOR_FILE, formatVersion());
         }
     }
@@ -97,11 +89,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public String formatVersion() {
         return rootDir == EMPTY_DIR ? "" : StringUtils.toUnixString(rootDir);
-    }
-
-    @Override
-    protected Class<? extends DependencyResolver> getResolverClass() {
-        throw new UnsupportedOperationException();
     }
 
     // version of local directory is its timestamp
@@ -125,8 +112,17 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
-    public boolean isConcrete() {
-        return true;
+    public CacheScope getCacheScope() {
+        return CacheScope.BUILD;
+    }
+
+    @Override
+    protected ResolvedDependency doResolve(ResolveContext context) {
+        if (rootDir == EMPTY_DIR) {
+            return this;
+        } else {
+            return GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).resolve(context, this);
+        }
     }
 
     @Override

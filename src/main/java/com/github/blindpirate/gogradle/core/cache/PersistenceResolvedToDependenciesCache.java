@@ -9,6 +9,7 @@ import groovy.lang.Singleton;
 import org.gradle.api.Project;
 
 import javax.inject.Inject;
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -16,14 +17,14 @@ import java.util.stream.Collectors;
 import static java.util.Map.Entry;
 
 @Singleton
-public class ResolveDependencyToDependenciesCache
+public class PersistenceResolvedToDependenciesCache
         extends PersistentCache<ResolvedDependency, GolangDependencySet> {
 
     private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public ResolveDependencyToDependenciesCache(Project project, PackagePathResolver packagePathResolver) {
-        super(project);
+    public PersistenceResolvedToDependenciesCache(Project project, PackagePathResolver packagePathResolver) {
+        super(new File(project.getRootDir(), ".gogradle/cache/PersistenceResolvedToDependenciesCache.bin"));
         this.packagePathResolver = packagePathResolver;
     }
 

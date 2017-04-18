@@ -26,7 +26,7 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
         GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency,
                 rootDir, configuration);
 
-        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
+        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir, configuration);
 
         GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
 

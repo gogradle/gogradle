@@ -6,12 +6,14 @@ import groovy.lang.Singleton;
 import org.gradle.api.Project;
 
 import javax.inject.Inject;
+import java.io.File;
 
 @Singleton
-public class ConcreteVcsNotationToResolvedDependencyCache
+public class PersistenceNotationToResolvedCache
         extends PersistentCache<NotationDependency, ResolvedDependency> {
+
     @Inject
-    public ConcreteVcsNotationToResolvedDependencyCache(Project project) {
-        super(project);
+    public PersistenceNotationToResolvedCache(Project project) {
+        super(new File(project.getRootDir(), ".gogradle/cache/PersistenceNotationToResolvedCache.bin"));
     }
 }

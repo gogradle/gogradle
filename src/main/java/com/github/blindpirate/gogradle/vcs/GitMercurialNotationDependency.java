@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.vcs;
 
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
@@ -68,8 +69,12 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
     }
 
     @Override
-    public boolean isConcrete() {
-        return StringUtils.isNotBlank(commit) && !LATEST_COMMIT.equals(commit);
+    public CacheScope getCacheScope() {
+        if (StringUtils.isBlank(commit) || LATEST_COMMIT.equals(commit)) {
+            return CacheScope.BUILD;
+        } else {
+            return CacheScope.PERSISTENCE;
+        }
     }
 
     @Override

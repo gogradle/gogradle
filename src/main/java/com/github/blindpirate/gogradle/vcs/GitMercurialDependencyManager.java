@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.core.cache.CacheScope.PERSISTENCE;
+
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
     protected static final Logger LOGGER = Logging.getLogger(GitMercurialDependencyManager.class);
 
@@ -98,7 +100,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
             }
         }
 
-        if (notationDependency.isConcrete()) {
+        if (notationDependency.getCacheScope() == PERSISTENCE) {
             Optional<GitMercurialCommit> commit = getAccessor().findCommit(repository, notationDependency.getCommit());
             if (commit.isPresent()) {
                 return commit.get();

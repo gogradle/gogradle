@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.resolve
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
@@ -54,16 +55,14 @@ class AbstractVcsDependencyManagerTest {
     @Mock
     VendorResolvedDependency vendorResolvedDependency
     @Mock
-    VendorNotationDependency vendorNotationDependency
-    @Mock
     DependencyRegistry dependencyRegistry
     @Mock
     ResolveContext context
     @Mock
     ProjectCacheManager projectCacheManager
 
-    VcsResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(VcsResolvedDependency, 'host')
-    GitMercurialNotationDependency hostNotationDependency = DependencyUtils.mockWithName(GitMercurialNotationDependency, 'host')
+    VcsResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(VcsResolvedDependency, 'vcs')
+    GitMercurialNotationDependency notationDependency = DependencyUtils.mockWithName(GitMercurialNotationDependency, 'vcs')
 
     File resource
 
@@ -84,21 +83,18 @@ class AbstractVcsDependencyManagerTest {
         when(projectCacheManager.resolve(any(NotationDependency), any(Function))).thenAnswer(APPLY_FUNCTION_ANSWER)
         manager = new AbstractVcsDependencyManagerForTest(globalCacheManager, projectCacheManager)
 
-        when(subclassDelegate.determineVersion(repoRoot, hostNotationDependency)).thenReturn('version')
+        when(subclassDelegate.determineVersion(repoRoot, notationDependency)).thenReturn('version')
         when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('url')
-        when(subclassDelegate.createResolvedDependency(hostNotationDependency, repoRoot, 'version', context)).thenReturn(hostResolvedDependency)
+        when(subclassDelegate.createResolvedDependency(notationDependency, repoRoot, 'version', context)).thenReturn(hostResolvedDependency)
 
         when(vendorResolvedDependency.getHostDependency()).thenReturn(hostResolvedDependency)
         when(vendorResolvedDependency.getRelativePathToHost()).thenReturn('vendor/root/package')
 
-        when(vendorNotationDependency.getHostNotationDependency()).thenReturn(hostNotationDependency)
-        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn('vendor/root/package')
-
-        when(vendorNotationDependency.getName()).thenReturn('thisisvendor')
+        when(notationDependency.getName()).thenReturn('vcs')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')
-        when(globalCacheManager.getGlobalPackageCachePath('host')).thenReturn(repoRoot.toPath())
+        when(globalCacheManager.getGlobalPackageCachePath('vcs')).thenReturn(repoRoot.toPath())
 
-        when(hostNotationDependency.getUrls()).thenReturn(['url'])
+        when(notationDependency.getUrls()).thenReturn(['url'])
         when(hostResolvedDependency.getUrl()).thenReturn('url')
 
     }
@@ -111,7 +107,7 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'installing a vendor dependency hosting in vcs dependency should succeed'() {
         // given
-        when(hostResolvedDependency.getName()).thenReturn('host')
+        when(hostResolvedDependency.getName()).thenReturn('vcs')
         // when
         manager.install(vendorResolvedDependency, targetDir)
         // then
@@ -132,57 +128,43 @@ class AbstractVcsDependencyManagerTest {
     @Test
     @MockRefreshDependencies(true)
     @MockOffline(false)
-    void 'resolving a vendor dependency hosting in vcs dependency should succeed'() {
-        // given
-        GolangDependencySet set = asGolangDependencySet(vendorResolvedDependency)
-        when(hostResolvedDependency.getDependencies()).thenReturn(set)
-        when(vendorResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
-        when(vendorNotationDependency.getVendorPath()).thenReturn('vendor/root/package')
-
+    void 'resolving a vcs dependency should succeed'() {
         // when
-        ResolvedDependency result = manager.resolve(context, vendorNotationDependency)
+        ResolvedDependency result = manager.resolve(context, notationDependency)
         // then
-        assert result.is(vendorResolvedDependency)
-    }
-
-    @Test(expected = DependencyResolutionException)
-    void 'exception should be thrown if the result does not exist in transitive dependencies of host dependency'() {
-        // given
-        when(hostResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
-        // then
-        manager.resolve(context, vendorNotationDependency)
+        assert result.is(hostResolvedDependency)
     }
 
     @Test
     @MockRefreshDependencies(false)
     void 'updating repository should be skipped if it is up-to-date'() {
-        when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(true)
-        'resolving a vendor dependency hosting in vcs dependency should succeed'()
-        verify(globalCacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
-        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repoRoot)
+        when(globalCacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(true)
+        'resolving a vcs dependency should succeed'()
+        verify(globalCacheManager, times(0)).updateCurrentDependencyLock(notationDependency)
+        verify(subclassDelegate, times(0)).updateRepository(notationDependency, repoRoot)
     }
 
     @Test
     @MockOffline(true)
     void 'updating repository should be skipped when offline'() {
         // given
-        when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(false)
-        'resolving a vendor dependency hosting in vcs dependency should succeed'()
-        verify(globalCacheManager, times(0)).updateCurrentDependencyLock(hostNotationDependency)
-        verify(subclassDelegate, times(0)).updateRepository(hostNotationDependency, repoRoot)
+        when(globalCacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
+        'resolving a vcs dependency should succeed'()
+        verify(globalCacheManager, times(0)).updateCurrentDependencyLock(notationDependency)
+        verify(subclassDelegate, times(0)).updateRepository(notationDependency, repoRoot)
     }
 
     @Test
     @MockOffline(false)
     void 'lock file should be updated after resolving'() {
         // given
-        when(globalCacheManager.currentRepositoryIsUpToDate(hostNotationDependency)).thenReturn(false)
-        when(hostNotationDependency.isConcrete()).thenReturn(true)
+        when(globalCacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
         // when
-        'resolving a vendor dependency hosting in vcs dependency should succeed'()
+        'resolving a vcs dependency should succeed'()
         // then
-        verify(subclassDelegate).updateRepository(hostNotationDependency, repoRoot)
-        verify(globalCacheManager).updateCurrentDependencyLock(hostNotationDependency)
+        verify(subclassDelegate).updateRepository(notationDependency, repoRoot)
+        verify(globalCacheManager).updateCurrentDependencyLock(notationDependency)
     }
 
     @Test
@@ -190,9 +172,9 @@ class AbstractVcsDependencyManagerTest {
         // given
         when(subclassDelegate.getCurrentRepositoryRemoteUrl(repoRoot)).thenReturn('anotherUrl')
         // when
-        manager.resolve(context, hostNotationDependency)
+        manager.resolve(context, notationDependency)
         // then
-        verify(globalCacheManager).updateCurrentDependencyLock(hostNotationDependency)
+        verify(globalCacheManager).updateCurrentDependencyLock(notationDependency)
     }
 
     @Test

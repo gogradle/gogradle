@@ -14,11 +14,15 @@ class GogradleRootProjectTest {
     @Test
     void 'some methods should throw UnsupportOperationException'() {
         assertUnsupport { rootProject.setDir('') }
-        assertUnsupport { rootProject.doResolve(null) }
         assertUnsupport { rootProject.getUpdateTime() }
         assertUnsupport { rootProject.formatVersion() }
         assertUnsupport { rootProject.getVersion() }
         assertUnsupport { rootProject.clone() }
+    }
+
+    @Test
+    void 'it should be resolved to itself'() {
+        assert rootProject.resolve(null).is(rootProject)
     }
 
     @Test

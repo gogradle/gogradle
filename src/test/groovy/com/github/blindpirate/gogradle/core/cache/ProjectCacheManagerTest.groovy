@@ -9,13 +9,16 @@ import java.util.function.Function
 import static org.mockito.Mockito.*
 
 class ProjectCacheManagerTest {
-    BuildScopedVcsNotationCache buildScopedNotationCache = mock(BuildScopedVcsNotationCache)
-    ConcreteVcsNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache = mock(ConcreteVcsNotationToResolvedDependencyCache)
-    ResolveDependencyToDependenciesCache resolveDependencyToDependenciesCache = mock(ResolveDependencyToDependenciesCache)
+    BuildScopedNotationToResolvedCache buildScopedNotationCache = mock(BuildScopedNotationToResolvedCache)
+    PersistenceNotationToResolvedCache persistenceNotationCache = mock(PersistenceNotationToResolvedCache)
+    BuildScopedResolvedToDependenciesCache buildScopedResolvedCache = mock(BuildScopedResolvedToDependenciesCache)
+    PersistenceResolvedToDependenciesCache persistenceResolvedCache = mock(PersistenceResolvedToDependenciesCache)
 
-    ProjectCacheManager projectCacheManager = new ProjectCacheManager(buildScopedNotationCache,
-            concreteNotationToResolvedDependencyCache,
-            resolveDependencyToDependenciesCache)
+    ProjectCacheManager projectCacheManager = new ProjectCacheManager(
+            buildScopedNotationCache,
+            buildScopedResolvedCache,
+            persistenceNotationCache,
+            persistenceResolvedCache)
 
     GitMercurialNotationDependency notationDependency = mock(GitMercurialNotationDependency)
     ResolvedDependency resolvedDependency = mock(ResolvedDependency)
@@ -25,31 +28,37 @@ class ProjectCacheManagerTest {
     void 'loading cache should succeed'() {
         projectCacheManager.loadPersistenceCache()
 
-        verify(concreteNotationToResolvedDependencyCache).load()
-        verify(resolveDependencyToDependenciesCache).load()
+        verify(persistenceNotationCache).load()
+        verify(persistenceResolvedCache).load()
     }
 
     @Test
     void 'saving cache should succeed'() {
         projectCacheManager.savePersistenceCache()
 
-        verify(concreteNotationToResolvedDependencyCache).save()
-        verify(resolveDependencyToDependenciesCache).save()
+        verify(persistenceNotationCache).save()
+        verify(persistenceResolvedCache).save()
     }
 
     @Test
     void 'resolving should succeed'() {
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         projectCacheManager.resolve(notationDependency, constructor)
         verify(buildScopedNotationCache).get(notationDependency, constructor)
 
-        when(notationDependency.isConcrete()).thenReturn(true)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
         projectCacheManager.resolve(notationDependency, constructor)
-        verify(concreteNotationToResolvedDependencyCache).get(notationDependency, constructor)
+        verify(persistenceNotationCache).get(notationDependency, constructor)
     }
 
     @Test
     void 'producing should succeed'() {
+        when(resolvedDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         projectCacheManager.produce(resolvedDependency, constructor)
-        verify(resolveDependencyToDependenciesCache).get(resolvedDependency, constructor)
+        verify(buildScopedResolvedCache).get(resolvedDependency, constructor)
+
+        when(resolvedDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
+        projectCacheManager.produce(resolvedDependency, constructor)
+        verify(persistenceResolvedCache).get(resolvedDependency, constructor)
     }
 }

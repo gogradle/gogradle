@@ -9,7 +9,7 @@ import org.gradle.api.logging.Logging;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
-public interface CacheEnabledDependencyResolverMixin extends DependencyResolver {
+public interface CacheEnabledDependencyResolverMixin extends DependencyManager {
     Logger LOGGER = Logging.getLogger(CacheEnabledDependencyResolverMixin.class);
 
     default ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {

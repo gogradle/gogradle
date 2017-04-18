@@ -25,7 +25,7 @@ public class GogradleRootProject extends LocalDirectoryDependency {
 
     @Override
     public ResolvedDependency doResolve(ResolveContext context) {
-        throw new UnsupportedOperationException();
+        return this;
     }
 
     @Override

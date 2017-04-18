@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
@@ -223,8 +223,8 @@ class GolangPluginTest {
 
     @Test
     void 'getting instance from injector should succeed'() {
-        assert GogradleGlobal.getInstance(Key.get(DependencyInstaller, Git)) instanceof GitDependencyManager
-        assert GogradleGlobal.getInstance(Key.get(DependencyInstaller, Mercurial)) instanceof MercurialDependencyManager
+        assert GogradleGlobal.getInstance(Key.get(DependencyManager, Git)) instanceof GitDependencyManager
+        assert GogradleGlobal.getInstance(Key.get(DependencyManager, Mercurial)) instanceof MercurialDependencyManager
         assert GogradleGlobal.getInstance(Key.get(VcsAccessor, Git)) instanceof GitClientAccessor
         assert GogradleGlobal.getInstance(Key.get(VcsAccessor, Mercurial)) instanceof HgClientAccessor
     }

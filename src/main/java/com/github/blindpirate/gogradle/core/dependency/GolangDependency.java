@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangCloneable;
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import org.gradle.api.artifacts.Dependency;
 
 import java.io.Serializable;
@@ -35,6 +36,6 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
 
     boolean isFirstLevel();
 
-
+    CacheScope getCacheScope();
 }
 

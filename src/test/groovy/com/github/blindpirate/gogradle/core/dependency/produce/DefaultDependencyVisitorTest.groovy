@@ -66,12 +66,12 @@ class DefaultDependencyVisitorTest {
         // given:
         when(vendorDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(GolangDependencySet.empty())
         // then:
-        assert visitor.visitVendorDependencies(resolvedDependency, rootDir).isEmpty()
+        assert visitor.visitVendorDependencies(resolvedDependency, rootDir, 'build').isEmpty()
 
         //given:
         when(vendorDependencyFactory.produce(resolvedDependency, rootDir)).thenReturn(dependencySet)
         // then:
-        assert visitor.visitVendorDependencies(resolvedDependency, rootDir) == dependencySet
+        assert visitor.visitVendorDependencies(resolvedDependency, rootDir, 'build') == dependencySet
     }
 
     @Test

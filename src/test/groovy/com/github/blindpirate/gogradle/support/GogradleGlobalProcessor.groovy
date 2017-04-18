@@ -14,7 +14,7 @@ import static org.mockito.Mockito.*
 abstract class GogradleGlobalProcessor<T extends Annotation> extends GogradleRunnerProcessor<T> {
     @Override
     void beforeTest(Object instance, FrameworkMethod method, T annotation) {
-        if (GogradleGlobal.INSTANCE.getInjector() == null) {
+        if (!isMock(GogradleGlobal.INSTANCE.getInjector())) {
             GogradleGlobal.INSTANCE.injector = mock(Injector)
         }
 
@@ -47,6 +47,8 @@ abstract class GogradleGlobalProcessor<T extends Annotation> extends GogradleRun
 
     @Override
     void afterTest(Object instance, FrameworkMethod method, T annotation) {
-        reset(GogradleGlobal.INSTANCE.getInjector())
+        if (isMock(GogradleGlobal.INSTANCE.getInjector())) {
+            reset(GogradleGlobal.INSTANCE.getInjector())
+        }
     }
 }

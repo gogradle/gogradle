@@ -3,7 +3,8 @@ package com.github.blindpirate.gogradle.core.dependency
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver
+import com.github.blindpirate.gogradle.core.cache.CacheScope
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -29,7 +30,6 @@ class AbstractNotationDependencyTest {
 
     @Before
     void setUp() {
-        when(dependency.getResolverClass()).thenReturn(DependencyResolver)
         setField(dependency, 'transitiveDepExclusions', [] as Set)
     }
 
@@ -38,14 +38,14 @@ class AbstractNotationDependencyTest {
     void 'resolved result should be cached'() {
         // given
         ResolveContext context = mock(ResolveContext)
-        DependencyResolver resolver = mock(DependencyResolver)
+        DependencyManager resolver = mock(DependencyManager)
         when(resolver.resolve(context, dependency)).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 return mock(ResolvedDependency)
             }
         })
-        when(GogradleGlobal.INSTANCE.getInstance(DependencyResolver)).thenReturn(resolver)
+        when(GogradleGlobal.INSTANCE.getInstance(DependencyManager)).thenReturn(resolver)
         assert dependency.resolve(context).is(dependency.resolve(context))
     }
 
@@ -181,13 +181,13 @@ class AbstractNotationDependencyTest {
         }
 
         @Override
-        protected Class<? extends DependencyResolver> getResolverClass() {
+        protected ResolvedDependency doResolve(ResolveContext context) {
             return null
         }
 
         @Override
-        boolean isConcrete() {
-            return false
+        CacheScope getCacheScope() {
+            return null
         }
     }
 }

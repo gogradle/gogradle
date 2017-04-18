@@ -1,7 +1,9 @@
 package com.github.blindpirate.gogradle.vcs.bazaar;
 
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 public class BazaarNotationDependency extends AbstractNotationDependency {
     public BazaarNotationDependency() {
@@ -9,12 +11,12 @@ public class BazaarNotationDependency extends AbstractNotationDependency {
     }
 
     @Override
-    protected Class<? extends DependencyResolver> getResolverClass() {
+    protected ResolvedDependency doResolve(ResolveContext context) {
         throw new UnsupportedOperationException("Bazaar is not implemented yet!");
     }
 
     @Override
-    public boolean isConcrete() {
+    public CacheScope getCacheScope() {
         throw new UnsupportedOperationException("Bazaar is not implemented yet!");
     }
 }

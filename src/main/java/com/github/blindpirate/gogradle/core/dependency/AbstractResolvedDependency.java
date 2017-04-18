@@ -1,12 +1,13 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import java.io.File;
 
-import static com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE;
+import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager.CURRENT_VERSION_INDICATOR_FILE;
 
 /**
  * Represents some code at a specific version.
@@ -54,11 +55,16 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
         getInstaller().install(this, targetDirectory);
     }
 
-    protected abstract DependencyInstaller getInstaller();
+    protected abstract DependencyManager getInstaller();
 
     @Override
     public String toString() {
         return getName() + ":" + formatVersion();
+    }
+
+    @Override
+    public CacheScope getCacheScope() {
+        return CacheScope.PERSISTENCE;
     }
 
     @Override

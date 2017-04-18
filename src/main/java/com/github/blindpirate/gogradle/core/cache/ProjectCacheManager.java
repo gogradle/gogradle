@@ -10,40 +10,47 @@ import java.util.function.Function;
 
 @Singleton
 public class ProjectCacheManager {
-    private final BuildScopedVcsNotationCache buildScopedVcsNotationCache;
-    private final ConcreteVcsNotationToResolvedDependencyCache concreteVcsNotationToResolvedDependencyCache;
-    private final ResolveDependencyToDependenciesCache resolveDependencyToDependenciesCache;
+    private final BuildScopedNotationToResolvedCache buildScopedNotationToResolvedCache;
+    private final BuildScopedResolvedToDependenciesCache buildScopedResolvedToDependenciesCache;
+    private final PersistenceNotationToResolvedCache persistenceNotationToResolvedCache;
+    private final PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache;
 
     @Inject
-    public ProjectCacheManager(BuildScopedVcsNotationCache buildScopedNotationCache,
-                               ConcreteVcsNotationToResolvedDependencyCache concreteNotationToResolvedDependencyCache,
-                               ResolveDependencyToDependenciesCache resolveDependencyToDependenciesCache) {
-        this.buildScopedVcsNotationCache = buildScopedNotationCache;
-        this.concreteVcsNotationToResolvedDependencyCache = concreteNotationToResolvedDependencyCache;
-        this.resolveDependencyToDependenciesCache = resolveDependencyToDependenciesCache;
+    public ProjectCacheManager(BuildScopedNotationToResolvedCache buildScopedNotationToResolvedCache,
+                               BuildScopedResolvedToDependenciesCache buildScopedResolvedToDependenciesCache,
+                               PersistenceNotationToResolvedCache persistenceNotationToResolvedCache,
+                               PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache) {
+        this.buildScopedNotationToResolvedCache = buildScopedNotationToResolvedCache;
+        this.buildScopedResolvedToDependenciesCache = buildScopedResolvedToDependenciesCache;
+        this.persistenceNotationToResolvedCache = persistenceNotationToResolvedCache;
+        this.persistenceResolvedToDependenciesCache = persistenceResolvedToDependenciesCache;
     }
 
     public void loadPersistenceCache() {
-        concreteVcsNotationToResolvedDependencyCache.load();
-        resolveDependencyToDependenciesCache.load();
+        persistenceNotationToResolvedCache.load();
+        persistenceResolvedToDependenciesCache.load();
     }
 
     public void savePersistenceCache() {
-        concreteVcsNotationToResolvedDependencyCache.save();
-        resolveDependencyToDependenciesCache.save();
+        persistenceNotationToResolvedCache.save();
+        persistenceResolvedToDependenciesCache.save();
     }
 
     public ResolvedDependency resolve(NotationDependency notationDependency,
                                       Function<NotationDependency, ResolvedDependency> constructor) {
-        if (notationDependency.isConcrete()) {
-            return concreteVcsNotationToResolvedDependencyCache.get(notationDependency, constructor);
+        if (notationDependency.getCacheScope() == CacheScope.BUILD) {
+            return buildScopedNotationToResolvedCache.get(notationDependency, constructor);
         } else {
-            return buildScopedVcsNotationCache.get(notationDependency, constructor);
+            return persistenceNotationToResolvedCache.get(notationDependency, constructor);
         }
     }
 
     public GolangDependencySet produce(ResolvedDependency resolvedDependency,
                                        Function<ResolvedDependency, GolangDependencySet> constructor) {
-        return resolveDependencyToDependenciesCache.get(resolvedDependency, constructor);
+        if (resolvedDependency.getCacheScope() == CacheScope.BUILD) {
+            return buildScopedResolvedToDependenciesCache.get(resolvedDependency, constructor);
+        } else {
+            return persistenceResolvedToDependenciesCache.get(resolvedDependency, constructor);
+        }
     }
 }

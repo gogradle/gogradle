@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.core.*
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
@@ -243,7 +243,7 @@ func main(){}
         IOUtils.write(resource, 'main.go', mainDotGo)
         ['github.com/a/b', 'github.com/a/b/c', 'github.com/a/b/c/d'].each {
             when(packagePathResolver.produce(it)).thenReturn(Optional.of(UnrecognizedGolangPackage.of(it)))
-            when(notationParser.parse(it)).thenReturn(UnrecognizedPackageNotationDependency.of(UnrecognizedGolangPackage.of(it)))
+            when(notationParser.parse(it)).thenReturn(UnrecognizedNotationDependency.of(UnrecognizedGolangPackage.of(it)))
         }
         // then
         def result = factory.produce(resolvedDependency, resource, 'build')

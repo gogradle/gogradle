@@ -23,11 +23,14 @@ public interface DependencyVisitor {
     /**
      * Visits dependencies in vendor.
      *
-     * @param dependency The dependency to visit
-     * @param rootDir    Root directory of a package
+     * @param dependency    The dependency to visit
+     * @param rootDir       Root directory of a package
+     * @param configuration Current context, {@code GolangConfiguration.BUILD} or {@code GolangConfiguration.TEST}
      * @return Dependencies in vendor directory
      */
-    GolangDependencySet visitVendorDependencies(ResolvedDependency dependency, File rootDir);
+    GolangDependencySet visitVendorDependencies(ResolvedDependency dependency,
+                                                File rootDir,
+                                                String configuration);
 
     /**
      * Analyze the imports in source code (all .go files in root directory except vendor) to get dependencies.

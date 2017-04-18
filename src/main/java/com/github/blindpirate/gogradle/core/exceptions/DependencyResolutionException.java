@@ -47,7 +47,7 @@ public final class DependencyResolutionException extends GradleException {
     public static DependencyResolutionException vendorNotExist(VendorNotationDependency vendorNotationDependency,
                                                                ResolvedDependency resolvedDependency) {
         return new DependencyResolutionException("vendor dependency " + vendorNotationDependency.toString()
-                + " does not exist in transitive dependencies in " + resolvedDependency);
+                + " does not exist in transitive dependencies of " + resolvedDependency);
     }
 
     public static DependencyResolutionException cannotFindGitTag(NotationDependency dependency, String tag) {

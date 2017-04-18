@@ -8,7 +8,7 @@ import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency;
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -89,7 +89,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
                                                         UnrecognizedGolangPackage pkg) {
         String url = MapUtils.getString(notation, GitMercurialNotationDependency.URL_KEY);
         if (url == null) {
-            return UnrecognizedPackageNotationDependency.of(pkg);
+            return UnrecognizedNotationDependency.of(pkg);
         } else {
             VcsGolangPackage vcsPkg = adaptAsVcsPackage(notation, pkg, url);
             notation.put(PACKAGE_KEY, vcsPkg);

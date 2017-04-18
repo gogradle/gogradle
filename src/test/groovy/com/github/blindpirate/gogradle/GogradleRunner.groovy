@@ -54,8 +54,6 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     protected void runChild(FrameworkMethod method, RunNotifier notifier) {
         testMethod = method
 
-        Injector oldValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'injector')
-
         processors = annoToProcessorMap.entrySet().findResults { entry ->
             def anno = findAnno(method, entry.key)
             if (anno) {
@@ -74,7 +72,6 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
             super.runChild(method, notifier)
         } finally {
             processors.each { it.processor.afterTest(testInstance, method, it.annotation) }
-            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', oldValue)
         }
     }
 

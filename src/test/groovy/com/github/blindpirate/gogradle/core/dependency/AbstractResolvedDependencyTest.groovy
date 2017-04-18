@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 class AbstractResolvedDependencyTest {
     @Mock
-    DependencyInstaller dependencyInstaller
+    DependencyManager dependencyManager
 
     @Mock
     AbstractResolvedDependency delegate
@@ -32,7 +32,7 @@ class AbstractResolvedDependencyTest {
     @Before
     void setUp() {
         dependency = new ResolvedDependencyForTest('name', 'version', 123L, delegate)
-        when(delegate.getInstaller()).thenReturn(dependencyInstaller)
+        when(delegate.getInstaller()).thenReturn(dependencyManager)
     }
 
     @Test
@@ -52,7 +52,7 @@ class AbstractResolvedDependencyTest {
         dependency.installTo(resource)
         // then
         assert new File(resource, '.CURRENT_VERSION').text == 'version'
-        verify(dependencyInstaller).install(dependency, resource)
+        verify(dependencyManager).install(dependency, resource)
     }
 
     @Test
@@ -149,7 +149,7 @@ class AbstractResolvedDependencyTest {
         }
 
         @Override
-        protected DependencyInstaller getInstaller() {
+        protected DependencyManager getInstaller() {
             return delegate.installer
         }
 

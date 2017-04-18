@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -42,12 +40,7 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         return resolvedDependency;
     }
 
-    protected ResolvedDependency doResolve(ResolveContext context) {
-        DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
-        return resolver.resolve(context, this);
-    }
-
-    protected abstract Class<? extends DependencyResolver> getResolverClass();
+    protected abstract ResolvedDependency doResolve(ResolveContext context);
 
     public void exclude(Map<String, Object> map) {
         transitiveDepExclusions.add(PropertiesExclusionPredicate.of(map));
