@@ -54,8 +54,8 @@ class VcsGolangPackageTest {
 
     @Test
     void 'equality check should succeed'() {
-        assert vcsGolangPackage != null
-        assert vcsGolangPackage == vcsGolangPackage
+        assert !vcsGolangPackage.equals(null)
+        assert vcsGolangPackage.equals(vcsGolangPackage)
         assert vcsGolangPackage != LocalDirectoryGolangPackage.of('github.com/user/package', 'github.com/user/pavkage/a', '')
         assert vcsGolangPackage == MockUtils.mockVcsPackage()
         assert vcsGolangPackage != VcsGolangPackage.builder()
@@ -83,6 +83,12 @@ class VcsGolangPackageTest {
                 .withRootPath('github.com/user/package')
                 .withSubstitutedVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
                 .build()
+    }
+
+    @Test
+    void 'hashCode should succeed'() {
+        assert vcsGolangPackage.hashCode() != LocalDirectoryGolangPackage.of('github.com/user/package', 'github.com/user/pavkage/a', '').hashCode()
+        assert vcsGolangPackage.hashCode() == MockUtils.mockVcsPackage().hashCode()
     }
 
     void assertRootPathAndSoOn(GolangPackage golangPackage) {

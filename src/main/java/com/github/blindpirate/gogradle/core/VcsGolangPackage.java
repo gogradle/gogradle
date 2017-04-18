@@ -152,7 +152,7 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), originalVcsInfo, substitutedVcsInfo);
+        return Objects.hash(super.hashCode(), determineVcs());
     }
 
     public static class VcsInfo implements Serializable {
