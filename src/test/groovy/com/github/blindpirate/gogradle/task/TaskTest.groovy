@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
@@ -54,6 +55,8 @@ abstract class TaskTest {
     ProjectCacheManager projectCacheManager
     @Mock
     IntellijIdeIntegration intellijIdeIntegration
+    @Mock
+    GogradleRootProject gogradleRootProject
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -88,6 +91,7 @@ abstract class TaskTest {
                       ideaIntegration        : ideaIntegration,
                       configurationManager   : configurationManager,
                       projectCacheManager    : projectCacheManager,
+                      gogradleRootProject    : gogradleRootProject,
                       intellijIdeIntegration : intellijIdeIntegration]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })

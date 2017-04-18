@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -20,6 +21,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.core.dependency.GogradleRootProject.GOGRADLE_ROOT;
 import static java.util.Collections.singletonList;
 
 /**
@@ -31,14 +33,17 @@ public class DefaultMapNotationParser implements MapNotationParser {
     private final DirMapNotationParser dirMapNotationParser;
     private final VendorMapNotationParser vendorMapNotationParser;
     private final PackagePathResolver packagePathResolver;
+    private final GogradleRootProject gogradleRootProject;
 
     @Inject
     public DefaultMapNotationParser(DirMapNotationParser dirMapNotationParser,
                                     VendorMapNotationParser vendorMapNotationParser,
-                                    PackagePathResolver packagePathResolver) {
+                                    PackagePathResolver packagePathResolver,
+                                    GogradleRootProject gogradleRootProject) {
         this.dirMapNotationParser = dirMapNotationParser;
         this.vendorMapNotationParser = vendorMapNotationParser;
         this.packagePathResolver = packagePathResolver;
+        this.gogradleRootProject = gogradleRootProject;
     }
 
     @Override
@@ -46,6 +51,11 @@ public class DefaultMapNotationParser implements MapNotationParser {
         Assert.isTrue(notation.containsKey(NAME_KEY), "Name must be specified!");
 
         String packagePath = MapUtils.getString(notation, NAME_KEY);
+
+        if (GOGRADLE_ROOT.equals(packagePath)) {
+            return gogradleRootProject;
+        }
+
         GolangPackage pkg = packagePathResolver.produce(packagePath).get();
 
         if (pkg instanceof ResolvableGolangPackage) {

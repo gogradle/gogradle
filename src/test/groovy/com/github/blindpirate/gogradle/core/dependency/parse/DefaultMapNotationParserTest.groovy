@@ -1,10 +1,12 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
@@ -13,6 +15,7 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsType
+import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,12 +44,14 @@ class DefaultMapNotationParserTest {
     MapNotationParser gitMapNotationParser
     @Mock
     MapNotationParser mercurialMapNotationParser
+    @Mock
+    GogradleRootProject gogradleRootProject
     @Captor
     ArgumentCaptor captor
 
     @Before
     void setUp() {
-        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver)
+        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver, gogradleRootProject)
         MockUtils.mockVcsService(MapNotationParser, Git, gitMapNotationParser)
         MockUtils.mockVcsService(MapNotationParser, Mercurial, mercurialMapNotationParser)
         when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
@@ -79,6 +84,11 @@ class DefaultMapNotationParserTest {
     @Test(expected = IllegalStateException)
     void 'notation without name should be rejected'() {
         parser.parse([:])
+    }
+
+    @Test
+    void 'parsing root project should succeed'() {
+        assert parser.parse([name: 'GOGRADLE_ROOT']).is(gogradleRootProject)
     }
 
     @Test

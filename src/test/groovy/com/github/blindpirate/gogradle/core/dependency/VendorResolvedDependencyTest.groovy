@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
@@ -52,6 +53,7 @@ class VendorResolvedDependencyTest {
         when(hostDependency.getName()).thenReturn('host')
         when(hostDependency.getVersion()).thenReturn('version')
         when(hostDependency.formatVersion()).thenReturn('version')
+        when(hostDependency.toString()).thenReturn("host#version")
         when(hostDependency.getVcsType()).thenReturn(VcsType.GIT)
 
         when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
@@ -92,14 +94,15 @@ class VendorResolvedDependencyTest {
     @Test
     void 'update time of vendor resolved dependency in local directory should be the dir\'s last modified time'() {
         // given
-        Project project = mock(Project)
-        when(GogradleGlobal.INSTANCE.getInjector().getInstance(Project)).thenReturn(project)
-        when(project.getRootDir()).thenReturn(resource)
-        LocalDirectoryDependency hostDependency = LocalDirectoryDependency.fromLocal('local', resource)
+        GogradleRootProject hostDependency = new GogradleRootProject()
+        hostDependency.initSingleton('root', resource)
+
+        // when
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         // then
         assert dependency.updateTime == new File(resource, 'vendor/github.com/a/b').lastModified()
         assert dependency.isFirstLevel()
+        assert dependency.formatVersion() == 'GOGRADLE_ROOT/vendor/github.com/a/b'
     }
 
     @Test(expected = IllegalStateException)

@@ -5,8 +5,8 @@ import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -56,8 +56,12 @@ public abstract class ResolveTask extends AbstractGolangTask {
     private ProjectCacheManager projectCacheManager;
 
     @Inject
+    private GogradleRootProject gogradleRootProject;
+
+    @Inject
     @DefaultDependencyVisitor.ExternalDependencyFactories
     private List<ExternalDependencyFactory> externalDependencyFactories;
+
 
     private DependencyTreeNode dependencyTree;
 
@@ -119,9 +123,12 @@ public abstract class ResolveTask extends AbstractGolangTask {
     @TaskAction
     public void resolve() {
         projectCacheManager.loadPersistenceCache();
-        resolveDependencies();
-        writeToSerializationFile();
-        projectCacheManager.savePersistenceCache();
+        try {
+            resolveDependencies();
+            writeToSerializationFile();
+        } finally {
+            projectCacheManager.savePersistenceCache();
+        }
     }
 
     private void writeToSerializationFile() {
@@ -130,19 +137,16 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
 
     private void resolveDependencies() {
-        File rootDir = getProject().getRootDir();
-        LocalDirectoryDependency rootProject = LocalDirectoryDependency.fromLocal(
-                setting.getPackagePath(),
-                rootDir);
-
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
         ResolveContext rootContext = ResolveContext.root(configuration);
-        rootProject.setDependencies(strategy.produce(rootProject,
-                rootDir,
+
+
+        gogradleRootProject.setDependencies(strategy.produce(gogradleRootProject,
+                gogradleRootProject.getRootDir(),
                 visitor,
                 getConfigurationName()));
 
-        dependencyTree = dependencyTreeFactory.getTree(rootContext, rootProject);
+        dependencyTree = dependencyTreeFactory.getTree(rootContext, gogradleRootProject);
     }
 
     public DependencyTreeNode getDependencyTree() {

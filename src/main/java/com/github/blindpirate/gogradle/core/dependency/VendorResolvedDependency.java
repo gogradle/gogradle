@@ -9,7 +9,6 @@ import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency;
-import org.gradle.api.Project;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -46,7 +45,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         ResolvedDependency hostDependency = determineHostDependency(parent);
         Path relativePathToHost = calculateRootPathToHost(parent, name);
         File hostRootDir = calculateHostRootDir(rootDirOfThisVendor, relativePathToHost);
-        String version = hostDependency.getVersion() + "/" + StringUtils.toUnixString(relativePathToHost);
+        String version = hostDependency.toString() + "/" + StringUtils.toUnixString(relativePathToHost);
         long updateTime = determineUpdateTime(hostDependency, hostRootDir, rootDirOfThisVendor, relativePathToHost);
 
         VendorResolvedDependency ret = new VendorResolvedDependency(name,
@@ -54,7 +53,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                 updateTime,
                 hostDependency,
                 StringUtils.toUnixString(relativePathToHost));
-        ret.setFirstLevel(isRoot(hostDependency));
+        ret.setFirstLevel(hostDependency instanceof GogradleRootProject);
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
         ProjectCacheManager projectCacheManager = GogradleGlobal.getInstance(ProjectCacheManager.class);
@@ -88,17 +87,6 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
             throw new IllegalStateException();
         }
     }
-
-    // if a hostDependency is root project
-    private static boolean isRoot(ResolvedDependency hostDependency) {
-        if (hostDependency instanceof LocalDirectoryDependency) {
-            File rootDir = LocalDirectoryDependency.class.cast(hostDependency).getRootDir();
-            return rootDir.equals(GogradleGlobal.getInstance(Project.class).getRootDir());
-        } else {
-            return false;
-        }
-    }
-
 
     private static Path calculateRootPathToHost(ResolvedDependency parent, String packagePath) {
         if (parent instanceof VendorResolvedDependency) {
@@ -141,8 +129,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public String formatVersion() {
-        return hostDependency.getName() + "#" + hostDependency.formatVersion()
-                + "/" + toUnixString(relativePathToHost);
+        return getVersion();
     }
 
     @Override

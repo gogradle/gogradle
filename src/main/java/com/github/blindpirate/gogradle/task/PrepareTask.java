@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.task;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.tasks.TaskAction;
@@ -26,6 +27,9 @@ public class PrepareTask extends DefaultTask {
     @Inject
     private GolangPluginSetting setting;
 
+    @Inject
+    private GogradleRootProject gogradleRootProject;
+
     @TaskAction
     public void prepare() {
         setting.verify();
@@ -33,6 +37,7 @@ public class PrepareTask extends DefaultTask {
         buildManager.ensureDotVendorDirNotExist();
         buildManager.prepareSymbolicLinks();
         buildConstraintManager.prepareConstraints();
+        gogradleRootProject.initSingleton(setting.getPackagePath(), getProject().getRootDir());
     }
 
 }

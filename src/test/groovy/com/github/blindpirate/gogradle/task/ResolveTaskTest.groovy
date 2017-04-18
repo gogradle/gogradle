@@ -55,17 +55,24 @@ class ResolveTaskTest extends TaskTest {
     @Mock
     DependencyVisitor dependencyVisitor
 
+    GogradleRootProject gogradleRootProject = new GogradleRootProject()
+
     @Before
     void setUp() {
+        when(project.getRootDir()).thenReturn(resource)
+        when(rootPath.toFile()).thenReturn(resource)
+        when(setting.getPackagePath()).thenReturn("package")
+
         resolveBuildDependenciesTask = buildTask(ResolveBuildDependenciesTask)
         resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
+
+        gogradleRootProject.initSingleton('package', resource)
+        ReflectionUtils.setField(resolveBuildDependenciesTask,'gogradleRootProject',gogradleRootProject)
+        ReflectionUtils.setField(resolveTestDependenciesTask,'gogradleRootProject',gogradleRootProject)
 
         when(configurationManager.getByName(anyString())).thenReturn(configuration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
 
-        when(rootPath.toFile()).thenReturn(resource)
-        when(setting.getPackagePath()).thenReturn("package")
-        when(project.getRootDir()).thenReturn(resource)
         when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
         when(dependencyTreeFactory.getTree(any(ResolveContext), any(LocalDirectoryDependency))).thenReturn(tree)
 

@@ -48,7 +48,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
         }
     }
 
-    private void setDir(File rootDir) {
+    protected void setDir(File rootDir) {
         Assert.isTrue(this.rootDir == null, "rootDir can be set only once!");
         this.rootDir = rootDir;
         if (!isValidDirectory(rootDir)) {
