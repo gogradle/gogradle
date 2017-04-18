@@ -72,8 +72,8 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        LOGGER.warn("You are locking a dependency existed only on your local filesystem, "
-                + "which may cause issues on other one's computer.");
+        LOGGER.warn("You are locking {} which exists only on your local filesystem, "
+                + "which may cause issues on other one's computer.", getRootDir());
         return ImmutableMap.of(MapNotationParser.NAME_KEY, getName(),
                 DirMapNotationParser.DIR_KEY, StringUtils.toUnixString(rootDir));
     }
