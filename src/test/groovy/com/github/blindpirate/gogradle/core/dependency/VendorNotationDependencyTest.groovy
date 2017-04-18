@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.junit.Before
 import org.junit.Test
@@ -17,11 +18,6 @@ class VendorNotationDependencyTest {
 
     VendorNotationDependency dependency = new VendorNotationDependency()
 
-    @Before
-    void setUp() {
-        when(hostNotationDependency.getResolverClass()).thenReturn(GitDependencyManager)
-    }
-
     @Test
     void 'setting hostDependency should success'() {
         dependency.hostNotationDependency = hostNotationDependency
@@ -35,16 +31,10 @@ class VendorNotationDependencyTest {
     }
 
     @Test
-    void "a VendorNotationDependency's resolver class should be its host's"() {
-        dependency.hostNotationDependency = hostNotationDependency
-        assert dependency.resolverClass == GitDependencyManager
-    }
-
-    @Test
     void 'isConcrete should be delegated to hostDependency'() {
-        when(hostNotationDependency.isConcrete()).thenReturn(true)
+        when(hostNotationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         dependency.hostNotationDependency = hostNotationDependency
-        assert dependency.isConcrete()
+        assert dependency.getCacheScope() == CacheScope.BUILD
     }
 
     @Test

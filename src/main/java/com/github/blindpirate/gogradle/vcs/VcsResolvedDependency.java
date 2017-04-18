@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
@@ -34,8 +34,8 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    protected DependencyInstaller getInstaller() {
-        return getVcsType().getService(DependencyInstaller.class);
+    protected DependencyManager getInstaller() {
+        return getVcsType().getService(DependencyManager.class);
     }
 
     @Override

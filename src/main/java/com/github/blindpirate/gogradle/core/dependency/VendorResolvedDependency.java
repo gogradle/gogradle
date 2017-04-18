@@ -2,9 +2,9 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
@@ -17,6 +17,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.HOST_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VENDOR_PATH_KEY;
@@ -59,7 +60,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         ProjectCacheManager projectCacheManager = GogradleGlobal.getInstance(ProjectCacheManager.class);
 
         GolangDependencySet dependencies = projectCacheManager.produce(ret,
-                resolvedDependency -> visitor.visitVendorDependencies(resolvedDependency, rootDirOfThisVendor));
+                resolvedDependency -> visitor.visitVendorDependencies(resolvedDependency, rootDirOfThisVendor, BUILD));
 
         ret.setDependencies(dependencies);
         return ret;
@@ -119,9 +120,9 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    protected DependencyInstaller getInstaller() {
+    protected DependencyManager getInstaller() {
         if (hostDependency instanceof LocalDirectoryDependency) {
-            return GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class);
+            return GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class);
         } else {
             return AbstractResolvedDependency.class.cast(hostDependency).getInstaller();
         }

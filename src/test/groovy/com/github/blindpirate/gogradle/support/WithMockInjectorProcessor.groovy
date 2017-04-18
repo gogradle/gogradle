@@ -24,15 +24,16 @@ class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector
 
     @Override
     void beforeTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
-        if (ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'injector') == null) {
-            Injector mockInjector = mock(Injector, RETURNS_DEEP_STUBS)
-            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', mockInjector)
-            setUpMockProgressMonitor(mockInjector)
+        if (!isMock(GogradleGlobal.INSTANCE.getInjector())) {
+            GogradleGlobal.INSTANCE.injector = mock(Injector)
         }
+        setUpMockProgressMonitor(GogradleGlobal.INSTANCE.getInjector())
     }
 
     @Override
     void afterTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
-        reset(ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'injector'))
+        if (isMock(GogradleGlobal.INSTANCE.getInjector())) {
+            reset(GogradleGlobal.INSTANCE.getInjector())
+        }
     }
 }

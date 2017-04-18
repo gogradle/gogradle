@@ -27,6 +27,7 @@ import org.mockito.Mock
 
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -72,7 +73,7 @@ class VendorDependencyFactoryTest {
         when(resolver.produce('root/package')).thenReturn(of(golangPackage))
         when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(visitor)
         when(GogradleGlobal.INSTANCE.getInjector().getInstance((Key) any(Key))).thenReturn(accessor)
-        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File)))
+        when(visitor.visitVendorDependencies(any(ResolvedDependency), any(File), anyString()))
                 .thenReturn(GolangDependencySet.empty())
         IOUtils.write(resource, 'vendor/root/package/main.go', '')
 

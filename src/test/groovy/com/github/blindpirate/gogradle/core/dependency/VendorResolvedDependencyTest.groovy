@@ -2,11 +2,10 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -17,7 +16,6 @@ import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
-import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -25,6 +23,7 @@ import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -36,7 +35,7 @@ class VendorResolvedDependencyTest {
     @Mock
     VcsResolvedDependency hostDependency
     @Mock
-    DependencyInstaller hostDependencyInstaller
+    DependencyManager hostDependencyManager
     @Mock
     DependencyVisitor dependencyVisitor
     @Mock
@@ -58,9 +57,9 @@ class VendorResolvedDependencyTest {
 
         when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
-        when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File))).thenReturn(GolangDependencySet.empty())
+        when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(GolangDependencySet.empty())
         when(GogradleGlobal.INSTANCE.getInstance(Key.get(VcsAccessor, Git))).thenReturn(accessor)
-        when(hostDependency.getInstaller()).thenReturn(hostDependencyInstaller)
+        when(hostDependency.getInstaller()).thenReturn(hostDependencyManager)
 
         IOUtils.mkdir(resource, 'vendor/github.com/a/b')
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
@@ -112,7 +111,7 @@ class VendorResolvedDependencyTest {
 
     @Test
     void 'installing a vendor dependency should succeed'() {
-        assert dependency.installer.is(hostDependencyInstaller)
+        assert dependency.installer.is(hostDependencyManager)
     }
 
     @Test
@@ -125,9 +124,9 @@ class VendorResolvedDependencyTest {
     }
 
     @Test
-    void 'installer class of vendor dependency hosting in LocalDirectoryDependency should be LocalDirectoryDependencyInstaller'() {
-        LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
-        when(GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
+    void 'installer class of vendor dependency hosting in LocalDirectoryDependency should be LocalDirectoryDependencyManager'() {
+        LocalDirectoryDependencyManager installer = mock(LocalDirectoryDependencyManager)
+        when(GogradleGlobal.getInstance(LocalDirectoryDependencyManager)).thenReturn(installer)
         ReflectionUtils.setField(dependency, 'hostDependency', mock(LocalDirectoryDependency))
         assert dependency.getInstaller().is(installer)
     }

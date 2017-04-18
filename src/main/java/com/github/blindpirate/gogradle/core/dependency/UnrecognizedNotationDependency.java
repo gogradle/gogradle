@@ -1,21 +1,22 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.exceptions.UnrecognizedPackageException;
 
 import java.util.Set;
 import java.util.function.Predicate;
 
-public class UnrecognizedPackageNotationDependency extends AbstractGolangDependency implements NotationDependency {
+public class UnrecognizedNotationDependency extends AbstractGolangDependency implements NotationDependency {
 
-    public static UnrecognizedPackageNotationDependency of(UnrecognizedGolangPackage pkg) {
-        UnrecognizedPackageNotationDependency ret = new UnrecognizedPackageNotationDependency();
+    public static UnrecognizedNotationDependency of(UnrecognizedGolangPackage pkg) {
+        UnrecognizedNotationDependency ret = new UnrecognizedNotationDependency();
         ret.setPackage(pkg);
         ret.setName(pkg.getPathString());
         return ret;
     }
 
-    private UnrecognizedPackageNotationDependency() {
+    private UnrecognizedNotationDependency() {
     }
 
     @Override
@@ -24,13 +25,13 @@ public class UnrecognizedPackageNotationDependency extends AbstractGolangDepende
     }
 
     @Override
-    public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
-        throw UnrecognizedPackageException.cannotRecognizePackage((UnrecognizedGolangPackage) getPackage());
+    public CacheScope getCacheScope() {
+        throw new UnsupportedOperationException();
     }
 
     @Override
-    public boolean isConcrete() {
-        throw new UnsupportedOperationException();
+    public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
+        throw UnrecognizedPackageException.cannotRecognizePackage((UnrecognizedGolangPackage) getPackage());
     }
 
     @Override

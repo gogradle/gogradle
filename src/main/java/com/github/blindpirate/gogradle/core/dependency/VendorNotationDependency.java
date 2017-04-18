@@ -1,8 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 
 import java.util.Objects;
+import java.util.Optional;
 
 public class VendorNotationDependency extends AbstractNotationDependency {
 
@@ -27,8 +29,20 @@ public class VendorNotationDependency extends AbstractNotationDependency {
     }
 
     @Override
-    public Class<? extends DependencyResolver> getResolverClass() {
-        return AbstractNotationDependency.class.cast(hostNotationDependency).getResolverClass();
+    public ResolvedDependency doResolve(ResolveContext context) {
+        ResolvedDependency hostResolvedDependency = hostNotationDependency.resolve(context);
+        Optional<VendorResolvedDependency> result = hostResolvedDependency.getDependencies().flatten()
+                .stream()
+                .filter(d -> d instanceof VendorResolvedDependency)
+                .map(d -> (VendorResolvedDependency) d)
+                .filter(d -> d.getRelativePathToHost().equals(vendorPath))
+                .findFirst();
+
+        if (result.isPresent()) {
+            return result.get();
+        } else {
+            throw DependencyResolutionException.vendorNotExist(this, hostResolvedDependency);
+        }
     }
 
     @Override
@@ -47,7 +61,7 @@ public class VendorNotationDependency extends AbstractNotationDependency {
     }
 
     @Override
-    public boolean isConcrete() {
-        return hostNotationDependency.isConcrete();
+    public CacheScope getCacheScope() {
+        return hostNotationDependency.getCacheScope();
     }
 }

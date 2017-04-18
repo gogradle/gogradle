@@ -4,11 +4,11 @@ import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.exceptions.UnrecognizedPackageException
 import org.junit.Test
 
-class UnrecognizedPackageNotationDependencyTest {
+class UnrecognizedNotationDependencyTest {
 
     UnrecognizedGolangPackage pkg = UnrecognizedGolangPackage.of('unrecognized')
 
-    UnrecognizedPackageNotationDependency dependency = UnrecognizedPackageNotationDependency.of(pkg)
+    UnrecognizedNotationDependency dependency = UnrecognizedNotationDependency.of(pkg)
 
     @Test(expected = UnsupportedOperationException)
     void 'isFirstLevel is not supported'() {
@@ -17,7 +17,7 @@ class UnrecognizedPackageNotationDependencyTest {
 
     @Test(expected = UnsupportedOperationException)
     void 'isConcrete is not supported'() {
-        dependency.isConcrete()
+        dependency.getCacheScope()
     }
 
     @Test(expected = UnrecognizedPackageException)
