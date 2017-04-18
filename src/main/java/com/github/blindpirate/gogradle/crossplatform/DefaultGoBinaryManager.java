@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.CompressUtils;
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
@@ -20,6 +19,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -160,7 +160,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
             String newestStableVersion = httpUtils.get(NEWEST_VERSION_URL).trim();
             fetchSpecifiedVersion(newestStableVersion);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -239,7 +239,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         try {
             httpUtils.download(url, goBinaryCachePath);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
         return goBinaryCachePath;
     }

@@ -1,15 +1,14 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsAccessor;
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency;
-import org.gradle.api.Project;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -29,13 +28,13 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
     private ResolvedDependency hostDependency;
 
     // java.io.NotSerializableException: sun.nio.fs.UnixPath
-    private Path relativePathToHost;
+    private String relativePathToHost;
 
-    private VendorResolvedDependency(String name,
-                                     String version,
-                                     long updateTime,
-                                     ResolvedDependency hostDependency,
-                                     Path relativePathToHost) {
+    protected VendorResolvedDependency(String name,
+                                       String version,
+                                       long updateTime,
+                                       ResolvedDependency hostDependency,
+                                       String relativePathToHost) {
         super(name, version, updateTime);
         this.hostDependency = hostDependency;
         this.relativePathToHost = relativePathToHost;
@@ -47,19 +46,23 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         ResolvedDependency hostDependency = determineHostDependency(parent);
         Path relativePathToHost = calculateRootPathToHost(parent, name);
         File hostRootDir = calculateHostRootDir(rootDirOfThisVendor, relativePathToHost);
-        String version = hostDependency.getVersion() + "/" + StringUtils.toUnixString(relativePathToHost);
+        String version = hostDependency.toString() + "/" + StringUtils.toUnixString(relativePathToHost);
         long updateTime = determineUpdateTime(hostDependency, hostRootDir, rootDirOfThisVendor, relativePathToHost);
 
         VendorResolvedDependency ret = new VendorResolvedDependency(name,
                 version,
                 updateTime,
                 hostDependency,
-                relativePathToHost);
-        ret.setFirstLevel(isRoot(hostDependency));
+                StringUtils.toUnixString(relativePathToHost));
+        ret.setFirstLevel(hostDependency instanceof GogradleRootProject);
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
-        VendorOnlyProduceStrategy strategy = GogradleGlobal.getInstance(VendorOnlyProduceStrategy.class);
-        ret.setDependencies(strategy.produce(ret, rootDirOfThisVendor, visitor, BUILD));
+        ProjectCacheManager projectCacheManager = GogradleGlobal.getInstance(ProjectCacheManager.class);
+
+        GolangDependencySet dependencies = projectCacheManager.produce(ret,
+                resolvedDependency -> visitor.visitVendorDependencies(resolvedDependency, rootDirOfThisVendor, BUILD));
+
+        ret.setDependencies(dependencies);
         return ret;
     }
 
@@ -86,21 +89,10 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         }
     }
 
-    // if a hostDependency is root project
-    private static boolean isRoot(ResolvedDependency hostDependency) {
-        if (hostDependency instanceof LocalDirectoryDependency) {
-            File rootDir = LocalDirectoryDependency.class.cast(hostDependency).getRootDir();
-            return rootDir.equals(GogradleGlobal.getInstance(Project.class).getRootDir());
-        } else {
-            return false;
-        }
-    }
-
-
     private static Path calculateRootPathToHost(ResolvedDependency parent, String packagePath) {
         if (parent instanceof VendorResolvedDependency) {
             VendorResolvedDependency parentVendorResolvedDependency = (VendorResolvedDependency) parent;
-            return parentVendorResolvedDependency.relativePathToHost
+            return Paths.get(parentVendorResolvedDependency.relativePathToHost)
                     .resolve(VENDOR_DIRECTORY).resolve(packagePath);
         } else {
             return Paths.get(VENDOR_DIRECTORY).resolve(packagePath);
@@ -119,14 +111,18 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         return hostDependency;
     }
 
-    public Path getRelativePathToHost() {
+    void setHostDependency(ResolvedDependency hostDependency) {
+        this.hostDependency = hostDependency;
+    }
+
+    public String getRelativePathToHost() {
         return relativePathToHost;
     }
 
     @Override
-    protected DependencyInstaller getInstaller() {
+    protected DependencyManager getInstaller() {
         if (hostDependency instanceof LocalDirectoryDependency) {
-            return GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class);
+            return GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class);
         } else {
             return AbstractResolvedDependency.class.cast(hostDependency).getInstaller();
         }
@@ -134,8 +130,7 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public String formatVersion() {
-        return hostDependency.getName() + "#" + hostDependency.formatVersion()
-                + "/" + toUnixString(relativePathToHost);
+        return getVersion();
     }
 
     @Override

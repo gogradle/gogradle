@@ -1,7 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import org.junit.Test
 
 class AutoConfigureMapNotationParserTest {
@@ -13,7 +16,12 @@ class AutoConfigureMapNotationParserTest {
         }
 
         @Override
-        Class<? extends DependencyResolver> getResolverClass() {
+        protected ResolvedDependency doResolve(ResolveContext context) {
+            return null
+        }
+
+        @Override
+        CacheScope getCacheScope() {
             return null
         }
     }
@@ -22,7 +30,12 @@ class AutoConfigureMapNotationParserTest {
         private static final long serialVersionUID = 1
 
         @Override
-        Class<? extends DependencyResolver> getResolverClass() {
+        protected ResolvedDependency doResolve(ResolveContext context) {
+            return null
+        }
+
+        @Override
+        CacheScope getCacheScope() {
             return null
         }
     }

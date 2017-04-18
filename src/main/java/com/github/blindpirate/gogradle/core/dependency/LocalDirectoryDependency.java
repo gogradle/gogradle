@@ -1,32 +1,35 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager;
+import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParser;
+import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+import com.google.common.collect.ImmutableMap;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager.CURRENT_VERSION_INDICATOR_FILE;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
     private static final File EMPTY_DIR = null;
     private static final long serialVersionUID = 1;
-
-    private long updateTime;
+    private static final Logger LOGGER = Logging.getLogger(LocalDirectoryDependency.class);
 
     private File rootDir;
 
-    @SuppressFBWarnings("SE_TRANSIENT_FIELD_NOT_RESTORED")
-    private transient GolangDependencySet dependencies = GolangDependencySet.empty();
+    private GolangDependencySet dependencies = GolangDependencySet.empty();
 
     public static LocalDirectoryDependency fromLocal(String name, File rootDir) {
         LocalDirectoryDependency ret = new LocalDirectoryDependency();
@@ -45,25 +48,17 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
         }
     }
 
-    private void setDir(File rootDir) {
+    protected void setDir(File rootDir) {
+        Assert.isTrue(this.rootDir == null, "rootDir can be set only once!");
         this.rootDir = rootDir;
-        this.updateTime = rootDir.lastModified();
         if (!isValidDirectory(rootDir)) {
             throw DependencyResolutionException.directoryIsInvalid(rootDir);
         }
     }
 
     @Override
-    public ResolvedDependency doResolve(ResolveContext context) {
-        if (rootDir != EMPTY_DIR) {
-            this.dependencies = context.produceTransitiveDependencies(this, rootDir);
-        }
-        return this;
-    }
-
-    @Override
     public long getUpdateTime() {
-        return updateTime;
+        return rootDir.lastModified();
     }
 
     public void setDependencies(GolangDependencySet dependencies) {
@@ -77,25 +72,23 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        throw new UnsupportedOperationException();
+        LOGGER.warn("You are locking {} which exists only on your local filesystem, "
+                + "which may cause issues on other one's computer.", getRootDir());
+        return ImmutableMap.of(MapNotationParser.NAME_KEY, getName(),
+                DirMapNotationParser.DIR_KEY, StringUtils.toUnixString(rootDir));
     }
 
     @Override
     public void installTo(File targetDirectory) {
         if (rootDir != EMPTY_DIR) {
-            GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller.class).install(this, targetDirectory);
-            IOUtils.write(targetDirectory, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE, formatVersion());
+            GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
+            IOUtils.write(targetDirectory, CURRENT_VERSION_INDICATOR_FILE, formatVersion());
         }
     }
 
     @Override
     public String formatVersion() {
         return rootDir == EMPTY_DIR ? "" : StringUtils.toUnixString(rootDir);
-    }
-
-    @Override
-    protected Class<? extends DependencyResolver> getResolverClass() {
-        throw new UnsupportedOperationException();
     }
 
     // version of local directory is its timestamp
@@ -106,12 +99,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
-            return false;
-        }
         if (!super.equals(o)) {
             return false;
         }
@@ -122,5 +109,42 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public int hashCode() {
         return Objects.hash(rootDir, super.hashCode());
+    }
+
+    @Override
+    public CacheScope getCacheScope() {
+        return CacheScope.BUILD;
+    }
+
+    @Override
+    protected ResolvedDependency doResolve(ResolveContext context) {
+        if (rootDir == EMPTY_DIR) {
+            return this;
+        } else {
+            return GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).resolve(context, this);
+        }
+    }
+
+    @Override
+    public Object clone() {
+        LocalDirectoryDependency ret = (LocalDirectoryDependency) super.clone();
+        ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
+        Assert.isTrue(onlyVendorDependenciesCanHaveDescendants());
+        ret.dependencies = this.dependencies.clone();
+        ret.dependencies.flatten().forEach(dependency -> resetVendorHostIfNecessary(dependency, ret));
+        return ret;
+    }
+
+    private void resetVendorHostIfNecessary(GolangDependency dependency, ResolvedDependency clone) {
+        if (dependency instanceof VendorResolvedDependency) {
+            VendorResolvedDependency.class.cast(dependency).setHostDependency(clone);
+        }
+    }
+
+    private boolean onlyVendorDependenciesCanHaveDescendants() {
+        return this.dependencies.stream().
+                filter(d -> (d instanceof ResolvedDependency) && !(d instanceof VendorResolvedDependency))
+                .map(d -> (ResolvedDependency) d)
+                .allMatch(d -> d.getDependencies().isEmpty());
     }
 }

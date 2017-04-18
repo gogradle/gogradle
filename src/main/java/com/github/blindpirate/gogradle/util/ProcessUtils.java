@@ -8,6 +8,7 @@ import org.gradle.api.logging.Logging;
 import javax.inject.Singleton;
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -74,7 +75,7 @@ public class ProcessUtils {
             }
             return pb.start();
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

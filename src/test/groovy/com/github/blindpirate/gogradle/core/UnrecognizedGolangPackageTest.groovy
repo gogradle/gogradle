@@ -21,4 +21,12 @@ class UnrecognizedGolangPackageTest {
     void 'toString() should succeed'() {
         assert unrecognizedGolangPackage.toString() == "UnrecognizedGolangPackage{path='golang/x'}"
     }
+
+    @Test
+    void 'equality check should succeed'() {
+        assert unrecognizedGolangPackage == unrecognizedGolangPackage
+        assert unrecognizedGolangPackage != null
+        assert unrecognizedGolangPackage != StandardGolangPackage.of("golang/x")
+        assert unrecognizedGolangPackage == of('golang/x')
+    }
 }

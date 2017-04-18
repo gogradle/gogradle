@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.vcs.mercurial;
 
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.vcs.GitMercurialAccessor;
 import com.github.blindpirate.gogradle.vcs.GitMercurialDependencyManager;
 import com.github.blindpirate.gogradle.vcs.VcsType;
@@ -15,8 +16,9 @@ public class MercurialDependencyManager extends GitMercurialDependencyManager {
 
     @Inject
     public MercurialDependencyManager(HgClientAccessor accessor,
-                                      GlobalCacheManager cacheManager) {
-        super(cacheManager);
+                                      GlobalCacheManager globalCacheManager,
+                                      ProjectCacheManager projectCacheManager) {
+        super(globalCacheManager, projectCacheManager);
         this.accessor = accessor;
     }
 

@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Objects;
 import java.util.Optional;
 
 public abstract class GolangPackage implements Serializable {
@@ -44,5 +45,20 @@ public abstract class GolangPackage implements Serializable {
 
     protected abstract Optional<GolangPackage> shorterPath(Path packagePath);
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        GolangPackage that = (GolangPackage) o;
+        return Objects.equals(pathString, that.pathString);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(pathString);
+    }
 }

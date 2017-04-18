@@ -47,8 +47,8 @@ class GitMercurialNotationDependencyTest {
     @Test
     void 'git dependencies with same name and commit but not url should not be equal'() {
         // when
-        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
-        GitMercurialNotationDependency dependency2 = withNameAndCommit('name', 'NEWEST_COMMIT')
+        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'LATEST_COMMIT')
+        GitMercurialNotationDependency dependency2 = withNameAndCommit('name', 'LATEST_COMMIT')
         // then
         assert dependency1 == dependency2
 
@@ -61,7 +61,7 @@ class GitMercurialNotationDependencyTest {
     @Test
     void 'git dependencies with different name or commit should not be equal'() {
         // when
-        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'NEWEST_COMMIT')
+        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'LATEST_COMMIT')
         GitMercurialNotationDependency dependency2 = withNameAndCommit('name', '12345')
         // then
         assert dependency1 != dependency2

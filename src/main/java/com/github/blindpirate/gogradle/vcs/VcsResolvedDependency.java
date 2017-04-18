@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.vcs;
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
@@ -34,8 +34,8 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
     }
 
     @Override
-    protected DependencyInstaller getInstaller() {
-        return getVcsType().getService(DependencyInstaller.class);
+    protected DependencyManager getInstaller() {
+        return getVcsType().getService(DependencyManager.class);
     }
 
     @Override
@@ -67,12 +67,13 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
         VcsResolvedDependency that = (VcsResolvedDependency) o;
         return Objects.equals(getVersion(), that.getVersion())
                 && Objects.equals(getName(), that.getName())
+                && Objects.equals(getVcsType(), that.getVcsType())
                 && Objects.equals(url, that.url);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, getVersion(), getName());
+        return Objects.hash(url, getVersion(), getName(), getVcsType());
     }
 
     public static GitMercurialResolvedDependencyBuilder builder(VcsType vcsType) {

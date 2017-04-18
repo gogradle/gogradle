@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.vcs
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.google.inject.Key
@@ -53,8 +53,8 @@ class VcsResolvedDependencyTest {
     @Test
     @WithMockInjector
     void 'getInstallerClass() should succeed'() {
-        DependencyInstaller installer = Mockito.mock(DependencyInstaller)
-        Mockito.when(GogradleGlobal.INSTANCE.getInjector().getInstance(Key.get(DependencyInstaller, Git))).thenReturn(installer)
+        DependencyManager installer = Mockito.mock(DependencyManager)
+        Mockito.when(GogradleGlobal.INSTANCE.getInjector().getInstance(Key.get(DependencyManager, Git))).thenReturn(installer)
         assert newResolvedDependency(VcsType.GIT).installer == installer
     }
 
@@ -74,7 +74,7 @@ class VcsResolvedDependencyTest {
     }
 
     @Test
-    void 'dependencies should be equal if name/version/url equals'() {
+    void 'dependencies should be equal if name/version/url/vcs equals'() {
         assert newResolvedDependency(VcsType.GIT) != newResolvedDependency(VcsType.MERCURIAL)
 
         def dependency1 = newResolvedDependency(VcsType.GIT)

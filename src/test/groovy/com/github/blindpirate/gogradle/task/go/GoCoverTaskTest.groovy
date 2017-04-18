@@ -129,7 +129,7 @@ class GoCoverTaskTest extends TaskTest {
         assert !new File(resource, '.gogradle/reports/coverage').list().any { it.endsWith('html') }
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedIOException)
     void 'exception should be thrown if io error occurs'() {
         task.extractCoverageInfo(new File('/unexistent'))
     }

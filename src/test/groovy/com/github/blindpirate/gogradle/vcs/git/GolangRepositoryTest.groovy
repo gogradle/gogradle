@@ -32,8 +32,9 @@ class GolangRepositoryTest {
         assert repository.getUrl(null) == '456'
 
         repository.url { name ->
-            return name + '789'
+            return "${name}789"
         }
+        assert repository.getUrl('name') instanceof String
         assert repository.getUrl('name') == 'name789'
 
         repository.url(1)

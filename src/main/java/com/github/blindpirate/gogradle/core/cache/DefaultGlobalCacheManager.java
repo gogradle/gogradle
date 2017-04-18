@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
@@ -18,6 +17,7 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
@@ -141,14 +141,14 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
     }
 
     @Override
-    public boolean currentDependencyIsOutOfDate(NotationDependency dependency) {
+    public boolean currentRepositoryIsUpToDate(NotationDependency dependency) {
         ensureGlobalCacheExistAndWritable();
         try {
             // On windows we have to read file like this
             Optional<GlobalCacheMetadata> metadata = getMetadataFromFile(fileChannels.get());
-            return determineIfOutOfDate(dependency, metadata);
+            return determineIfUpToDate(dependency, metadata);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -165,16 +165,16 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         }
     }
 
-    private boolean determineIfOutOfDate(NotationDependency dependency, Optional<GlobalCacheMetadata> metadata) {
+    private boolean determineIfUpToDate(NotationDependency dependency, Optional<GlobalCacheMetadata> metadata) {
         if (!metadata.isPresent()) {
-            return true;
+            return false;
         }
         List<String> urls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
         if (urls.contains(metadata.get().getLastUpdateUrl())) {
             long cacheSecond = setting.getGlobalCacheSecond();
-            return System.currentTimeMillis() - metadata.get().getLastUpdateTime() > toMilliseconds(cacheSecond);
+            return System.currentTimeMillis() - metadata.get().getLastUpdateTime() < toMilliseconds(cacheSecond);
         } else {
-            return true;
+            return false;
         }
     }
 
@@ -189,7 +189,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
             currentLockFile.truncate(bytesToWrite.length);
             currentLockFile.write(ByteBuffer.wrap(bytesToWrite));
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

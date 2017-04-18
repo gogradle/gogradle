@@ -39,6 +39,12 @@ dependencies {
 }
 ```
 
+默认情况下，如果你的声明没有指定commit的话，Gogradle就不会对本地缓存中的仓库执行`git pull`或者`hg update -u`。若期望如此，请使用`--refresh-dependencies`：
+
+```
+gradlew goBuild --refresh-dependencies
+```
+
 依赖声明支持[语义化版本](http://semver.org/)。在Git中，"版本"即Git的tag。不过，考虑到构建的第一要务是保证稳定，Gogradle并不推荐使用它们。
 
 ```groovy

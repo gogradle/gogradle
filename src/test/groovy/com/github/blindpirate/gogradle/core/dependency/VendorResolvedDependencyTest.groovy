@@ -2,26 +2,24 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
-import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-
-import java.nio.file.Paths
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
@@ -37,15 +35,15 @@ class VendorResolvedDependencyTest {
     @Mock
     VcsResolvedDependency hostDependency
     @Mock
-    DependencyInstaller hostDependencyInstaller
+    DependencyManager hostDependencyManager
     @Mock
     DependencyVisitor dependencyVisitor
     @Mock
-    VendorOnlyProduceStrategy vendorOnlyProduceStrategy
-    @Mock
-    VendorResolvedDependency dependency
-    @Mock
     VcsAccessor accessor
+
+    VendorResolvedDependency dependency
+
+    ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
 
     File resource
 
@@ -54,13 +52,14 @@ class VendorResolvedDependencyTest {
         when(hostDependency.getName()).thenReturn('host')
         when(hostDependency.getVersion()).thenReturn('version')
         when(hostDependency.formatVersion()).thenReturn('version')
+        when(hostDependency.toString()).thenReturn("host#version")
         when(hostDependency.getVcsType()).thenReturn(VcsType.GIT)
 
-        when(GogradleGlobal.INSTANCE.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
+        when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(GogradleGlobal.INSTANCE.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
-        when(vendorOnlyProduceStrategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
+        when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(GolangDependencySet.empty())
         when(GogradleGlobal.INSTANCE.getInstance(Key.get(VcsAccessor, Git))).thenReturn(accessor)
-        when(hostDependency.getInstaller()).thenReturn(hostDependencyInstaller)
+        when(hostDependency.getInstaller()).thenReturn(hostDependencyManager)
 
         IOUtils.mkdir(resource, 'vendor/github.com/a/b')
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
@@ -78,12 +77,12 @@ class VendorResolvedDependencyTest {
     @Test
     void 'creating a sub vendor dependency of vendor dependency should succeed'() {
         // when
-        ReflectionUtils.setField(dependency, 'relativePathToHost', Paths.get('vendor/github.com/a/b'))
+        ReflectionUtils.setField(dependency, 'relativePathToHost', 'vendor/github.com/a/b')
         File dir = IOUtils.mkdir(resource, 'vendor/github.com/a/b/vendor/github.com/b/c')
         VendorResolvedDependency subDependency = VendorResolvedDependency.fromParent('github.com/b/c', dependency, dir)
         // then
         assert subDependency.hostDependency == hostDependency
-        assert toUnixString(subDependency.relativePathToHost) == 'vendor/github.com/a/b/vendor/github.com/b/c'
+        assert subDependency.relativePathToHost == 'vendor/github.com/a/b/vendor/github.com/b/c'
     }
 
     @Test
@@ -94,14 +93,15 @@ class VendorResolvedDependencyTest {
     @Test
     void 'update time of vendor resolved dependency in local directory should be the dir\'s last modified time'() {
         // given
-        Project project = mock(Project)
-        when(GogradleGlobal.INSTANCE.getInjector().getInstance(Project)).thenReturn(project)
-        when(project.getRootDir()).thenReturn(resource)
-        LocalDirectoryDependency hostDependency = LocalDirectoryDependency.fromLocal('local', resource)
+        GogradleRootProject hostDependency = new GogradleRootProject()
+        hostDependency.initSingleton('root', resource)
+
+        // when
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         // then
         assert dependency.updateTime == new File(resource, 'vendor/github.com/a/b').lastModified()
         assert dependency.isFirstLevel()
+        assert dependency.formatVersion() == 'GOGRADLE_ROOT/vendor/github.com/a/b'
     }
 
     @Test(expected = IllegalStateException)
@@ -111,7 +111,7 @@ class VendorResolvedDependencyTest {
 
     @Test
     void 'installing a vendor dependency should succeed'() {
-        assert dependency.installer.is(hostDependencyInstaller)
+        assert dependency.installer.is(hostDependencyManager)
     }
 
     @Test
@@ -124,9 +124,9 @@ class VendorResolvedDependencyTest {
     }
 
     @Test
-    void 'installer class of vendor dependency hosting in LocalDirectoryDependency should be LocalDirectoryDependencyInstaller'() {
-        LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
-        when(GogradleGlobal.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
+    void 'installer class of vendor dependency hosting in LocalDirectoryDependency should be LocalDirectoryDependencyManager'() {
+        LocalDirectoryDependencyManager installer = mock(LocalDirectoryDependencyManager)
+        when(GogradleGlobal.getInstance(LocalDirectoryDependencyManager)).thenReturn(installer)
         ReflectionUtils.setField(dependency, 'hostDependency', mock(LocalDirectoryDependency))
         assert dependency.getInstaller().is(installer)
     }
@@ -137,6 +137,7 @@ class VendorResolvedDependencyTest {
         assert dependency != null
         assert dependency != mock(GolangDependency)
         assert dependency == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
+        assert dependency != VendorResolvedDependency.fromParent('github.com/a/c', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency.hashCode() == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b')).hashCode()
     }
 

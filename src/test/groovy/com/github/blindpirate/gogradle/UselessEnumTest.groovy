@@ -15,7 +15,7 @@ class UselessEnumTest {
         [BuildMode,
          Os,
          Arch,
-         AbstractNotationDependency.NoTransitiveSpec,
+         AbstractNotationDependency.NoTransitivePredicate,
          DependencyInstallFileFilter,
          GogradleGlobal].each(this.&doUselessTest)
     }

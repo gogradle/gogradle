@@ -58,11 +58,14 @@ golang {
         assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
     }
 
-    void build() {
-        initStdoutStderr()
-        newBuild {
+    void build(List arguments) {
+        newBuild({
             it.forTasks('resolveBuildDependencies')
-        }
+        }, arguments)
+    }
+
+    void build() {
+        build([])
     }
 
     @Test
@@ -142,5 +145,23 @@ dependencies {
         IOUtils.write(resource, 'sub/testdata/a.go', 'modified')
         build()
         assertUpToDate()
+    }
+
+    @Test
+    void 'up-to-date check should be always disabled if --refresh-dependencies exist'() {
+        build(['--refresh-dependencies'])
+
+        build(['--refresh-dependencies'])
+        assertNotUpToDate()
+        build(['--refresh-dependencies'])
+        assertNotUpToDate()
+    }
+
+    @Test
+    void 'modification to build mode should make dependencies updated'() {
+        build()
+        IOUtils.write(resource, 'build.gradle', buildDotGradle + 'golang {buildMode="DEVELOP"}')
+        build()
+        assertNotUpToDate()
     }
 }

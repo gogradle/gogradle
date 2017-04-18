@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.vcs;
 
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
@@ -11,7 +12,7 @@ import static java.util.Collections.singletonList;
 
 public abstract class GitMercurialNotationDependency extends AbstractNotationDependency {
 
-    public static final String NEWEST_COMMIT = "NEWEST_COMMIT";
+    public static final String LATEST_COMMIT = "LATEST_COMMIT";
 
     public static final String URL_KEY = "url";
     public static final String URLS_KEY = "urls";
@@ -67,6 +68,14 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
         return commit;
     }
 
+    @Override
+    public CacheScope getCacheScope() {
+        if (StringUtils.isBlank(commit) || LATEST_COMMIT.equals(commit)) {
+            return CacheScope.BUILD;
+        } else {
+            return CacheScope.PERSISTENCE;
+        }
+    }
 
     @Override
     public String toString() {

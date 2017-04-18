@@ -75,9 +75,6 @@ public class StandardPackagePathResolver implements PackagePathResolver {
                     "unicode",
                     "unsafe",
                     // since Go 1.8
-                    "plugin",
-                    // workaround
-                    "appengine",
-                    "appengine_internal"
+                    "plugin"
             );
 }

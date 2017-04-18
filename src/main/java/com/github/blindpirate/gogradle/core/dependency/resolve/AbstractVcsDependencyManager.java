@@ -2,13 +2,13 @@ package com.github.blindpirate.gogradle.core.dependency.resolve;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller;
+import com.github.blindpirate.gogradle.core.dependency.install.VendorSupportMixin;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -19,77 +19,39 @@ import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static com.github.blindpirate.gogradle.core.cache.CacheScope.PERSISTENCE;
+import static java.util.Arrays.asList;
 
 public abstract class AbstractVcsDependencyManager<VERSION>
-        implements DependencyResolver, DependencyInstaller {
+        implements CacheEnabledDependencyResolverMixin, VendorSupportMixin, DependencyManager {
 
     private static final Logger LOGGER = Logging.getLogger(AbstractVcsDependencyManager.class);
 
     private final GlobalCacheManager globalCacheManager;
+    private final ProjectCacheManager projectCacheManager;
 
-    public AbstractVcsDependencyManager(GlobalCacheManager cacheManager) {
-        this.globalCacheManager = cacheManager;
+    public AbstractVcsDependencyManager(GlobalCacheManager globalCacheManager,
+                                        ProjectCacheManager projectCacheManager) {
+        this.globalCacheManager = globalCacheManager;
+        this.projectCacheManager = projectCacheManager;
     }
 
     @Override
-    public ResolvedDependency resolve(ResolveContext context, NotationDependency dependency) {
-        Optional<ResolvedDependency> resultInCache = context.getDependencyRegistry().getFromCache(dependency);
-        if (resultInCache.isPresent()) {
-            return resultInCache.get();
-        }
-        ResolvedDependency ret = doResolve(dependency, context);
-
-        context.getDependencyRegistry().putIntoCache(dependency, ret);
-        return ret;
+    public ProjectCacheManager getProjectCacheManager() {
+        return projectCacheManager;
     }
 
-    private ResolvedDependency doResolve(NotationDependency dependency, ResolveContext context) {
-        LOGGER.quiet("Resolving {}", dependency);
+    @Override
+    public ResolvedDependency doResolve(ResolveContext context, NotationDependency dependency) {
         try {
-            NotationDependency vcsNotationDependency = extractVcsHostDependency(dependency);
-
-            return globalCacheManager.runWithGlobalCacheLock(vcsNotationDependency, () -> {
-                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(vcsNotationDependency.getName()).toFile();
-                ResolvedDependency vcsResolvedDependency = resolveVcs(vcsNotationDependency, vcsRoot, context);
-                return extractVendorDependencyIfNecessary(dependency, vcsResolvedDependency);
+            return globalCacheManager.runWithGlobalCacheLock(dependency, () -> {
+                File vcsRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
+                return resolveVcs(dependency, vcsRoot, context);
             });
         } catch (Exception e) {
             throw DependencyResolutionException.cannotResolveDependency(dependency, e);
-        }
-    }
-
-    private NotationDependency extractVcsHostDependency(NotationDependency dependency) {
-        if (dependency instanceof VendorNotationDependency) {
-            return VendorNotationDependency.class.cast(dependency).getHostNotationDependency();
-        } else {
-            return dependency;
-        }
-    }
-
-    private ResolvedDependency extractVendorDependencyIfNecessary(NotationDependency dependency,
-                                                                  ResolvedDependency resolvedDependency) {
-        if (dependency instanceof VendorNotationDependency) {
-            VendorNotationDependency vendorNotationDependency = (VendorNotationDependency) dependency;
-            Optional<VendorResolvedDependency> result = resolvedDependency.getDependencies().flatten()
-                    .stream()
-                    .filter(d -> d instanceof VendorResolvedDependency)
-                    .map(d -> (VendorResolvedDependency) d)
-                    .filter(d ->
-                            toUnixString(d.getRelativePathToHost()).equals(vendorNotationDependency.getVendorPath()))
-                    .findFirst();
-            if (result.isPresent()) {
-                return result.get();
-            } else {
-                throw DependencyResolutionException.vendorNotExist(vendorNotationDependency, resolvedDependency);
-            }
-        } else {
-            return resolvedDependency;
         }
     }
 
@@ -103,7 +65,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     @Override
     public void install(ResolvedDependency dependency, File targetDirectory) {
         try {
-            ResolvedDependency realDependency = determineResolvedDependency(dependency);
+            ResolvedDependency realDependency = determineDependency(dependency);
             globalCacheManager.runWithGlobalCacheLock(realDependency, () -> {
                 restoreRepository(realDependency);
                 installUnderLock(dependency, targetDirectory);
@@ -115,28 +77,12 @@ public abstract class AbstractVcsDependencyManager<VERSION>
     }
 
     private void installUnderLock(ResolvedDependency dependency, File targetDirectory) {
-        ResolvedDependency realDependency = determineResolvedDependency(dependency);
+        ResolvedDependency realDependency = determineDependency(dependency);
         Path globalCachePath = globalCacheManager.getGlobalPackageCachePath(realDependency.getName());
         doReset(realDependency, globalCachePath);
 
         Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
         IOUtils.copyDirectory(srcPath.toFile(), targetDirectory, DependencyInstallFileFilter.INSTANCE);
-    }
-
-    private ResolvedDependency determineResolvedDependency(ResolvedDependency dependency) {
-        if (dependency instanceof VendorResolvedDependency) {
-            return VendorResolvedDependency.class.cast(dependency).getHostDependency();
-        } else {
-            return dependency;
-        }
-    }
-
-    private Path determineRelativePath(ResolvedDependency dependency) {
-        if (dependency instanceof VendorResolvedDependency) {
-            return VendorResolvedDependency.class.cast(dependency).getRelativePathToHost();
-        } else {
-            return Paths.get(".");
-        }
     }
 
 
@@ -156,39 +102,54 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         File globalCacheRepoRoot = globalCacheManager.getGlobalPackageCachePath(dependency.getName()).toFile();
 
         String url = VcsResolvedDependency.class.cast(dependency).getUrl();
-        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(globalCacheRepoRoot, Arrays.asList(url));
-        if (repositoryNeedInit) {
-            initRepository(dependency.getName(), Arrays.asList(url), globalCacheRepoRoot);
+        if (repositoryNeedInit(globalCacheRepoRoot, asList(url))) {
+            initRepository(dependency.getName(), asList(url), globalCacheRepoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
+        } else if (!concreteVersionExistInRepo(globalCacheRepoRoot, dependency)) {
+            updateRepository(dependency, globalCacheRepoRoot);
         }
     }
 
     private void resolveRepository(NotationDependency dependency, File repoRoot) {
         List<String> expectedUrls = GitMercurialNotationDependency.class.cast(dependency).getUrls();
-        boolean repositoryNeedInit = globalCacheRepositoryNeedInit(repoRoot, expectedUrls);
-        if (repositoryNeedInit) {
+        if (repositoryNeedInit(repoRoot, expectedUrls)) {
             initRepository(dependency.getName(), expectedUrls, repoRoot);
             globalCacheManager.updateCurrentDependencyLock(dependency);
-        } else if (globalCacheManager.currentDependencyIsOutOfDate(dependency)) {
-            if (GogradleGlobal.isOffline()) {
-                LOGGER.info("Cannot pull update {} since it is offline now.", dependency);
-            } else {
-                updateRepository(dependency, repoRoot);
-                globalCacheManager.updateCurrentDependencyLock(dependency);
-            }
-        } else {
-            LOGGER.info("Skipped updating {} since it is up-to-date.", dependency);
+        } else if (repositoryNeedUpdate(repoRoot, dependency)) {
+            updateRepository(dependency, repoRoot);
+            globalCacheManager.updateCurrentDependencyLock(dependency);
         }
     }
 
-    protected abstract void updateRepository(NotationDependency dependency,
+    protected boolean repositoryNeedUpdate(File repoRoot, NotationDependency dependency) {
+        if (GogradleGlobal.isOffline()) {
+            LOGGER.info("Cannot update {} in {} since it is offline now.", dependency, repoRoot);
+            return false;
+        } else if (globalCacheManager.currentRepositoryIsUpToDate(dependency)) {
+            LOGGER.info("Skip updating {} in {} since it is up-to-date.", dependency, repoRoot);
+            return false;
+        } else if (dependency.getCacheScope() == PERSISTENCE && !concreteVersionExistInRepo(repoRoot, dependency)) {
+            LOGGER.info("{} does not exist in {}, updating will be performed.", dependency, repoRoot);
+            return true;
+        } else if (GogradleGlobal.isRefreshDependencies()) {
+            LOGGER.info("Updating {} in {} since --refresh-dependencies is used.", dependency, repoRoot);
+            return true;
+        } else {
+            LOGGER.info("Skip updating {} in {}.", dependency, repoRoot);
+            return false;
+        }
+    }
+
+    protected abstract boolean concreteVersionExistInRepo(File repoRoot, GolangDependency dependency);
+
+    protected abstract void updateRepository(GolangDependency dependency,
                                              File repoRoot);
 
     protected abstract void initRepository(String name, List<String> urls, File repoRoot);
 
 
-    private boolean globalCacheRepositoryNeedInit(File globalCacheRepoRoot,
-                                                  List<String> expectedUrls) {
+    private boolean repositoryNeedInit(File globalCacheRepoRoot,
+                                       List<String> expectedUrls) {
         if (IOUtils.dirIsEmpty(globalCacheRepoRoot)) {
             return true;
         } else {

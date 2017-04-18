@@ -46,7 +46,7 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
         // Here we can just fetch them from internal container
         GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
         GolangDependencySet lockedDependencies = getLockedDependencies(dependency, rootDir, visitor, configuration);
-        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir);
+        GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir, configuration);
 
 
         GolangDependencySet result = settings

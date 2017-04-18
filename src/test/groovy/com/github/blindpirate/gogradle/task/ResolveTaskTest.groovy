@@ -3,15 +3,24 @@ package com.github.blindpirate.gogradle.task
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
-import com.github.blindpirate.gogradle.core.dependency.ResolveContext
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
+import com.github.blindpirate.gogradle.core.dependency.produce.external.glide.GlideDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.produce.external.glock.GlockDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.produce.external.godep.GodepDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.GopmDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor.GovendorDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory
+import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -21,9 +30,9 @@ import org.mockito.stubbing.Answer
 
 import java.nio.file.Path
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
-import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
 import static org.mockito.Mockito.verify
@@ -46,57 +55,133 @@ class ResolveTaskTest extends TaskTest {
     @Mock
     DependencyVisitor dependencyVisitor
 
-    ResolvedDependency resolvedDependency = mockResolvedDependency('notationDependency')
+    GogradleRootProject gogradleRootProject = new GogradleRootProject()
 
     @Before
     void setUp() {
+        when(project.getRootDir()).thenReturn(resource)
+        when(rootPath.toFile()).thenReturn(resource)
+        when(setting.getPackagePath()).thenReturn("package")
+
         resolveBuildDependenciesTask = buildTask(ResolveBuildDependenciesTask)
         resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
+
+        gogradleRootProject.initSingleton('package', resource)
+        ReflectionUtils.setField(resolveBuildDependenciesTask,'gogradleRootProject',gogradleRootProject)
+        ReflectionUtils.setField(resolveTestDependenciesTask,'gogradleRootProject',gogradleRootProject)
 
         when(configurationManager.getByName(anyString())).thenReturn(configuration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
 
-        when(buildManager.getInstallationDirectory('build')).thenReturn(new File(resource, '.gogradle/build_gopath').toPath())
-        when(buildManager.getInstallationDirectory('test')).thenReturn(new File(resource, '.gogradle/test_gopath').toPath())
-
-        when(rootPath.toFile()).thenReturn(resource)
-        when(setting.getPackagePath()).thenReturn("package")
-        when(project.getRootDir()).thenReturn(resource)
         when(GogradleGlobal.INSTANCE.getInjector().getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
         when(dependencyTreeFactory.getTree(any(ResolveContext), any(LocalDirectoryDependency))).thenReturn(tree)
-        GolangDependencySet dependencies = asGolangDependencySet(resolvedDependency)
-        when(tree.flatten()).thenReturn(dependencies)
+
+        DependencyTreeNode.metaClass.getName = { ReflectionUtils.getField(delegate, 'name') }
+        DependencyTreeNode.metaClass.getStar = { ReflectionUtils.getField(delegate, 'star') }
+        DependencyTreeNode.metaClass.getOriginalDependency = {
+            ReflectionUtils.getField(delegate, 'originalDependency')
+        }
+        DependencyTreeNode.metaClass.getFinalDependency = { ReflectionUtils.getField(delegate, 'finalDependency') }
+        DependencyTreeNode.metaClass.getChildren = { ReflectionUtils.getField(delegate, 'children') }
     }
 
     @Test
-    void 'build dependency resolution should succeed'() {
+    void 'dependency resolution should succeed'() {
         // when
         when(configuration.getName()).thenReturn('build')
+        when(dependencyTreeFactory.getTree(any(ResolveContext), any(ResolvedDependency)))
+                .thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return buildDependencyTree(invocation.getArgument(1))
+            }
+        })
         resolveBuildDependenciesTask.resolve()
         // then
-        verify(buildManager).installDependency(resolvedDependency, 'build')
-        assert resolveBuildDependenciesTask.dependencyTree.is(tree)
+        assert new File(resource, '.gogradle/cache/build.bin').exists()
+        verify(projectCacheManager).loadPersistenceCache()
+        verify(projectCacheManager).savePersistenceCache()
+    }
+
+    DependencyTreeNode buildDependencyTree(ResolvedDependency rootProject) {
+        ResolvedDependency d1 = LocalDirectoryDependency.fromLocal('d1', resource)
+        d1.exclude([name: 'excluded'])
+
+        ResolvedDependency d2 = LocalDirectoryDependency.fromLocal('d2', resource)
+        NotationDependency d3 = new GitNotationDependency()
+        d3.name = 'd3'
+        d3.commit = 'commit'
+        d3.url = 'url'
+        d3.transitive = false
+
+        ResolvedDependency d3Resolved = GitResolvedDependency.builder(VcsType.GIT)
+                .withName('d3')
+                .withCommitId('commit')
+                .withUrl('url')
+                .withNotationDependency(d3)
+                .build()
+        ReflectionUtils.setField(d3, 'resolvedDependency', d3Resolved)
+
+        d1.dependencies.add(d3)
+
+        DependencyTreeNode root = DependencyTreeNode.withOrignalAndFinal(rootProject, rootProject, false)
+        DependencyTreeNode node1 = DependencyTreeNode.withOrignalAndFinal(d1, d1, false)
+        DependencyTreeNode node2 = DependencyTreeNode.withOrignalAndFinal(d2, d2, false)
+        DependencyTreeNode node3 = DependencyTreeNode.withOrignalAndFinal(d3Resolved, d3Resolved, true)
+        root.addChild(node1)
+        root.addChild(node2)
+        node1.addChild(node3)
+        return root
     }
 
     @Test
-    void 'test dependency resolution should succeed'() {
-        // when
-        when(configuration.getName()).thenReturn('test')
-        resolveTestDependenciesTask.resolve()
-        // then
-        verify(buildManager).installDependency(resolvedDependency, 'test')
-        assert resolveTestDependenciesTask.dependencyTree.is(tree)
+    void 'recovering from serialization file should succeed'() {
+        'dependency resolution should succeed'()
+        ReflectionUtils.setField(resolveBuildDependenciesTask, 'dependencyTree', null)
+        DependencyTreeNode tree = resolveBuildDependenciesTask.dependencyTree
+
+        assert tree.name == 'package'
+        assert tree.children.size() == 2
+
+        assertTreeNodeIs(tree.children[0], 'd1')
+        assert tree.children[0].originalDependency.transitiveDepExclusions.size() == 1
+        assert tree.children[0].originalDependency.dependencies.size() == 1
+        assert tree.children[0].originalDependency.transitiveDepExclusions[0] == PropertiesExclusionPredicate.of([name: 'excluded'])
+
+        GitNotationDependency d3NotationDependency = tree.children[0].originalDependency.dependencies.first()
+        assert d3NotationDependency.name == 'd3'
+        assert d3NotationDependency.commit == 'commit'
+        assert d3NotationDependency.urls == ['url']
+        assert d3NotationDependency.transitiveDepExclusions == [NO_TRANSITIVE_DEP_PREDICATE] as Set
+        GitResolvedDependency d3ResolvedDependency = ReflectionUtils.getField(d3NotationDependency, 'resolvedDependency')
+        assert d3ResolvedDependency.name == 'd3'
+        assert d3ResolvedDependency.version == 'commit'
+        assert d3ResolvedDependency.url == 'url'
+
+
+        assertTreeNodeIs(tree.children[1], 'd2')
+
+        assertTreeNodeIs(tree.children[0].children[0], 'd3')
+        assert tree.children[0].children[0].originalDependency.is(d3ResolvedDependency)
+    }
+
+    void assertTreeNodeIs(DependencyTreeNode node, String name) {
+        assert node.name == name
+        assert node.originalDependency instanceof ResolvedDependency
+        assert node.originalDependency.is(node.finalDependency)
     }
 
     @Test
     void 'checking external files should succeed'() {
-        when(GogradleGlobal.INSTANCE.getInjector().getInstance((Class) any(Class))).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                return invocation.getArgument(0).newInstance()
-            }
-        })
-
+        ReflectionUtils.setField(resolveBuildDependenciesTask, 'externalDependencyFactories',
+                [DefaultLockedDependencyManager,
+                 GodepDependencyFactory,
+                 GlideDependencyFactory,
+                 GovendorDependencyFactory,
+                 GvtGbvendorDependencyFactory,
+                 TrashDependencyFactory,
+                 GlockDependencyFactory,
+                 GopmDependencyFactory].collect { it.newInstance() })
         ['gogradle.lock', 'glide.lock', 'vendor/vendor.json'].each {
             IOUtils.write(resource, it, '')
         }
@@ -148,21 +233,5 @@ class ResolveTaskTest extends TaskTest {
         IOUtils.write(resource, 'main_test.go', '')
         assert resolveBuildDependenciesTask.goSourceFiles == [new File(resource, 'main.go')]
         assert resolveTestDependenciesTask.goSourceFiles == [new File(resource, 'main_test.go')]
-    }
-
-    @Test
-    void 'checking installation directory should succeed'() {
-        assert resolveBuildDependenciesTask.installationDirectory == new File(resource, '.gogradle/build_gopath')
-        assert resolveTestDependenciesTask.installationDirectory == new File(resource, '.gogradle/test_gopath')
-    }
-
-    @Test
-    void 'resolution should be executed if it is skipped'() {
-        when(configuration.getName()).thenReturn('build')
-
-        DependencyTreeNode tree = resolveBuildDependenciesTask.getDependencyTree()
-        assert tree == resolveBuildDependenciesTask.getDependencyTree()
-
-        verify(buildManager).installDependency(resolvedDependency, 'build')
     }
 }

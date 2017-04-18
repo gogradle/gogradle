@@ -102,7 +102,7 @@ dependencies {
 
 """)
         newBuild {
-            it.forTasks('resolveBuildDependencies')
+            it.forTasks('installBuildDependencies')
         }
         assert new File(resource, 'project/.gogradle/build_gopath/src/unrecognized2/helloworld.go').exists()
     }

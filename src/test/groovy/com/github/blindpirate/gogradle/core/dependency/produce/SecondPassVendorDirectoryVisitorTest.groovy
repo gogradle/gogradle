@@ -2,13 +2,14 @@ package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.VendorOnlyProduceStrategy
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
@@ -21,7 +22,6 @@ import org.mockito.Mock
 
 import java.nio.file.Path
 
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
 
@@ -31,20 +31,20 @@ import static org.mockito.Mockito.when
 class SecondPassVendorDirectoryVisitorTest {
     PackagePathResolver packagePathResolver = new UnrecognizedPackagePathResolver()
     @Mock
-    VendorOnlyProduceStrategy vendorOnlyProduceStrategy
-    @Mock
     VcsResolvedDependency hostDependency
     @Mock
     DependencyVisitor dependencyVisitor
     @Mock
     VcsAccessor vcsAccessor
 
+    ProjectCacheManager projectCacheManager = MockUtils.projectCacheManagerWithoutCache()
+
     File resource
 
     @Before
     void setUp() {
         when(hostDependency.getVcsType()).thenReturn(VcsType.GIT)
-        when(GogradleGlobal.INSTANCE.injector.getInstance(VendorOnlyProduceStrategy)).thenReturn(vendorOnlyProduceStrategy)
+        when(GogradleGlobal.INSTANCE.injector.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(GogradleGlobal.INSTANCE.injector.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
         when(GogradleGlobal.INSTANCE.injector.getInstance(Key.get(VcsAccessor, Git))).thenReturn(vcsAccessor)
         when(vcsAccessor.lastCommitTimeOfPath(any(File), any(Path))).thenReturn(123L)
@@ -64,8 +64,8 @@ class SecondPassVendorDirectoryVisitorTest {
             assert it.hostDependency == hostDependency
             assert it.updateTime == 123L
         }
-        assert toUnixString(a.relativePathToHost) == 'vendor/a'
-        assert toUnixString(b.relativePathToHost) == 'vendor/b'
+        assert a.relativePathToHost == 'vendor/a'
+        assert b.relativePathToHost == 'vendor/b'
     }
 
 }

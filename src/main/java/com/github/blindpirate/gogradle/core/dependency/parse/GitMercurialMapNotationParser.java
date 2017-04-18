@@ -16,7 +16,7 @@ import java.util.Optional;
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.COMMIT_KEY;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.NEWEST_COMMIT;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.LATEST_COMMIT;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URLS_KEY;
 import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URL_KEY;
@@ -39,7 +39,7 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         }
 
         if (allBlank(version, tag, commit)) {
-            notation.put("commit", NEWEST_COMMIT);
+            notation.put("commit", LATEST_COMMIT);
         }
     }
 

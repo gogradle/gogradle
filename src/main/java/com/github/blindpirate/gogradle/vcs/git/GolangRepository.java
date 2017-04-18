@@ -87,7 +87,7 @@ public class GolangRepository {
             return (String) valueOrClousure;
         } else if (valueOrClousure instanceof Closure) {
             Closure closure = (Closure) valueOrClousure;
-            return (String) closure.call(name);
+            return Assert.isNotNull(closure.call(name)).toString();
         } else {
             return null;
         }

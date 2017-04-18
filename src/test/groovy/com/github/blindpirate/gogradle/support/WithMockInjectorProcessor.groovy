@@ -13,8 +13,6 @@ import static org.mockito.Mockito.*
 
 class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector> {
 
-    Injector originalValue
-
     void setUpMockProgressMonitor(Injector injector) {
         ProgressLogger mockLogger = mock(ProgressLogger)
         ServiceRegistry mockServiceRegistry = mock(ServiceRegistry)
@@ -26,14 +24,16 @@ class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector
 
     @Override
     void beforeTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
-        originalValue = ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'injector')
-        Injector mockInjector = mock(Injector, RETURNS_DEEP_STUBS)
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', mockInjector)
-        setUpMockProgressMonitor(mockInjector)
+        if (!isMock(GogradleGlobal.INSTANCE.getInjector())) {
+            GogradleGlobal.INSTANCE.injector = mock(Injector)
+        }
+        setUpMockProgressMonitor(GogradleGlobal.INSTANCE.getInjector())
     }
 
     @Override
     void afterTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'injector', originalValue)
+        if (isMock(GogradleGlobal.INSTANCE.getInjector())) {
+            reset(GogradleGlobal.INSTANCE.getInjector())
+        }
     }
 }

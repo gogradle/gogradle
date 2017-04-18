@@ -15,7 +15,7 @@ class GitDependencyManagerTest {
 
     @Before
     void setUp() {
-        manager = new GitDependencyManager(null, accessor)
+        manager = new GitDependencyManager(null, null, accessor)
     }
 
     @Test

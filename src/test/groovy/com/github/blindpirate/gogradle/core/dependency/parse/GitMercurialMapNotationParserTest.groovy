@@ -68,7 +68,7 @@ class GitMercurialMapNotationParserTest {
         assert dependency.name == 'github.com/a/b'
         assertEmpty(dependency, 'tag',)
         assert dependency.urls == ['specifiedUrl']
-        assert dependency.commit == GitMercurialNotationDependency.NEWEST_COMMIT
+        assert dependency.commit == GitMercurialNotationDependency.LATEST_COMMIT
     }
 
     @Test
@@ -84,7 +84,7 @@ class GitMercurialMapNotationParserTest {
         assert dependency.name == 'github.com/a/b'
         assertEmpty(dependency, 'tag', 'url')
         assert dependency.urls == ['url']
-        assert dependency.commit == GitMercurialNotationDependency.NEWEST_COMMIT
+        assert dependency.commit == GitMercurialNotationDependency.LATEST_COMMIT
     }
 
     @Test
@@ -116,8 +116,8 @@ class GitMercurialMapNotationParserTest {
 
         // then
         assertEmpty(dependency, 'tag', 'url')
-        assert dependency.commit == GitMercurialNotationDependency.NEWEST_COMMIT
-        assert dependency.version == GitMercurialNotationDependency.NEWEST_COMMIT
+        assert dependency.commit == GitMercurialNotationDependency.LATEST_COMMIT
+        assert dependency.version == GitMercurialNotationDependency.LATEST_COMMIT
     }
 
     @Test

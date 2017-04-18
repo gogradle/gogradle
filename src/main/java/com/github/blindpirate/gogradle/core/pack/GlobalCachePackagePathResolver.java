@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.pack;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
@@ -26,20 +27,22 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
     @Override
     @DebugLog
     public Optional<GolangPackage> produce(String packagePath) {
-        Path path = Paths.get(packagePath);
-        for (int i = path.getNameCount(); i > 0; i--) {
-            Path subpath = path.subpath(0, i);
-            Optional<GlobalCacheMetadata> metadata = globalCacheManager.getMetadata(subpath);
-            if (metadata.isPresent() && metadata.get().getOriginalVcs() != null) {
-                VcsType vcsType = VcsType.of(metadata.get().getOriginalVcs()).get();
-                List<String> urls = metadata.get().getOriginalUrls();
+        if (!GogradleGlobal.isRefreshDependencies()) {
+            Path path = Paths.get(packagePath);
+            for (int i = path.getNameCount(); i > 0; i--) {
+                Path subpath = path.subpath(0, i);
+                Optional<GlobalCacheMetadata> metadata = globalCacheManager.getMetadata(subpath);
+                if (metadata.isPresent() && metadata.get().getOriginalVcs() != null) {
+                    VcsType vcsType = VcsType.of(metadata.get().getOriginalVcs()).get();
+                    List<String> urls = metadata.get().getOriginalUrls();
 
-                VcsGolangPackage pkg = VcsGolangPackage.builder()
-                        .withPath(packagePath)
-                        .withRootPath(subpath)
-                        .withOriginalVcsInfo(vcsType, urls)
-                        .build();
-                return Optional.of(pkg);
+                    VcsGolangPackage pkg = VcsGolangPackage.builder()
+                            .withPath(packagePath)
+                            .withRootPath(subpath)
+                            .withOriginalVcsInfo(vcsType, urls)
+                            .build();
+                    return Optional.of(pkg);
+                }
             }
         }
 

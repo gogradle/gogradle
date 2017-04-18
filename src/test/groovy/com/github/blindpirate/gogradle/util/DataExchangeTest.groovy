@@ -10,7 +10,7 @@ import org.junit.runner.RunWith
 class DataExchangeTest {
     File resource
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = UncheckedIOException)
     void 'unchecked exception should be thrown if IOException occurs'() {
         DataExchange.toYaml(new Object() {
             @SuppressFBWarnings('UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS')

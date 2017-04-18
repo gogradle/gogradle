@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
 
@@ -9,6 +10,7 @@ import java.io.File;
 import java.util.Set;
 import java.util.function.Predicate;
 
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
 import static java.util.Collections.emptySet;
 
@@ -59,10 +61,10 @@ public class ResolveContext {
     public GolangDependencySet produceTransitiveDependencies(ResolvedDependency dependency,
                                                              File rootDir) {
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
-        GolangDependencySet ret = dependencyProduceStrategy.produce(dependency,
-                rootDir,
-                visitor,
-                GolangConfiguration.BUILD);
+        ProjectCacheManager projectCacheManager = GogradleGlobal.getInstance(ProjectCacheManager.class);
+
+        GolangDependencySet ret = projectCacheManager.produce(dependency,
+                resolvedDependency -> dependencyProduceStrategy.produce(dependency, rootDir, visitor, BUILD));
 
         return filterRecursively(ret);
     }

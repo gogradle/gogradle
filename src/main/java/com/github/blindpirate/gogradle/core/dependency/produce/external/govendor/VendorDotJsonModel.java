@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
+
 /**
  * Model of vendor/vendor.json in repos managed by govendor.
  *
@@ -45,8 +47,18 @@ public class VendorDotJsonModel {
 
         Map<String, Object> toNotation() {
             Assert.isNotBlank(path);
+            /*
+             {
+                 "path": "appengine",
+                 "revision": ""
+             },
+             {
+                 "path": "appengine_internal",
+                 "revision": ""
+             }
+             */
             return MapUtils.asMapWithoutNull("name", path,
-                    "version", revision);
+                    "version", isBlank(revision) ? null : revision);
         }
     }
 }

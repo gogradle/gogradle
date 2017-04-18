@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -15,15 +13,14 @@ import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
-/**
- * All implementations must override equals() and hashCode()
- */
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NoTransitivePredicate.NO_TRANSITIVE_PREDICATE;
+
 public abstract class AbstractNotationDependency extends AbstractGolangDependency implements NotationDependency {
-    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NoTransitiveSpec.NO_TRANSITIVE_SPEC;
+    public static final Predicate<GolangDependency> NO_TRANSITIVE_DEP_PREDICATE = NO_TRANSITIVE_PREDICATE;
 
     public static final String VERSION_KEY = "version";
 
-    private transient ResolvedDependency resolvedDependency;
+    private ResolvedDependency resolvedDependency;
 
     /**
      * The {@link GolangDependency} matching any of this set will be excluded from transitive dependencies.
@@ -32,7 +29,7 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
 
     @Override
     public Set<Predicate<GolangDependency>> getTransitiveDepExclusions() {
-        return transitiveDepExclusions;
+        return new HashSet<>(transitiveDepExclusions);
     }
 
     @Override
@@ -43,12 +40,7 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         return resolvedDependency;
     }
 
-    protected ResolvedDependency doResolve(ResolveContext context) {
-        DependencyResolver resolver = GogradleGlobal.getInstance(this.getResolverClass());
-        return resolver.resolve(context, this);
-    }
-
-    protected abstract Class<? extends DependencyResolver> getResolverClass();
+    protected abstract ResolvedDependency doResolve(ResolveContext context);
 
     public void exclude(Map<String, Object> map) {
         transitiveDepExclusions.add(PropertiesExclusionPredicate.of(map));
@@ -62,8 +54,16 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         }
     }
 
-    public enum NoTransitiveSpec implements Predicate<GolangDependency> {
-        NO_TRANSITIVE_SPEC;
+    @Override
+    public Object clone() {
+        AbstractNotationDependency ret = (AbstractNotationDependency) super.clone();
+        ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
+        ret.resolvedDependency = null;
+        return ret;
+    }
+
+    public enum NoTransitivePredicate implements Predicate<GolangDependency> {
+        NO_TRANSITIVE_PREDICATE;
 
         @Override
         public boolean test(GolangDependency dependency) {

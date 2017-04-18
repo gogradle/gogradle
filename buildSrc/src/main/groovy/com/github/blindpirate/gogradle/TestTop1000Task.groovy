@@ -79,7 +79,7 @@ goBuild {
         stdout.append("Start building ${path}\n")
         stderr.append("Start building ${path}\n")
 
-        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'clean', 'build', '--stacktrace').directory(path.toFile())
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goClean', 'goBuild', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 

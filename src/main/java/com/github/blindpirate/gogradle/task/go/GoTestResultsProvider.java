@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.task.go;
 
-import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.Action;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
@@ -8,6 +7,7 @@ import org.gradle.api.internal.tasks.testing.junit.result.TestResultsProvider;
 import org.gradle.api.tasks.testing.TestOutputEvent;
 
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class GoTestResultsProvider implements TestResultsProvider {
         try {
             writer.write(stdout);
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

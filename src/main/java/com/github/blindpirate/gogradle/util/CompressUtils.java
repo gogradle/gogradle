@@ -2,15 +2,16 @@ package com.github.blindpirate.gogradle.util;
 
 import net.lingala.zip4j.core.ZipFile;
 import net.lingala.zip4j.exception.ZipException;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.apache.tools.tar.TarEntry;
 import org.apache.tools.tar.TarInputStream;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.zip.GZIPInputStream;
 
 public class CompressUtils {
@@ -44,7 +45,7 @@ public class CompressUtils {
             }
             tin.close();
         } catch (IOException e) {
-            throw ExceptionHandler.uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 

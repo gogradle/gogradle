@@ -29,4 +29,12 @@ class StandardGolangPackageTest {
         assert standardGolangPackage.resolve('go').get() instanceof StandardGolangPackage
         assert standardGolangPackage.resolve('go/ast/ast').get() instanceof StandardGolangPackage
     }
+
+    @Test
+    void 'equality check should succeed'() {
+        assert standardGolangPackage == standardGolangPackage
+        assert standardGolangPackage != null
+        assert standardGolangPackage != UnrecognizedGolangPackage.of("go/ast")
+        assert standardGolangPackage == StandardGolangPackage.of("go/ast")
+    }
 }

@@ -5,7 +5,8 @@ import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
-import com.github.blindpirate.gogradle.core.dependency.UnrecognizedPackageNotationDependency
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
+import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -41,12 +42,14 @@ class DefaultMapNotationParserTest {
     MapNotationParser gitMapNotationParser
     @Mock
     MapNotationParser mercurialMapNotationParser
+    @Mock
+    GogradleRootProject gogradleRootProject
     @Captor
     ArgumentCaptor captor
 
     @Before
     void setUp() {
-        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver)
+        parser = new DefaultMapNotationParser(dirMapNotationParser, vendorMapNotationParser, packagePathResolver, gogradleRootProject)
         MockUtils.mockVcsService(MapNotationParser, Git, gitMapNotationParser)
         MockUtils.mockVcsService(MapNotationParser, Mercurial, mercurialMapNotationParser)
         when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
@@ -82,6 +85,11 @@ class DefaultMapNotationParserTest {
     }
 
     @Test
+    void 'parsing root project should succeed'() {
+        assert parser.parse([name: 'GOGRADLE_ROOT']).is(gogradleRootProject)
+    }
+
+    @Test
     void 'unrecognized package with dir should be delegated to DirMapNotationParser'() {
         // when
         parser.parse([name: 'unrecognized', dir: 'dir'])
@@ -94,7 +102,7 @@ class DefaultMapNotationParserTest {
 
     @Test
     void 'unrecognized notation dependency should be generated if url not specified'() {
-        assert parser.parse([name: 'unrecognized', useless: 'useless']) instanceof UnrecognizedPackageNotationDependency
+        assert parser.parse([name: 'unrecognized', useless: 'useless']) instanceof UnrecognizedNotationDependency
     }
 
     @Test
@@ -119,7 +127,7 @@ class DefaultMapNotationParserTest {
         assert captor.value.name == 'local'
         assert captor.value.package instanceof LocalDirectoryGolangPackage
         assert captor.value.package.rootPathString == 'local'
-        assert captor.value.package.pathString == 'local/sub'
+        assert captor.value.package.pathString == 'local'
         assert captor.value.package.dir == 'dir'
     }
 
@@ -178,7 +186,7 @@ class DefaultMapNotationParserTest {
         verify(gitMapNotationParser).parse(captor.capture())
         assert captor.value.name == 'original'
         assert captor.value.package instanceof VcsGolangPackage
-        assert captor.value.package.pathString == 'original/sub'
+        assert captor.value.package.pathString == 'original'
         assert captor.value.package.rootPathString == 'original'
         assert captor.value.package.originalVcsInfo.vcsType == VcsType.GIT
         assert captor.value.package.originalVcsInfo.urls == ['originalUrl']

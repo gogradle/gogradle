@@ -4,8 +4,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.ConcurrentHashMap;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.isPrefix;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -13,8 +11,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 public class DefaultDependencyRegistry implements DependencyRegistry {
 
     private Map<String, ResolvedDependency> packages = new HashMap<>();
-
-    private ConcurrentHashMap<NotationDependency, ResolvedDependency> cache = new ConcurrentHashMap<>();
 
     @Override
     public boolean register(ResolvedDependency dependencyToResolve) {
@@ -64,16 +60,6 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
             }
         }
         return null;
-    }
-
-    @Override
-    public Optional<ResolvedDependency> getFromCache(NotationDependency dependency) {
-        return Optional.ofNullable(cache.get(dependency));
-    }
-
-    @Override
-    public void putIntoCache(NotationDependency dependency, ResolvedDependency resolvedDependency) {
-        cache.put(dependency, resolvedDependency);
     }
 
     private boolean existentDependencyIsOutOfDate(ResolvedDependency existingDependency,

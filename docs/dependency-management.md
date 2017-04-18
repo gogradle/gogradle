@@ -38,6 +38,13 @@ dependencies {
 }
 ```
 
+By default, if you don't specify a commit, Gogradle won't do `git pull` or `hg update -u`  in local repository. You can use `--refresh-dependencies` to force Gogradle to do so:
+ 
+```
+gradlew goBuild --refresh-dependencies
+``` 
+
+
 [SemVersion](http://semver.org/) is supported in dependency declaration. In Git, a "version" is just a tag. Gogradle doesn't recommend to use SemVersion since it may break reproducibility of build.
 
 ```groovy

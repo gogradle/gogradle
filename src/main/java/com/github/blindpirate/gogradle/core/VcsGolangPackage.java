@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 public class VcsGolangPackage extends ResolvableGolangPackage {
@@ -140,6 +141,20 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
                 + '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        VcsGolangPackage that = (VcsGolangPackage) o;
+        return Objects.equals(determineVcs(), that.determineVcs());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), determineVcs());
+    }
+
     public static class VcsInfo implements Serializable {
         private VcsType vcsType = VcsType.GIT;
         private List<String> urls;
@@ -155,6 +170,24 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
 
         public List<String> getUrls() {
             return urls;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            VcsInfo vcsInfo = (VcsInfo) o;
+            return vcsType == vcsInfo.vcsType
+                    && Objects.equals(urls, vcsInfo.urls);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(vcsType, urls);
         }
     }
 }

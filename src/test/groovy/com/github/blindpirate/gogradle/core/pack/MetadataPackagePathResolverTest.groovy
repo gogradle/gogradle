@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.pack
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.util.HttpUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -19,6 +20,7 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
+@MockOffline(false)
 class MetadataPackagePathResolverTest {
 
     @Mock
@@ -30,13 +32,11 @@ class MetadataPackagePathResolverTest {
     void setUp() {
         resolver = new MetadataPackagePathResolver(httpUtils)
         when(httpUtils.appendQueryParams(anyString(), anyMap())).thenCallRealMethod()
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
     }
 
     @Test
+    @MockOffline(true)
     void 'empty result should be returned when offline'() {
-        // given
-        ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', true)
         // then
         assert !resolver.produce('').isPresent()
     }

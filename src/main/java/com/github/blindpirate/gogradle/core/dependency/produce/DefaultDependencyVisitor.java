@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
+import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
@@ -54,8 +55,13 @@ public class DefaultDependencyVisitor implements DependencyVisitor {
     @Override
     @DebugLog
     public GolangDependencySet visitVendorDependencies(ResolvedDependency dependency,
-                                                       File rootDir) {
-        return vendorDependencyFactory.produce(dependency, rootDir);
+                                                       File rootDir,
+                                                       String configuration) {
+        if (GolangConfiguration.BUILD.equals(configuration)) {
+            return vendorDependencyFactory.produce(dependency, rootDir);
+        } else {
+            return GolangDependencySet.empty();
+        }
     }
 
     @Override

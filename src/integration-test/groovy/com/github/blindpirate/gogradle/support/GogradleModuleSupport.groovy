@@ -6,9 +6,7 @@ import com.google.inject.Guice
 import com.google.inject.Injector
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.internal.reflect.Instantiator
 import org.junit.Before
-import org.mockito.Mock
 
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS
 import static org.mockito.Mockito.mock

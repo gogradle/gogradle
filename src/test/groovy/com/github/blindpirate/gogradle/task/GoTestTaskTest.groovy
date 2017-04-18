@@ -24,8 +24,8 @@ import org.mockito.stubbing.Answer
 
 import java.util.function.Consumer
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
@@ -76,8 +76,8 @@ class GoTestTaskTest extends TaskTest {
 
     @Test
     void 'test task should depend on install task'() {
-        assertTaskDependsOn(task, RESOLVE_TEST_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
     }
 
     @Test

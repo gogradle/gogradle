@@ -2,12 +2,11 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
-import com.github.blindpirate.gogradle.core.dependency.ResolveContext
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstaller
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
+import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
+import com.github.blindpirate.gogradle.core.cache.CacheScope
+import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
+import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
@@ -17,11 +16,15 @@ import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Mock
 
 import java.time.Instant
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate.of
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -32,19 +35,23 @@ class LocalDirectoryDependencyTest {
 
     LocalDirectoryDependency dependency
 
+    @Mock
+    LocalDirectoryDependencyManager manager
+
     @Before
     void setUp() {
         dependency = LocalDirectoryDependency.fromLocal('name', resource)
+        when(GogradleGlobal.getInstance(LocalDirectoryDependencyManager)).thenReturn(manager)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'rootDir can be set only once'() {
+        dependency.setDir(StringUtils.toUnixString(resource))
     }
 
     @Test
-    void 'local directory should be resolved to itself'() {
-        // given
-        ResolveContext context = mock(ResolveContext)
-        // when
-        dependency.resolve(context)
-        // then
-        verify(context).produceTransitiveDependencies(dependency, resource)
+    void 'its cache scope should be build'() {
+        assert dependency.cacheScope == CacheScope.BUILD
     }
 
     @Test
@@ -52,9 +59,9 @@ class LocalDirectoryDependencyTest {
         assert dependency.formatVersion() == StringUtils.toUnixString(resource.toPath().toAbsolutePath())
     }
 
-    @Test(expected = UnsupportedOperationException)
+    @Test
     void 'locking a local dependency should cause an exception'() {
-        dependency.toLockedNotation()
+        assert dependency.toLockedNotation() == [name: 'name', dir: StringUtils.toUnixString(resource)]
     }
 
     @Test
@@ -93,18 +100,13 @@ class LocalDirectoryDependencyTest {
         File dest = new File(resource, 'dest')
 
         dependency = LocalDirectoryDependency.fromLocal('name', src)
-        LocalDirectoryDependencyInstaller installer = mock(LocalDirectoryDependencyInstaller)
-        when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyInstaller)).thenReturn(installer)
+        LocalDirectoryDependencyManager installer = mock(LocalDirectoryDependencyManager)
+        when(GogradleGlobal.INSTANCE.getInstance(LocalDirectoryDependencyManager)).thenReturn(installer)
         // when
         dependency.installTo(dest)
         // then
         verify(installer).install(dependency, dest)
-        assert new File(dest, DependencyInstaller.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'local dependency does not support getResolverClass()'() {
-        dependency.getResolverClass()
+        assert new File(dest, DependencyManager.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
     }
 
     @Test
@@ -113,7 +115,19 @@ class LocalDirectoryDependencyTest {
     }
 
     @Test
-    void 'empty dir should be handled successfully'() {
+    void 'resolution and installation should be delegated to LocalDirectoryDependencyManager'() {
+        // given
+        dependency = new LocalDirectoryDependency()
+        dependency.setDir(resource)
+        ResolveContext context = mock(ResolveContext)
+        // when
+        dependency.resolve(context)
+        // then
+        verify(manager).resolve(context, dependency)
+    }
+
+    @Test
+    void 'empty dir should be handled properly'() {
         // given
         dependency = new LocalDirectoryDependency()
         dependency.setDir(GolangRepository.EMPTY_DIR)
@@ -126,4 +140,105 @@ class LocalDirectoryDependencyTest {
         dependency.installTo(null)
     }
 
+    @Test
+    void 'cloning should succeed'() {
+        // given
+        LocalDirectoryDependency d = createLocalDirectoryDependency('d')
+        d.firstLevel = true
+        d.transitive = false
+        d.dependencies.add(createLocalDirectoryDependency('sub'))
+        createVendor(d)
+        // when
+        LocalDirectoryDependency clone = d.clone()
+        // then
+        assertLocalDependencyEqual(d, clone, true)
+        assertLocalDependencyEqual(
+                d.dependencies.find { it.name == 'sub' },
+                clone.dependencies.find { it.name == 'sub' }, false)
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if cascading descebdant dependencies exist'() {
+        LocalDirectoryDependency d = createLocalDirectoryDependency('d')
+        LocalDirectoryDependency sub = createLocalDirectoryDependency('sub')
+        createVendor(d)
+        createVendor(sub)
+        d.dependencies.add(sub)
+        d.clone()
+    }
+
+    void assertLocalDependencyEqual(LocalDirectoryDependency old, LocalDirectoryDependency clone, boolean compareVendor) {
+        assert !old.is(clone)
+        assert old == clone
+        assert old.name == clone.name
+        assert !getField(old, 'transitiveDepExclusions').is(getField(clone, 'transitiveDepExclusions'))
+        assert getField(old, 'transitiveDepExclusions') == getField(clone, 'transitiveDepExclusions')
+        assert old.firstLevel == clone.firstLevel
+
+        if (compareVendor) {
+            VendorResolvedDependency vendor1InOld = old.dependencies.find { it.name == 'vendor1' }
+            VendorResolvedDependency vendor1InClone = clone.dependencies.find { it.name == 'vendor1' }
+            VendorResolvedDependency vendor2InOld = vendor1InOld.dependencies.find { it.name == 'vendor2' }
+            VendorResolvedDependency vendor2InClone = vendor1InClone.dependencies.find { it.name == 'vendor2' }
+
+            assert vendor1InClone == vendor1InOld
+            assert !vendor1InOld.is(vendor1InClone)
+            assert vendor2InClone == vendor2InOld
+            assert !vendor2InOld.is(vendor2InClone)
+            assert vendor1InClone.hostDependency.is(clone)
+            assert vendor2InClone.hostDependency.is(clone)
+        }
+    }
+
+    void createVendor(LocalDirectoryDependency local) {
+        VendorResolvedDependency vendor1 = new VendorResolvedDependencyForTest('vendor1', 'version', 1L, local, 'vendor/vendor1')
+        VendorResolvedDependency vendor2 = new VendorResolvedDependencyForTest('vendor2', 'version', 2L, local, 'vendor/vendor1/vendor/vendor2')
+        vendor1.dependencies.add(vendor2)
+        local.dependencies.add(vendor1)
+    }
+
+    @Test
+    void 'serialization and deserialization should succeed'() {
+        // given
+        LocalDirectoryDependency d1 = createLocalDirectoryDependency('d1')
+        LocalDirectoryDependency d2 = createLocalDirectoryDependency('d2')
+        LocalDirectoryDependency d3 = createLocalDirectoryDependency('d3')
+
+        d1.dependencies.add(d2)
+        d2.dependencies.add(d3)
+
+        d1.exclude([name: 'excluded'])
+        d3.transitive = false
+
+        // when
+        IOUtils.serialize(d1, new File(resource, 'test.bin'))
+        LocalDirectoryDependency resultD1 = IOUtils.deserialize(new File(resource, 'test.bin'))
+        LocalDirectoryDependency resultD2 = resultD1.dependencies.first()
+        LocalDirectoryDependency resultD3 = resultD2.dependencies.first()
+        // then
+        assertResultIs(resultD1, 'd1')
+        assertResultIs(resultD2, 'd2')
+        assertResultIs(resultD3, 'd3')
+        assert resultD1.transitiveDepExclusions == [of([name: 'excluded'])] as Set
+        assert resultD3.transitiveDepExclusions == [NO_TRANSITIVE_DEP_PREDICATE] as Set
+    }
+
+    void assertResultIs(LocalDirectoryDependency localDirectoryDependency, String name) {
+        assert localDirectoryDependency.name == name
+        assert localDirectoryDependency.rootDir == new File(resource, name)
+        assert localDirectoryDependency.package.pathString == name
+        assert localDirectoryDependency.package.rootPathString == name
+        assert localDirectoryDependency.package.dir == StringUtils.toUnixString(new File(resource, name))
+    }
+
+    LocalDirectoryDependency createLocalDirectoryDependency(String name) {
+        File rootDir = new File(resource, name)
+        assert rootDir.mkdir()
+        LocalDirectoryDependency ret = LocalDirectoryDependency.fromLocal(name, rootDir)
+
+        ret.name = name
+        ret.package = LocalDirectoryGolangPackage.of(name, name, StringUtils.toUnixString(rootDir))
+
+        return ret
+    }
 }

@@ -3,15 +3,13 @@ package com.github.blindpirate.gogradle.core.dependency.resolve
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyInstaller
+import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-
-import java.nio.file.Paths
 
 import static org.mockito.Mockito.when
 
@@ -21,7 +19,7 @@ class LocalDirectoryDependencyInstallerTest {
 
     File resource
 
-    LocalDirectoryDependencyInstaller installer = new LocalDirectoryDependencyInstaller()
+    LocalDirectoryDependencyManager installer = new LocalDirectoryDependencyManager()
 
     @Mock
     LocalDirectoryDependency dependency
@@ -52,7 +50,7 @@ class LocalDirectoryDependencyInstallerTest {
     void 'installing a dependency hosting in local dependency should succeed'() {
         // given
         when(vendorResolvedDependency.getHostDependency()).thenReturn(dependency)
-        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn(Paths.get('vendor/root/package'))
+        when(vendorResolvedDependency.getRelativePathToHost()).thenReturn('vendor/root/package')
         IOUtils.write(src, 'vendor/root/package/main.go', 'This is main.go')
         // when
         installer.install(vendorResolvedDependency, dest)

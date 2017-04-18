@@ -4,7 +4,7 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 public class ResolveTestDependenciesTask extends ResolveTask {
     @Override
-    protected String getConfigurationName() {
+    public String getConfigurationName() {
         return TEST;
     }
 }

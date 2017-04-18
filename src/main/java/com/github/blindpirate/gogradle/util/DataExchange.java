@@ -1,16 +1,15 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.ctc.wstx.stax.WstxInputFactory;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.dataformat.xml.XmlMapper;
 import com.fasterxml.jackson.dataformat.yaml.YAMLFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.UncheckedIOException;
 
 import static com.ctc.wstx.api.WstxInputProperties.PARSING_MODE_DOCUMENTS;
-import static com.github.blindpirate.gogradle.util.ExceptionHandler.uncheckException;
 
 public class DataExchange {
     private static final ObjectMapper JSON_MAPPER = new ObjectMapper();
@@ -48,7 +47,7 @@ public class DataExchange {
         try {
             return mapper.readValue(s, clazz);
         } catch (IOException e) {
-            throw uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -56,15 +55,15 @@ public class DataExchange {
         try {
             return mapper.readValue(file, clazz);
         } catch (IOException e) {
-            throw uncheckException(e);
+            throw new UncheckedIOException(e);
         }
     }
 
     public static String toYaml(Object model) {
         try {
             return YAML_MAPPER.writeValueAsString(model);
-        } catch (JsonProcessingException e) {
-            throw uncheckException(e);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 }

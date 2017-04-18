@@ -4,11 +4,14 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
+import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.MockOffline
+import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -20,8 +23,10 @@ import org.mockito.Mock
 
 import java.nio.file.Paths
 import java.util.concurrent.Callable
+import java.util.function.Function
 
-import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.callCallableAnswer
+import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.APPLY_FUNCTION_ANSWER
+import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.CALL_CALLABLE_ANSWER
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockWithName
 import static java.util.Optional.empty
 import static java.util.Optional.of
@@ -53,6 +58,8 @@ class GitMercurialDependencyManagerTest {
     GitMercurialCommit commit
     @Mock
     ResolveContext resolveContext
+    @Mock
+    ProjectCacheManager projectCacheManager
 
     GitMercurialDependencyManager manager
 
@@ -71,11 +78,12 @@ class GitMercurialDependencyManagerTest {
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
         IOUtils.write(resource, '.git', '')
 
-        manager = new TestGitMercurialDependencyManager(cacheManager, accessor)
+        manager = new GitMercurialDependencyManagerForTest(cacheManager, projectCacheManager, accessor)
+        when(projectCacheManager.resolve(any(NotationDependency), any(Function))).thenAnswer(APPLY_FUNCTION_ANSWER)
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
-        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(callCallableAnswer)
+        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(CALL_CALLABLE_ANSWER)
         when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
         when(accessor.findCommit(resource, commitId)).thenReturn(of(commit))
         when(accessor.headCommitOfBranch(resource, 'MockDefault')).thenReturn(commit)
@@ -87,6 +95,7 @@ class GitMercurialDependencyManagerTest {
 
         when(notationDependency.getUrls()).thenReturn([repoUrl])
         when(notationDependency.getCommit()).thenReturn(commitId)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
         when(notationDependency.getPackage()).thenReturn(thePackage)
 
         when(resolveContext.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
@@ -128,10 +137,22 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    void 'existed repository should be updated'() {
+    @MockRefreshDependencies(false)
+    void 'existed repository should not be updated if no --refresh-dependencies'() {
         // given:
-        when(cacheManager.currentDependencyIsOutOfDate(notationDependency)).thenReturn(true)
-        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
+        when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
+        // when:
+        manager.resolve(resolveContext, notationDependency)
+        // then:
+        verify(accessor, times(0)).update(resource)
+    }
+
+    @Test
+    @MockRefreshDependencies(true)
+    @MockOffline(false)
+    void 'existed repository should be updated if --refresh-dependencies'() {
+        // given:
+        when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
         // when:
         manager.resolve(resolveContext, notationDependency)
         // then:
@@ -149,7 +170,7 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    @MockOffline
+    @MockOffline(true)
     void 'pull should not be executed if offline'() {
         // when:
         manager.resolve(resolveContext, notationDependency)
@@ -158,6 +179,7 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
+    @MockRefreshDependencies(false)
     void 'dependency with tag should be resolved successfully'() {
         // given
         when(notationDependency.getTag()).thenReturn('tag')
@@ -182,7 +204,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'commit will be searched if tag cannot be recognized'() {
         // given
-        when(notationDependency.getCommit()).thenReturn(null)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -190,9 +212,10 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    void 'NEWEST_COMMIT should be recognized properly'() {
+    void 'LATEST_COMMIT should be recognized properly'() {
         // given
-        when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.NEWEST_COMMIT)
+        when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.LATEST_COMMIT)
+        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -284,15 +307,15 @@ class GitMercurialDependencyManagerTest {
         manager.install(resolvedDependency, resource)
     }
 
-    class TestGitMercurialDependencyManager extends GitMercurialDependencyManager {
+    class GitMercurialDependencyManagerForTest extends GitMercurialDependencyManager {
         GitMercurialAccessor accessor
 
-        TestGitMercurialDependencyManager(GlobalCacheManager cacheManager,
-                                          GitMercurialAccessor accessor) {
-            super(cacheManager)
+        GitMercurialDependencyManagerForTest(GlobalCacheManager globalCacheManager,
+                                             ProjectCacheManager projectCacheManager,
+                                             GitMercurialAccessor accessor) {
+            super(globalCacheManager, projectCacheManager)
             this.accessor = accessor
         }
-
 
         @Override
         protected GitMercurialAccessor getAccessor() {

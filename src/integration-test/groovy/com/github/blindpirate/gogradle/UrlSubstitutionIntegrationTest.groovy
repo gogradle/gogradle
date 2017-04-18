@@ -48,7 +48,7 @@ dependencies {
     void 'url substitution should succeed'() {
         try {
             newBuild {
-                it.forTasks('resolveBuildDependencies')
+                it.forTasks('installBuildDependencies')
             }
         } finally {
             println(stderr)

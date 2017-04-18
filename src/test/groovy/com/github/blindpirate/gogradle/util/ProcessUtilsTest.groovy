@@ -24,4 +24,9 @@ class ProcessUtilsTest {
         assert result.stdout.contains('This is stdout')
     }
 
+    @Test(expected = UncheckedIOException)
+    void 'exception should be thrown if error occurs'() {
+        processUtils.run('unexistent_program')
+    }
+
 }

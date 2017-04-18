@@ -15,4 +15,5 @@ public class GitResolvedDependency extends VcsResolvedDependency {
     public VcsType getVcsType() {
         return VcsType.GIT;
     }
+
 }

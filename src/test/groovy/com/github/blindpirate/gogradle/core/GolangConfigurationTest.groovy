@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.core
 
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Test
 
 class GolangConfigurationTest {

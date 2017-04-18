@@ -30,7 +30,7 @@ public class GolangPluginSetting {
     private BuildMode buildMode = REPRODUCIBLE;
     private String packagePath;
     private List<String> buildTags = new ArrayList<>();
-    private long globalCacheSecond = 24 * 3600;
+    private long globalCacheSecond = 5 * 60;
 
     // e.g 1.1/1.7/1.7.3/1.8beta1
     private String goVersion;

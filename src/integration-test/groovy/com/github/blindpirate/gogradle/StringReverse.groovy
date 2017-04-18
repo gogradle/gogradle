@@ -47,8 +47,6 @@ dependencies {
     }
 
     void buildAgain() {
-        initStdoutStderr()
-
         newBuild { build ->
             build.forTasks('goDependencies')
         }
@@ -59,8 +57,6 @@ dependencies {
     }
 
     void buildAgainAndAgain() {
-        initStdoutStderr()
-
         IOUtils.write(resource, 'hello.go', helloDotGo + " ")
 
         newBuild { build ->

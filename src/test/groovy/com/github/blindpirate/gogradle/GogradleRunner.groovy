@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.google.inject.Injector
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod
@@ -16,18 +17,19 @@ import java.lang.annotation.Annotation
 class GogradleRunner extends BlockJUnit4ClassRunner {
 
     private Map annoToProcessorMap = [
-            (AccessWeb)           : AccessWebProcessor,
-            (MockOffline)         : MockOfflineProcessor,
-            (WithProject)         : WithProjectProcessor,
-            (WithResource)        : WithResourceProcessor,
-            (WithMockInjector)    : WithMockInjectorProcessor,
-            (WithMockGo)          : WithMockGoProcessor,
-            (WithGitRepos)        : WithGitReposProcessor,
-            (WithGitRepo)         : WithGitRepoProcessor,
-            (WithIsolatedUserhome): WithIsolatedUserhomeProcessor,
-            (OnlyWhen)            : OnlyWhenProcessor,
-            (OnlyOnPosix)         : OnlyOnPosixProcessor,
-            (OnlyOnWindows)       : OnlyOnWindowsProcessor
+            (AccessWeb)              : AccessWebProcessor,
+            (MockOffline)            : MockOfflineProcessor,
+            (MockRefreshDependencies): MockRefreshDependenciesProcessor,
+            (WithProject)            : WithProjectProcessor,
+            (WithResource)           : WithResourceProcessor,
+            (WithMockInjector)       : WithMockInjectorProcessor,
+            (WithMockGo)             : WithMockGoProcessor,
+            (WithGitRepos)           : WithGitReposProcessor,
+            (WithGitRepo)            : WithGitRepoProcessor,
+            (WithIsolatedUserhome)   : WithIsolatedUserhomeProcessor,
+            (OnlyWhen)               : OnlyWhenProcessor,
+            (OnlyOnPosix)            : OnlyOnPosixProcessor,
+            (OnlyOnWindows)          : OnlyOnWindowsProcessor
     ]
 
     private List<AnnotationAndProcessor> processors
@@ -44,15 +46,8 @@ class GogradleRunner extends BlockJUnit4ClassRunner {
     Object createTest() throws Exception {
         testInstance = super.createTest()
         MockitoAnnotations.initMocks(testInstance)
-        setOfflineIfNecessary()
         processors.each { it.processor.beforeTest(testInstance, testMethod, it.annotation) }
         return testInstance
-    }
-
-    def setOfflineIfNecessary() {
-        if (ReflectionUtils.getField(GogradleGlobal.INSTANCE, 'offline') == null) {
-            ReflectionUtils.setField(GogradleGlobal.INSTANCE, 'offline', false)
-        }
     }
 
     @Override

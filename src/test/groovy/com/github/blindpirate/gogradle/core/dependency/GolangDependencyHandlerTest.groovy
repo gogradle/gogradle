@@ -5,22 +5,13 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
-import com.github.blindpirate.gogradle.task.GolangTaskContainer
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import org.gradle.api.Project
-import org.gradle.api.artifacts.Configuration
-import org.gradle.api.artifacts.ConfigurationContainer
-import org.gradle.api.artifacts.DependencySet
-import org.gradle.api.artifacts.dsl.DependencyHandler
-import org.gradle.api.artifacts.query.ArtifactResolutionQuery
-import org.gradle.api.internal.TaskInternal
-import org.gradle.api.tasks.TaskContainer
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GolangDependencyHandlerTest {

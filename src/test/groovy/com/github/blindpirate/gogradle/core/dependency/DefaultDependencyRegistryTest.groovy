@@ -2,14 +2,11 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.util.DependencyUtils
-import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.reset
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -87,14 +84,6 @@ class DefaultDependencyRegistryTest {
         registry.register(resolvedDependency1)
         // then
         assert !registry.register(resolvedDependency1)
-    }
-
-    @Test
-    void 'resolved dependency should be put into cache'() {
-        // when
-        registry.putIntoCache(notationDependency, resolvedDependency1)
-        // then
-        assert registry.getFromCache(notationDependency).get().is(resolvedDependency1)
     }
 
     @Test(expected = IllegalStateException)
