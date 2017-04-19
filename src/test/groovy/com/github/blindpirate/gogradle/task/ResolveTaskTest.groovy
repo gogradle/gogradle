@@ -14,6 +14,8 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
+import com.github.blindpirate.gogradle.core.mode.BuildMode
+import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -32,6 +34,7 @@ import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.*
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
@@ -67,8 +70,8 @@ class ResolveTaskTest extends TaskTest {
         resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
 
         gogradleRootProject.initSingleton('package', resource)
-        ReflectionUtils.setField(resolveBuildDependenciesTask,'gogradleRootProject',gogradleRootProject)
-        ReflectionUtils.setField(resolveTestDependenciesTask,'gogradleRootProject',gogradleRootProject)
+        ReflectionUtils.setField(resolveBuildDependenciesTask, 'gogradleRootProject', gogradleRootProject)
+        ReflectionUtils.setField(resolveTestDependenciesTask, 'gogradleRootProject', gogradleRootProject)
 
         when(configurationManager.getByName(anyString())).thenReturn(configuration)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(GolangDependencySet.empty())
@@ -225,6 +228,26 @@ class ResolveTaskTest extends TaskTest {
     void 'checking build tags should succeed'() {
         when(setting.getBuildTags()).thenReturn([''])
         assert resolveBuildDependenciesTask.buildTags == ['']
+    }
+
+    @Test
+    void 'checking buildMode should succeed'() {
+        when(setting.getBuildMode()).thenReturn(DEVELOP)
+        assert resolveBuildDependenciesTask.buildMode == 'DEVELOP'
+    }
+
+    @Test
+    @MockRefreshDependencies(true)
+    void 'refreshDependenciesFlag should vary every time if --refresh-dependencies is set'() {
+        assert resolveBuildDependenciesTask.refreshDependenciesFlag != resolveBuildDependenciesTask.refreshDependenciesFlag
+        assert resolveBuildDependenciesTask.refreshDependenciesFlag != resolveBuildDependenciesTask.refreshDependenciesFlag
+    }
+
+    @Test
+    @MockRefreshDependencies(false)
+    void 'refreshDependenciesFlag should be stable every time if --refresh-dependencies not set'() {
+        assert resolveBuildDependenciesTask.refreshDependenciesFlag == resolveBuildDependenciesTask.refreshDependenciesFlag
+        assert resolveBuildDependenciesTask.refreshDependenciesFlag == resolveBuildDependenciesTask.refreshDependenciesFlag
     }
 
     @Test
