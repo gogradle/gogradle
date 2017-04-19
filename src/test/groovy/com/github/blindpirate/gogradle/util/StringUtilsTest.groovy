@@ -2,7 +2,7 @@ package com.github.blindpirate.gogradle.util
 
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.util.ExceptionHandler.*
+import static com.github.blindpirate.gogradle.util.ExceptionHandler.UncheckedException
 
 class StringUtilsTest {
     @Test

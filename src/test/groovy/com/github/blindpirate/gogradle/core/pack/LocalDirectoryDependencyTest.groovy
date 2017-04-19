@@ -20,11 +20,11 @@ import org.mockito.Mock
 
 import java.time.Instant
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate.of
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
-import static com.github.blindpirate.gogradle.util.ReflectionUtils.*
+import static com.github.blindpirate.gogradle.util.ReflectionUtils.getField
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

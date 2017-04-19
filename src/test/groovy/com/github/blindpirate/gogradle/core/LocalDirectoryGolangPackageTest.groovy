@@ -3,7 +3,7 @@ package com.github.blindpirate.gogradle.core
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage.*
+import static com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage.of
 
 class LocalDirectoryGolangPackageTest {
     @Test

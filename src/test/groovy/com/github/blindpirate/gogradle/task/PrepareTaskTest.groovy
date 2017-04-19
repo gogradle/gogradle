@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
 import org.junit.Test

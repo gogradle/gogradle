@@ -10,13 +10,13 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
-import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import java.nio.file.Paths
 import java.util.function.Function
 
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
 class MockUtils {

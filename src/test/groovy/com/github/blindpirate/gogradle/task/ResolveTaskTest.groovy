@@ -14,7 +14,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
-import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
@@ -34,7 +33,7 @@ import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.NO_TRANSITIVE_DEP_PREDICATE
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.*
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any

@@ -13,11 +13,9 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.Mockito
 
-import java.util.concurrent.ConcurrentHashMap
 import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.GolangCloneableForTest
-import static com.github.blindpirate.gogradle.core.cache.PersistentCacheTest.*
 
 @RunWith(GogradleRunner)
 @WithResource('')

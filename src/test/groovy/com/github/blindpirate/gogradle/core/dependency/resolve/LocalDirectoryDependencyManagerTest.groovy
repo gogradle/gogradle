@@ -6,7 +6,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -17,7 +16,7 @@ import org.mockito.Mock
 
 import java.util.function.Function
 
-import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.*
+import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.APPLY_FUNCTION_ANSWER
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when

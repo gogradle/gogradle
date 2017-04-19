@@ -1,7 +1,6 @@
 package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GogradleGlobal
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.google.inject.Injector
 import org.gradle.internal.logging.progress.ProgressLogger
 import org.gradle.internal.logging.progress.ProgressLoggerFactory

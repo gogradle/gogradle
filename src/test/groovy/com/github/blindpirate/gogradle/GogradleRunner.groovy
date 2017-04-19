@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.*
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.google.inject.Injector
 import org.junit.runner.notification.RunNotifier
 import org.junit.runners.BlockJUnit4ClassRunner
 import org.junit.runners.model.FrameworkMethod

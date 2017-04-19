@@ -5,7 +5,7 @@ import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.util.ExceptionHandler.*
+import static com.github.blindpirate.gogradle.util.ExceptionHandler.UncheckedException
 
 @RunWith(GogradleRunner)
 class CompressUtilsTest {

@@ -14,9 +14,7 @@ import org.mockito.Mock
 
 import java.nio.file.Path
 
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')

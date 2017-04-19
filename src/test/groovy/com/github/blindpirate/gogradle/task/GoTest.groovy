@@ -10,9 +10,7 @@ import org.mockito.ArgumentCaptor
 
 import java.util.function.Consumer
 
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.anyList
-import static org.mockito.ArgumentMatchers.isNull
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
