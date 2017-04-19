@@ -4,7 +4,6 @@ import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import org.junit.Test
 
 class AutoConfigureMapNotationParserTest {

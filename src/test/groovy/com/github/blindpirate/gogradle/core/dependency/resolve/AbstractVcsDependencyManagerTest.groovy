@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
-import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
 import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithResource
@@ -25,7 +24,6 @@ import java.nio.file.Path
 import java.util.concurrent.Callable
 import java.util.function.Function
 
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 

@@ -8,7 +8,6 @@ import org.apache.commons.collections4.map.LRUMap
 import org.junit.Before
 import org.junit.Test
 
-import java.util.concurrent.ConcurrentHashMap
 import java.util.concurrent.atomic.AtomicInteger
 import java.util.function.Function
 
