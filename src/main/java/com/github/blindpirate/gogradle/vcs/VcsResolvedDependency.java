@@ -82,12 +82,10 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
 
     public static final class GitMercurialResolvedDependencyBuilder {
         private VcsType vcsType;
-        private NotationDependency notationDependency;
+        private GitMercurialNotationDependency notationDependency;
         private String url;
-        private String tag;
         private String commitId;
         private long commitTime;
-        private String name;
 
         private GitMercurialResolvedDependencyBuilder(VcsType vcsType) {
             this.vcsType = vcsType;
@@ -99,7 +97,7 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
         }
 
         public GitMercurialResolvedDependencyBuilder withNotationDependency(NotationDependency notationDependency) {
-            this.notationDependency = notationDependency;
+            this.notationDependency = (GitMercurialNotationDependency) notationDependency;
             return this;
         }
 
@@ -108,18 +106,8 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
             return this;
         }
 
-        public GitMercurialResolvedDependencyBuilder withTag(String tag) {
-            this.tag = tag;
-            return this;
-        }
-
         public GitMercurialResolvedDependencyBuilder withCommitTime(long commitTime) {
             this.commitTime = commitTime;
-            return this;
-        }
-
-        public GitMercurialResolvedDependencyBuilder withName(String name) {
-            this.name = name;
             return this;
         }
 
@@ -127,11 +115,11 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
             VcsResolvedDependency ret;
             Assert.isTrue(vcsType == VcsType.GIT || vcsType == VcsType.MERCURIAL);
             if (vcsType == VcsType.GIT) {
-                ret = new GitResolvedDependency(name, url, commitId, commitTime);
+                ret = new GitResolvedDependency(notationDependency.getName(), url, commitId, commitTime);
             } else {
-                ret = new MercurialResolvedDependency(name, url, commitId, commitTime);
+                ret = new MercurialResolvedDependency(notationDependency.getName(), url, commitId, commitTime);
             }
-            ret.tag = this.tag;
+            ret.tag = notationDependency.getTag();
             ret.setFirstLevel(notationDependency.isFirstLevel());
             ret.setPackage(notationDependency.getPackage());
             return ret;

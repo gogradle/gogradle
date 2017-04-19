@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -12,23 +11,25 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
+
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class VcsResolvedDependencyTest {
     @Mock
-    NotationDependency notationDependency
+    GitMercurialNotationDependency notationDependency
     @Mock
     Spec exclusionSpec
 
     @Before
     void setUp() {
-        Mockito.when(notationDependency.getTransitiveDepExclusions()).thenReturn([exclusionSpec] as Set)
+        when(notationDependency.getTransitiveDepExclusions()).thenReturn([exclusionSpec] as Set)
+        when(notationDependency.getName()).thenReturn('package')
     }
 
     VcsResolvedDependency newResolvedDependency(VcsType type) {
         return VcsResolvedDependency.builder(type)
-                .withName("package")
                 .withCommitId('commitId')
                 .withCommitTime(42L)
                 .withUrl('url')
@@ -53,8 +54,8 @@ class VcsResolvedDependencyTest {
     @Test
     @WithMockInjector
     void 'getInstallerClass() should succeed'() {
-        DependencyManager installer = Mockito.mock(DependencyManager)
-        Mockito.when(GogradleGlobal.INSTANCE.getInjector().getInstance(Key.get(DependencyManager, Git))).thenReturn(installer)
+        DependencyManager installer = mock(DependencyManager)
+        when(GogradleGlobal.INSTANCE.getInjector().getInstance(Key.get(DependencyManager, Git))).thenReturn(installer)
         assert newResolvedDependency(VcsType.GIT).installer == installer
     }
 
