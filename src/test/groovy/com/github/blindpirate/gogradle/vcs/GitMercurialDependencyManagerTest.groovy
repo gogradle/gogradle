@@ -16,12 +16,13 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
+import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import java.nio.file.Paths
 import java.util.concurrent.Callable
 import java.util.function.Function
 
@@ -123,20 +124,6 @@ class GitMercurialDependencyManagerTest {
     }
 
     @Test
-    void 'git notation dependency with non-root name should be created successfully'() {
-        // given
-        when(notationDependency.getName()).thenReturn('github.com/a/b/c')
-        when(notationDependency.getPackage()).thenReturn(thePackage.resolve(Paths.get('github.com/a/b/c')).get())
-        when(notationDependency.getTag()).thenReturn('tag')
-        when(notationDependency.isFirstLevel()).thenReturn(true)
-        // when
-        ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit, resolveContext)
-        // then
-        verify(resolveContext).produceTransitiveDependencies(result, resource)
-        assertResolvedDependency(result)
-    }
-
-    @Test
     @MockRefreshDependencies(false)
     void 'existed repository should not be updated if no --refresh-dependencies'() {
         // given:
@@ -145,6 +132,22 @@ class GitMercurialDependencyManagerTest {
         manager.resolve(resolveContext, notationDependency)
         // then:
         verify(accessor, times(0)).update(resource)
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'exception should be thrown if commit not found'() {
+        // given
+        when(accessor.findCommit(resource, commitId)).thenReturn(Optional.empty())
+        // then
+        manager.determineVersion(resource, notationDependency)
+    }
+
+    @Test(expected = DependencyResolutionException)
+    void 'exception should be thrown if tag not found'() {
+        // given
+        when(notationDependency.getTag()).thenReturn('tag')
+        // then
+        manager.determineVersion(resource, notationDependency)
     }
 
     @Test
@@ -273,6 +276,22 @@ class GitMercurialDependencyManagerTest {
                 .thenThrow(new IOException())
         // when
         manager.resolve(resolveContext, notationDependency)
+    }
+
+    @Test
+    void 'version existence in repository should be determined correctly'() {
+        // given
+        GitNotationDependency notationDependency = new GitNotationDependency()
+        notationDependency.name = 'git'
+        notationDependency.commit = 'commit'
+        GitResolvedDependency resolvedDependency = VcsResolvedDependency.builder(VcsType.GIT)
+                .withNotationDependency(notationDependency)
+                .withCommitId(notationDependency.commit)
+                .build()
+        when(accessor.findCommit(resource, 'commit')).thenReturn(Optional.of(commit))
+        // then
+        assert manager.concreteVersionExistInRepo(resource, notationDependency)
+        assert manager.concreteVersionExistInRepo(resource, resolvedDependency)
     }
 
     @Test

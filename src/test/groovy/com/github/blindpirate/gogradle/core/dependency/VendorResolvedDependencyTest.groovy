@@ -133,9 +133,9 @@ class VendorResolvedDependencyTest {
 
     @Test
     void 'equals and hashCode should be correct'() {
-        assert dependency == dependency
-        assert dependency != null
-        assert dependency != mock(GolangDependency)
+        assert dependency.equals(dependency)
+        assert !dependency.equals(null)
+        assert !dependency.equals(mock(GolangDependency))
         assert dependency == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency != VendorResolvedDependency.fromParent('github.com/a/c', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency.hashCode() == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b')).hashCode()

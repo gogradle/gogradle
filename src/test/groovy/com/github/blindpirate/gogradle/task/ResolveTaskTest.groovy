@@ -118,7 +118,6 @@ class ResolveTaskTest extends TaskTest {
         d3.transitive = false
 
         ResolvedDependency d3Resolved = GitResolvedDependency.builder(VcsType.GIT)
-                .withName('d3')
                 .withCommitId('commit')
                 .withUrl('url')
                 .withNotationDependency(d3)

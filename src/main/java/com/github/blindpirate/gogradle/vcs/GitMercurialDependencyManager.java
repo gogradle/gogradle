@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle.vcs;
 
-import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
@@ -38,9 +37,6 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         File repoRoot = globalCachePath.toFile();
 
         VcsResolvedDependency vcsResolvedDependency = (VcsResolvedDependency) dependency;
-        if (!getAccessor().findCommit(repoRoot, vcsResolvedDependency.getVersion()).isPresent()) {
-            getAccessor().update(repoRoot);
-        }
 
         getAccessor().checkout(repoRoot, vcsResolvedDependency.getVersion());
     }
@@ -50,13 +46,9 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
                                                           File repoRoot,
                                                           GitMercurialCommit commit,
                                                           ResolveContext context) {
-        VcsGolangPackage pkg = (VcsGolangPackage) dependency.getPackage();
-
         VcsResolvedDependency ret = VcsResolvedDependency.builder(getVcsType())
                 .withNotationDependency(dependency)
-                .withName(pkg.getRootPathString())
                 .withCommitId(commit.getId())
-                .withTag(GitMercurialNotationDependency.class.cast(dependency).getTag())
                 .withUrl(getAccessor().getRemoteUrl(repoRoot))
                 .withCommitTime(commit.getCommitTime())
                 .build();
