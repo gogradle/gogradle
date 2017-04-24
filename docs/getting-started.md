@@ -178,7 +178,7 @@ golang {
     // 2.locked dependencies
     // 3.dependencies declared in build.gradle
 
-    mode = 'REPRODUCIBLE'
+    buildMode = 'REPRODUCIBLE'
     
     // The golang version to use. See https://golang.org/dl/
     // If not specified, the latest stable version is used
