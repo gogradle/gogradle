@@ -58,7 +58,11 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public long getUpdateTime() {
-        return rootDir.lastModified();
+        if (rootDir == EMPTY_DIR) {
+            return 0L;
+        } else {
+            return rootDir.lastModified();
+        }
     }
 
     public void setDependencies(GolangDependencySet dependencies) {
