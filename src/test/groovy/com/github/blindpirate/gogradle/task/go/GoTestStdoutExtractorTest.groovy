@@ -265,7 +265,7 @@ can't load package: package github.com/my/project/b: found packages broken (b1.g
     void 'extracting results from stdout when package cannot be found should succeed'() {
         // given
         String stdout = '''\
-can't find package: package github.com/my/project/b: found packages broken (b1.go) and b (b1_test.go) in /src/github.com/my/project/b
+cannot find package: package github.com/my/project/b: found packages broken (b1.go) and b (b1_test.go) in /src/github.com/my/project/b
 '''
         // when
         PackageTestContext context = PackageTestContext.builder()
@@ -276,9 +276,9 @@ can't find package: package github.com/my/project/b: found packages broken (b1.g
         List<TestClassResult> results = extractor.extractTestResult(context)
         // then
         assert results.size() == 1
-        assert results[0].className == "b.can't find package"
+        assert results[0].className == "b.cannot find package"
         assert results[0].results.size() == 1
-        assert results[0].results[0].name == "can't find package"
+        assert results[0].results[0].name == "cannot find package"
         assert results[0].results[0].message.contains('found packages broken')
         assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
     }

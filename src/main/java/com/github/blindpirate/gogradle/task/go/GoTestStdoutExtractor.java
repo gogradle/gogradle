@@ -47,7 +47,7 @@ public class GoTestStdoutExtractor {
     private static final String SETUP_FAILED_ERROR = "[setup failed]";
     private static final String BUILD_FAILED_ERROR = "[build failed]";
     private static final String CANNOT_LOAD_PACKAGE_ERROR = "can't load package";
-    private static final String CANNOT_FIND_PACKAGE_ERROR = "can't find package";
+    private static final String CANNOT_FIND_PACKAGE_ERROR = "cannot find package";
     private static final AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
 
     public List<TestClassResult> extractTestResult(PackageTestContext context) {
