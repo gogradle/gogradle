@@ -64,7 +64,7 @@ public class ProcessUtils {
     }
 
     public Process run(List<String> args, Map<String, String> envs, File workingDirectory) {
-        LOGGER.debug("Forking process: args {}, envs {}, workingDir {}", args, envs, workingDirectory);
+        LOGGER.quiet("Forking process: args {}, envs {}, workingDir {}", args, envs, workingDirectory);
         try {
             ProcessBuilder pb = new ProcessBuilder().command(args);
             if (envs != null) {
