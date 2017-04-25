@@ -89,11 +89,7 @@ public class GoTestTask extends Go {
 
     @Override
     protected void doAddDefaultAction() {
-        if (isEmpty(testNamePattern)) {
-            addTestAllAction();
-        } else {
-            addTestActions();
-        }
+        super.doLast(new TestPackagesAction());
     }
 
     @Override
@@ -116,33 +112,9 @@ public class GoTestTask extends Go {
         throw new UnsupportedOperationException("Left shift is not supported since it's deprecated officially");
     }
 
-    private void addTestActions() {
-        Collection<File> filesMatchingPatterns = filterMatchedTests();
-
-        if (filesMatchingPatterns.isEmpty()) {
-            LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
-        } else {
-            LOGGER.quiet("Found " + filesMatchingPatterns.size() + " tests to run.");
-
-            Map<File, List<File>> parentDirToFiles = groupByParentDir(filesMatchingPatterns);
-
-            parentDirToFiles.forEach((parentDir, tests) -> {
-                tests.addAll(getAllNonTestGoFiles(parentDir));
-            });
-
-            doLast(new TestPackagesAction(parentDirToFiles, true));
-        }
-    }
-
     private Collection<File> filterMatchedTests() {
         TestPatternFilter filter = TestPatternFilter.withPattern(testNamePattern);
         return filterFilesRecursively(getProject().getRootDir(), filter);
-    }
-
-    private void addTestAllAction() {
-        // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-        Collection<File> allTestFiles = filterFilesRecursively(getProject().getRootDir(), TEST_GO_FILTER);
-        doLast(new TestPackagesAction(groupByParentDir(allTestFiles), false));
     }
 
     private Map<File, List<File>> groupByParentDir(Collection<File> files) {
@@ -170,15 +142,29 @@ public class GoTestTask extends Go {
 
         private boolean isCommandLineArguments;
 
-        private TestPackagesAction(Map<File, List<File>> parentDirToTestFiles, boolean isCommandLineArguments) {
-            this.parentDirToTestFiles = parentDirToTestFiles;
-            this.isCommandLineArguments = isCommandLineArguments;
-        }
-
         @Override
         public void execute(Task task) {
-            List<TestClassResult> testResults = new ArrayList<>();
+            determineTestPattern();
             prepareCoverageProfileDir();
+
+            List<TestClassResult> testResults = doTest();
+
+            File reportDir = generateTestReport(testResults);
+
+            rewritePackageName(reportDir);
+            reportErrorIfNecessary(testResults, reportDir);
+        }
+
+        private File generateTestReport(List<TestClassResult> testResults) {
+            GoTestResultsProvider provider = new GoTestResultsProvider(testResults);
+            File reportDir = new File(getProject().getRootDir(), ".gogradle/reports/test");
+            DefaultTestReport report = new DefaultTestReport(buildOperationProcessor);
+            report.generateReport(provider, reportDir);
+            return reportDir;
+        }
+
+        private List<TestClassResult> doTest() {
+            List<TestClassResult> ret = new ArrayList<>();
 
             parentDirToTestFiles.forEach((parentDir, testFiles) -> {
                 String packageImportPath = dirToImportPath(parentDir);
@@ -192,18 +178,33 @@ public class GoTestTask extends Go {
 
                 List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(context);
                 logResult(packageImportPath, resultOfSinglePackage);
-                testResults.addAll(resultOfSinglePackage);
+                ret.addAll(resultOfSinglePackage);
             });
+            return ret;
+        }
 
-            GoTestResultsProvider provider = new GoTestResultsProvider(testResults);
+        private void determineTestPattern() {
+            if (isEmpty(testNamePattern)) {
+                // https://golang.org/cmd/go/#hdr-Description_of_package_lists
+                Collection<File> allTestFiles = filterFilesRecursively(getProject().getRootDir(), TEST_GO_FILTER);
+                this.parentDirToTestFiles = groupByParentDir(allTestFiles);
+                this.isCommandLineArguments = false;
+            } else {
+                Collection<File> filesMatchingPatterns = filterMatchedTests();
 
-            File reportDir = new File(getProject().getRootDir(), ".gogradle/reports/test");
-            DefaultTestReport report = new DefaultTestReport(buildOperationProcessor);
-            report.generateReport(provider, reportDir);
+                if (filesMatchingPatterns.isEmpty()) {
+                    LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
+                } else {
+                    LOGGER.quiet("Found " + filesMatchingPatterns.size() + " files to test.");
 
-            rewritePackageName(reportDir);
+                    Map<File, List<File>> parentDirToFiles = groupByParentDir(filesMatchingPatterns);
 
-            reportErrorIfNecessary(testResults, reportDir);
+                    parentDirToFiles.forEach((parentDir, tests) -> tests.addAll(getAllNonTestGoFiles(parentDir)));
+
+                    this.parentDirToTestFiles = parentDirToFiles;
+                    this.isCommandLineArguments = true;
+                }
+            }
         }
 
 
