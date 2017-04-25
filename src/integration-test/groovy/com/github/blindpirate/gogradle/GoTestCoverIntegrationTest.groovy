@@ -71,6 +71,7 @@ golang {
                 .directory(getProjectRoot())
                 .inheritIO()
                 .start()
+                .waitFor()
 
 //        ProcessUtils.ProcessResult result = new ProcessUtils().getResult(process)
 //
