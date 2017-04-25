@@ -70,7 +70,7 @@ goVet {
     void firstBuild() {
         try {
             newBuild {
-                it.forTasks('goBuild', 'goCheck', 'goLock', 'goDependencies')
+                it.forTasks('goBuild', 'goCheck', 'goLock')
             }
         } catch (Exception e) {
             throw e
@@ -83,7 +83,7 @@ goVet {
     void secondBuild() {
         try {
             newBuild {
-                it.forTasks('goBuild', 'goCheck', 'goDependencies')
+                it.forTasks('goBuild', 'goCheck')
             }
         } catch (Exception e) {
             throw e
