@@ -1,9 +1,11 @@
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.go.GoCoverTaskTest
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.gradle.tooling.BuildException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -46,6 +48,35 @@ golang {
 
 
         GoCoverTaskTest.examineCoverageHtmls(resource)
+    }
+
+//    Caused by: org.gradle.tooling.internal.protocol.exceptions.InternalUnsupportedBuildArgumentException: Problem with provided build arguments: [--stacktrace, --tests a1_test.go].
+//    Unknown command-line option '--tests a1_test.go'.
+//    Either it is not a valid build option or it is not supported in the target Gradle version.
+//    Not all of the Gradle command line options are supported build arguments.
+//    Examples of supported build arguments: '--info', '-u', '-p'.
+//    Examples of unsupported build options: '--daemon', '-?', '-v'.
+//    Please find more information in the javadoc for the BuildLauncher class.
+//    at org.gradle.tooling.internal.provider.ProviderStartParameterConverter.toStartParameter(ProviderStartParameterConverter.java:79)
+    @Test
+    void 'test with --tests should succeed'() {
+        assert System.getProperty('GRADLE_DIST_HOME')
+        String gradleBinPath = new File("${System.getProperty('GRADLE_DIST_HOME')}/bin/gradle")
+        if (Os.getHostOs() == Os.WINDOWS) {
+            gradleBinPath += '.bat'
+        }
+
+        Process process = new ProcessUtils()
+                .run([gradleBinPath, 'goTest', '--tests', 'a1_test.go', '--stacktrace'], [:], getProjectRoot())
+
+        ProcessUtils.ProcessResult result = new ProcessUtils().getResult(process)
+
+        println(result.getStderr())
+
+        assert result.getStdout().contains('Found 1 files to test')
+        assert result.getStdout().contains('2 succeed, 0 failed')
+        assert !result.getStdout().contains('3 succeed, 0 failed')
+        assert result.getStdout().contains('BUILD SUCCESSFUL')
     }
 
     @Test
