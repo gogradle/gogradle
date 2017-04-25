@@ -6,6 +6,7 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.go.GoCoverTaskTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.tooling.BuildException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -61,7 +62,7 @@ golang {
     @Test
     void 'test with --tests should succeed'() {
         assert System.getProperty('GRADLE_DIST_HOME')
-        String gradleBinPath = new File("${System.getProperty('GRADLE_DIST_HOME')}/bin/gradle")
+        String gradleBinPath = new File("${StringUtils.toUnixString(System.getProperty('GRADLE_DIST_HOME'))}/bin/gradle")
         if (Os.getHostOs() == Os.WINDOWS) {
             gradleBinPath += '.bat'
         }
