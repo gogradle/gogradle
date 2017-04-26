@@ -119,7 +119,7 @@ class GoTestTaskTest extends TaskTest {
         List<String> args = argumentsCaptor.getValue()
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
-        assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any { args.contains(new File(resource, it).absolutePath) }
+        assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any { args.contains(StringUtils.toUnixString(new File(resource, it))) }
     }
 
     @Test
