@@ -200,11 +200,11 @@ golang {
     // 当前构建的包路径
     packagePath = 'github.com/user/project'
     
-    // 指明当前的模式。有两个可选值：DEVELOP/REPRODUCIBLE，默认为DEVELOP
+    // 指明当前的模式。有两个可选值：DEVELOP/REPRODUCIBLE，默认为REPRODUCIBLE
     // 在DEVELOP模式下，Gogradle会优先使用build.gradle中声明的依赖（这些依赖包可能是以模糊方式声明的）
     // 然后依次使用被锁定的依赖包（gogradle.lock或者其他的包管理工具）、vendor目录中的依赖包
     // 在REPRODUCIBLE模式下，这个顺序是vendor目录中的依赖包、被锁定的依赖包、build.gradle中声明的依赖包
-    mode = 'REPRODUCIBLE'
+    buildMode = 'REPRODUCIBLE'
     
     // 构建所需的Go版本。详见 https://golang.org/dl/
     // 若不指定此值，且goExecutable存在，则使用之；否则，使用最新的Stable版本

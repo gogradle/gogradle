@@ -168,7 +168,7 @@ golang {
     // Import path of package to be built
     packagePath = 'github.com/user/project'
     
-    // The buid mode. There are two alternatives: DEVELOP/REPRODUCIBLE, DEVELOP by default
+    // The buid mode. There are two alternatives: DEVELOP/REPRODUCIBLE, REPRODUCIBLE by default
     // In DEVELOP mode, the dependency priority is:
     // 1.dependencies declared in build.gradle
     // 2.locked dependencies (in goradle.lock or lock file of other tools)

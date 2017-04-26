@@ -232,7 +232,7 @@ public class GoTestTask extends Go {
                 args = CollectionUtils.asStringList(
                         "test",
                         "-v",
-                        testFiles.stream().map(File::getAbsolutePath).collect(toList()));
+                        testFiles.stream().map(StringUtils::toUnixString).collect(toList()));
             } else {
                 args = Lists.newArrayList("test", "-v", importPath);
             }
