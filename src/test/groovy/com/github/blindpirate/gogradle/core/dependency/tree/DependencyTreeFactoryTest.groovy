@@ -81,21 +81,21 @@ class DependencyTreeFactoryTest {
     void 'dependency conflict should be resolved'() {
         /*
         rootProject
-            ├── a1 -> a2
-            │   └── c
-            └── b
-                └── a2
-                    └── d
-                        └── a3 -> a2
+            |-- a1 -> a2
+            |   \\- c
+            \\- b
+                \\- a2
+                    \\- d
+                        \\- a3 -> a2
 
        the result is:
 
        rootProject
-            ├── a2
-            │   └── d
-            │       └── a2 (*)
-            └── b
-                └── a2 (*)
+            |-- a2
+            |   \\- d
+            |       \\- a2 (*)
+            \\- b
+                \\- a2 (*)
          */
         // given
         // a2 is newer than a1 and a3

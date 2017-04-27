@@ -39,17 +39,17 @@ import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 // ${projectRoot}
-// └── .gogradle
-//     ├── project_gopath
-//     │   └── src
-//     │       └── github.com/user/project -> ../../../../../..
-//     ├── build_gopath
-//     │   └── src
-//     │       └── <the dependencies>
-//     ├── test_gopath
-//     │   └── src
-//     │       └── <the dependencies>
-//     └── ${os}_${arch}_${outputName}
+// \- .gogradle
+//     |-- project_gopath
+//     |   \-- src
+//     |       \-- github.com/user/project -> ../../../../../..
+//     |-- build_gopath
+//     |   \-- src
+//     |       \-- <the dependencies>
+//     |-- test_gopath
+//     |   \-- src
+//     |       \-- <the dependencies>
+//     \-- ${os}_${arch}_${outputName}
 //
 
 @Singleton

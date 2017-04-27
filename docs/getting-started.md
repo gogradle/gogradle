@@ -117,19 +117,19 @@ The output is as follows:
 build:
 
 github.com/gogits/gogs
-├── github.com/Unknwon/cae:c6aac99 √
-├── github.com/Unknwon/com:28b053d √
-├── github.com/Unknwon/i18n:39d6f27 √
-│   ├── github.com/Unknwon/com:28b053d √ (*)
-│   └── gopkg.in/ini.v1:766e555 -> 6f66b0e
-├── github.com/Unknwon/paginater:701c23f √
-├── github.com/bradfitz/gomemcache:2fafb84 √
-├── github.com/go-macaron/binding:4892016 √
-│   ├── github.com/Unknwon/com:28b053d √ (*)
-│   └── gopkg.in/macaron.v1:ddb19a9 √
-│       ├── github.com/Unknwon/com:28b053d √ (*)
-│       ├── github.com/go-macaron/inject:d8a0b86 -> c5ab7bf
-│       └── gopkg.in/ini.v1:766e555 -> 6f66b0e (*)
+|-- github.com/Unknwon/cae:c6aac99
+|-- github.com/Unknwon/com:28b053d
+|-- github.com/Unknwon/i18n:39d6f27
+|   |-- github.com/Unknwon/com:28b053d (*)
+|   \- gopkg.in/ini.v1:766e555 -> 6f66b0e
+|-- github.com/Unknwon/paginater:701c23f
+|-- github.com/bradfitz/gomemcache:2fafb84
+|-- github.com/go-macaron/binding:4892016
+|   |-- github.com/Unknwon/com:28b053d (*)
+|   \- gopkg.in/macaron.v1:ddb19a9
+|       |-- github.com/Unknwon/com:28b053d (*)
+|       |-- github.com/go-macaron/inject:d8a0b86 -> c5ab7bf
+|       \- gopkg.in/ini.v1:766e555 -> 6f66b0e (*)
 ... 
 
 ```
