@@ -130,6 +130,11 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     @Override
+    public String toString() {
+        return "LocalDirectoryDependency@" + StringUtils.toUnixString(rootDir);
+    }
+
+    @Override
     public Object clone() {
         LocalDirectoryDependency ret = (LocalDirectoryDependency) super.clone();
         ret.transitiveDepExclusions = this.getTransitiveDepExclusions();
