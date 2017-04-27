@@ -3,6 +3,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangCloneable;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.google.common.collect.ImmutableSet;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -12,12 +13,47 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.function.BiConsumer;
+import java.util.function.BinaryOperator;
 import java.util.function.Consumer;
 import java.util.function.Function;
+import java.util.function.Supplier;
+import java.util.stream.Collector;
 
 import static java.util.Comparator.comparing;
 
 public class GolangDependencySet implements Set<GolangDependency>, Serializable, GolangCloneable {
+
+    public static final Collector<GolangDependency, GolangDependencySet, GolangDependencySet> COLLECTOR =
+            new Collector<GolangDependency, GolangDependencySet, GolangDependencySet>() {
+                @Override
+                public Supplier<GolangDependencySet> supplier() {
+                    return GolangDependencySet::new;
+                }
+
+                @Override
+                public BiConsumer<GolangDependencySet, GolangDependency> accumulator() {
+                    return GolangDependencySet::add;
+                }
+
+                @Override
+                public BinaryOperator<GolangDependencySet> combiner() {
+                    return (set1, set2) -> {
+                        set1.addAll(set2);
+                        return set1;
+                    };
+                }
+
+                @Override
+                public Function<GolangDependencySet, GolangDependencySet> finisher() {
+                    return set -> set;
+                }
+
+                @Override
+                public Set<Characteristics> characteristics() {
+                    return ImmutableSet.of(Characteristics.UNORDERED);
+                }
+            };
 
     private TreeSet<GolangDependency> container = new TreeSet<>(
             comparing((Serializable & Function<GolangDependency, String>) GolangDependency::getName));
