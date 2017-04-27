@@ -1,7 +1,10 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 
@@ -34,6 +37,17 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
             candidate = visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         }
 
-        return candidate;
+        return candidate.stream()
+                .filter(d -> !isGogradleVendorDependency(d))
+                .collect(GolangDependencySet.COLLECTOR);
+    }
+
+    private boolean isGogradleVendorDependency(GolangDependency dependency) {
+        if (dependency instanceof VendorNotationDependency) {
+            VendorNotationDependency vendorNotationDependency = (VendorNotationDependency) dependency;
+            return vendorNotationDependency.getHostNotationDependency() instanceof GogradleRootProject;
+        } else {
+            return false;
+        }
     }
 }
