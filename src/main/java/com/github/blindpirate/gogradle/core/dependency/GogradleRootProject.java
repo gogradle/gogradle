@@ -1,12 +1,13 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
-import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.google.common.collect.ImmutableMap;
+import com.github.blindpirate.gogradle.util.MapUtils;
 
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.Map;
+
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 
 @Singleton
 public class GogradleRootProject extends LocalDirectoryDependency {
@@ -35,7 +36,7 @@ public class GogradleRootProject extends LocalDirectoryDependency {
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        return ImmutableMap.of(MapNotationParser.NAME_KEY, GOGRADLE_ROOT);
+        return MapUtils.asMap(NAME_KEY, GOGRADLE_ROOT);
     }
 
 
