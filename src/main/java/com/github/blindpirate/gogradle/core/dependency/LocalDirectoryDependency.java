@@ -7,10 +7,9 @@ import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParse
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
-import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager.CURRENT_VERSION_INDICATOR_FILE;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -78,16 +76,13 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     public Map<String, Object> toLockedNotation() {
         LOGGER.warn("You are locking {} which exists only on your local filesystem, "
                 + "which may cause issues on other one's computer.", getRootDir());
-        return ImmutableMap.of(MapNotationParser.NAME_KEY, getName(),
+        return MapUtils.asMap(MapNotationParser.NAME_KEY, getName(),
                 DirMapNotationParser.DIR_KEY, StringUtils.toUnixString(rootDir));
     }
 
     @Override
     public void installTo(File targetDirectory) {
-        if (rootDir != EMPTY_DIR) {
-            GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
-            IOUtils.write(targetDirectory, CURRENT_VERSION_INDICATOR_FILE, formatVersion());
-        }
+        GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
     }
 
     @Override
@@ -99,6 +94,11 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public String getVersion() {
         return Instant.ofEpochMilli(getUpdateTime()).toString();
+    }
+
+    @Override
+    public String toString() {
+        return getName() + "@" + StringUtils.toUnixString(rootDir);
     }
 
     @Override

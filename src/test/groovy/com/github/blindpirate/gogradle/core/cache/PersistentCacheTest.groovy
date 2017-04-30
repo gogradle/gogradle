@@ -7,15 +7,20 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.apache.commons.collections4.map.LRUMap
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.Mock
 import org.mockito.Mockito
 
 import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.GolangCloneableForTest
+import static org.mockito.Mockito.*
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -33,7 +38,7 @@ class PersistentCacheTest {
     void setUp() {
         storageFile = new File(resource, "cache.bin")
         cache = new PersistentCacheForTest(storageFile)
-        Mockito.when(project.getRootDir()).thenReturn(resource)
+        when(project.getRootDir()).thenReturn(resource)
     }
 
     Map prepareCacheMap() {
@@ -78,6 +83,20 @@ class PersistentCacheTest {
         // then
         assert ReflectionUtils.getField(cache, 'container').size() == 1
         assert cache.get(buildCloneable(1), null) == buildCloneable(1)
+    }
+
+    @Test
+    void 'exception should be recorded if IOException occurs'() {
+        // given
+        Logger logger = mock(Logger)
+        ReflectionUtils.setStaticFinalField(PersistentCache, 'LOGGER', logger)
+        cache = new PersistentCacheForTest(resource)
+        ArgumentCaptor captor = ArgumentCaptor.forClass(Throwable)
+        // when
+        cache.save()
+        // then
+        assert ReflectionUtils.getField(cache, 'container').isEmpty()
+        verify(logger).warn('Exception in serializing dependency cache, skip.')
     }
 
     GolangCloneable buildCloneable(int value) {

@@ -68,21 +68,21 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
         if (isRoot) {
             return "";
         }
-        return isTail ? "    " : "│   ";
+        return isTail ? "    " : "|   ";
     }
 
     private String branch(boolean isRoot, boolean isTail) {
         if (isRoot) {
             return "";
         }
-        return isTail ? "└── " : "├── ";
+        return isTail ? "\\-- " : "|-- ";
     }
 
     private String format(boolean isRoot) {
         if (isRoot) {
             return name;
         } else if (originalDependency.equals(finalDependency)) {
-            return withCheckMark() + star();
+            return withName() + star();
         } else {
             return withArrow() + star();
         }
@@ -97,8 +97,8 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
                 + originalDependency.formatVersion() + " -> " + finalDependency.formatVersion();
     }
 
-    private String withCheckMark() {
-        return finalDependency.getName() + ":" + finalDependency.formatVersion() + " √";
+    private String withName() {
+        return finalDependency.getName() + ":" + finalDependency.formatVersion();
     }
 
     public GolangDependencySet flatten() {

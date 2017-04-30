@@ -69,11 +69,11 @@ dependencies {
     }
 
     void assertDependencyOutput() {
-        // "golang.org/x/tools:0d047c8 √" -> "golang.org/x/tools √"
+        // "golang.org/x/tools:0d047c8" -> "golang.org/x/tools"
         assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/, '').contains('''
 sample
-└── github.com/golang/example √
-    └── golang.org/x/tools √
+\\-- github.com/golang/example
+    \\-- golang.org/x/tools
 ''')
     }
 

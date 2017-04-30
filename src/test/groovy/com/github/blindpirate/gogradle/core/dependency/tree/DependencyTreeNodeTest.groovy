@@ -35,15 +35,16 @@ class DependencyTreeNodeTest {
 
     @Test
     void 'tree building whth check mark should succeed'() {
+        println(root.output())
         assert root.output() == '''\
 a
-├── b:version -> version (*)
-├── c:version -> version
-│   └── e:version √
-│       └── h:version √
-└── d:version √
-    ├── f:version -> version (*)
-    └── g:version √
+|-- b:version -> version (*)
+|-- c:version -> version
+|   \\-- e:version
+|       \\-- h:version
+\\-- d:version
+    |-- f:version -> version (*)
+    \\-- g:version
 '''
     }
 
@@ -64,7 +65,7 @@ a
         // then
         assert root.output() == '''\
 a
-└── b:version √
+\\-- b:version
 '''
     }
 

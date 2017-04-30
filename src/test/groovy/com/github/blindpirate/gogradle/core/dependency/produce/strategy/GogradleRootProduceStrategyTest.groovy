@@ -6,7 +6,6 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
@@ -27,8 +26,6 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     @Mock
     GolangPluginSetting golangPluginSetting
     @Mock
-    LockedDependencyManager lockedDependencyManager
-    @Mock
     GolangConfigurationManager configurationManager
     @Mock
     GolangConfiguration configuration
@@ -38,11 +35,9 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
     @Before
     void setUp() {
-
         strategy = new GogradleRootProduceStrategy(
                 golangPluginSetting,
-                configurationManager,
-                lockedDependencyManager)
+                configurationManager)
         when(configurationManager.getByName(anyString()))
                 .thenReturn(configuration)
     }
@@ -52,17 +47,12 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         when(configuration.getDependencies()).thenReturn(result)
     }
 
-    void lockedDependencies(GolangDependency... dependencies) {
-        GolangDependencySet result = asGolangDependencySet(dependencies)
-        when(lockedDependencyManager.getLockedDependencies('build')).thenReturn(result)
-    }
-
     @Test
     void 'dependencies in build.gradle should have top priority when in Develop mode'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
         dependenciesInBuildDotGradle(a1, b1)
-        lockedDependencies(a2)
+        externalDependencies(a2)
         vendorDependencies(b2)
 
         // when
@@ -81,7 +71,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
         dependenciesInBuildDotGradle(a1)
-        lockedDependencies(a2, b2)
+        externalDependencies(a2, b2)
         vendorDependencies()
 
         // when
@@ -99,7 +89,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
         dependenciesInBuildDotGradle(a1, b1)
-        lockedDependencies(a2)
+        externalDependencies(a2)
         vendorDependencies()
 
         // when
@@ -117,7 +107,6 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
         externalDependencies()
         dependenciesInBuildDotGradle()
-        lockedDependencies()
         vendorDependencies()
         sourceCodeDependencies()
 
@@ -136,7 +125,6 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
         externalDependencies(a1)
         dependenciesInBuildDotGradle()
-        lockedDependencies()
         vendorDependencies()
 
         // when

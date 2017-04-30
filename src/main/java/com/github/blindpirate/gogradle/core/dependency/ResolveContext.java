@@ -72,7 +72,7 @@ public class ResolveContext {
     private GolangDependencySet filterRecursively(GolangDependencySet set) {
         GolangDependencySet ret = set.stream()
                 .filter(this::shouldBeReserved)
-                .collect(GolangDependencySet::new, GolangDependencySet::add, GolangDependencySet::addAll);
+                .collect(GolangDependencySet.COLLECTOR);
 
         ret.forEach(dependency -> {
             if (dependency instanceof VendorResolvedDependency) {

@@ -61,6 +61,11 @@ public class VendorNotationDependency extends AbstractNotationDependency {
     }
 
     @Override
+    public String getVersion() {
+        return hostNotationDependency + "/" + vendorPath;
+    }
+
+    @Override
     public CacheScope getCacheScope() {
         return hostNotationDependency.getCacheScope();
     }

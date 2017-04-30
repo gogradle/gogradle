@@ -1,10 +1,8 @@
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.util.DataExchange;
-import com.github.blindpirate.gogradle.util.DependencySetUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.Project;
 
@@ -31,17 +29,6 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     private static final String LOCK_FILE = "gogradle.lock";
 
     @Override
-    public GolangDependencySet getLockedDependencies(String configuration) {
-        File lockFile = new File(project.getRootDir(), LOCK_FILE);
-        if (!lockFile.exists()) {
-            return GolangDependencySet.empty();
-        }
-        GogradleLockModel model = parseYaml(lockFile, GogradleLockModel.class);
-        List<Map<String, Object>> notations = model.getDependencies(configuration);
-        return DependencySetUtils.parseMany(notations, mapNotationParser);
-    }
-
-    @Override
     public void lock(Collection<? extends ResolvedDependency> flatBuildDependencies,
                      Collection<? extends ResolvedDependency> flatTestDependencies) {
         List<Map<String, Object>> buildNotations = toNotations(flatBuildDependencies);
@@ -57,9 +44,11 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     }
 
     private List<Map<String, Object>> toNotations(Collection<? extends ResolvedDependency> flatDependencies) {
-        return flatDependencies.stream()
+        List<Map<String, Object>> ret = flatDependencies.stream()
                 .map(ResolvedDependency::toLockedNotation)
                 .collect(Collectors.toList());
+        ret.forEach(this::deactiveTransitiveDependency);
+        return ret;
     }
 
     @Override
@@ -68,10 +57,13 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     protected List<Map<String, Object>> adapt(File file) {
         GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
         return model.getDependencies(BUILD);
+    }
+
+    private void deactiveTransitiveDependency(Map<String, Object> map) {
+        map.put("transitive", false);
     }
 
     @Override

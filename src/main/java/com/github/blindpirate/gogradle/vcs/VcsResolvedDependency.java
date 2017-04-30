@@ -4,9 +4,9 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependenc
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
-import com.google.common.collect.ImmutableMap;
 
 import java.util.Map;
 import java.util.Objects;
@@ -40,7 +40,7 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        return ImmutableMap.of(
+        return MapUtils.asMap(
                 NAME_KEY, getName(),
                 VCS_KEY, getVcsType().getName(),
                 GitMercurialNotationDependency.URL_KEY, getUrl(),
@@ -54,6 +54,11 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
         } else {
             return getVersion().substring(0, COMMIT_PREFIX_LENGTH);
         }
+    }
+
+    @Override
+    public String toString() {
+        return getName() + "#" + getVersion();
     }
 
     @Override

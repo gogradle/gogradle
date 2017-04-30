@@ -27,6 +27,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -138,7 +139,7 @@ public class GoTestTask extends Go {
     }
 
     private class TestPackagesAction implements Action<Task> {
-        private Map<File, List<File>> parentDirToTestFiles;
+        private Map<File, List<File>> parentDirToTestFiles = Collections.emptyMap();
 
         private boolean isCommandLineArguments;
 

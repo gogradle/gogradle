@@ -13,18 +13,18 @@ import org.junit.runner.RunWith
 class ExcludeAllInDescendantTest extends IntegrationTestSupport {
     /*
         rootProject
-            └── a exclude e
-                ├── b
-                └── c
-                    └── d
-                        └── e
+            \-- a exclude e
+                |-- b
+                \-- c
+                    \-- d
+                        \-- e
  results:
 
         rootProject
-            └── a
-                ├── b
-                └── c
-                    └── d
+            \-- a
+                |-- b
+                \-- c
+                    \-- d
      */
 
     @Before

@@ -229,6 +229,17 @@ class ResolveTaskTest extends TaskTest {
     }
 
     @Test
+    void 'checking dir dependencies should succeed'() {
+        GolangDependencySet set = GolangDependencySet.empty()
+        LocalDirectoryDependency local = LocalDirectoryDependency.fromLocal('local', resource)
+        set.add(local)
+
+        when(configurationManager.getByName('build')).thenReturn(configuration)
+        when(configuration.getDependencies()).thenReturn(set)
+        assert resolveBuildDependenciesTask.localDirDependencies == [resource]
+    }
+
+    @Test
     void 'checking buildMode should succeed'() {
         when(setting.getBuildMode()).thenReturn(DEVELOP)
         assert resolveBuildDependenciesTask.buildMode == 'DEVELOP'

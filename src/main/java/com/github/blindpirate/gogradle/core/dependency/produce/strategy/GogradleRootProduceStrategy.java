@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 
@@ -25,16 +24,12 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
 
     private final GolangPluginSetting settings;
     private final GolangConfigurationManager configurationManager;
-    private final LockedDependencyManager lockedDependenciesManager;
-
 
     @Inject
     public GogradleRootProduceStrategy(GolangPluginSetting settings,
-                                       GolangConfigurationManager configurationManager,
-                                       LockedDependencyManager lockedDependenciesManager) {
+                                       GolangConfigurationManager configurationManager) {
         this.settings = settings;
         this.configurationManager = configurationManager;
-        this.lockedDependenciesManager = lockedDependenciesManager;
     }
 
     @DebugLog
@@ -74,12 +69,7 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
                                                       File rootDir,
                                                       DependencyVisitor visitor,
                                                       String configuration) {
-        GolangDependencySet lockedByGogradle = lockedDependenciesManager.getLockedDependencies(configuration);
-        if (lockedByGogradle.isEmpty()) {
-            return visitor.visitExternalDependencies(dependency, rootDir, configuration);
-        } else {
-            return lockedByGogradle;
-        }
+        return visitor.visitExternalDependencies(dependency, rootDir, configuration);
     }
 
     private GolangDependencySet getDependenciesInBuildDotGradle(String configuration) {

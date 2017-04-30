@@ -14,8 +14,23 @@ class WithGitReposProcessor extends GogradleRunnerProcessor<WithGitRepos> {
 
     @Override
     void beforeTest(Object instance, FrameworkMethod method, WithGitRepos annotation) {
-        setUpGitServer(annotation.value())
+        if (annotation.value() != '') {
+            setUpGitServerWithZip(annotation.value())
+        } else {
+            setUpGitServerFromScratch(annotation.repoNames(), annotation.fileNames())
+        }
         ReflectionUtils.setFieldSafely(instance, 'repositories', resourceDir)
+    }
+
+    def setUpGitServerFromScratch(String[] repoNames, String[] fileNames) {
+        resourceDir = tmpRandomDirectory("repositories")
+        (0..<repoNames.size()).each {
+            File dir = new File(resourceDir, repoNames[it])
+            dir.mkdir()
+            GitServer.createRepository(dir, fileNames[it])
+            gitServer.addRepo(repoNames[it], dir)
+        }
+        gitServer.start(GitServer.DEFAULT_PORT)
     }
 
     @Override
@@ -24,7 +39,7 @@ class WithGitReposProcessor extends GogradleRunnerProcessor<WithGitRepos> {
         deleteQuitely(resourceDir)
     }
 
-    File setUpGitServer(String resourceName) {
+    File setUpGitServerWithZip(String resourceName) {
         File destDir = tmpRandomDirectory("repositories")
         Assert.isTrue(resourceName.endsWith('.zip'))
         decompressResourceToDir(resourceName, destDir)

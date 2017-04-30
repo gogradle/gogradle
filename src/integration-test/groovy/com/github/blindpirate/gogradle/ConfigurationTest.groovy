@@ -76,13 +76,13 @@ repositories {
             String expectedOutput = """
 build:
 github.com/my/project
-└── a:${StringUtils.toUnixString(resource)}/a √
-    └── b:${StringUtils.toUnixString(resource)}/b √
+\\-- a:${StringUtils.toUnixString(resource)}/a
+    \\-- b:${StringUtils.toUnixString(resource)}/b
 
 test:
 github.com/my/project
-└── c:${StringUtils.toUnixString(resource)}/c √
-    └── d:${StringUtils.toUnixString(resource)}/d √
+\\-- c:${StringUtils.toUnixString(resource)}/c
+    \\-- d:${StringUtils.toUnixString(resource)}/d
 """.replaceAll('\\r', '')
 
             assert actualOutput.concat(expectedOutput)

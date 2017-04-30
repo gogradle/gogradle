@@ -21,6 +21,19 @@ class GolangDependencySetTest {
     File resource
 
     @Test
+    void 'collector should be correct'() {
+        GolangDependencySet set1 = new GolangDependencySet()
+        GolangDependencySet set2 = new GolangDependencySet()
+        LocalDirectoryDependency dependency = new LocalDirectoryDependency()
+        dependency.setName('local')
+        set1.add(dependency)
+
+        GolangDependencySet combined = GolangDependencySet.COLLECTOR.combiner().apply(set1, set2)
+        assert combined.size() == 1
+        assert combined.first().is(dependency)
+    }
+
+    @Test
     void 'flattening should succeed'() {
         // given
         ResolvedDependency d1 = mockResolvedDependency('d1')

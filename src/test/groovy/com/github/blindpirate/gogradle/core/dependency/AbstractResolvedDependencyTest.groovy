@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
@@ -36,6 +37,11 @@ class AbstractResolvedDependencyTest {
     }
 
     @Test
+    void 'getting cache scope should succeed'() {
+        assert dependency.cacheScope == CacheScope.PERSISTENCE
+    }
+
+    @Test
     void 'resolved dependency should be resolved to itself'() {
         assert dependency.resolve(null).is(dependency)
     }
@@ -47,11 +53,10 @@ class AbstractResolvedDependencyTest {
 
     @Test
     @WithResource('')
-    void 'version should be recorded in installation directory'() {
+    void 'installation should succeed'() {
         // when
         dependency.installTo(resource)
         // then
-        assert new File(resource, '.CURRENT_VERSION').text == 'version'
         verify(dependencyManager).install(dependency, resource)
     }
 
