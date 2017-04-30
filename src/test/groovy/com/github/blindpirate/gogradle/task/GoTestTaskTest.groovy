@@ -96,13 +96,23 @@ class GoTestTaskTest extends TaskTest {
     }
 
     @Test
+    void 'nothing should happened if no tests match the specific pattern'() {
+        // when
+        ReflectionUtils.setField(task, 'testNamePattern', ["THIS WON'T BE MATCHED"])
+        task.addDefaultActionIfNoCustomActions()
+        task.actions[0].execute(task)
+        // then
+        verifyNoMoreInteractions(buildManager)
+    }
+
+    @Test
     void 'coverage profiles should not be generated if not specified'() {
         // when
         task.addDefaultActionIfNoCustomActions()
         task.setGenerateCoverageProfile(false)
         task.actions[0].execute(task)
         // then
-        assert !task.generateCoverageProfile
+        assert !task.coverageProfileGenerated
         verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/a'])
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/b'])
@@ -119,7 +129,9 @@ class GoTestTaskTest extends TaskTest {
         List<String> args = argumentsCaptor.getValue()
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
-        assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any { args.contains(StringUtils.toUnixString(new File(resource, it))) }
+        assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any {
+            args.contains(StringUtils.toUnixString(new File(resource, it)))
+        }
     }
 
     @Test

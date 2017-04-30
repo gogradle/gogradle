@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
@@ -33,6 +34,11 @@ class AbstractResolvedDependencyTest {
     void setUp() {
         dependency = new ResolvedDependencyForTest('name', 'version', 123L, delegate)
         when(delegate.getInstaller()).thenReturn(dependencyManager)
+    }
+
+    @Test
+    void 'getting cache scope should succeed'() {
+        assert dependency.cacheScope == CacheScope.PERSISTENCE
     }
 
     @Test

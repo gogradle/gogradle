@@ -95,4 +95,9 @@ class VcsResolvedDependencyTest {
         assert dependency1.hashCode() == dependency2.hashCode()
     }
 
+    @Test
+    void 'toString should succeed'() {
+        assert newResolvedDependency(VcsType.GIT).toString() == 'package#commitId'
+    }
+
 }

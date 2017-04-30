@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -32,6 +33,17 @@ class GitMercurialNotationDependencyTest {
         dependency.name = 'github.com/a/b'
         dependency.commit = 'commitId'
         dependency.url = 'url'
+    }
+
+    @Test
+    void 'getting cache scope should succeed'() {
+        assert dependency.cacheScope == CacheScope.PERSISTENCE
+
+        dependency.commit = ''
+        assert dependency.cacheScope == CacheScope.BUILD
+
+        dependency.commit = 'LATEST_COMMIT'
+        assert dependency.cacheScope == CacheScope.BUILD
     }
 
     @Test

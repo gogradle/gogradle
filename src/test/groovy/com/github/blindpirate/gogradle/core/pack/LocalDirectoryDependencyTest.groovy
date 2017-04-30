@@ -69,6 +69,12 @@ class LocalDirectoryDependencyTest {
         assert Instant.parse(dependency.getVersion()) > Instant.now().minusSeconds(60)
     }
 
+    @Test
+    void 'version of empty local dependency is 0'() {
+        LocalDirectoryDependency local = new LocalDirectoryDependency()
+        local.dir = GolangRepository.EMPTY_DIR
+        assert local.updateTime == 0L
+    }
 
     @Test(expected = DependencyResolutionException)
     void 'notation with invalid dir should cause an exception'() {
