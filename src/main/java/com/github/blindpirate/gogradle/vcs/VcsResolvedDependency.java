@@ -57,6 +57,11 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
     }
 
     @Override
+    public String toString() {
+        return getName() + "#" + getVersion();
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;

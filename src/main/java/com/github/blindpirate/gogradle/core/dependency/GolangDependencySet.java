@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangCloneable;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.google.common.collect.ImmutableSet;
 
@@ -11,6 +12,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.function.BiConsumer;
@@ -63,6 +65,30 @@ public class GolangDependencySet implements Set<GolangDependency>, Serializable,
     }
 
     public GolangDependencySet() {
+    }
+
+    public Optional<GolangDependency> findByName(String name) {
+        GolangDependency dependency = new AbstractGolangDependency() {
+            @Override
+            public String getName() {
+                return name;
+            }
+
+            @Override
+            public ResolvedDependency resolve(ResolveContext context) {
+                return null;
+            }
+
+            @Override
+            public CacheScope getCacheScope() {
+                return null;
+            }
+        };
+        GolangDependency result = container.floor(dependency);
+        if (result != null && !result.getName().equals(name)) {
+            result = null;
+        }
+        return Optional.ofNullable(result);
     }
 
     public static GolangDependencySet merge(GolangDependencySet... sets) {

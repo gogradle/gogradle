@@ -7,7 +7,6 @@ import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParse
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
@@ -19,7 +18,6 @@ import java.time.Instant;
 import java.util.Map;
 import java.util.Objects;
 
-import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager.CURRENT_VERSION_INDICATOR_FILE;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -84,10 +82,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public void installTo(File targetDirectory) {
-        if (rootDir != EMPTY_DIR) {
-            GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
-            IOUtils.write(targetDirectory, CURRENT_VERSION_INDICATOR_FILE, formatVersion());
-        }
+        GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
     }
 
     @Override
@@ -99,6 +94,11 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     @Override
     public String getVersion() {
         return Instant.ofEpochMilli(getUpdateTime()).toString();
+    }
+
+    @Override
+    public String toString() {
+        return getName() + "@" + StringUtils.toUnixString(rootDir);
     }
 
     @Override
@@ -127,11 +127,6 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
         } else {
             return GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).resolve(context, this);
         }
-    }
-
-    @Override
-    public String toString() {
-        return "LocalDirectoryDependency@" + StringUtils.toUnixString(rootDir);
     }
 
     @Override

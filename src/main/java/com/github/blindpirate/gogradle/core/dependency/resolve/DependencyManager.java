@@ -8,7 +8,7 @@ import java.io.File;
 
 public interface DependencyManager {
 
-    String CURRENT_VERSION_INDICATOR_FILE = ".CURRENT_VERSION";
+
 
     /**
      * Resolves a dependency.

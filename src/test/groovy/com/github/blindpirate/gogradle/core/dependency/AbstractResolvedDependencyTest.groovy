@@ -47,11 +47,10 @@ class AbstractResolvedDependencyTest {
 
     @Test
     @WithResource('')
-    void 'version should be recorded in installation directory'() {
+    void 'installation should succeed'() {
         // when
         dependency.installTo(resource)
         // then
-        assert new File(resource, '.CURRENT_VERSION').text == 'version'
         verify(dependencyManager).install(dependency, resource)
     }
 

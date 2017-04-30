@@ -65,4 +65,9 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
             return null;
         }
     }
+
+    @Override
+    public String toString() {
+        return getName() + ":" + getVersion();
+    }
 }

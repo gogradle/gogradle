@@ -3,11 +3,8 @@ package com.github.blindpirate.gogradle.core.dependency;
 import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.IOUtils;
 
 import java.io.File;
-
-import static com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager.CURRENT_VERSION_INDICATOR_FILE;
 
 /**
  * Represents some code at a specific version.
@@ -51,7 +48,6 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
 
     @Override
     public void installTo(File targetDirectory) {
-        IOUtils.write(targetDirectory, CURRENT_VERSION_INDICATOR_FILE, formatVersion());
         getInstaller().install(this, targetDirectory);
     }
 

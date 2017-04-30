@@ -106,7 +106,6 @@ class LocalDirectoryDependencyTest {
         dependency.installTo(dest)
         // then
         verify(installer).install(dependency, dest)
-        assert new File(dest, DependencyManager.CURRENT_VERSION_INDICATOR_FILE).text == StringUtils.toUnixString(src)
     }
 
     @Test
