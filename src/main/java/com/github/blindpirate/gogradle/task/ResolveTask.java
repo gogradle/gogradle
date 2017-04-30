@@ -8,6 +8,7 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -122,14 +123,15 @@ public abstract class ResolveTask extends AbstractGolangTask {
         }
     }
 
-//    @InputFiles
-//    public List<File> getLocalDirDependencies() {
-//        return getDependencies().stream()
-//                .filter(dependency -> dependency instanceof LocalDirectoryDependency)
-//                .map(dependency -> (LocalDirectoryDependency) dependency)
-//                .map(LocalDirectoryDependency::getRootDir)
-//                .collect(Collectors.toList());
-//    }
+    @InputFiles
+    public List<File> getLocalDirDependencies() {
+        return configurationManager.getByName(getConfigurationName())
+                .getDependencies().stream()
+                .filter(dependency -> dependency instanceof LocalDirectoryDependency)
+                .map(dependency -> (LocalDirectoryDependency) dependency)
+                .map(LocalDirectoryDependency::getRootDir)
+                .collect(Collectors.toList());
+    }
 
     @OutputFile
     public File getSerializationFile() {

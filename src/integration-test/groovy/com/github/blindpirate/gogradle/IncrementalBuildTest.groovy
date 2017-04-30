@@ -164,4 +164,37 @@ dependencies {
         build()
         assertNotUpToDate()
     }
+
+    @Test
+    void 'modification to local dependencies should make dependencies updated'() {
+        File originalResource = resource
+
+        IOUtils.write(resource, 'a/a.go', '')
+        IOUtils.write(resource, 'b/b.go', '')
+        IOUtils.write(resource, 'project/build.gradle', """
+buildscript {
+    dependencies {
+        classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
+    }
+}
+apply plugin: 'com.github.blindpirate.gogradle'
+golang {
+    packagePath='my/project'
+}
+dependencies {
+    golang {
+        build name:'a', dir: '${StringUtils.toUnixString(new File(resource, 'a'))}'
+        build name:'b', dir: '${StringUtils.toUnixString(new File(resource, 'b'))}'
+    }
+}
+""")
+        resource = new File(resource, 'project')
+        build()
+        build()
+        assertUpToDate()
+        IOUtils.write(originalResource, 'a/a.go', 'something else')
+        build()
+        assertNotUpToDate()
+        resource = originalResource
+    }
 }
