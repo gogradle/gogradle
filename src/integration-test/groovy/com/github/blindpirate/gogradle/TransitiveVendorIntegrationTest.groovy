@@ -60,8 +60,8 @@ dependencies {
             assert stdout.toString().contains("""\
 a
 \\-- c:${toUnixString(resource)}/c
-    \\-- d:LocalDirectoryDependency@${toUnixString(resource)}/c/vendor/d
-        \\-- e:LocalDirectoryDependency@${toUnixString(resource)}/c/vendor/d/vendor/e""")
+    \\-- d:c@${toUnixString(resource)}/c/vendor/d
+        \\-- e:c@${toUnixString(resource)}/c/vendor/d/vendor/e""")
         }
     }
 
