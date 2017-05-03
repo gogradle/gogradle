@@ -123,6 +123,15 @@ class DefaultGoBinaryManagerTest {
     }
 
     @Test
+    void 'local go binary should be ignored if IGNORE_LOCAL is specified'() {
+        // given
+        turnOnMockGo()
+        when(setting.getGoExecutable()).thenReturn('IGNORE_LOCAL')
+        // then
+        'the newest stable version will be used if local binary not exist and no version specified'()
+    }
+
+    @Test
     void 'local go binary should be ignored if it cannot be recognized'() {
         // given
         turnOnMockGo()
