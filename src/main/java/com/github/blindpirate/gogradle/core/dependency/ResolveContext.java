@@ -83,7 +83,6 @@ public class ResolveContext {
         return ret;
     }
 
-
     private boolean shouldBeReserved(GolangDependency dependency) {
         ResolveContext current = this;
         while (current != null) {

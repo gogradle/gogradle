@@ -1,5 +1,6 @@
 package com.github.blindpirate.gogradle.support
 
+import com.github.blindpirate.gogradle.util.IOUtils
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletHandler
 import org.eclipse.jetty.servlet.ServletHolder
@@ -83,8 +84,10 @@ class GitServer {
         Git git
         try {
             git = new Git(repository)
-            new File(dir, fileName).createNewFile()
-            git.add().addFilepattern(fileName).call()
+            fileName.split('&').each {
+                IOUtils.write(dir, it.trim(), '')
+            }
+            git.add().addFilepattern('.').call()
             git.commit().setMessage('commit').call()
         } finally {
             if (git != null) {

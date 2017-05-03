@@ -30,7 +30,10 @@ public class VendorNotationDependency extends AbstractNotationDependency {
 
     @Override
     public ResolvedDependency doResolve(ResolveContext context) {
-        ResolvedDependency hostResolvedDependency = hostNotationDependency.resolve(context);
+        // Here we create a new context to avoid incorrect exclusion
+        ResolveContext rootContext = ResolveContext.root(context.getConfiguration());
+
+        ResolvedDependency hostResolvedDependency = hostNotationDependency.resolve(rootContext);
         Optional<VendorResolvedDependency> result = hostResolvedDependency.getDependencies().flatten()
                 .stream()
                 .filter(d -> d instanceof VendorResolvedDependency)
