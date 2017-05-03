@@ -9,6 +9,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -48,7 +49,7 @@ class VendorNotationDependencyTest {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown if it does not exist in host\'s dependencies'() {
         // given
-        when(hostNotationDependency.resolve(context)).thenReturn(hostResolvedDependency)
+        when(hostNotationDependency.resolve(any(ResolveContext))).thenReturn(hostResolvedDependency)
         when(hostResolvedDependency.getDependencies()).thenReturn(GolangDependencySet.empty())
         // then
         dependency.resolve(context)
@@ -57,7 +58,7 @@ class VendorNotationDependencyTest {
     @Test
     void 'vendor resolved dependency should be picked up from host\'s descendants'() {
         // given
-        when(hostNotationDependency.resolve(context)).thenReturn(hostResolvedDependency)
+        when(hostNotationDependency.resolve(any(ResolveContext))).thenReturn(hostResolvedDependency)
         VendorResolvedDependencyForTest vendor1 = new VendorResolvedDependencyForTest('vendor1', 'version', 1L, hostResolvedDependency, 'vendor/vendor1')
         VendorResolvedDependencyForTest vendor2 = new VendorResolvedDependencyForTest('vendor2', 'version', 2L, hostResolvedDependency, 'vendor/vendor1/vendor/vendor2')
         vendor1.dependencies.add(vendor2)
