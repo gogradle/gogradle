@@ -54,7 +54,7 @@ FAIL\ta\t0.006s'''
 --- FAIL: Test_A1 (0.00s)
 \ta1_test.go:9: Failed
 === RUN   Test_A2
---- PASS: Test_A2 (0.00s)
+SomeOutputWithoutNewline--- PASS: Test_A2 (0.00s)
 \ta1_test.go:15: Passed
 === RUN   Test_A3
 --- PASS: Test_A3 (0.00s)
@@ -82,13 +82,12 @@ FAIL\tgithub.com/my/project/a\t0.006s'''
         assert result.results[0].resultType == TestResult.ResultType.FAILURE
 
         assert result.results[1].name == 'Test_A2'
-        assert result.results[1].message.trim() == 'a1_test.go:15: Passed'
+        assert result.results[1].message.trim() == 'SomeOutputWithoutNewline\n\ta1_test.go:15: Passed'
         assert result.results[1].resultType == TestResult.ResultType.SUCCESS
 
         assert result.results[2].name == 'Test_A3'
         assert result.results[2].message.trim() == 'a2_test.go:7: Passed'
         assert result.results[2].resultType == TestResult.ResultType.SUCCESS
-
     }
 
     @Test
