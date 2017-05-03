@@ -13,6 +13,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.List;
 
 /**
  * This task perform preparation such as Go executable and GOPATH.
@@ -48,11 +49,16 @@ public class PrepareTask extends DefaultTask {
 
     private void deleteGogradleDotLockIfLockTaskExists() {
         File gogradleDotLock = new File(getProject().getRootDir(), "gogradle.lock");
-        if (getProject().getTasks().getByName(GolangTaskContainer.LOCK_TASK_NAME) != null
-                && gogradleDotLock.exists()) {
+        if (goLockExistsInCurrentTasks() && gogradleDotLock.exists()) {
             LOGGER.warn("gogradle.lock already exists, it will be removed now.");
             IOUtils.forceDelete(gogradleDotLock);
         }
+    }
+
+    private boolean goLockExistsInCurrentTasks() {
+        List<String> taskNames = getProject().getGradle().getStartParameter().getTaskNames();
+        return taskNames.contains(GolangTaskContainer.LOCK_TASK_NAME)
+                || taskNames.contains("gL");
     }
 
 }

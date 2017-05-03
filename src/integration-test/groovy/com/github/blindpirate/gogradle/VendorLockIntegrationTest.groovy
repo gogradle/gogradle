@@ -70,10 +70,10 @@ dependencies {
         build('goLock', 'installBuildDependencies')
         assertLockIsVcs()
 
-        build('goLock', 'installBuildDependencies')
+        build('installBuildDependencies')
 
         deleteDependencyTreeCache()
-        build('goLock', 'installBuildDependencies')
+        build('installBuildDependencies')
         assert new File(resource, '.gogradle/build_gopath/src/github.com/my/dependency1/commit1.go').exists()
         assert stdout.toString().contains('Resolving cached')
     }

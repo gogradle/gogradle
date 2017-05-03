@@ -4,10 +4,13 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.api.Task
+import org.gradle.api.internal.GradleInternal
 import org.gradle.api.internal.tasks.TaskContainerInternal
+import org.gradle.api.invocation.Gradle
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import org.mockito.Answers
 import org.mockito.Mock
 
 import static org.mockito.Mockito.*
@@ -20,15 +23,15 @@ class PrepareTaskTest extends TaskTest {
 
     File resource
 
-    @Mock
-    TaskContainerInternal taskContainer
+    @Mock(answer = Answers.RETURNS_DEEP_STUBS)
+    GradleInternal gradle
 
     @Before
     void setUp() {
         task = buildTask(PrepareTask)
         when(project.getRootDir()).thenReturn(resource)
-        when(project.getTasks()).thenReturn(taskContainer)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
+        when(project.getGradle()).thenReturn(gradle)
     }
 
     @Test
@@ -48,11 +51,27 @@ class PrepareTaskTest extends TaskTest {
     void 'old gogradle.lock should be removed before locking'() {
         // given
         IOUtils.write(resource, 'gogradle.lock', '')
-        when(taskContainer.getByName('goLock')).thenReturn(mock(Task))
+        when(gradle.getStartParameter().getTaskNames()).thenReturn(["goLock"])
         // when
         task.prepare()
         // then
         assert !new File(resource, 'gogradle.lock').exists()
+
+        // given
+        IOUtils.write(resource, 'gogradle.lock', '')
+        when(gradle.getStartParameter().getTaskNames()).thenReturn(["gL"])
+        // when
+        task.prepare()
+        // then
+        assert !new File(resource, 'gogradle.lock').exists()
+
+        // given
+        IOUtils.write(resource, 'gogradle.lock', '')
+        when(gradle.getStartParameter().getTaskNames()).thenReturn(["gD"])
+        // when
+        task.prepare()
+        // then
+        assert new File(resource, 'gogradle.lock').exists()
     }
 
 }
