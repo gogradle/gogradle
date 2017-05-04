@@ -136,7 +136,7 @@ github.com/gogits/gogs
 
 This is denpendency tree of [gogs](https://github.com/gogits/gogs) in v0.9.113. A `glide.lock` file exists in its root directory, thus Gogradle imports it automatically. It's simple, isn't it?
 
-Tick mark `√` indicates that the dependency is the final resolved version; arrow `->` indicates that the dependency conflicts with another dependency and is resolved to another version; star `*` indicates this node's descendants are ignored because they have been displayed before.
+Arrow `->` indicates that the dependency conflicts with another dependency and is resolved to another version; star `*` indicates this node's descendants are ignored because they have been displayed before.
 
 ## Dependency Lock
 
@@ -185,6 +185,7 @@ golang {
     goVersion = '1.7.1'
     
     // Default value is "go". Modify this when go is not in $PATH
+    // You can use goExecutable = 'IGNORE_LOCAL' to ignore local go forcibly 
     goExecutable = '/path/to/go/executable'
     // If not set, GOROOT will be <directory of go binary>/..
     goRoot = '/path/to/my/goroot'

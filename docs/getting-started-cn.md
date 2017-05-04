@@ -166,8 +166,7 @@ github.com/gogits/gogs
 
 这是[gogs](https://github.com/gogits/gogs)项目v0.9.113的依赖树。在其项目目录下存在`glide.lock`文件，这是[glide](https://github.com/Masterminds/glide)工具生成的，因此Gogradle自动导入了它。无需任何设置，就是这么简单。
 
-其中，对号(√)代表该依赖包即最终的依赖包；
-箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点之前已经显示过，因此忽略其后代。
+其中，箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点之前已经显示过，因此忽略其后代。
 
 ## 依赖锁定
 
@@ -211,6 +210,7 @@ golang {
     goVersion = '1.7.1'
     
     // 默认为"go"。若go不在$PATH中，可以使用此配置指定其位置
+    // 可以用 goExecutable = 'IGNORE_LOCAL' 来强制指定不使用本地的go
     goExecutable = '/path/to/go/executable'
     // 默认为<go程序所在目录>/..
     goRoot = '/path/to/my/goroot'
