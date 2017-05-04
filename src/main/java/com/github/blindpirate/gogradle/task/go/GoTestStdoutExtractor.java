@@ -150,8 +150,8 @@ public class GoTestStdoutExtractor {
 
     private Optional<GoTestMethodResult> extractOneTestMethod(List<String> middleLines) {
         OptionalInt testResultLineIndex = IntStream.range(0, middleLines.size())
-                .filter(index -> middleLines.get(index).startsWith(TEST_FAIL)
-                        || middleLines.get(index).startsWith(TEST_PASS))
+                .filter(index -> middleLines.get(index).contains(TEST_FAIL)
+                        || middleLines.get(index).contains(TEST_PASS))
                 .findAny();
         if (testResultLineIndex.isPresent()) {
             String line = middleLines.get(testResultLineIndex.getAsInt());
@@ -163,8 +163,7 @@ public class GoTestStdoutExtractor {
                 long duration = toMilliseconds(parseDouble(matcher.group(3)));
 
                 String message = IntStream.range(1, middleLines.size())
-                        .filter(i -> i != testResultLineIndex.getAsInt())
-                        .mapToObj(middleLines::get)
+                        .mapToObj(i -> mapToResultLine(i, middleLines, testResultLineIndex.getAsInt()))
                         .collect(Collectors.joining("\n"));
 
                 GoTestMethodResult result = new GoTestMethodResult(id,
@@ -180,6 +179,21 @@ public class GoTestStdoutExtractor {
             }
         }
         return Optional.empty();
+    }
+
+    private String mapToResultLine(int index, List<String> lines, int testResultLineIndex) {
+        String line = lines.get(index);
+        if (index == testResultLineIndex) {
+            int testFailIndex = line.indexOf(TEST_FAIL);
+            int testPassIndex = line.indexOf(TEST_PASS);
+            if (testFailIndex > 0 || testPassIndex > 0) {
+                // they seemed to omit a new line
+                return line.substring(0, testFailIndex > 0 ? testFailIndex : testPassIndex);
+            } else {
+                return "";
+            }
+        }
+        return lines.get(index);
     }
 
     private Map<File, String> loadTestFiles(List<File> testFiles) {
