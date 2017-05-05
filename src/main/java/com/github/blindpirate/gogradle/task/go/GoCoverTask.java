@@ -109,7 +109,7 @@ public class GoCoverTask extends AbstractGolangTask {
                         .collect(Collectors.toList());
         long totalMissedLines = calculateTotalMissedLines(packageCoverages);
         long totalLines = calculateLines(packageCoverages);
-        int totalCoverageRate = NumberUtils.percentage(totalMissedLines, totalLines);
+        int totalCoverageRate = NumberUtils.percentage(totalLines - totalMissedLines, totalLines);
 
         sortByName(packageCoverages);
         sortByCoverageRate(packageCoverages);
