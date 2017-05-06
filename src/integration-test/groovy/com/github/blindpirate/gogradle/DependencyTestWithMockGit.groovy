@@ -10,6 +10,7 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithMockGo
 @WithResource('')
+@WithGitRepos('git-repo.zip')
 @WithIsolatedUserhome
 class DependencyTestWithMockGit extends IntegrationTestSupport {
     File resource
@@ -87,7 +88,6 @@ dependencies {
 
 
     @Test
-    @WithGitRepos('git-repo.zip')
     void 'resolving dependencies of a complicated package should succeed'() {
         firstBuild()
         secondBuildWithUpToDate()
@@ -123,9 +123,8 @@ dependencies {
                 'github.com/vendoronly/d'    : 'commit2',
                 'github.com/vendoronly/e'    : 'commit2',
                 'github.com/external/a'      : 'commit3',
-                'github.com/external/b'      : 'commit4',
+                'github.com/external/b'      : 'commit3',
                 'github.com/external/c'      : 'commit4',
-                'github.com/external/d'      : 'commit4',
                 'github.com/external/e'      : 'commit3',
 
         ])
@@ -145,7 +144,6 @@ dependencies {
     }
 
     @Test
-    @WithGitRepos('git-repo.zip')
     void 'project-level cache should be used in second resolution'() {
         firstBuild()
 

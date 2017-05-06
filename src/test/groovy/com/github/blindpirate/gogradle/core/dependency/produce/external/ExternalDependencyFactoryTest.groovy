@@ -6,6 +6,8 @@ import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
+import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.Mock
 
 import java.nio.file.Path
@@ -27,7 +29,6 @@ class ExternalDependencyFactoryTest {
     @Mock
     StandardPackagePathResolver standardPackagePathResolver
 
-
     @Before
     void superSetUp() {
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
@@ -36,6 +37,6 @@ class ExternalDependencyFactoryTest {
     }
 
     void verifyMapParsed(Map map) {
-        verify(mapNotationParser).parse(eq(map))
+        verify(mapNotationParser).parse(eq(map + [transitive: false]))
     }
 }

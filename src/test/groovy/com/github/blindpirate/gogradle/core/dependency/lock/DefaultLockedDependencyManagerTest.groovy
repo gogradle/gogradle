@@ -50,17 +50,13 @@ dependencies:
   build:
   - name: "a"
     version: "v1"
-    transitive: false
   - name: "b"
     version: "v2"
-    transitive: false
   test:
   - name: "a"
     version: "v2"
-    transitive: false
   - name: "c"
     version: "v3"
-    transitive: false
 """
 
     @Before

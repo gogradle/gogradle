@@ -40,12 +40,12 @@ include = public|scripts|templates'''
 
         // then
         verifyMapParsed([name: 'github.com/a/b'])
-        verify(mapNotationParser).parse(eq([name: 'github.com/c/d']))
-        verify(mapNotationParser).parse(eq([name: 'github.com/e/f', dir: '/path/to/my/project']))
-        verify(mapNotationParser).parse(eq([name: 'github.com/g/h', dir: /d:\projects\xorm/]))
-        verify(mapNotationParser).parse(eq([name: 'golang.org/i/j', branch: 'master']))
-        verify(mapNotationParser).parse(eq([name: 'golang.org/k/l', tag: 'v0.9.0']))
-        verify(mapNotationParser).parse(eq([name: 'gopkg.in/redis.v2', commit: 'e617904']))
+        verifyMapParsed([name: 'github.com/c/d'])
+        verifyMapParsed([name: 'github.com/e/f', dir: '/path/to/my/project'])
+        verifyMapParsed([name: 'github.com/g/h', dir: /d:\projects\xorm/])
+        verifyMapParsed([name: 'golang.org/i/j', branch: 'master'])
+        verifyMapParsed([name: 'golang.org/k/l', tag: 'v0.9.0'])
+        verifyMapParsed([name: 'gopkg.in/redis.v2', commit: 'e617904'])
     }
 
     @Test

@@ -47,11 +47,16 @@ public abstract class ExternalDependencyFactory {
             List<Map<String, Object>> mapNotations = adapter.apply(identityFile);
 
             mapNotations = removeStandardPackages(mapNotations);
+            mapNotations.forEach(this::putTransitiveFalse);
 
             return Optional.of(parseMany(mapNotations, mapNotationParser));
         } else {
             return Optional.empty();
         }
+    }
+
+    private void putTransitiveFalse(Map<String, Object> map) {
+        map.put("transitive", false);
     }
 
     private List<Map<String, Object>> removeStandardPackages(List<Map<String, Object>> packages) {

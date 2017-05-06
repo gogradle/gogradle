@@ -47,7 +47,6 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         List<Map<String, Object>> ret = flatDependencies.stream()
                 .map(ResolvedDependency::toLockedNotation)
                 .collect(Collectors.toList());
-        ret.forEach(this::deactiveTransitiveDependency);
         return ret;
     }
 
@@ -60,10 +59,6 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     protected List<Map<String, Object>> adapt(File file) {
         GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
         return model.getDependencies(BUILD);
-    }
-
-    private void deactiveTransitiveDependency(Map<String, Object> map) {
-        map.put("transitive", false);
     }
 
     @Override
