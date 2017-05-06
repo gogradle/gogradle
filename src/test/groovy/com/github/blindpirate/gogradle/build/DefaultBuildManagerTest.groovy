@@ -129,7 +129,7 @@ class DefaultBuildManagerTest {
         // given
         when(process.waitFor()).thenReturn(1)
         // then
-        manager.go(['test', './...'], null)
+        manager.go(['test', './...'], [:])
     }
 
     String getBuildGopath() {

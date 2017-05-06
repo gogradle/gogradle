@@ -63,7 +63,7 @@ public class GoBuildTask extends Go {
     }
 
     private void buildWithEnv(Map<String, String> env) {
-        setEnv(env);
+        setSingleBuildEnvironment(env);
         go(Arrays.asList("build", "-o", outputLocation));
     }
 

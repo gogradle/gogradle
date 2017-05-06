@@ -86,7 +86,7 @@ class GoTestTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         task.actions[0].execute(task)
         // then
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
                  "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
@@ -113,7 +113,7 @@ class GoTestTaskTest extends TaskTest {
         task.actions[0].execute(task)
         // then
         assert !task.coverageProfileGenerated
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/a'])
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/b'])
     }
@@ -125,7 +125,7 @@ class GoTestTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         task.actions[0].execute(task)
         // then
-        verify(buildManager).go(argumentsCaptor.capture(), isNull(Map), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
         List<String> args = argumentsCaptor.getValue()
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
@@ -138,7 +138,7 @@ class GoTestTaskTest extends TaskTest {
     void 'collecting stdout should succeed'() {
         // given
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
-        when(buildManager.go(anyList(), isNull(Map), any(Consumer), any(Consumer), any(Consumer))).thenAnswer(new Answer<Object>() {
+        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), any(Consumer))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 invocation.arguments[2].accept('stdout')

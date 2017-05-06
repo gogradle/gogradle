@@ -12,6 +12,7 @@ import java.util.function.Consumer
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
@@ -40,7 +41,7 @@ class GoVetTaskTest extends TaskTest {
         task.actions[0].execute(task)
         ArgumentCaptor captor = ArgumentCaptor.forClass(List)
         // then
-        verify(buildManager).go(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
         assert captor.value == ['vet', './...']
     }
 }

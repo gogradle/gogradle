@@ -15,6 +15,7 @@ import java.util.function.Consumer
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
@@ -56,7 +57,7 @@ class GofmtTaskTest extends TaskTest {
         task.actions[0].execute(task)
 
         // then
-        verify(buildManager).run(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
 
         assert captor.value[0..1] == [absolutePath('.go/bin/gofmt'), '-w']
         assert captor.value.contains(absolutePath('a.go'))
@@ -72,7 +73,7 @@ class GofmtTaskTest extends TaskTest {
         // when
         task.gofmt 'whatever'
         // then
-        verify(buildManager).run(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
         assert captor.value == [absolutePath('.go/bin/gofmt'), 'whatever']
     }
 }

@@ -14,6 +14,7 @@ import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import static org.mockito.ArgumentMatchers.anyList
+import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.when
 
@@ -36,7 +37,7 @@ class GoCoverTaskTest extends TaskTest {
         when(golangTaskContainer.get(GoTestTask).isCoverageProfileGenerated()).thenReturn(true)
 
         when(project.getName()).thenReturn(resource.getName())
-        when(buildManager.go(anyList(), isNull())).thenAnswer(new Answer<Object>() {
+        when(buildManager.go(anyList(), anyMap())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 List args = invocation.getArgument(0)

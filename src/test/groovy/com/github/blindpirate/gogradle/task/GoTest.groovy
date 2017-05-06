@@ -35,7 +35,7 @@ class GoTest extends TaskTest {
         task.go('build -o "output name"')
         // then
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
-        verify(buildManager).go(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
         assert captor.getValue() == ['build', '-o', 'output name']
     }
 
@@ -50,7 +50,7 @@ class GoTest extends TaskTest {
         task.run('golint -v -a')
         // then
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
-        verify(buildManager).run(captor.capture(), isNull(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
         assert captor.getValue() == ['golint', '-v', '-a']
     }
 
@@ -72,7 +72,7 @@ class GoTest extends TaskTest {
         task.go('test -v github.com/my/package')
         // then
         ArgumentCaptor<Consumer> captor = ArgumentCaptor.forClass(Consumer)
-        verify(buildManager).go(anyList(), isNull(), any(Consumer), any(Consumer), captor.capture())
+        verify(buildManager).go(anyList(), anyMap(), any(Consumer), any(Consumer), captor.capture())
         assert captor.getValue().is(ReflectionUtils.getStaticField(Go,'DO_NOTHING'))
     }
 

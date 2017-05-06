@@ -27,7 +27,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -44,6 +43,7 @@ import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -139,7 +139,7 @@ public class GoTestTask extends Go {
     }
 
     private class TestPackagesAction implements Action<Task> {
-        private Map<File, List<File>> parentDirToTestFiles = Collections.emptyMap();
+        private Map<File, List<File>> parentDirToTestFiles = emptyMap();
 
         private boolean isCommandLineArguments;
 
@@ -245,7 +245,7 @@ public class GoTestTask extends Go {
                 coverageProfileGenerated = true;
             }
 
-            buildManager.go(args, null, lineCollector, lineCollector, code -> {
+            buildManager.go(args, emptyMap(), lineCollector, lineCollector, code -> {
             });
             return lineCollector.getLines();
         }

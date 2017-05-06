@@ -224,9 +224,7 @@ public class DefaultBuildManager implements BuildManager {
                 "GOOS", Os.getHostOs().toString(),
                 "GOEXE", Os.getHostOs().exeExtension(),
                 "GOARCH", Arch.getHostArch().toString());
-        if (env != null) {
-            defaultEnvs.putAll(env);
-        }
+        defaultEnvs.putAll(env);
         return defaultEnvs;
     }
 

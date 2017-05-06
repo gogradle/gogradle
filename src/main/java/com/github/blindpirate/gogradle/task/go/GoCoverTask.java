@@ -24,6 +24,7 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -201,7 +202,8 @@ public class GoCoverTask extends AbstractGolangTask {
     private void analyzeProfile(File profile) {
         String htmlOutputFilePath = toUnixString(profileFileToHtmlFile(profile));
         String profilePath = toUnixString(profile);
-        buildManager.go(asList("tool", "cover", "-html=" + profilePath, "-o", htmlOutputFilePath), null);
+        buildManager.go(asList("tool", "cover", "-html=" + profilePath, "-o", htmlOutputFilePath),
+                Collections.emptyMap());
     }
 
     private File profileFileToHtmlFile(File profile) {

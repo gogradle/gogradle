@@ -96,7 +96,7 @@ class GoBuildTaskTest extends TaskTest {
         // then
         assert task.actions.size() == 3
         assert task.actions.any { it instanceof GoExecutionAction }
-        assert task.env == null
+        assert task.singleBuildEnvironment == [:]
         verify(buildManager, times(3)).go(cmdsCaptor.capture(), envCaptor.capture(), any(Consumer), any(Consumer), isNull())
         assert cmdsCaptor.allValues == [
                 ['build', '-o', 'output'],
