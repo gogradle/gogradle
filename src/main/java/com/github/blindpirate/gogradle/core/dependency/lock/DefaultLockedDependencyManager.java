@@ -50,6 +50,10 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         return ret;
     }
 
+    protected boolean supportTestConfiguration() {
+        return true;
+    }
+
     @Override
     public String identityFileName() {
         return LOCK_FILE;

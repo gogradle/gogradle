@@ -6,11 +6,14 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
+import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
+
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 /**
  * In {@code DEVELOP} mode, dependencies in build.gradle have top priority.
@@ -52,10 +55,22 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
 
         setFirstLevel(result);
 
-        if (result.isEmpty()) {
+        if (needToParseSourceCode(result, configuration)) {
             return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         } else {
             return result;
+        }
+    }
+
+    private boolean needToParseSourceCode(GolangDependencySet result, String configuration) {
+        if (result.isEmpty()) {
+            if (TEST.equals(configuration) && result == ExternalDependencyFactory.TEST_DEPENDENCIES_OF_UNSUPPORT_TOOL) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+            return false;
         }
     }
 

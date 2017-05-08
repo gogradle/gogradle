@@ -20,10 +20,13 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.util.DependencySetUtils.parseMany;
+import static com.google.common.collect.ImmutableMap.*;
 
 public abstract class ExternalDependencyFactory {
-    private Map<String, Function<File, List>> adapters =
-            ImmutableMap.of(BUILD, this::adapt, TEST, this::adaptTest);
+    public static final GolangDependencySet TEST_DEPENDENCIES_OF_UNSUPPORT_TOOL =
+            GolangDependencySet.empty();
+
+    private Map<String, Function<File, List>> adapters = of(BUILD, this::adapt, TEST, this::adaptTest);
 
     @Inject
     protected MapNotationParser mapNotationParser;
@@ -43,8 +46,11 @@ public abstract class ExternalDependencyFactory {
     public Optional<GolangDependencySet> produce(File rootDir, String configuration) {
         File identityFile = identityFile(rootDir);
         if (identityFile.exists()) {
-            Function<File, List> adapter = adapters.get(configuration);
-            List<Map<String, Object>> mapNotations = adapter.apply(identityFile);
+            if (TEST.equals(configuration) && !supportTestConfiguration()) {
+                return Optional.of(TEST_DEPENDENCIES_OF_UNSUPPORT_TOOL);
+            }
+
+            List<Map<String, Object>> mapNotations = adapters.get(configuration).apply(identityFile);
 
             mapNotations = removeStandardPackages(mapNotations);
             mapNotations.forEach(this::putTransitiveFalse);
@@ -53,6 +59,11 @@ public abstract class ExternalDependencyFactory {
         } else {
             return Optional.empty();
         }
+    }
+
+    // Most external tools do not support configuration isolation
+    protected boolean supportTestConfiguration() {
+        return false;
     }
 
     private void putTransitiveFalse(Map<String, Object> map) {
