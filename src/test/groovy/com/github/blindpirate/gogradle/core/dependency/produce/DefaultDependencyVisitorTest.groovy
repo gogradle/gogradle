@@ -46,8 +46,9 @@ class DefaultDependencyVisitorTest {
     @Test
     void 'visiting external dependencies should succeed'() {
         // given:
-        when(external1.produce(rootDir, 'build')).thenReturn(Optional.empty())
-        when(external2.produce(rootDir, 'build')).thenReturn(Optional.of(dependencySet))
+        when(external1.canRecognize(rootDir)).thenReturn(false)
+        when(external2.canRecognize(rootDir)).thenReturn(true)
+        when(external2.produce(rootDir, 'build')).thenReturn(dependencySet)
 
         // then:
         assert visitor.visitExternalDependencies(resolvedDependency, rootDir, 'build') == dependencySet

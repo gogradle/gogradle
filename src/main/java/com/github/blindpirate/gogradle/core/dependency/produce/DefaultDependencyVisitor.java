@@ -12,7 +12,6 @@ import java.io.File;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
 import java.util.List;
-import java.util.Optional;
 
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
@@ -44,9 +43,8 @@ public class DefaultDependencyVisitor implements DependencyVisitor {
                                                          File rootDir,
                                                          String configuration) {
         for (ExternalDependencyFactory factory : externalDependencyFactories) {
-            Optional<GolangDependencySet> result = factory.produce(rootDir, configuration);
-            if (result.isPresent()) {
-                return result.get();
+            if (factory.canRecognize(rootDir)) {
+                return factory.produce(rootDir, configuration);
             }
         }
         return GolangDependencySet.empty();
