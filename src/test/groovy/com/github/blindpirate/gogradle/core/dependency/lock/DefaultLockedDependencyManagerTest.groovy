@@ -50,13 +50,17 @@ dependencies:
   build:
   - name: "a"
     version: "v1"
+    transitive: false
   - name: "b"
     version: "v2"
+    transitive: false
   test:
   - name: "a"
     version: "v2"
+    transitive: false
   - name: "c"
     version: "v3"
+    transitive: false
 """
 
     @Before
@@ -77,19 +81,6 @@ dependencies:
         IOUtils.write(project.getRootDir(), LOCK_FILE_NAME, gogradleDotLock)
     }
 
-//    @Test
-//    void 'reading from gogradle.lock should succeed'() {
-//        // given
-//        prepareGogradleDotLock()
-//        // when
-//        GolangDependencySet buildResult = manager.getLockedDependencies('build')
-//        GolangDependencySet testResult = manager.getLockedDependencies('test')
-//        // then
-//        assert buildResult.any { it.is(dependency1) }
-//        assert buildResult.any { it.is(dependency2) }
-//        assert testResult.any { it.is(dependency3) }
-//        assert testResult.any { it.is(dependency4) }
-//    }
 
     @Test
     @WithResource('')
@@ -97,8 +88,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.produce(project.rootDir, 'build').get()
-        GolangDependencySet testResult = manager.produce(project.rootDir, 'test').get()
+        GolangDependencySet buildResult = manager.produce(project.rootDir, 'build')
+        GolangDependencySet testResult = manager.produce(project.rootDir, 'test')
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }

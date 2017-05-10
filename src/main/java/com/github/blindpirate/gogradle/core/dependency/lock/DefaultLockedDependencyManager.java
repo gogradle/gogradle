@@ -47,11 +47,12 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         List<Map<String, Object>> ret = flatDependencies.stream()
                 .map(ResolvedDependency::toLockedNotation)
                 .collect(Collectors.toList());
+        ret.forEach(this::deactivateTransitive);
         return ret;
     }
 
-    protected boolean supportTestConfiguration() {
-        return true;
+    private void deactivateTransitive(Map<String, Object> map) {
+        map.put("transitive", false);
     }
 
     @Override
