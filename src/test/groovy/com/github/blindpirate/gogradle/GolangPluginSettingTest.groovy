@@ -33,6 +33,17 @@ class GolangPluginSettingTest {
     }
 
     @Test
+    void 'setting build mode via System.property should succeed'() {
+        setting.buildMode = 'DEVELOP'
+        assert setting.buildMode == BuildMode.DEVELOP
+
+        System.setProperty('gogradle.mode', 'REPRODUCIBLE')
+        assert setting.buildMode == BuildMode.REPRODUCIBLE
+
+        System.setProperty('gogradle.mode', '')
+    }
+
+    @Test
     void 'setting go executable should succeed'() {
         assert setting.goExecutable == 'go'
 

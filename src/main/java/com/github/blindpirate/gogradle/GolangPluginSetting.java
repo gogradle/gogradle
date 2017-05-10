@@ -2,6 +2,7 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Singleton;
@@ -26,8 +27,9 @@ public class GolangPluginSetting {
             .put("day", TimeUnit.DAYS)
             .put("days", TimeUnit.DAYS)
             .build();
-
     private BuildMode buildMode = REPRODUCIBLE;
+    private static final String BUILD_MODE_KEY = "gogradle.mode";
+
     private String packagePath;
     private List<String> buildTags = new ArrayList<>();
     private long globalCacheSecond = 5 * 60;
@@ -53,12 +55,17 @@ public class GolangPluginSetting {
         return goExecutable == null ? "go" : goExecutable;
     }
 
-    public void setBuildMode(String buildMode) {
-        this.buildMode = valueOf(buildMode);
+    public BuildMode getBuildMode() {
+        String mode = System.getProperty(BUILD_MODE_KEY);
+        if (StringUtils.isNotEmpty(mode)) {
+            return BuildMode.valueOf(mode);
+        } else {
+            return buildMode;
+        }
     }
 
-    public BuildMode getBuildMode() {
-        return buildMode;
+    public void setBuildMode(String buildMode) {
+        this.buildMode = valueOf(buildMode);
     }
 
     public void setBuildMode(BuildMode buildMode) {
