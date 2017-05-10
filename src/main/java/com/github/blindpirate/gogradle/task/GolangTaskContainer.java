@@ -27,6 +27,7 @@ public class GolangTaskContainer {
     // show dependencies tree
     public static final String DEPENDENCIES_TASK_NAME = "goDependencies";
 
+    public static final String INIT_TASK_NAME = "goInit";
     public static final String CHECK_TASK_NAME = "goCheck";
     public static final String LOCK_TASK_NAME = "goLock";
     public static final String BUILD_TASK_NAME = "goBuild";
@@ -57,6 +58,7 @@ public class GolangTaskContainer {
             .put(VENDOR_TASK_NAME, VendorTask.class)
             .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
             .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
+            .put(INIT_TASK_NAME, InitTask.class)
             .put(CLEAN_TASK_NAME, CleanTask.class)
             .put(CHECK_TASK_NAME, CheckTask.class)
             .put(LOCK_TASK_NAME, LockTask.class)

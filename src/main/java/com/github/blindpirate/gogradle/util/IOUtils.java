@@ -172,7 +172,11 @@ public final class IOUtils {
     }
 
     public static void append(File file, String str) {
-        write(file, toString(file) + str);
+        if (file.exists()) {
+            write(file, toString(file) + str);
+        } else {
+            write(file, str);
+        }
     }
 
     public static List<String> readLines(File file) {
