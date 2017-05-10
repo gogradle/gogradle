@@ -5,7 +5,6 @@ import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
-import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -13,19 +12,15 @@ import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.util.DependencySetUtils.parseMany;
-import static com.google.common.collect.ImmutableMap.*;
+import static com.google.common.collect.ImmutableMap.of;
 
 public abstract class ExternalDependencyFactory {
-    public static final GolangDependencySet TEST_DEPENDENCIES_OF_UNSUPPORT_TOOL =
-            GolangDependencySet.empty();
-
     private Map<String, Function<File, List>> adapters = of(BUILD, this::adapt, TEST, this::adaptTest);
 
     @Inject
@@ -42,39 +37,27 @@ public abstract class ExternalDependencyFactory {
      */
     public abstract String identityFileName();
 
+    public GolangDependencySet produce(File rootDir, String configuration) {
+        List<Map<String, Object>> mapNotations = extractNotations(rootDir, configuration);
+
+        mapNotations = removeStandardPackages(mapNotations);
+        return parseMany(mapNotations, mapNotationParser);
+    }
+
     @SuppressWarnings("unchecked")
-    public Optional<GolangDependencySet> produce(File rootDir, String configuration) {
+    public List<Map<String, Object>> extractNotations(File rootDir, String configuration) {
         File identityFile = identityFile(rootDir);
-        if (identityFile.exists()) {
-            if (TEST.equals(configuration) && !supportTestConfiguration()) {
-                return Optional.of(TEST_DEPENDENCIES_OF_UNSUPPORT_TOOL);
-            }
-
-            List<Map<String, Object>> mapNotations = adapters.get(configuration).apply(identityFile);
-
-            mapNotations = removeStandardPackages(mapNotations);
-            mapNotations.forEach(this::putTransitiveFalse);
-
-            return Optional.of(parseMany(mapNotations, mapNotationParser));
-        } else {
-            return Optional.empty();
-        }
+        return adapters.get(configuration).apply(identityFile);
     }
 
-    // Most external tools do not support configuration isolation
-    protected boolean supportTestConfiguration() {
-        return false;
-    }
-
-    private void putTransitiveFalse(Map<String, Object> map) {
-        map.put("transitive", false);
+    public boolean canRecognize(File rootDir) {
+        return identityFile(rootDir).exists();
     }
 
     private List<Map<String, Object>> removeStandardPackages(List<Map<String, Object>> packages) {
         return packages.stream().filter(pkg -> {
             String path = MapUtils.getString(pkg, MapNotationParser.NAME_KEY, "");
             return !standardPackagePathResolver.isStandardPackage(Paths.get(path));
-
         }).collect(Collectors.toList());
     }
 
