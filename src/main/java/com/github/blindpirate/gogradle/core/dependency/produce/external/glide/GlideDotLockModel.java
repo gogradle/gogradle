@@ -22,11 +22,15 @@ public class GlideDotLockModel {
     private String updated;
     @JsonProperty("imports")
     private List<ImportBean> imports;
-    @JsonProperty("testImport")
+    @JsonProperty("testImports")
     private List<ImportBean> testImports;
 
-    public List<Map<String, Object>> toNotations() {
+    public List<Map<String, Object>> toBuildNotations() {
         return imports.stream().map(ImportBean::toNotation).collect(Collectors.toList());
+    }
+
+    public List<Map<String, Object>> toTestNotations() {
+        return testImports.stream().map(ImportBean::toNotation).collect(Collectors.toList());
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -40,7 +44,8 @@ public class GlideDotLockModel {
             Assert.isNotBlank(name);
             return MapUtils.asMapWithoutNull(
                     "name", name,
-                    "version", version);
+                    "version", version,
+                    "transitive", false);
         }
     }
 }

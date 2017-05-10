@@ -25,6 +25,12 @@ public class GlideDependencyFactory extends ExternalDependencyFactory {
     @Override
     protected List<Map<String, Object>> adapt(File file) {
         GlideDotLockModel model = parseYaml(file, GlideDotLockModel.class);
-        return model.toNotations();
+        return model.toBuildNotations();
+    }
+
+    @Override
+    protected List<Map<String, Object>> adaptTest(File file) {
+        GlideDotLockModel model = parseYaml(file, GlideDotLockModel.class);
+        return model.toTestNotations();
     }
 }
