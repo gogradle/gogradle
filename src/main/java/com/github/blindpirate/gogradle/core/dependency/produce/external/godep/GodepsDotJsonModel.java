@@ -45,7 +45,8 @@ public class GodepsDotJsonModel {
             Assert.isNotBlank(ImportPath, "ImportPath cannot be blank!");
             return MapUtils.asMapWithoutNull(
                     "name", ImportPath,
-                    "version", Rev);
+                    "version", Rev,
+                    "transitive", false);
         }
     }
 }
