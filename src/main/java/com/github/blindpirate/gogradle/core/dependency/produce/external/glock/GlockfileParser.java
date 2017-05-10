@@ -14,6 +14,8 @@ import java.util.stream.Collectors;
  * Parses GLOCKFILE.
  *
  * @see <a href="https://github.com/robfig/glock">glock</a>
+ * @see <a href="https://github.com/dcoker/biscuit/blob/master/GLOCKFILE" >docker/biscuit/GLOCKFILE</a>
+ * @see <a href="https://github.com/jwilder/dockerize/blob/master/GLOCKFILE" >jwilder/dockerize/GLOCKFILE</a>
  */
 public class GlockfileParser {
     public List<Map<String, Object>> parse(File file) {
@@ -29,7 +31,8 @@ public class GlockfileParser {
         String[] packageAndRevision = StringUtils.splitAndTrim(line, "\\s");
         Assert.isTrue(packageAndRevision.length == 2, "Unrecognized line:" + line);
         return MapUtils.asMap("name", packageAndRevision[0],
-                "version", packageAndRevision[1]);
+                "version", packageAndRevision[1],
+                "transitive", false);
     }
 
     private boolean isNotCmdLine(String line) {

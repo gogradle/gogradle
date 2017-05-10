@@ -37,6 +37,6 @@ class ExternalDependencyFactoryTest {
     }
 
     void verifyMapParsed(Map map) {
-        verify(mapNotationParser).parse(eq(map + [transitive: false]))
+        verify(mapNotationParser).parse(eq(map))
     }
 }

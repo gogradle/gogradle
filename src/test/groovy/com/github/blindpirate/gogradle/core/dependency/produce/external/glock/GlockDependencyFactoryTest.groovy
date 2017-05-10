@@ -18,7 +18,7 @@ class GlockDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without GLOCKFILE should be rejected'() {
-        assert !factory.produce(resource, 'build').isPresent()
+        assert !factory.canRecognize(resource)
     }
 
     String GLOCKFILE = '''
@@ -34,9 +34,9 @@ code.google.com/p/go-uuid 7dda39b2e7d5
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'bitbucket.org/tebeka/selenium', version: '02df1758050f'])
-        verifyMapParsed([name: 'code.google.com/p/cascadia', version: '4f03c71bc42b'])
-        verifyMapParsed([name: 'code.google.com/p/go-uuid', version: '7dda39b2e7d5'])
+        verifyMapParsed([name: 'bitbucket.org/tebeka/selenium', version: '02df1758050f', transitive: false])
+        verifyMapParsed([name: 'code.google.com/p/cascadia', version: '4f03c71bc42b', transitive: false])
+        verifyMapParsed([name: 'code.google.com/p/go-uuid', version: '7dda39b2e7d5', transitive: false])
     }
 
     String glockfileWithCmds = '''
