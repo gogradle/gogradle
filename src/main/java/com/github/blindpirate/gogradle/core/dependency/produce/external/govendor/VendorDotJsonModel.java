@@ -58,7 +58,8 @@ public class VendorDotJsonModel {
              }
              */
             return MapUtils.asMapWithoutNull("name", path,
-                    "version", isBlank(revision) ? null : revision);
+                    "version", isBlank(revision) ? null : revision,
+                    "transitive", false);
         }
     }
 }

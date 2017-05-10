@@ -36,7 +36,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without vendor/vendor.json should be rejected'() {
-        assert !factory.produce(resource, 'build').isPresent()
+        assert !factory.canRecognize(resource)
     }
 
     @Test
@@ -46,8 +46,12 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'github.com/Bowery/prompt', version: 'd43c2707a6c5a152a344c64bb4fed657e2908a81'])
-        verifyMapParsed([name: 'github.com/dchest/safefile', version: '855e8d98f1852d48dde521e0522408d1fe7e836a'])
+        verifyMapParsed([name      : 'github.com/Bowery/prompt',
+                         version   : 'd43c2707a6c5a152a344c64bb4fed657e2908a81',
+                         transitive: false])
+        verifyMapParsed([name      : 'github.com/dchest/safefile',
+                         version   : '855e8d98f1852d48dde521e0522408d1fe7e836a',
+                         transitive: false])
     }
 
     @Test(expected = RuntimeException)
@@ -73,7 +77,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'a'])
+        verifyMapParsed([name: 'a', transitive: false])
     }
     String vendorDotJsonWithExtraProperties = '''
     {
