@@ -10,6 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.core.dependency.produce.external.trash.VersionConverter.determineVersionAndPutIntoMap;
+
 /**
  * Parses vendor.conf in repos managed by trash.
  *
@@ -43,20 +45,13 @@ public class VendorDotConfParser {
         Map<String, Object> ret = new HashMap<>();
         String[] array = StringUtils.splitAndTrim(line, "\\s");
 
+        ret.put("transitive", false);
         ret.put("name", array[0]);
         determineVersionAndPutIntoMap(ret, array[1]);
         if (array.length > 2) {
             ret.put("url", array[2]);
         }
         return ret;
-    }
-
-    private void determineVersionAndPutIntoMap(Map<String, Object> ret, String version) {
-        if (version.contains(".")) {
-            ret.put("tag", version);
-        } else {
-            ret.put("version", version);
-        }
     }
 
     private boolean isNotCommentLine(String line) {

@@ -1,6 +1,9 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.trash;
 
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.util.DataExchange;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 
 import javax.inject.Singleton;
 import java.io.File;
@@ -14,6 +17,7 @@ import java.util.Map;
  */
 @Singleton
 public class TrashDependencyFactory extends ExternalDependencyFactory {
+    private static final Logger LOGGER = Logging.getLogger(TrashDependencyFactory.class);
     private VendorDotConfParser parser = new VendorDotConfParser();
 
     @Override
@@ -23,6 +27,11 @@ public class TrashDependencyFactory extends ExternalDependencyFactory {
 
     @Override
     protected List<Map<String, Object>> adapt(File file) {
-        return parser.parse(file);
+        try {
+            return DataExchange.parseYaml(file, VendorDotConfYamlModel.class).toBuildNotations();
+        } catch (Exception e) {
+            LOGGER.info("Parsing {} as yaml failed, try plain format.", file.getAbsolutePath());
+            return parser.parse(file);
+        }
     }
 }
