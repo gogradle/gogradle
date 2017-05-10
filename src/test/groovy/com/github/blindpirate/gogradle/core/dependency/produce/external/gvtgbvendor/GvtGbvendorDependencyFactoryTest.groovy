@@ -45,13 +45,19 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'github.com/wadey/gocovmerge', vcs: 'git', version: 'b5bfa59ec0adc420475f97f89b58045c721d761c'])
-        verifyMapParsed([name: 'golang.org/x/tools', vcs: 'git', version: '8b84dae17391c154ca50b0162662aa1fc9ff84c2'])
+        verifyMapParsed([name      : 'github.com/wadey/gocovmerge',
+                         vcs       : 'git',
+                         version   : 'b5bfa59ec0adc420475f97f89b58045c721d761c',
+                         transitive: false])
+        verifyMapParsed([name      : 'golang.org/x/tools',
+                         vcs       : 'git',
+                         version   : '8b84dae17391c154ca50b0162662aa1fc9ff84c2',
+                         transitive: false])
     }
 
     @Test
     void 'directory without vendor/manifest should be rejected'() {
-        assert !factory.produce(resource, 'build').isPresent()
+        assert !factory.canRecognize(resource)
     }
 
     String manifestMissingImportpath = '''
@@ -111,8 +117,14 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'github.com/wadey/gocovmerge', vcs: 'git', version: 'b5bfa59ec0adc420475f97f89b58045c721d761c'])
-        verifyMapParsed([name: 'golang.org/x/tools', vcs: 'git', version: '8b84dae17391c154ca50b0162662aa1fc9ff84c2'])
+        verifyMapParsed([name      : 'github.com/wadey/gocovmerge',
+                         vcs       : 'git',
+                         version   : 'b5bfa59ec0adc420475f97f89b58045c721d761c',
+                         transitive: false])
+        verifyMapParsed([name      : 'golang.org/x/tools',
+                         vcs       : 'git',
+                         version   : '8b84dae17391c154ca50b0162662aa1fc9ff84c2',
+                         transitive: false])
 
     }
 

@@ -50,7 +50,8 @@ public class ManifestModel {
             Assert.isNotBlank(importpath);
             return MapUtils.asMapWithoutNull("vcs", vcs,
                     "name", determineName(),
-                    "version", revision);
+                    "version", revision,
+                    "transitive", false);
         }
 
         private String determineName() {
