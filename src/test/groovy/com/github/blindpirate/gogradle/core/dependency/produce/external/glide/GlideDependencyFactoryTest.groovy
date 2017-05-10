@@ -87,7 +87,7 @@ testImports: []
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'github.com/codegangsta/cli'])
+        verifyMapParsed([name: 'github.com/codegangsta/cli', transitive: false])
     }
 
     String glideDotLockWithExtraAndMissingProperties = '''
@@ -106,7 +106,9 @@ imports:
         factory.produce(resource, 'build')
         // then
 
-        verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e'])
+        verifyMapParsed([name      : 'github.com/codegangsta/cli',
+                         version   : '1efa31f08b9333f1bd4882d61f9d668a70cd902e',
+                         transitive: false])
     }
 
 
