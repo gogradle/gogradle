@@ -45,16 +45,19 @@ abstract class DependencyProduceStrategyTest {
     void vendorDependencies(GolangDependency... dependencies) {
         GolangDependencySet result = asGolangDependencySet(dependencies)
         when(visitor.visitVendorDependencies(resolvedDependency, rootDir, 'build')).thenReturn(result)
+        when(visitor.visitVendorDependencies(resolvedDependency, rootDir, 'test')).thenReturn(result)
     }
 
     void externalDependencies(GolangDependency... dependencies) {
         GolangDependencySet set = asGolangDependencySet(dependencies)
         when(visitor.visitExternalDependencies(resolvedDependency, rootDir, 'build')).thenReturn(set)
+        when(visitor.visitExternalDependencies(resolvedDependency, rootDir, 'test')).thenReturn(set)
     }
 
     void sourceCodeDependencies(GolangDependency... dependencies) {
         GolangDependencySet set = asGolangDependencySet(dependencies)
         when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')).thenReturn(set)
+        when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, 'test')).thenReturn(set)
     }
 
 
