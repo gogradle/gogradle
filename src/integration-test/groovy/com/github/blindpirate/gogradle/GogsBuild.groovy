@@ -51,6 +51,8 @@ goVet {
             writeBuildAndSettingsDotGradle(buildDotGradle)
         }
 
+        init()
+
         firstBuild()
 
         File firstBuildResult = getOutputExecutable()
@@ -67,13 +69,23 @@ goVet {
 //        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
     }
 
+    void init() {
+        IOUtils.deleteQuitely(new File(resource, 'gogradle.lock'))
+        try {
+            newBuild {
+                it.forTasks('goInit')
+            }
+        } finally {
+            println(stdout)
+            println(stderr)
+        }
+    }
+
     void firstBuild() {
         try {
             newBuild {
                 it.forTasks('goBuild', 'goCheck', 'goLock')
             }
-        } catch (Exception e) {
-            throw e
         } finally {
             println(stdout)
             println(stderr)
@@ -85,8 +97,6 @@ goVet {
             newBuild {
                 it.forTasks('goBuild', 'goCheck')
             }
-        } catch (Exception e) {
-            throw e
         } finally {
             println(stdout)
             println(stderr)

@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager;
@@ -37,6 +38,9 @@ public class InitTask extends AbstractGolangTask {
     @Inject
     private GolangConfigurationManager configurationManager;
 
+    @Inject
+    private GogradleRootProject rootProject;
+
     public InitTask() {
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
     }
@@ -64,8 +68,8 @@ public class InitTask extends AbstractGolangTask {
     }
 
     private void initBySourceCodeScan(File rootDir) {
-        GolangDependencySet buildDependencies = visitor.visitSourceCodeDependencies(null, rootDir, BUILD);
-        GolangDependencySet testDependencies = visitor.visitSourceCodeDependencies(null, rootDir, TEST);
+        GolangDependencySet buildDependencies = visitor.visitSourceCodeDependencies(rootProject, rootDir, BUILD);
+        GolangDependencySet testDependencies = visitor.visitSourceCodeDependencies(rootProject, rootDir, TEST);
 
         testDependencies.removeAll(buildDependencies);
 
