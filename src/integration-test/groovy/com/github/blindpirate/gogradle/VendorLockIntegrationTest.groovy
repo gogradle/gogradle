@@ -94,7 +94,8 @@ dependencies {
         assert model.getDependencies('build') == [
                 [name      : 'github.com/my/dependency1',
                  host      : [name: 'GOGRADLE_ROOT'],
-                 vendorPath: 'vendor/github.com/my/dependency1']
+                 vendorPath: 'vendor/github.com/my/dependency1',
+                 transitive: false]
         ]
 
         assert model.getDependencies('test') == []

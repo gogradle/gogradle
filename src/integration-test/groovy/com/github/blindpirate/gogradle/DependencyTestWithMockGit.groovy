@@ -70,14 +70,15 @@ dependencies {
             transitive = false
         }
 
-    
         build(name: 'github.com/firstlevel/e', commit: '95907c7d') { // commit5
             transitive = true
             exclude name: 'github.com/external/e'
         }
 
         build name: 'github.com/firstlevel/f', dir: "${StringUtils.toUnixString(localDependencyRoot)}"
-
+        
+        test name:'github.com/external/d'
+        test name:'github.com/external/a' // this should be excluded since it has already existed in build dependencies
     }
 }
 
@@ -96,15 +97,15 @@ dependencies {
     void firstBuild() {
         try {
             newBuild { build ->
-                build.forTasks('installBuildDependencies', 'goDependencies')
+                build.forTasks('installBuildDependencies','installTestDependencies', 'goDependencies')
             }
         } finally {
             println(stderr)
             println(stdout)
         }
 
-        assertDependenciesAre([
-                'github.com/firstlevel/a'    : 'commit2',
+        assertDependenciesAre('build', [
+                'github.com/firstlevel/a'    : 'commit3',
                 'github.com/firstlevel/b'    : 'commit3',
                 'github.com/firstlevel/c'    : 'commit3',
                 'github.com/firstlevel/d'    : 'commit2',
@@ -128,18 +129,24 @@ dependencies {
                 'github.com/external/e'      : 'commit3',
 
         ])
+        assertDependenciesAre('test',
+                ['github.com/external/d': 'commit5',
+                 'github.com/external/a': 'NOT_EXIST',
+                 'github.com/external/e': 'commit2'])
     }
 
     void secondBuildWithUpToDate() {
         try {
             newBuild { build ->
-                build.forTasks('installBuildDependencies')
+                build.forTasks('installBuildDependencies','installTestDependencies')
             }
         } finally {
             println(stderr)
             println(stdout)
             assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
             assert stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
+            assert stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')
+            assert stdout.toString().contains(':installTestDependencies UP-TO-DATE')
         }
     }
 
@@ -161,6 +168,8 @@ dependencies {
 
         assert !stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
         assert !stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
+        assert !stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')
+        assert !stdout.toString().contains(':installTestDependencies UP-TO-DATE')
     }
 
     @Override
@@ -168,9 +177,44 @@ dependencies {
         return projectRoot
     }
 
-    void assertDependenciesAre(Map<String, String> finalDependencies) {
+    void assertDependenciesAre(String configuration, Map<String, String> finalDependencies) {
         finalDependencies.each { packageName, commit ->
-            assert new File(projectRoot, ".gogradle/build_gopath/src/${packageName}/${commit}.go").exists()
+            if ('NOT_EXIST' == commit) {
+                assert !new File(projectRoot, ".gogradle/${configuration}_gopath/src/${packageName}").exists()
+            } else {
+                assert new File(projectRoot, ".gogradle/${configuration}_gopath/src/${packageName}/${commit}.go").exists()
+            }
         }
     }
+    /*
+    build:
+		github.com/my/project
+		|-- github.com/firstlevel/a:1e74619
+		|   |-- github.com/external/a:240e90c
+		|   |-- github.com/external/e:f3e9fd1
+		|   |-- github.com/vendorexternal/a:github.com/firstlevel/a#1e746195353b53d769160bec52882dc36cd4a26b/vendor/github.com/vendorexternal/a
+		|   \-- github.com/vendorexternal/b:github.com/firstlevel/a#1e746195353b53d769160bec52882dc36cd4a26b/vendor/github.com/vendorexternal/b
+		|-- github.com/firstlevel/b:67b0cfa
+		|   |-- github.com/vendoronly/a:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a
+		|   |   |-- github.com/vendoronly/c:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a/vendor/github.com/vendoronly/c
+		|   |   |   \-- github.com/vendoronly/b:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a/vendor/github.com/vendoronly/c/vendor/github.com/vendoronly/b -> github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/b
+		|   |   \-- github.com/vendoronly/d:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a/vendor/github.com/vendoronly/d
+		|   |       \-- github.com/vendoronly/b:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a/vendor/github.com/vendoronly/d/vendor/github.com/vendoronly/b -> github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/b (*)
+		|   |-- github.com/vendoronly/b:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/b (*)
+		|   \-- github.com/vendoronly/e:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/e
+		|       \-- github.com/vendoronly/c:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/e/vendor/github.com/vendoronly/c -> github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a/vendor/github.com/vendoronly/c (*)
+		|-- github.com/firstlevel/c:1.0.0(ccf0636)
+		|   |-- github.com/external/a:240e90c (*)
+		|   |-- github.com/external/b:dcea2ee
+		|   \-- github.com/external/c:9cf45b1
+		|-- github.com/firstlevel/d:80aa0f0
+		|-- github.com/firstlevel/e:95907c7
+		\-- github.com/firstlevel/f:/Users/zhb/Projects/gogradle/build/tmp/resource-e4984884-00ad-4b27-880f-6d55a965b777/localDependency
+		    \-- unrecognized:github.com/firstlevel/f@/Users/zhb/Projects/gogradle/build/tmp/resource-e4984884-00ad-4b27-880f-6d55a965b777/localDependency/vendor/unrecognized
+
+	test:
+		github.com/my/project
+		\-- github.com/external/d:b572b7e
+		    \-- github.com/external/e:1340c2c
+     */
 }
