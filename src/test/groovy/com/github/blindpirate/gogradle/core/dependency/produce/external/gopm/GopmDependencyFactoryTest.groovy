@@ -53,7 +53,7 @@ include = public|scripts|templates'''
         // given
         IOUtils.write(resource, '.gopmfile', '[target]\npath = github.com/gogits/gogs')
         // then
-        assert factory.produce(resource, 'build').get().isEmpty()
+        assert factory.produce(resource, 'build').isEmpty()
     }
 
     @Test
@@ -64,7 +64,7 @@ path = github.com/gogits/gogs
 [deps]
 ''')
         // then
-        assert factory.produce(resource, 'build').get().isEmpty()
+        assert factory.produce(resource, 'build').isEmpty()
     }
 
     String misorderedDotGompfile1 = '''

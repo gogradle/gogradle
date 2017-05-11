@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -26,10 +27,16 @@ public class GlideDotLockModel {
     private List<ImportBean> testImports;
 
     public List<Map<String, Object>> toBuildNotations() {
+        if (imports == null) {
+            return Collections.emptyList();
+        }
         return imports.stream().map(ImportBean::toNotation).collect(Collectors.toList());
     }
 
     public List<Map<String, Object>> toTestNotations() {
+        if (testImports == null) {
+            return Collections.emptyList();
+        }
         return testImports.stream().map(ImportBean::toNotation).collect(Collectors.toList());
     }
 
