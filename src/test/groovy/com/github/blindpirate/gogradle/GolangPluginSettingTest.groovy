@@ -57,6 +57,16 @@ class GolangPluginSettingTest {
         assert setting.buildTags == ['a', 'b']
     }
 
+    @Test(expected = IllegalStateException)
+    void 'setting build tags should fail when it contains single quote'() {
+        setting.buildTags = ["'"]
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'setting build tags should fail when it contains double quote'() {
+        setting.buildTags = ['"']
+    }
+
     @Test
     void 'setting packagePath should succeed'() {
         assert setting.packagePath == 'github.com/a/b'

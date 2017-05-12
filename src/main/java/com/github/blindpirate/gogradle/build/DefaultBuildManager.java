@@ -11,6 +11,7 @@ import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -22,6 +23,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -152,6 +154,7 @@ public class DefaultBuildManager implements BuildManager {
                    Consumer<String> stderrLineConsumer,
                    Consumer<Integer> retcodeConsumer) {
         List<String> cmdAndArgs = asStringList(getGoBinary(), args);
+        cmdAndArgs.addAll(buildTagsArgs());
         run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
     }
 
@@ -168,6 +171,18 @@ public class DefaultBuildManager implements BuildManager {
 
             doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
         });
+    }
+
+    private List<? extends String> buildTagsArgs() {
+        if (setting.getBuildTags().isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
+            List<String> ret = Lists.newArrayList("-tags");
+            String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
+            ret.add("'" + tagsArg + "'");
+            return ret;
+        }
     }
 
     @SuppressWarnings("unchecked")

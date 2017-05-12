@@ -145,6 +145,8 @@ class DefaultBuildManagerTest {
 
     @Test
     void 'customized command should succeed'() {
+        // given
+        setting.buildTags = ['a', 'b', 'c']
         // when
         manager.run(['golint'], [:], null, null, null)
         // then
@@ -154,6 +156,18 @@ class DefaultBuildManagerTest {
                  GOOS  : Os.getHostOs().toString(),
                  GOARCH: Arch.getHostArch().toString(),
                  GOEXE : Os.getHostOs().exeExtension()],
+                resource)
+    }
+
+    @Test
+    void 'build tags should succeed'() {
+        // given
+        setting.buildTags = ['a', 'b', 'c']
+        // when
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        // then
+        verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project', '-tags', "'a b c'"],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
                 resource)
     }
 

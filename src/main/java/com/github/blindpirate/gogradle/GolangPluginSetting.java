@@ -85,9 +85,9 @@ public class GolangPluginSetting {
     }
 
     public void setBuildTags(List<String> buildTags) {
+        buildTags.forEach(t -> Assert.isTrue(!t.contains("\"") && !t.contains("'")));
         this.buildTags = buildTags;
     }
-
 
     public String getGoVersion() {
         return goVersion;
