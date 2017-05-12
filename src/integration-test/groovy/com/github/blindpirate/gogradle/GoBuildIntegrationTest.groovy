@@ -24,6 +24,7 @@ class GoBuildIntegrationTest extends IntegrationTestSupport {
     String subMainDotGo
     String printDotGo
     String mainDotGo
+    String mainWithBuildTagDotGo
 
     @Before
     void setUp() {
@@ -33,20 +34,32 @@ golang {
     packagePath='github.com/my/package'
     goVersion='1.8'
 }
-goBuild {
-    targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
-}
+
 """
         settingDotGradle = '''
 rootProject.name="myPackage"
 '''
         mainDotGo = '''
+// +build !a,!b
+
 package main
 
 import "github.com/my/package/print"
 
 func main(){
     print.PrintHello() 
+}
+'''
+        mainWithBuildTagDotGo = '''
+// +build a b
+
+package main
+
+import "github.com/my/package/print"
+
+func main(){
+    print.PrintHello()
+    print.PrintWorld()
 }
 '''
         printDotGo = '''
@@ -71,6 +84,7 @@ func main(){
 '''
 
         IOUtils.write(resource, 'main.go', mainDotGo)
+        IOUtils.write(resource, 'mainWithBuildTag.go', mainWithBuildTagDotGo)
         IOUtils.write(resource, 'print/print.go', printDotGo)
         IOUtils.write(resource, 'sub/main.go', subMainDotGo)
         writeBuildAndSettingsDotGradle(buildDotGradle, settingDotGradle)
@@ -78,6 +92,12 @@ func main(){
 
     @Test
     void 'build should succeed'() {
+        appendOnBuildDotGradle("""
+goBuild {
+    targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
+}
+""")
+
         newBuild {
             it.forTasks('goBuild')
         }
@@ -87,7 +107,25 @@ func main(){
         }
 
         assert runExecutable(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_myPackage") == 'Hello'
+    }
 
+    @Test
+    void 'build with build tags should succeed'() {
+        appendOnBuildDotGradle('''
+golang {
+    buildTags = ['a']
+}
+''')
+
+        newBuild {
+            it.forTasks('goBuild')
+        }
+
+        assert runExecutable(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_myPackage") == 'HelloWorld'
+    }
+
+    void appendOnBuildDotGradle(String s) {
+        IOUtils.append(new File(resource, 'build.gradle'), s)
     }
 
     private String runExecutable(String name) {
@@ -102,24 +140,15 @@ func main(){
 
     @Test
     void 'customized build should succeed'() {
-        writeBuildAndSettingsDotGradle(buildDotGradle + '''
+        appendOnBuildDotGradle('''
 goBuild {
     doLast {
         go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
     }
 }
 ''')
-        try {
-            newBuild {
-                it.forTasks('goBuild')
-            }
-        } catch (Exception e) {
-            println(stderr)
-            println(stdout)
-        }
-
-        ["darwin_amd64_output", 'windows_amd64_output', 'linux_386_output'].each {
-            assert new File(resource, "${it}").exists()
+        newBuild {
+            it.forTasks('goBuild')
         }
 
         assert runExecutable("${Os.getHostOs()}_${Arch.getHostArch()}_output") == 'World'
