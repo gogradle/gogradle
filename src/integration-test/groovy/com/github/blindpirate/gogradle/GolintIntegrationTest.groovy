@@ -45,13 +45,10 @@ fmt.Printf("Hello")
 
     @Test
     void 'golint should succeed'() {
-        try {
-            newBuild {
-                it.forTasks('golint')
-            }
-        } finally {
-            assert stdout.toString().contains('should not use dot imports')
+        newBuild {
+            it.forTasks('golint')
         }
+        assert stdout.toString().contains('should not use dot imports')
     }
 
     @Override

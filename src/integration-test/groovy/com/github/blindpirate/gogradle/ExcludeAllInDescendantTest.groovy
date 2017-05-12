@@ -51,13 +51,8 @@ dependencies {
 
     @Test
     void 'exclusion in ancestor should succeed'() {
-        try {
-            newBuild {
-                it.forTasks('goDependencies', 'installBuildDependencies')
-            }
-        } finally {
-            println(stderr)
-            println(stdout)
+        newBuild {
+            it.forTasks('goDependencies', 'installBuildDependencies')
         }
 
         assert new File(resource, 'project/.gogradle/build_gopath/src/a/a.go').exists()

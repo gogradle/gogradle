@@ -51,18 +51,15 @@ dependencies {
 
     @Test
     void 'resolving vendor with GOGRADLE_ROOT in transitive dependency should succeed'() {
-        try {
-            newBuild {
-                it.forTasks('iBD', 'gD')
-            }
-        } finally {
-            println(stderr)
-            assert stdout.toString().contains("""\
+        newBuild {
+            it.forTasks('iBD', 'gD')
+        }
+        println(stderr)
+        assert stdout.toString().contains("""\
 a
 \\-- c:${toUnixString(resource)}/c
     \\-- d:c@${toUnixString(resource)}/c/vendor/d
         \\-- e:c@${toUnixString(resource)}/c/vendor/d/vendor/e""")
-        }
     }
 
     @Override

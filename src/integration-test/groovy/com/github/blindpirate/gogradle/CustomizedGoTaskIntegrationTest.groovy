@@ -33,15 +33,11 @@ task ls(type: com.github.blindpirate.gogradle.Go){
 
     @Test
     void 'customized go task should succeed'() {
-        try {
-            newBuild {
-                it.forTasks('ls')
-            }
-        } finally {
-            println(stderr)
-            assert stdout.toString().contains('go version')
-            assert stdout.toString().contains('settings.gradle')
+        newBuild {
+            it.forTasks('ls')
         }
+        assert stdout.toString().contains('go version')
+        assert stdout.toString().contains('settings.gradle')
     }
 
     @Override

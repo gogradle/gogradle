@@ -82,24 +82,14 @@ goVet {
     }
 
     void firstBuild() {
-        try {
-            newBuild {
-                it.forTasks('goBuild', 'goCheck', 'goLock')
-            }
-        } finally {
-            println(stdout)
-            println(stderr)
+        newBuild {
+            it.forTasks('goBuild', 'goCheck', 'goLock')
         }
     }
 
     void secondBuild() {
-        try {
-            newBuild {
-                it.forTasks('goBuild', 'goCheck')
-            }
-        } finally {
-            println(stdout)
-            println(stderr)
+        newBuild {
+            it.forTasks('goBuild', 'goCheck')
         }
     }
 

@@ -68,6 +68,10 @@ golang {
             closure(build)
 
             build.run()
+        } catch (Exception e) {
+            println("stdout:\n${stdout}")
+            println("stderr:\n${stderr}")
+            throw e
         } finally {
             connection.close()
         }

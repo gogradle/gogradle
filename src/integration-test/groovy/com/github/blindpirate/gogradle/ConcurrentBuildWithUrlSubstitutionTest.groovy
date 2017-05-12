@@ -124,12 +124,8 @@ golang {
 }
 """
             writeBuildAndSettingsDotGradle(buildDotGradle)
-            try {
-                newBuild {
-                    it.forTasks('installBuildDependencies')
-                }
-            } catch (Exception e) {
-                e.printStackTrace()
+            newBuild {
+                it.forTasks('installBuildDependencies')
             }
         }
     }

@@ -46,13 +46,8 @@ dependencies {
 
     @Test
     void 'url substitution should succeed'() {
-        try {
-            newBuild {
-                it.forTasks('installBuildDependencies')
-            }
-        } finally {
-            println(stderr)
-            println(stdout)
+        newBuild {
+            it.forTasks('installBuildDependencies')
         }
 
         assert new File(resource, ".gogradle/build_gopath/src/my/awesome/project/main.go").exists()

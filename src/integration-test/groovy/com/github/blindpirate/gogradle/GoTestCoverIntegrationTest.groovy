@@ -34,13 +34,8 @@ golang {
 
     @Test
     void 'test and coverage report should be generated successfully'() {
-        try {
-            newBuild {
-                it.forTasks('goCheck')
-            }
-        } finally {
-            println(stderr)
-            println(stdout)
+        newBuild {
+            it.forTasks('goCheck')
         }
 
         assert stdout.toString().contains('1 succeed, 0 failed')

@@ -67,13 +67,12 @@ repositories {
 
     @Test
     void 'dependencies should be resolved correctly'() {
-        try {
-            newBuild {
-                it.forTasks('goDependencies')
-            }
+        newBuild {
+            it.forTasks('goDependencies')
+        }
 
-            String actualOutput = stdout.toString().replaceAll('\\r', '')
-            String expectedOutput = """
+        String actualOutput = stdout.toString().replaceAll('\\r', '')
+        String expectedOutput = """
 build:
 github.com/my/project
 \\-- a:${StringUtils.toUnixString(resource)}/a
@@ -85,10 +84,7 @@ github.com/my/project
     \\-- d:${StringUtils.toUnixString(resource)}/d
 """.replaceAll('\\r', '')
 
-            assert actualOutput.concat(expectedOutput)
-        } finally {
-            println(stdout)
-            println(stderr)
-        }
+        assert actualOutput.concat(expectedOutput)
+
     }
 }

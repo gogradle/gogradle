@@ -52,13 +52,8 @@ golang {
 
     @Test
     void 'gofmt should succeed'() {
-        try {
-            newBuild {
-                it.forTasks('gofmt')
-            }
-        } finally {
-            println(stderr)
-            println(stdout)
+        newBuild {
+            it.forTasks('gofmt')
         }
 
         assert new File(resource, 'main.go').getText() == '''\

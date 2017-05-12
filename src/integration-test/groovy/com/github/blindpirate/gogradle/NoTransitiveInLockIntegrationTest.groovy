@@ -47,32 +47,24 @@ dependencies {
 
     @Test
     void 'transitive:false should be added to gogradle.lock'() {
-        try {
-            newBuild {
-                it.forTasks('goDependencies', 'goLock')
-            }
+        newBuild {
+            it.forTasks('goDependencies', 'goLock')
         }
-        finally {
-            assert stdout.toString().contains("""\
+        assert stdout.toString().contains("""\
 a
 \\-- b:${toUnixString(resource)}/b
     \\-- c:${toUnixString(resource)}/c
 """)
-        }
 
         // at second time, all dependencies should be flattened
-        try {
-            newBuild {
-                it.forTasks('goDependencies')
-            }
+        newBuild {
+            it.forTasks('goDependencies')
         }
-        finally {
-            assert stdout.toString().contains("""\
+        assert stdout.toString().contains("""\
 a
 |-- b:${toUnixString(resource)}/b
 \\-- c:${toUnixString(resource)}/c
 """)
-        }
     }
 
     @Override

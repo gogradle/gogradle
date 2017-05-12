@@ -95,14 +95,10 @@ dependencies {
     }
 
     void firstBuild() {
-        try {
-            newBuild { build ->
-                build.forTasks('installBuildDependencies','installTestDependencies', 'goDependencies')
-            }
-        } finally {
-            println(stderr)
-            println(stdout)
+        newBuild { build ->
+            build.forTasks('installBuildDependencies', 'installTestDependencies', 'goDependencies')
         }
+
 
         assertDependenciesAre('build', [
                 'github.com/firstlevel/a'    : 'commit3',
@@ -136,18 +132,13 @@ dependencies {
     }
 
     void secondBuildWithUpToDate() {
-        try {
-            newBuild { build ->
-                build.forTasks('installBuildDependencies','installTestDependencies')
-            }
-        } finally {
-            println(stderr)
-            println(stdout)
-            assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
-            assert stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
-            assert stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')
-            assert stdout.toString().contains(':installTestDependencies UP-TO-DATE')
+        newBuild { build ->
+            build.forTasks('installBuildDependencies', 'installTestDependencies')
         }
+        assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
+        assert stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
+        assert stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')
+        assert stdout.toString().contains(':installTestDependencies UP-TO-DATE')
     }
 
     @Test
