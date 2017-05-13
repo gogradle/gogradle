@@ -9,7 +9,6 @@ import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -123,7 +122,7 @@ class InstallTaskTest extends TaskTest {
         verify(d).installTo(new File(resource, 'src/github.com/user/d'))
         assert IOUtils.toString(new File(resource, 'src/github.com/user/d/.CURRENT_VERSION')) == 'd'
 
-        assert IOUtils.dirIsEmpty(new File(resource, 'src/github.com/user/e'))
+        assert !new File(resource, 'src/github.com/user/e').exists()
 
         verify(f).installTo(new File(resource, 'src/f'))
         assert IOUtils.toString(new File(resource, 'src/f/.CURRENT_VERSION')) == 'f'
