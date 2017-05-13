@@ -25,6 +25,7 @@ github.com/Sirupsen/logrus                      v0.10.0
 github.com/cloudfoundry-incubator/candiedyaml   99c3df8
 github.com/stretchr/testify                     v1.1.3
 github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://github.com/cpuguy83/check.git
+github.com/opencontainers/runtime-spec 1c7c27d043c2a5e513a44084d2b10d77d1402b8c # specs
 ''')
         // when
         factory.produce(resource, 'build')
@@ -36,6 +37,7 @@ github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://githu
                          version   : '4ed411733c5785b40214c70bce814c3a3a689609',
                          url       : 'https://github.com/cpuguy83/check.git',
                          transitive: false])
+        verifyMapParsed([name: 'github.com/opencontainers/runtime-spec', version: '1c7c27d043c2a5e513a44084d2b10d77d1402b8c', transitive: false])
 
     }
 

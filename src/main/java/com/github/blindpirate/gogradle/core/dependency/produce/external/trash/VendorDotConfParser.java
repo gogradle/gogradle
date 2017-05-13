@@ -5,10 +5,13 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.base.CharMatcher;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.OptionalInt;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.external.trash.VersionConverter.determineVersionAndPutIntoMap;
 
@@ -44,6 +47,7 @@ public class VendorDotConfParser {
         // github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://github.com/cpuguy83/check.git
         Map<String, Object> ret = new HashMap<>();
         String[] array = StringUtils.splitAndTrim(line, "\\s");
+        array = removeComment(array);
 
         ret.put("transitive", false);
         ret.put("name", array[0]);
@@ -52,6 +56,13 @@ public class VendorDotConfParser {
             ret.put("url", array[2]);
         }
         return ret;
+    }
+
+    private String[] removeComment(String[] array) {
+        OptionalInt index = IntStream.range(0, array.length)
+                .filter(i -> array[i].startsWith("#"))
+                .findFirst();
+        return index.isPresent() ? Arrays.copyOfRange(array, 0, index.getAsInt()) : array;
     }
 
     private boolean isNotCommentLine(String line) {
