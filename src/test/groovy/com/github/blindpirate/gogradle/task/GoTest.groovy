@@ -30,7 +30,7 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'go command on ToolTask should succeed'() {
+    void 'go command should succeed'() {
         // when
         task.go('build -o "output name"')
         // then
@@ -45,7 +45,7 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'run command on ToolTask should succeed'() {
+    void 'run command should succeed'() {
         // when
         task.run('golint -v -a')
         // then

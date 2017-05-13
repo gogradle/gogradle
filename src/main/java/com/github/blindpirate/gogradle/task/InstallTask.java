@@ -35,13 +35,13 @@ public abstract class InstallTask extends AbstractGolangTask {
     public void installDependencies() {
         File src = buildManager.getInstallationDirectory(getConfigurationName()).resolve("src").toFile();
         DependencyTreeNode dependencyTree = getUpstreamResolveTask().getDependencyTree();
-        GolangDependencySet flattened = dependencyTree.flatten()
+        GolangDependencySet flatDependencies = dependencyTree.flatten()
                 .stream()
                 .collect(GolangDependencySet.COLLECTOR);
 
-        clearDirectoriesIfNecessary(src, flattened);
+        clearDirectoriesIfNecessary(src, flatDependencies);
 
-        flattened.forEach(this::installIfNecessary);
+        flatDependencies.forEach(this::installIfNecessary);
     }
 
     private void installIfNecessary(GolangDependency dependency) {
@@ -58,9 +58,9 @@ public abstract class InstallTask extends AbstractGolangTask {
         }
     }
 
-    private void clearDirectoriesIfNecessary(File src, GolangDependencySet flattenedDependencies) {
+    private void clearDirectoriesIfNecessary(File src, GolangDependencySet flatDependencies) {
         Set<File> dirsToBeCleared = new HashSet<>();
-        dfs(src, "", flattenedDependencies, dirsToBeCleared, 0);
+        dfs(src, "", flatDependencies, dirsToBeCleared, 0);
         dirsToBeCleared.forEach(IOUtils::clearDirectory);
     }
 
