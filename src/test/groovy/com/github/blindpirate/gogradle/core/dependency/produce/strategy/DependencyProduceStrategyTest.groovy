@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -28,7 +29,7 @@ abstract class DependencyProduceStrategyTest {
     @Mock
     AbstractGolangDependency a2
     @Mock
-    AbstractGolangDependency b2
+    AbstractResolvedDependency b2
     @Mock
     AbstractGolangDependency c2
 
@@ -40,6 +41,8 @@ abstract class DependencyProduceStrategyTest {
         when(a2.getName()).thenReturn('a')
         when(b2.getName()).thenReturn('b')
         when(c2.getName()).thenReturn('c')
+
+        when(b2.dependencies).thenReturn(GolangDependencySet.empty())
     }
 
     void vendorDependencies(GolangDependency... dependencies) {
