@@ -1,20 +1,17 @@
 package com.github.blindpirate.gogradle.core.mode
 
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
-import org.junit.runner.RunWith
-import org.mockito.Mock
+import org.mockito.Mockito
 
-@RunWith(GogradleRunner)
 class BuildModeTest {
     GolangDependencySet declared = GolangDependencySet.empty()
     GolangDependencySet locked = GolangDependencySet.empty()
     GolangDependencySet vendor = GolangDependencySet.empty()
-    @Mock
-    GogradleRootProject gogradleRootProject
+
+    GogradleRootProject gogradleRootProject = Mockito.mock(GogradleRootProject)
 
     VendorResolvedDependency a = new VendorResolvedDependencyForTest('a', 'a', 1L, gogradleRootProject, 'vendor/a')
     VendorResolvedDependency b = new VendorResolvedDependencyForTest('b', 'b', 1L, gogradleRootProject, 'vendor/a/vendor/b')
@@ -52,6 +49,6 @@ class BuildModeTest {
         assert result.size() == 1
         assert result.any { it.is(a) }
         assert a.dependencies.contains(b)
-        assert b.dependencies.any {it.is(cInVendor)}
+        assert b.dependencies.any { it.is(cInVendor) }
     }
 }

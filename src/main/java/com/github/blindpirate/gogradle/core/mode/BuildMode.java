@@ -1,7 +1,7 @@
 package com.github.blindpirate.gogradle.core.mode;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 
 import static com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.merge;
 
@@ -15,7 +15,7 @@ public enum BuildMode {
 
             vendorDependencies.flatten()
                     .stream()
-                    .map(dependency -> (VendorResolvedDependency) dependency)
+                    .map(dependency -> (ResolvedDependency) dependency)
                     .forEach(dependency -> dependency.getDependencies().removeAll(declaredAndLocked));
 
             return merge(declaredAndLocked, vendorDependencies);
