@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle.core.mode;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 
 import static com.github.blindpirate.gogradle.core.dependency.GolangDependencySet.merge;
 
@@ -10,7 +11,14 @@ public enum BuildMode {
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet vendorDependencies,
                                              GolangDependencySet lockedDependencies) {
-            return merge(declaredDependencies, lockedDependencies, vendorDependencies);
+            GolangDependencySet declaredAndLocked = merge(declaredDependencies, lockedDependencies);
+
+            vendorDependencies.flatten()
+                    .stream()
+                    .map(dependency -> (VendorResolvedDependency) dependency)
+                    .forEach(dependency -> dependency.getDependencies().removeAll(declaredAndLocked));
+
+            return merge(declaredAndLocked, vendorDependencies);
         }
     },
     REPRODUCIBLE {
@@ -18,7 +26,11 @@ public enum BuildMode {
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet vendorDependencies,
                                              GolangDependencySet lockedDependencies) {
-            return merge(vendorDependencies, lockedDependencies, declaredDependencies);
+            GolangDependencySet lockedAndDeclared = merge(lockedDependencies, declaredDependencies);
+
+            lockedAndDeclared.removeAll(vendorDependencies.flatten());
+
+            return merge(vendorDependencies, lockedAndDeclared);
         }
     };
 
