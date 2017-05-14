@@ -40,7 +40,7 @@ github.com/rancher/trash
 
 github.com/Sirupsen/logrus                      v0.10.0
 github.com/cloudfoundry-incubator/candiedyaml   99c3df8
-github.com/stretchr/testify                     v1.1.3
+github.com/coreos/go-systemd v4
 github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://github.com/cpuguy83/check.git
 github.com/opencontainers/runtime-spec 1c7c27d043c2a5e513a44084d2b10d77d1402b8c # specs
 ''')
@@ -49,7 +49,7 @@ github.com/opencontainers/runtime-spec 1c7c27d043c2a5e513a44084d2b10d77d1402b8c 
         // then
         verifyMapParsed([name: 'github.com/Sirupsen/logrus', tag: 'v0.10.0', transitive: false])
         verifyMapParsed([name: 'github.com/cloudfoundry-incubator/candiedyaml', version: '99c3df8', transitive: false])
-        verifyMapParsed([name: 'github.com/stretchr/testify', tag: 'v1.1.3', transitive: false])
+        verifyMapParsed([name: 'github.com/coreos/go-systemd', tag: 'v4', transitive: false])
         verifyMapParsed([name      : 'github.com/go-check/check',
                          version   : '4ed411733c5785b40214c70bce814c3a3a689609',
                          url       : 'https://github.com/cpuguy83/check.git',

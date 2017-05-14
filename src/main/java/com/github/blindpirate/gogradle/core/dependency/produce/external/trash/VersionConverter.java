@@ -18,13 +18,16 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.trash;
 
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public interface VersionConverter {
+    Pattern HEX_PATTERN = Pattern.compile("[a-fA-F0-9]+");
+
     static void determineVersionAndPutIntoMap(Map<String, Object> ret, String version) {
-        if (version.contains(".")) {
-            ret.put("tag", version);
-        } else {
+        if (HEX_PATTERN.matcher(version).matches()) {
             ret.put("version", version);
+        } else {
+            ret.put("tag", version);
         }
     }
 }
