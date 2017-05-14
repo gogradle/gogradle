@@ -4,7 +4,9 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
+import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import com.github.blindpirate.gogradle.vcs.Mercurial
@@ -14,6 +16,7 @@ import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import com.github.blindpirate.gogradle.vcs.mercurial.HgClientAccessor
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialDependencyManager
+import com.google.inject.Injector
 import com.google.inject.Key
 import org.gradle.api.Project
 import org.gradle.plugins.ide.idea.IdeaPlugin
@@ -30,9 +33,12 @@ class GolangPluginTest {
 
     Project project
 
+    Injector injector
+
     @Before
     void applyPlugin() {
         project.pluginManager.apply(GolangPlugin)
+        injector = ReflectionUtils.getField(project.getPlugins().getPlugin(GolangPlugin), 'injector')
     }
 
     @Test
@@ -70,7 +76,7 @@ class GolangPluginTest {
     }
 
     private GolangDependencySet getDependencySet(String configurationName) {
-        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName(configurationName).dependencies
+        return injector.getInstance(GolangConfigurationManager).getByName(configurationName).dependencies
     }
 
     @Test
@@ -90,13 +96,26 @@ class GolangPluginTest {
     }
 
     def findFirstInDependencies() {
-        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName('build').dependencies.first()
+        return injector.getInstance(GolangConfigurationManager).getByName('build').dependencies.first()
     }
 
     def findFirstInDependencies(String name) {
-        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName('build').dependencies.find {
+        return injector.getInstance(GolangConfigurationManager).getByName('build').dependencies.find {
             it.name == name
         }
+    }
+
+    @Test
+    void 'DEVELOP and REPRODUCIBLE should be able to be used directly'() {
+        project.golang {
+            buildMode = project.DEVELOP
+        }
+        assert injector.getInstance(GolangPluginSetting).buildMode == BuildMode.DEVELOP
+
+        project.golang {
+            buildMode = project.REPRODUCIBLE
+        }
+        assert injector.getInstance(GolangPluginSetting).buildMode == BuildMode.REPRODUCIBLE
     }
 
     @Test

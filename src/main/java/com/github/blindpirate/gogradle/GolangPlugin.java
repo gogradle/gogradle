@@ -1,6 +1,7 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
+import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
@@ -38,7 +39,6 @@ public class GolangPlugin implements Plugin<Project> {
     };
 
     // This is invoked by gradle, not our Guice.
-
     private Injector initGuice() {
         return Guice.createInjector(new GogradleModule(project));
     }
@@ -65,7 +65,7 @@ public class GolangPlugin implements Plugin<Project> {
         this.injector = initGuice();
         this.settings = injector.getInstance(GolangPluginSetting.class);
         this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
-        project.getExtensions().add("gogradleInjector", this.injector);
+        Arrays.asList(BuildMode.values()).forEach(mode -> project.getExtensions().add(mode.toString(), mode));
     }
 
     private void configureGlobalInjector() {

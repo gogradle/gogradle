@@ -40,7 +40,7 @@ System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
-    buildMode = 'DEVELOP'
+    buildMode = DEVELOP
     packagePath = 'github.com/my/project'
     goVersion = '1.7.1'
     globalCacheFor 0,'second'
