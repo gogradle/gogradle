@@ -2,7 +2,6 @@ package com.github.blindpirate.gogradle.build;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
@@ -35,7 +34,6 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
-import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -266,29 +264,5 @@ public class DefaultBuildManager implements BuildManager {
                 .toString();
 
         return toUnixString(getBuildGopath() + File.pathSeparator + testGopath);
-    }
-
-    @Override
-    public void installDependency(ResolvedDependency dependency, String configuration) {
-        File targetDir = getInstallationDirectory(configuration)
-                .resolve(SRC)
-                .resolve(dependency.getName())
-                .toFile();
-        installTo(dependency, targetDir);
-    }
-
-    private void installTo(ResolvedDependency dependency, File targetDir) {
-        forceMkdir(targetDir);
-        clearDirectory(targetDir);
-        dependency.installTo(targetDir);
-    }
-
-    @Override
-    public void installDependencyToVendor(ResolvedDependency dependency) {
-        File targetDir = project.getRootDir().toPath()
-                .resolve(VENDOR_DIRECTORY)
-                .resolve(dependency.getName())
-                .toFile();
-        installTo(dependency, targetDir);
     }
 }
