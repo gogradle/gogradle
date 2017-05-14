@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
@@ -8,6 +25,7 @@ import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
@@ -143,13 +161,13 @@ public abstract class ResolveTask extends AbstractGolangTask {
         projectCacheManager.loadPersistenceCache();
         try {
             resolveDependencies();
-            writeToSerializationFile();
+            writeDependencyTreeToSerializationFile();
         } finally {
             projectCacheManager.savePersistenceCache();
         }
     }
 
-    private void writeToSerializationFile() {
+    private void writeDependencyTreeToSerializationFile() {
         IOUtils.serialize(dependencyTree, getSerializationFile());
     }
 
@@ -158,13 +176,13 @@ public abstract class ResolveTask extends AbstractGolangTask {
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
         ResolveContext rootContext = ResolveContext.root(configuration);
 
-
-        gogradleRootProject.setDependencies(strategy.produce(gogradleRootProject,
-                gogradleRootProject.getRootDir(),
-                visitor,
-                getConfigurationName()));
+        gogradleRootProject.setDependencies(produceFirstLevelDependencies());
 
         dependencyTree = dependencyTreeFactory.getTree(rootContext, gogradleRootProject);
+    }
+
+    protected GolangDependencySet produceFirstLevelDependencies() {
+        return strategy.produce(gogradleRootProject, getProject().getRootDir(), visitor, getConfigurationName());
     }
 
     public DependencyTreeNode getDependencyTree() {

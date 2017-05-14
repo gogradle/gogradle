@@ -1,5 +1,24 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVistor;
+import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -29,6 +48,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
@@ -172,7 +192,11 @@ public final class IOUtils {
     }
 
     public static void append(File file, String str) {
-        write(file, toString(file) + str);
+        if (file.exists()) {
+            write(file, toString(file) + str);
+        } else {
+            write(file, str);
+        }
     }
 
     public static List<String> readLines(File file) {
@@ -285,6 +309,14 @@ public final class IOUtils {
         } catch (IOException | ClassNotFoundException e) {
             throw ExceptionHandler.uncheckException(e);
         }
+    }
+
+    public static void markAndDelete(File rootDir, Predicate<File> predicate) {
+        MarkDirectoryVisitor markVisitor = new MarkDirectoryVisitor(rootDir, predicate);
+        walkFileTreeSafely(rootDir.toPath(), markVisitor);
+
+        DeleteUnmarkedDirectoryVistor deleteVisitor = new DeleteUnmarkedDirectoryVistor(markVisitor);
+        walkFileTreeSafely(rootDir.toPath(), deleteVisitor);
     }
 
 }

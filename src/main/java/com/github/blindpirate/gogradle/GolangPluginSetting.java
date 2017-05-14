@@ -1,7 +1,25 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Singleton;
@@ -26,8 +44,9 @@ public class GolangPluginSetting {
             .put("day", TimeUnit.DAYS)
             .put("days", TimeUnit.DAYS)
             .build();
-
     private BuildMode buildMode = REPRODUCIBLE;
+    private static final String BUILD_MODE_KEY = "gogradle.mode";
+
     private String packagePath;
     private List<String> buildTags = new ArrayList<>();
     private long globalCacheSecond = 5 * 60;
@@ -53,12 +72,17 @@ public class GolangPluginSetting {
         return goExecutable == null ? "go" : goExecutable;
     }
 
-    public void setBuildMode(String buildMode) {
-        this.buildMode = valueOf(buildMode);
+    public BuildMode getBuildMode() {
+        String mode = System.getProperty(BUILD_MODE_KEY);
+        if (StringUtils.isNotEmpty(mode)) {
+            return BuildMode.valueOf(mode);
+        } else {
+            return buildMode;
+        }
     }
 
-    public BuildMode getBuildMode() {
-        return buildMode;
+    public void setBuildMode(String buildMode) {
+        this.buildMode = valueOf(buildMode);
     }
 
     public void setBuildMode(BuildMode buildMode) {
@@ -78,9 +102,9 @@ public class GolangPluginSetting {
     }
 
     public void setBuildTags(List<String> buildTags) {
+        buildTags.forEach(t -> Assert.isTrue(!t.contains("\"") && !t.contains("'")));
         this.buildTags = buildTags;
     }
-
 
     public String getGoVersion() {
         return goVersion;

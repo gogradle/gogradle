@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.core.dependency.produce.external.godep
 
 import com.github.blindpirate.gogradle.GogradleRunner
@@ -15,7 +32,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @Test
     void 'package with Godeps/Godeps.json should be rejected'() {
         // then:
-        assert !godepDependencyFactory.produce(resource, 'build').isPresent()
+        assert !godepDependencyFactory.canRecognize(resource)
     }
 
     String GodepsDotJson = '''
@@ -45,9 +62,12 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when:
         godepDependencyFactory.produce(resource, 'build')
         // then:
-        verifyMapParsed([name: "github.com/kr/fs", version: '2788f0dbd16903de03cb8186e5c7d97b69ad387b'])
-        verifyMapParsed([name   : "github.com/kr/pretty",
-                         version: 'f31442d60e51465c69811e2107ae978868dbea5c'])
+        verifyMapParsed([name      : "github.com/kr/fs",
+                         version   : '2788f0dbd16903de03cb8186e5c7d97b69ad387b',
+                         transitive: false])
+        verifyMapParsed([name      : "github.com/kr/pretty",
+                         version   : 'f31442d60e51465c69811e2107ae978868dbea5c',
+                         transitive: false])
     }
 
     @Test(expected = RuntimeException)
@@ -81,7 +101,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         godepDependencyFactory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'a'])
+        verifyMapParsed([name: 'a', transitive: false])
 
     }
 
@@ -104,7 +124,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         godepDependencyFactory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'a', version: 'b'])
+        verifyMapParsed([name: 'a', version: 'b', transitive: false])
     }
 
 }

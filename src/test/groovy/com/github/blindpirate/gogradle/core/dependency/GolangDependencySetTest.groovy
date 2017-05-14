@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
@@ -12,6 +29,7 @@ import org.junit.runner.RunWith
 import java.lang.reflect.Method
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.*
 
@@ -120,10 +138,6 @@ class GolangDependencySetTest {
         reset(container)
         set.retainAll([])
         verify(container).retainAll([])
-
-        reset(container)
-        set.removeAll([])
-        verify(container).removeAll([])
     }
 
     @Test
@@ -195,6 +209,17 @@ class GolangDependencySetTest {
         assert !findInDependencies(oldSet, VendorNotationDependency).is(findInDependencies(newSet, VendorNotationDependency))
         assert !findInDependencies(oldSet, LocalDirectoryDependency).is(findInDependencies(newSet, LocalDirectoryDependency))
         verifyResult(newSet)
+    }
+
+    @Test
+    void 'removeAll should succeed'() {
+        GolangDependency a = mockDependency('a')
+        GolangDependency b1 = mockDependency('b')
+        GolangDependency b2 = mockDependency('b')
+        GolangDependency c = mockDependency('c')
+        assert asGolangDependencySet(b1).removeAll([a, b2])
+        assert asGolangDependencySet(a, b1).removeAll([b2])
+        assert !asGolangDependencySet(a, b1).removeAll([c])
     }
 
     def findInDependencies(GolangDependencySet set, Class clazz) {

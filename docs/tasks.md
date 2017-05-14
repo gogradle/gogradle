@@ -3,8 +3,11 @@
 A task unit executed independently is usually called [Task](https://docs.gradle.org/current/userguide/more_about_tasks.html). Gogradle predefined the following tasks:
 
 - goPrepare
+- goInit
 - resolveBuildDependencies
 - resolveTestDependencies
+- installBuildDependencies
+- installTestDependencies
 - goDependencies
 - goBuild
 - goTest
@@ -20,10 +23,17 @@ A task unit executed independently is usually called [Task](https://docs.gradle.
 
 Do some preparation, for example, verifying `build.gradle` and installing golang executables.
 
+## goInit
+
+Perform migration from other package management tools. Currently `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash` are supported.
+
 ## resolveBuildDependencies/resolveTestDependencies
 
-- Resolve `build` and `test` dependencies to dependency trees. Conflicts will also be resolved in this task.
-- Flatten resolved `build` and `test` dependencies and install them into `.gogradle` directory respectively so that the future build can use them.
+Resolve `build` and `test` dependencies to dependency trees. Conflicts will also be resolved in this task.
+
+## installBuildDependencies/installTestDependencies
+
+Flatten resolved `build` and `test` dependencies and install them into `.gogradle` directory respectively so that the future build can use them.
 
 ## goDependencies
 

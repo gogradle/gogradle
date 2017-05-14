@@ -1,8 +1,24 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.build;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
@@ -11,6 +27,7 @@ import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -22,6 +39,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,7 +51,6 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
-import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -152,6 +169,7 @@ public class DefaultBuildManager implements BuildManager {
                    Consumer<String> stderrLineConsumer,
                    Consumer<Integer> retcodeConsumer) {
         List<String> cmdAndArgs = asStringList(getGoBinary(), args);
+        cmdAndArgs.addAll(buildTagsArgs());
         run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
     }
 
@@ -168,6 +186,18 @@ public class DefaultBuildManager implements BuildManager {
 
             doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
         });
+    }
+
+    private List<? extends String> buildTagsArgs() {
+        if (setting.getBuildTags().isEmpty()) {
+            return Collections.emptyList();
+        } else {
+            // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
+            List<String> ret = Lists.newArrayList("-tags");
+            String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
+            ret.add("'" + tagsArg + "'");
+            return ret;
+        }
     }
 
     @SuppressWarnings("unchecked")
@@ -224,9 +254,7 @@ public class DefaultBuildManager implements BuildManager {
                 "GOOS", Os.getHostOs().toString(),
                 "GOEXE", Os.getHostOs().exeExtension(),
                 "GOARCH", Arch.getHostArch().toString());
-        if (env != null) {
-            defaultEnvs.putAll(env);
-        }
+        defaultEnvs.putAll(env);
         return defaultEnvs;
     }
 
@@ -253,29 +281,5 @@ public class DefaultBuildManager implements BuildManager {
                 .toString();
 
         return toUnixString(getBuildGopath() + File.pathSeparator + testGopath);
-    }
-
-    @Override
-    public void installDependency(ResolvedDependency dependency, String configuration) {
-        File targetDir = getInstallationDirectory(configuration)
-                .resolve(SRC)
-                .resolve(dependency.getName())
-                .toFile();
-        installTo(dependency, targetDir);
-    }
-
-    private void installTo(ResolvedDependency dependency, File targetDir) {
-        forceMkdir(targetDir);
-        clearDirectory(targetDir);
-        dependency.installTo(targetDir);
-    }
-
-    @Override
-    public void installDependencyToVendor(ResolvedDependency dependency) {
-        File targetDir = project.getRootDir().toPath()
-                .resolve(VENDOR_DIRECTORY)
-                .resolve(dependency.getName())
-                .toFile();
-        installTo(dependency, targetDir);
     }
 }

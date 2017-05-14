@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.build
 
 import com.github.blindpirate.gogradle.GogradleRunner
@@ -129,7 +146,7 @@ class DefaultBuildManagerTest {
         // given
         when(process.waitFor()).thenReturn(1)
         // then
-        manager.go(['test', './...'], null)
+        manager.go(['test', './...'], [:])
     }
 
     String getBuildGopath() {
@@ -145,6 +162,8 @@ class DefaultBuildManagerTest {
 
     @Test
     void 'customized command should succeed'() {
+        // given
+        setting.buildTags = ['a', 'b', 'c']
         // when
         manager.run(['golint'], [:], null, null, null)
         // then
@@ -154,6 +173,18 @@ class DefaultBuildManagerTest {
                  GOOS  : Os.getHostOs().toString(),
                  GOARCH: Arch.getHostArch().toString(),
                  GOEXE : Os.getHostOs().exeExtension()],
+                resource)
+    }
+
+    @Test
+    void 'build tags should succeed'() {
+        // given
+        setting.buildTags = ['a', 'b', 'c']
+        // when
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        // then
+        verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project', '-tags', "'a b c'"],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
                 resource)
     }
 
@@ -198,41 +229,6 @@ class DefaultBuildManagerTest {
         verify(stdoutLineConsumer).accept('anotherline')
         verify(stderrLineConsumer).accept('stderr')
         verify(retcodeConsumer).accept(0)
-    }
-
-    @Test
-    void 'copying a dependency from global cache to project cache should succeed'() {
-        // given
-        when(resolvedDependency.getName()).thenReturn('root/package')
-        // when
-        manager.installDependency(resolvedDependency, 'build')
-        // then
-        File targetDir = new File(resource, '.gogradle/build_gopath/src/root/package')
-        assert targetDir.exists()
-        verify(resolvedDependency).installTo(targetDir)
-    }
-
-    @Test
-    void 'installing a dependency to vendor should succeed'() {
-        // given
-        when(resolvedDependency.getName()).thenReturn('root/package')
-        // when
-        manager.installDependencyToVendor(resolvedDependency)
-        // then
-        File targetDir = new File(resource, 'vendor/root/package')
-        assert targetDir.exists()
-        verify(resolvedDependency).installTo(targetDir)
-    }
-
-    @Test
-    void 'target directory should be cleared before installing'() {
-        // given
-        when(resolvedDependency.getName()).thenReturn('root/package')
-        IOUtils.write(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go', '')
-        // when
-        manager.installDependency(resolvedDependency, 'build')
-        // then
-        assert !new File(resource, '.gogradle/build_gopath/src/root/package/oldbuildremains.go').exists()
     }
 
     @Test(expected = BuildException)

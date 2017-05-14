@@ -1,6 +1,22 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -8,8 +24,8 @@ import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.InputFile;
@@ -18,11 +34,7 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.util.HashSet;
-import java.util.List;
 import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 public abstract class InstallTask extends AbstractGolangTask {
     private static final String CURRENT_VERSION_META = ".CURRENT_VERSION";
@@ -34,14 +46,14 @@ public abstract class InstallTask extends AbstractGolangTask {
     @TaskAction
     public void installDependencies() {
         File src = buildManager.getInstallationDirectory(getConfigurationName()).resolve("src").toFile();
+        IOUtils.forceMkdir(src);
+
         DependencyTreeNode dependencyTree = getUpstreamResolveTask().getDependencyTree();
-        GolangDependencySet flattened = dependencyTree.flatten()
-                .stream()
-                .collect(GolangDependencySet.COLLECTOR);
+        GolangDependencySet flatDependencies = dependencyTree.flatten();
 
-        clearDirectoriesIfNecessary(src, flattened);
+        IOUtils.markAndDelete(src, dir -> currentVersionMatchDependency(dir, src, flatDependencies));
 
-        flattened.forEach(this::installIfNecessary);
+        flatDependencies.forEach(this::installIfNecessary);
     }
 
     private void installIfNecessary(GolangDependency dependency) {
@@ -58,67 +70,28 @@ public abstract class InstallTask extends AbstractGolangTask {
         }
     }
 
-    private void clearDirectoriesIfNecessary(File src, GolangDependencySet flattenedDependencies) {
-        Set<File> dirsToBeCleared = new HashSet<>();
-        dfs(src, "", flattenedDependencies, dirsToBeCleared, 0);
-        dirsToBeCleared.forEach(IOUtils::clearDirectory);
-    }
-
-    private boolean dfs(File currentDir,
-                        String currentRelativePath,
-                        GolangDependencySet dependencySet,
-                        Set<File> dirsToBeCleared,
-                        int depth) {
-        Assert.isTrue(depth < GogradleGlobal.MAX_DFS_DEPTH);
-        List<File> files = IOUtils.safeListFiles(currentDir);
-        boolean ret;
-        if (versionFileExists(files)) {
-            ret = !currentVersionMatchDependency(currentDir, currentRelativePath, dependencySet);
-        } else if (anyDotGoFilesExist(files)) {
-            ret = true;
-        } else {
-            List<Boolean> subdirectoryResults = files.stream()
-                    .filter(File::isDirectory)
-                    .map(dir -> dfs(dir,
-                            determineSubPath(currentRelativePath, dir.getName()),
-                            dependencySet,
-                            dirsToBeCleared,
-                            depth + 1))
-                    .collect(Collectors.toList());
-            ret = subdirectoryResults.stream().allMatch(b -> b);
-        }
-        if (ret) {
-            dirsToBeCleared.add(currentDir);
-        }
-        return ret;
-    }
-
-    private String determineSubPath(String currentPath, String currentDirName) {
-        if (currentPath.length() == 0) {
-            return currentDirName;
-        } else {
-            return currentPath + "/" + currentDirName;
-        }
-    }
-
-    private boolean anyDotGoFilesExist(List<File> files) {
-        return files.stream().map(File::getName).anyMatch(name -> name.endsWith(".go"));
-    }
 
     private boolean currentVersionMatchDependency(File currentDir,
-                                                  String currentRelativePath,
+                                                  File srcDir,
                                                   GolangDependencySet dependencySet) {
-        Optional<GolangDependency> existed = dependencySet.findByName(currentRelativePath);
-        if (existed.isPresent()) {
-            ResolvedDependency resolvedDependency = (ResolvedDependency) (existed.get());
-            if (isOnDisk(resolvedDependency)) {
-                return false;
-            } else {
-                return IOUtils.toString(new File(currentDir, CURRENT_VERSION_META))
-                        .equals(resolvedDependency.getVersion());
-            }
-        } else {
+        String packagePath = StringUtils.toUnixString(srcDir.toPath().relativize(currentDir.toPath()));
+        Optional<GolangDependency> existed = dependencySet.findByName(packagePath);
+        if (!existed.isPresent()) {
             return false;
+        }
+
+        File versionFile = new File(currentDir, CURRENT_VERSION_META);
+        if (!versionFile.exists()) {
+            return false;
+        }
+
+        ResolvedDependency resolvedDependency = (ResolvedDependency) (existed.get());
+        if (isOnDisk(resolvedDependency)) {
+            // For the sake of security, we would always think local dependency as out-of-date
+            return false;
+        } else {
+            return IOUtils.toString(new File(currentDir, CURRENT_VERSION_META))
+                    .equals(resolvedDependency.getVersion());
         }
     }
 
@@ -131,10 +104,6 @@ public abstract class InstallTask extends AbstractGolangTask {
         } else {
             return false;
         }
-    }
-
-    private boolean versionFileExists(List<File> files) {
-        return files.stream().filter(File::isFile).map(File::getName).anyMatch(CURRENT_VERSION_META::equals);
     }
 
     @InputFile

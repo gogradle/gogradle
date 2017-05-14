@@ -3,8 +3,11 @@
 在Gradle的构建模型中，一个独立执行的任务单元称为[Task](https://docs.gradle.org/current/userguide/more_about_tasks.html)。Gogradle预定义了以下任务：
 
 - goPrepare
+- goInit
 - resolveBuildDependencies
 - resolveTestDependencies
+- installBuildDependencies
+- installTestDependencies
 - goDependencies
 - goBuild
 - goTest
@@ -22,10 +25,17 @@
 
 进行一些准备工作，例如`build.gradle`中配置的合法性校验、指定Go语言版本的下载与安装。
 
+## goInit
+
+执行从其他包管理工具的迁移工作。当前支持的包管理工具有：`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash`
+
 ## resolveBuildDependencies/resolveTestDependencies
 
-- 分别解析`build`和`test`的依赖，生成依赖树。在这个过程中会解决相关依赖之间的冲突。
-- 将解析完成的`build`和`test`进行扁平化，然后安装到项目目录的`.gogradle`文件夹中，以备构建使用。
+分别解析`build`和`test`的依赖，生成依赖树。在这个过程中会解决相关依赖之间的冲突。
+
+## installBuildDependencies/installTestDependencies
+
+将解析完成的`build`和`test`进行扁平化，然后安装到项目目录的`.gogradle`文件夹中，以备构建使用。
 
 ## goDependencies
 

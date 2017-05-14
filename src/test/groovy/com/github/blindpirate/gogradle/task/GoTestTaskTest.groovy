@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
@@ -86,7 +103,7 @@ class GoTestTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         task.actions[0].execute(task)
         // then
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
                  "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
@@ -113,7 +130,7 @@ class GoTestTaskTest extends TaskTest {
         task.actions[0].execute(task)
         // then
         assert !task.coverageProfileGenerated
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), isNull(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/a'])
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/b'])
     }
@@ -125,7 +142,7 @@ class GoTestTaskTest extends TaskTest {
         task.addDefaultActionIfNoCustomActions()
         task.actions[0].execute(task)
         // then
-        verify(buildManager).go(argumentsCaptor.capture(), isNull(Map), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
         List<String> args = argumentsCaptor.getValue()
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
@@ -138,7 +155,7 @@ class GoTestTaskTest extends TaskTest {
     void 'collecting stdout should succeed'() {
         // given
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
-        when(buildManager.go(anyList(), isNull(Map), any(Consumer), any(Consumer), any(Consumer))).thenAnswer(new Answer<Object>() {
+        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), any(Consumer))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 invocation.arguments[2].accept('stdout')

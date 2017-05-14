@@ -1,6 +1,24 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
+import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
@@ -38,7 +56,6 @@ public class GolangPlugin implements Plugin<Project> {
     };
 
     // This is invoked by gradle, not our Guice.
-
     private Injector initGuice() {
         return Guice.createInjector(new GogradleModule(project));
     }
@@ -65,7 +82,7 @@ public class GolangPlugin implements Plugin<Project> {
         this.injector = initGuice();
         this.settings = injector.getInstance(GolangPluginSetting.class);
         this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
-        project.getExtensions().add("gogradleInjector", this.injector);
+        Arrays.asList(BuildMode.values()).forEach(mode -> project.getExtensions().add(mode.toString(), mode));
     }
 
     private void configureGlobalInjector() {

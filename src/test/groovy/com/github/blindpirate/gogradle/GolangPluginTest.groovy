@@ -1,10 +1,29 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
+import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.support.WithProject
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
 import com.github.blindpirate.gogradle.vcs.Mercurial
@@ -14,6 +33,7 @@ import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import com.github.blindpirate.gogradle.vcs.mercurial.HgClientAccessor
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialDependencyManager
+import com.google.inject.Injector
 import com.google.inject.Key
 import org.gradle.api.Project
 import org.gradle.plugins.ide.idea.IdeaPlugin
@@ -30,9 +50,12 @@ class GolangPluginTest {
 
     Project project
 
+    Injector injector
+
     @Before
     void applyPlugin() {
         project.pluginManager.apply(GolangPlugin)
+        injector = ReflectionUtils.getField(project.getPlugins().getPlugin(GolangPlugin), 'injector')
     }
 
     @Test
@@ -70,7 +93,7 @@ class GolangPluginTest {
     }
 
     private GolangDependencySet getDependencySet(String configurationName) {
-        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName(configurationName).dependencies
+        return injector.getInstance(GolangConfigurationManager).getByName(configurationName).dependencies
     }
 
     @Test
@@ -90,13 +113,26 @@ class GolangPluginTest {
     }
 
     def findFirstInDependencies() {
-        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName('build').dependencies.first()
+        return injector.getInstance(GolangConfigurationManager).getByName('build').dependencies.first()
     }
 
     def findFirstInDependencies(String name) {
-        return project.gogradleInjector.getInstance(GolangConfigurationManager).getByName('build').dependencies.find {
+        return injector.getInstance(GolangConfigurationManager).getByName('build').dependencies.find {
             it.name == name
         }
+    }
+
+    @Test
+    void 'DEVELOP and REPRODUCIBLE should be able to be used directly'() {
+        project.golang {
+            buildMode = project.DEVELOP
+        }
+        assert injector.getInstance(GolangPluginSetting).buildMode == BuildMode.DEVELOP
+
+        project.golang {
+            buildMode = project.REPRODUCIBLE
+        }
+        assert injector.getInstance(GolangPluginSetting).buildMode == BuildMode.REPRODUCIBLE
     }
 
     @Test

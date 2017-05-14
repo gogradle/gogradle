@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.crossplatform.Arch
@@ -46,10 +63,12 @@ goVet {
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
-            writeBuildAndSettingsDotGradle(buildDotGradle + 'goTest.enabled = false')
+            writeBuildAndSettingsDotGradle(buildDotGradle + 'goTest.enabled = false\n')
         } else {
             writeBuildAndSettingsDotGradle(buildDotGradle)
         }
+
+        init()
 
         firstBuild()
 
@@ -67,29 +86,27 @@ goVet {
 //        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
     }
 
-    void firstBuild() {
+    void init() {
+        IOUtils.deleteQuitely(new File(resource, 'gogradle.lock'))
         try {
             newBuild {
-                it.forTasks('goBuild', 'goCheck', 'goLock')
+                it.forTasks('goInit')
             }
-        } catch (Exception e) {
-            throw e
         } finally {
             println(stdout)
             println(stderr)
         }
     }
 
+    void firstBuild() {
+        newBuild {
+            it.forTasks('goBuild', 'goCheck', 'goLock')
+        }
+    }
+
     void secondBuild() {
-        try {
-            newBuild {
-                it.forTasks('goBuild', 'goCheck')
-            }
-        } catch (Exception e) {
-            throw e
-        } finally {
-            println(stdout)
-            println(stderr)
+        newBuild {
+            it.forTasks('goBuild', 'goCheck')
         }
     }
 

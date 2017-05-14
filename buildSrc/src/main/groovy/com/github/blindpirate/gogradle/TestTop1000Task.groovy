@@ -50,6 +50,8 @@ apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath = "github.com/${userAndProject[0]}/${userAndProject[1]}" // path of project to be built 
 }
+resolveBuildDependencies.mustRunAfter goInit
+resolveTestDependencies.mustRunAfter goInit
 """
         if (path.resolve('build.gradle.ext').toFile().exists()) {
             stdout.append('Found extend build.gradle\n')

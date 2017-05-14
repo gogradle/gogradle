@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -47,8 +64,12 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         List<Map<String, Object>> ret = flatDependencies.stream()
                 .map(ResolvedDependency::toLockedNotation)
                 .collect(Collectors.toList());
-        ret.forEach(this::deactiveTransitiveDependency);
+        ret.forEach(this::deactivateTransitive);
         return ret;
+    }
+
+    private void deactivateTransitive(Map<String, Object> map) {
+        map.put("transitive", false);
     }
 
     @Override
@@ -60,10 +81,6 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
     protected List<Map<String, Object>> adapt(File file) {
         GogradleLockModel model = parseYaml(file, GogradleLockModel.class);
         return model.getDependencies(BUILD);
-    }
-
-    private void deactiveTransitiveDependency(Map<String, Object> map) {
-        map.put("transitive", false);
     }
 
     @Override

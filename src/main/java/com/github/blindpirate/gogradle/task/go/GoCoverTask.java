@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
@@ -24,6 +41,7 @@ import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -109,7 +127,7 @@ public class GoCoverTask extends AbstractGolangTask {
                         .collect(Collectors.toList());
         long totalMissedLines = calculateTotalMissedLines(packageCoverages);
         long totalLines = calculateLines(packageCoverages);
-        int totalCoverageRate = NumberUtils.percentage(totalMissedLines, totalLines);
+        int totalCoverageRate = NumberUtils.percentage(totalLines - totalMissedLines, totalLines);
 
         sortByName(packageCoverages);
         sortByCoverageRate(packageCoverages);
@@ -201,7 +219,8 @@ public class GoCoverTask extends AbstractGolangTask {
     private void analyzeProfile(File profile) {
         String htmlOutputFilePath = toUnixString(profileFileToHtmlFile(profile));
         String profilePath = toUnixString(profile);
-        buildManager.go(asList("tool", "cover", "-html=" + profilePath, "-o", htmlOutputFilePath), null);
+        buildManager.go(asList("tool", "cover", "-html=" + profilePath, "-o", htmlOutputFilePath),
+                Collections.emptyMap());
     }
 
     private File profileFileToHtmlFile(File profile) {

@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
@@ -67,13 +84,12 @@ repositories {
 
     @Test
     void 'dependencies should be resolved correctly'() {
-        try {
-            newBuild {
-                it.forTasks('goDependencies')
-            }
+        newBuild {
+            it.forTasks('goDependencies')
+        }
 
-            String actualOutput = stdout.toString().replaceAll('\\r', '')
-            String expectedOutput = """
+        String actualOutput = stdout.toString().replaceAll('\\r', '')
+        String expectedOutput = """
 build:
 github.com/my/project
 \\-- a:${StringUtils.toUnixString(resource)}/a
@@ -85,10 +101,7 @@ github.com/my/project
     \\-- d:${StringUtils.toUnixString(resource)}/d
 """.replaceAll('\\r', '')
 
-            assert actualOutput.concat(expectedOutput)
-        } finally {
-            println(stdout)
-            println(stderr)
-        }
+        assert actualOutput.concat(expectedOutput)
+
     }
 }

@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle.core.dependency.produce.external.govendor
 
 import com.github.blindpirate.gogradle.GogradleRunner
@@ -36,7 +53,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Test
     void 'package without vendor/vendor.json should be rejected'() {
-        assert !factory.produce(resource, 'build').isPresent()
+        assert !factory.canRecognize(resource)
     }
 
     @Test
@@ -46,8 +63,12 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'github.com/Bowery/prompt', version: 'd43c2707a6c5a152a344c64bb4fed657e2908a81'])
-        verifyMapParsed([name: 'github.com/dchest/safefile', version: '855e8d98f1852d48dde521e0522408d1fe7e836a'])
+        verifyMapParsed([name      : 'github.com/Bowery/prompt',
+                         version   : 'd43c2707a6c5a152a344c64bb4fed657e2908a81',
+                         transitive: false])
+        verifyMapParsed([name      : 'github.com/dchest/safefile',
+                         version   : '855e8d98f1852d48dde521e0522408d1fe7e836a',
+                         transitive: false])
     }
 
     @Test(expected = RuntimeException)
@@ -73,7 +94,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // when
         factory.produce(resource, 'build')
         // then
-        verifyMapParsed([name: 'a'])
+        verifyMapParsed([name: 'a', transitive: false])
     }
     String vendorDotJsonWithExtraProperties = '''
     {

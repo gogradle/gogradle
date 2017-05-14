@@ -1,3 +1,20 @@
+/*
+ * Copyright 2016-2017 the original author or authors.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *           http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ *
+ */
+
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
@@ -11,6 +28,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -26,7 +44,9 @@ public class Go extends AbstractGolangTask {
 
     protected BuildManager buildManager;
 
-    private Map<String, String> env;
+    private Map<String, String> singleBuildEnvironment = new HashMap<>();
+
+    private Map<String, String> overallEnvironment = new HashMap<>();
 
     private boolean continueWhenFail;
 
@@ -41,12 +61,26 @@ public class Go extends AbstractGolangTask {
         buildManager = GogradleGlobal.getInstance(BuildManager.class);
     }
 
-    public Map<String, String> getEnv() {
-        return env;
+    public void environment(Map<String, String> map) {
+        overallEnvironment.putAll(map);
     }
 
-    public void setEnv(Map<String, String> env) {
-        this.env = env;
+    public void environment(String key, String value) {
+        overallEnvironment.put(key, value);
+    }
+
+    private Map<String, String> getBuildEnvironment() {
+        Map<String, String> ret = new HashMap<>(overallEnvironment);
+        ret.putAll(singleBuildEnvironment);
+        return ret;
+    }
+
+    public Map<String, String> getSingleBuildEnvironment() {
+        return singleBuildEnvironment;
+    }
+
+    public void setSingleBuildEnvironment(Map<String, String> singleBuildEnvironment) {
+        this.singleBuildEnvironment = singleBuildEnvironment;
     }
 
     public void addDefaultActionIfNoCustomActions() {
@@ -74,7 +108,11 @@ public class Go extends AbstractGolangTask {
     public void go(List<String> args, Closure stdoutStderrConsumer) {
         Consumer<String> stdoutLineConsumer = stdoutStderrConsumer == null ? LOGGER::quiet : new LineCollector();
         Consumer<String> stderrLineConsumer = stdoutStderrConsumer == null ? LOGGER::error : new LineCollector();
-        buildManager.go(args, env, stdoutLineConsumer, stderrLineConsumer, continueWhenFail ? DO_NOTHING : null);
+        buildManager.go(args,
+                getBuildEnvironment(),
+                stdoutLineConsumer,
+                stderrLineConsumer,
+                continueWhenFail ? DO_NOTHING : null);
 
         processStdoutStderrIfNecessary(stdoutStderrConsumer, stdoutLineConsumer, stderrLineConsumer);
     }
@@ -95,7 +133,11 @@ public class Go extends AbstractGolangTask {
     public void run(List<String> args, Closure stdoutStderrConsumer) {
         Consumer<String> stdoutLineConsumer = stdoutStderrConsumer == null ? LOGGER::quiet : new LineCollector();
         Consumer<String> stderrLineConsumer = stdoutStderrConsumer == null ? LOGGER::error : new LineCollector();
-        buildManager.run(args, env, stdoutLineConsumer, stderrLineConsumer, continueWhenFail ? DO_NOTHING : null);
+        buildManager.run(args,
+                getBuildEnvironment(),
+                stdoutLineConsumer,
+                stderrLineConsumer,
+                continueWhenFail ? DO_NOTHING : null);
 
         processStdoutStderrIfNecessary(stdoutStderrConsumer, stdoutLineConsumer, stderrLineConsumer);
 
