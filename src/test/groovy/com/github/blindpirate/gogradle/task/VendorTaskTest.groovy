@@ -1,17 +1,23 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.times
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -21,47 +27,106 @@ class VendorTaskTest extends TaskTest {
 
     VendorTask task
 
-    ResolvedDependency resolvedDependency = DependencyUtils.mockResolvedDependency('a')
-
     File resource
 
     @Mock
     DependencyTreeNode buildTree
+    @Mock
+    DependencyTreeNode testTree
+
+    GolangDependencySet buildSet = GolangDependencySet.empty();
+    GolangDependencySet testSet = GolangDependencySet.empty();
 
     @Before
     void setUp() {
         task = buildTask(VendorTask)
         when(project.getRootDir()).thenReturn(resource)
         when(golangTaskContainer.get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(buildTree)
+        when(golangTaskContainer.get(ResolveTestDependenciesTask).getDependencyTree()).thenReturn(testTree)
 
-        GolangDependencySet set = DependencyUtils.asGolangDependencySet(resolvedDependency)
-        when(buildTree.flatten()).thenReturn(set)
+        when(buildTree.flatten()).thenReturn(buildSet)
+
+        when(testTree.flatten()).thenReturn(testSet)
     }
 
     @Test
-    void 'vendor task should depend on install task'() {
-        assertTaskDependsOn(task, GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)
+    void 'vendor task should depend on resolve task'() {
+        assertTaskDependsOn(task, GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME)
     }
 
     @Test
-    void 'vendor directory should be cleared before installing'() {
+    void 'build dependencies should have higher priority'() {
         // given
-        IOUtils.mkdir(resource, 'vendor/a')
-        IOUtils.mkdir(resource, 'vendor/b')
-        IOUtils.write(resource, 'vendor/vendor.json', '')
+        LocalDirectoryDependency local = mockWithName(LocalDirectoryDependency, 'a')
+        VendorResolvedDependency vendor = mockWithName(VendorResolvedDependency, 'a')
+        buildSet.add(local)
+        testSet.add(vendor)
         // when
         task.vendor()
         // then
-        assert !new File(resource, 'vendor/a').exists()
-        assert !new File(resource, 'vendor/b').exists()
-        assert new File(resource, 'vendor/vendor.json').exists()
+        verify(local).installTo(new File(resource, 'vendor/a'))
+        verify(vendor, times(0)).installTo(new File(resource, 'vendor/a'))
+    }
+
+
+    @Test
+    void 'vendor should be flattened and cascading vendor should be removed'() {
+        // given
+        GogradleRootProject root = mock(GogradleRootProject)
+        VendorResolvedDependency a = mockVendorResolvedDependency('a', root, 'vendor/a')
+        VendorResolvedDependency b = mockVendorResolvedDependency('b', root, 'vendor/a/vendor/b')
+        VendorResolvedDependency c = mockVendorResolvedDependency('c', root, 'vendor/a/vendor/b/vendor/c')
+        testSet.addAll([a, b, c])
+
+        IOUtils.mkdir(resource, 'vendor/a/vendor/b/vendor/c')
+        IOUtils.mkdir(resource, 'vendor/d')
+
+        // when
+        task.vendor()
+        // then
+        verify(a, times(0)).installTo(new File(resource, 'vendor/a'))
+        verify(b).installTo(new File(resource, 'vendor/b'))
+        verify(c).installTo(new File(resource, 'vendor/c'))
+        assert !new File(resource, 'vendor/a/vendor/b/vendor').exists()
+        assert !new File(resource, 'vendor/a/vendor').exists()
+        assert new File(resource, 'vendor/a').exists()
+        assert new File(resource, 'vendor/b').exists()
+        assert new File(resource, 'vendor/c').exists()
+        assert !new File(resource, 'vendor/d').exists()
+    }
+
+    def addDependencyTo(ResolvedDependency resolvedDependency, GolangDependency... dependencies) {
+        GolangDependencySet set = asGolangDependencySet(dependencies)
+        when(resolvedDependency.getDependencies()).thenReturn(set)
     }
 
     @Test
-    void 'vendor should be installed successfully'() {
+    void 'vendor should be reserved if it matched dependency to be installed'() {
+        // given
+        GogradleRootProject root = mock(GogradleRootProject)
+        VendorResolvedDependency a = mockVendorResolvedDependency('a', root, 'vendor/a')
+        VendorResolvedDependency b = mockVendorResolvedDependency('b', root, 'vendor/a/vendor/b')
+        LocalDirectoryDependency c = mockWithName(LocalDirectoryDependency, 'c')
+        testSet.addAll([a, b, c])
+
+        IOUtils.mkdir(resource, 'vendor/a/vendor/b/vendor/c')
         // when
         task.vendor()
         // then
-        verify(buildManager).installDependencyToVendor(resolvedDependency)
+        verify(a, times(0)).installTo(new File(resource, 'vendor/a'))
+        verify(b).installTo(new File(resource, 'vendor/b'))
+        verify(c).installTo(new File(resource, 'vendor/c'))
+        assert !new File(resource, 'vendor/a/vendor/b/vendor').exists()
+        assert !new File(resource, 'vendor/a/vendor').exists()
+    }
+
+    @Test
+    void 'all files under vendor directory should be deleted'() {
+        // given
+        IOUtils.write(resource, 'vendor/vendor/json', '')
+        // when
+        task.vendor()
+        // then
+        assert !new File(resource, 'vendor/vendor/json').exists()
     }
 }
