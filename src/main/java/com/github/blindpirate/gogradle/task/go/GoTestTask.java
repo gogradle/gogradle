@@ -213,7 +213,7 @@ public class GoTestTask extends Go {
             int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
             if (totalFailureCount > 0) {
                 throw new IllegalStateException("There are " + totalFailureCount + " failed tests. Please see "
-                        + reportDir.getAbsolutePath()
+                        + StringUtils.toUnixString(new File(reportDir, "index.html"))
                         + " for more details.");
             }
         }
