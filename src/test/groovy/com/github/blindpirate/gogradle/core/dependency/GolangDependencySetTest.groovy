@@ -12,6 +12,7 @@ import org.junit.runner.RunWith
 import java.lang.reflect.Method
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
 import static org.mockito.Mockito.*
 
@@ -120,10 +121,6 @@ class GolangDependencySetTest {
         reset(container)
         set.retainAll([])
         verify(container).retainAll([])
-
-        reset(container)
-        set.removeAll([])
-        verify(container).removeAll([])
     }
 
     @Test
@@ -195,6 +192,17 @@ class GolangDependencySetTest {
         assert !findInDependencies(oldSet, VendorNotationDependency).is(findInDependencies(newSet, VendorNotationDependency))
         assert !findInDependencies(oldSet, LocalDirectoryDependency).is(findInDependencies(newSet, LocalDirectoryDependency))
         verifyResult(newSet)
+    }
+
+    @Test
+    void 'removeAll should succeed'() {
+        GolangDependency a = mockDependency('a')
+        GolangDependency b1 = mockDependency('b')
+        GolangDependency b2 = mockDependency('b')
+        GolangDependency c = mockDependency('c')
+        assert asGolangDependencySet(b1).removeAll([a, b2])
+        assert asGolangDependencySet(a, b1).removeAll([b2])
+        assert !asGolangDependencySet(a, b1).removeAll([c])
     }
 
     def findInDependencies(GolangDependencySet set, Class clazz) {

@@ -200,7 +200,12 @@ public class GolangDependencySet implements Set<GolangDependency>, Serializable,
 
     @Override
     public boolean removeAll(Collection<?> c) {
-        return container.removeAll(c);
+        // when this.size<=c.size
+        // custom comparing function (based on name) will not be invoked.
+        // this might cause issues, see AbstractSet.removeAll()
+        int originalSize = container.size();
+        c.forEach(container::remove);
+        return container.size() < originalSize;
     }
 
     @Override
