@@ -202,5 +202,5 @@ or
 gradlew gV 
 ```
 
-This task will copy all resolved `build` dependencies into vendor directory. Note that `test` dependencies won't be copied.
+This task will copy all resolved `build` and `test` dependencies into vendor directory. 
 

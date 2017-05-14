@@ -20,8 +20,15 @@ golang {
 }
 ```
 
+如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，请运行
 
-如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，那么无需任何设置，Gogradle会自动读取这些包管理工具保存在项目目录中的依赖锁定文件。此外，可以令Gogradle生成自己的锁定文件`gogradle.lock`。一旦该文件生成，原先的包管理工具的依赖锁定文件就不会再生效，你可以删除之。详见[依赖锁定](#依赖锁定)一节。
+```
+./gradlew goInit # *nix
+
+gradlew goInit # Windows
+```
+
+来进行迁移。此外，你也可以令Gogradle生成自己的锁定文件`gogradle.lock`。详见[依赖锁定](#依赖锁定)一节。
 
 ## 离线使用Gogradle插件
 本节的目的是为访问官方插件仓库[https://plugins.gradle.org](https://plugins.gradle.org)存在问题的小伙伴提供的workaround。若你在构建时没有遇到无法下载Gogradle插件的问题，请忽略本节。

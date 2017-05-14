@@ -210,5 +210,5 @@ gradlew goVendor
 gradlew gV
 ```
 
-这会将解析完成的`build`依赖拷贝到vendor目录中。注意，`test`依赖不会被拷贝。
+这会将解析完成的`build`和`test`依赖拷贝到vendor目录中。
 
