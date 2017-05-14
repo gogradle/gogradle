@@ -1,5 +1,7 @@
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVistor;
+import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
@@ -29,6 +31,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
@@ -289,6 +292,14 @@ public final class IOUtils {
         } catch (IOException | ClassNotFoundException e) {
             throw ExceptionHandler.uncheckException(e);
         }
+    }
+
+    public static void markAndDelete(File rootDir, Predicate<File> predicate) {
+        MarkDirectoryVisitor markVisitor = new MarkDirectoryVisitor(rootDir, predicate);
+        walkFileTreeSafely(rootDir.toPath(), markVisitor);
+
+        DeleteUnmarkedDirectoryVistor deleteVisitor = new DeleteUnmarkedDirectoryVistor(markVisitor);
+        walkFileTreeSafely(rootDir.toPath(), deleteVisitor);
     }
 
 }

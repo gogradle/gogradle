@@ -16,7 +16,7 @@ public class MarkDirectoryVisitor extends SimpleFileVisitor<Path> {
     private Predicate<File> dirPredicate;
     private File rootDir;
 
-    public MarkDirectoryVisitor(Predicate<File> dirPredicate, File rootDir) {
+    public MarkDirectoryVisitor(File rootDir, Predicate<File> dirPredicate) {
         this.dirPredicate = dirPredicate;
         this.rootDir = rootDir;
     }

@@ -41,12 +41,12 @@ class MarkAndDeleteDirectoryVisitorTest {
     }
 
     private MarkDirectoryVisitor mark() {
-        MarkDirectoryVisitor visitor = new MarkDirectoryVisitor(new Predicate<File>() {
+        MarkDirectoryVisitor visitor = new MarkDirectoryVisitor(resource, new Predicate<File>() {
             @Override
             boolean test(File file) {
                 return 'f' == file.name
             }
-        }, resource)
+        })
 
         IOUtils.walkFileTreeSafely(resource.toPath(), visitor)
         return visitor
