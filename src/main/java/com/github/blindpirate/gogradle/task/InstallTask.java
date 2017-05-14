@@ -1,8 +1,6 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVistor;
-import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
@@ -31,21 +29,14 @@ public abstract class InstallTask extends AbstractGolangTask {
     @TaskAction
     public void installDependencies() {
         File src = buildManager.getInstallationDirectory(getConfigurationName()).resolve("src").toFile();
+        IOUtils.forceMkdir(src);
+
         DependencyTreeNode dependencyTree = getUpstreamResolveTask().getDependencyTree();
         GolangDependencySet flatDependencies = dependencyTree.flatten();
 
-        MarkDirectoryVisitor markVisitor =
-                new MarkDirectoryVisitor(dir -> currentVersionMatchDependency(dir, src, flatDependencies), src);
-        IOUtils.walkFileTreeSafely(src.toPath(), markVisitor);
-
-        DeleteUnmarkedDirectoryVistor deleteVisitor=new DeleteUnmarkedDirectoryVistor(markVisitor);
-        IOUtils.walkFileTreeSafely(src.toPath(),deleteVisitor);
+        IOUtils.markAndDelete(src, dir -> currentVersionMatchDependency(dir, src, flatDependencies));
 
         flatDependencies.forEach(this::installIfNecessary);
-    }
-
-    protected String extractPackage(File rootDir, File currentDir) {
-        return StringUtils.toUnixString(rootDir.toPath().relativize(currentDir.toPath()));
     }
 
     private void installIfNecessary(GolangDependency dependency) {
@@ -66,7 +57,8 @@ public abstract class InstallTask extends AbstractGolangTask {
     private boolean currentVersionMatchDependency(File currentDir,
                                                   File srcDir,
                                                   GolangDependencySet dependencySet) {
-        Optional<GolangDependency> existed = dependencySet.findByName(extractPackage(srcDir, currentDir));
+        String packagePath = StringUtils.toUnixString(srcDir.toPath().relativize(currentDir.toPath()));
+        Optional<GolangDependency> existed = dependencySet.findByName(packagePath);
         if (!existed.isPresent()) {
             return false;
         }
