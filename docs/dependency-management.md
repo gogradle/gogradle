@@ -30,10 +30,10 @@ dependencies {
     
         build 'github.com/user/project@1.0.0-RELEASE' // Specify a version(tag in Git)
         build name:'github.com/user/project', tag:'1.0.0-RELEASE' // Equivalent to last line
-        build name:'github.com/user/project', version:'1.0.0-RELEASE' // Equivalent to last line
-    
+        
         test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
         test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
+        test name:'github.com/user/project', version:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
     }
 }
 ```
