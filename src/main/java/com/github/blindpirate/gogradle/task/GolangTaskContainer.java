@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.task;
 import com.github.blindpirate.gogradle.ide.IdeaTask;
 import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
 import com.github.blindpirate.gogradle.ide.RenameVendorTask;
+import com.github.blindpirate.gogradle.ide.VscodeTask;
 import com.github.blindpirate.gogradle.task.go.GoBuildTask;
 import com.github.blindpirate.gogradle.task.go.GoCoverTask;
 import com.github.blindpirate.gogradle.task.go.GoTestTask;
@@ -56,6 +57,7 @@ public class GolangTaskContainer {
     public static final String WEBSTORM_TASK_NAME = "webStorm";
     public static final String PHPSTORM_TASK_NAME = "phpStorm";
     public static final String PYCHARM_TASK_NAME = "pyCharm";
+    public static final String VSCODE_TASK_NAME = "vscode";
     private static final String RUBYMINE_TASK_NAME = "rubyMine";
     private static final String CLION_TASK_NAME = "cLion";
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
@@ -80,6 +82,7 @@ public class GolangTaskContainer {
             .put(CHECK_TASK_NAME, CheckTask.class)
             .put(LOCK_TASK_NAME, LockTask.class)
             .put(IDEA_TASK_NAME, IdeaTask.class)
+            .put(VSCODE_TASK_NAME, VscodeTask.class)
             .put(GOGLAND_TASK_NAME, IntellijIdeTask.class)
             .put(WEBSTORM_TASK_NAME, IntellijIdeTask.class)
             .put(PHPSTORM_TASK_NAME, IntellijIdeTask.class)

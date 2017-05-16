@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle.ide
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.task.GolangTaskContainer
 import com.github.blindpirate.gogradle.task.TaskTest
 import com.github.blindpirate.gogradle.util.DataExchange
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -27,10 +26,9 @@ import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.Mockito
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class VscodeTaskTest extends TaskTest {
@@ -38,10 +36,19 @@ class VscodeTaskTest extends TaskTest {
 
     VscodeTask task
 
+    String gopath
+
     @Before
     void setUp() {
         task = buildTask(VscodeTask)
-        when(project.getRootDir()).thenReturn(resource)
+        if (resource != null) {
+            when(project.getRootDir()).thenReturn(resource)
+            String projectGopath = StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
+            String buildGopath = StringUtils.toUnixString(new File(resource, '.gogradle/build_gopath'))
+            String testGopath = StringUtils.toUnixString(new File(resource, '.gogradle/test_gopath'))
+            gopath = projectGopath + File.pathSeparator + buildGopath + File.pathSeparator + testGopath
+            when(buildManager.getTestGopath()).thenReturn(gopath)
+        }
     }
 
     @Test
@@ -56,10 +63,6 @@ class VscodeTaskTest extends TaskTest {
     @Test
     void 'adding project gopath to settings.json should succeed when it exists'() {
         // given
-        String projectGopath = StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
-        String buildGopath = StringUtils.toUnixString(new File(resource, '.gogradle/build_gopath'))
-        String testGopath = StringUtils.toUnixString(new File(resource, '.gogradle/test_gopath'))
-        String gopath = projectGopath + File.pathSeparator + buildGopath + File.pathSeparator + testGopath
         when(buildManager.getTestGopath()).thenReturn(gopath)
         IOUtils.write(new File(resource, '.vscode/settings.json'), '''
 // Place your settings in this file to overwrite default and user settings.
@@ -72,5 +75,15 @@ class VscodeTaskTest extends TaskTest {
 
         // then
         assert DataExchange.parseJson(new File(resource, '.vscode/settings.json'), Map) == [hello: 'world', 'go.gopath': gopath]
+    }
+
+    @WithResource('')
+    @Test
+    void 'adding project gopath to settings.json should succeed when it does not exist'() {
+        // when
+        task.addGopathToSettingsDotJson()
+
+        // then
+        assert DataExchange.parseJson(new File(resource, '.vscode/settings.json'), Map) == ['go.gopath': gopath]
     }
 }
