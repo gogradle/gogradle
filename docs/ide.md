@@ -21,18 +21,22 @@ Gogradle can help you to:
 
 ## Install IDE and Golang Plugin
 
-At first, you need to have IDE and Golang plugin installed. Gogradle has been tested in IntelliJ IDEA 2016.3/Gogland 1.0 EAP/WebStorm 2016.3/PhpStorm 2016.3/PyCharm 2016.3/RubyMine 2016.3/CLion 2016.3 on Mac 10.11 and Windows 7.
+At first, you need to have IDE and Golang plugin installed. Gogradle has been tested in IntelliJ IDEA 2016.3/Gogland 1.0 EAP/WebStorm 2016.3/PhpStorm 2016.3/PyCharm 2016.3/RubyMine 2016.3/CLion 2016.3/VSCode 1.12.2 on Mac 10.11 and Windows 7.
 Theoretically, it is applicable for:
 
-- IntelliJ IDEA 2016.1+ (Ultimate and Community)
-- Gogland 1.0 EAP
-- WebStorm 2016.1+
-- PhpStorm 2016.1+
-- PyCharm 2016.1+
-- RubyMine 2016.1+
-- CLion 2016.1+
+- [IntelliJ IDEA 2016.1+ (Ultimate and Community)](https://www.jetbrains.com/idea/)
+- [VSCode 1.12+](https://code.visualstudio.com/)
+- [Gogland 1.0 EAP](https://www.jetbrains.com/go/)
+- [WebStorm 2016.1+](https://www.jetbrains.com/webstorm)
+- [PhpStorm 2016.1+](https://www.jetbrains.com/phpstorm)
+- [PyCharm 2016.1+](https://www.jetbrains.com/pycharm)
+- [RubyMine 2016.1+](https://www.jetbrains.com/ruby)
+- [CLion 2016.1+](https://www.jetbrains.com/clion)
+- [Vim](http://www.vim.org/)
 
-Except for Gogland, [Golang Plugin](https://github.com/go-lang-plugin-org/go-lang-idea-plugin) is required.
+Click the corresponding link and download your favorite IDE.
+
+On IntelliJ IDEA/WebStorm/PhpStorm/PyCharm/RubyMine/CLion, [go-lang-idea-plugin](https://github.com/go-lang-plugin-org/go-lang-idea-plugin) is required。
 
 On Mac:
 
@@ -44,6 +48,12 @@ On Windows:
 ```
 File > Settings > Plugins > Browse Repositories > Search for 'Go' and install
 ```
+
+And VSCode needs [vscode-go](https://github.com/Microsoft/vscode-go)。
+
+Search `Go` and install the plugin as documented [here](https://code.visualstudio.com/docs/editor/extension-gallery).
+
+On Vim, [vim-go](https://github.com/fatih/vim-go) is required, just follow the documentation.
 
 ## Install JRE
 
@@ -66,11 +76,11 @@ On Windows, it is located in
 
 Set your environment variable `JAVA_HOME` to it and that's it!
 
-## Write Build Script
+## Write Build Script and Initialization
 
-Place `gradlew`/`gradle`/`build.gradle` as documented in [Getting Started](./getting-started.md)
+Place `gradlew`/`gradle`/`build.gradle` as documented in [Getting Started](./getting-started.md), if your project is not managed by Gogradle previously, please run `gradlew goInit` now.
 
-## IntelliJIDEA
+## Import project into IntelliJIDEA
 
 - First way: run `gradlew goIdea` in project root directory, then do `File`-`Open` to the project root.
 - Second way: use `File`-`Open` to open `build.gradle` and select `Open as Project` as follows.
@@ -88,34 +98,36 @@ IDEA has Gradle integrated, so you can enable it via `View > ToolWindows > Gradl
 >
 > `you need to restart the IDE to make it come into effect`
 
-## Gogland
+## Import project into VSCode
 
-Run `gradlew gogland` in project root directory.
+Run `gradlew vscode` in project root directory and use `File`-`Open` to open project root directory.
 
-## WebStorm
+## Import project into Gogland
 
-Run `gradlew webStorm` or `gradlew wS` in project root directory.
+Run `gradlew gogland` in project root directory and use `File`-`Open` to open project root directory.
 
-## PhpStorm
+## Import project into WebStorm
 
-Run `gradlew phpStorm` or `gradlew pS` in project root directory.
+Run `gradlew webStorm` or `gradlew wS` in project root directory and use `File`-`Open` to open project root directory.
 
-## PyCharm
+## Import project into PhpStorm
 
-Run `gradlew pyCharm` or `gradlew pC` in project root directory.
+Run `gradlew phpStorm` or `gradlew pS` in project root directory and use `File`-`Open` to open project root directory.
 
-## RubyMine
+## Import project intoPyCharm
 
-Run `gradlew rubyMine` or `gradlew rM` in project root directory.
+Run `gradlew pyCharm` or `gradlew pC` in project root directory and use `File`-`Open` to open project root directory.
 
-## CLion
+## Import project intoRubyMine
 
-Run `gradlew cLion` or `gradlew cL` in project root directory.
+Run `gradlew rubyMine` or `gradlew rM` in project root directory and use `File`-`Open` to open project root directory.
+
+## Import project intoCLion
+
+Run `gradlew cLion` or `gradlew cL` in project root directory and use `File`-`Open` to open project root directory.
 
 
-## Vim
-
-Since Vim reads GOPATH from environment variable directly, you can get project-scoped GOPATH and GOROOT via `gradlew showGopathGoroot` or `gradlew sGG`.
+Since Vim reads GOPATH from environment variable directly, you can get project-scoped GOPATH and GOROOT via `gradlew showGopathGoroot` or `gradlew sGG` and run Vim with these environment variables.
 
 
 
