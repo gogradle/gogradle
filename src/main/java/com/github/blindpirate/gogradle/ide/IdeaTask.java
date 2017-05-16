@@ -22,9 +22,9 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RENAME_VENDOR_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
 
 public class IdeaTask extends AbstractGolangTask {
 
@@ -32,8 +32,8 @@ public class IdeaTask extends AbstractGolangTask {
     private IdeaIntegration ideaIntegration;
 
     public IdeaTask() {
-        dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
-                RESOLVE_TEST_DEPENDENCIES_TASK_NAME,
+        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
+                INSTALL_TEST_DEPENDENCIES_TASK_NAME,
                 RENAME_VENDOR_TASK_NAME);
     }
 
