@@ -83,4 +83,12 @@ public class DataExchange {
             throw new UncheckedIOException(e);
         }
     }
+
+    public static String toJson(Object model) {
+        try {
+            return JSON_MAPPER.writeValueAsString(model);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
+        }
+    }
 }
