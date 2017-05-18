@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import org.gradle.api.artifacts.Dependency;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * A {@link GolangDependency} represents a dependency
@@ -54,5 +55,7 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
     boolean isFirstLevel();
 
     CacheScope getCacheScope();
+
+    Set<String> getSubpackages();
 }
 
