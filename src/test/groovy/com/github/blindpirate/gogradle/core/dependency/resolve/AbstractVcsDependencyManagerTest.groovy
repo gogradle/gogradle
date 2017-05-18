@@ -87,6 +87,7 @@ class AbstractVcsDependencyManagerTest {
 
     @Before
     void setUp() {
+
         repoRoot = IOUtils.mkdir(resource, 'repo')
         targetDir = IOUtils.mkdir(resource, 'target')
         // prevent ensureGlobalCacheEmptyOrMatch from returning directly
@@ -112,6 +113,9 @@ class AbstractVcsDependencyManagerTest {
         when(notationDependency.getUrls()).thenReturn(['url'])
         when(hostResolvedDependency.getUrl()).thenReturn('url')
 
+        [vendorResolvedDependency, hostResolvedDependency, notationDependency].each {
+            when(it.getSubpackages()).thenReturn(['...'] as Set)
+        }
     }
 
     @Test
@@ -209,7 +213,7 @@ class AbstractVcsDependencyManagerTest {
         when(hostResolvedDependency.getUrl()).thenReturn('anotherUrl')
 
         // when
-        manager.install(vendorResolvedDependency, resource)
+        manager.install(vendorResolvedDependency, targetDir)
 
         // then
         verify(subclassDelegate).initRepository(hostResolvedDependency.getName(), ['anotherUrl'], repoRoot)
