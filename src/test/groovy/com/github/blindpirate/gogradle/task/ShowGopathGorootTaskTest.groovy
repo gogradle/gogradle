@@ -57,16 +57,13 @@ class ShowGopathGorootTaskTest extends TaskTest {
     void 'it should succeed'() {
         // when
         String projectGopath = new File(resource, 'project/.gogradle/project_gopath').getAbsolutePath().replace('\\', '/')
-        String buildGopath = new File(resource, 'project/.gogradle/build_gopath').getAbsolutePath().replace('\\', '/')
-        String testGopath = new File(resource, 'project/.gogradle/test_gopath').getAbsolutePath().replace('\\', '/')
-        String gopath = projectGopath + File.pathSeparator + buildGopath + File.pathSeparator + testGopath
-        when(buildManager.getTestGopath()).thenReturn(gopath)
+        when(buildManager.getProjectGopath()).thenReturn(projectGopath)
         when(project.getRootDir()).thenReturn(new File(resource, 'project'))
         when(goBinaryManager.getGoroot()).thenReturn(resource.toPath().resolve('goroot'))
         // when
         task.showGopathGoroot()
         // then
-        verify(logger).quiet("GOPATH: {}", gopath)
+        verify(logger).quiet("GOPATH: {}", projectGopath)
         verify(logger).quiet("GOROOT: {}", StringUtils.toUnixString(new File(resource, 'goroot')))
     }
 }

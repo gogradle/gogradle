@@ -24,8 +24,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class ShowGopathGorootTask extends AbstractGolangTask {
@@ -37,12 +36,12 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public ShowGopathGorootTask() {
-        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(VENDOR_TASK_NAME);
     }
 
     @TaskAction
     public void showGopathGoroot() {
-        LOGGER.quiet("GOPATH: {}", buildManager.getTestGopath());
+        LOGGER.quiet("GOPATH: {}", buildManager.getProjectGopath());
         LOGGER.quiet("GOROOT: {}", toUnixString(goBinaryManager.getGoroot()));
     }
 }
