@@ -96,16 +96,6 @@ class DefaultBuildManagerTest {
         when(project.getName()).thenReturn('project')
     }
 
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if .vendor exists before build'() {
-        IOUtils.mkdir(resource, '.vendor')
-        manager.ensureDotVendorDirNotExist()
-    }
-
-    @Test
-    void 'nothing should happen if .vendor not exist'() {
-        manager.ensureDotVendorDirNotExist()
-    }
 
     @Test
     void 'symbolic links should be created properly in preparation'() {
@@ -122,25 +112,6 @@ class DefaultBuildManagerTest {
         assert linkPath.getParent().resolve(relativePathOfLink).normalize() == targetPath.normalize()
     }
 
-    @Test
-    void 'vendor dir should be renamed to .vendor during build'() {
-        // given
-        IOUtils.mkdir(resource, 'vendor')
-        String dirDuringBuild = null
-        when(processUtils.run(anyList(), anyMap(), any(File))).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                dirDuringBuild = IOUtils.safeList(resource).first()
-                return process
-            }
-        })
-        // when
-        manager.go(['test'], [:])
-        // then
-        assert dirDuringBuild == '.vendor'
-        assert new File(resource, 'vendor').exists()
-    }
-
     @Test(expected = BuildException)
     void 'exception should be thrown if go build return non-zero'() {
         // given
@@ -149,15 +120,8 @@ class DefaultBuildManagerTest {
         manager.go(['test', './...'], [:])
     }
 
-    String getBuildGopath() {
-        return StringUtils.toUnixString("" + new File(resource, '.gogradle/project_gopath') + File.pathSeparator + new File(resource, '.gogradle/build_gopath'))
-    }
-
-    String getTestGopath() {
-        return StringUtils.toUnixString("" + new File(resource, '.gogradle/project_gopath') +
-                File.pathSeparator + new File(resource, '.gogradle/build_gopath') +
-                File.pathSeparator + new File(resource, '.gogradle/test_gopath'))
-
+    String getProjectGopath() {
+        return StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
     }
 
     @Test
@@ -168,7 +132,7 @@ class DefaultBuildManagerTest {
         manager.run(['golint'], [:], null, null, null)
         // then
         verify(processUtils).run(['golint'],
-                [GOPATH: getTestGopath(),
+                [GOPATH: getProjectGopath(),
                  GOROOT: getGoroot(),
                  GOOS  : Os.getHostOs().toString(),
                  GOARCH: Arch.getHostArch().toString(),
@@ -181,20 +145,20 @@ class DefaultBuildManagerTest {
         // given
         setting.buildTags = ['a', 'b', 'c']
         // when
-        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath'])
         // then
-        verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project', '-tags', "'a b c'"],
-                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
+        verify(processUtils).run([goBin, 'build', '-tags', "'a b c'", '-o', 'linux_amd64_project'],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath', GOROOT: goroot],
                 resource)
     }
 
     @Test
     void 'command args should be rendered correctly'() {
         // when
-        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath'])
         // then
         verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project'],
-                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath', GOROOT: goroot],
                 resource)
     }
 
@@ -229,29 +193,5 @@ class DefaultBuildManagerTest {
         verify(stdoutLineConsumer).accept('anotherline')
         verify(stderrLineConsumer).accept('stderr')
         verify(retcodeConsumer).accept(0)
-    }
-
-    @Test(expected = BuildException)
-    void 'exception should be thrown if renaming vendor fails'() {
-        // given
-        IOUtils.mkdir(resource, 'vendor')
-        IOUtils.write(resource, '.vendor', '')
-        // then
-        manager.go(['build'], [:])
-    }
-
-    @Test(expected = BuildException)
-    void 'exception should be thrown if renaming .vendor back fails'() {
-        // given
-        IOUtils.mkdir(resource, 'vendor')
-        when(process.getInputStream()).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                IOUtils.mkdir(resource, 'vendor')
-                return new ByteArrayInputStream([] as byte[])
-            }
-        })
-        // then
-        manager.go(['build'], [:])
     }
 }

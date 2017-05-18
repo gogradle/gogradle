@@ -4,8 +4,6 @@
     <option name="urls">
       <list>
         <option value="file://$PROJECT_DIR$/.gogradle/project_gopath" />
-        <option value="file://$PROJECT_DIR$/.gogradle/build_gopath" />
-        <option value="file://$PROJECT_DIR$/.gogradle/test_gopath" />
       </list>
     </option>
   </component>

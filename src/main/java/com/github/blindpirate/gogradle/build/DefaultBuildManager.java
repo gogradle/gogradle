@@ -27,7 +27,6 @@ import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.Lists;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -39,7 +38,7 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -47,8 +46,6 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
@@ -57,21 +54,15 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 // ${projectRoot}
 // \- .gogradle
-//     |-- project_gopath
+//     \-- project_gopath
 //     |   \-- src
 //     |       \-- github.com/user/project -> ../../../../../..
-//     |-- build_gopath
-//     |   \-- src
-//     |       \-- <the dependencies>
-//     |-- test_gopath
-//     |   \-- src
-//     |       \-- <the dependencies>
+//     |
 //     \-- ${os}_${arch}_${outputName}
 //
 
 @Singleton
 public class DefaultBuildManager implements BuildManager {
-    private static final String GOPATH = "%s_gopath";
     private static final String PROJECT_GOPATH = "project_gopath";
     private static final String SRC = "src";
 
@@ -127,34 +118,9 @@ public class DefaultBuildManager implements BuildManager {
         }
     }
 
-    public Path getInstallationDirectory(String configuration) {
-        String gopathDirName = String.format(GOPATH, configuration);
-        return getGogradleBuildDir().resolve(gopathDirName);
-    }
-
     private Path getGogradleBuildDir() {
         return project.getRootDir().toPath()
                 .resolve(GogradleGlobal.GOGRADLE_BUILD_DIR_NAME);
-    }
-
-
-    private void renameVendorDuringBuild(Runnable runnable) {
-        File vendorDir = new File(project.getRootDir(), VENDOR_DIRECTORY);
-        File targetDir = new File(project.getRootDir(), "." + VENDOR_DIRECTORY);
-        try {
-            if (vendorDir.exists()) {
-                if (targetDir.exists() || !vendorDir.renameTo(targetDir)) {
-                    throw BuildException.cannotRenameVendorDir(targetDir);
-                }
-            }
-            runnable.run();
-        } finally {
-            if (targetDir.exists()) {
-                if (vendorDir.exists() || !targetDir.renameTo(vendorDir)) {
-                    throw BuildException.cannotRenameVendorDir(vendorDir);
-                }
-            }
-        }
     }
 
     @Override
@@ -168,9 +134,22 @@ public class DefaultBuildManager implements BuildManager {
                    Consumer<String> stdoutLineConsumer,
                    Consumer<String> stderrLineConsumer,
                    Consumer<Integer> retcodeConsumer) {
-        List<String> cmdAndArgs = asStringList(getGoBinary(), args);
-        cmdAndArgs.addAll(buildTagsArgs());
+        List<String> cmdAndArgs = asStringList(getGoBinary(), insertBuildTags(args));
         run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
+    }
+
+    private List<String> insertBuildTags(List<String> cmd) {
+        if (setting.getBuildTags().isEmpty() || cmd.isEmpty()) {
+            return cmd;
+        }
+
+        List<String> ret = new ArrayList<>(cmd);
+        // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
+        ret.add(1, "-tags");
+
+        String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
+        ret.add(2, "'" + tagsArg + "'");
+        return ret;
     }
 
     @Override
@@ -178,26 +157,12 @@ public class DefaultBuildManager implements BuildManager {
                     Consumer<String> stdoutLineConsumer,
                     Consumer<String> stderrLineConsumer,
                     Consumer<Integer> retcodeConsumer) {
-        renameVendorDuringBuild(() -> {
-            Map<String, String> finalEnv = determineEnv(env);
+        Map<String, String> finalEnv = determineEnv(env);
 
-            @SuppressWarnings("unchecked")
-            List<String> finalArgs = renderArgs(args, (Map) finalEnv);
+        @SuppressWarnings("unchecked")
+        List<String> finalArgs = renderArgs(args, (Map) finalEnv);
 
-            doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
-        });
-    }
-
-    private List<? extends String> buildTagsArgs() {
-        if (setting.getBuildTags().isEmpty()) {
-            return Collections.emptyList();
-        } else {
-            // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
-            List<String> ret = Lists.newArrayList("-tags");
-            String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
-            ret.add("'" + tagsArg + "'");
-            return ret;
-        }
+        doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
     }
 
     @SuppressWarnings("unchecked")
@@ -249,7 +214,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private Map<String, String> determineEnv(Map<String, String> env) {
-        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getTestGopath(),
+        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getProjectGopath(),
                 "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()),
                 "GOOS", Os.getHostOs().toString(),
                 "GOEXE", Os.getHostOs().exeExtension(),
@@ -263,23 +228,11 @@ public class DefaultBuildManager implements BuildManager {
     }
 
 
-    public String getBuildGopath() {
-        String projectGopath = getGogradleBuildDir()
+    public String getProjectGopath() {
+        return getGogradleBuildDir()
                 .resolve(PROJECT_GOPATH)
                 .toAbsolutePath()
                 .toString();
-        String buildGopath = getInstallationDirectory(BUILD)
-                .toAbsolutePath()
-                .toString();
-
-        return toUnixString(projectGopath + File.pathSeparator + buildGopath);
     }
 
-    public String getTestGopath() {
-        String testGopath = getInstallationDirectory(TEST)
-                .toAbsolutePath()
-                .toString();
-
-        return toUnixString(getBuildGopath() + File.pathSeparator + testGopath);
-    }
 }
