@@ -18,7 +18,6 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.common.GoSourceCodeFilter
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter
 import com.github.blindpirate.gogradle.support.OnlyOnPosix
 import com.github.blindpirate.gogradle.support.OnlyOnWindows

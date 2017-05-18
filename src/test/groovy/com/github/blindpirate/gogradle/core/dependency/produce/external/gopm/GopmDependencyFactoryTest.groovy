@@ -24,9 +24,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
-import static org.mockito.Matchers.eq
-import static org.mockito.Mockito.verify
-
 @RunWith(GogradleRunner)
 class GopmDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @InjectMocks

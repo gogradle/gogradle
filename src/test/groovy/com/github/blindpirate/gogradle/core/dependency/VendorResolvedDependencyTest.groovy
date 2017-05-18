@@ -39,7 +39,6 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
-import static groovy.util.StringTestUtil.*
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock

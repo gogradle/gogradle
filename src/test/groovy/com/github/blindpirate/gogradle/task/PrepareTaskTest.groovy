@@ -19,18 +19,15 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.IOUtils
-import org.gradle.api.Task
 import org.gradle.api.internal.GradleInternal
-import org.gradle.api.internal.tasks.TaskContainerInternal
-import org.gradle.api.invocation.Gradle
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Answers
 import org.mockito.Mock
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')

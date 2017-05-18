@@ -17,11 +17,7 @@
 
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
-import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
-import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import org.junit.Before
 import org.mockito.Mock

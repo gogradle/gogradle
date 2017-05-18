@@ -26,12 +26,8 @@ import org.mockito.ArgumentCaptor
 
 import java.util.function.Consumer
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.anyMap
-import static org.mockito.ArgumentMatchers.isNull
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 

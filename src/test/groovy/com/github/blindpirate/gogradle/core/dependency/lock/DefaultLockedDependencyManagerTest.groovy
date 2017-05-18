@@ -40,7 +40,6 @@ import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfaces
 import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.eq
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

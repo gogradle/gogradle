@@ -17,11 +17,7 @@
 
 package com.github.blindpirate.gogradle.util
 
-import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.*
 
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when

@@ -18,12 +18,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.dependency.lock.GogradleLockModel
-import com.github.blindpirate.gogradle.support.GitServer
-import com.github.blindpirate.gogradle.support.IntegrationTestSupport
-import com.github.blindpirate.gogradle.support.WithGitRepo
-import com.github.blindpirate.gogradle.support.WithGitRepos
-import com.github.blindpirate.gogradle.support.WithIsolatedUserhome
-import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.DataExchange
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
@@ -31,8 +26,6 @@ import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 
 @RunWith(GogradleRunner)
 @WithResource('')

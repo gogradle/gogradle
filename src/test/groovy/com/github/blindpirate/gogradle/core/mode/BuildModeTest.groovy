@@ -17,11 +17,11 @@
 
 package com.github.blindpirate.gogradle.core.mode
 
-import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 
 class BuildModeTest {
     GolangDependencySet declared = GolangDependencySet.empty()
