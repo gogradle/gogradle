@@ -34,20 +34,18 @@ class VendorTaskIntegrationTest extends IntegrationTestSupport {
     vendor/github.com/user/a
       |- a.go
       \- vendor/github.com/user/b
-          |- b.go
-          \- vendor/github.com/user/c
-             \- c.go
+          \- b.go
      */
 
     @Before
     void setUp() {
         IOUtils.write(resource, 'vendor/github.com/user/a/a.go', '')
         IOUtils.write(resource, 'vendor/github.com/user/a/vendor/github.com/user/b/b.go', '')
-        IOUtils.write(resource,
-                'vendor/github.com/user/a/vendor/github.com/user/b/vendor/github.com/user/c/c.go', '')
         IOUtils.write(resource, 'vendor/vendor.json', '')
 
         IOUtils.write(resource, '.tmp/b1/b1.go', '')
+        IOUtils.write(resource, '.tmp/b1/vendor/github.com/user/a/a1.go', '')
+        IOUtils.write(resource, '.tmp/b1/vendor/github.com/user/a/vendor/github.com/user/c/c1.go', '')
         IOUtils.write(resource, '.tmp/b2/b2.go', '')
         IOUtils.write(resource, '.tmp/d/d.go', '')
 
@@ -69,16 +67,16 @@ dependencies {
     @Test
     void 'vendor task should succeed'() {
         newBuild {
-            it.setJvmArguments('-Dgogradle.mode=DEVELOP')
             it.forTasks('goVendor')
         }
 
+        assert new File(resource, 'vendor/github.com/user/a/a1.go').exists()
         assert !new File(resource, 'vendor/github.com/user/a/vendor').exists()
-        assert new File(resource, 'vendor/github.com/user/a/a.go').exists()
         assert new File(resource, 'vendor/github.com/user/b/b1.go').exists()
         assert !new File(resource, 'vendor/github.com/user/b/vendor').exists()
-        assert !new File(resource, 'vendor/github.com/user/c/c.go').exists()
+        assert new File(resource, 'vendor/github.com/user/c/c1.go').exists()
         assert new File(resource, 'vendor/github.com/user/d/d.go').exists()
+        assert !new File(resource, 'vendor/vendor.json').exists()
     }
 
     @Override

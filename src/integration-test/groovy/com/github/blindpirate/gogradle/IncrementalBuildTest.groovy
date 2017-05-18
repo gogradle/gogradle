@@ -106,14 +106,6 @@ golang {
     }
 
     @Test
-    void 'modification to vendor should make dependencies updated'() {
-        build()
-        IOUtils.write(resource, 'vendor/a/b/c.go', 'modified')
-        build()
-        assertNotUpToDate()
-    }
-
-    @Test
     void 'modification to buildTags should make dependencies updated'() {
         build()
         IOUtils.write(resource, 'build.gradle', buildDotGradle + """

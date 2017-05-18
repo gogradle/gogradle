@@ -69,14 +69,14 @@ dependencies {
     @Test
     void 'exclusion in ancestor should succeed'() {
         newBuild {
-            it.forTasks('goDependencies', 'installBuildDependencies')
+            it.forTasks('goDependencies', 'goVendor')
         }
 
-        assert new File(resource, 'project/.gogradle/build_gopath/src/a/a.go').exists()
-        assert new File(resource, 'project/.gogradle/build_gopath/src/b/b.go').exists()
-        assert new File(resource, 'project/.gogradle/build_gopath/src/c/c.go').exists()
-        assert new File(resource, 'project/.gogradle/build_gopath/src/d/d.go').exists()
-        assert !new File(resource, 'project/.gogradle/build_gopath/src/e').exists()
+        assert new File(resource, 'project/vendor/a/a.go').exists()
+        assert new File(resource, 'project/vendor/b/b.go').exists()
+        assert new File(resource, 'project/vendor/c/c.go').exists()
+        assert new File(resource, 'project/vendor/d/d.go').exists()
+        assert !new File(resource, 'project/vendor/e').exists()
     }
 
     @Override

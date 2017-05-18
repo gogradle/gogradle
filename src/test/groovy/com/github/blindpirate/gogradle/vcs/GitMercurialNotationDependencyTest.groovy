@@ -107,7 +107,7 @@ class GitMercurialNotationDependencyTest {
     }
 
     @Test
-    void 'equals should succeed'() {
+    void 'equals and hashCode should succeed'() {
         assert dependency.equals(dependency)
         assert !dependency.equals(null)
         assert dependency != new LocalDirectoryDependency()
@@ -117,23 +117,22 @@ class GitMercurialNotationDependencyTest {
         dependency2.commit = 'commitId'
         dependency2.url = 'url'
         assert dependency == dependency2
+        assert dependency.hashCode() == dependency2.hashCode()
 
         dependency2.url = 'anotherurl'
         assert dependency != dependency2
+        assert dependency.hashCode() != dependency2.hashCode()
 
         dependency2.url = 'url'
         dependency2.name = 'github.com/a/c'
         assert dependency != dependency2
+        assert dependency.hashCode() != dependency2.hashCode()
 
         dependency2.name = 'github.com/a/b'
         dependency2.commit = 'anotherCommit'
 
         assert dependency != dependency2
-    }
-
-    @Test
-    void 'hashCode should succeed'() {
-        assert dependency.hashCode() == Objects.hash('commitId', ['url'], Objects.hash([] as Set, 'github.com/a/b', false))
+        assert dependency.hashCode() != dependency2.hashCode()
     }
 
     GitMercurialNotationDependency withNameAndCommit(String name, String commit) {

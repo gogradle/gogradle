@@ -37,7 +37,7 @@ class StringReverse extends IntegrationTestSupport {
         String buildDotGradle = """
 ${buildDotGradleBase}
 golang {
-    packagePath='sample'
+    packagePath='example'
 }
 dependencies {
     golang {
@@ -88,7 +88,7 @@ dependencies {
     void assertDependencyOutput() {
         // "golang.org/x/tools:0d047c8" -> "golang.org/x/tools"
         assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/, '').contains('''
-sample
+example
 \\-- github.com/golang/example
     \\-- golang.org/x/tools
 ''')

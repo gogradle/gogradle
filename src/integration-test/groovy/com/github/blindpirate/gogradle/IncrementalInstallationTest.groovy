@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.support.GitServer
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithGitRepos
 import com.github.blindpirate.gogradle.support.WithIsolatedUserhome
@@ -54,6 +55,7 @@ dependencies {
     golang {
         build 'localhost/a'
         build 'localhost/b'
+        build 'localhost/c'
     }
 }
 """)
@@ -62,14 +64,15 @@ dependencies {
     @Test
     void 'incremental installation should succeed'() {
         newBuild {
-            it.forTasks('installBuildDependencies')
+            it.forTasks('goVendor')
         }
 
-        assert new File(resource, '.gogradle/build_gopath/src/localhost/a/.CURRENT_VERSION').exists()
-        assert new File(resource, '.gogradle/build_gopath/src/localhost/b/.CURRENT_VERSION').exists()
-        assert !new File(resource, '.gogradle/build_gopath/src/localhost/c/.CURRENT_VERSION').exists()
+        assert new File(resource, 'vendor/localhost/a/a.go').exists()
+        assert new File(resource, 'vendor/localhost/b/b.go').exists()
+        assert new File(resource, 'vendor/localhost/c/c.go').exists()
 
-        IOUtils.write(resource, '.gogradle/build_gopath/src/localhost/b/IT_WILL_STAY', '')
+        IOUtils.write(resource, 'vendor/localhost/a/a.go', 'modified')
+
         writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
 golang {
@@ -85,20 +88,19 @@ repositories {
 
 dependencies {
     golang {
+        build 'localhost/a'
         build 'localhost/b'
-        build 'localhost/c'
     }
 }
 """)
 
-        newBuild {
-            it.forTasks('installBuildDependencies')
-        }
+        newBuild({
+            it.forTasks('goVendor')
+        }, ['--info'])
 
-        assert !new File(resource, '.gogradle/build_gopath/src/localhost/a/.CURRENT_VERSION').exists()
-        assert new File(resource, '.gogradle/build_gopath/src/localhost/b/.CURRENT_VERSION').exists()
-        assert new File(resource, '.gogradle/build_gopath/src/localhost/c/.CURRENT_VERSION').exists()
-        assert new File(resource, '.gogradle/build_gopath/src/localhost/b/IT_WILL_STAY').exists()
+        assert IOUtils.toString(new File(resource, 'vendor/localhost/a/a.go')) == ''
+        assert stdout.toString().contains('localhost/b is up-to-date')
+        assert !new File(resource, 'vendor/localhost/c').exists()
     }
 
     @Override

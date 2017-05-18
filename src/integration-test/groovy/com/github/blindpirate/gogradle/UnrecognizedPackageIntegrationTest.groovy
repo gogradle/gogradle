@@ -119,9 +119,9 @@ dependencies {
 
 """)
         newBuild {
-            it.forTasks('installBuildDependencies')
+            it.forTasks('goVendor')
         }
-        assert new File(resource, 'project/.gogradle/build_gopath/src/unrecognized2/helloworld.go').exists()
+        assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
     }
 
     @Test
