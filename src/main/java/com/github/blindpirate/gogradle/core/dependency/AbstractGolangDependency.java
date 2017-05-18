@@ -18,24 +18,23 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
-import com.google.common.collect.Sets;
+import com.google.common.collect.ImmutableSet;
 import org.gradle.api.artifacts.Dependency;
 
 import java.io.Serializable;
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
 public abstract class AbstractGolangDependency implements GolangDependency, Serializable {
-    public static final String ALL_DESCENDANTS = "...";
-    public static final String ONLY_CURRENT_FILES = ".";
+
     private String name;
 
     private boolean firstLevel;
 
     private GolangPackage golangPackage;
 
-    private Set<String> subpackages = Sets.newHashSet(ALL_DESCENDANTS);
+    private Set<String> subpackages = ImmutableSet.of(ALL_DESCENDANTS);
 
     public GolangPackage getPackage() {
         return golangPackage;
@@ -65,15 +64,24 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
 
     @Override
     public Set<String> getSubpackages() {
-        return new HashSet<>(subpackages);
+        return subpackages;
     }
 
-    public void setSubpackages(Set<String> subpackages) {
-        this.subpackages = subpackages;
+    public void setSubpackages(Collection<String> subpackages) {
+        this.subpackages = ImmutableSet.copyOf(subpackages);
+    }
+
+    public void setSubpackages(String subpackage) {
+        this.subpackages = ImmutableSet.of(subpackage);
+    }
+
+    // these two methods exist in case of user's typo and should should not be called internally
+    public void setSubpackage(Collection<String> subpackages) {
+        this.subpackages = ImmutableSet.copyOf(subpackages);
     }
 
     public void setSubpackage(String subpackage) {
-        this.subpackages = Sets.newHashSet(subpackage);
+        this.subpackages = ImmutableSet.of(subpackage);
     }
 
     @Override
@@ -119,7 +127,6 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
     public Object clone() {
         try {
             AbstractGolangDependency ret = (AbstractGolangDependency) super.clone();
-            ret.setSubpackages(this.getSubpackages());
             return ret;
         } catch (CloneNotSupportedException e) {
             return null;
