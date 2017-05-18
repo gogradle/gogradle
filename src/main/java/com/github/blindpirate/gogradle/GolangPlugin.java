@@ -101,11 +101,12 @@ public class GolangPlugin implements Plugin<Project> {
             golangTaskContainer.put((Class) entry.getValue(), task);
         });
 
-        project.afterEvaluate(p ->
-                asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
-                        task -> Go.class.cast(taskContainer.getByName(task)).addDefaultActionIfNoCustomActions())
-        );
+        project.afterEvaluate(this::afterEvaluate);
+    }
 
+    private void afterEvaluate(Project p) {
+        asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
+                task -> Go.class.cast(p.getTasks().getByName(task)).addDefaultActionIfNoCustomActions());
         project.getTasks().withType(Go.class)
                 .matching(task -> !task.getClass().getPackage().equals(GoBuildTask.class.getPackage()))
                 .forEach(task -> task.dependsOn(VENDOR_TASK_NAME));
