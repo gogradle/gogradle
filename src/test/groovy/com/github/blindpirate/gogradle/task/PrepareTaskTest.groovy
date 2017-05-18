@@ -61,34 +61,6 @@ class PrepareTaskTest extends TaskTest {
         verify(buildManager).ensureDotVendorDirNotExist()
         verify(buildManager).prepareSymbolicLinks()
         verify(buildConstraintManager).prepareConstraints()
-        verify(gogradleRootProject).initSingleton('github.com/my/project', resource)
-    }
-
-    @Test
-    void 'old gogradle.lock should be removed before locking'() {
-        // given
-        IOUtils.write(resource, 'gogradle.lock', '')
-        when(gradle.getStartParameter().getTaskNames()).thenReturn(["goLock"])
-        // when
-        task.prepare()
-        // then
-        assert !new File(resource, 'gogradle.lock').exists()
-
-        // given
-        IOUtils.write(resource, 'gogradle.lock', '')
-        when(gradle.getStartParameter().getTaskNames()).thenReturn(["gL"])
-        // when
-        task.prepare()
-        // then
-        assert !new File(resource, 'gogradle.lock').exists()
-
-        // given
-        IOUtils.write(resource, 'gogradle.lock', '')
-        when(gradle.getStartParameter().getTaskNames()).thenReturn(["gD"])
-        // when
-        task.prepare()
-        // then
-        assert new File(resource, 'gogradle.lock').exists()
     }
 
 }
