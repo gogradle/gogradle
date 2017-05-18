@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.common;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
+import com.github.blindpirate.gogradle.util.Assert;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -45,6 +46,7 @@ public class InSubpackagesPredicate implements Predicate<File> {
 
     @Override
     public boolean test(File file) {
+        Assert.isTrue(file.isFile());
         if (alwaysTrue) {
             return true;
         }
@@ -53,7 +55,7 @@ public class InSubpackagesPredicate implements Predicate<File> {
 
     private boolean fileIsInSubpackage(File file, File rootDir, String subpackage) {
         if (GolangDependency.ONLY_CURRENT_FILES.equals(subpackage)) {
-            return file.isFile() && file.getParentFile().equals(rootDir);
+            return file.getParentFile().equals(rootDir);
         } else {
             Path subpackagePath = rootDir.toPath().resolve(subpackage);
             return file.toPath().startsWith(subpackagePath.normalize());

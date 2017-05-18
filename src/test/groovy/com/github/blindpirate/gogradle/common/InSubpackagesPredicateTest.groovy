@@ -26,44 +26,41 @@ import org.junit.runner.RunWith
 import static com.github.blindpirate.gogradle.common.InSubpackagesPredicate.*
 
 @RunWith(GogradleRunner)
+@WithResource('')
 class InSubpackagesPredicateTest extends FileFilterTest {
 
     @Test
     void 'subpackages ... should accept everything'() {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['...'] as Set)
-        assert predicate.test(null)
-        assert predicate.test(new File(''))
+        assert predicate.test(touch('a'))
+        assert predicate.test(touch('.a'))
+        assert predicate.test(touch('_a/.a'))
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'testing a directory should cause an exception'() {
+        withRootDirAndSubpackages(resource, [] as Set).test(resource)
     }
 
     @Test
-    @WithResource('')
     void 'subpackage . should only accept file in rootDir'() {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['.'] as Set)
         assert predicate.test(touch('file1'))
         assert !predicate.test(touch('dir1/file1'))
-        assert !predicate.test(mkdir('dir2'))
-        assert !predicate.test(mkdir('dir2/file2'))
     }
 
     @Test
-    @WithResource('')
     void 'ordinary subpackage should take effect'() {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['a', 'b', 'c/d'] as Set)
         assert predicate.test(touch('a/file'))
         assert predicate.test(touch('a/dir/file'))
-        assert predicate.test(mkdir('b/dir'))
-        assert predicate.test(mkdir('b/dir/dir'))
-        assert !predicate.test(mkdir('dir'))
         assert !predicate.test(touch('file'))
 
         assert predicate.test(touch('c/d'))
         IOUtils.forceDelete(new File(resource, 'c/d'))
 
-        assert predicate.test(mkdir('c/d'))
         assert predicate.test(touch('c/d/file'))
-        assert predicate.test(mkdir('c/d/dir'))
         assert !predicate.test(touch('c/file'))
-        assert !predicate.test(mkdir('c/dir'))
     }
 
 }
