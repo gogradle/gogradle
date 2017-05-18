@@ -21,10 +21,10 @@ import com.github.blindpirate.gogradle.antlr.GolangBuildInfoBaseListener;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoLexer;
 import com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
+import com.github.blindpirate.gogradle.common.InSubpackagesPredicate;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.ImmutableMap;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -38,32 +38,30 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildOptionContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTagContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.BuildTermContext;
 import static com.github.blindpirate.gogradle.antlr.GolangBuildInfoParser.ImportPathContext;
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 
 @Singleton
 public class GoImportExtractor {
     private final BuildConstraintManager buildConstraintManager;
-
-    public static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
-            BUILD, GoSourceCodeFilter.BUILD_GO_FILTER,
-            TEST, GoSourceCodeFilter.TEST_GO_FILTER
-    );
 
     @Inject
     public GoImportExtractor(BuildConstraintManager buildConstraintManager) {
         this.buildConstraintManager = buildConstraintManager;
     }
 
-    public Set<String> getImportPaths(File dir, String configuration) {
-        Collection<File> files = IOUtils.filterFilesRecursively(dir, FILTERS.get(configuration));
+    public Set<String> getImportPaths(File dir, Set<String> subpackages, String configuration) {
+        Predicate<File> buildOrTest = GoSourceCodeFilter.PREDICATES.get(configuration);
+        Predicate<File> inSubpackages = InSubpackagesPredicate.withRootDirAndSubpackages(dir, subpackages);
+
+        GoSourceCodeFilter sourceCodeFilter = GoSourceCodeFilter.withPredicate(buildOrTest.and(inSubpackages));
+
+        Collection<File> files = IOUtils.filterFilesRecursively(dir, sourceCodeFilter);
 
         return files.stream().map(IOUtils::toString)
                 .map(this::extract)
