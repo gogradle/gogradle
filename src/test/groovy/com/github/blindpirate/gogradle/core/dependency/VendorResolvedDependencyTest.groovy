@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -154,6 +155,12 @@ class VendorResolvedDependencyTest {
         assert dependency == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency != VendorResolvedDependency.fromParent('github.com/a/c', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency.hashCode() == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b')).hashCode()
+    }
+
+    @Test
+    void "its cache scope should be host's"() {
+        when(hostDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
+        assert dependency.getCacheScope() == CacheScope.BUILD
     }
 
 }
