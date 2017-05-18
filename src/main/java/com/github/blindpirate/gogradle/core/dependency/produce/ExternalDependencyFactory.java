@@ -68,7 +68,7 @@ public abstract class ExternalDependencyFactory {
     }
 
     public boolean canRecognize(File rootDir) {
-        return identityFile(rootDir).exists();
+        return identityFile(rootDir).isFile();
     }
 
     private List<Map<String, Object>> removeStandardPackages(List<Map<String, Object>> packages) {

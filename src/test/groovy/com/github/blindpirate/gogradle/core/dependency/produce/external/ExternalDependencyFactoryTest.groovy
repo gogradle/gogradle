@@ -23,8 +23,6 @@ import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
 
 import java.nio.file.Path
