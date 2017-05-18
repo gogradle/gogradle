@@ -26,12 +26,14 @@ import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDepen
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
@@ -56,32 +58,37 @@ class SourceCodeDependencyFactoryTest {
 
     @Mock
     ResolvedDependency resolvedDependency
-    @Mock
-    GolangDependency dependency
 
     @Before
     void setUp() {
         extractor = new GoImportExtractor(buildConstraintManager)
         factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor)
         when(resolvedDependency.getName()).thenReturn('root/package')
+        when(resolvedDependency.getSubpackages()).thenReturn(['...'] as Set)
         when(buildConstraintManager.getAllConstraints()).thenReturn([] as Set)
-        when(notationParser.parse('github.com/a/b')).thenReturn(dependency)
-        when(dependency.getName()).thenReturn('github.com/a/b')
         when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                String name = invocation.getArgument(0)
-                if (name.startsWith('github.com')) {
+                String path = invocation.getArgument(0)
+                if (path.startsWith('github.com')) {
+                    String rootPath = path.split('/')[0..2].join('/')
                     GolangPackage ret = VcsGolangPackage.builder()
-                            .withPath(name)
-                            .withRootPath('github.com/a/b')
-                            .withOriginalVcsInfo(VcsType.GIT, ['https://github.com/a/b.git'])
+                            .withPath(path)
+                            .withRootPath(rootPath)
+                            .withOriginalVcsInfo(VcsType.GIT, ["https://${rootPath}.git"])
                             .build()
                     return Optional.of(ret)
                 } else {
-                    GolangPackage standardPackage = StandardGolangPackage.of(name)
+                    GolangPackage standardPackage = StandardGolangPackage.of(path)
                     return Optional.of(standardPackage)
                 }
+            }
+        })
+
+        when(notationParser.parse(anyString())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return DependencyUtils.mockWithName(GolangDependency, invocation.getArgument(0))
             }
         })
     }
@@ -143,7 +150,7 @@ func main(){}
         GolangDependencySet result = factory.produce(resolvedDependency, resource, 'build')
         // then
         assert result.size() == 1
-        assert result.any { it.is(dependency) }
+        assert result.first().name == 'github.com/a/b'
     }
 
     @Test
@@ -154,27 +161,68 @@ func main(){}
         GolangDependencySet result = factory.produce(resolvedDependency, resource, 'test')
         // then
         assert result.size() == 1
-        assert result.any { it.is(dependency) }
+        assert result.first().name == 'github.com/a/b'
     }
 
     @Test
     void 'directory should be searched recursively'() {
         // given
-        File sub = new File(resource, 'sub')
-        File subsub = new File(sub, 'sub')
-        IOUtils.forceMkdir(sub)
-        IOUtils.forceMkdir(sub)
-        IOUtils.write(subsub, 'main.go', mainDotGo)
-        IOUtils.write(subsub, 'main_test.go', mainDotGo)
-        IOUtils.write(subsub, 'garbage', 'This is unused')
+        IOUtils.write(resource, 'sub/sub/main.go', mainDotGo)
+        IOUtils.write(resource, 'sub/sub/main_test.go', mainDotGo)
+        IOUtils.write(resource, 'sub/sub/garbage', 'This is useless')
         // when
         GolangDependencySet buildResult = factory.produce(resolvedDependency, resource, 'build')
         GolangDependencySet testResult = factory.produce(resolvedDependency, resource, 'test')
         // then
         assert buildResult.size() == 1
-        assert buildResult.any { it.is(dependency) }
+        assert buildResult.first().name == 'github.com/a/b'
         assert testResult.size() == 1
-        assert testResult.any { it.is(dependency) }
+        assert testResult.first().name == 'github.com/a/b'
+    }
+
+    @Test
+    void 'searched with subpackages should succeed'() {
+        /*
+        a
+        |--b
+        |  |-- c
+        |  |   \- c.go
+        |  |
+        |  \-- d
+        |      \- d.go
+        \--e
+           \-- f
+               \-- f.go
+         */
+        // given
+        IOUtils.write(resource, 'a/b/c/c.go', '''
+package main
+import (
+    "github.com/my/c"
+)
+func Whatever(){}
+''')
+        IOUtils.write(resource, 'a/b/d/d.go', '''
+package main
+import (
+    "github.com/my/d"
+)
+func Whatever(){}
+''')
+        IOUtils.write(resource, 'a/e/f/f.go', '''
+package main
+import (
+    "github.com/my/f"
+)
+func Whatever(){}
+''')
+        when(resolvedDependency.getSubpackages()).thenReturn(['a/b/d', 'a/e'] as Set)
+        // when
+        GolangDependencySet buildResult = factory.produce(resolvedDependency, resource, 'build')
+        // then
+        assert buildResult.size() == 2
+        assert buildResult.any { it.name == 'github.com/my/d' }
+        assert buildResult.any { it.name == 'github.com/my/f' }
     }
 
     @Test
@@ -258,6 +306,7 @@ func main(){}
     void 'exception should be thrown if import package cannot be recognized'() {
         // given
         IOUtils.write(resource, 'main.go', mainDotGo)
+        Mockito.reset(notationParser, packagePathResolver)
         ['github.com/a/b', 'github.com/a/b/c', 'github.com/a/b/c/d'].each {
             when(packagePathResolver.produce(it)).thenReturn(Optional.of(UnrecognizedGolangPackage.of(it)))
             when(notationParser.parse(it)).thenReturn(UnrecognizedNotationDependency.of(UnrecognizedGolangPackage.of(it)))

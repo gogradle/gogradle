@@ -27,9 +27,11 @@ import com.google.inject.Inject
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
+
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
+@WithResource('example-master.zip')
 class SourceCodeAnalysisTest extends GogradleModuleSupport {
 
     @Inject
@@ -40,17 +42,24 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     @Mock
     ResolvedDependency resolvedDependency
 
-    @WithResource('golang-example-master.zip')
     @Test
     @AccessWeb
     void 'imports should be parsed correctly'() {
+        assertImportsAre(['...'] as Set, ['golang.org/x/tools', 'github.com/golang/example'] as Set)
+        assertImportsAre(['.'] as Set, [] as Set)
+        assertImportsAre(['.', 'hello'] as Set, ['github.com/golang/example'] as Set)
+        assertImportsAre(['.', 'hello', 'gotypes/skeleton'] as Set, ['golang.org/x/tools', 'github.com/golang/example'] as Set)
+    }
+
+    void assertImportsAre(Set subpackages, Set expect) {
         // given
-        Mockito.when(resolvedDependency.getName()).thenReturn("name")
+        when(resolvedDependency.getName()).thenReturn("name")
+        when(resolvedDependency.getSubpackages()).thenReturn(subpackages as Set)
+
         // when
         GolangDependencySet result = factory.produce(resolvedDependency, resource, 'build')
 
         // then
-        def expectation = ['golang.org/x/tools', 'github.com/golang/example'] as Set
-        assert result.collect { it.name } as Set == expectation
+        assert result.collect { it.name } as Set == expect
     }
 }
