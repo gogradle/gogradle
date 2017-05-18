@@ -29,18 +29,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RENAME_VENDOR_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 
 public class VscodeTask extends AbstractGolangTask {
     @Inject
     private BuildManager buildManager;
 
     public VscodeTask() {
-        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
-                INSTALL_TEST_DEPENDENCIES_TASK_NAME,
-                RENAME_VENDOR_TASK_NAME);
+        dependsOn(VENDOR_TASK_NAME);
     }
 
     @TaskAction
@@ -54,7 +50,7 @@ public class VscodeTask extends AbstractGolangTask {
         @SuppressWarnings("unchecked")
         Map<String, Object> model = DataExchange.parseJson(json, Map.class);
         // https://github.com/Microsoft/vscode-go/wiki/GOPATH-in-the-VS-Code-Go-extension
-        model.put("go.gopath", buildManager.getTestGopath());
+        model.put("go.gopath", buildManager.getProjectGopath());
         IOUtils.write(settingsDotJson, DataExchange.toJson(model));
     }
 

@@ -43,19 +43,14 @@ class VscodeTaskTest extends TaskTest {
         task = buildTask(VscodeTask)
         if (resource != null) {
             when(project.getRootDir()).thenReturn(resource)
-            String projectGopath = StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
-            String buildGopath = StringUtils.toUnixString(new File(resource, '.gogradle/build_gopath'))
-            String testGopath = StringUtils.toUnixString(new File(resource, '.gogradle/test_gopath'))
-            gopath = projectGopath + File.pathSeparator + buildGopath + File.pathSeparator + testGopath
-            when(buildManager.getTestGopath()).thenReturn(gopath)
+            gopath = StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
+            when(buildManager.getProjectGopath()).thenReturn(gopath)
         }
     }
 
     @Test
     void 'it should depend on installTestDependencies and renameVendorDependencies'() {
-        assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, RENAME_VENDOR_TASK_NAME)
+        assertTaskDependsOn(task, VENDOR_TASK_NAME)
     }
 
 
@@ -63,7 +58,6 @@ class VscodeTaskTest extends TaskTest {
     @Test
     void 'adding project gopath to settings.json should succeed when it exists'() {
         // given
-        when(buildManager.getTestGopath()).thenReturn(gopath)
         IOUtils.write(new File(resource, '.vscode/settings.json'), '''
 // Place your settings in this file to overwrite default and user settings.
 {
