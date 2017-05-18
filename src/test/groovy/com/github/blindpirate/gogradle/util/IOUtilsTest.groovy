@@ -116,21 +116,32 @@ class IOUtilsTest {
 
     @Test
     void 'copying empty file should succeed'() {
-        IOUtils.write(resource, 'src/1.go', '')
+        /*
+        a
+        |--b
+        |  |-- c
+        |  |   \- c.go
+        |  |
+        |  \-- d
+        |      \- d.go
+        \--e
+           \-- f
+               \-- f.go
+         */
+        IOUtils.write(resource, 'src/a/b/c/c.go', '1')
+        IOUtils.write(resource, 'src/a/b/d/d.go', '2')
+        IOUtils.write(resource, 'src/a/e/f/f.go', '3')
         IOUtils.mkdir(resource, 'dest')
 
-        IOUtils.copyDirectory(new File(resource, 'src'), new File(resource, 'dest'), DependencyInstallFileFilter.INSTANCE)
-        assert new File(resource, 'dest/1.go').exists()
+        IOUtils.copyDependencies(new File(resource, 'src'), new File(resource, 'dest'), ['a/b/d', 'a/e'] as Set)
+        assert new File(resource, 'dest/a/b/d/d.go').exists()
+        assert new File(resource, 'dest/a/e/f/f.go').exists()
+        assert !new File(resource, 'dest/a/b/c').exists()
     }
 
     @Test(expected = UncheckedIOException)
     void 'exception should be thrown when copying src or dest is invalid'() {
         IOUtils.copyDirectory(new File(resource, 'invalid'), new File(resource, 'invalid'))
-    }
-
-    @Test(expected = UncheckedIOException)
-    void 'exception should be thrown when copying src or dest is invalid 2'() {
-        IOUtils.copyDirectory(new File(resource, 'invalid'), new File(resource, 'invalid'), TrueFileFilter.INSTANCE)
     }
 
     @Test
