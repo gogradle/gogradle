@@ -269,4 +269,13 @@ class GolangPluginTest {
     void 'getting root dir from injector should succeed'() {
         assert GogradleGlobal.getInstance(Project).getRootDir()
     }
+
+    @Test
+    void 'abbr for DEV/REP should succeed'() {
+        project.golang {
+            buildMode = project.DEV
+        }
+
+        assert GogradleGlobal.getInstance(GolangPluginSetting.class).buildMode == BuildMode.DEVELOP
+    }
 }
