@@ -30,11 +30,9 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
-
 /**
- * In {@code DEVELOP} mode, dependencies in build.gradle have top priority.
- * In {@code REPRODUCIBLE} mode, dependencies in vendor (or settings.gradle) have top priority.
+ * In {@code DEVELOP} mode, dependencies in build.gradle have higher priority.
+ * In {@code REPRODUCIBLE} mode, dependencies in gogradle.lock have higher priority.
  * <p>
  * Additionally, if there aren't any dependencies in build.gradle,
  * a scan for external dependency management tools will be performed.
@@ -58,43 +56,29 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
     @DebugLog
     @Override
     public GolangDependencySet produce(ResolvedDependency dependency,
-                                       File rootDir,
+                                       File projectRoot,
                                        DependencyVisitor visitor,
                                        String configuration) {
-        // Here we can just fetch them from internal container
-        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
-        GolangDependencySet vendorDependencies = getVendorDependencies(visitor, dependency, rootDir, configuration);
-        GolangDependencySet lockedDependencies = getDependenciesInGogradleDotLock(rootDir, configuration);
-
-        GolangDependencySet result = settings.getBuildMode()
-                .determine(declaredDependencies, vendorDependencies, lockedDependencies);
+        GolangDependencySet result = determineDependencies(projectRoot, configuration);
 
         setFirstLevel(result);
 
         if (result.isEmpty()) {
-            return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
+            return visitor.visitSourceCodeDependencies(dependency, projectRoot, configuration);
         } else {
             return result;
         }
     }
 
-    private GolangDependencySet getDependenciesInGogradleDotLock(File rootDir, String configuration) {
-        if (lockedDependencyManager.canRecognize(rootDir)) {
-            return lockedDependencyManager.produce(rootDir, configuration);
+    private GolangDependencySet determineDependencies(File projectRoot, String configuration) {
+        // Here we can just fetch them from internal container
+        GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
+        if (lockedDependencyManager.canRecognize(projectRoot)) {
+            // gogradle.lock exists
+            GolangDependencySet lockedDependencies = lockedDependencyManager.produce(projectRoot, configuration);
+            return settings.getBuildMode().determine(declaredDependencies, lockedDependencies);
         } else {
-            return GolangDependencySet.empty();
-        }
-
-    }
-
-    private GolangDependencySet getVendorDependencies(DependencyVisitor visitor,
-                                                      ResolvedDependency dependency,
-                                                      File rootDir,
-                                                      String configuration) {
-        if (TEST.equals(configuration)) {
-            return GolangDependencySet.empty();
-        } else {
-            return visitor.visitVendorDependencies(dependency, rootDir, configuration);
+            return declaredDependencies;
         }
     }
 
