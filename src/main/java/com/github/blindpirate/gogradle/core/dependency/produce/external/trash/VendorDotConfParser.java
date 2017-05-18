@@ -22,15 +22,13 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.base.CharMatcher;
 
 import java.io.File;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.OptionalInt;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.external.trash.VersionConverter.determineVersionAndPutIntoMap;
+import static com.github.blindpirate.gogradle.core.dependency.produce.external.trash.SimpleConfFileHelper.determineVersionAndPutIntoMap;
+import static com.github.blindpirate.gogradle.core.dependency.produce.external.trash.SimpleConfFileHelper.removeComment;
 
 /**
  * Parses vendor.conf in repos managed by trash.
@@ -44,7 +42,7 @@ public class VendorDotConfParser {
     public List<Map<String, Object>> parse(File file) {
         List<String> lines = IOUtils.readLines(file);
         return lines.stream()
-                .filter(this::isNotCommentLine)
+                .filter(SimpleConfFileHelper::isNotCommentLine)
                 .filter(StringUtils::isNotBlank)
                 .filter(this::isNotPackageDeclareLine)
                 .map(this::toNotation)
@@ -73,16 +71,5 @@ public class VendorDotConfParser {
             ret.put("url", array[2]);
         }
         return ret;
-    }
-
-    private String[] removeComment(String[] array) {
-        OptionalInt index = IntStream.range(0, array.length)
-                .filter(i -> array[i].startsWith("#"))
-                .findFirst();
-        return index.isPresent() ? Arrays.copyOfRange(array, 0, index.getAsInt()) : array;
-    }
-
-    private boolean isNotCommentLine(String line) {
-        return !line.trim().startsWith("#");
     }
 }

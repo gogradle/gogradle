@@ -50,7 +50,7 @@ public class VendorDotConfYamlModel {
                     "name", packageX,
                     "url", repo,
                     "transitive", false);
-            VersionConverter.determineVersionAndPutIntoMap(ret, version);
+            SimpleConfFileHelper.determineVersionAndPutIntoMap(ret, version);
             return ret;
         }
     }
