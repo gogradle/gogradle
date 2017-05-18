@@ -41,8 +41,6 @@ class IdeaTaskTest extends TaskTest {
         task.generateXmlsForIdea()
         // then
         verify(ideaIntegration).generateXmls()
-        assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, RENAME_VENDOR_TASK_NAME)
+        assertTaskDependsOn(task, VENDOR_TASK_NAME)
     }
 }

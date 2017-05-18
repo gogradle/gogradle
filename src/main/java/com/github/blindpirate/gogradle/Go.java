@@ -33,8 +33,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 
 public class Go extends AbstractGolangTask {
@@ -55,9 +53,7 @@ public class Go extends AbstractGolangTask {
     }
 
     public Go() {
-        dependsOn(PREPARE_TASK_NAME,
-                INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
-                INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(PREPARE_TASK_NAME);
         buildManager = GogradleGlobal.getInstance(BuildManager.class);
     }
 

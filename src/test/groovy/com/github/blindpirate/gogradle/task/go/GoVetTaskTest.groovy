@@ -28,6 +28,7 @@ import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.isNull
@@ -47,8 +48,7 @@ class GoVetTaskTest extends TaskTest {
 
     @Test
     void 'it should depend on install tasks'() {
-        assertTaskDependsOn(task, INSTALL_TEST_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, INSTALL_BUILD_DEPENDENCIES_TASK_NAME)
+        assertTaskDependsOn(task, VENDOR_TASK_NAME)
     }
 
     @Test
