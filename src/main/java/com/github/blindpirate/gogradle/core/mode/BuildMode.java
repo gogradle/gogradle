@@ -24,22 +24,14 @@ public enum BuildMode {
         @Override
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet lockedDependencies) {
-            if (declaredDependencies.isEmpty()) {
-                return lockedDependencies;
-            } else {
-                return declaredDependencies;
-            }
+            return declaredDependencies;
         }
     },
     REPRODUCIBLE("REP") {
         @Override
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                              GolangDependencySet lockedDependencies) {
-            if (lockedDependencies.isEmpty()) {
-                return declaredDependencies;
-            } else {
-                return lockedDependencies;
-            }
+            return lockedDependencies;
         }
     };
 
