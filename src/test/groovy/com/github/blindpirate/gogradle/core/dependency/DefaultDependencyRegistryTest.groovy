@@ -121,19 +121,4 @@ class DefaultDependencyRegistryTest {
         assert registry.retrieve('resolvedDependency').is(resolvedDependency1)
     }
 
-    @Test
-    void 'duplicated first-level vendor package should be registered successfully'() {
-        // given
-        VendorResolvedDependency dependency1 = DependencyUtils.mockWithName(VendorResolvedDependency, 'name')
-        VendorResolvedDependency dependency2 = DependencyUtils.mockWithName(VendorResolvedDependency, 'name')
-        when(dependency1.isFirstLevel()).thenReturn(true)
-        when(dependency2.isFirstLevel()).thenReturn(true)
-
-        // then
-        assert registry.register(dependency1)
-        assert !registry.register(dependency2)
-
-        when(dependency2.getUpdateTime()).thenReturn(1L)
-        assert registry.register(dependency2)
-    }
 }
