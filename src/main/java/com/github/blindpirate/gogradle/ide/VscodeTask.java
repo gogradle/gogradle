@@ -50,7 +50,7 @@ public class VscodeTask extends AbstractGolangTask {
         @SuppressWarnings("unchecked")
         Map<String, Object> model = DataExchange.parseJson(json, Map.class);
         // https://github.com/Microsoft/vscode-go/wiki/GOPATH-in-the-VS-Code-Go-extension
-        model.put("go.gopath", buildManager.getProjectGopath());
+        model.put("go.gopath", buildManager.getGopath());
         IOUtils.write(settingsDotJson, DataExchange.toJson(model));
     }
 
