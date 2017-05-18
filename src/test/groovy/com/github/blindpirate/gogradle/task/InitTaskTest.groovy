@@ -113,8 +113,8 @@ dependencies {
         // given
         GolangDependencySet ab = asGolangDependencySet(mockDependency('a'), mockDependency('b'))
         GolangDependencySet bc = asGolangDependencySet(mockDependency('b'), mockDependency('c'))
-        when(visitor.visitSourceCodeDependencies(null, resource, 'build')).thenReturn(ab)
-        when(visitor.visitSourceCodeDependencies(null, resource, 'test')).thenReturn(bc)
+        when(visitor.visitSourceCodeDependencies(gogradleRootProject, resource, 'build')).thenReturn(ab)
+        when(visitor.visitSourceCodeDependencies(gogradleRootProject, resource, 'test')).thenReturn(bc)
         // when
         task.init()
         // then

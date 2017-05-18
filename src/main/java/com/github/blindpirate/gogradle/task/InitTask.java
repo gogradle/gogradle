@@ -50,13 +50,13 @@ public class InitTask extends AbstractGolangTask {
     private List<ExternalDependencyFactory> externalDependencyFactories;
 
     @Inject
+    private GogradleRootProject gogradleRootProject;
+
+    @Inject
     private DependencyVisitor visitor;
 
     @Inject
     private GolangConfigurationManager configurationManager;
-
-    @Inject
-    private GogradleRootProject rootProject;
 
     public InitTask() {
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
@@ -85,14 +85,14 @@ public class InitTask extends AbstractGolangTask {
     }
 
     private void initBySourceCodeScan(File rootDir) {
-        GolangDependencySet buildDependencies = visitor.visitSourceCodeDependencies(rootProject, rootDir, BUILD);
-        GolangDependencySet testDependencies = visitor.visitSourceCodeDependencies(rootProject, rootDir, TEST);
+        GolangDependencySet buildDeps = visitor.visitSourceCodeDependencies(gogradleRootProject, rootDir, BUILD);
+        GolangDependencySet testDeps = visitor.visitSourceCodeDependencies(gogradleRootProject, rootDir, TEST);
 
-        testDependencies.removeAll(buildDependencies);
+        testDeps.removeAll(buildDeps);
 
         appendToBuildDotGradle(rootDir,
-                convertToNotationMaps(buildDependencies),
-                convertToNotationMaps(testDependencies));
+                convertToNotationMaps(buildDeps),
+                convertToNotationMaps(testDeps));
     }
 
     private List<Map<String, Object>> convertToNotationMaps(GolangDependencySet set) {
