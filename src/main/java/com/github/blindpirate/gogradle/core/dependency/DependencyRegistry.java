@@ -24,12 +24,18 @@ package com.github.blindpirate.gogradle.core.dependency;
  */
 public interface DependencyRegistry {
     /**
-     * Registers a dependency
+     * Registers a dependency. In this course, conflicts will be resolved or thrown.
      *
      * @param dependency The dependency to register
-     * @return True if the dependency is newer than existing dependency with same name.
+     * @return @{code true}if the dependency is newer than existing dependency with same name, @{code false} otherwise.
      */
     boolean register(ResolvedDependency dependency);
 
+    /**
+     * Retrieve a registered dependency from the registry.
+     *
+     * @param name the name of dependency to be retrieved
+     * @return the corresponding dependency, @{code null} if it does not exist in this registry
+     */
     ResolvedDependency retrieve(String name);
 }
