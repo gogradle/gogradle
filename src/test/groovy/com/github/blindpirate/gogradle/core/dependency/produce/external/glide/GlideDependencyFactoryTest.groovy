@@ -116,7 +116,7 @@ imports:
 '''
 
     @Test
-    void 'extra properties in glide.lock should be success'() {
+    void 'extra properties in glide.lock should succeed'() {
         // given
         prepareGlideDotLock(glideDotLockWithExtraAndMissingProperties)
         // when
@@ -128,6 +128,12 @@ imports:
                          transitive: false])
     }
 
+    @Test
+    void 'corrupt glide.lock should not cause exception'() {
+        prepareGlideDotLock('hash: xxx')
+        assert factory.produce(resource, 'build').isEmpty()
+        assert factory.produce(resource, 'test').isEmpty()
+    }
 
     void prepareGlideDotLock(String glideDotLock) {
         IOUtils.write(resource, 'glide.lock', glideDotLock)
