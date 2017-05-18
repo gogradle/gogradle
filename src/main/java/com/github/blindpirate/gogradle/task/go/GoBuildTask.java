@@ -114,7 +114,6 @@ public class GoBuildTask extends Go {
         List<Map<String, String>> ret = targetPlatforms.stream()
                 .map(this::pairToEnv)
                 .collect(Collectors.toList());
-        ret.forEach(env -> env.put("GOPATH", buildManager.getProjectGopath()));
         return ret;
     }
 

@@ -47,7 +47,7 @@ class GoBuildTaskTest extends TaskTest {
     void setUp() {
         task = buildTask(GoBuildTask)
         task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
-        when(buildManager.getProjectGopath()).thenReturn('project_gopath')
+        when(buildManager.getGopath()).thenReturn('project_gopath')
         when(setting.getPackagePath()).thenReturn('my/package')
     }
 
@@ -65,9 +65,9 @@ class GoBuildTaskTest extends TaskTest {
                  ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
                 ]
         assert envCaptor.allValues == [
-                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath'],
-                [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'project_gopath'],
-                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'project_gopath']
+                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: ''],
+                [GOOS: 'linux', GOARCH: '386', GOEXE: ''],
+                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
         ]
     }
 
@@ -122,9 +122,9 @@ class GoBuildTaskTest extends TaskTest {
                 ['build', '-o', 'output']
         ]
         assert envCaptor.allValues == [
-                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath'],
-                [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'project_gopath'],
-                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'project_gopath']
+                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: ''],
+                [GOOS: 'linux', GOARCH: '386', GOEXE: '',],
+                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
         ]
     }
 
