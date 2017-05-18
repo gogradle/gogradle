@@ -43,6 +43,7 @@ class VcsResolvedDependencyTest {
     void setUp() {
         when(notationDependency.getTransitiveDepExclusions()).thenReturn([exclusionSpec] as Set)
         when(notationDependency.getName()).thenReturn('package')
+        when(notationDependency.getSubpackages()).thenReturn(['...'] as Set)
     }
 
     VcsResolvedDependency newResolvedDependency(VcsType type) {
@@ -66,6 +67,15 @@ class VcsResolvedDependencyTest {
         VcsResolvedDependency dependency = newResolvedDependency(VcsType.GIT)
         // then
         assert dependency.toLockedNotation() == [name: 'package', commit: 'commitId', vcs: 'git', url: 'url']
+    }
+
+    @Test
+    void 'a resolved dependency with subpackages should be converted to notation successfully'() {
+        // given
+        VcsResolvedDependency dependency = newResolvedDependency(VcsType.GIT)
+        dependency.setSubpackages(['.'])
+        // then
+        assert dependency.toLockedNotation() == [name: 'package', commit: 'commitId', vcs: 'git', url: 'url', subpackages: ['.']]
     }
 
     @Test
