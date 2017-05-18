@@ -18,6 +18,8 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.common.GoSourceCodeFilter
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter
 import com.github.blindpirate.gogradle.support.OnlyOnPosix
 import com.github.blindpirate.gogradle.support.OnlyOnWindows
 import com.github.blindpirate.gogradle.support.WithResource
@@ -111,6 +113,15 @@ class IOUtilsTest {
         IOUtils.mkdir(resource, 'dest')
         IOUtils.copyDirectory(new File(resource, 'src'), new File(resource, 'dest'))
         assert new File(resource, 'dest/file').exists()
+    }
+
+    @Test
+    void 'copying empty file should succeed'() {
+        IOUtils.write(resource, 'src/1.go', '')
+        IOUtils.mkdir(resource, 'dest')
+
+        IOUtils.copyDirectory(new File(resource, 'src'), new File(resource, 'dest'), DependencyInstallFileFilter.INSTANCE)
+        assert new File(resource, 'dest/1.go').exists()
     }
 
     @Test(expected = UncheckedIOException)

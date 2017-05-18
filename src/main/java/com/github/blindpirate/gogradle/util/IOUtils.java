@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
 import java.io.FileFilter;
@@ -224,6 +225,10 @@ public final class IOUtils {
         return FileUtils.listFiles(dir, fileFilter, dirFilter);
     }
 
+    public static Collection<File> listAllDescendents(File dir) {
+        return FileUtils.listFilesAndDirs(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
+    }
+
     public static void clearDirectory(File dir) {
         try {
             if (dir == null || !dir.exists()) {
@@ -311,7 +316,7 @@ public final class IOUtils {
         }
     }
 
-    public static void markAndDelete(File rootDir, Predicate<File> predicate) {
+    public static void markAndDeleteUnmarked(File rootDir, Predicate<File> predicate) {
         MarkDirectoryVisitor markVisitor = new MarkDirectoryVisitor(rootDir, predicate);
         walkFileTreeSafely(rootDir.toPath(), markVisitor);
 
