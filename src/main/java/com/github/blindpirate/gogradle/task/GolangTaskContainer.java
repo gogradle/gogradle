@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.ide.IdeaTask;
 import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
-import com.github.blindpirate.gogradle.ide.RenameVendorTask;
 import com.github.blindpirate.gogradle.ide.VscodeTask;
 import com.github.blindpirate.gogradle.task.go.GoBuildTask;
 import com.github.blindpirate.gogradle.task.go.GoCoverTask;
@@ -40,8 +39,7 @@ public class GolangTaskContainer {
     // produce all dependencies by analyzing build.gradle
     public static final String RESOLVE_BUILD_DEPENDENCIES_TASK_NAME = "resolveBuildDependencies";
     public static final String RESOLVE_TEST_DEPENDENCIES_TASK_NAME = "resolveTestDependencies";
-    public static final String INSTALL_BUILD_DEPENDENCIES_TASK_NAME = "installBuildDependencies";
-    public static final String INSTALL_TEST_DEPENDENCIES_TASK_NAME = "installTestDependencies";
+    public static final String INSTALL_DEPENDENCIES_TASK_NAME = "installDependencies";
     // show dependencies tree
     public static final String DEPENDENCIES_TASK_NAME = "goDependencies";
 
@@ -61,7 +59,6 @@ public class GolangTaskContainer {
     private static final String RUBYMINE_TASK_NAME = "rubyMine";
     private static final String CLION_TASK_NAME = "cLion";
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
-    public static final String RENAME_VENDOR_TASK_NAME = "renameVendor";
     public static final String COVERAGE_TASK_NAME = "goCover";
     public static final String GOFMT_TASK_NAME = "gofmt";
     public static final String GOVET_TASK_NAME = "goVet";
@@ -75,8 +72,7 @@ public class GolangTaskContainer {
             .put(BUILD_TASK_NAME, GoBuildTask.class)
             .put(TEST_TASK_NAME, GoTestTask.class)
             .put(VENDOR_TASK_NAME, VendorTask.class)
-            .put(INSTALL_BUILD_DEPENDENCIES_TASK_NAME, InstallBuildDependenciesTask.class)
-            .put(INSTALL_TEST_DEPENDENCIES_TASK_NAME, InstallTestDependenciesTask.class)
+            .put(INSTALL_DEPENDENCIES_TASK_NAME, InstallTask.class)
             .put(INIT_TASK_NAME, InitTask.class)
             .put(CLEAN_TASK_NAME, CleanTask.class)
             .put(CHECK_TASK_NAME, CheckTask.class)
@@ -90,7 +86,6 @@ public class GolangTaskContainer {
             .put(RUBYMINE_TASK_NAME, IntellijIdeTask.class)
             .put(CLION_TASK_NAME, IntellijIdeTask.class)
             .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGorootTask.class)
-            .put(RENAME_VENDOR_TASK_NAME, RenameVendorTask.class)
             .put(COVERAGE_TASK_NAME, GoCoverTask.class)
             .put(GOVET_TASK_NAME, GoVetTask.class)
             .put(GOFMT_TASK_NAME, GofmtTask.class)
