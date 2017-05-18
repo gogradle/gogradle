@@ -48,12 +48,34 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
     @Override
     String getVersion();
 
+    /**
+     * Get the package this dependency stands for.
+     *
+     * @return the package
+     * @see GolangPackage
+     */
     GolangPackage getPackage();
 
+    /**
+     * Resolve to a concrete dependency which can be located to a specific version of code.
+     *
+     * @param context the resolve context
+     * @return resolved dependency
+     */
     ResolvedDependency resolve(ResolveContext context);
 
+    /**
+     * A dependency is seen as "first-level" when it is defined in build.gradle or gogradle.lock of root project.
+     *
+     * @return @{code true} if it is "first-level", @{code false} otherwise.
+     */
     boolean isFirstLevel();
 
+    /**
+     * Get cache scope of this dependency.
+     *
+     * @return the cache scope
+     */
     CacheScope getCacheScope();
 
     Set<String> getSubpackages();
