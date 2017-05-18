@@ -67,7 +67,7 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
     /**
      * A dependency is seen as "first-level" when it is defined in build.gradle or gogradle.lock of root project.
      *
-     * @return @{code true} if it is "first-level", @{code false} otherwise.
+     * @return <code>true</code> if it is "first-level", <code>false</code> otherwise.
      */
     boolean isFirstLevel();
 
@@ -78,6 +78,22 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
      */
     CacheScope getCacheScope();
 
+
+    /**
+     * This dependencies sub packages. A sub package is a string representing the relative path to the repo root.
+     * This concept is inspired by <a href="https://github.com/Masterminds/glide">glide</a>
+     *
+     * @return the set of sub packages
+     */
     Set<String> getSubpackages();
+
+    /**
+     * All descendants files and directories.
+     */
+    String ALL_DESCENDANTS = "...";
+    /**
+     * Only files located in repo root.
+     */
+    String ONLY_CURRENT_FILES = ".";
 }
 

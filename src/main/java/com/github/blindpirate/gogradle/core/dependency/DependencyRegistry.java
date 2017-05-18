@@ -27,7 +27,7 @@ public interface DependencyRegistry {
      * Registers a dependency. In this course, conflicts will be resolved or thrown.
      *
      * @param dependency The dependency to register
-     * @return @{code true}if the dependency is newer than existing dependency with same name, @{code false} otherwise.
+     * @return <code>true</code> if the dependency is newer than existing dependency with same name, <code>false</code> otherwise.
      */
     boolean register(ResolvedDependency dependency);
 
