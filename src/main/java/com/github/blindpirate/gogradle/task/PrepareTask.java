@@ -23,8 +23,6 @@ import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import org.gradle.api.DefaultTask;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
@@ -35,8 +33,6 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.CLEAN_TAS
  * This task perform preparation such as Go executable and GOPATH.
  */
 public class PrepareTask extends DefaultTask {
-
-    private static final Logger LOGGER = Logging.getLogger(PrepareTask.class);
     @Inject
     private GoBinaryManager goBinaryManager;
 
@@ -60,8 +56,7 @@ public class PrepareTask extends DefaultTask {
     public void prepare() {
         setting.verify();
         goBinaryManager.getBinaryPath();
-        buildManager.ensureDotVendorDirNotExist();
-        buildManager.prepareSymbolicLinks();
+        buildManager.prepareProjectGopathIfNecessary();
         buildConstraintManager.prepareConstraints();
         gogradleRootProject.setName(setting.getPackagePath());
     }

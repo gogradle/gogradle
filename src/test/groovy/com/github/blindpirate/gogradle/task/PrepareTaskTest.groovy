@@ -55,8 +55,7 @@ class PrepareTaskTest extends TaskTest {
         // then
         verify(setting).verify()
         verify(goBinaryManager).getBinaryPath()
-        verify(buildManager).ensureDotVendorDirNotExist()
-        verify(buildManager).prepareSymbolicLinks()
+        verify(buildManager).prepareProjectGopathIfNecessary()
         verify(buildConstraintManager).prepareConstraints()
     }
 
