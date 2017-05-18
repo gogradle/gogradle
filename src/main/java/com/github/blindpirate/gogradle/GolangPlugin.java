@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
+import com.github.blindpirate.gogradle.task.go.GoBuildTask;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -40,6 +41,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TAS
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 import static java.util.Arrays.asList;
 
 
@@ -82,7 +84,10 @@ public class GolangPlugin implements Plugin<Project> {
         this.injector = initGuice();
         this.settings = injector.getInstance(GolangPluginSetting.class);
         this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
-        Arrays.asList(BuildMode.values()).forEach(mode -> project.getExtensions().add(mode.toString(), mode));
+        Arrays.asList(BuildMode.values()).forEach(mode -> {
+            project.getExtensions().add(mode.toString(), mode);
+            project.getExtensions().add(mode.getAbbr(), mode);
+        });
     }
 
     private void configureGlobalInjector() {
@@ -101,6 +106,9 @@ public class GolangPlugin implements Plugin<Project> {
                         task -> Go.class.cast(taskContainer.getByName(task)).addDefaultActionIfNoCustomActions())
         );
 
+        project.getTasks().withType(Go.class)
+                .matching(task -> !task.getClass().getPackage().equals(GoBuildTask.class.getPackage()))
+                .forEach(task -> task.dependsOn(VENDOR_TASK_NAME));
     }
 
     private void customizeProjectInternalServices(Project project) {
