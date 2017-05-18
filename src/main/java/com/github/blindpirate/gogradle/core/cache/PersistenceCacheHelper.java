@@ -17,7 +17,6 @@
 
 package com.github.blindpirate.gogradle.core.cache;
 
-import com.github.blindpirate.gogradle.core.GolangCloneable;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import org.gradle.api.logging.Logger;
@@ -27,33 +26,26 @@ import java.io.File;
 import java.io.UncheckedIOException;
 import java.util.Map;
 
-public abstract class PersistentCache<K extends GolangCloneable, V extends GolangCloneable>
-        extends AbstractCache<K, V> {
-    private static final Logger LOGGER = Logging.getLogger(PersistentCache.class);
-
-    private final File persistenceFile;
-
-    public PersistentCache(File persistenceFile) {
-        this.persistenceFile = persistenceFile;
-    }
+public interface PersistenceCacheHelper {
+    Logger LOGGER = Logging.getLogger(PersistenceCache.class);
 
     @SuppressWarnings("unchecked")
-    public void load() {
+    static void load(Map cache, File persistenceFile) {
         if (persistenceFile.exists()) {
             try {
-                container = (Map) IOUtils.deserialize(persistenceFile);
+                cache.putAll((Map) IOUtils.deserialize(persistenceFile));
             } catch (ExceptionHandler.UncheckedException e) {
                 LOGGER.warn("Exception in deserializing dependency cache, skip.");
                 LOGGER.info("", e);
             }
         } else {
-            LOGGER.info("Cache {} not found, skip.", getClass().getSimpleName());
+            LOGGER.info("Cache {} not found, skip.", persistenceFile);
         }
     }
 
-    public void save() {
+    static void save(Object cache, File persistenceFile) {
         try {
-            IOUtils.serialize(container, persistenceFile);
+            IOUtils.serialize(cache, persistenceFile);
         } catch (UncheckedIOException e) {
             LOGGER.warn("Exception in serializing dependency cache, skip.");
             LOGGER.info("", e);

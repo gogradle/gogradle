@@ -17,65 +17,84 @@
 
 package com.github.blindpirate.gogradle.core.cache
 
+import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
+import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import org.gradle.api.Project
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
 
 import java.util.function.Function
 
 import static org.mockito.Mockito.*
 
+@RunWith(GogradleRunner)
 class ProjectCacheManagerTest {
-    BuildScopedNotationToResolvedCache buildScopedNotationCache = mock(BuildScopedNotationToResolvedCache)
-    PersistenceNotationToResolvedCache persistenceNotationCache = mock(PersistenceNotationToResolvedCache)
-    BuildScopedResolvedToDependenciesCache buildScopedResolvedCache = mock(BuildScopedResolvedToDependenciesCache)
-    PersistenceResolvedToDependenciesCache persistenceResolvedCache = mock(PersistenceResolvedToDependenciesCache)
-
-    ProjectCacheManager projectCacheManager = new ProjectCacheManager(
-            buildScopedNotationCache,
-            buildScopedResolvedCache,
-            persistenceNotationCache,
-            persistenceResolvedCache)
-
-    GitMercurialNotationDependency notationDependency = mock(GitMercurialNotationDependency)
-    ResolvedDependency resolvedDependency = mock(ResolvedDependency)
+    @Mock
+    Project project
+    @Mock
+    PersistenceResolvedToDependenciesCache resolvedToDependenciesCache
+    @Mock
+    CloneBackedCache buildScopedNotationToResolvedCache
+    @Mock
+    CloneBackedCache buildScopedResolvedToDependenciesCache
+    @Mock
+    PersistenceCache persistenceNotationToResolvedCache
+    @Mock
+    GitMercurialNotationDependency notationDependency
+    @Mock
+    ResolvedDependency resolvedDependency
+    @Mock
     Function constructor = mock(Function)
+
+    ProjectCacheManager projectCacheManager
+
+    @Before
+    void setUp() {
+        projectCacheManager = new ProjectCacheManager(project, resolvedToDependenciesCache)
+        ReflectionUtils.setField(projectCacheManager, 'buildScopedNotationToResolvedCache', buildScopedNotationToResolvedCache)
+        ReflectionUtils.setField(projectCacheManager, 'buildScopedResolvedToDependenciesCache', buildScopedResolvedToDependenciesCache)
+        ReflectionUtils.setField(projectCacheManager, 'persistenceNotationToResolvedCache', persistenceNotationToResolvedCache)
+    }
 
     @Test
     void 'loading cache should succeed'() {
         projectCacheManager.loadPersistenceCache()
 
-        verify(persistenceNotationCache).load()
-        verify(persistenceResolvedCache).load()
+        verify(persistenceNotationToResolvedCache).load()
+        verify(resolvedToDependenciesCache).load()
     }
 
     @Test
     void 'saving cache should succeed'() {
         projectCacheManager.savePersistenceCache()
 
-        verify(persistenceNotationCache).save()
-        verify(persistenceResolvedCache).save()
+        verify(persistenceNotationToResolvedCache).save()
+        verify(resolvedToDependenciesCache).save()
     }
 
     @Test
     void 'resolving should succeed'() {
         when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         projectCacheManager.resolve(notationDependency, constructor)
-        verify(buildScopedNotationCache).get(notationDependency, constructor)
+        verify(buildScopedNotationToResolvedCache).get(notationDependency, constructor)
 
         when(notationDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
         projectCacheManager.resolve(notationDependency, constructor)
-        verify(persistenceNotationCache).get(notationDependency, constructor)
+        verify(persistenceNotationToResolvedCache).get(notationDependency, constructor)
     }
 
     @Test
     void 'producing should succeed'() {
         when(resolvedDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
         projectCacheManager.produce(resolvedDependency, constructor)
-        verify(buildScopedResolvedCache).get(resolvedDependency, constructor)
+        verify(buildScopedResolvedToDependenciesCache).get(resolvedDependency, constructor)
 
         when(resolvedDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
         projectCacheManager.produce(resolvedDependency, constructor)
-        verify(persistenceResolvedCache).get(resolvedDependency, constructor)
+        verify(resolvedToDependenciesCache).get(resolvedDependency, constructor)
     }
 }

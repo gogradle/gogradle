@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.core.cache;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import org.gradle.api.Project;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -27,19 +28,18 @@ import java.util.function.Function;
 
 @Singleton
 public class ProjectCacheManager {
-    private final BuildScopedNotationToResolvedCache buildScopedNotationToResolvedCache;
-    private final BuildScopedResolvedToDependenciesCache buildScopedResolvedToDependenciesCache;
-    private final PersistenceNotationToResolvedCache persistenceNotationToResolvedCache;
+    private final CloneBackedCache<NotationDependency, ResolvedDependency> buildScopedNotationToResolvedCache
+            = new CloneBackedCache<>();
+    private final CloneBackedCache<ResolvedDependency, GolangDependencySet> buildScopedResolvedToDependenciesCache
+            = new CloneBackedCache<>();
+    private final PersistenceCache<NotationDependency, ResolvedDependency> persistenceNotationToResolvedCache;
     private final PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache;
 
     @Inject
-    public ProjectCacheManager(BuildScopedNotationToResolvedCache buildScopedNotationToResolvedCache,
-                               BuildScopedResolvedToDependenciesCache buildScopedResolvedToDependenciesCache,
-                               PersistenceNotationToResolvedCache persistenceNotationToResolvedCache,
+    public ProjectCacheManager(Project project,
                                PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache) {
-        this.buildScopedNotationToResolvedCache = buildScopedNotationToResolvedCache;
-        this.buildScopedResolvedToDependenciesCache = buildScopedResolvedToDependenciesCache;
-        this.persistenceNotationToResolvedCache = persistenceNotationToResolvedCache;
+        this.persistenceNotationToResolvedCache
+                = new PersistenceCache<>(project, "PersistenceNotationToResolvedCache.bin");
         this.persistenceResolvedToDependenciesCache = persistenceResolvedToDependenciesCache;
     }
 
