@@ -22,12 +22,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 public interface BuildManager {
+    void prepareProjectGopathIfNecessary();
 
-    void ensureDotVendorDirNotExist();
-
-    void prepareSymbolicLinks();
-
-    String getProjectGopath();
+    String getGopath();
 
     void go(List<String> args, Map<String, String> env);
 

@@ -34,10 +34,10 @@ import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +46,9 @@ import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static com.github.blindpirate.gogradle.util.StringUtils.formatEnv;
 import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
@@ -73,6 +72,7 @@ public class DefaultBuildManager implements BuildManager {
     private final GoBinaryManager goBinaryManager;
     private final GolangPluginSetting setting;
     private final ProcessUtils processUtils;
+    private String gopath;
 
     @Inject
     public DefaultBuildManager(Project project,
@@ -86,16 +86,21 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
-    public void ensureDotVendorDirNotExist() {
-        if (new File(project.getRootDir(), "." + VENDOR_DIRECTORY).exists()) {
-            throw new IllegalStateException("We need .vendor directory as temp directory, "
-                    + "existent .vendor before build is not allowed.");
+    public void prepareProjectGopathIfNecessary() {
+        String systemGopath = System.getenv("GOPATH");
+        if (currentProjectMatchesGopath(systemGopath)) {
+            gopath = systemGopath;
+        } else {
+            createProjectSymbolicLinkIfNotExist();
+            gopath = toUnixString(getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath());
         }
     }
 
-    @Override
-    public void prepareSymbolicLinks() {
-        createProjectSymbolicLinkIfNotExist();
+    private boolean currentProjectMatchesGopath(String systemGopath) {
+        if (StringUtils.isBlank(systemGopath)) {
+            return false;
+        }
+        return Paths.get(systemGopath).resolve(setting.getPackagePath()).equals(project.getRootDir().toPath());
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
@@ -215,7 +220,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private Map<String, String> determineEnv(Map<String, String> env) {
-        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getProjectGopath(),
+        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getGopath(),
                 "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()),
                 "GOOS", Os.getHostOs().toString(),
                 "GOEXE", Os.getHostOs().exeExtension(),
@@ -229,8 +234,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
 
-    public String getProjectGopath() {
-        return toUnixString(getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath());
+    public String getGopath() {
+        return gopath;
     }
-
 }

@@ -23,9 +23,11 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
+import com.github.blindpirate.gogradle.crossplatform.MockEnvironmentVariableSupport
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
@@ -43,14 +45,14 @@ import java.nio.file.Path
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockInjector
-class DefaultBuildManagerTest {
+class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     DefaultBuildManager manager
 
     File resource
@@ -93,13 +95,34 @@ class DefaultBuildManagerTest {
         when(project.getName()).thenReturn('project')
     }
 
-
     @Test
-    void 'symbolic links should be created properly in preparation'() {
+    void 'symbolic links should be created if GOPATH dose not exist'() {
         // when
-        manager.prepareSymbolicLinks()
+        manager.prepareProjectGopathIfNecessary()
         // then
         assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+        assert manager.gopath == getProjectGopath()
+    }
+
+    @Test
+    void 'symbolic links should be created if current project dose not match GOPATH'() {
+        // when
+        environmentVariables.set('GOPATH', toUnixString(resource))
+        manager.prepareProjectGopathIfNecessary()
+        // then
+        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+        assert manager.gopath == getProjectGopath()
+    }
+
+    @Test
+    void 'project gopath will not be created if current project matches GOPATH'() {
+        // when
+        environmentVariables.set('GOPATH', toUnixString(resource.getParentFile()))
+        setting.packagePath = resource.name
+        manager.prepareProjectGopathIfNecessary()
+        // then
+        assert !new File(resource, '.gogradle/project_gopath').exists()
+        assert manager.gopath == toUnixString(resource.getParentFile())
     }
 
     void assertSymbolicLinkLinkToTarget(String link, String target) {
@@ -118,12 +141,13 @@ class DefaultBuildManagerTest {
     }
 
     String getProjectGopath() {
-        return StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
+        return toUnixString(new File(resource, '.gogradle/project_gopath'))
     }
 
     @Test
     void 'customized command should succeed'() {
         // given
+        manager.prepareProjectGopathIfNecessary()
         setting.buildTags = ['a', 'b', 'c']
         // when
         manager.run(['golint'], [:], null, null, null)
@@ -190,5 +214,25 @@ class DefaultBuildManagerTest {
         verify(stdoutLineConsumer).accept('anotherline')
         verify(stderrLineConsumer).accept('stderr')
         verify(retcodeConsumer).accept(0)
+    }
+
+    @Test
+    void 'inserting build tags should succeed'() {
+        setting.buildTags = ['a', 'b', 'c']
+
+        assert manager.insertBuildTags([]) == []
+        assert manager.insertBuildTags(['build']) == ['build', '-tags', "'a b c'"]
+        assert manager.insertBuildTags(['build', 'package']) == ['build', '-tags', "'a b c'", 'package']
+    }
+
+    @Test(expected = BuildException)
+    void 'exception should be thrown if creating symbolic link fails'() {
+        manager.createSymbolicLink(resource.toPath(), resource.toPath())
+    }
+
+    @Test
+    void 'nothing should happen if symbolic link exists'() {
+        IOUtils.write(resource, '.gogradle/project_gopath/root/package', '')
+        manager.prepareProjectGopathIfNecessary()
     }
 }
