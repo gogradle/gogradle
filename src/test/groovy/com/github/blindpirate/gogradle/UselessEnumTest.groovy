@@ -35,7 +35,6 @@ class UselessEnumTest {
          Arch,
          CacheScope,
          AbstractNotationDependency.NoTransitivePredicate,
-         DependencyInstallFileFilter,
          GogradleGlobal].each(this.&doUselessTest)
     }
 
