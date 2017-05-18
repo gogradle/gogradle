@@ -36,8 +36,7 @@ public class ResolveTestDependenciesTask extends ResolveTask {
     protected GolangDependencySet produceFirstLevelDependencies() {
         GolangDependencySet ret = super.produceFirstLevelDependencies();
         // this is complete build dependencies
-        GolangDependencySet flatDeps = getTask(ResolveBuildDependenciesTask.class).getDependencyTree().flatten();
-        ret.removeAll(flatDeps);
+        ret.removeAll(getTask(ResolveBuildDependenciesTask.class).getFlatDependencies());
         return ret;
     }
 }
