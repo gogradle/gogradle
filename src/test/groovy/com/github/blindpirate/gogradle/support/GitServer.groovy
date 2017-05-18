@@ -101,9 +101,7 @@ class GitServer {
         Git git
         try {
             git = new Git(repository)
-            fileName.split('&').each {
-                IOUtils.write(dir, it.trim(), '')
-            }
+            IOUtils.write(dir, fileName, '')
             git.add().addFilepattern('.').call()
             git.commit().setMessage('commit').call()
         } finally {
