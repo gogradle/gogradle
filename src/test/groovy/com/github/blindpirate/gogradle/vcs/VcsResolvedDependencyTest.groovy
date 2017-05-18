@@ -92,7 +92,7 @@ class VcsResolvedDependencyTest {
     }
 
     @Test
-    void 'dependencies should be equal if name/version/url/vcs equals'() {
+    void 'dependencies should be equal if name/version/url/vcs/firstlevel equals'() {
         assert newResolvedDependency(VcsType.GIT) != newResolvedDependency(VcsType.MERCURIAL)
 
         def dependency1 = newResolvedDependency(VcsType.GIT)
@@ -106,8 +106,6 @@ class VcsResolvedDependencyTest {
         ReflectionUtils.setField(dependency2, 'tag', 'tag2')
         ReflectionUtils.setField(dependency1, 'updateTime', 0L)
         ReflectionUtils.setField(dependency2, 'updateTime', 1L)
-        dependency1.firstLevel = true
-        dependency2.firstLevel = false
         assert dependency1 == dependency2
         assert dependency1.hashCode() == dependency2.hashCode()
     }

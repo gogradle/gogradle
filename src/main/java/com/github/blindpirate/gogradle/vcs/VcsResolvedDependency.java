@@ -80,16 +80,11 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(o)) {
             return false;
         }
         VcsResolvedDependency that = (VcsResolvedDependency) o;
-        return Objects.equals(getVersion(), that.getVersion())
-                && Objects.equals(getName(), that.getName())
-                && Objects.equals(getVcsType(), that.getVcsType())
+        return Objects.equals(getVcsType(), that.getVcsType())
                 && Objects.equals(url, that.url);
     }
 

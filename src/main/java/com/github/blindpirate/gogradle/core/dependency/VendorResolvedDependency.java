@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -71,7 +72,6 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
                 updateTime,
                 hostDependency,
                 StringUtils.toUnixString(relativePathToHost));
-        ret.setFirstLevel(hostDependency instanceof GogradleRootProject);
 
         DependencyVisitor visitor = GogradleGlobal.getInstance(DependencyVisitor.class);
         ProjectCacheManager projectCacheManager = GogradleGlobal.getInstance(ProjectCacheManager.class);
@@ -159,13 +159,14 @@ public class VendorResolvedDependency extends AbstractResolvedDependency {
         return ret;
     }
 
+    @Override
+    public CacheScope getCacheScope() {
+        return hostDependency.getCacheScope();
+    }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(o)) {
             return false;
         }
         VendorResolvedDependency that = (VendorResolvedDependency) o;

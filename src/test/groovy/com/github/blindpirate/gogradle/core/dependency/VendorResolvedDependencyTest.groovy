@@ -39,6 +39,7 @@ import org.junit.runner.RunWith
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
+import static groovy.util.StringTestUtil.*
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock
@@ -110,15 +111,13 @@ class VendorResolvedDependencyTest {
     @Test
     void 'update time of vendor resolved dependency in local directory should be the dir\'s last modified time'() {
         // given
-        GogradleRootProject hostDependency = new GogradleRootProject()
-        hostDependency.initSingleton('root', resource)
+        LocalDirectoryDependency hostDependency = LocalDirectoryDependency.fromLocal('root', resource)
 
         // when
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         // then
         assert dependency.updateTime == new File(resource, 'vendor/github.com/a/b').lastModified()
-        assert dependency.isFirstLevel()
-        assert dependency.formatVersion() == 'GOGRADLE_ROOT/vendor/github.com/a/b'
+        assert dependency.formatVersion() == "root@${toUnixString(resource)}/vendor/github.com/a/b"
     }
 
     @Test(expected = IllegalStateException)
