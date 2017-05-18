@@ -25,7 +25,7 @@ Do some preparation, for example, verifying `build.gradle` and installing golang
 
 ## goInit
 
-Perform migration from other package management tools. Currently `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash` are supported.
+Perform migration from other package management tools. Currently `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm` are supported.
 
 ## resolveBuildDependencies/resolveTestDependencies
 

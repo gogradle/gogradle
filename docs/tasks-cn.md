@@ -27,7 +27,7 @@
 
 ## goInit
 
-执行从其他包管理工具的迁移工作。当前支持的包管理工具有：`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash`
+执行从其他包管理工具的迁移工作。当前支持的包管理工具有：`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`
 
 ## resolveBuildDependencies/resolveTestDependencies
 

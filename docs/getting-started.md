@@ -15,7 +15,7 @@ golang {
 }
 ```
 
-Then, if you are using one of glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash, please run 
+Then, if you are using one of glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm, please run 
 
 ```
 ./gradlew goInit # *nix

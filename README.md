@@ -29,7 +29,7 @@ Gogradle is a gradle plugin which provides support for building golang.
   - Transitive dependency management
   - Resolve package conflict automatically
   - Support dependency lock
-  - Support importing dependencies managed by various external tools such as glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash (Based on [this report](https://github.com/blindpirate/report-of-go-package-management-tool))
+  - Support importing dependencies managed by various external tools such as glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm (Based on [this report](https://github.com/blindpirate/report-of-go-package-management-tool))
   - Support [submodule](https://git-scm.com/book/en/v2/Git-Tools-Submodules)
   - Support [SemVersion](http://semver.org/)
   - Support [vendor](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo)

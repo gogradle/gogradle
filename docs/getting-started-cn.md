@@ -20,7 +20,7 @@ golang {
 }
 ```
 
-如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash之一，请运行
+如果你之前使用的是glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm之一，请运行
 
 ```
 ./gradlew goInit # *nix

@@ -27,7 +27,7 @@ Gogradle是一个提供Go语言构建支持的Gradle插件。
   - 支持自定义传递性依赖策略
   - 自动解决冲突 
   - 支持依赖锁定
-  - 支持glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash等外部依赖的导入（基于[这份报告](https://github.com/blindpirate/report-of-go-package-management-tool)）
+  - 支持glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm等外部依赖的导入（基于[这份报告](https://github.com/blindpirate/report-of-go-package-management-tool)）
   - 支持[submodule](https://git-scm.com/book/zh/v2/Git-%E5%B7%A5%E5%85%B7-%E5%AD%90%E6%A8%A1%E5%9D%97)
   - 支持[语义化版本](http://semver.org/)
   - 支持[vendor](https://docs.google.com/document/d/1Bz5-UB7g2uPBdOx-rw5t9MxJwkfpx90cqG9AFL0JAYo)
