@@ -63,12 +63,15 @@ public class GlideDotLockModel {
         private String name;
         @JsonProperty("version")
         private String version;
+        @JsonProperty("subpackages")
+        private List<String> subpackages;
 
         public Map<String, Object> toNotation() {
             Assert.isNotBlank(name);
             return MapUtils.asMapWithoutNull(
                     "name", name,
                     "version", version,
+                    "subpackages", subpackages,
                     "transitive", false);
         }
     }

@@ -54,6 +54,9 @@ imports:
   version: fbe9fb6ad5b5f35b3e82a7c21123cfc526cbf895
 - name: gopkg.in/yaml.v2
   version: e4d366fc3c7938e2958e662b4258c7a89e1f0e3e
+  subpackages:
+    - memcache
+    - redis
 testImports: 
 - name: test
   version: testVersion 
@@ -70,7 +73,10 @@ testImports:
         verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e', transitive: false])
         verifyMapParsed([name: 'github.com/Masterminds/semver', version: '8d0431362b544d1a3536cca26684828866a7de09', transitive: false])
         verifyMapParsed([name: 'github.com/Masterminds/vcs', version: 'fbe9fb6ad5b5f35b3e82a7c21123cfc526cbf895', transitive: false])
-        verifyMapParsed([name: 'gopkg.in/yaml.v2', version: 'e4d366fc3c7938e2958e662b4258c7a89e1f0e3e', transitive: false])
+        verifyMapParsed([name       : 'gopkg.in/yaml.v2',
+                         version    : 'e4d366fc3c7938e2958e662b4258c7a89e1f0e3e',
+                         subpackages: ['memcache', 'redis'],
+                         transitive : false])
     }
 
     String glideDotLockMissingName = '''
