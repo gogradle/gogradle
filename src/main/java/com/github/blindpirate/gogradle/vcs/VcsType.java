@@ -26,19 +26,17 @@ import java.util.Arrays;
 import java.util.Optional;
 
 public enum VcsType {
-    GIT("git", ".git", Git.class),
-    MERCURIAL("hg", ".hg", Mercurial.class),
-    SVN("svn", ".svn", Svn.class),
-    BAZAAR("bzr", ".bzr", Bazaar.class);
+    GIT("git", Git.class),
+    MERCURIAL("hg", Mercurial.class),
+    SVN("svn", Svn.class),
+    BAZAAR("bzr", Bazaar.class);
 
     private String name;
 
-    private String repo;
     private Class<? extends Annotation> annoClass;
 
-    VcsType(String name, String repo, Class annoClass) {
+    VcsType(String name, Class annoClass) {
         this.name = name;
-        this.repo = repo;
         this.annoClass = annoClass;
     }
 
@@ -55,10 +53,6 @@ public enum VcsType {
 
     public <T> T getService(Class<T> serviceClass) {
         return GogradleGlobal.getInstance(Key.get(serviceClass, annoClass));
-    }
-
-    public String getRepo() {
-        return repo;
     }
 
     public VcsAccessor getAccessor() {
