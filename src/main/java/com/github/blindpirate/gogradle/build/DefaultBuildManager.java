@@ -49,6 +49,7 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
+import static com.github.blindpirate.gogradle.util.StringUtils.*;
 import static com.github.blindpirate.gogradle.util.StringUtils.render;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
@@ -208,7 +209,7 @@ public class DefaultBuildManager implements BuildManager {
             String message = "\nCommand:\n "
                     + String.join(" ", args)
                     + "\nEnv:\n"
-                    + StringUtils.formatEnv(env);
+                    + formatEnv(env);
             throw BuildException.processInteractionFailed(retcode, message);
         }
     }
@@ -229,10 +230,7 @@ public class DefaultBuildManager implements BuildManager {
 
 
     public String getProjectGopath() {
-        return getGogradleBuildDir()
-                .resolve(PROJECT_GOPATH)
-                .toAbsolutePath()
-                .toString();
+        return toUnixString(getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath());
     }
 
 }
