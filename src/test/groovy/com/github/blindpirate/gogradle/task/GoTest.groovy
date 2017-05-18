@@ -90,7 +90,7 @@ class GoTest extends TaskTest {
         // then
         ArgumentCaptor<Consumer> captor = ArgumentCaptor.forClass(Consumer)
         verify(buildManager).go(anyList(), anyMap(), any(Consumer), any(Consumer), captor.capture())
-        assert captor.getValue().is(ReflectionUtils.getStaticField(Go,'DO_NOTHING'))
+        assert captor.getValue().is(ReflectionUtils.getStaticField(Go, 'DO_NOTHING'))
     }
 
     @Test
@@ -126,5 +126,13 @@ class GoTest extends TaskTest {
 
         assert !stderrIsVisited
         assert !stdoutIsVisited
+    }
+
+    @Test
+    void 'setting environment should succeed'() {
+        task.environment(['a': '1'])
+        assert ReflectionUtils.getField(task, 'overallEnvironment') == [a: '1']
+        task.environment('b', '2')
+        assert ReflectionUtils.getField(task, 'overallEnvironment') == [a: '1', b: '2']
     }
 }

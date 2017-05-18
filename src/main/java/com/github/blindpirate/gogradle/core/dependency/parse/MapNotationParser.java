@@ -28,6 +28,7 @@ public interface MapNotationParser extends NotationParser<Map<String, Object>> {
     String VCS_KEY = "vcs";
     String HOST_KEY = "host";
     String VENDOR_PATH_KEY = "vendorPath";
+    String SUBPACKAGES_KEY = "subpackages";
 
     @Override
     NotationDependency parse(Map<String, Object> notation);
