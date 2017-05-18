@@ -29,7 +29,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
-import com.github.blindpirate.gogradle.core.dependency.produce.GoImportExtractor;
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory;
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode;
@@ -99,7 +98,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
     // INPUT 3: all go files in specific configuration
     @InputFiles
     public Collection<File> getGoSourceFiles() {
-        GoSourceCodeFilter filter = GoImportExtractor.FILTERS.get(getConfigurationName());
+        GoSourceCodeFilter filter = GoSourceCodeFilter.FILTERS.get(getConfigurationName());
         return filterFilesRecursively(getProject().getRootDir(), filter);
     }
 

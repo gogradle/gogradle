@@ -159,6 +159,10 @@ class ResolveTaskTest extends TaskTest {
         // when
         DependencyTreeNode tree = resolveBuildDependenciesTask.dependencyTree
 
+        // then
+        assert resolveBuildDependenciesTask.flatDependencies.size() == 3
+        assert resolveBuildDependenciesTask.flatDependencies.collect { it.name } as Set == ['d1', 'd2', 'd3'] as Set
+
         assert tree.name == 'package'
         assert tree.children.size() == 2
 
@@ -184,10 +188,31 @@ class ResolveTaskTest extends TaskTest {
         assert tree.children[0].children[0].originalDependency.is(d3ResolvedDependency)
     }
 
+    @Test
+    void 'dependencyTree should be null if that task is not executed at all'() {
+        // given
+        'dependency resolution should succeed'()
+        ReflectionUtils.setField(resolveBuildDependenciesTask, 'dependencyTree', null)
+        // then
+        assert resolveBuildDependenciesTask.dependencyTree == null
+        assert resolveBuildDependenciesTask.flatDependencies.isEmpty()
+    }
+
     void assertTreeNodeIs(DependencyTreeNode node, String name) {
         assert node.name == name
         assert node.originalDependency instanceof ResolvedDependency
         assert node.originalDependency.is(node.finalDependency)
+    }
+
+    @Test
+    void 'cache binary file should be updated even if error occurred'() {
+        when(configurationManager.getByName(anyString())).thenThrow(Exception)
+        try {
+            resolveBuildDependenciesTask.resolve()
+        }
+        catch (Exception e) {
+            verify(projectCacheManager).savePersistenceCache()
+        }
     }
 
     @Test
