@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
@@ -40,6 +41,16 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
                                        File rootDir,
                                        DependencyVisitor visitor,
                                        String configuration) {
+        if (dependency.getSubpackages().contains(GolangDependency.ALL_DESCENDANTS)) {
+            return visitAll(dependency, rootDir, visitor, configuration);
+        } else {
+            return visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
+        }
+    }
+
+    private GolangDependencySet visitAll(ResolvedDependency dependency,
+                                         File rootDir,
+                                         DependencyVisitor visitor, String configuration) {
         GolangDependencySet externalDependencies = visitor.visitExternalDependencies(dependency,
                 rootDir, configuration);
         GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir, configuration);
@@ -48,7 +59,6 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
         if (candidate.isEmpty()) {
             candidate = visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         }
-
         return candidate;
     }
 }

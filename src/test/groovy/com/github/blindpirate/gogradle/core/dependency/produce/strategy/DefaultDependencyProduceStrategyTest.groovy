@@ -23,6 +23,7 @@ import org.junit.runner.RunWith
 
 import static org.mockito.Mockito.times
 import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest {
@@ -34,6 +35,21 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         externalDependencies()
         vendorDependencies()
         sourceCodeDependencies()
+
+        // when
+        assert strategy.produce(resolvedDependency, rootDir, visitor, 'build').isEmpty()
+
+        //then
+        verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
+    }
+
+    @Test
+    void 'source code will be scanned when subpackage is specified'() {
+        // given
+        vendorDependencies(a1, b1)
+        externalDependencies(a2, c2)
+        sourceCodeDependencies()
+        when(resolvedDependency.getSubpackages()).thenReturn(['sub'] as Set)
 
         // when
         assert strategy.produce(resolvedDependency, rootDir, visitor, 'build').isEmpty()

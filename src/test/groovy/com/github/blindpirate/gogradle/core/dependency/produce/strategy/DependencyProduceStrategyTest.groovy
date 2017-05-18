@@ -54,6 +54,7 @@ abstract class DependencyProduceStrategyTest {
         when(a2.getName()).thenReturn('a')
         when(b2.getName()).thenReturn('b')
         when(c2.getName()).thenReturn('c')
+        when(resolvedDependency.getSubpackages()).thenReturn(['...'] as Set)
 
         when(b2.dependencies).thenReturn(GolangDependencySet.empty())
     }
@@ -75,6 +76,4 @@ abstract class DependencyProduceStrategyTest {
         when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')).thenReturn(set)
         when(visitor.visitSourceCodeDependencies(resolvedDependency, rootDir, 'test')).thenReturn(set)
     }
-
-
 }
