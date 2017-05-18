@@ -77,7 +77,16 @@ class LocalDirectoryDependencyTest {
 
     @Test
     void 'locking a local dependency should cause an exception'() {
-        assert dependency.toLockedNotation() == [name: 'name', dir: StringUtils.toUnixString(resource)]
+        assert dependency.toLockedNotation() == [name: 'name',
+                                                 dir : StringUtils.toUnixString(resource)]
+    }
+
+    @Test
+    void 'locking a local dependency with subpackages should cause an exception'() {
+        dependency.subpackages = ['.'] as Set
+        assert dependency.toLockedNotation() == [name       : 'name',
+                                                 dir        : StringUtils.toUnixString(resource),
+                                                 subpackages: ['.']]
     }
 
     @Test
@@ -186,6 +195,16 @@ class LocalDirectoryDependencyTest {
         createVendor(sub)
         d.dependencies.add(sub)
         d.clone()
+    }
+
+    @Test
+    void 'equals should be correct'() {
+        LocalDirectoryDependency d = createLocalDirectoryDependency('d')
+        assert d.equals(d)
+        assert !d.equals(null)
+        assert !d.equals(mock(GolangDependency))
+        assert !d.equals(createLocalDirectoryDependency('e'))
+        assert d.equals(LocalDirectoryDependency.fromLocal('d', new File(resource, 'd')))
     }
 
     void assertLocalDependencyEqual(LocalDirectoryDependency old, LocalDirectoryDependency clone, boolean compareVendor) {
