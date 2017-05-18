@@ -100,7 +100,7 @@ goVet {
 
     void firstBuild() {
         newBuild {
-            it.forTasks('goBuild', 'goCheck', 'goLock')
+            it.forTasks('goClean', 'goBuild', 'goCheck', 'goLock')
         }
     }
 
