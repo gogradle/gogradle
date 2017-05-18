@@ -41,7 +41,7 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
 
     @TaskAction
     public void showGopathGoroot() {
-        LOGGER.quiet("GOPATH: {}", buildManager.getProjectGopath());
+        LOGGER.quiet("GOPATH: {}", buildManager.getGopath());
         LOGGER.quiet("GOROOT: {}", toUnixString(goBinaryManager.getGoroot()));
     }
 }

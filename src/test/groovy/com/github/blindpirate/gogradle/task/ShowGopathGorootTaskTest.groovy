@@ -57,7 +57,7 @@ class ShowGopathGorootTaskTest extends TaskTest {
     void 'it should succeed'() {
         // when
         String projectGopath = new File(resource, 'project/.gogradle/project_gopath').getAbsolutePath().replace('\\', '/')
-        when(buildManager.getProjectGopath()).thenReturn(projectGopath)
+        when(buildManager.getGopath()).thenReturn(projectGopath)
         when(project.getRootDir()).thenReturn(new File(resource, 'project'))
         when(goBinaryManager.getGoroot()).thenReturn(resource.toPath().resolve('goroot'))
         // when
