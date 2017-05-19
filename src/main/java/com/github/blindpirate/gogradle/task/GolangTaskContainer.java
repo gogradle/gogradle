@@ -18,7 +18,7 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.ide.IdeaTask;
-import com.github.blindpirate.gogradle.ide.IntellijIdeTask;
+import com.github.blindpirate.gogradle.ide.JetBrainsIdeTask;
 import com.github.blindpirate.gogradle.ide.VscodeTask;
 import com.github.blindpirate.gogradle.task.go.GoBuildTask;
 import com.github.blindpirate.gogradle.task.go.GoCoverTask;
@@ -79,12 +79,12 @@ public class GolangTaskContainer {
             .put(LOCK_TASK_NAME, LockTask.class)
             .put(IDEA_TASK_NAME, IdeaTask.class)
             .put(VSCODE_TASK_NAME, VscodeTask.class)
-            .put(GOGLAND_TASK_NAME, IntellijIdeTask.class)
-            .put(WEBSTORM_TASK_NAME, IntellijIdeTask.class)
-            .put(PHPSTORM_TASK_NAME, IntellijIdeTask.class)
-            .put(PYCHARM_TASK_NAME, IntellijIdeTask.class)
-            .put(RUBYMINE_TASK_NAME, IntellijIdeTask.class)
-            .put(CLION_TASK_NAME, IntellijIdeTask.class)
+            .put(GOGLAND_TASK_NAME, JetBrainsIdeTask.class)
+            .put(WEBSTORM_TASK_NAME, JetBrainsIdeTask.class)
+            .put(PHPSTORM_TASK_NAME, JetBrainsIdeTask.class)
+            .put(PYCHARM_TASK_NAME, JetBrainsIdeTask.class)
+            .put(RUBYMINE_TASK_NAME, JetBrainsIdeTask.class)
+            .put(CLION_TASK_NAME, JetBrainsIdeTask.class)
             .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGorootTask.class)
             .put(COVERAGE_TASK_NAME, GoCoverTask.class)
             .put(GOVET_TASK_NAME, GoVetTask.class)

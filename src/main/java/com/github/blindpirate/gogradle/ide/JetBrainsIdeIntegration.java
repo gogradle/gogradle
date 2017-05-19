@@ -30,13 +30,13 @@ import javax.inject.Singleton;
  */
 @Singleton
 @SuppressWarnings("checkstyle:linelength")
-public class IntellijIdeIntegration extends IdeIntegration {
+public class JetBrainsIdeIntegration extends IdeIntegration {
     private static final String MODULE_IML_PATH = ".idea/${projectName}.iml";
 
     private static final String GO_SDK_DOT_XML_PATH = ".idea/libraries/Go_SDK.xml";
 
     @Inject
-    public IntellijIdeIntegration(GoBinaryManager goBinaryManager, Project project, BuildManager buildManager) {
+    public JetBrainsIdeIntegration(GoBinaryManager goBinaryManager, Project project, BuildManager buildManager) {
         super(goBinaryManager, project, buildManager);
     }
 
@@ -53,7 +53,7 @@ public class IntellijIdeIntegration extends IdeIntegration {
     @Override
     protected void generateModuleIml() {
         String moduleImlTemplate = IOUtils.toString(
-                getClass().getClassLoader().getResourceAsStream("ide/intellij_module.iml.template"));
+                getClass().getClassLoader().getResourceAsStream("ide/jetbrains_module.iml.template"));
         writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(moduleImlTemplate));
     }
 

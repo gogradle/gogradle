@@ -32,7 +32,7 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class IntellijIdeIntegrationTest {
+class JetBrainsIdeTest {
     @Mock
     GoBinaryManager manager
     @Mock
@@ -42,11 +42,11 @@ class IntellijIdeIntegrationTest {
 
     File resource
 
-    IntellijIdeIntegration intellijIdeIntegration
+    JetBrainsIdeIntegration JetBrainsIdeIntegration
 
     @Before
     void setUp() {
-        intellijIdeIntegration = new IntellijIdeIntegration(manager, project, buildManager)
+        JetBrainsIdeIntegration = new JetBrainsIdeIntegration(manager, project, buildManager)
         when(project.getRootDir()).thenReturn(resource)
         when(manager.getBinaryPath()).thenReturn(new File(resource, 'go/bin/go').toPath())
         when(manager.getGoroot()).thenReturn(new File(resource, 'go').toPath())
@@ -58,7 +58,7 @@ class IntellijIdeIntegrationTest {
 
     @Test
     void 'xmls should be generated correctly'() {
-        intellijIdeIntegration.generateXmls()
+        JetBrainsIdeIntegration.generateXmls()
 
         assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://global"')
 

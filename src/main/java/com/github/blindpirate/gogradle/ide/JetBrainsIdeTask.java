@@ -23,16 +23,16 @@ import org.gradle.api.tasks.TaskAction;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 
-public class IntellijIdeTask extends AbstractGolangTask {
+public class JetBrainsIdeTask extends AbstractGolangTask {
     @Inject
-    private IntellijIdeIntegration intellijIdeIntegration;
+    private JetBrainsIdeIntegration jetBrainsIdeIntegration;
 
-    public IntellijIdeTask() {
+    public JetBrainsIdeTask() {
         dependsOn(VENDOR_TASK_NAME);
     }
 
     @TaskAction
     public void generateXmls() {
-        intellijIdeIntegration.generateXmls();
+        jetBrainsIdeIntegration.generateXmls();
     }
 }

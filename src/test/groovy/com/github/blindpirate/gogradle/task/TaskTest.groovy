@@ -31,7 +31,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.Gogradle
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.ide.IdeaIntegration
-import com.github.blindpirate.gogradle.ide.IntellijIdeIntegration
+import com.github.blindpirate.gogradle.ide.JetBrainsIdeIntegration
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
@@ -72,7 +72,7 @@ abstract class TaskTest {
     @Mock
     ProjectCacheManager projectCacheManager
     @Mock
-    IntellijIdeIntegration intellijIdeIntegration
+    JetBrainsIdeIntegration jetBrainsIdeIntegration
     @Mock
     VendorSnapshoter vendorSnapshoter
     @Mock
@@ -113,7 +113,7 @@ abstract class TaskTest {
                       projectCacheManager    : projectCacheManager,
                       gogradleRootProject    : gogradleRootProject,
                       vendorSnapshoter       : vendorSnapshoter,
-                      intellijIdeIntegration : intellijIdeIntegration]
+                      jetBrainsIdeIntegration: jetBrainsIdeIntegration]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
