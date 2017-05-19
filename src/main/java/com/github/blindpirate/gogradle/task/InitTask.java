@@ -25,6 +25,8 @@ import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDepende
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.DataExchange;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
@@ -33,6 +35,8 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -139,6 +143,9 @@ public class InitTask extends AbstractGolangTask {
             sb.append("'").append(value).append("'");
         } else if (value instanceof Boolean) {
             sb.append(value);
+        } else if (value instanceof Collection) {
+            Assert.isTrue(Collection.class.cast(value).stream().allMatch(s -> s instanceof String));
+            sb.append(DataExchange.toJson(new ArrayList<String>((Collection) value)));
         } else {
             throw new IllegalStateException("Sorry, we should not be here: " + value);
         }
