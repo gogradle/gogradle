@@ -103,6 +103,21 @@ a
 '''
     }
 
+    @Test
+    void 'subpackages should be printed2'() {
+        // given
+        ResolvedDependency b1 = withNameAndVersion('b', 'version1')
+
+        b1.subpackages = ['sub1', 'sub2']
+
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b1, true)])
+        // then
+        assert root.output() == '''\
+a
+\\-- b:version1 [sub1, sub2] (*)
+'''
+    }
+
     ResolvedDependency withNameAndVersion(String name, String version) {
         return new Temp(name, version, 0L)
     }

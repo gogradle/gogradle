@@ -112,10 +112,10 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
 
     private String withArrow() {
         return finalDependency.getName() + ":"
-                + formatResolvedDependency(originalDependency) + " -> " + formatResolvedDependency(finalDependency);
+                + formatVersion(originalDependency) + " -> " + formatVersion(finalDependency);
     }
 
-    private String formatResolvedDependency(ResolvedDependency dependency) {
+    private String formatVersion(ResolvedDependency dependency) {
         if (dependency.getSubpackages().contains(GolangDependency.ALL_DESCENDANTS)) {
             return dependency.formatVersion();
         } else {
@@ -124,7 +124,7 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
     }
 
     private String withName() {
-        return finalDependency.getName() + ":" + finalDependency.formatVersion();
+        return finalDependency.getName() + ":" + formatVersion(finalDependency);
     }
 
     public GolangDependencySet flatten() {
