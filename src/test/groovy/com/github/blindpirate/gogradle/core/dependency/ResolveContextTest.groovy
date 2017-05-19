@@ -31,6 +31,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.Mockito
 
 import java.util.function.Predicate
 
@@ -70,7 +71,7 @@ class ResolveContextTest {
 
     @Before
     void setUp() {
-        root = ResolveContext.root(buildConfiguration)
+        root = ResolveContext.root(mock(GogradleRootProject), buildConfiguration)
         ReflectionUtils.setField(root, 'dependencyProduceStrategy', strategy)
 
         when(buildConfiguration.getName()).thenReturn('build')

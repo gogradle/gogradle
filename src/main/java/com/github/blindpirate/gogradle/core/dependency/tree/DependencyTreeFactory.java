@@ -21,7 +21,7 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.exceptions.UnrecognizedPackageException;
+import com.github.blindpirate.gogradle.core.exceptions.ResolutionStackWrappingException;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Singleton;
@@ -71,21 +71,23 @@ public class DependencyTreeFactory {
 
         try {
             // BFS order
-            List<Pair<ResolveContext, ResolvedDependency>> contextAndResults = resolvedDependency.getDependencies()
+            List<Pair<ResolveContext, ResolvedDependency>> subResolution = resolvedDependency
+                    .getDependencies()
                     .stream()
-                    .map(dependency -> createContextAndResolve(dependency, context))
+                    .map(dependency -> createSubContextAndResolve(dependency, context))
                     .collect(Collectors.toList());
 
-            contextAndResults
+            subResolution
                     .forEach(contextAndResult -> resolve(contextAndResult.getRight(), contextAndResult.getLeft()));
-        } catch (UnrecognizedPackageException e) {
-            throw new IllegalStateException("Cannot recognize " + e.getPkg().getPathString()
-                    + " in " + resolvedDependency.getName());
+        } catch (ResolutionStackWrappingException e) {
+            throw e;
+        } catch (Throwable e) {
+            throw ResolutionStackWrappingException.wrapWithResolutionStack(e, context);
         }
     }
 
-    private Pair<ResolveContext, ResolvedDependency> createContextAndResolve(GolangDependency dependency,
-                                                                             ResolveContext parentContext) {
+    private Pair<ResolveContext, ResolvedDependency> createSubContextAndResolve(GolangDependency dependency,
+                                                                                ResolveContext parentContext) {
         ResolveContext subContext = parentContext.createSubContext(dependency);
         ResolvedDependency resolvedDependency = dependency.resolve(subContext);
         return Pair.of(subContext, resolvedDependency);

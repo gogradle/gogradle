@@ -170,13 +170,6 @@ class DependencyTreeFactoryTest {
         order.verify(a3).resolve(context)
     }
 
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if package is unrecognized'() {
-        UnrecognizedGolangPackage pkg = UnrecognizedGolangPackage.of('unrecognized')
-        bindDependencies(rootProject, UnrecognizedNotationDependency.of(pkg))
-        factory.getTree(context, rootProject)
-    }
-
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {
         List children = node.getChildren()
         assert children.size() == expectedChildren.size()

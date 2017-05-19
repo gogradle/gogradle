@@ -158,7 +158,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     private void resolveDependencies() {
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
-        ResolveContext rootContext = ResolveContext.root(configuration);
+        ResolveContext rootContext = ResolveContext.root(gogradleRootProject, configuration);
 
         gogradleRootProject.setDependencies(produceFirstLevelDependencies());
 
