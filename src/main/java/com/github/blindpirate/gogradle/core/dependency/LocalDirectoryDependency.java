@@ -106,6 +106,9 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public void installTo(File targetDirectory) {
+        if (rootDir == EMPTY_DIR) {
+            return;
+        }
         GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
     }
 
