@@ -23,10 +23,8 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import groovy.transform.EqualsAndHashCode
 import org.junit.Before
 import org.junit.Test
-import org.mockito.Mockito
 
 class DependencyTreeNodeTest {
 

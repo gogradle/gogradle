@@ -18,11 +18,9 @@
 package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter
 import com.github.blindpirate.gogradle.support.OnlyOnPosix
 import com.github.blindpirate.gogradle.support.OnlyOnWindows
 import com.github.blindpirate.gogradle.support.WithResource
-import org.apache.commons.io.filefilter.TrueFileFilter
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock

@@ -42,12 +42,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.BUILD_TASK_NAME
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
-import static java.util.Arrays.asList
 
 @RunWith(GogradleRunner)
 @WithProject

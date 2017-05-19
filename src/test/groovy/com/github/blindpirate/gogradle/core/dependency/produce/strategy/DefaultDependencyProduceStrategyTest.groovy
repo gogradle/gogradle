@@ -21,9 +21,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static org.mockito.Mockito.times
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest {

@@ -30,7 +30,6 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
@@ -45,8 +44,8 @@ import java.nio.file.Path
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET
-import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

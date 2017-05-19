@@ -18,7 +18,6 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

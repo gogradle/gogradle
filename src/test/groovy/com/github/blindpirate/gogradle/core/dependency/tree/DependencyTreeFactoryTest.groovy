@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle.core.dependency.tree
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before

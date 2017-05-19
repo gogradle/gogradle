@@ -23,7 +23,7 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.common.InSubpackagesPredicate.*
+import static com.github.blindpirate.gogradle.common.InSubpackagesPredicate.withRootDirAndSubpackages
 
 /**
  * Determine if a file matches the specific subpackage set.
