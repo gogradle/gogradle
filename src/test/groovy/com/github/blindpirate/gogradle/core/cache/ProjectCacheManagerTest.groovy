@@ -34,15 +34,13 @@ import static org.mockito.Mockito.*
 @RunWith(GogradleRunner)
 class ProjectCacheManagerTest {
     @Mock
-    Project project
-    @Mock
     PersistenceResolvedToDependenciesCache resolvedToDependenciesCache
     @Mock
     CloneBackedCache buildScopedNotationToResolvedCache
     @Mock
     CloneBackedCache buildScopedResolvedToDependenciesCache
     @Mock
-    PersistenceCache persistenceNotationToResolvedCache
+    PersistenceNotationToResolvedCache persistenceNotationToResolvedCache
     @Mock
     GitMercurialNotationDependency notationDependency
     @Mock
@@ -54,10 +52,9 @@ class ProjectCacheManagerTest {
 
     @Before
     void setUp() {
-        projectCacheManager = new ProjectCacheManager(project, resolvedToDependenciesCache)
+        projectCacheManager = new ProjectCacheManager(resolvedToDependenciesCache, persistenceNotationToResolvedCache)
         ReflectionUtils.setField(projectCacheManager, 'buildScopedNotationToResolvedCache', buildScopedNotationToResolvedCache)
         ReflectionUtils.setField(projectCacheManager, 'buildScopedResolvedToDependenciesCache', buildScopedResolvedToDependenciesCache)
-        ReflectionUtils.setField(projectCacheManager, 'persistenceNotationToResolvedCache', persistenceNotationToResolvedCache)
     }
 
     @Test

@@ -19,28 +19,25 @@ package com.github.blindpirate.gogradle.core.cache;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import groovy.lang.Singleton;
 import org.gradle.api.Project;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static java.util.Map.Entry;
-
 @Singleton
-public class PersistenceResolvedToDependenciesCache
-        extends PersistenceCache<ResolvedDependency, GolangDependencySet> {
-
+public class PersistenceNotationToResolvedCache
+        extends PersistenceCache<NotationDependency, ResolvedDependency> {
     private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public PersistenceResolvedToDependenciesCache(Project project, PackagePathResolver packagePathResolver) {
-        super(project, "PersistenceResolvedToDependenciesCache.bin");
+    public PersistenceNotationToResolvedCache(Project project, PackagePathResolver packagePathResolver) {
+        super(project, "PersistenceNotationToResolvedCache.bin");
         this.packagePathResolver = packagePathResolver;
     }
 
@@ -57,8 +54,8 @@ public class PersistenceResolvedToDependenciesCache
         entriesToRemove.forEach(entry -> container.remove(entry.getKey()));
     }
 
-    private boolean shouldBePreserved(Map.Entry<ResolvedDependency, GolangDependencySet> entry) {
-        List<GolangDependency> dependencies = entry.getValue().flatten();
+    private boolean shouldBePreserved(Map.Entry<NotationDependency, ResolvedDependency> entry) {
+        List<GolangDependency> dependencies = entry.getValue().getDependencies().flatten();
         return dependencies.stream().allMatch(this::packageIsSame);
     }
 

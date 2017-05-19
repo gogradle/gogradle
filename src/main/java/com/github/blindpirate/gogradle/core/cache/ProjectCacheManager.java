@@ -20,7 +20,6 @@ package com.github.blindpirate.gogradle.core.cache;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import org.gradle.api.Project;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,14 +31,13 @@ public class ProjectCacheManager {
             = new CloneBackedCache<>();
     private final CloneBackedCache<ResolvedDependency, GolangDependencySet> buildScopedResolvedToDependenciesCache
             = new CloneBackedCache<>();
-    private final PersistenceCache<NotationDependency, ResolvedDependency> persistenceNotationToResolvedCache;
+    private final PersistenceNotationToResolvedCache persistenceNotationToResolvedCache;
     private final PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache;
 
     @Inject
-    public ProjectCacheManager(Project project,
-                               PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache) {
-        this.persistenceNotationToResolvedCache
-                = new PersistenceCache<>(project, "PersistenceNotationToResolvedCache.bin");
+    public ProjectCacheManager(PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache,
+                               PersistenceNotationToResolvedCache persistenceNotationToResolvedCache) {
+        this.persistenceNotationToResolvedCache = persistenceNotationToResolvedCache;
         this.persistenceResolvedToDependenciesCache = persistenceResolvedToDependenciesCache;
     }
 
