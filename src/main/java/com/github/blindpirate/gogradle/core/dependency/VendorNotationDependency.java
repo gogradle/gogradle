@@ -45,10 +45,11 @@ public class VendorNotationDependency extends AbstractNotationDependency {
         this.vendorPath = vendorPath;
     }
 
+
     @Override
     public ResolvedDependency doResolve(ResolveContext context) {
         // Here we create a new context to avoid incorrect exclusion
-        ResolveContext rootContext = ResolveContext.root(context.getConfiguration());
+        ResolveContext rootContext = ResolveContext.root(hostNotationDependency, context.getConfiguration());
 
         ResolvedDependency hostResolvedDependency = hostNotationDependency.resolve(rootContext);
         Optional<VendorResolvedDependency> result = hostResolvedDependency.getDependencies().flatten()
