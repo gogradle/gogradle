@@ -89,10 +89,12 @@ public class DefaultBuildManager implements BuildManager {
     public void prepareProjectGopathIfNecessary() {
         String systemGopath = System.getenv("GOPATH");
         if (currentProjectMatchesGopath(systemGopath)) {
+            LOGGER.quiet("Found global GOPATH: {}.", systemGopath);
             gopath = systemGopath;
         } else {
             createProjectSymbolicLinkIfNotExist();
             gopath = toUnixString(getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath());
+            LOGGER.quiet("Use project GOPATH: {}", gopath);
         }
     }
 
