@@ -67,6 +67,10 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
         return subpackages;
     }
 
+    protected boolean containsAllSubpackages() {
+        return subpackages.contains(ALL_DESCENDANTS);
+    }
+
     public void setSubpackages(Collection<String> subpackages) {
         this.subpackages = ImmutableSet.copyOf(subpackages);
     }

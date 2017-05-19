@@ -64,7 +64,7 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
                 VCS_KEY, getVcsType().getName(),
                 GitMercurialNotationDependency.URL_KEY, getUrl(),
                 GitMercurialNotationDependency.COMMIT_KEY, getVersion());
-        if (!getSubpackages().contains(ALL_DESCENDANTS)) {
+        if (!containsAllSubpackages()) {
             ret.put(SUBPACKAGES_KEY, new ArrayList<>(getSubpackages()));
         }
         return ret;
