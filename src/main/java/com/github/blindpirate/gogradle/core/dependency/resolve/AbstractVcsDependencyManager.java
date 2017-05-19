@@ -97,7 +97,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         Path globalCachePath = globalCacheManager.getGlobalPackageCachePath(realDependency.getName());
         doReset(realDependency, globalCachePath);
 
-        Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
+        Path srcPath = globalCachePath.resolve(determineRelativePath(dependency)).normalize();
         IOUtils.copyDependencies(srcPath.toFile(), targetDirectory, dependency.getSubpackages());
     }
 

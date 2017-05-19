@@ -44,7 +44,7 @@ public class LocalDirectoryDependencyManager
     @Override
     public void install(ResolvedDependency dependency, File targetDirectory) {
         LocalDirectoryDependency realDependency = (LocalDirectoryDependency) determineDependency(dependency);
-        Path realPath = realDependency.getRootDir().toPath().resolve(determineRelativePath(dependency));
+        Path realPath = realDependency.getRootDir().toPath().resolve(determineRelativePath(dependency)).normalize();
 
         IOUtils.copyDependencies(realPath.toFile(), targetDirectory, dependency.getSubpackages());
     }
