@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
+import static com.github.blindpirate.gogradle.util.StringUtils.appendNSpaces;
 
 public class InitTask extends AbstractGolangTask {
     private static final int DEFAULT_INDENT = 4;
@@ -150,12 +151,6 @@ public class InitTask extends AbstractGolangTask {
             throw new IllegalStateException("Sorry, we should not be here: " + value);
         }
         return sb.toString();
-    }
-
-    private void appendNSpaces(StringBuilder sb, int n) {
-        while (n-- > 0) {
-            sb.append(' ');
-        }
     }
 
     private Optional<ExternalDependencyFactory> findExternalDependencyFactory(File rootDir) {
