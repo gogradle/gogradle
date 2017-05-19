@@ -75,7 +75,7 @@ testImports:
         verifyMapParsed([name: 'github.com/Masterminds/vcs', version: 'fbe9fb6ad5b5f35b3e82a7c21123cfc526cbf895', transitive: false])
         verifyMapParsed([name       : 'gopkg.in/yaml.v2',
                          version    : 'e4d366fc3c7938e2958e662b4258c7a89e1f0e3e',
-                         subpackages: ['memcache', 'redis'],
+                         subpackages: ['.', 'redis', 'memcache'] as Set,
                          transitive : false])
     }
 
