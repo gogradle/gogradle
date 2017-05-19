@@ -111,12 +111,12 @@ class GitServer {
         }
     }
 
-    static void addFileToRepository(File dir, String fileName) {
+    static void addFileToRepository(File dir, String fileName, String fileContent) {
         Repository repository = FileRepositoryBuilder.create(new File(dir, '.git'))
         Git git
         try {
             git = new Git(repository)
-            new File(dir, fileName).createNewFile()
+            IOUtils.write(new File(dir, fileName), fileContent)
             git.add().addFilepattern(fileName).call()
             git.commit().setMessage('commit').call()
         } finally {

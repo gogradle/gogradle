@@ -117,7 +117,7 @@ dependencies {
         build('goVendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
 
-        GitServer.addFileToRepository(new File(repositories, 'a2'), 'commit2.go')
+        GitServer.addFileToRepository(new File(repositories, 'a2'), 'commit2.go', '')
 
         build('goVendor')
         assert stdout.toString().contains('UP-TO-DATE')
