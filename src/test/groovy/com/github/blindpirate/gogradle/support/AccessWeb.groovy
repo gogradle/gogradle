@@ -26,6 +26,6 @@ import java.lang.annotation.Target
  * Indicates that a test method needs to access web, which may ignored when offline
  */
 @Retention(RetentionPolicy.RUNTIME)
-@Target([ElementType.METHOD])
+@Target([ElementType.METHOD, ElementType.TYPE])
 @interface AccessWeb {
 }
