@@ -21,7 +21,6 @@ import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import com.github.blindpirate.gogradle.task.go.GoBuildTask;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -41,7 +40,6 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TAS
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 import static java.util.Arrays.asList;
 
 
@@ -107,9 +105,6 @@ public class GolangPlugin implements Plugin<Project> {
     private void afterEvaluate(Project p) {
         asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
                 task -> Go.class.cast(p.getTasks().getByName(task)).addDefaultActionIfNoCustomActions());
-        project.getTasks().withType(Go.class)
-                .matching(task -> !task.getClass().getPackage().equals(GoBuildTask.class.getPackage()))
-                .forEach(task -> task.dependsOn(VENDOR_TASK_NAME));
     }
 
     private void customizeProjectInternalServices(Project project) {
