@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.ide
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -36,17 +37,21 @@ class IntellijIdeIntegrationTest {
     GoBinaryManager manager
     @Mock
     Project project
+    @Mock
+    BuildManager buildManager
+
     File resource
 
     IntellijIdeIntegration intellijIdeIntegration
 
     @Before
     void setUp() {
-        intellijIdeIntegration = new IntellijIdeIntegration(manager, project)
+        intellijIdeIntegration = new IntellijIdeIntegration(manager, project, buildManager)
         when(project.getRootDir()).thenReturn(resource)
         when(manager.getBinaryPath()).thenReturn(new File(resource, 'go/bin/go').toPath())
         when(manager.getGoroot()).thenReturn(new File(resource, 'go').toPath())
         when(manager.getGoVersion()).thenReturn('1.7.1')
+        when(buildManager.getGopath()).thenReturn('global')
 
         when(project.getName()).thenReturn('MyAwesomeProject')
     }
@@ -55,7 +60,7 @@ class IntellijIdeIntegrationTest {
     void 'xmls should be generated correctly'() {
         intellijIdeIntegration.generateXmls()
 
-        assert new File(resource, '.idea/goLibraries.xml').exists()
+        assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://global"')
 
         String moduleIml = IOUtils.toString(new File(resource, '.idea/MyAwesomeProject.iml'))
         assert moduleIml.contains('WEB_MODULE')

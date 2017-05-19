@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.ide;
 
+import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
@@ -36,11 +37,14 @@ public abstract class IdeIntegration {
 
     protected final Project project;
 
+    private final BuildManager buildManager;
+
     private final Map<String, Object> context = new HashMap<>();
 
-    protected IdeIntegration(GoBinaryManager goBinaryManager, Project project) {
+    protected IdeIntegration(GoBinaryManager goBinaryManager, Project project, BuildManager buildManager) {
         this.goBinaryManager = goBinaryManager;
         this.project = project;
+        this.buildManager = buildManager;
     }
 
     protected abstract String getModuleType();
@@ -56,8 +60,8 @@ public abstract class IdeIntegration {
 
     private void generateGoLibrariesDotXml() {
         String goLibrariesXmlTemplate = IOUtils.toString(
-                IdeIntegration.class.getClassLoader().getResourceAsStream("ide/goLibraries.xml"));
-        writeFileIntoProjectRoot(GO_LIBRARIES_DOT_XML_PATH, goLibrariesXmlTemplate);
+                IdeIntegration.class.getClassLoader().getResourceAsStream("ide/goLibraries.xml.template"));
+        writeFileIntoProjectRoot(GO_LIBRARIES_DOT_XML_PATH, render(goLibrariesXmlTemplate));
     }
 
     protected abstract void generateModuleIml();
@@ -94,5 +98,10 @@ public abstract class IdeIntegration {
         context.put("moduleType", getModuleType());
         context.put("moduleImlDir", getModuleImlDir());
         context.put("goVersion", goBinaryManager.getGoVersion());
+        if (buildManager.getGopath().endsWith(".gogradle/project_gopath")) {
+            context.put("gopath", "file://$PROJECT_DIR$/.gogradle/project_gopath");
+        } else {
+            context.put("gopath", "file://" + buildManager.getGopath());
+        }
     }
 }

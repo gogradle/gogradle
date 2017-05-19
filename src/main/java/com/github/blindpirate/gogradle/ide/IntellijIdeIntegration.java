@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.ide;
 
+import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.inject.Inject;
@@ -35,8 +36,8 @@ public class IntellijIdeIntegration extends IdeIntegration {
     private static final String GO_SDK_DOT_XML_PATH = ".idea/libraries/Go_SDK.xml";
 
     @Inject
-    public IntellijIdeIntegration(GoBinaryManager goBinaryManager, Project project) {
-        super(goBinaryManager, project);
+    public IntellijIdeIntegration(GoBinaryManager goBinaryManager, Project project, BuildManager buildManager) {
+        super(goBinaryManager, project, buildManager);
     }
 
     @Override

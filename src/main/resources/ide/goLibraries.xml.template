@@ -3,7 +3,7 @@
   <component name="GoLibraries">
     <option name="urls">
       <list>
-        <option value="file://$PROJECT_DIR$/.gogradle/project_gopath" />
+        <option value="${gopath}" />
       </list>
     </option>
   </component>
