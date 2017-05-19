@@ -25,6 +25,24 @@ import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.common.InSubpackagesPredicate.*
 
+/**
+ * Determine if a file matches the specific subpackage set.
+ *
+ * Examples:<br>
+ *
+ * |--------file--------|--given subpackage-|-result-|<br>
+ * |--------------------|-------------------|--------|<br>
+ * |---------any--------|--------...--------|---√----|<br>
+ * |-------file.go------|---------.---------|---√----|<br>
+ * |-------file.go------|--------dir--------|---×----|<br>
+ * |-----dir/file.go----|---------.---------|---×----|<br>
+ * |-----dir/file.go----|--------dir--------|---√----|<br>
+ * |-----dir/file.go----|-------dir/.-------|---√----|<br>
+ * |-----dir/file.go----|----dir/subdir-----|---×----|<br>
+ * |-dir/subdir/file.go-|----dir/subdir-----|---√----|<br>
+ * |-dir/subdir/file.go-|--------dir--------|---√----|<br>
+ */
+
 @RunWith(GogradleRunner)
 @WithResource('')
 class InSubpackagesPredicateTest extends FileFilterTest {
@@ -47,6 +65,13 @@ class InSubpackagesPredicateTest extends FileFilterTest {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['.'] as Set)
         assert predicate.test(touch('file1'))
         assert !predicate.test(touch('dir1/file1'))
+    }
+
+    @Test
+    void "sub/. should only accept sub's children"() {
+        InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['dir/.'] as Set)
+        assert predicate.test(touch('dir/file'))
+        assert !predicate.test(touch('dir/dir/file'))
     }
 
     @Test

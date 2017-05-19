@@ -25,6 +25,23 @@ import java.nio.file.Path;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * Determine if a file matches the specific subpackage set.
+ * <p>
+ * Examples:<br>
+ * <p>
+ * |--------file--------|--given subpackage-|-result-|<br>
+ * |--------------------|-------------------|--------|<br>
+ * |---------any--------|--------...--------|---√----|<br>
+ * |-------file.go------|---------.---------|---√----|<br>
+ * |-------file.go------|--------dir--------|---×----|<br>
+ * |-----dir/file.go----|---------.---------|---×----|<br>
+ * |-----dir/file.go----|--------dir--------|---√----|<br>
+ * |-----dir/file.go----|-------dir/.-------|---√----|<br>
+ * |-----dir/file.go----|----dir/subdir-----|---×----|<br>
+ * |-dir/subdir/file.go-|----dir/subdir-----|---√----|<br>
+ * |-dir/subdir/file.go-|--------dir--------|---√----|<br>
+ */
 public class InSubpackagesPredicate implements Predicate<File> {
     private boolean alwaysTrue;
     private File rootDir;
@@ -50,12 +67,16 @@ public class InSubpackagesPredicate implements Predicate<File> {
         if (alwaysTrue) {
             return true;
         }
+        Assert.isTrue(file.toPath().startsWith(rootDir.toPath()));
         return subpackages.stream().anyMatch(subpackage -> fileIsInSubpackage(file, rootDir, subpackage));
     }
 
     private boolean fileIsInSubpackage(File file, File rootDir, String subpackage) {
         if (GolangDependency.ONLY_CURRENT_FILES.equals(subpackage)) {
             return file.getParentFile().equals(rootDir);
+        } else if (subpackage.endsWith("/.")) {
+            String withoutDot = subpackage.substring(0, subpackage.length() - 2);
+            return file.getParentFile().toPath().equals(rootDir.toPath().resolve(withoutDot).normalize());
         } else {
             Path subpackagePath = rootDir.toPath().resolve(subpackage);
             return file.toPath().startsWith(subpackagePath.normalize());
