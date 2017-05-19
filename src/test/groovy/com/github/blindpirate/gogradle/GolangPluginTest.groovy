@@ -42,7 +42,12 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.BUILD_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
+import static java.util.Arrays.asList
 
 @RunWith(GogradleRunner)
 @WithProject
@@ -277,5 +282,13 @@ class GolangPluginTest {
         }
 
         assert GogradleGlobal.getInstance(GolangPluginSetting.class).buildMode == BuildMode.DEVELOP
+    }
+
+    @Test
+    void 'default action should be added after evaluation'() {
+        project.getPlugins().getPlugin('com.github.blindpirate.gogradle').afterEvaluate(project)
+        [BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME].each {
+            assert project.getTasksByName(it, false).first().actions.size() == 1
+        }
     }
 }

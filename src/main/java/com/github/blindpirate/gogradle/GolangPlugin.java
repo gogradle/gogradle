@@ -72,9 +72,7 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void hackIdeaPlugin() {
-        project.getPlugins().withId("idea", plugin -> {
-            injector.getInstance(IdeaIntegration.class).hack();
-        });
+        project.getPlugins().withId("idea", plugin -> injector.getInstance(IdeaIntegration.class).hack());
     }
 
     private void init(Project project) {
