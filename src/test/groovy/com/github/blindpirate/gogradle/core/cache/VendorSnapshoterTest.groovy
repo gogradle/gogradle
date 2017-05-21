@@ -61,6 +61,7 @@ class VendorSnapshoterTest {
         vendorSnapshoter.loadPersistenceCache()
 
         // then
+        assert new File(resource, '.gogradle/cache/VendorSnapshot.bin').exists()
         assert ReflectionUtils.getField(vendorSnapshoter, 'cache').get(dependency) instanceof DirectorySnapshot
     }
 

@@ -39,7 +39,7 @@ public class VendorSnapshoter {
     @Inject
     public VendorSnapshoter(Project project) {
         this.project = project;
-        this.persistenceFile = new File(project.getRootDir(), "VendorSnapshot.bin");
+        this.persistenceFile = new File(project.getRootDir(), ".gogradle/cache/VendorSnapshot.bin");
     }
 
     public void loadPersistenceCache() {
