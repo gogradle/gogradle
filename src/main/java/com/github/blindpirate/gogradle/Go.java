@@ -163,7 +163,7 @@ public class Go extends AbstractGolangTask {
         return Arrays.asList(Commandline.translateCommandline(arg));
     }
 
-    private class ClosureLineConsumer implements Consumer<String> {
+    private static class ClosureLineConsumer implements Consumer<String> {
         private Closure closure;
 
         private ClosureLineConsumer(Closure closure) {
