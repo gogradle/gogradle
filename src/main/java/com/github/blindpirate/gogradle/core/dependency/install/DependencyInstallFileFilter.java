@@ -49,8 +49,11 @@ public class DependencyInstallFileFilter implements FileFilter {
     public boolean accept(File pathname) {
         if (pathname.isDirectory()) {
             return acceptDirectory(pathname);
-        } else {
+        } else if (pathname.isFile()) {
             return inSubpackagesPredicate.test(pathname) && acceptFile(pathname);
+        } else {
+            // symbolic links
+            return false;
         }
     }
 
