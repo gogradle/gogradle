@@ -34,6 +34,7 @@ import org.gradle.api.logging.Logging;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -45,6 +46,7 @@ import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
@@ -102,7 +104,12 @@ public class DefaultBuildManager implements BuildManager {
         if (StringUtils.isBlank(systemGopath)) {
             return false;
         }
-        return Paths.get(systemGopath).resolve(setting.getPackagePath()).equals(project.getRootDir().toPath());
+        return Stream.of(systemGopath.split(File.pathSeparator))
+                .anyMatch(this::currentProjectMatchesSingleGopath);
+    }
+
+    private boolean currentProjectMatchesSingleGopath(String gopath) {
+        return Paths.get(gopath).resolve(setting.getPackagePath()).equals(project.getRootDir().toPath());
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
