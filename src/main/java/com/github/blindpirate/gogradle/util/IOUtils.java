@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVistor;
 import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
@@ -196,10 +197,10 @@ public final class IOUtils {
     }
 
     public static void append(File file, String str) {
-        if (file.exists()) {
-            write(file, toString(file) + str);
-        } else {
-            write(file, str);
+        try {
+            FileUtils.write(file, str, GogradleGlobal.DEFAULT_CHARSET, true);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 

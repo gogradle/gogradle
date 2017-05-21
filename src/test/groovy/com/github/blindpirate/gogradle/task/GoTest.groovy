@@ -19,25 +19,52 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.Go
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
 import java.util.function.Consumer
 
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GoTest extends TaskTest {
 
     Go task
 
+    List stdouts = ['stdout1', 'stdout2']
+
+    List stderrs = ['stderr1', 'stderr2']
+
+    File resource
+
     @Before
     void setUp() {
         task = buildTask(Go)
+        when(project.getRootDir()).thenReturn(resource)
+    }
+
+    void letBuildManagerCallConsumer() {
+        Answer answer = new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                Consumer stdoutLineConsumer = invocation.getArgument(2)
+                Consumer stderrLineConsumer = invocation.getArgument(3)
+
+                stdouts.each { stdoutLineConsumer.accept(it) }
+                stderrs.each { stderrLineConsumer.accept(it) }
+            }
+        }
+        when(buildManager.run(anyList(), anyMap(), any(Consumer), any(Consumer), isNull())).thenAnswer(answer)
+        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), isNull())).thenAnswer(answer)
     }
 
     @Test
@@ -94,38 +121,99 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'consuming stdout and stderr should succeed'() {
-        boolean stdoutIsVisited, stderrIsVisited
-        task.go('test -v github.com/my/package', { stdout, stderr ->
-            stdoutIsVisited = true
-            stderrIsVisited = true
+    void 'consuming stdout and stderr in go() should succeed'() {
+        // given
+        letBuildManagerCallConsumer()
+
+        // when
+        List stdout = []
+        List stderr = []
+        task.go('vet ./...', { line ->
+            stdout << line
+        }, { line ->
+            stderr << line
         })
 
-        assert stderrIsVisited
-        assert stdoutIsVisited
+        // then
+        assert stdout == stdouts
+        assert stderr == stderrs
     }
 
     @Test
-    void 'consuming stdout should succeed'() {
-        boolean stdoutIsVisited, stderrIsVisited
-        task.go('test -v github.com/my/package', { stdout ->
-            stdoutIsVisited = true
+    void 'consuming stdout and stderr in run() should succeed'() {
+        // given
+        letBuildManagerCallConsumer()
+
+        // when
+        List stdout = []
+        List stderr = []
+        task.run('vet ./...', { line ->
+            stdout << line
+        }, { line ->
+            stderr << line
         })
 
-        assert !stderrIsVisited
-        assert stdoutIsVisited
+        // then
+        assert stdout == stdouts
+        assert stderr == stderrs
     }
 
     @Test
-    void 'closure with more than 2 args should be ignored'() {
-        boolean stdoutIsVisited, stderrIsVisited
-        task.run('golint -v -a', { a, b, c ->
-            stdoutIsVisited = true
-            stderrIsVisited = true
+    void 'consuming stdout with go() should succeed'() {
+        // given
+        letBuildManagerCallConsumer()
+
+        // when
+        List stdout = []
+        task.go('vet ./...', { line ->
+            stdout << line
         })
 
-        assert !stderrIsVisited
-        assert !stdoutIsVisited
+        // then
+        assert stdout == ['stdout1', 'stdout2']
+    }
+
+    @Test
+    void 'consuming stdout with run() should succeed'() {
+        // given
+        letBuildManagerCallConsumer()
+
+        // when
+        List stdout = []
+        task.run('golint -v -a', { line ->
+            stdout << line
+        })
+
+        // then
+        assert stdout == ['stdout1', 'stdout2']
+    }
+
+    @Test
+    @WithResource('')
+    void 'appending and writing to file should succeed'() {
+        // given
+        letBuildManagerCallConsumer()
+        IOUtils.write(resource, 'append.txt', 'append\n');
+        IOUtils.write(resource, 'write.txt', 'write\n');
+        // when
+        task.go('vet ./...', task.appendTo('append.txt'), task.writeTo(new File(resource, 'write.txt').absolutePath))
+
+        // then
+        assert new File(resource, 'append.txt').text == 'append\nstdout1\nstdout2\n'
+        assert new File(resource, 'write.txt').text == 'stderr1\nstderr2\n'
+    }
+
+    @Test
+    @WithResource('')
+    void 'appending and writing to file should succeed when file not exist'() {
+        // given
+        letBuildManagerCallConsumer()
+        // when
+        task.go('vet ./...', task.appendTo('append.txt'), task.writeTo(new File(resource, 'write.txt').absolutePath))
+
+        // then
+        assert new File(resource, 'append.txt').text == 'stdout1\nstdout2\n'
+        assert new File(resource, 'write.txt').text == 'stderr1\nstderr2\n'
     }
 
     @Test
@@ -135,4 +223,5 @@ class GoTest extends TaskTest {
         task.environment('b', '2')
         assert ReflectionUtils.getField(task, 'overallEnvironment') == [a: '1', b: '2']
     }
+
 }
