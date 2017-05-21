@@ -121,7 +121,7 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'consuming stdout and stderr in go() should succeed'() {
+    void 'consuming stdout and stderr in go should succeed'() {
         // given
         letBuildManagerCallConsumer()
 
@@ -140,7 +140,7 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'consuming stdout and stderr in run() should succeed'() {
+    void 'consuming stdout and stderr in run should succeed'() {
         // given
         letBuildManagerCallConsumer()
 
@@ -159,7 +159,7 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'consuming stdout with go() should succeed'() {
+    void 'consuming stdout with go should succeed'() {
         // given
         letBuildManagerCallConsumer()
 
@@ -174,7 +174,7 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'consuming stdout with run() should succeed'() {
+    void 'consuming stdout with run should succeed'() {
         // given
         letBuildManagerCallConsumer()
 
