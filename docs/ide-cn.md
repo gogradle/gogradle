@@ -14,7 +14,7 @@ Go语言是一门静态类型语言，因此许多IDE对其提供了支持，如
 
 Gogradle帮你完成的事情有：
 - 下载正确的Go版本（若其不存在的话）
-- 解析依赖并安装至项目目录下的`.gogradle`目录
+- 解析依赖并安装至项目目录下的`vendor`目录
 - 为IDE生成项目的配置文件，将Go SDK指向正确的位置，并设置IDE的依赖包路径为上述`.gogradle`目录
 
 ## 安装IDE和Golang插件
@@ -124,4 +124,4 @@ IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来�
 
 ## Vim
 
-由于Vim是直接通过环境变量来读取GOPATH的，因此可以通过`gradlew showGopathGoroot`或者`gradlew sGG`命令获取项目级的GOPATH和GOROOT，然后使用这些环境变量启动Vim即可。
+由于Vim是直接通过环境变量来读取GOPATH的，因此可以通过`goVendor`来安装依赖，然后通过`gradlew showGopathGoroot`或者`gradlew sGG`命令获取项目级的GOPATH和GOROOT，使用这些环境变量启动Vim即可。

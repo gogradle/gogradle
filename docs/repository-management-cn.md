@@ -78,4 +78,18 @@ repositories {
         ...
     }
 }  
-``` 
+```
+
+这样做相比下面的声明的好处在于：
+
+- `repositories`声明是全局的，它会影响所有的传递性依赖。
+- `repositories`声明中可以使用Groovy的闭包，轻松实现自定义逻辑的包替换。
+
+```
+dependencies {
+    golang {
+        build name:'github.com/my/project', url: 'http://my-repo/my/project.git'
+    }
+}
+}
+```
