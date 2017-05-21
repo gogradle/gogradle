@@ -18,9 +18,12 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest
+import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependencyForTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -57,7 +60,7 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
     }
 
     @Test
-    void 'external dependencies should have priority over vendor dependencies'() {
+    void 'vendor dependencies should have priority over external dependencies'() {
         // given
         vendorDependencies(a1, b1)
         externalDependencies(a2, c2)
@@ -65,10 +68,32 @@ class DefaultDependencyProduceStrategyTest extends DependencyProduceStrategyTest
         // when
         def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
         // then
-        assert result.any { it.is(a2) }
+        assert !result.any { it.is(a2) }
         assert result.any { it.is(b1) }
         assert result.any { it.is(c2) }
-        assert !result.any { it.is(a1) }
+        assert result.any { it.is(a1) }
+        verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
+    }
+
+    @Test
+    void 'cascading vendor dependencies should be handled correctly'() {
+        // given
+        ResolvedDependencyForTest a = new ResolvedDependencyForTest('a', 'a', 1L, null)
+
+        VendorResolvedDependencyForTest b = new VendorResolvedDependencyForTest('b', 'b', 1L, a, 'vendor/b')
+        VendorResolvedDependencyForTest c = new VendorResolvedDependencyForTest('c', 'c', 1L, a, 'vendor/b/vendor/c')
+
+        a.dependencies.add(b)
+        b.dependencies.add(c)
+
+        vendorDependencies(a)
+        externalDependencies(b2)
+
+        // when
+        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
+        // then
+        assert result.any { it.is(a) }
+        assert !result.any { it.is(b2) }
         verify(visitor, times(0)).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
     }
 

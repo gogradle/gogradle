@@ -127,8 +127,8 @@ dependencies {
                 'github.com/firstlevel/e'    : 'commit5',
 
                 // vendorexternal/a#1 and vendorexternal/a#2 exist in firstlevel/a#2's dependencies
-                // and vendorexternal/a#2 wins because it is in gogradle.lock
-                'github.com/vendorexternal/a': 'commit2',
+                // and vendorexternal/a#3 wins because it is in vendor
+                'github.com/vendorexternal/a': 'commit1',
                 'github.com/vendorexternal/b': 'commit2',
 
                 'github.com/vendoronly/a'    : 'commit2',

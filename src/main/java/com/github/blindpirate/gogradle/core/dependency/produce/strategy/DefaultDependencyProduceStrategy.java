@@ -25,6 +25,7 @@ import com.github.blindpirate.gogradle.util.logging.DebugLog;
 
 import javax.inject.Singleton;
 import java.io.File;
+import java.util.List;
 
 /**
  * Default strategy to generate dependencies of a package.
@@ -55,7 +56,10 @@ public class DefaultDependencyProduceStrategy implements DependencyProduceStrate
                 rootDir, configuration);
         GolangDependencySet vendorDependencies = visitor.visitVendorDependencies(dependency, rootDir, configuration);
 
-        GolangDependencySet candidate = GolangDependencySet.merge(externalDependencies, vendorDependencies);
+        List<GolangDependency> flatVendorDependencies = vendorDependencies.flatten();
+        externalDependencies.removeAll(flatVendorDependencies);
+
+        GolangDependencySet candidate = GolangDependencySet.merge(vendorDependencies, externalDependencies);
         if (candidate.isEmpty()) {
             candidate = visitor.visitSourceCodeDependencies(dependency, rootDir, configuration);
         }
