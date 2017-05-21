@@ -29,7 +29,7 @@ Gogradle是一个为Go语言提供现代构建支持的Gradle插件。Gogradle�
 - Gogradle支持多Go版本共存和切换
 - 社区的各种[依赖管理工具]((https://github.com/blindpirate/report-of-go-package-management-tool))众多，且互不兼容
   - Gogradle提供了[导入命令](gettingstartd-import)，从而使你能够方便地从其他工具迁移到Gogradle
-  - Gogradle在查找一个依赖包的传递性依赖时，能够自动识别`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`工具的锁定文件，从而与它们保持兼容
+  - Gogradle兼容`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`工具。在查找一个依赖包的传递性依赖时，它能够自动识别工具的锁定文件
 - Gogradle会长期维护
 
 Gogradle实现了`glide`的绝大部分功能，并添加了一些额外的功能特性：

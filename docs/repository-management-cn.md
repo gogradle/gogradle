@@ -91,5 +91,4 @@ dependencies {
         build name:'github.com/my/project', url: 'http://my-repo/my/project.git'
     }
 }
-}
 ```

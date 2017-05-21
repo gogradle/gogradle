@@ -88,6 +88,8 @@ IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来�
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
+额外地，你可以利用IDEA的Gradle支持来运行相关任务，如上图所示。
+
 
 >
 > **注意** 在上述过程中，如果你是第一次使用Gogradle，你可能需要重启IDEA来使其生效。Gogradle会在构建的最后提示：

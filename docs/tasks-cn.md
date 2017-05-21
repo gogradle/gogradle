@@ -121,7 +121,7 @@ goBuild {
 ## goTest
 
 依赖`resolveBuildDependencies/resolveTestDependencies/installDependencies`。执行测试工作。假定你的项目`github.com/my/project`包含若干个子包`github.com/my/project/sub1`/`github.com/my/project/sub2`/.../`github.com/my/project/subN`，Gogradle会对这N个包逐个执行测试和覆盖率检查，并生成HTML格式的测试报告。测试报告位于`<project root>/.gogradle/reports/test`目录。目前，`goTest`任务尚不支持自定义配置。
-在测试中，Gogradle会扫描所有的包并逐测试，这是为了生成测试报告。
+在测试中，Gogradle会扫描所有的包并逐个测试，这是为了生成测试报告。
 
 ## gofmt
 
@@ -156,4 +156,4 @@ goVet {
 
 Gogradle支持自定义的go任务。详见[自定义任务](./getting-started-cn.md#自定义任务)。
 
-欲了解更多有关任务的信息，请参考[官方文档](https://docs.gradle.org/current/userguide/more_about_tasks.html)
+欲了解更多有关任务的信息，请参考[官方文档](https://docs.gradle.org/current/userguide/more_about_tasks.html)。

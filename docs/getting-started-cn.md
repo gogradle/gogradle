@@ -1,7 +1,6 @@
 # 入门指南
 
-Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用Groovy作为DSL的自动化构建工具，允许用户通过自定义的构建脚本来完成构建工作。
-大多数情况下，你无需了解Gradle本身，只需要阅读本文档即可。
+Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用Groovy作为DSL的自动化构建工具，允许用户通过自定义的构建脚本来完成构建工作。Gradle的文档在[这里](https://docs.gradle.org/current/userguide/userguide.html)。
 
 ## 准备工作
 
@@ -205,7 +204,7 @@ dependencies {
 
 其中，build和test分别是构建和测试的依赖，二者是独立的，Java的开发者应该很熟悉这样的概念。默认情况下，`goBuild`依赖`resolveBuildDependencies`任务，因此`goBuild`运行时，`vendor`中只包含声明为`build`的依赖包；而`goTest`同时依赖`resolveBuildDependencies`和`resolveTestDependencies`，因此`goTest`运行时，`vendor`中同时包含声明为`build`和`test`的依赖包。
 
-有关依赖的详细解释，参考[依赖管理](./dependency-management-cn.md)一节
+有关依赖的详细解释，参考[依赖管理](./dependency-management-cn.md)一节。
 
 ## 查看依赖
 
