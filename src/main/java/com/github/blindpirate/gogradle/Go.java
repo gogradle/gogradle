@@ -91,60 +91,60 @@ public class Go extends AbstractGolangTask {
     protected void doAddDefaultAction() {
     }
 
-    public void go(String arg) {
-        go(arg, null, null);
+    public int go(String arg) {
+        return go(arg, null, null);
     }
 
-    public void go(List<String> args) {
-        go(args, null, null);
+    public int go(List<String> args) {
+        return go(args, null, null);
     }
 
-    public void go(String arg, Closure stdoutLineConsumer) {
+    public int go(String arg, Closure stdoutLineConsumer) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        go(extractArgs(arg), stdoutLineConsumer, null);
+        return go(extractArgs(arg), stdoutLineConsumer, null);
     }
 
-    public void go(String arg, Closure stdoutLineConsumer, Closure stderrLineConsumer) {
+    public int go(String arg, Closure stdoutLineConsumer, Closure stderrLineConsumer) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        go(extractArgs(arg), stdoutLineConsumer, stderrLineConsumer);
+        return go(extractArgs(arg), stdoutLineConsumer, stderrLineConsumer);
     }
 
-    public void go(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
+    public int go(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
         Consumer<String> stdoutLineConsumer =
                 stdoutLineClosure == null ? LOGGER::quiet : new ClosureLineConsumer(stdoutLineClosure);
         Consumer<String> stderrLineConsumer =
                 stderrLineClosure == null ? LOGGER::error : new ClosureLineConsumer(stderrLineClosure);
-        buildManager.go(args,
+        return buildManager.go(args,
                 getBuildEnvironment(),
                 stdoutLineConsumer,
                 stderrLineConsumer,
                 continueWhenFail ? DO_NOTHING : null);
     }
 
-    public void run(String arg) {
-        run(arg, null, null);
+    public int run(String arg) {
+        return run(arg, null, null);
     }
 
-    public void run(List<String> args) {
-        run(args, null, null);
+    public int run(List<String> args) {
+        return run(args, null, null);
     }
 
-    public void run(String arg, Closure stdoutLineClosure) {
+    public int run(String arg, Closure stdoutLineClosure) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        run(extractArgs(arg), stdoutLineClosure, null);
+        return run(extractArgs(arg), stdoutLineClosure, null);
     }
 
-    public void run(String arg, Closure stdoutLineClosure, Closure stderrLineClosure) {
+    public int run(String arg, Closure stdoutLineClosure, Closure stderrLineClosure) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        run(extractArgs(arg), stdoutLineClosure, stderrLineClosure);
+        return run(extractArgs(arg), stdoutLineClosure, stderrLineClosure);
     }
 
-    public void run(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
+    public int run(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
         Consumer<String> stdoutLineConsumer =
                 stdoutLineClosure == null ? LOGGER::quiet : new ClosureLineConsumer(stdoutLineClosure);
         Consumer<String> stderrLineConsumer =
                 stderrLineClosure == null ? LOGGER::error : new ClosureLineConsumer(stderrLineClosure);
-        buildManager.run(args,
+        return buildManager.run(args,
                 getBuildEnvironment(),
                 stdoutLineConsumer,
                 stderrLineConsumer,
@@ -157,6 +157,14 @@ public class Go extends AbstractGolangTask {
 
     public Closure writeTo(String file) {
         return new FileWritingClosure(file, false);
+    }
+
+    public Closure devNull() {
+        return new Closure<Void>(this) {
+            public Void call(Object line) {
+                return null;
+            }
+        };
     }
 
     protected List<String> extractArgs(String arg) {

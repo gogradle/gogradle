@@ -61,6 +61,8 @@ class GoTest extends TaskTest {
 
                 stdouts.each { stdoutLineConsumer.accept(it) }
                 stderrs.each { stderrLineConsumer.accept(it) }
+
+                return 0
             }
         }
         when(buildManager.run(anyList(), anyMap(), any(Consumer), any(Consumer), isNull())).thenAnswer(answer)
@@ -128,13 +130,14 @@ class GoTest extends TaskTest {
         // when
         List stdout = []
         List stderr = []
-        task.go('vet ./...', { line ->
+        def retcode = task.go('vet ./...', { line ->
             stdout << line
         }, { line ->
             stderr << line
         })
 
         // then
+        assert retcode == 0
         assert stdout == stdouts
         assert stderr == stderrs
     }
@@ -147,13 +150,14 @@ class GoTest extends TaskTest {
         // when
         List stdout = []
         List stderr = []
-        task.run('vet ./...', { line ->
+        def retcode = task.run('vet ./...', { line ->
             stdout << line
         }, { line ->
             stderr << line
         })
 
         // then
+        assert retcode == 0
         assert stdout == stdouts
         assert stderr == stderrs
     }

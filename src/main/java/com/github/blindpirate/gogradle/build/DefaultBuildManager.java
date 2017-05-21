@@ -139,18 +139,18 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
-    public void go(List<String> args, Map<String, String> env) {
-        go(args, env, null, null, null);
+    public int go(List<String> args, Map<String, String> env) {
+        return go(args, env, null, null, null);
     }
 
     @Override
-    public void go(List<String> args,
-                   Map<String, String> env,
-                   Consumer<String> stdoutLineConsumer,
-                   Consumer<String> stderrLineConsumer,
-                   Consumer<Integer> retcodeConsumer) {
+    public int go(List<String> args,
+                  Map<String, String> env,
+                  Consumer<String> stdoutLineConsumer,
+                  Consumer<String> stderrLineConsumer,
+                  Consumer<Integer> retcodeConsumer) {
         List<String> cmdAndArgs = asStringList(getGoBinary(), insertBuildTags(args));
-        run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
+        return run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
     }
 
     private List<String> insertBuildTags(List<String> cmd) {
@@ -168,16 +168,16 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
-    public void run(List<String> args, Map<String, String> env,
-                    Consumer<String> stdoutLineConsumer,
-                    Consumer<String> stderrLineConsumer,
-                    Consumer<Integer> retcodeConsumer) {
+    public int run(List<String> args, Map<String, String> env,
+                   Consumer<String> stdoutLineConsumer,
+                   Consumer<String> stderrLineConsumer,
+                   Consumer<Integer> retcodeConsumer) {
         Map<String, String> finalEnv = determineEnv(env);
 
         @SuppressWarnings("unchecked")
         List<String> finalArgs = renderArgs(args, (Map) finalEnv);
 
-        doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
+        return doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
     }
 
     @SuppressWarnings("unchecked")
@@ -187,11 +187,11 @@ public class DefaultBuildManager implements BuildManager {
         return args.stream().map(s -> render(s, context)).collect(Collectors.toList());
     }
 
-    private void doRun(List<String> args,
-                       Map<String, String> env,
-                       Consumer<String> stdoutLineConsumer,
-                       Consumer<String> stderrLineConsumer,
-                       Consumer<Integer> retcodeConsumer) {
+    private int doRun(List<String> args,
+                      Map<String, String> env,
+                      Consumer<String> stdoutLineConsumer,
+                      Consumer<String> stderrLineConsumer,
+                      Consumer<Integer> retcodeConsumer) {
         stdoutLineConsumer = stdoutLineConsumer == null ? LOGGER::quiet : stdoutLineConsumer;
         stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
         retcodeConsumer = retcodeConsumer == null ? code -> ensureProcessReturnZero(code, args, env) : retcodeConsumer;
@@ -213,6 +213,7 @@ public class DefaultBuildManager implements BuildManager {
             int retcode = process.waitFor();
 
             retcodeConsumer.accept(retcode);
+            return retcode;
         } catch (InterruptedException e) {
             throw ExceptionHandler.uncheckException(e);
         }

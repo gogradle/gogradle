@@ -26,15 +26,15 @@ public interface BuildManager {
 
     String getGopath();
 
-    void go(List<String> args, Map<String, String> env);
+    int go(List<String> args, Map<String, String> env);
 
-    void go(List<String> args,
+    int go(List<String> args,
             Map<String, String> env,
             Consumer<String> stdoutLineConsumer,
             Consumer<String> stderrLineConsumer,
             Consumer<Integer> retcodeConsumer);
 
-    void run(List<String> args,
+    int run(List<String> args,
              Map<String, String> env,
              Consumer<String> stdoutLineConsumer,
              Consumer<String> stderrLineConsumer,
