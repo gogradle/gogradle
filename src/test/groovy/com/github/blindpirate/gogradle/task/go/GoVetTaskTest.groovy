@@ -55,6 +55,6 @@ class GoVetTaskTest extends TaskTest {
         ArgumentCaptor captor = ArgumentCaptor.forClass(List)
         // then
         verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
-        assert captor.value == ['vet', './...']
+        assert captor.value == ['vet', 'github.com/my/package/...']
     }
 }
