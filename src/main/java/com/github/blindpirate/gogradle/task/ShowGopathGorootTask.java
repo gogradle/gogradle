@@ -24,7 +24,7 @@ import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class ShowGopathGorootTask extends AbstractGolangTask {
@@ -36,7 +36,7 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public ShowGopathGorootTask() {
-        dependsOn(VENDOR_TASK_NAME);
+        dependsOn(PREPARE_TASK_NAME);
     }
 
     @TaskAction
