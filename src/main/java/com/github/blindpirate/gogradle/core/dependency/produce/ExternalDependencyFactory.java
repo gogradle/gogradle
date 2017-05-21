@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -42,6 +43,9 @@ public abstract class ExternalDependencyFactory {
 
     @Inject
     protected MapNotationParser mapNotationParser;
+
+    @Inject
+    protected PackagePathResolver packagePathResolver;
 
     @Inject
     private StandardPackagePathResolver standardPackagePathResolver;

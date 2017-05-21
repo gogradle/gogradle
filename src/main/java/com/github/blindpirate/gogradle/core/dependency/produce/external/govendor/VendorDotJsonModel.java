@@ -20,14 +20,20 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.govendo
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.MapUtils;
 
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
+import static com.github.blindpirate.gogradle.util.MapUtils.asMapWithoutNull;
+import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 /**
  * Model of vendor/vendor.json in repos managed by govendor.
@@ -47,8 +53,8 @@ public class VendorDotJsonModel {
     @JsonProperty("package")
     private List<PackageBean> packageX;
 
-    public List<Map<String, Object>> toNotations() {
-        return packageX.stream().map(PackageBean::toNotation).collect(Collectors.toList());
+    public List<Map<String, Object>> toNotations(PackagePathResolver packagePathResolver) {
+        return packageX.stream().map(bean -> bean.toNotation(packagePathResolver)).collect(Collectors.toList());
     }
 
     @JsonIgnoreProperties(ignoreUnknown = true)
@@ -57,14 +63,23 @@ public class VendorDotJsonModel {
         private String checksumSHA1;
         @JsonProperty("path")
         private String path;
+        @JsonProperty("origin")
+        private String origin;
         @JsonProperty("revision")
         private String revision;
         @JsonProperty("revisionTime")
         private String revisionTime;
 
-        Map<String, Object> toNotation() {
+        Map<String, Object> toNotation(PackagePathResolver packagePathResolver) {
             Assert.isNotBlank(path);
             /*
+            {
+                    "checksumSHA1": "CujWu7+PWlZSX5+zAPJH91O5AVQ=",
+                    "origin": "github.com/docker/distribution/vendor/github.com/Sirupsen/logrus",
+                    "path": "github.com/Sirupsen/logrus",
+                    "revision": "0700fa570d7bcc1b3e46ee127c4489fd25f4daa3",
+                    "revisionTime": "2017-03-21T17:14:25Z"
+            },
              {
                  "path": "appengine",
                  "revision": ""
@@ -74,9 +89,29 @@ public class VendorDotJsonModel {
                  "revision": ""
              }
              */
-            return MapUtils.asMapWithoutNull("name", path,
-                    "version", isBlank(revision) ? null : revision,
-                    "transitive", false);
+
+            Map<String, Object> ret = asMapWithoutNull("name", path, "transitive", false);
+            if (isNotBlank(origin)) {
+                recognizeHostAndVendorPath(ret, packagePathResolver);
+            } else if (isNotBlank(revision)) {
+                ret.put("version", revision);
+            }
+            return ret;
+        }
+
+        private void recognizeHostAndVendorPath(Map<String, Object> ret, PackagePathResolver packagePathResolver) {
+            GolangPackage pkg = packagePathResolver.produce(origin).get();
+
+            Assert.isNotBlank(revision, "Illegal vendor.json: revision must exist along with origin!");
+            Assert.isTrue(pkg instanceof ResolvableGolangPackage, "Cannot resolve package in vendor.json: " + origin);
+
+            Path hostImportPath = ResolvableGolangPackage.class.cast(pkg).getRootPath();
+            Path vendorPath = hostImportPath.relativize(Paths.get(origin));
+            Map<String, Object> host = asMapWithoutNull("name", toUnixString(hostImportPath),
+                    "version", revision);
+
+            ret.put("vendorPath", toUnixString(vendorPath));
+            ret.put("host", host);
         }
     }
 }
