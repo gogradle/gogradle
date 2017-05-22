@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
@@ -67,7 +68,7 @@ class JetBrainsIdeTest {
         assert moduleIml.contains('Go SDK')
 
         String goSdkXml = IOUtils.toString(new File(resource, '.idea/libraries/Go_SDK.xml'))
-        assert goSdkXml.contains("file://${new File(resource, 'go/src').getAbsolutePath()}")
+        assert goSdkXml.contains("file://${StringUtils.toUnixString(new File(resource, 'go/src'))}")
 
         String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))
         assert modulesXml.contains('.idea/MyAwesomeProject.iml')
