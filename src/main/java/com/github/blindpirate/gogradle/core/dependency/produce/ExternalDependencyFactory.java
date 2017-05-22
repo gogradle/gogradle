@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
@@ -42,6 +43,9 @@ public abstract class ExternalDependencyFactory {
 
     @Inject
     protected MapNotationParser mapNotationParser;
+
+    @Inject
+    protected PackagePathResolver packagePathResolver;
 
     @Inject
     private StandardPackagePathResolver standardPackagePathResolver;
@@ -68,7 +72,7 @@ public abstract class ExternalDependencyFactory {
     }
 
     public boolean canRecognize(File rootDir) {
-        return identityFile(rootDir).exists();
+        return identityFile(rootDir).isFile();
     }
 
     private List<Map<String, Object>> removeStandardPackages(List<Map<String, Object>> packages) {

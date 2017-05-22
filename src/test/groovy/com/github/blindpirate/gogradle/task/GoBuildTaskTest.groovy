@@ -47,7 +47,8 @@ class GoBuildTaskTest extends TaskTest {
     void setUp() {
         task = buildTask(GoBuildTask)
         task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
-        when(buildManager.getBuildGopath()).thenReturn('build_gopath')
+        when(buildManager.getGopath()).thenReturn('project_gopath')
+        when(setting.getPackagePath()).thenReturn('my/package')
     }
 
     @Test
@@ -59,14 +60,14 @@ class GoBuildTaskTest extends TaskTest {
         assert task.actions.size() == 1
         verify(buildManager, times(3)).go(cmdsCaptor.capture(), envCaptor.capture(), any(Consumer), any(Consumer), isNull())
         assert cmdsCaptor.allValues ==
-                [['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'],
-                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'],
-                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}'],
+                [['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
+                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
+                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
                 ]
         assert envCaptor.allValues == [
-                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'],
-                [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'],
-                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath']
+                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: ''],
+                [GOOS: 'linux', GOARCH: '386', GOEXE: ''],
+                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
         ]
     }
 
@@ -121,9 +122,9 @@ class GoBuildTaskTest extends TaskTest {
                 ['build', '-o', 'output']
         ]
         assert envCaptor.allValues == [
-                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'],
-                [GOOS: 'linux', GOARCH: '386', GOEXE: '', GOPATH: 'build_gopath'],
-                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe', GOPATH: 'build_gopath']
+                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: ''],
+                [GOOS: 'linux', GOARCH: '386', GOEXE: '',],
+                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
         ]
     }
 

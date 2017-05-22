@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
+import com.github.blindpirate.gogradle.core.cache.VendorSnapshoter
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.lock.LockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -30,7 +31,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.strategy.Gogradle
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.ide.IdeaIntegration
-import com.github.blindpirate.gogradle.ide.IntellijIdeIntegration
+import com.github.blindpirate.gogradle.ide.JetBrainsIdeIntegration
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
@@ -71,7 +72,9 @@ abstract class TaskTest {
     @Mock
     ProjectCacheManager projectCacheManager
     @Mock
-    IntellijIdeIntegration intellijIdeIntegration
+    JetBrainsIdeIntegration jetBrainsIdeIntegration
+    @Mock
+    VendorSnapshoter vendorSnapshoter
     @Mock
     GogradleRootProject gogradleRootProject
     // This is a real task container for test tasks to fetch notationDependency tasks from
@@ -109,7 +112,8 @@ abstract class TaskTest {
                       configurationManager   : configurationManager,
                       projectCacheManager    : projectCacheManager,
                       gogradleRootProject    : gogradleRootProject,
-                      intellijIdeIntegration : intellijIdeIntegration]
+                      vendorSnapshoter       : vendorSnapshoter,
+                      jetBrainsIdeIntegration: jetBrainsIdeIntegration]
 
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 

@@ -23,7 +23,6 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import groovy.transform.EqualsAndHashCode
 import org.junit.Before
 import org.junit.Test
 
@@ -86,11 +85,41 @@ a
 '''
     }
 
+    @Test
+    void 'subpackages should be printed'() {
+        // given
+        ResolvedDependency b1 = withNameAndVersion('b', 'version1')
+        ResolvedDependency b2 = withNameAndVersion('b', 'version2')
+
+        b1.subpackages = ['sub1', 'sub2']
+
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b2, false)])
+        // then
+        assert root.output() == '''\
+a
+\\-- b:version1 [sub1, sub2] -> version2
+'''
+    }
+
+    @Test
+    void 'subpackages should be printed2'() {
+        // given
+        ResolvedDependency b1 = withNameAndVersion('b', 'version1')
+
+        b1.subpackages = ['sub1', 'sub2']
+
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b1, true)])
+        // then
+        assert root.output() == '''\
+a
+\\-- b:version1 [sub1, sub2] (*)
+'''
+    }
+
     ResolvedDependency withNameAndVersion(String name, String version) {
         return new Temp(name, version, 0L)
     }
 
-    @EqualsAndHashCode(includes = ['name', 'version'])
     static class Temp extends AbstractResolvedDependency {
         private static final int serialVersionUID = 1
 

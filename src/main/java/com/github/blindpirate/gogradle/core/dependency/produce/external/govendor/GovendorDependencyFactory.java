@@ -42,7 +42,7 @@ public class GovendorDependencyFactory extends ExternalDependencyFactory {
     @Override
     protected List<Map<String, Object>> adapt(File file) {
         VendorDotJsonModel model = parseJson(file, VendorDotJsonModel.class);
-        return model.toNotations();
+        return model.toNotations(packagePathResolver);
     }
 
 }

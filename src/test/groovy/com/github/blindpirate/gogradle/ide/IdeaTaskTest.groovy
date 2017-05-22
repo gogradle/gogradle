@@ -23,7 +23,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
 import static org.mockito.Mockito.verify
 
 @RunWith(GogradleRunner)
@@ -41,8 +41,6 @@ class IdeaTaskTest extends TaskTest {
         task.generateXmlsForIdea()
         // then
         verify(ideaIntegration).generateXmls()
-        assertTaskDependsOn(task, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, RESOLVE_TEST_DEPENDENCIES_TASK_NAME)
-        assertTaskDependsOn(task, RENAME_VENDOR_TASK_NAME)
+        assertTaskDependsOn(task, VENDOR_TASK_NAME)
     }
 }

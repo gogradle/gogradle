@@ -24,12 +24,12 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy;
 
 import java.io.File;
+import java.util.Collections;
 import java.util.Set;
 import java.util.function.Predicate;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy.DEFAULT_STRATEGY;
-import static java.util.Collections.emptySet;
 
 public class ResolveContext {
 
@@ -39,7 +39,9 @@ public class ResolveContext {
 
     private DependencyProduceStrategy dependencyProduceStrategy;
 
-    private Set<Predicate<GolangDependency>> transitiveDepExclusions;
+    private GolangDependency dependency;
+
+    private Set<Predicate<GolangDependency>> transitiveDepExclusions = Collections.emptySet();
 
     public GolangConfiguration getConfiguration() {
         return configuration;
@@ -50,28 +52,25 @@ public class ResolveContext {
     }
 
     public ResolveContext createSubContext(GolangDependency dependency) {
-        if (dependency instanceof NotationDependency) {
-            return new ResolveContext(this,
-                    configuration,
-                    NotationDependency.class.cast(dependency).getTransitiveDepExclusions(),
-                    dependencyProduceStrategy);
-        } else {
-            return new ResolveContext(this, configuration, emptySet(), dependencyProduceStrategy);
-        }
+        return new ResolveContext(this, configuration, dependency, dependencyProduceStrategy);
     }
 
-    public static ResolveContext root(GolangConfiguration configuration) {
-        return new ResolveContext(null, configuration, emptySet(), DEFAULT_STRATEGY);
+    public static ResolveContext root(GolangDependency rootDependency, GolangConfiguration configuration) {
+        return new ResolveContext(null, configuration, rootDependency, DEFAULT_STRATEGY);
     }
 
     private ResolveContext(ResolveContext parent,
                            GolangConfiguration configuration,
-                           Set<Predicate<GolangDependency>> transitiveDepExclusions,
+                           GolangDependency dependency,
                            DependencyProduceStrategy strategy) {
         this.parent = parent;
         this.configuration = configuration;
-        this.transitiveDepExclusions = transitiveDepExclusions;
         this.dependencyProduceStrategy = strategy;
+        this.dependency = dependency;
+
+        if (dependency instanceof NotationDependency) {
+            this.transitiveDepExclusions = NotationDependency.class.cast(dependency).getTransitiveDepExclusions();
+        }
     }
 
 
@@ -110,5 +109,13 @@ public class ResolveContext {
             current = current.parent;
         }
         return true;
+    }
+
+    public GolangDependency getDependency() {
+        return dependency;
+    }
+
+    public ResolveContext getParent() {
+        return parent;
     }
 }

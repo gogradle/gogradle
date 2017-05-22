@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.ide;
 
+import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -43,8 +44,9 @@ public class IdeaIntegration extends IdeIntegration {
     @Inject
     public IdeaIntegration(GoBinaryManager goBinaryManager,
                            Project project,
+                           BuildManager buildManager,
                            IdeaSdkHacker hacker) {
-        super(goBinaryManager, project);
+        super(goBinaryManager, project, buildManager);
         this.hacker = hacker;
     }
 

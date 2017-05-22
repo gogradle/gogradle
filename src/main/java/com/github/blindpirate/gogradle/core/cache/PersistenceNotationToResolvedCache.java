@@ -17,20 +17,51 @@
 
 package com.github.blindpirate.gogradle.core.cache;
 
+import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import groovy.lang.Singleton;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import org.gradle.api.Project;
 
 import javax.inject.Inject;
-import java.io.File;
+import javax.inject.Singleton;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Singleton
 public class PersistenceNotationToResolvedCache
-        extends PersistentCache<NotationDependency, ResolvedDependency> {
+        extends PersistenceCache<NotationDependency, ResolvedDependency> {
+    private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public PersistenceNotationToResolvedCache(Project project) {
-        super(new File(project.getRootDir(), ".gogradle/cache/PersistenceNotationToResolvedCache.bin"));
+    public PersistenceNotationToResolvedCache(Project project, PackagePathResolver packagePathResolver) {
+        super(project, "PersistenceNotationToResolvedCache.bin");
+        this.packagePathResolver = packagePathResolver;
+    }
+
+    @Override
+    public void load() {
+        super.load();
+        removeCachedItemWhosePackageHasChanged();
+    }
+
+    private void removeCachedItemWhosePackageHasChanged() {
+        List<Map.Entry> entriesToRemove = container.entrySet().stream()
+                .filter(entry -> !shouldBePreserved(entry))
+                .collect(Collectors.toList());
+        entriesToRemove.forEach(entry -> container.remove(entry.getKey()));
+    }
+
+    private boolean shouldBePreserved(Map.Entry<NotationDependency, ResolvedDependency> entry) {
+        List<GolangDependency> dependencies = entry.getValue().getDependencies().flatten();
+        return dependencies.stream().allMatch(this::packageIsSame);
+    }
+
+    private boolean packageIsSame(GolangDependency dependency) {
+        GolangPackage newPkg = packagePathResolver.produce(dependency.getName()).get();
+        GolangPackage oldPkg = dependency.getPackage();
+        return newPkg.equals(oldPkg);
     }
 }

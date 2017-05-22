@@ -20,17 +20,11 @@ package com.github.blindpirate.gogradle.core.exceptions;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
 
 public class UnrecognizedPackageException extends RuntimeException {
-    private UnrecognizedGolangPackage pkg;
-
-    public UnrecognizedGolangPackage getPkg() {
-        return pkg;
-    }
-
-    private UnrecognizedPackageException(UnrecognizedGolangPackage pkg) {
-        this.pkg = pkg;
+    private UnrecognizedPackageException(String message) {
+        super(message);
     }
 
     public static UnrecognizedPackageException cannotRecognizePackage(UnrecognizedGolangPackage pkg) {
-        return new UnrecognizedPackageException(pkg);
+        return new UnrecognizedPackageException("Cannot recognized package: " + pkg.getPathString());
     }
 }

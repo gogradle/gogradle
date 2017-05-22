@@ -32,9 +32,11 @@ import org.gradle.api.logging.Logging;
 
 import java.io.File;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.SUBPACKAGES_KEY;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 
 public class LocalDirectoryDependency extends AbstractNotationDependency implements ResolvedDependency {
@@ -93,12 +95,20 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     public Map<String, Object> toLockedNotation() {
         LOGGER.warn("You are locking {} which exists only on your local filesystem, "
                 + "which may cause issues on other one's computer.", getRootDir());
-        return MapUtils.asMap(MapNotationParser.NAME_KEY, getName(),
+        Map<String, Object> ret = MapUtils.asMap(
+                MapNotationParser.NAME_KEY, getName(),
                 DirMapNotationParser.DIR_KEY, StringUtils.toUnixString(rootDir));
+        if (!getSubpackages().contains(ALL_DESCENDANTS)) {
+            ret.put(SUBPACKAGES_KEY, new ArrayList<>(getSubpackages()));
+        }
+        return ret;
     }
 
     @Override
     public void installTo(File targetDirectory) {
+        if (rootDir == EMPTY_DIR) {
+            return;
+        }
         GogradleGlobal.getInstance(LocalDirectoryDependencyManager.class).install(this, targetDirectory);
     }
 

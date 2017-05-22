@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.task
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.ReflectionUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.logging.Logger
 import org.gradle.api.logging.Logging
 import org.junit.After
@@ -55,16 +56,14 @@ class ShowGopathGorootTaskTest extends TaskTest {
     @WithResource('')
     void 'it should succeed'() {
         // when
+        String projectGopath = new File(resource, 'project/.gogradle/project_gopath').getAbsolutePath().replace('\\', '/')
+        when(buildManager.getGopath()).thenReturn(projectGopath)
         when(project.getRootDir()).thenReturn(new File(resource, 'project'))
         when(goBinaryManager.getGoroot()).thenReturn(resource.toPath().resolve('goroot'))
         // when
         task.showGopathGoroot()
         // then
-        String projectGopath = new File(resource, 'project/.gogradle/project_gopath').getAbsolutePath().replace('\\', '/')
-        String buildGopath = new File(resource, 'project/.gogradle/build_gopath').getAbsolutePath().replace('\\', '/')
-        String testGopath = new File(resource, 'project/.gogradle/test_gopath').getAbsolutePath().replace('\\', '/')
-        String separator = File.pathSeparator
-        verify(logger).quiet("GOPATH: {}", "${projectGopath}${separator}${buildGopath}${separator}${testGopath}".toString())
-        verify(logger).quiet("GOROOT: {}", new File(resource, 'goroot').absolutePath.replace('\\', '/'))
+        verify(logger).quiet("GOPATH: {}", projectGopath)
+        verify(logger).quiet("GOROOT: {}", StringUtils.toUnixString(new File(resource, 'goroot')))
     }
 }

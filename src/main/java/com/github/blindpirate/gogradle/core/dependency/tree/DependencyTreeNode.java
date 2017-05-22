@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency.tree;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -111,11 +112,19 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
 
     private String withArrow() {
         return finalDependency.getName() + ":"
-                + originalDependency.formatVersion() + " -> " + finalDependency.formatVersion();
+                + formatVersion(originalDependency) + " -> " + formatVersion(finalDependency);
+    }
+
+    private String formatVersion(ResolvedDependency dependency) {
+        if (dependency.getSubpackages().contains(GolangDependency.ALL_DESCENDANTS)) {
+            return dependency.formatVersion();
+        } else {
+            return dependency.formatVersion() + " " + dependency.getSubpackages();
+        }
     }
 
     private String withName() {
-        return finalDependency.getName() + ":" + finalDependency.formatVersion();
+        return finalDependency.getName() + ":" + formatVersion(finalDependency);
     }
 
     public GolangDependencySet flatten() {

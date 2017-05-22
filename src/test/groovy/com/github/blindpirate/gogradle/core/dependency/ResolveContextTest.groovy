@@ -70,7 +70,7 @@ class ResolveContextTest {
 
     @Before
     void setUp() {
-        root = ResolveContext.root(buildConfiguration)
+        root = ResolveContext.root(mock(GogradleRootProject), buildConfiguration)
         ReflectionUtils.setField(root, 'dependencyProduceStrategy', strategy)
 
         when(buildConfiguration.getName()).thenReturn('build')

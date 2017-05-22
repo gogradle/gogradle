@@ -17,15 +17,38 @@
 
 package com.github.blindpirate.gogradle.core.dependency
 
+import com.github.blindpirate.gogradle.GogradleRunner
+import org.gradle.api.Project
+import org.junit.Before
 import org.junit.Test
+import org.junit.runner.RunWith
+import org.mockito.Mock
 
+import static org.mockito.Mockito.when
+
+@RunWith(GogradleRunner)
 class GogradleRootProjectTest {
-    GogradleRootProject rootProject = new GogradleRootProject()
+    @Mock
+    Project project
+    @Mock
+    File rootDir
+
+    GogradleRootProject rootProject
+
+    @Before
+    void setUp() {
+        when(project.getRootDir()).thenReturn(rootDir)
+        when(rootDir.exists()).thenReturn(true)
+        when(rootDir.isDirectory()).thenReturn(true)
+        rootProject = new GogradleRootProject(project)
+    }
 
     @Test(expected = IllegalStateException)
     void 'exception should be thrown in second initialization'() {
         rootProject.name = 'name'
-        rootProject.initSingleton('name', null)
+
+        assert rootProject.name == 'name'
+        rootProject.name = 'name'
     }
 
     @Test
@@ -35,6 +58,7 @@ class GogradleRootProjectTest {
         assertUnsupport { rootProject.formatVersion() }
         assertUnsupport { rootProject.getVersion() }
         assertUnsupport { rootProject.clone() }
+        assertUnsupport { rootProject.toLockedNotation() }
     }
 
     @Test
@@ -43,14 +67,10 @@ class GogradleRootProjectTest {
     }
 
     @Test
-    void 'toNotation should succeed'() {
-        assert rootProject.toLockedNotation() == [name: 'GOGRADLE_ROOT']
-    }
-
-    @Test
     void 'equals and hashCode should succeed'() {
-        assert rootProject != new GogradleRootProject()
-        assert rootProject.hashCode() != new GogradleRootProject().hashCode()
+        assert rootProject != new GogradleRootProject(project)
+        assert rootProject == rootProject
+        assert rootProject.hashCode() != new GogradleRootProject(project).hashCode()
     }
 
     void assertUnsupport(Closure c) {

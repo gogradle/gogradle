@@ -20,5 +20,7 @@ package com.github.blindpirate.gogradle.core.cache;
 import java.util.function.Function;
 
 public interface Cache<K, V> {
+    int DEFAULT_LRU_CAPACITY = 1000;
+
     V get(K key, Function<K, V> constructor);
 }

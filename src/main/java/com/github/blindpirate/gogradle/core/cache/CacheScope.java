@@ -17,6 +17,18 @@
 
 package com.github.blindpirate.gogradle.core.cache;
 
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency;
+import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+
+/**
+ * Represents a dependency's cache scope. When a dependency whose code for is not fixed,
+ * say, a dependency existing on local file system, or a git dependency declared with commit "LATEST_COMMIT",
+ * it has a @{code BUILD} scope. Otherwise, it has a @{code PERSISTENCE} scope, e.g., a git dependency with
+ * concrete commit.
+ *
+ * @see LocalDirectoryDependency#getCacheScope()
+ * @see GitMercurialNotationDependency#getCacheScope()
+ */
 public enum CacheScope {
     BUILD,
     PERSISTENCE

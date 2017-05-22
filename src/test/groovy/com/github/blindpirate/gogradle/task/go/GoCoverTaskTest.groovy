@@ -32,7 +32,6 @@ import org.mockito.stubbing.Answer
 
 import static org.mockito.ArgumentMatchers.anyList
 import static org.mockito.ArgumentMatchers.anyMap
-import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

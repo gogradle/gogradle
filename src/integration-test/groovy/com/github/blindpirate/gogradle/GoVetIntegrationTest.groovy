@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.tooling.BuildException
 import org.junit.Before
 import org.junit.Test
@@ -28,33 +29,50 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 class GoVetIntegrationTest extends IntegrationTestSupport {
-    String mainDotGo
-    String buildDotGradle
-
     @Before
     void setUp() {
-        mainDotGo = """
-package main
-
-import "fmt"
-import "os"
-
-func main() {
-    fmt.Println(os.Stderr, fmt.Errorf("error msg"))
-}
-"""
-        buildDotGradle = """
+        writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
 golang {
     packagePath="github.com/my/package"
 }
-"""
-        IOUtils.write(resource, 'main.go', mainDotGo)
+dependencies {
+    golang {
+        build name:'github.com/my/a', dir:'${StringUtils.toUnixString(resource)}/.tmp'
+    }
+}
+""")
+
+        IOUtils.write(resource, 'main.go', """
+package main
+
+import "fmt"
+import "os"
+import "github.com/my/a"
+""")
+
+        IOUtils.write(resource, '.tmp/a.go', """
+package a
+
+import "fmt"
+import "os"
+
+func A() {
+    fmt.Println(os.Stderr, fmt.Errorf("error msg"))
+}
+""")
+    }
+
+    void letGoVetForMainFail() {
+        IOUtils.append(new File(resource, 'main.go'), """
+func main() {
+    fmt.Println(os.Stderr, fmt.Errorf("error msg"))
+}
+""")
     }
 
     @Test
     void 'exception should be thrown if go vet fails'() {
-        writeBuildAndSettingsDotGradle(buildDotGradle)
         try {
             newBuild {
                 it.forTasks('goVet')
@@ -68,11 +86,19 @@ golang {
 
     @Test
     void 'exception should be suppressed if continueWhenFail=true'() {
-        writeBuildAndSettingsDotGradle(buildDotGradle + '''
+        letGoVetForMainFail()
+        IOUtils.append(new File(resource, 'build.gradle'), '''
 goVet {
     continueWhenFail = true
 }
 ''')
+        newBuild {
+            it.forTasks('goVet')
+        }
+    }
+
+    @Test
+    void 'code in vendor should not be vetted'() {
         newBuild {
             it.forTasks('goVet')
         }

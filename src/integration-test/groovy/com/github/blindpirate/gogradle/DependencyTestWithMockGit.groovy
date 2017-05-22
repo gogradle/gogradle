@@ -113,11 +113,13 @@ dependencies {
 
     void firstBuild() {
         newBuild { build ->
-            build.forTasks('installBuildDependencies', 'installTestDependencies', 'goDependencies')
+            build.forTasks('goVendor', 'goDependencies')
         }
 
+        System.out.println(stdout)
 
-        assertDependenciesAre('build', [
+
+        assertDependenciesAre([
                 'github.com/firstlevel/a'    : 'commit3',
                 'github.com/firstlevel/b'    : 'commit3',
                 'github.com/firstlevel/c'    : 'commit3',
@@ -125,7 +127,7 @@ dependencies {
                 'github.com/firstlevel/e'    : 'commit5',
 
                 // vendorexternal/a#1 and vendorexternal/a#2 exist in firstlevel/a#2's dependencies
-                // and vendorexternal/a#1 wins because it is in vendor
+                // and vendorexternal/a#3 wins because it is in vendor
                 'github.com/vendorexternal/a': 'commit1',
                 'github.com/vendorexternal/b': 'commit2',
 
@@ -141,28 +143,22 @@ dependencies {
                 'github.com/external/c'      : 'commit4',
                 'github.com/external/e'      : 'commit3',
 
+                'github.com/external/d'      : 'commit5'
         ])
-        assertDependenciesAre('test',
-                ['github.com/external/d': 'commit5',
-                 'github.com/external/a': 'NOT_EXIST',
-                 'github.com/external/e': 'commit2'])
     }
 
     void secondBuildWithUpToDate() {
         newBuild { build ->
-            build.forTasks('installBuildDependencies', 'installTestDependencies')
+            build.forTasks('goVendor')
         }
         assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
-        assert stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
         assert stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')
-        assert stdout.toString().contains(':installTestDependencies UP-TO-DATE')
     }
 
     @Test
     void 'project-level cache should be used in second resolution'() {
         firstBuild()
 
-        IOUtils.clearDirectory(new File(projectRoot, '.gogradle/build_gopath'))
         IOUtils.forceDelete(new File(projectRoot, '.gogradle/cache/build.bin'))
         IOUtils.forceDelete(new File(projectRoot, '.gogradle/cache/test.bin'))
         repositories.listFiles().each {
@@ -175,9 +171,7 @@ dependencies {
         firstBuild()
 
         assert !stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
-        assert !stdout.toString().contains(':installBuildDependencies UP-TO-DATE')
         assert !stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')
-        assert !stdout.toString().contains(':installTestDependencies UP-TO-DATE')
     }
 
     @Override
@@ -185,13 +179,9 @@ dependencies {
         return projectRoot
     }
 
-    void assertDependenciesAre(String configuration, Map<String, String> finalDependencies) {
+    void assertDependenciesAre(Map<String, String> finalDependencies) {
         finalDependencies.each { packageName, commit ->
-            if ('NOT_EXIST' == commit) {
-                assert !new File(projectRoot, ".gogradle/${configuration}_gopath/src/${packageName}").exists()
-            } else {
-                assert new File(projectRoot, ".gogradle/${configuration}_gopath/src/${packageName}/${commit}.go").exists()
-            }
+            assert new File(projectRoot, "vendor/${packageName}/${commit}.go").exists()
         }
     }
     /*
@@ -200,8 +190,8 @@ dependencies {
 		|-- github.com/firstlevel/a:1e74619
 		|   |-- github.com/external/a:240e90c
 		|   |-- github.com/external/e:f3e9fd1
-		|   |-- github.com/vendorexternal/a:github.com/firstlevel/a#1e746195353b53d769160bec52882dc36cd4a26b/vendor/github.com/vendorexternal/a
-		|   \-- github.com/vendorexternal/b:github.com/firstlevel/a#1e746195353b53d769160bec52882dc36cd4a26b/vendor/github.com/vendorexternal/b
+        |   |-- github.com/vendorexternal/a:2f41dbb
+        |   \-- github.com/vendorexternal/b:03c8d57
 		|-- github.com/firstlevel/b:67b0cfa
 		|   |-- github.com/vendoronly/a:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a
 		|   |   |-- github.com/vendoronly/c:github.com/firstlevel/b#67b0cfae52118d8044c03c1564fd2845ba1b81e1/vendor/github.com/vendoronly/a/vendor/github.com/vendoronly/c

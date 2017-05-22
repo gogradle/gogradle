@@ -18,26 +18,24 @@
 package com.github.blindpirate.gogradle.core.cache;
 
 import com.github.blindpirate.gogradle.core.GolangCloneable;
-import org.apache.commons.collections4.map.LRUMap;
+import org.gradle.api.Project;
 
-import java.util.Map;
-import java.util.function.Function;
+import java.io.File;
 
-// NOT THREAD-SAFE
-public abstract class AbstractCache<K, V extends GolangCloneable> implements Cache<K, V> {
-    protected static final int CAPACITY = 1000;
-    protected Map<K, V> container = new LRUMap<>(CAPACITY);
+public class PersistenceCache<K extends GolangCloneable, V extends GolangCloneable>
+        extends CloneBackedCache<K, V> {
+    private final File persistenceFile;
+
+    public PersistenceCache(Project project, String persistenceFileName) {
+        this.persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + persistenceFileName);
+    }
 
     @SuppressWarnings("unchecked")
-    public V get(K key, Function<K, V> constructor) {
-        V cachedItem = container.get(key);
-        if (cachedItem == null) {
-            V ret = constructor.apply(key);
-            cachedItem = (V) ret.clone();
-            container.put(key, cachedItem);
-            return ret;
-        } else {
-            return (V) cachedItem.clone();
-        }
+    public void load() {
+        PersistenceCacheHelper.load(container, persistenceFile);
+    }
+
+    public void save() {
+        PersistenceCacheHelper.save(container, persistenceFile);
     }
 }

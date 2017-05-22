@@ -18,20 +18,18 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependencyForTest
-import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
+import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.support.WithResource
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
-import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
+import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -42,13 +40,13 @@ class ResolveTestDependenciesTaskTest extends TaskTest {
 
     File resource
 
-    @Mock
-    DependencyTreeNode buildDependencyTree
+    LocalDirectoryDependency local
 
     @Before
     void setUp() {
-        task = buildTask(ResolveTestDependenciesTask)
         when(project.getRootDir()).thenReturn(resource)
+        task = buildTask(ResolveTestDependenciesTask)
+        local = LocalDirectoryDependency.fromLocal('local', resource)
     }
 
     @Test
@@ -57,17 +55,17 @@ class ResolveTestDependenciesTaskTest extends TaskTest {
         VendorResolvedDependency vendorA = new VendorResolvedDependencyForTest('a',
                 'versionA',
                 1L,
-                gogradleRootProject,
+                local,
                 'vendor/a')
         VendorResolvedDependency vendorB = new VendorResolvedDependencyForTest('b',
                 'versionB',
                 2L,
-                gogradleRootProject,
+                local,
                 'vendor/b')
         VendorResolvedDependency vendorC = new VendorResolvedDependencyForTest('c',
                 'versionC',
                 3L,
-                gogradleRootProject,
+                local,
                 'vendor/a/vendor/c')
 
         vendorA.dependencies.add(vendorC)
@@ -76,9 +74,9 @@ class ResolveTestDependenciesTaskTest extends TaskTest {
         GolangDependencySet testDependencies = asGolangDependencySet(mockDependency('c'), mockDependency('d'))
 
 
-        when(getGolangTaskContainer().get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(buildDependencyTree)
-        when(buildDependencyTree.flatten()).thenReturn(buildDependencies)
-        when(strategy.produce(gogradleRootProject, resource, visitor, 'test')).thenReturn(testDependencies)
+        when(getGolangTaskContainer().get(ResolveBuildDependenciesTask).getFlatDependencies()).thenReturn(buildDependencies)
+        when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(testDependencies)
+
         // when
         task.resolve()
         // then

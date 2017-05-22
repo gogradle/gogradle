@@ -18,22 +18,23 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.MapUtils;
+import org.gradle.api.Project;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.io.File;
 import java.util.Map;
-
-import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 
 @Singleton
 public class GogradleRootProject extends LocalDirectoryDependency {
-    public static final String GOGRADLE_ROOT = "GOGRADLE_ROOT";
+    @Inject
+    public GogradleRootProject(Project project) {
+        super();
+        super.setDir(project.getRootDir());
+    }
 
-    public void initSingleton(String name, File rootDir) {
-        Assert.isTrue(getName() == null, "Gogradle root project can be initialized only once!");
-        setName(name);
-        setDir(rootDir);
+    public void setName(String name) {
+        Assert.isTrue(getName() == null, "Root project's name can be set only once!");
+        super.setName(name);
     }
 
     @Override
@@ -53,9 +54,8 @@ public class GogradleRootProject extends LocalDirectoryDependency {
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        return MapUtils.asMap(NAME_KEY, GOGRADLE_ROOT);
+        throw new UnsupportedOperationException();
     }
-
 
     @Override
     public String formatVersion() {
@@ -69,7 +69,7 @@ public class GogradleRootProject extends LocalDirectoryDependency {
 
     @Override
     public String toString() {
-        return GOGRADLE_ROOT;
+        return getName();
     }
 
     @Override

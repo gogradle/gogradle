@@ -58,8 +58,8 @@ goVet {
     @Test
     @AccessWeb
     void 'gogs should be built successfully'() {
-        // v0.9.113
-        assert processUtils.run(['git', 'checkout', '114c179e5a50e3313f7a5894100693805e64e440'], null, resource).waitFor() == 0
+        // v0.11
+        assert processUtils.run(['git', 'checkout', '348c75c91b95ce7fb0f6dac263aa7290f2319e1b', '-f'], null, resource).waitFor() == 0
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
@@ -69,6 +69,8 @@ goVet {
         }
 
         init()
+
+        addMissingDependencies()
 
         firstBuild()
 
@@ -86,6 +88,17 @@ goVet {
 //        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
     }
 
+    void addMissingDependencies() {
+        // I don't know why this is missing in vendor.json
+        IOUtils.append(new File(resource, 'build.gradle'), '''
+dependencies {
+    golang {
+        build 'gopkg.in/bufio.v1'
+    }
+}
+''')
+    }
+
     void init() {
         IOUtils.deleteQuitely(new File(resource, 'gogradle.lock'))
         try {
@@ -100,7 +113,7 @@ goVet {
 
     void firstBuild() {
         newBuild {
-            it.forTasks('goBuild', 'goCheck', 'goLock')
+            it.forTasks('goClean', 'goBuild', 'goCheck', 'goLock')
         }
     }
 

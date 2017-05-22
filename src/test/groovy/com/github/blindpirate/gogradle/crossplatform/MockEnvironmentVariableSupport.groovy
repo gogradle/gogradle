@@ -15,18 +15,12 @@
  *
  */
 
-package com.github.blindpirate.gogradle.task;
+package com.github.blindpirate.gogradle.crossplatform
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
+import org.junit.Rule
+import org.junit.contrib.java.lang.system.EnvironmentVariables
 
-public class InstallBuildDependenciesTask extends InstallTask {
-
-    public InstallBuildDependenciesTask() {
-        dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
-    }
-
-    @Override
-    protected ResolveTask getUpstreamResolveTask() {
-        return getTask(ResolveBuildDependenciesTask.class);
-    }
+class MockEnvironmentVariableSupport {
+    @Rule
+    public final EnvironmentVariables environmentVariables = new EnvironmentVariables()
 }

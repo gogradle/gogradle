@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter
 import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
@@ -35,7 +34,6 @@ class UselessEnumTest {
          Arch,
          CacheScope,
          AbstractNotationDependency.NoTransitivePredicate,
-         DependencyInstallFileFilter,
          GogradleGlobal].each(this.&doUselessTest)
     }
 

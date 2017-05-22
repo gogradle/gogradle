@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.util.Assert;
 
 import java.io.File;
+import java.util.Objects;
 
 /**
  * Represents some code at a specific version.
@@ -78,6 +79,20 @@ public abstract class AbstractResolvedDependency extends AbstractGolangDependenc
     @Override
     public CacheScope getCacheScope() {
         return CacheScope.PERSISTENCE;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (!super.equals(o)) {
+            return false;
+        }
+        AbstractResolvedDependency that = (AbstractResolvedDependency) o;
+        return Objects.equals(version, that.version);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(super.hashCode(), version);
     }
 
     @Override

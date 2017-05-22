@@ -26,9 +26,7 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
-import org.junit.Rule
 import org.junit.Test
-import org.junit.contrib.java.lang.system.EnvironmentVariables
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
@@ -43,7 +41,7 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class DefaultGoBinaryManagerTest {
+class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
     @Mock
     GolangPluginSetting setting
     @Mock
@@ -60,9 +58,6 @@ class DefaultGoBinaryManagerTest {
     InputStream mockGoTarGz = getClass().classLoader.getResourceAsStream('mock-go-1.7.4' + Os.getHostOs().archiveExtension())
 
     DefaultGoBinaryManager manager
-
-    @Rule
-    public final EnvironmentVariables environmentVariables = new EnvironmentVariables()
 
     @Before
     void setUp() {

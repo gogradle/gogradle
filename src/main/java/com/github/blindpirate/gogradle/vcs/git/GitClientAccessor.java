@@ -66,7 +66,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
 
     @Override
     public void checkout(File repoRoot, String version) {
-        run(repoRoot, asList("git", "checkout", version));
+        run(repoRoot, asList("git", "checkout", "-f", version));
     }
 
     @Override

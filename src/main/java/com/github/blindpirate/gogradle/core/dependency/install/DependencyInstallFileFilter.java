@@ -17,11 +17,13 @@
 
 package com.github.blindpirate.gogradle.core.dependency.install;
 
+import com.github.blindpirate.gogradle.common.InSubpackagesPredicate;
 import com.github.blindpirate.gogradle.util.IOUtils;
 
 import java.io.File;
 import java.io.FileFilter;
 import java.util.List;
+import java.util.Set;
 
 import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory.TESTDATA_DIRECTORY;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
@@ -30,16 +32,28 @@ import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 
-public enum DependencyInstallFileFilter implements FileFilter {
+public class DependencyInstallFileFilter implements FileFilter {
+    private InSubpackagesPredicate inSubpackagesPredicate;
 
-    INSTANCE;
+    public static DependencyInstallFileFilter subpackagesFilter(File rootDir,
+                                                                Set<String> subpackages) {
+        InSubpackagesPredicate predicate = InSubpackagesPredicate.withRootDirAndSubpackages(rootDir, subpackages);
+        return new DependencyInstallFileFilter(predicate);
+    }
+
+    private DependencyInstallFileFilter(InSubpackagesPredicate inSubpackagesPredicate) {
+        this.inSubpackagesPredicate = inSubpackagesPredicate;
+    }
 
     @Override
     public boolean accept(File pathname) {
         if (pathname.isDirectory()) {
             return acceptDirectory(pathname);
+        } else if (pathname.isFile()) {
+            return inSubpackagesPredicate.test(pathname) && acceptFile(pathname);
         } else {
-            return acceptFile(pathname);
+            // symbolic links
+            return false;
         }
     }
 

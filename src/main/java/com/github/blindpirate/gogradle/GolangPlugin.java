@@ -72,9 +72,7 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void hackIdeaPlugin() {
-        project.getPlugins().withId("idea", plugin -> {
-            injector.getInstance(IdeaIntegration.class).hack();
-        });
+        project.getPlugins().withId("idea", plugin -> injector.getInstance(IdeaIntegration.class).hack());
     }
 
     private void init(Project project) {
@@ -82,7 +80,10 @@ public class GolangPlugin implements Plugin<Project> {
         this.injector = initGuice();
         this.settings = injector.getInstance(GolangPluginSetting.class);
         this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
-        Arrays.asList(BuildMode.values()).forEach(mode -> project.getExtensions().add(mode.toString(), mode));
+        Arrays.asList(BuildMode.values()).forEach(mode -> {
+            project.getExtensions().add(mode.toString(), mode);
+            project.getExtensions().add(mode.getAbbr(), mode);
+        });
     }
 
     private void configureGlobalInjector() {
@@ -96,11 +97,12 @@ public class GolangPlugin implements Plugin<Project> {
             golangTaskContainer.put((Class) entry.getValue(), task);
         });
 
-        project.afterEvaluate(p ->
-                asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
-                        task -> Go.class.cast(taskContainer.getByName(task)).addDefaultActionIfNoCustomActions())
-        );
+        project.afterEvaluate(this::afterEvaluate);
+    }
 
+    private void afterEvaluate(Project p) {
+        asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
+                task -> Go.class.cast(p.getTasks().getByName(task)).addDefaultActionIfNoCustomActions());
     }
 
     private void customizeProjectInternalServices(Project project) {

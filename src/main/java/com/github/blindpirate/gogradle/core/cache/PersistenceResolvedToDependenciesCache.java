@@ -26,7 +26,6 @@ import groovy.lang.Singleton;
 import org.gradle.api.Project;
 
 import javax.inject.Inject;
-import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -35,24 +34,27 @@ import static java.util.Map.Entry;
 
 @Singleton
 public class PersistenceResolvedToDependenciesCache
-        extends PersistentCache<ResolvedDependency, GolangDependencySet> {
+        extends PersistenceCache<ResolvedDependency, GolangDependencySet> {
 
     private final PackagePathResolver packagePathResolver;
 
     @Inject
     public PersistenceResolvedToDependenciesCache(Project project, PackagePathResolver packagePathResolver) {
-        super(new File(project.getRootDir(), ".gogradle/cache/PersistenceResolvedToDependenciesCache.bin"));
+        super(project, "PersistenceResolvedToDependenciesCache.bin");
         this.packagePathResolver = packagePathResolver;
     }
 
+    @Override
     public void load() {
         super.load();
-        cleanseCacheData();
+        removeCachedItemWhosePackageHasChanged();
     }
 
-    private void cleanseCacheData() {
-        container = container.entrySet().stream().filter(this::shouldBePreserved)
-                .collect(Collectors.toConcurrentMap(Entry::getKey, Entry::getValue));
+    private void removeCachedItemWhosePackageHasChanged() {
+        List<Map.Entry> entriesToRemove = container.entrySet().stream()
+                .filter(entry -> !shouldBePreserved(entry))
+                .collect(Collectors.toList());
+        entriesToRemove.forEach(entry -> container.remove(entry.getKey()));
     }
 
     private boolean shouldBePreserved(Map.Entry<ResolvedDependency, GolangDependencySet> entry) {

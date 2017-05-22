@@ -19,18 +19,22 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.glide;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
+import com.google.common.collect.Sets;
 
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
  * Model of glide.lock in repo managed by glide.
  *
  * @see <a href="https://github.com/Masterminds/glide/blob/master/glide.lock">glide.lock</a>
+ * @see <a href="https://github.com/Masterminds/glide/blob/master/docs/glide.yaml.md">glide.yaml.md</a>
  */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class GlideDotLockModel {
@@ -63,13 +67,30 @@ public class GlideDotLockModel {
         private String name;
         @JsonProperty("version")
         private String version;
+        @JsonProperty("vcs")
+        private String vcs;
+        @JsonProperty("repo")
+        private String repo;
+        @JsonProperty("subpackages")
+        private List<String> subpackages;
 
         public Map<String, Object> toNotation() {
             Assert.isNotBlank(name);
-            return MapUtils.asMapWithoutNull(
+
+            Map<String, Object> ret = MapUtils.asMapWithoutNull(
                     "name", name,
                     "version", version,
+                    "url", repo,
+                    "vcs", vcs,
                     "transitive", false);
+            if (subpackages != null) {
+                // It seems that subpackages in glide contains files in 'root' dir
+                // So here we act as an adapter
+                Set<String> realSubpackages = Sets.newHashSet(GolangDependency.ONLY_CURRENT_FILES);
+                realSubpackages.addAll(subpackages);
+                ret.put("subpackages", realSubpackages);
+            }
+            return ret;
         }
     }
 }

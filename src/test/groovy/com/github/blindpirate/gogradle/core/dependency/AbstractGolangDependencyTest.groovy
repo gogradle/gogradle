@@ -61,6 +61,34 @@ class AbstractGolangDependencyTest {
         assert MockUtils.isMockVcsPackage(dependency.package)
     }
 
+    @Test
+    void 'setting subpackages should succeed'() {
+        AbstractGolangDependency dependency = new AbstractGolangDependencyForTest()
+
+        dependency.subpackages = ['a']
+        assert dependency.subpackages == ['a'] as Set
+
+        dependency.subpackages = 'b'
+        assert dependency.subpackages == ['b'] as Set
+
+        dependency.subpackage = ['c']
+        assert dependency.subpackages == ['c'] as Set
+
+        dependency.subpackage = 'd'
+        assert dependency.subpackages == ['d'] as Set
+    }
+
+    @Test
+    void 'subpackages should be included in equals'() {
+        AbstractGolangDependency dependency1 = new AbstractGolangDependencyForTest()
+        AbstractGolangDependency dependency2 = new AbstractGolangDependencyForTest()
+
+        assert dependency1 == dependency2
+
+        dependency1.subpackage = ['...', '.']
+        assert dependency1 != dependency2
+    }
+
     static class AbstractGolangDependencyForTest extends AbstractGolangDependency {
         private static final long serialVersionUID = 1L
 

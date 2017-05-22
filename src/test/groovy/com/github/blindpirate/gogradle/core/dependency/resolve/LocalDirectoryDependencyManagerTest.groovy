@@ -63,6 +63,7 @@ class LocalDirectoryDependencyManagerTest {
         src = IOUtils.mkdir(resource, 'src')
         dest = IOUtils.mkdir(resource, 'dest')
         when(dependency.getRootDir()).thenReturn(src)
+        when(dependency.getSubpackages()).thenReturn(['...'] as Set)
         when(projectCacheManager.resolve(any(NotationDependency), any(Function))).thenAnswer(APPLY_FUNCTION_ANSWER)
         localDirectoryDependencyManager = new LocalDirectoryDependencyManager(projectCacheManager)
     }

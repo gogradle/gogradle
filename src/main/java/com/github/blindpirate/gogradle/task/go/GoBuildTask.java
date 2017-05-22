@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -27,6 +28,7 @@ import groovy.lang.Closure;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.Task;
 
+import javax.inject.Inject;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -35,11 +37,16 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_DEPENDENCIES_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
 public class GoBuildTask extends Go {
+
+    @Inject
+    private GolangPluginSetting setting;
+
     private static final Pattern TARGET_PLATFORM_PATTERN
             = Pattern.compile("(\\s*\\w+\\-\\w+\\s*)(,\\s*\\w+\\-\\w+\\s*)*");
 
@@ -71,7 +78,7 @@ public class GoBuildTask extends Go {
     }
 
     public GoBuildTask() {
-        dependsOn(INSTALL_BUILD_DEPENDENCIES_TASK_NAME);
+        dependsOn(INSTALL_DEPENDENCIES_TASK_NAME, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
     @Override
@@ -81,7 +88,7 @@ public class GoBuildTask extends Go {
 
     private void buildWithEnv(Map<String, String> env) {
         setSingleBuildEnvironment(env);
-        go(Arrays.asList("build", "-o", outputLocation));
+        go(Arrays.asList("build", "-o", outputLocation, setting.getPackagePath()));
     }
 
 
@@ -107,7 +114,6 @@ public class GoBuildTask extends Go {
         List<Map<String, String>> ret = targetPlatforms.stream()
                 .map(this::pairToEnv)
                 .collect(Collectors.toList());
-        ret.forEach(env -> env.put("GOPATH", buildManager.getBuildGopath()));
         return ret;
     }
 

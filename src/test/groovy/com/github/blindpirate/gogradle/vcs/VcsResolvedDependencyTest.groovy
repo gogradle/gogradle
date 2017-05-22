@@ -43,6 +43,7 @@ class VcsResolvedDependencyTest {
     void setUp() {
         when(notationDependency.getTransitiveDepExclusions()).thenReturn([exclusionSpec] as Set)
         when(notationDependency.getName()).thenReturn('package')
+        when(notationDependency.getSubpackages()).thenReturn(['...'] as Set)
     }
 
     VcsResolvedDependency newResolvedDependency(VcsType type) {
@@ -69,6 +70,15 @@ class VcsResolvedDependencyTest {
     }
 
     @Test
+    void 'a resolved dependency with subpackages should be converted to notation successfully'() {
+        // given
+        VcsResolvedDependency dependency = newResolvedDependency(VcsType.GIT)
+        dependency.setSubpackages(['.'])
+        // then
+        assert dependency.toLockedNotation() == [name: 'package', commit: 'commitId', vcs: 'git', url: 'url', subpackages: ['.']]
+    }
+
+    @Test
     @WithMockInjector
     void 'getInstallerClass() should succeed'() {
         DependencyManager installer = mock(DependencyManager)
@@ -92,7 +102,7 @@ class VcsResolvedDependencyTest {
     }
 
     @Test
-    void 'dependencies should be equal if name/version/url/vcs equals'() {
+    void 'dependencies should be equal if name/version/url/vcs/firstlevel equals'() {
         assert newResolvedDependency(VcsType.GIT) != newResolvedDependency(VcsType.MERCURIAL)
 
         def dependency1 = newResolvedDependency(VcsType.GIT)
@@ -106,8 +116,6 @@ class VcsResolvedDependencyTest {
         ReflectionUtils.setField(dependency2, 'tag', 'tag2')
         ReflectionUtils.setField(dependency1, 'updateTime', 0L)
         ReflectionUtils.setField(dependency2, 'updateTime', 1L)
-        dependency1.firstLevel = true
-        dependency2.firstLevel = false
         assert dependency1 == dependency2
         assert dependency1.hashCode() == dependency2.hashCode()
     }

@@ -28,9 +28,7 @@ import org.junit.runner.RunWith
 
 import java.lang.reflect.Method
 
-import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
-import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
-import static com.github.blindpirate.gogradle.util.DependencyUtils.mockResolvedDependency
+import static com.github.blindpirate.gogradle.util.DependencyUtils.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

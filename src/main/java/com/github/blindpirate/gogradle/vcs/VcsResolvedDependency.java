@@ -25,10 +25,12 @@ import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
 
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
+import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.SUBPACKAGES_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VCS_KEY;
 
 public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
@@ -57,11 +59,15 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public Map<String, Object> toLockedNotation() {
-        return MapUtils.asMap(
+        Map<String, Object> ret = MapUtils.asMap(
                 NAME_KEY, getName(),
                 VCS_KEY, getVcsType().getName(),
                 GitMercurialNotationDependency.URL_KEY, getUrl(),
                 GitMercurialNotationDependency.COMMIT_KEY, getVersion());
+        if (!containsAllSubpackages()) {
+            ret.put(SUBPACKAGES_KEY, new ArrayList<>(getSubpackages()));
+        }
+        return ret;
     }
 
     @Override
@@ -80,16 +86,11 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) {
-            return true;
-        }
-        if (o == null || getClass() != o.getClass()) {
+        if (!super.equals(o)) {
             return false;
         }
         VcsResolvedDependency that = (VcsResolvedDependency) o;
-        return Objects.equals(getVersion(), that.getVersion())
-                && Objects.equals(getName(), that.getName())
-                && Objects.equals(getVcsType(), that.getVcsType())
+        return Objects.equals(getVcsType(), that.getVcsType())
                 && Objects.equals(url, that.url);
     }
 
@@ -142,6 +143,7 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
                 ret = new MercurialResolvedDependency(notationDependency.getName(), url, commitId, commitTime);
             }
             ret.tag = notationDependency.getTag();
+            ret.setSubpackages(notationDependency.getSubpackages());
             ret.setFirstLevel(notationDependency.isFirstLevel());
             ret.setPackage(notationDependency.getPackage());
             return ret;

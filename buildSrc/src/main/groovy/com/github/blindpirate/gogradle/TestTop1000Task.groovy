@@ -50,21 +50,31 @@ apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     packagePath = "github.com/${userAndProject[0]}/${userAndProject[1]}" // path of project to be built 
 }
-resolveBuildDependencies.mustRunAfter goInit
-resolveTestDependencies.mustRunAfter goInit
+
+repositories {
+    golang {
+        root ~/appengine.*/
+        emptyDir()
+    }
+    
+    golang {
+        root 'common'
+        emptyDir()
+    }
+}
 """
         if (path.resolve('build.gradle.ext').toFile().exists()) {
             stdout.append('Found extend build.gradle\n')
             stderr.append('Found extend build.gradle\n')
             buildDotGradle += path.resolve('build.gradle.ext').toFile().text
         } else if (!path.toFile().list().any { it.endsWith('.go') }) {
-            buildDotGradle += '''
+            buildDotGradle += """
 goBuild {
     doLast {
-        go 'build ./...'
+        go 'build github.com/${userAndProject[0]}/${userAndProject[1]}/...'
     }
 }
-'''
+"""
         }
         write(new File(path.toFile(), 'build.gradle'), buildDotGradle)
         write(new File(path.toFile(), 'settings.gradle'), '')
@@ -81,6 +91,14 @@ goBuild {
         stdout.append("Start building ${path}\n")
         stderr.append("Start building ${path}\n")
 
+        if (!goInit(path)) {
+            return
+        }
+
+        goBuild(path)
+    }
+
+    private boolean goBuild(Path path) {
         ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goBuild', 'goLock', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
@@ -89,9 +107,28 @@ goBuild {
         if (pb.start().waitFor() == 0) {
             stderr.append("Building ${path} succeed\n")
             stdout.append("Building ${path} succeed\n")
+            return true
         } else {
             stderr.append("Building ${path} failed\n")
             stdout.append("Building ${path} failed\n")
+            return false
+        }
+    }
+
+    private boolean goInit(Path path) {
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goInit', '--stacktrace').directory(path.toFile())
+        pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
+        pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
+
+
+        if (pb.start().waitFor() == 0) {
+            stderr.append("Initializing ${path} succeed\n")
+            stdout.append("Initializing ${path} succeed\n")
+            return true
+        } else {
+            stderr.append("Initializing ${path} failed\n")
+            stdout.append("Initializing ${path} failed\n")
+            return false
         }
     }
 }

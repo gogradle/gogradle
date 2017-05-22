@@ -1,6 +1,8 @@
 # 为构建设置代理
 
-若需要为拉取代码设置代理，可以在`gradlew`命令中增加参数（以Shadowsocks为例）：
+# 注意！！！，本节仅仅描述如何为`Gogradle`进程设置代理，而非`git`和`hg`。若希望为它们设置代理，请参阅[Getting git to work with a proxy server](http://stackoverflow.com/questions/783811/getting-git-to-work-with-a-proxy-server)和[using hg through a proxy](http://bayo.opadeyi.net/2012/08/using-hg-through-proxy.html)
+
+若需要为Gradle设置代理，可以在`gradlew`命令中增加参数（以Shadowsocks为例）：
 
 ```./gradlew build -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080```
 
@@ -26,4 +28,3 @@ org.gradle.jvmargs=-DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080
 
 来将此设置持久化，有关更多环境和代理的信息，详见[Gradle构建环境](https://docs.gradle.org/current/userguide/build_environment.html#sec:gradle_properties_and_system_properties)与[Java代理](http://docs.oracle.com/javase/8/docs/technotes/guides/net/proxies.html)
 
-要注意的是，这仅仅是为`Gogradle`进程设置代理，而非`git`和`hg`。若希望为它们设置代理，请参阅[Getting git to work with a proxy server](http://stackoverflow.com/questions/783811/getting-git-to-work-with-a-proxy-server)和[using hg through a proxy](http://bayo.opadeyi.net/2012/08/using-hg-through-proxy.html)。

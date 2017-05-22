@@ -28,8 +28,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.valueOf;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 
 @Singleton
@@ -43,6 +43,12 @@ public class GolangPluginSetting {
             .put("hours", TimeUnit.HOURS)
             .put("day", TimeUnit.DAYS)
             .put("days", TimeUnit.DAYS)
+            .build();
+    private static final Map<String, BuildMode> BUILD_MODE_MAP = ImmutableMap.<String, BuildMode>builder()
+            .put(DEVELOP.getAbbr(), DEVELOP)
+            .put(DEVELOP.toString(), DEVELOP)
+            .put(REPRODUCIBLE.getAbbr(), REPRODUCIBLE)
+            .put(REPRODUCIBLE.toString(), REPRODUCIBLE)
             .build();
     private BuildMode buildMode = REPRODUCIBLE;
     private static final String BUILD_MODE_KEY = "gogradle.mode";
@@ -75,14 +81,14 @@ public class GolangPluginSetting {
     public BuildMode getBuildMode() {
         String mode = System.getProperty(BUILD_MODE_KEY);
         if (StringUtils.isNotEmpty(mode)) {
-            return BuildMode.valueOf(mode);
+            return Assert.isNotNull(BUILD_MODE_MAP.get(mode));
         } else {
             return buildMode;
         }
     }
 
     public void setBuildMode(String buildMode) {
-        this.buildMode = valueOf(buildMode);
+        this.buildMode = Assert.isNotNull(BUILD_MODE_MAP.get(buildMode));
     }
 
     public void setBuildMode(BuildMode buildMode) {

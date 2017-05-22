@@ -23,13 +23,13 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.exceptions.BuildException
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
+import com.github.blindpirate.gogradle.crossplatform.MockEnvironmentVariableSupport
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import org.gradle.api.Project
 import org.gradle.api.logging.Logger
@@ -38,8 +38,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 
 import java.nio.file.Files
 import java.nio.file.Path
@@ -53,7 +51,7 @@ import static org.mockito.Mockito.*
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockInjector
-class DefaultBuildManagerTest {
+class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     DefaultBuildManager manager
 
     File resource
@@ -96,23 +94,35 @@ class DefaultBuildManagerTest {
         when(project.getName()).thenReturn('project')
     }
 
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if .vendor exists before build'() {
-        IOUtils.mkdir(resource, '.vendor')
-        manager.ensureDotVendorDirNotExist()
-    }
-
     @Test
-    void 'nothing should happen if .vendor not exist'() {
-        manager.ensureDotVendorDirNotExist()
-    }
-
-    @Test
-    void 'symbolic links should be created properly in preparation'() {
+    void 'symbolic links should be created if GOPATH dose not exist'() {
         // when
-        manager.prepareSymbolicLinks()
+        manager.prepareProjectGopathIfNecessary()
         // then
         assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+        assert manager.gopath == getProjectGopath()
+    }
+
+    @Test
+    void 'symbolic links should be created if current project dose not match GOPATH'() {
+        // when
+        environmentVariables.set('GOPATH', toUnixString(resource))
+        manager.prepareProjectGopathIfNecessary()
+        // then
+        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+        assert manager.gopath == getProjectGopath()
+    }
+
+    @Test
+    void 'project gopath will not be created if current project matches GOPATH'() {
+        // when
+        String systemGopath = 'fakegopath' + File.pathSeparator + toUnixString(resource.getParentFile())
+        environmentVariables.set('GOPATH', systemGopath)
+        setting.packagePath = resource.name
+        manager.prepareProjectGopathIfNecessary()
+        // then
+        assert !new File(resource, '.gogradle/project_gopath').exists()
+        assert manager.gopath == systemGopath
     }
 
     void assertSymbolicLinkLinkToTarget(String link, String target) {
@@ -120,25 +130,6 @@ class DefaultBuildManagerTest {
         Path targetPath = resource.toPath().resolve(target)
         Path relativePathOfLink = Files.readSymbolicLink(linkPath)
         assert linkPath.getParent().resolve(relativePathOfLink).normalize() == targetPath.normalize()
-    }
-
-    @Test
-    void 'vendor dir should be renamed to .vendor during build'() {
-        // given
-        IOUtils.mkdir(resource, 'vendor')
-        String dirDuringBuild = null
-        when(processUtils.run(anyList(), anyMap(), any(File))).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                dirDuringBuild = IOUtils.safeList(resource).first()
-                return process
-            }
-        })
-        // when
-        manager.go(['test'], [:])
-        // then
-        assert dirDuringBuild == '.vendor'
-        assert new File(resource, 'vendor').exists()
     }
 
     @Test(expected = BuildException)
@@ -149,26 +140,20 @@ class DefaultBuildManagerTest {
         manager.go(['test', './...'], [:])
     }
 
-    String getBuildGopath() {
-        return StringUtils.toUnixString("" + new File(resource, '.gogradle/project_gopath') + File.pathSeparator + new File(resource, '.gogradle/build_gopath'))
-    }
-
-    String getTestGopath() {
-        return StringUtils.toUnixString("" + new File(resource, '.gogradle/project_gopath') +
-                File.pathSeparator + new File(resource, '.gogradle/build_gopath') +
-                File.pathSeparator + new File(resource, '.gogradle/test_gopath'))
-
+    String getProjectGopath() {
+        return toUnixString(new File(resource, '.gogradle/project_gopath'))
     }
 
     @Test
     void 'customized command should succeed'() {
         // given
+        manager.prepareProjectGopathIfNecessary()
         setting.buildTags = ['a', 'b', 'c']
         // when
         manager.run(['golint'], [:], null, null, null)
         // then
         verify(processUtils).run(['golint'],
-                [GOPATH: getTestGopath(),
+                [GOPATH: getProjectGopath(),
                  GOROOT: getGoroot(),
                  GOOS  : Os.getHostOs().toString(),
                  GOARCH: Arch.getHostArch().toString(),
@@ -181,20 +166,20 @@ class DefaultBuildManagerTest {
         // given
         setting.buildTags = ['a', 'b', 'c']
         // when
-        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath'])
         // then
-        verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project', '-tags', "'a b c'"],
-                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
+        verify(processUtils).run([goBin, 'build', '-tags', "'a b c'", '-o', 'linux_amd64_project'],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath', GOROOT: goroot],
                 resource)
     }
 
     @Test
     void 'command args should be rendered correctly'() {
         // when
-        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath'])
+        manager.go(['build', '-o', '${GOOS}_${GOARCH}_${PROJECT_NAME}${GOEXE}'], [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath'])
         // then
         verify(processUtils).run([goBin, 'build', '-o', 'linux_amd64_project'],
-                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'build_gopath', GOROOT: goroot],
+                [GOOS: 'linux', GOARCH: 'amd64', GOEXE: '', GOPATH: 'project_gopath', GOROOT: goroot],
                 resource)
     }
 
@@ -231,27 +216,23 @@ class DefaultBuildManagerTest {
         verify(retcodeConsumer).accept(0)
     }
 
-    @Test(expected = BuildException)
-    void 'exception should be thrown if renaming vendor fails'() {
-        // given
-        IOUtils.mkdir(resource, 'vendor')
-        IOUtils.write(resource, '.vendor', '')
-        // then
-        manager.go(['build'], [:])
+    @Test
+    void 'inserting build tags should succeed'() {
+        setting.buildTags = ['a', 'b', 'c']
+
+        assert manager.insertBuildTags([]) == []
+        assert manager.insertBuildTags(['build']) == ['build', '-tags', "'a b c'"]
+        assert manager.insertBuildTags(['build', 'package']) == ['build', '-tags', "'a b c'", 'package']
     }
 
     @Test(expected = BuildException)
-    void 'exception should be thrown if renaming .vendor back fails'() {
-        // given
-        IOUtils.mkdir(resource, 'vendor')
-        when(process.getInputStream()).thenAnswer(new Answer<Object>() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                IOUtils.mkdir(resource, 'vendor')
-                return new ByteArrayInputStream([] as byte[])
-            }
-        })
-        // then
-        manager.go(['build'], [:])
+    void 'exception should be thrown if creating symbolic link fails'() {
+        manager.createSymbolicLink(resource.toPath(), resource.toPath())
+    }
+
+    @Test
+    void 'nothing should happen if symbolic link exists'() {
+        IOUtils.write(resource, '.gogradle/project_gopath/root/package', '')
+        manager.prepareProjectGopathIfNecessary()
     }
 }

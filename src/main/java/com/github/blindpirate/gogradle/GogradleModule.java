@@ -44,6 +44,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.glock.Gl
 import com.github.blindpirate.gogradle.core.dependency.produce.external.godep.GodepDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.GopmDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor.GovendorDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.gpm.GpmDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
@@ -148,7 +149,6 @@ public class GogradleModule extends AbstractModule {
         }, new DebugLogMethodInterceptor());
     }
 
-
     // The order is based on https://github.com/blindpirate/report-of-go-package-management-tool
     @Inject
     @Provides
@@ -162,7 +162,8 @@ public class GogradleModule extends AbstractModule {
             GvtGbvendorDependencyFactory gvtGbvendorDependencyFactory,
             TrashDependencyFactory trashDependencyFactory,
             GlockDependencyFactory glockDependencyFactory,
-            GopmDependencyFactory gopmDependencyFactory) {
+            GopmDependencyFactory gopmDependencyFactory,
+            GpmDependencyFactory gpmDependencyFactory) {
         return CollectionUtils.immutableList(
                 lockedDependencyManager,
                 godepDependencyFactory,
@@ -171,7 +172,8 @@ public class GogradleModule extends AbstractModule {
                 gvtGbvendorDependencyFactory,
                 trashDependencyFactory,
                 glockDependencyFactory,
-                gopmDependencyFactory);
+                gopmDependencyFactory,
+                gpmDependencyFactory);
 
     }
 

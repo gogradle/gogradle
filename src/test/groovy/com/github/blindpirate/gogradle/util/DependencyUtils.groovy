@@ -21,7 +21,6 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependenc
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependency
 
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
@@ -37,12 +36,14 @@ class DependencyUtils {
     static GolangDependency mockDependency(String name) {
         GolangDependency ret = mock(GolangDependency)
         when(ret.getName()).thenReturn(name)
+        when(ret.getSubpackages()).thenReturn(['...'] as Set)
         return ret
     }
 
     static mockWithName(Class clazz, String name) {
         def ret = mock(clazz)
         when(ret.getName()).thenReturn(name)
+        when(ret.getSubpackages()).thenReturn(['...'] as Set)
         return ret
     }
 
@@ -52,14 +53,7 @@ class DependencyUtils {
         when(ret.formatVersion()).thenReturn('version')
         when(ret.toString()).thenReturn(name)
         when(ret.resolve()).thenReturn(ret)
-        return ret
-    }
-
-    static VendorResolvedDependency mockVendorResolvedDependency(String name, ResolvedDependency host, String vendorPath) {
-        VendorResolvedDependency ret = mock(VendorResolvedDependency)
-        when(ret.getName()).thenReturn(name)
-        when(ret.getHostDependency()).thenReturn(host)
-        when(ret.getRelativePathToHost()).thenReturn(vendorPath)
+        when(ret.getSubpackages()).thenReturn(['...'] as Set)
         return ret
     }
 

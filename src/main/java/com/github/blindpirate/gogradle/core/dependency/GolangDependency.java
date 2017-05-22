@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import org.gradle.api.artifacts.Dependency;
 
 import java.io.Serializable;
+import java.util.Set;
 
 /**
  * A {@link GolangDependency} represents a dependency
@@ -47,12 +48,52 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
     @Override
     String getVersion();
 
+    /**
+     * Get the package this dependency stands for.
+     *
+     * @return the package
+     * @see GolangPackage
+     */
     GolangPackage getPackage();
 
+    /**
+     * Resolve to a concrete dependency which can be located to a specific version of code.
+     *
+     * @param context the resolve context
+     * @return resolved dependency
+     */
     ResolvedDependency resolve(ResolveContext context);
 
+    /**
+     * A dependency is seen as "first-level" when it is defined in build.gradle or gogradle.lock of root project.
+     *
+     * @return <code>true</code> if it is "first-level", <code>false</code> otherwise.
+     */
     boolean isFirstLevel();
 
+    /**
+     * Get cache scope of this dependency.
+     *
+     * @return the cache scope
+     */
     CacheScope getCacheScope();
+
+
+    /**
+     * This dependencies sub packages. A sub package is a string representing the relative path to the repo root.
+     * This concept is inspired by <a href="https://github.com/Masterminds/glide">glide</a>
+     *
+     * @return the set of sub packages
+     */
+    Set<String> getSubpackages();
+
+    /**
+     * All descendants files and directories.
+     */
+    String ALL_DESCENDANTS = "...";
+    /**
+     * Only files located in repo root.
+     */
+    String ONLY_CURRENT_FILES = ".";
 }
 

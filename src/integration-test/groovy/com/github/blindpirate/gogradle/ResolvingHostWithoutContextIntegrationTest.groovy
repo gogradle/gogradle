@@ -67,9 +67,9 @@ dependencies {
         }
 
         newBuild {
-            it.forTasks('installBuildDependencies')
+            it.forTasks('goVendor')
         }
 
-        assert new File(resource, '.gogradle/build_gopath/src/github.com/user/b/b.go').exists()
+        assert new File(resource, 'vendor/github.com/user/b/b.go').exists()
     }
 }

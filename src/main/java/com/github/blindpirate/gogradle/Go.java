@@ -18,23 +18,24 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.common.LineCollector;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.IOUtils;
 import groovy.lang.Closure;
 import org.apache.tools.ant.types.Commandline;
 import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
+import java.io.File;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_TEST_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 
 public class Go extends AbstractGolangTask {
@@ -55,9 +56,7 @@ public class Go extends AbstractGolangTask {
     }
 
     public Go() {
-        dependsOn(PREPARE_TASK_NAME,
-                INSTALL_BUILD_DEPENDENCIES_TASK_NAME,
-                INSTALL_TEST_DEPENDENCIES_TASK_NAME);
+        dependsOn(PREPARE_TASK_NAME);
         buildManager = GogradleGlobal.getInstance(BuildManager.class);
     }
 
@@ -92,73 +91,119 @@ public class Go extends AbstractGolangTask {
     protected void doAddDefaultAction() {
     }
 
-    public void go(String arg) {
-        go(arg, null);
+    public int go(String arg) {
+        return go(arg, null, null);
     }
 
-    public void go(List<String> args) {
-        go(args, null);
+    public int go(List<String> args) {
+        return go(args, null, null);
     }
 
-    public void go(String arg, Closure stdoutStderrConsumer) {
+    public int go(String arg, Closure stdoutLineConsumer) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        go(extractArgs(arg), stdoutStderrConsumer);
+        return go(extractArgs(arg), stdoutLineConsumer, null);
     }
 
-    public void go(List<String> args, Closure stdoutStderrConsumer) {
-        Consumer<String> stdoutLineConsumer = stdoutStderrConsumer == null ? LOGGER::quiet : new LineCollector();
-        Consumer<String> stderrLineConsumer = stdoutStderrConsumer == null ? LOGGER::error : new LineCollector();
-        buildManager.go(args,
+    public int go(String arg, Closure stdoutLineConsumer, Closure stderrLineConsumer) {
+        Assert.isNotBlank(arg, "Arguments must not be null!");
+        return go(extractArgs(arg), stdoutLineConsumer, stderrLineConsumer);
+    }
+
+    public int go(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
+        Consumer<String> stdoutLineConsumer =
+                stdoutLineClosure == null ? LOGGER::quiet : new ClosureLineConsumer(stdoutLineClosure);
+        Consumer<String> stderrLineConsumer =
+                stderrLineClosure == null ? LOGGER::error : new ClosureLineConsumer(stderrLineClosure);
+        return buildManager.go(args,
                 getBuildEnvironment(),
                 stdoutLineConsumer,
                 stderrLineConsumer,
                 continueWhenFail ? DO_NOTHING : null);
-
-        processStdoutStderrIfNecessary(stdoutStderrConsumer, stdoutLineConsumer, stderrLineConsumer);
     }
 
-    public void run(String arg) {
-        run(arg, null);
+    public int run(String arg) {
+        return run(arg, null, null);
     }
 
-    public void run(List<String> args) {
-        run(args, null);
+    public int run(List<String> args) {
+        return run(args, null, null);
     }
 
-    public void run(String arg, Closure stdoutStderrConsumer) {
+    public int run(String arg, Closure stdoutLineClosure) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        run(extractArgs(arg), stdoutStderrConsumer);
+        return run(extractArgs(arg), stdoutLineClosure, null);
     }
 
-    public void run(List<String> args, Closure stdoutStderrConsumer) {
-        Consumer<String> stdoutLineConsumer = stdoutStderrConsumer == null ? LOGGER::quiet : new LineCollector();
-        Consumer<String> stderrLineConsumer = stdoutStderrConsumer == null ? LOGGER::error : new LineCollector();
-        buildManager.run(args,
+    public int run(String arg, Closure stdoutLineClosure, Closure stderrLineClosure) {
+        Assert.isNotBlank(arg, "Arguments must not be null!");
+        return run(extractArgs(arg), stdoutLineClosure, stderrLineClosure);
+    }
+
+    public int run(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
+        Consumer<String> stdoutLineConsumer =
+                stdoutLineClosure == null ? LOGGER::quiet : new ClosureLineConsumer(stdoutLineClosure);
+        Consumer<String> stderrLineConsumer =
+                stderrLineClosure == null ? LOGGER::error : new ClosureLineConsumer(stderrLineClosure);
+        return buildManager.run(args,
                 getBuildEnvironment(),
                 stdoutLineConsumer,
                 stderrLineConsumer,
                 continueWhenFail ? DO_NOTHING : null);
-
-        processStdoutStderrIfNecessary(stdoutStderrConsumer, stdoutLineConsumer, stderrLineConsumer);
-
     }
 
-    private void processStdoutStderrIfNecessary(Closure stdoutStderrConsumer,
-                                                Consumer<String> stdoutLineConsumer,
-                                                Consumer<String> stderrLineConsumer) {
-        if (stdoutStderrConsumer != null) {
-            String stdout = LineCollector.class.cast(stdoutLineConsumer).getOutput();
-            String stderr = LineCollector.class.cast(stderrLineConsumer).getOutput();
-            if (stdoutStderrConsumer.getMaximumNumberOfParameters() == 1) {
-                stdoutStderrConsumer.call(stdout);
-            } else if (stdoutStderrConsumer.getMaximumNumberOfParameters() == 2) {
-                stdoutStderrConsumer.call(stdout, stderr);
+    public Closure appendTo(String file) {
+        return new FileWritingClosure(file, true);
+    }
+
+    public Closure writeTo(String file) {
+        return new FileWritingClosure(file, false);
+    }
+
+    public Closure devNull() {
+        return new Closure<Void>(this) {
+            public Void call(Object line) {
+                return null;
             }
-        }
+        };
     }
 
     protected List<String> extractArgs(String arg) {
         return Arrays.asList(Commandline.translateCommandline(arg));
     }
 
+    private static class ClosureLineConsumer implements Consumer<String> {
+        private Closure closure;
+
+        private ClosureLineConsumer(Closure closure) {
+            this.closure = closure;
+        }
+
+        @Override
+        public void accept(String s) {
+            closure.call(s);
+        }
+    }
+
+    private class FileWritingClosure extends Closure<Void> {
+        private File file;
+
+        private FileWritingClosure(String file, boolean append) {
+            super(Go.this);
+            Path filePath = Paths.get(file);
+            if (filePath.isAbsolute()) {
+                this.file = filePath.toFile();
+            } else {
+                this.file = new File(getProject().getRootDir(), file);
+            }
+
+            if (!append) {
+                IOUtils.write(this.file, "");
+            }
+        }
+
+        public Void call(Object line) {
+            IOUtils.append(file, "" + line + "\n");
+            return null;
+        }
+    }
 }

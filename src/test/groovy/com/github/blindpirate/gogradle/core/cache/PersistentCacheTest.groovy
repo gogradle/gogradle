@@ -28,15 +28,11 @@ import org.gradle.api.logging.Logger
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
 import org.mockito.Mock
-import org.mockito.Mockito
 
 import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.cache.AbstractCacheTest.GolangCloneableForTest
-import static org.mockito.Mockito.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -47,15 +43,15 @@ class PersistentCacheTest {
     @Mock
     Project project
 
-    PersistentCache cache
+    PersistenceCache cache
 
     File storageFile
 
     @Before
     void setUp() {
-        storageFile = new File(resource, "cache.bin")
-        cache = new PersistentCacheForTest(storageFile)
         when(project.getRootDir()).thenReturn(resource)
+        storageFile = new File(resource, '.gogradle/cache/cache.bin')
+        cache = new PersistenceCache(project, 'cache.bin')
     }
 
     Map prepareCacheMap() {
@@ -106,9 +102,8 @@ class PersistentCacheTest {
     void 'exception should be recorded if IOException occurs'() {
         // given
         Logger logger = mock(Logger)
-        ReflectionUtils.setStaticFinalField(PersistentCache, 'LOGGER', logger)
-        cache = new PersistentCacheForTest(resource)
-        ArgumentCaptor captor = ArgumentCaptor.forClass(Throwable)
+        ReflectionUtils.setStaticFinalField(PersistenceCacheHelper, 'LOGGER', logger)
+        cache = new PersistenceCache(project, '.')
         // when
         cache.save()
         // then
@@ -117,12 +112,7 @@ class PersistentCacheTest {
     }
 
     GolangCloneable buildCloneable(int value) {
-        return new GolangCloneableForTest(value: value);
+        return new GolangCloneableForTest(value: value)
     }
 
-    class PersistentCacheForTest extends PersistentCache<GolangCloneableForTest, GolangCloneableForTest> {
-        PersistentCacheForTest(File file) {
-            super(file)
-        }
-    }
 }

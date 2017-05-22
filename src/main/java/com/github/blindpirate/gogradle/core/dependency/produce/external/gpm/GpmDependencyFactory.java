@@ -15,13 +15,27 @@
  *
  */
 
-package com.github.blindpirate.gogradle.core.cache;
+package com.github.blindpirate.gogradle.core.dependency.produce.external.gpm;
 
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 
 import javax.inject.Singleton;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
+// https://github.com/pote/gpm
 @Singleton
-public class BuildScopedNotationToResolvedCache extends AbstractCache<NotationDependency, ResolvedDependency> {
+public class GpmDependencyFactory extends ExternalDependencyFactory {
+    private GodepsParser parser = new GodepsParser();
+
+    @Override
+    public String identityFileName() {
+        return "Godeps";
+    }
+
+    @Override
+    protected List<Map<String, Object>> adapt(File file) {
+        return parser.parse(file);
+    }
 }

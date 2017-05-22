@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle.core.dependency.tree
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
@@ -168,13 +167,6 @@ class DependencyTreeFactoryTest {
         order.verify(d).resolve(context)
         order.verify(context).createSubContext(a3)
         order.verify(a3).resolve(context)
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if package is unrecognized'() {
-        UnrecognizedGolangPackage pkg = UnrecognizedGolangPackage.of('unrecognized')
-        bindDependencies(rootProject, UnrecognizedNotationDependency.of(pkg))
-        factory.getTree(context, rootProject)
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {

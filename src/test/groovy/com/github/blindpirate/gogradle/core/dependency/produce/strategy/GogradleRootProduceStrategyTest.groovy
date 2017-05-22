@@ -68,10 +68,16 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         when(configuration.getDependencies()).thenReturn(result)
     }
 
+    void assertResultIs(GolangDependencySet actual, List expected) {
+        assert actual.size() == expected.size()
+        assert expected.intersect(actual) == expected
+    }
+
     @Test
-    void 'dependencies in build.gradle should have top priority when in Develop mode'() {
+    void 'dependencies in build.gradle should be used in DEVELOP mode'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
+        when(lockedDependencyManager.canRecognize(rootDir)).thenReturn(false)
         dependenciesInBuildDotGradle(a1, b1)
         lockedDependencies(a2)
         vendorDependencies(b2)
@@ -80,61 +86,51 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
         def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
-        assert resultDependencies.any { it.is(a1) }
-        assert resultDependencies.any { it.is(b1) }
-        assert !resultDependencies.any { it.is(a2) }
-        assert !resultDependencies.any { it.is(b2) }
+        assertResultIs(resultDependencies, [a1, b1])
     }
 
     @Test
-    void 'vendor dependencies should be seen as build dependencies'() {
+    void 'dependencies in build.gradle should be used when gogradle.lock does not exist'() {
         // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
-        dependenciesInBuildDotGradle()
+        when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
+        when(lockedDependencyManager.canRecognize(rootDir)).thenReturn(false)
+        dependenciesInBuildDotGradle(a1, b1)
+        lockedDependencies()
+        vendorDependencies(b2)
+
+        // when
+        def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
+
+        // then
+        assertResultIs(resultDependencies, [a1, b1])
+    }
+
+    @Test
+    void 'locked dependencies should be used in REPRODUCIBLE mode'() {
+        // given
+        when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
+        when(lockedDependencyManager.canRecognize(rootDir)).thenReturn(true)
+        dependenciesInBuildDotGradle(a1, b1)
         lockedDependencies(a2)
         vendorDependencies(b2)
 
         // when
-        def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor, 'test')
+        def resultDependencies = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
 
         // then
-        assert resultDependencies.any { it.is(a2) }
-        assert !resultDependencies.any { it.is(b2) }
+        assertResultIs(resultDependencies, [a2])
     }
 
     @Test
-    void 'dependencies in vendor should have top priority when in Reproducible mode'() {
+    void 'dependencies in vendor should be ignored'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
-        dependenciesInBuildDotGradle(a1)
-        lockedDependencies(a2, b2)
-        vendorDependencies()
+        dependenciesInBuildDotGradle(a2)
+        lockedDependencies(b2)
+        vendorDependencies(a1, b1)
 
         // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
-
-        // then
-        assert result.any { it.is(a2) }
-        assert result.any { it.is(b2) }
-        assert !result.any { it.is(a1) }
-        assert !result.any { it.is(b1) }
-    }
-
-    @Test
-    void 'locked dependencies should have priority than build.gradle in Reproducible mode'() {
-        // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
-        dependenciesInBuildDotGradle(a1, b1)
-        lockedDependencies(a2)
-        vendorDependencies()
-
-        // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
-
-        // then
-        assert result.any { it.is(a2) }
-        assert result.any { it.is(b1) }
-        assert !result.any { it.is(a1) }
+        assert strategy.produce(resolvedDependency, rootDir, visitor, 'build').disjoint([a1, b1])
     }
 
     @Test
@@ -151,21 +147,6 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
         // then
         verify(visitor).visitSourceCodeDependencies(resolvedDependency, rootDir, 'build')
-    }
-
-    @Test
-    void 'external tools should be scanned when no dependencies exist in build.gradle'() {
-        // given
-        when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
-        lockedDependencies(a1)
-        dependenciesInBuildDotGradle()
-        vendorDependencies()
-
-        // when
-        def result = strategy.produce(resolvedDependency, rootDir, visitor, 'build')
-
-        // then
-        assert result.any { it.is(a1) }
     }
 
     void lockedDependencies(GolangDependency... dependencies) {

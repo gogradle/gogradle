@@ -42,6 +42,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
 
 @RunWith(GogradleRunner)
@@ -268,5 +269,22 @@ class GolangPluginTest {
     @Test
     void 'getting root dir from injector should succeed'() {
         assert GogradleGlobal.getInstance(Project).getRootDir()
+    }
+
+    @Test
+    void 'abbr for DEV/REP should succeed'() {
+        project.golang {
+            buildMode = project.DEV
+        }
+
+        assert GogradleGlobal.getInstance(GolangPluginSetting.class).buildMode == BuildMode.DEVELOP
+    }
+
+    @Test
+    void 'default action should be added after evaluation'() {
+        project.getPlugins().getPlugin('com.github.blindpirate.gogradle').afterEvaluate(project)
+        [BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME].each {
+            assert project.getTasksByName(it, false).first().actions.size() == 1
+        }
     }
 }

@@ -15,14 +15,20 @@
  *
  */
 
-package com.github.blindpirate.gogradle.core.cache;
+package com.github.blindpirate.gogradle.common
 
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
-import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
+import com.github.blindpirate.gogradle.util.IOUtils
 
-import javax.inject.Singleton;
+class FileFilterTest {
+    File resource
 
-@Singleton
-public class BuildScopedResolvedToDependenciesCache
-        extends AbstractCache<ResolvedDependency, GolangDependencySet> {
+    File touch(String name) {
+        IOUtils.write(resource, name, '')
+        return new File(resource, name)
+    }
+
+    File mkdir(String dirName) {
+        IOUtils.mkdir(resource, dirName)
+        return new File(resource, dirName)
+    }
 }

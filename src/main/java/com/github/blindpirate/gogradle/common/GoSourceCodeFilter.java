@@ -18,20 +18,32 @@
 package com.github.blindpirate.gogradle.common;
 
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.google.common.collect.ImmutableMap;
 
 import java.io.File;
+import java.util.Map;
 import java.util.function.Predicate;
 
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory.TESTDATA_DIRECTORY;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
 
 public class GoSourceCodeFilter extends AbstractFileFilter {
+    public static final GoSourceCodeFilter BUILD_GO_FILTER = withPredicate(GoSourceCodeFilter::isBuildGoFile);
+    public static final GoSourceCodeFilter TEST_GO_FILTER = withPredicate(GoSourceCodeFilter::isTestGoFile);
+
+    public static final Map<String, Predicate<File>> PREDICATES = ImmutableMap.of(
+            BUILD, GoSourceCodeFilter::isBuildGoFile,
+            TEST, GoSourceCodeFilter::isTestGoFile);
+
+
+    public static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
+            BUILD, BUILD_GO_FILTER,
+            TEST, TEST_GO_FILTER);
 
     private Predicate<File> filePredicate;
-
-    public static final GoSourceCodeFilter BUILD_GO_FILTER = withFilePredicate(GoSourceCodeFilter::isBuildGoFile);
-    public static final GoSourceCodeFilter TEST_GO_FILTER = withFilePredicate(GoSourceCodeFilter::isTestGoFile);
 
     protected static boolean isBuildGoFile(File file) {
         return file.getName().endsWith(".go") && !file.getName().endsWith("_test.go");
@@ -41,7 +53,7 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
         return file.getName().endsWith("_test.go");
     }
 
-    public static GoSourceCodeFilter withFilePredicate(Predicate<File> predicate) {
+    public static GoSourceCodeFilter withPredicate(Predicate<File> predicate) {
         return new GoSourceCodeFilter(predicate);
     }
 

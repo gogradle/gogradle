@@ -19,10 +19,14 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.govendo
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ReflectionUtils
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
+import org.mockito.Mockito
 
 
 @RunWith(GogradleRunner)
@@ -45,11 +49,23 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
                         "path": "github.com/dchest/safefile",
                         "revision": "855e8d98f1852d48dde521e0522408d1fe7e836a",
                         "revisionTime": "2015-10-22T12:31:44+02:00"
-                    } 
+                    },
+                    {
+                        "checksumSHA1": "CujWu7+PWlZSX5+zAPJH91O5AVQ=",
+                        "origin": "github.com/docker/distribution/vendor/github.com/Sirupsen/logrus",
+                        "path": "github.com/Sirupsen/logrus",
+                        "revision": "0700fa570d7bcc1b3e46ee127c4489fd25f4daa3",
+                        "revisionTime": "2017-03-21T17:14:25Z"
+                    }
             ],
                 "rootPath": "github.com/kardianos/govendor"
         }
     '''
+
+    @Before
+    void setUp() {
+        ReflectionUtils.setField(factory, 'packagePathResolver', new GithubPackagePathResolver())
+    }
 
     @Test
     void 'package without vendor/vendor.json should be rejected'() {
@@ -68,6 +84,11 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
                          transitive: false])
         verifyMapParsed([name      : 'github.com/dchest/safefile',
                          version   : '855e8d98f1852d48dde521e0522408d1fe7e836a',
+                         transitive: false])
+        verifyMapParsed([name      : 'github.com/Sirupsen/logrus',
+                         host      : [name   : 'github.com/docker/distribution',
+                                      version: '0700fa570d7bcc1b3e46ee127c4489fd25f4daa3'],
+                         vendorPath: 'vendor/github.com/Sirupsen/logrus',
                          transitive: false])
     }
 
@@ -96,6 +117,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // then
         verifyMapParsed([name: 'a', transitive: false])
     }
+
     String vendorDotJsonWithExtraProperties = '''
     {
                 "comment": "",

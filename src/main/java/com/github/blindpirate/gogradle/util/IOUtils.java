@@ -17,14 +17,16 @@
 
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVistor;
 import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
+import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
+import org.apache.commons.io.filefilter.TrueFileFilter;
 
 import java.io.File;
-import java.io.FileFilter;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -48,6 +50,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
 
@@ -120,9 +123,11 @@ public final class IOUtils {
         return ret;
     }
 
-    public static void copyDirectory(final File srcDir, final File destDir,
-                                     final FileFilter filter) {
+    public static void copyDependencies(final File srcDir, final File destDir,
+                                        final Set<String> subpackages) {
         try {
+            Assert.isTrue(dirIsEmpty(destDir));
+            DependencyInstallFileFilter filter = DependencyInstallFileFilter.subpackagesFilter(srcDir, subpackages);
             FileUtils.copyDirectory(srcDir, destDir, filter);
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -192,10 +197,10 @@ public final class IOUtils {
     }
 
     public static void append(File file, String str) {
-        if (file.exists()) {
-            write(file, toString(file) + str);
-        } else {
-            write(file, str);
+        try {
+            FileUtils.write(file, str, GogradleGlobal.DEFAULT_CHARSET, true);
+        } catch (IOException e) {
+            throw new UncheckedIOException(e);
         }
     }
 
@@ -222,6 +227,10 @@ public final class IOUtils {
 
     public static Collection<File> filterFilesRecursively(File dir, IOFileFilter fileFilter, IOFileFilter dirFilter) {
         return FileUtils.listFiles(dir, fileFilter, dirFilter);
+    }
+
+    public static Collection<File> listAllDescendents(File dir) {
+        return FileUtils.listFilesAndDirs(dir, TrueFileFilter.INSTANCE, TrueFileFilter.INSTANCE);
     }
 
     public static void clearDirectory(File dir) {
@@ -311,7 +320,7 @@ public final class IOUtils {
         }
     }
 
-    public static void markAndDelete(File rootDir, Predicate<File> predicate) {
+    public static void markAndDeleteUnmarked(File rootDir, Predicate<File> predicate) {
         MarkDirectoryVisitor markVisitor = new MarkDirectoryVisitor(rootDir, predicate);
         walkFileTreeSafely(rootDir.toPath(), markVisitor);
 

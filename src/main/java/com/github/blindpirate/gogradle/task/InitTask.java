@@ -25,6 +25,8 @@ import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDepende
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.DataExchange;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
@@ -33,6 +35,8 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,6 +44,7 @@ import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
+import static com.github.blindpirate.gogradle.util.StringUtils.appendNSpaces;
 
 public class InitTask extends AbstractGolangTask {
     private static final int DEFAULT_INDENT = 4;
@@ -50,13 +55,13 @@ public class InitTask extends AbstractGolangTask {
     private List<ExternalDependencyFactory> externalDependencyFactories;
 
     @Inject
+    private GogradleRootProject gogradleRootProject;
+
+    @Inject
     private DependencyVisitor visitor;
 
     @Inject
     private GolangConfigurationManager configurationManager;
-
-    @Inject
-    private GogradleRootProject rootProject;
 
     public InitTask() {
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
@@ -85,14 +90,14 @@ public class InitTask extends AbstractGolangTask {
     }
 
     private void initBySourceCodeScan(File rootDir) {
-        GolangDependencySet buildDependencies = visitor.visitSourceCodeDependencies(rootProject, rootDir, BUILD);
-        GolangDependencySet testDependencies = visitor.visitSourceCodeDependencies(rootProject, rootDir, TEST);
+        GolangDependencySet buildDeps = visitor.visitSourceCodeDependencies(gogradleRootProject, rootDir, BUILD);
+        GolangDependencySet testDeps = visitor.visitSourceCodeDependencies(gogradleRootProject, rootDir, TEST);
 
-        testDependencies.removeAll(buildDependencies);
+        testDeps.removeAll(buildDeps);
 
         appendToBuildDotGradle(rootDir,
-                convertToNotationMaps(buildDependencies),
-                convertToNotationMaps(testDependencies));
+                convertToNotationMaps(buildDeps),
+                convertToNotationMaps(testDeps));
     }
 
     private List<Map<String, Object>> convertToNotationMaps(GolangDependencySet set) {
@@ -139,16 +144,13 @@ public class InitTask extends AbstractGolangTask {
             sb.append("'").append(value).append("'");
         } else if (value instanceof Boolean) {
             sb.append(value);
+        } else if (value instanceof Collection) {
+            Assert.isTrue(Collection.class.cast(value).stream().allMatch(s -> s instanceof String));
+            sb.append(DataExchange.toJson(new ArrayList<String>((Collection) value)));
         } else {
             throw new IllegalStateException("Sorry, we should not be here: " + value);
         }
         return sb.toString();
-    }
-
-    private void appendNSpaces(StringBuilder sb, int n) {
-        while (n-- > 0) {
-            sb.append(' ');
-        }
     }
 
     private Optional<ExternalDependencyFactory> findExternalDependencyFactory(File rootDir) {

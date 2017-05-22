@@ -124,6 +124,12 @@ public class StringUtils {
         return org.apache.commons.lang3.StringUtils.lastIndexOf(s, substr);
     }
 
+    public static void appendNSpaces(StringBuilder sb, int n) {
+        while (n-- > 0) {
+            sb.append(' ');
+        }
+    }
+
     public static String trimToNull(String str) {
         return org.apache.commons.lang3.StringUtils.trimToNull(str);
     }

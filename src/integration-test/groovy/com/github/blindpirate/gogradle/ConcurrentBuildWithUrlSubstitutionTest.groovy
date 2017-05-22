@@ -84,10 +84,10 @@ class ConcurrentBuildWithUrlSubstitutionTest {
         futures.each { println(it.get()) }
 
         (1..TOTAL_THREAD_NUM / 2).each {
-            assert new File(resource, "project${it}/.gogradle/build_gopath/src/github.com/my/project/1.go").exists()
+            assert new File(resource, "project${it}/vendor/github.com/my/project/1.go").exists()
         }
         (TOTAL_THREAD_NUM / 2 + 1..TOTAL_THREAD_NUM).each {
-            assert new File(resource, "project${it}/.gogradle/build_gopath/src/github.com/my/project/2.go").exists()
+            assert new File(resource, "project${it}/vendor/github.com/my/project/2.go").exists()
         }
     }
 
@@ -142,7 +142,7 @@ golang {
 """
             writeBuildAndSettingsDotGradle(buildDotGradle)
             newBuild {
-                it.forTasks('installBuildDependencies')
+                it.forTasks('goVendor')
             }
         }
     }

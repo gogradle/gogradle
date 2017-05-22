@@ -33,7 +33,7 @@ import static org.mockito.Mockito.mock
 
 class AbstractCacheTest {
 
-    AbstractCache cache = mock(AbstractCache, CALLS_REAL_METHODS)
+    CloneBackedCache cache = mock(CloneBackedCache, CALLS_REAL_METHODS)
 
     @Before
     void setUp() {

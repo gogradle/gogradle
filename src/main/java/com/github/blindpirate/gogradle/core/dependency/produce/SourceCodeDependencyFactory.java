@@ -60,7 +60,9 @@ public class SourceCodeDependencyFactory {
     public GolangDependencySet produce(ResolvedDependency resolvedDependency,
                                        File rootDir,
                                        String configuration) {
-        return createDependencies(resolvedDependency, goImportExtractor.getImportPaths(rootDir, configuration));
+        Set<String> subpackages = resolvedDependency.getSubpackages();
+        Set<String> importPaths = goImportExtractor.getImportPaths(rootDir, subpackages, configuration);
+        return createDependencies(resolvedDependency, importPaths);
     }
 
     private GolangDependencySet createDependencies(ResolvedDependency resolvedDependency, Set<String> importPaths) {

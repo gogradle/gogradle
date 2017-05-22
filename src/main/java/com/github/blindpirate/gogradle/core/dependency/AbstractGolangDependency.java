@@ -18,15 +18,23 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.google.common.collect.ImmutableSet;
 import org.gradle.api.artifacts.Dependency;
 
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.Objects;
+import java.util.Set;
 
 public abstract class AbstractGolangDependency implements GolangDependency, Serializable {
+
     private String name;
+
     private boolean firstLevel;
 
     private GolangPackage golangPackage;
+
+    private Set<String> subpackages = ImmutableSet.of(ALL_DESCENDANTS);
 
     public GolangPackage getPackage() {
         return golangPackage;
@@ -55,6 +63,32 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
     }
 
     @Override
+    public Set<String> getSubpackages() {
+        return subpackages;
+    }
+
+    protected boolean containsAllSubpackages() {
+        return subpackages.contains(ALL_DESCENDANTS);
+    }
+
+    public void setSubpackages(Collection<String> subpackages) {
+        this.subpackages = ImmutableSet.copyOf(subpackages);
+    }
+
+    public void setSubpackages(String subpackage) {
+        this.subpackages = ImmutableSet.of(subpackage);
+    }
+
+    // these two methods exist in case of user's typo and should should not be called internally
+    public void setSubpackage(Collection<String> subpackages) {
+        this.subpackages = ImmutableSet.copyOf(subpackages);
+    }
+
+    public void setSubpackage(String subpackage) {
+        this.subpackages = ImmutableSet.of(subpackage);
+    }
+
+    @Override
     public String getGroup() {
         throw new UnsupportedOperationException("Unsupported method getGroup is invoked!");
     }
@@ -75,9 +109,29 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
     }
 
     @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        AbstractGolangDependency that = (AbstractGolangDependency) o;
+        return Objects.equals(getName(), that.getName())
+                && Objects.equals(getSubpackages(), that.getSubpackages())
+                && Objects.equals(isFirstLevel(), that.isFirstLevel());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, firstLevel, subpackages);
+    }
+
+    @Override
     public Object clone() {
         try {
-            return super.clone();
+            AbstractGolangDependency ret = (AbstractGolangDependency) super.clone();
+            return ret;
         } catch (CloneNotSupportedException e) {
             return null;
         }

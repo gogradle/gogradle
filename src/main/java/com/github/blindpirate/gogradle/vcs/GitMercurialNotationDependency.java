@@ -101,6 +101,7 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
                 + (commit == null ? "" : ", commit='" + commit + '\'')
                 + (tag == null ? "" : ", tag='" + tag + '\'')
                 + (getUrls() == null ? "" : ", urls='" + getUrls() + '\'')
+                + (containsAllSubpackages() ? "" : ", subpackages='" + getSubpackages() + '\'')
                 + '}';
     }
 

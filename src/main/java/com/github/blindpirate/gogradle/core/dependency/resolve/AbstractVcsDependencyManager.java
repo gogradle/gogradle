@@ -24,7 +24,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
 import com.github.blindpirate.gogradle.core.dependency.install.VendorSupportMixin;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyInstallationException;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
@@ -98,10 +97,9 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         Path globalCachePath = globalCacheManager.getGlobalPackageCachePath(realDependency.getName());
         doReset(realDependency, globalCachePath);
 
-        Path srcPath = globalCachePath.resolve(determineRelativePath(dependency));
-        IOUtils.copyDirectory(srcPath.toFile(), targetDirectory, DependencyInstallFileFilter.INSTANCE);
+        Path srcPath = globalCachePath.resolve(determineRelativePath(dependency)).normalize();
+        IOUtils.copyDependencies(srcPath.toFile(), targetDirectory, dependency.getSubpackages());
     }
-
 
     protected abstract void doReset(ResolvedDependency dependency, Path globalCachePath);
 

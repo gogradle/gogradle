@@ -27,18 +27,16 @@ import java.util.function.Function;
 
 @Singleton
 public class ProjectCacheManager {
-    private final BuildScopedNotationToResolvedCache buildScopedNotationToResolvedCache;
-    private final BuildScopedResolvedToDependenciesCache buildScopedResolvedToDependenciesCache;
+    private final CloneBackedCache<NotationDependency, ResolvedDependency> buildScopedNotationToResolvedCache
+            = new CloneBackedCache<>();
+    private final CloneBackedCache<ResolvedDependency, GolangDependencySet> buildScopedResolvedToDependenciesCache
+            = new CloneBackedCache<>();
     private final PersistenceNotationToResolvedCache persistenceNotationToResolvedCache;
     private final PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache;
 
     @Inject
-    public ProjectCacheManager(BuildScopedNotationToResolvedCache buildScopedNotationToResolvedCache,
-                               BuildScopedResolvedToDependenciesCache buildScopedResolvedToDependenciesCache,
-                               PersistenceNotationToResolvedCache persistenceNotationToResolvedCache,
-                               PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache) {
-        this.buildScopedNotationToResolvedCache = buildScopedNotationToResolvedCache;
-        this.buildScopedResolvedToDependenciesCache = buildScopedResolvedToDependenciesCache;
+    public ProjectCacheManager(PersistenceResolvedToDependenciesCache persistenceResolvedToDependenciesCache,
+                               PersistenceNotationToResolvedCache persistenceNotationToResolvedCache) {
         this.persistenceNotationToResolvedCache = persistenceNotationToResolvedCache;
         this.persistenceResolvedToDependenciesCache = persistenceResolvedToDependenciesCache;
     }

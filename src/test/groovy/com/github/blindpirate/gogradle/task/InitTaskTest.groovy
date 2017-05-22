@@ -19,21 +19,20 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.Mockito
 
-import static com.github.blindpirate.gogradle.util.DependencyUtils.*
+import static com.github.blindpirate.gogradle.util.DependencyUtils.asGolangDependencySet
+import static com.github.blindpirate.gogradle.util.DependencyUtils.mockDependency
+import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -113,8 +112,8 @@ dependencies {
         // given
         GolangDependencySet ab = asGolangDependencySet(mockDependency('a'), mockDependency('b'))
         GolangDependencySet bc = asGolangDependencySet(mockDependency('b'), mockDependency('c'))
-        when(visitor.visitSourceCodeDependencies(null, resource, 'build')).thenReturn(ab)
-        when(visitor.visitSourceCodeDependencies(null, resource, 'test')).thenReturn(bc)
+        when(visitor.visitSourceCodeDependencies(gogradleRootProject, resource, 'build')).thenReturn(ab)
+        when(visitor.visitSourceCodeDependencies(gogradleRootProject, resource, 'test')).thenReturn(bc)
         // when
         task.init()
         // then

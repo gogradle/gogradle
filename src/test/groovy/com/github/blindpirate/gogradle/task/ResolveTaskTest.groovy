@@ -21,15 +21,7 @@ import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.*
-import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
-import com.github.blindpirate.gogradle.core.dependency.produce.external.glide.GlideDependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.produce.external.glock.GlockDependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.produce.external.godep.GodepDependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.produce.external.gopm.GopmDependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.produce.external.govendor.GovendorDependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.produce.external.gvtgbvendor.GvtGbvendorDependencyFactory
-import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.TrashDependencyFactory
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
@@ -39,6 +31,9 @@ import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency
+import org.gradle.api.internal.tasks.TaskExecutionOutcome
+import org.gradle.api.internal.tasks.TaskStateInternal
+import org.gradle.api.tasks.TaskState
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -54,8 +49,7 @@ import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -74,7 +68,7 @@ class ResolveTaskTest extends TaskTest {
     @Mock
     DependencyVisitor dependencyVisitor
 
-    GogradleRootProject gogradleRootProject = new GogradleRootProject()
+    GogradleRootProject gogradleRootProject
 
     @Before
     void setUp() {
@@ -85,7 +79,8 @@ class ResolveTaskTest extends TaskTest {
         resolveBuildDependenciesTask = buildTask(ResolveBuildDependenciesTask)
         resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
 
-        gogradleRootProject.initSingleton('package', resource)
+        gogradleRootProject = new GogradleRootProject(project)
+        gogradleRootProject.setName('package')
         ReflectionUtils.setField(resolveBuildDependenciesTask, 'gogradleRootProject', gogradleRootProject)
         ReflectionUtils.setField(resolveTestDependenciesTask, 'gogradleRootProject', gogradleRootProject)
 
@@ -153,10 +148,20 @@ class ResolveTaskTest extends TaskTest {
     }
 
     @Test
-    void 'recovering from serialization file should succeed'() {
+    void 'recovering from serialization file should succeed when task is up-to-date'() {
+        // given
         'dependency resolution should succeed'()
         ReflectionUtils.setField(resolveBuildDependenciesTask, 'dependencyTree', null)
+        TaskState state = mock(TaskStateInternal)
+        ReflectionUtils.setField(resolveBuildDependenciesTask, 'state', state)
+        when(state.getOutcome()).thenReturn(TaskExecutionOutcome.UP_TO_DATE)
+
+        // when
         DependencyTreeNode tree = resolveBuildDependenciesTask.dependencyTree
+
+        // then
+        assert resolveBuildDependenciesTask.flatDependencies.size() == 3
+        assert resolveBuildDependenciesTask.flatDependencies.collect { it.name } as Set == ['d1', 'd2', 'd3'] as Set
 
         assert tree.name == 'package'
         assert tree.children.size() == 2
@@ -183,6 +188,16 @@ class ResolveTaskTest extends TaskTest {
         assert tree.children[0].children[0].originalDependency.is(d3ResolvedDependency)
     }
 
+    @Test
+    void 'dependencyTree should be null if that task is not executed at all'() {
+        // given
+        'dependency resolution should succeed'()
+        ReflectionUtils.setField(resolveBuildDependenciesTask, 'dependencyTree', null)
+        // then
+        assert resolveBuildDependenciesTask.dependencyTree == null
+        assert resolveBuildDependenciesTask.flatDependencies.isEmpty()
+    }
+
     void assertTreeNodeIs(DependencyTreeNode node, String name) {
         assert node.name == name
         assert node.originalDependency instanceof ResolvedDependency
@@ -190,26 +205,19 @@ class ResolveTaskTest extends TaskTest {
     }
 
     @Test
-    void 'checking external files should succeed'() {
-        ReflectionUtils.setField(resolveBuildDependenciesTask, 'externalDependencyFactories',
-                [DefaultLockedDependencyManager,
-                 GodepDependencyFactory,
-                 GlideDependencyFactory,
-                 GovendorDependencyFactory,
-                 GvtGbvendorDependencyFactory,
-                 TrashDependencyFactory,
-                 GlockDependencyFactory,
-                 GopmDependencyFactory].collect { it.newInstance() })
-        ['gogradle.lock', 'glide.lock', 'vendor/vendor.json'].each {
-            IOUtils.write(resource, it, '')
+    void 'cache binary file should be updated even if error occurred'() {
+        when(configurationManager.getByName(anyString())).thenThrow(Exception)
+        try {
+            resolveBuildDependenciesTask.resolve()
         }
+        catch (Exception e) {
+            verify(projectCacheManager).savePersistenceCache()
+        }
+    }
 
-        List<File> externalLockFiles = resolveBuildDependenciesTask.getExternalLockfiles()
-
-        assert externalLockFiles.size() == 3
-        assert externalLockFiles.any { it.name == 'gogradle.lock' }
-        assert externalLockFiles.any { it.name == 'glide.lock' }
-        assert externalLockFiles.any { it.name == 'vendor.json' }
+    @Test
+    void 'checking external files should succeed'() {
+        assert resolveBuildDependenciesTask.externalLockfiles == new File(resource, 'gogradle.lock')
     }
 
     @Test
@@ -226,17 +234,6 @@ class ResolveTaskTest extends TaskTest {
         when(configurationManager.getByName('build')).thenReturn(configuration)
         when(configuration.getDependencies()).thenReturn(set)
         assert resolveBuildDependenciesTask.getDependencies().containsAll(configuration.getDependencies())
-    }
-
-    @Test
-    void 'checking vendor should succeed'() {
-        IOUtils.mkdir(resource, 'vendor')
-        assert resolveBuildDependenciesTask.vendorDirectory == [new File(resource, 'vendor')]
-    }
-
-    @Test
-    void 'checking vendor should succeed if vendor not exist'() {
-        assert resolveBuildDependenciesTask.vendorDirectory == []
     }
 
     @Test

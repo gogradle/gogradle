@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
@@ -110,15 +111,13 @@ class VendorResolvedDependencyTest {
     @Test
     void 'update time of vendor resolved dependency in local directory should be the dir\'s last modified time'() {
         // given
-        GogradleRootProject hostDependency = new GogradleRootProject()
-        hostDependency.initSingleton('root', resource)
+        LocalDirectoryDependency hostDependency = LocalDirectoryDependency.fromLocal('root', resource)
 
         // when
         dependency = VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         // then
         assert dependency.updateTime == new File(resource, 'vendor/github.com/a/b').lastModified()
-        assert dependency.isFirstLevel()
-        assert dependency.formatVersion() == 'GOGRADLE_ROOT/vendor/github.com/a/b'
+        assert dependency.formatVersion() == "root@${toUnixString(resource)}/vendor/github.com/a/b"
     }
 
     @Test(expected = IllegalStateException)
@@ -156,6 +155,12 @@ class VendorResolvedDependencyTest {
         assert dependency == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency != VendorResolvedDependency.fromParent('github.com/a/c', hostDependency, new File(resource, 'vendor/github.com/a/b'))
         assert dependency.hashCode() == VendorResolvedDependency.fromParent('github.com/a/b', hostDependency, new File(resource, 'vendor/github.com/a/b')).hashCode()
+    }
+
+    @Test
+    void "its cache scope should be host's"() {
+        when(hostDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
+        assert dependency.getCacheScope() == CacheScope.BUILD
     }
 
 }
