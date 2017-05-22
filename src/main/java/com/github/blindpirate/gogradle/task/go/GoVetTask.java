@@ -18,22 +18,17 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
-import com.github.blindpirate.gogradle.GolangPluginSetting;
-
-import javax.inject.Inject;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
-import static java.util.Arrays.asList;
 
 public class GoVetTask extends Go {
-    @Inject
-    private GolangPluginSetting setting;
 
     public GoVetTask() {
         dependsOn(VENDOR_TASK_NAME);
     }
 
     protected void doAddDefaultAction() {
-        doLast(task -> go(asList("vet", setting.getPackagePath() + "/...")));
+        doLast(task -> go(CollectionUtils.asStringList("tool", "vet", children())));
     }
 }
