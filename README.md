@@ -45,6 +45,8 @@ Gogradle implements most features of `glide` and adds some extra features:
 
 If you puzzled over these issues, or you were a Java developer and familiar with Gradle, Gogradle is your choice!  
 
+Gogradle's objective is not replacing other tools, it only provides an option for developers.
+
 ## Feature
 
 - No need to preinstall anything but `JDK 8+` (including golang itself)

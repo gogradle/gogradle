@@ -69,7 +69,7 @@ or
 gradlew gB # Windows
 ```
 
-`goBuild` task [depends on](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies) `resolveBuildDependencies` task. Therefore, even you never specify `resolveBuildDependencies` task, it will be executed by Gogradle first, which is similar to `make`. That is to say, when `goBuild` starts, `resolveBuildDependencies` task has already been executed and all dependency packages have been installed into `vendor`. By default, `goBuild` is equivalent to run `go build <current package path> -o <output location>`. To configure the build, see [goBuild任务](./tasks.md#goBuild).
+`goBuild` task [depends on](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies) `resolveBuildDependencies` task. Therefore, even you never specify `resolveBuildDependencies` task, it will be executed by Gogradle first, which is similar to `make`. That is to say, when `goBuild` starts, `resolveBuildDependencies` task has already been executed and all dependency packages have been installed into `vendor`. By default, `goBuild` is equivalent to run `go build <current package path> -o <output location>`. To configure the build, see [goBuild任务](./tasks.md#gobuild).
 
 ## Test a Project
 
@@ -98,9 +98,9 @@ If you want to let build depend on test, just add the following line to `build.g
 goBuild.dependsOn goTest
 ```
 
-Test reports will be generated in `<project root>/.gogradle/reports/test`. See [goTest task](./tasks.md#goTest) for more details.
+Test reports will be generated in `<project root>/.gogradle/reports/test`. See [goTest task](./tasks.md#gotest) for more details.
 
-# Custom task
+## Custom task
 
 If you want to define some custom tasks, I recommend reading Gradle documentation of [task mechanism](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html). It's similar to `make` rule but more flexible and powerful.
 
@@ -217,7 +217,6 @@ github.com/aws/aws-sdk-go
     |-- github.com/pmezard/go-difflib:d8ed262
     \-- github.com/stretchr/objx:cbeaeb1
 
-```
 ```
 
 This is denpendency tree of [aws-sdk-go](https://github.com/aws/aws-sdk-go) at `31484500fe`. 

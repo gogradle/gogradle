@@ -95,7 +95,7 @@ gradlew goBuild # Windows
 gradlew gB # Windows
 ```
 
-`goBuild`任务默认[依赖](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies)`resolveBuildDependencies`任务，因此，即使你并未指明执行`resolveBuildDependencies`任务，Gradle仍然会先运行`resolveBuildDependencies`，这与`make`类似。这意味着，在`goBuild`任务执行时，`resolveBuildDependencies`任务已经执行完毕，并将所有的依赖包安装在了`vendor`目录中。默认情况下，`goBuild`任务等价于调用`go build <current package path> -o <output location>`，你可以对其进行进一步的配置，详见[goBuild任务](./tasks-cn.md#goBuild)。
+`goBuild`任务默认[依赖](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies)`resolveBuildDependencies`任务，因此，即使你并未指明执行`resolveBuildDependencies`任务，Gradle仍然会先运行`resolveBuildDependencies`，这与`make`类似。这意味着，在`goBuild`任务执行时，`resolveBuildDependencies`任务已经执行完毕，并将所有的依赖包安装在了`vendor`目录中。默认情况下，`goBuild`任务等价于调用`go build <current package path> -o <output location>`，你可以对其进行进一步的配置，详见[goBuild任务](./tasks-cn.md#gobuild)。
 
 ## 测试Go项目
 
@@ -124,7 +124,7 @@ gradlew goTest --tests *_test.go // 通配符测试
 goBuild.dependsOn goTest
 ```
 
-HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`目录。更多细节，请参阅[goTest任务](./tasks-cn.md#goTest)。
+HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`目录。更多细节，请参阅[goTest任务](./tasks-cn.md#gotest)。
 
 ## 自定义任务
 
