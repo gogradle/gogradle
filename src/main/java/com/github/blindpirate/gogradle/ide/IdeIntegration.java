@@ -93,7 +93,7 @@ public abstract class IdeIntegration {
     private void loadContext() {
         Path gorootSrcPath = goBinaryManager.getGoroot().resolve("src");
 
-        context.put("goRootSrc", gorootSrcPath.toString());
+        context.put("goRootSrc", StringUtils.toUnixString(gorootSrcPath));
         context.put("projectName", project.getName());
         context.put("moduleType", getModuleType());
         context.put("moduleImlDir", getModuleImlDir());
