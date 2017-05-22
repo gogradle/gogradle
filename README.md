@@ -8,7 +8,7 @@
 [![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
 [![Apache License 2](https://img.shields.io/badge/license-APL2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
 
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go.png)
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go-mini.png)
 
 # Gogradle 0.5.0 contains a breaking change of core model, please read the documentation carefully
 
