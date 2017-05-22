@@ -67,13 +67,13 @@ gradlew goVendor # Windows
 
 在下文中，`gradlew`命令将以统一的`gradlew <task>`形式给出，不再区分平台。
 
-Gogradle会按照`build.gradle`或者`gogradle.lock`（稍后提及）文件的要求，解析依赖包及其传递性依赖，并将它们扁平化后安装到到`vendor`目录。Gogradle将`vendor`看做一个项目级的、放置依赖包的临时目录，因此，在每次运行此任务时，它会保证`vendor`目录和当前构建所声明或者锁定的全部依赖的版本一致。在Gogradle中存在两种模式：DEVELOP和REPRODUCIBLE模式，DEVELOP模式下，此任务会解析`build.gradle`中声明的依赖；REPRODUCIBLE模式下，此任务会解析`gogradle.lock`文件中锁定的依赖（如果它存在的话）。默认模式为REPRODUCIBLE模式，若希望切换模式，只需要在运行任意`gradlew xxx`时，加上参数
+Gogradle会按照`build.gradle`或者`gogradle.lock`（稍后提及）文件的要求，解析依赖包及其传递性依赖，并将它们扁平化后安装到到`vendor`目录。Gogradle将`vendor`看做一个项目级的、放置依赖包的临时目录，因此，在每次运行此任务时，它会保证`vendor`目录和当前构建所声明或者锁定的全部依赖的版本一致。在Gogradle中存在两种模式：`DEVELOP`和`REPRODUCIBLE`模式（可缩写为`DEV`和`REP`），`DEVELOP`模式下，此任务会解析`build.gradle`中声明的依赖；`REPRODUCIBLE`模式下，此任务会解析`gogradle.lock`文件中锁定的依赖（如果它存在的话）。默认模式为`REPRODUCIBLE`模式，若希望切换模式，只需要在运行任意`gradlew xxx`时，加上参数
 
-`gradle xxx -Dgogradle.mode=DEV`或者`gradle xxx -Dgogradle.mode=DEVEVLOP`（DEVELOP模式）
+`gradle xxx -Dgogradle.mode=DEV`或者`gradle xxx -Dgogradle.mode=DEVELOP`（`DEVELOP`模式）
 
 以及
 
-`gradle xxx -Dgogradle.mode=REP`或者`gradle xxx -Dgogradle.mode=REPRODUCIBLE`（REPRODUCIBLE模式）即可。
+`gradle xxx -Dgogradle.mode=REP`或者`gradle xxx -Dgogradle.mode=REPRODUCIBLE`（`REPRODUCIBLE`模式）即可。
 
 你可以自行决定是否将`vendor`目录提交到源代码管理系统中，我个人倾向于提交依赖锁定文件`gogradle.lock`，在每次构建时重新生成`vendor`目录，以减小代码仓库的体积。
 
@@ -185,9 +185,9 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 }
 ```
 
-这段代码指示Gogradle执行`go build -v github.com/my/project`，并将标准输入和标准输出丢弃。如果go进程的返回值不会0，则打印之。你可能会问，这么冗长复杂的命令，我为什么不用Shell和`make`实现呢？
+这段代码指示Gogradle执行`go build -v github.com/my/project`，并将标准输入和标准输出丢弃。如果`go`进程的返回值不会0，则打印之。你可能会问，这么冗长复杂的命令，我为什么不用Shell和`make`实现呢？
 
-答案是，第一，Shell跨平台能力差，而这里的所有的代码都是可以跨平台的；第二，这里可以编写任意的`Groovy`代码，引用Java生态系统中的任何类库。
+答案是，第一，Shell跨平台能力差，而这里的所有的代码都是可以跨平台的；第二，这里可以编写任意的`Groovy`代码，引用JVM生态系统（Java/Groovy/Scala/Kotlin, etc）中的任何类库。
 
 ## 添加依赖
 
@@ -273,7 +273,7 @@ golang {
     packagePath = 'github.com/user/project'
     
     // 指明当前的模式。有两个可选值：DEVELOP/REPRODUCIBLE，默认为REPRODUCIBLE
-    // 该配置会被命令行参数所覆盖
+    // 该配置会被命令行参数-Dgogradle.mode所覆盖
     // 可缩写为DEV/REP
     buildMode = 'REPRODUCIBLE'
     

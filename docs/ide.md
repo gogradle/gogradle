@@ -91,6 +91,8 @@ IDEA has Gradle integrated, so you can enable it via `View > ToolWindows > Gradl
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
+Moreover, you can use IDEA's Gradle Tool View to run tasks as illustrated above.
+
 
 >
 > **NOTE** If you're using Gogradle for the first time,

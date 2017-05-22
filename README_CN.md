@@ -18,7 +18,7 @@
 
 ## Gogradle是什么?
 
-Gogradle是一个为Go语言提供现代构建支持的Gradle插件。Gogradle深受[glide](https://github.com/Masterminds/glide)启发（这里需要向它致以崇高的敬意），可以简单地理解为`glide`+`make`。
+Gogradle是一个为Go语言提供现代构建支持的[Gradle](https://gradle.org)插件。Gogradle深受[glide](https://github.com/Masterminds/glide)启发（这里需要向它致以崇高的敬意），可以简单地理解为`glide`+`make`。
 
 ## 为什么使用Gogradle？
 
@@ -28,7 +28,7 @@ Gogradle是一个为Go语言提供现代构建支持的Gradle插件。Gogradle�
 - Gogradle支持项目级的`GOPATH`，你可以自己决定使用全局`GOPATH`还是项目级别的`GOPATH`
 - Gogradle支持多Go版本共存和切换
 - 社区的各种[依赖管理工具]((https://github.com/blindpirate/report-of-go-package-management-tool))众多，且互不兼容
-  - Gogradle提供了[导入命令](gettingstartd-import)，从而使你能够方便地从其他工具迁移到Gogradle
+  - Gogradle提供了[导入命令](./docs/getting-started-cn.md#准备工作)，从而使你能够方便地从其他工具迁移到Gogradle
   - Gogradle兼容`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`工具。在查找一个依赖包的传递性依赖时，它能够自动识别工具的锁定文件
 - Gogradle会长期维护
 
