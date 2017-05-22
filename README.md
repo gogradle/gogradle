@@ -22,7 +22,7 @@ Gogradle is a gradle plugin which provides support for building golang.
 
 ## What is Gogradle?
 
-Gogradle is a [Gradle](https://gradle.org) plugin which provide modern build support for [Golang](https://golang.org/). Gogradle is deeply inspired by [glide](https://github.com/Masterminds/glide)(I need to pay respect for it). You can simply think Gogradle is `glide`+`make`.
+Gogradle is a [Gradle](https://gradle.org) plugin which provide modern build support for [Golang](https://golang.org/). Gogradle is deeply inspired by [glide](https://github.com/Masterminds/glide)(I need to pay respect for it). You can simply think Gogradle as `glide`+`make`.
 
 ## Why Gogradle?
 
