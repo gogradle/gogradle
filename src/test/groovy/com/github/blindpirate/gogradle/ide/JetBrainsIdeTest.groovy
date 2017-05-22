@@ -67,7 +67,7 @@ class JetBrainsIdeTest {
         assert moduleIml.contains('Go SDK')
 
         String goSdkXml = IOUtils.toString(new File(resource, '.idea/libraries/Go_SDK.xml'))
-        assert goSdkXml.contains("file://${new File(resource, 'go/src').getAbsolutePath()}")
+        assert goSdkXml.contains("file://${IOUtils.toString(new File(resource, 'go/src'))}")
 
         String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))
         assert modulesXml.contains('.idea/MyAwesomeProject.iml')
