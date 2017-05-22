@@ -111,9 +111,27 @@ gradlew goInit # Windows
 
 更多细节请阅读[goBuild任务](https://github.com/gogradle/gogradle/blob/master/docs/tasks-cn.md#gobuild)。
 
+![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/build.png)
+
+这是`goBuild`任务的截图，可以看到其中执行的任务。
+
 ### 测试
 
 在项目目录下运行`gradlew goTest`或者`gradlew gT`。它会逐个包执行测试并生成之前我们看到的HTML格式的测试/覆盖率报告，是不是比原生的`go test`的简陋输出看上去好一点？
+
+![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/test.png)
+
+这次构建包含若干失败的测试，因此构建失败了。输出结果显示了测试报告的位置。
+
+### Check
+
+Gogradle将常用的代码检查任务封装在了`goCheck`任务中。默认情况下，它依赖`goVet`任务、`gofmt`任务和`goCover`任务，开箱即用，如图所示：
+
+![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/check.png)
+
+在这次构建中，`goBuild`依赖了`goCheck`任务，因此相关任务得到了执行。
+
+更多细节请阅读[Gogradle的任务](https://github.com/gogradle/gogradle/blob/master/docs/tasks-cn.md)。
 
 ### 依赖包管理
 
@@ -171,7 +189,7 @@ dependencies {
 在管理依赖的过程中，我们不可避免地会遇到依赖包冲突、需要手工处理的情况。这个时候，可以使用：
 
 ```
-gradlew gD
+gradlew goDependencies
 ```
 
 它会打印当前的依赖树：
