@@ -19,16 +19,48 @@ package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
+import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 
+import java.io.File;
+import java.util.List;
+import java.util.stream.Collectors;
+
+import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 
 public class GoVetTask extends Go {
-
     public GoVetTask() {
         dependsOn(VENDOR_TASK_NAME);
     }
 
     protected void doAddDefaultAction() {
-        doLast(task -> go(CollectionUtils.asStringList("tool", "vet", children())));
+        vet(allSubGoFiles());
+        vet(allSubDirectories());
     }
+
+    private void vet(List<String> fileNames) {
+        if (!fileNames.isEmpty()) {
+            doLast(task -> go(CollectionUtils.asStringList("tool", "vet", fileNames)));
+        }
+    }
+
+    private List<String> allSubGoFiles() {
+        return IOUtils.safeListFiles(getProject().getRootDir()).stream()
+                .filter(File::isFile)
+                .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
+                .filter(file -> StringUtils.endsWithAny(file.getName(), ".go"))
+                .map(StringUtils::toUnixString)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> allSubDirectories() {
+        return IOUtils.safeListFiles(getProject().getRootDir()).stream()
+                .filter(File::isDirectory)
+                .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
+                .filter(file -> !VENDOR_DIRECTORY.equals(file.getName()))
+                .map(StringUtils::toUnixString)
+                .collect(Collectors.toList());
+    }
+
 }

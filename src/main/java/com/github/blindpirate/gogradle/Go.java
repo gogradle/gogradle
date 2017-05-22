@@ -18,11 +18,9 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
 import groovy.lang.Closure;
 import org.apache.tools.ant.types.Commandline;
 import org.gradle.api.internal.AbstractTask;
@@ -37,10 +35,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
-import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 
 public class Go extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(Go.class);
@@ -211,14 +207,5 @@ public class Go extends AbstractGolangTask {
         }
     }
 
-    // A workaround because gofmt on Windows doesn't ignore .gogradle and go vet doesnt ignore vendor/
-    protected List<String> children() {
-        return IOUtils.safeListFiles(getProject().getRootDir())
-                .stream()
-                .filter(file -> !startsWithAny(file.getName(), "_", "."))
-                .filter(file -> !VendorDependencyFactory.VENDOR_DIRECTORY.equals(file.getName()))
-                .filter(file -> file.isDirectory() || file.getName().endsWith(".go"))
-                .map(StringUtils::toUnixString)
-                .collect(Collectors.toList());
-    }
+
 }

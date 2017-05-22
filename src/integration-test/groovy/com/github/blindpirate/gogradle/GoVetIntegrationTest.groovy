@@ -42,51 +42,62 @@ dependencies {
     }
 }
 """)
+        IOUtils.mkdir(resource, '.tmp')
+    }
 
-        IOUtils.write(resource, 'main.go', """
+    String goFileWithVetError = """
 package main
 
 import "fmt"
 import "os"
-import "github.com/my/a"
-""")
 
-        IOUtils.write(resource, '.tmp/a.go', """
-package a
-
-import "fmt"
-import "os"
-
-func A() {
-    fmt.Println(os.Stderr, fmt.Errorf("error msg"))
-}
-""")
-    }
-
-    void letGoVetForMainFail() {
-        IOUtils.append(new File(resource, 'main.go'), """
 func main() {
     fmt.Println(os.Stderr, fmt.Errorf("error msg"))
 }
-""")
+"""
+
+
+    void writeGoFileWithErrorToProjectRoot() {
+        IOUtils.write(resource, 'main.go', goFileWithVetError)
+    }
+
+    void writeGoFileWithErrorToVendor() {
+        IOUtils.write(resource, '.tmp/main.go', goFileWithVetError)
+    }
+
+    void writeGoFileWithErrorToSub() {
+        IOUtils.write(resource, 'sub/main.go', goFileWithVetError)
     }
 
     @Test
-    void 'exception should be thrown if go vet fails'() {
+    void 'exception should be thrown if error exists in project root'() {
+        writeGoFileWithErrorToProjectRoot()
         try {
             newBuild {
                 it.forTasks('goVet')
             }
         } catch (BuildException e) {
             assert stderr.toString().contains('first argument to Println is os.Stderr')
-            assert stderr.toString().contains('exit status 1')
+            assert stdout.toString().contains('goVet FAILED')
+        }
+    }
+
+    @Test
+    void 'exception should be thrown if error exists in sub package'() {
+        writeGoFileWithErrorToSub()
+        try {
+            newBuild {
+                it.forTasks('goVet')
+            }
+        } catch (BuildException e) {
+            assert stderr.toString().contains('first argument to Println is os.Stderr')
             assert stdout.toString().contains('goVet FAILED')
         }
     }
 
     @Test
     void 'exception should be suppressed if continueWhenFail=true'() {
-        letGoVetForMainFail()
+        writeGoFileWithErrorToProjectRoot()
         IOUtils.append(new File(resource, 'build.gradle'), '''
 goVet {
     continueWhenFail = true
@@ -99,6 +110,7 @@ goVet {
 
     @Test
     void 'code in vendor should not be vetted'() {
+        writeGoFileWithErrorToVendor()
         newBuild {
             it.forTasks('goVet')
         }
