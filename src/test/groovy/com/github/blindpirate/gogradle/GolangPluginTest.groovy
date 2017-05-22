@@ -283,7 +283,7 @@ class GolangPluginTest {
     @Test
     void 'default action should be added after evaluation'() {
         project.getPlugins().getPlugin('com.github.blindpirate.gogradle').afterEvaluate(project)
-        [BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME].each {
+        [BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME].each {
             assert project.getTasksByName(it, false).first().actions.size() == 1
         }
     }

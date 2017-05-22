@@ -18,13 +18,19 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
+import com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
+import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 
 import javax.inject.Inject;
 import java.nio.file.Path;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 public class GofmtTask extends Go {
@@ -47,5 +53,16 @@ public class GofmtTask extends Go {
 
     public void gofmt(String arg) {
         run(getGofmtPath() + " " + arg);
+    }
+
+    // A workaround because gofmt on Windows doesn't ignore .gogradle
+    protected List<String> children() {
+        return IOUtils.safeListFiles(getProject().getRootDir())
+                .stream()
+                .filter(file -> !startsWithAny(file.getName(), "_", "."))
+                .filter(file -> !VendorDependencyFactory.VENDOR_DIRECTORY.equals(file.getName()))
+                .filter(file -> file.isDirectory() || file.getName().endsWith(".go"))
+                .map(StringUtils::toUnixString)
+                .collect(Collectors.toList());
     }
 }
