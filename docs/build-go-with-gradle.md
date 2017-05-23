@@ -22,7 +22,7 @@ Gogradle就是一个支持构建Go语言的插件。简单而言，你可以将G
 
 ## 为什么使用Gogradle
 
-- Gradle基于Groovy和JVM，平台兼容性好，容易上手，同时JVM平台有大量轮子可用
+- Gradle基于Groovy和JVM，平台兼容性好，容易上手，同时JVM生态系统（Java/Groovy/Scala/Kotlin）有大量轮子可用
 - [Gradle生态系统](https://plugins.gradle.org/)有很多插件可用
 - Gradle拥有众多Feature：
   - 允许自定义任务依赖，自动生成DAG并执行
@@ -44,7 +44,6 @@ Gogradle的项目地址在这里：[https://github.com/gogradle/gogradle](https:
 下图是[`gogs`](https://github.com/gogits/gogs)项目在我的Mac上的测试结果：
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/classes.png)
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/failedtest.png)
 
 以及覆盖率报告
 
@@ -63,7 +62,7 @@ Gogradle会自动解析该包及所有的传递性依赖，解决所有可能的
 
 ### 安装JRE及IDE
 
-Gogradle所需的一切仅仅是一个JVM。现在你需要安装JDK或者JRE 8+，在[这里](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)下载。不过，如果你决定使用JetBrains系列的IDE（IntellijIDEA/Gogland/WebStorm/PhpStorm/PyCharm/RubyMine/CLion）之一，那么你可以利用其自带的JDK，而无需额外安装。详见[Gogradle IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)设置使用其自带的IDE。同样，如果你决定使用VSCode或者Vim，也按照该文档描述，安装相应的插件。
+Gogradle所需的一切仅仅是一个JVM。现在你需要安装JDK或者JRE 8+，在[这里](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)下载。不过，如果你决定使用JetBrains系列的IDE（IntellijIDEA/Gogland/WebStorm/PhpStorm/PyCharm/RubyMine/CLion）之一，那么你可以利用其自带的JRE，而无需额外安装。详见[Gogradle IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)设置使用其自带的JRE。同样，如果你决定使用VSCode或者Vim，也按照该文档描述，安装相应的插件。
 
 ### 拷贝Gradle脚本
 
@@ -75,7 +74,7 @@ Gogradle所需的一切仅仅是一个JVM。现在你需要安装JDK或者JRE 8+
 
 ```
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.5.1' // 请使用当前的最新版本
+    id 'com.github.blindpirate.gogradle' version '0.5.2' // 请使用当前的最新版本
 }
 
 golang {
@@ -103,7 +102,7 @@ gradlew goInit # Windows
 
 它会自动解析所有的依赖、传递性依赖，解决依赖包冲突，然后将依赖包安装到项目目录下并调用命令行执行`go build`。
 
-你可能会疑惑，纳尼，我还没安装Go呢！没关系，Gogradle如果发现你的机器上没有安装go，会自动下载安装go的最新版本。如果你在墙内，可能遇到Go的二进制包下载不下来的问题，可移步[这里](https://github.com/gogradle/gogradle/blob/master/docs/getting-started-cn.md#自定义gogradle配置)配置`fuckGfw`参数使用墙内的镜像。
+你可能会疑惑，蛤，我还没安装Go呢！没关系，Gogradle如果发现你的机器上没有安装go，会自动下载安装go的最新版本。如果你在墙内，可能遇到Go的二进制包下载不下来的问题，可移步[这里](https://github.com/gogradle/gogradle/blob/master/docs/getting-started-cn.md#自定义gogradle配置)配置`fuckGfw`参数使用墙内的镜像。
 
 同样，你也无需预先设置GOPATH。如果Gogradle发现你没有设置`GOPATH`，会自动在项目目录下的`.gogradle`隐藏目录中新建一个项目级的`GOPATH`并使用它作为构建时的环境变量。因为所有的依赖包都会被安装在`vendor`内，所以不会发生找不到依赖包的情况。
 
@@ -118,6 +117,8 @@ gradlew goInit # Windows
 ### 测试
 
 在项目目录下运行`gradlew goTest`或者`gradlew gT`。它会逐个包执行测试并生成之前我们看到的HTML格式的测试/覆盖率报告，是不是比原生的`go test`的简陋输出看上去好一点？
+
+![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/failedtest.png)
 
 ![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/test.png)
 
@@ -220,7 +221,7 @@ github.com/gogits/gogs
 - 一级依赖优先：定义在根项目中的依赖优先级高于传递性依赖
 - 越新的依赖包优先级越高：例如，commit时间晚的依赖包会覆盖commit时间早的依赖包
 
-最终，Gogradle会保证同名的依赖包在`vendo`中仅存在一份。这个过程和Java的依赖包解析过程非常相似。
+最终，Gogradle会保证同名的依赖包在`vendor`中仅存在一份。这个过程和Java的依赖包解析过程非常相似。
 
 ### 自定义仓库与镜像仓库
 
