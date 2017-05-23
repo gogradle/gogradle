@@ -18,7 +18,7 @@ Gogradle is a Gradle plugin providing Go build support. You can simply think it 
 ## Why Gogradle
 
 - Gradle is based on Groovy and JVM and has an excellent compatibility. It's easy to use and there are many wheels in JVM ecosystem (Java/Groovy/Scala/Kotlin).
-- There are many plugins in [Gradle生态系统](https://plugins.gradle.org/)
+- There are many plugins in [Gradle ecosystem](https://plugins.gradle.org/)
 - Gradle has many features:
   - Task dependencies and automatic task DAG 
   - [Up-to-date check](https://docs.gradle.org/current/userguide/more_about_tasks.html#sec:up_to_date_checks)
