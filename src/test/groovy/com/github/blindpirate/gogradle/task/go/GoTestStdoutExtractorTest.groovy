@@ -44,7 +44,7 @@ FAIL
 exit status 
 FAIL\ta\t0.006s'''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('a/b/c')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles(resource.listFiles() as List)
@@ -61,6 +61,7 @@ FAIL\ta\t0.006s'''
         assert result.results[0].message.trim() == ''
         assert result.results[0].resultType == TestResult.ResultType.FAILURE
     }
+
 
     @Test
     void 'extracting Log/Error output of testing.T should succeed'() {
@@ -81,7 +82,7 @@ coverage: 66.7% of statements
 exit status 1
 FAIL\tgithub.com/my/project/a\t0.006s'''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('a/b/c')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles(resource.listFiles() as List)
@@ -171,7 +172,7 @@ FAIL
 exit status 1
 FAIL\tgithub.com/gogits/gogs/models\t0.074s'''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('github.com/gogits/gogs/models')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles(resource.listFiles() as List)
@@ -216,7 +217,7 @@ FAIL\tgithub.com/gogits/gogs/models\t0.074s'''
 .gogradle/project_gopath/src/github.com/gogits/gogs/models/ssh_key_test.go:7:1: expected declaration, found 'IDENT' sfds
 FAIL\tgithub.com/gogits/gogs/models [setup failed]'''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('github.com/gogits/gogs/models')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles([])
@@ -239,7 +240,7 @@ FAIL\tgithub.com/gogits/gogs/models [setup failed]'''
 ./a1.go:3: syntax error: non-declaration statement outside function body
 FAIL\ta [build failed]'''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('a')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles([])
@@ -262,7 +263,7 @@ FAIL\ta [build failed]'''
 can't load package: package github.com/my/project/b: found packages broken (b1.go) and b (b1_test.go) in /src/github.com/my/project/b
 '''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('b')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles([])
@@ -284,7 +285,7 @@ can't load package: package github.com/my/project/b: found packages broken (b1.g
 cannot find package: package github.com/my/project/b: found packages broken (b1.go) and b (b1_test.go) in /src/github.com/my/project/b
 '''
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('b')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles([])
@@ -296,6 +297,39 @@ cannot find package: package github.com/my/project/b: found packages broken (b1.
         assert results[0].results.size() == 1
         assert results[0].results[0].name == "cannot find package"
         assert results[0].results[0].message.contains('found packages broken')
+        assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
+    }
+
+    @Test
+    void 'extracting result with panic should succeed'() {
+        // given
+        String stdout = '''\
+panic: 42
+
+goroutine 1 [running]:
+github.com/my/package.init.1()
+\t/Users/zhb/Projects/examples/typical-build/.gogradle/project_gopath/src/github.com/my/package/StringReverse.go:9 +0x58
+github.com/my/package.init()
+\t/Users/zhb/Projects/examples/typical-build/.gogradle/project_gopath/src/github.com/my/package/StringReverse_test.go:8 +0x4e
+main.init()
+\tgithub.com/my/package/_test/_testmain.go:46 +0x53
+exit status 2
+FAIL\tgithub.com/my/package\t0.010s
+'''
+        // when
+        PackageTestResult result = PackageTestResult.builder()
+                .withPackagePath('a/b/c')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .withCode(2)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(result)
+
+        assert results.size() == 1
+        assert results[0].className == "a.b.c.go test return 2"
+        assert results[0].results.size() == 1
+        assert results[0].results[0].name == "go test return 2"
+        assert results[0].results[0].message.contains('panic: 42')
         assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
     }
 
@@ -351,7 +385,7 @@ cannot find package: package github.com/my/project/b: found packages broken (b1.
         IOUtils.write(resource, 'gogs_test.go', 'func TestMarkdown()')
 
         // when
-        PackageTestContext context = PackageTestContext.builder()
+        PackageTestResult context = PackageTestResult.builder()
                 .withPackagePath('gogs')
                 .withStdout(stdout.split(/\n/) as List)
                 .withTestFiles(resource.listFiles() as List)

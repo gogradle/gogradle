@@ -21,7 +21,6 @@ import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.common.LineCollector;
-import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.Lists;
@@ -46,10 +45,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.go.GoCoverTask.COVERAGE_PROFILES_PATH;
+import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
 import static com.github.blindpirate.gogradle.util.IOUtils.encodeInternally;
@@ -184,15 +185,9 @@ public class GoTestTask extends Go {
 
             parentDirToTestFiles.forEach((parentDir, testFiles) -> {
                 String packageImportPath = dirToImportPath(parentDir);
-                List<String> stdout = doSingleTest(parentDir, testFiles);
+                PackageTestResult result = doSingleTest(packageImportPath, parentDir, testFiles);
 
-                PackageTestContext context = PackageTestContext.builder()
-                        .withPackagePath(packageImportPath)
-                        .withStdout(stdout)
-                        .withTestFiles(testFiles)
-                        .build();
-
-                List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(context);
+                List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(result);
                 logResult(packageImportPath, resultOfSinglePackage);
                 ret.addAll(resultOfSinglePackage);
             });
@@ -239,19 +234,12 @@ public class GoTestTask extends Go {
             clearDirectory(coverageDir);
         }
 
-        private List<String> doSingleTest(File parentDir, List<File> testFiles) {
+        private PackageTestResult doSingleTest(String importPath, File parentDir, List<File> testFiles) {
             LineCollector lineCollector = new LineCollector();
-            String importPath = dirToImportPath(parentDir);
-            List<String> args;
+            List<String> args = isCommandLineArguments
+                    ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
+                    : Lists.newArrayList("test", "-v", importPath);
 
-            if (isCommandLineArguments) {
-                args = CollectionUtils.asStringList(
-                        "test",
-                        "-v",
-                        testFiles.stream().map(StringUtils::toUnixString).collect(toList()));
-            } else {
-                args = Lists.newArrayList("test", "-v", importPath);
-            }
 
             if (generateCoverageProfile) {
                 File profilesPath = new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH + "/"
@@ -260,9 +248,16 @@ public class GoTestTask extends Go {
                 coverageProfileGenerated = true;
             }
 
-            buildManager.go(args, emptyMap(), lineCollector, lineCollector, code -> {
-            });
-            return lineCollector.getLines();
+            AtomicInteger retcode = new AtomicInteger(0);
+
+            buildManager.go(args, emptyMap(), lineCollector, lineCollector, retcode::set);
+
+            return PackageTestResult.builder()
+                    .withPackagePath(importPath)
+                    .withStdout(lineCollector.getLines())
+                    .withTestFiles(testFiles)
+                    .withCode(retcode.get())
+                    .build();
         }
 
 

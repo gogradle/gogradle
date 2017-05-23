@@ -65,37 +65,44 @@ public class GoTestStdoutExtractor {
     private static final String BUILD_FAILED_ERROR = "[build failed]";
     private static final String CANNOT_LOAD_PACKAGE_ERROR = "can't load package";
     private static final String CANNOT_FIND_PACKAGE_ERROR = "cannot find package";
+    private static final String RETURN_NON_ZERO = "go test return ";
     private static final AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
 
-    public List<TestClassResult> extractTestResult(PackageTestContext context) {
-        if (stdoutContains(context, SETUP_FAILED_ERROR)) {
-            return failResult(context, SETUP_FAILED_ERROR);
-        } else if (stdoutContains(context, BUILD_FAILED_ERROR)) {
-            return failResult(context, BUILD_FAILED_ERROR);
-        } else if (stdoutContains(context, CANNOT_LOAD_PACKAGE_ERROR)) {
-            return failResult(context, CANNOT_LOAD_PACKAGE_ERROR);
-        } else if (stdoutContains(context, CANNOT_FIND_PACKAGE_ERROR)) {
-            return failResult(context, CANNOT_FIND_PACKAGE_ERROR);
+    public List<TestClassResult> extractTestResult(PackageTestResult result) {
+        if (stdoutContains(result, SETUP_FAILED_ERROR)) {
+            return failResult(result, SETUP_FAILED_ERROR);
+        } else if (stdoutContains(result, BUILD_FAILED_ERROR)) {
+            return failResult(result, BUILD_FAILED_ERROR);
+        } else if (stdoutContains(result, CANNOT_LOAD_PACKAGE_ERROR)) {
+            return failResult(result, CANNOT_LOAD_PACKAGE_ERROR);
+        } else if (stdoutContains(result, CANNOT_FIND_PACKAGE_ERROR)) {
+            return failResult(result, CANNOT_FIND_PACKAGE_ERROR);
+        } else if (testFailed(result)) {
+            return failResult(result, RETURN_NON_ZERO + result.getCode());
         } else {
-            return successfulTestResults(context);
+            return successfulTestResults(result);
         }
     }
 
-    private boolean stdoutContains(PackageTestContext context, String error) {
-        return context.getStdout().stream().anyMatch(s -> s.contains(error));
+    private boolean testFailed(PackageTestResult result) {
+        return !stdoutContains(result, TEST_START) && result.getCode() != 0;
     }
 
-    private List<TestClassResult> successfulTestResults(PackageTestContext context) {
-        List<String> stdout = removeTailMessages(context.getStdout());
+    private boolean stdoutContains(PackageTestResult result, String error) {
+        return result.getStdout().stream().anyMatch(s -> s.contains(error));
+    }
 
-        Map<File, String> testFileContents = loadTestFiles(context.getTestFiles());
+    private List<TestClassResult> successfulTestResults(PackageTestResult result) {
+        List<String> stdout = removeTailMessages(result.getStdout());
+
+        Map<File, String> testFileContents = loadTestFiles(result.getTestFiles());
         List<GoTestMethodResult> results = extractTestMethodResult(stdout);
 
         Map<File, List<GoTestMethodResult>> testFileToResults = groupByTestFile(results, testFileContents);
 
         return testFileToResults.entrySet().stream()
                 .map(entry -> {
-                    String className = determineClassName(context.getPackagePath(), entry.getKey().getName());
+                    String className = determineClassName(result.getPackagePath(), entry.getKey().getName());
                     return methodResultsToClassResult(className, entry.getValue());
                 })
                 .collect(toList());
@@ -129,20 +136,20 @@ public class GoTestStdoutExtractor {
         return stdout;
     }
 
-    private List<TestClassResult> failResult(PackageTestContext context, String reason) {
-        String message = String.join("\n", context.getStdout());
-        GoTestMethodResult result = new GoTestMethodResult(GLOBAL_COUNTER.incrementAndGet(),
+    private List<TestClassResult> failResult(PackageTestResult testResult, String reason) {
+        String message = String.join("\n", testResult.getStdout());
+        GoTestMethodResult ret = new GoTestMethodResult(GLOBAL_COUNTER.incrementAndGet(),
                 reason,
                 TestResult.ResultType.FAILURE,
                 0L,
                 0L,
                 message);
 
-        result.addFailure(message, message, message);
+        ret.addFailure(message, message, message);
 
-        String className = determineClassName(context.getPackagePath(), reason);
+        String className = determineClassName(testResult.getPackagePath(), reason);
 
-        return asList(methodResultsToClassResult(className, asList(result)));
+        return asList(methodResultsToClassResult(className, asList(ret)));
     }
 
     private List<GoTestMethodResult> extractTestMethodResult(List<String> stdout) {

@@ -21,7 +21,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor
 import com.github.blindpirate.gogradle.task.go.GoTestTask
-import com.github.blindpirate.gogradle.task.go.PackageTestContext
+import com.github.blindpirate.gogradle.task.go.PackageTestResult
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
@@ -42,7 +42,6 @@ import org.mockito.stubbing.Answer
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -160,13 +159,13 @@ class GoTestTaskTest extends TaskTest {
                 invocation.arguments[3].accept('stderr')
             }
         })
-        ArgumentCaptor<PackageTestContext> argumentCaptor = ArgumentCaptor.forClass(PackageTestContext)
+        ArgumentCaptor<PackageTestResult> argumentCaptor = ArgumentCaptor.forClass(PackageTestResult)
         // when
         task.addDefaultActionIfNoCustomActions()
         task.actions[0].execute(task)
         // then
         verify(extractor).extractTestResult(argumentCaptor.capture())
-        PackageTestContext context = argumentCaptor.getValue()
+        PackageTestResult context = argumentCaptor.getValue()
         assert context.packagePath == 'github.com/my/package/a'
         assert context.stdout == ['stdout', 'stderr']
         assert context.testFiles.size() == 3
@@ -178,7 +177,7 @@ class GoTestTaskTest extends TaskTest {
         TestClassResult result = new TestClassResult(1L, 'className', 2L)
         result.add(new TestMethodResult(1L, 'methodName', TestResult.ResultType.FAILURE, 2L, 3L))
         result.add(new TestMethodResult(1L, 'methodName', TestResult.ResultType.SUCCESS, 2L, 3L))
-        when(extractor.extractTestResult(any(PackageTestContext))).thenReturn([result])
+        when(extractor.extractTestResult(any(PackageTestResult))).thenReturn([result])
 
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
 
