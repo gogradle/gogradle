@@ -109,7 +109,9 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private boolean currentProjectMatchesSingleGopath(String gopath) {
-        return Paths.get(gopath).resolve(setting.getPackagePath()).equals(project.getRootDir().toPath());
+        return Paths.get(gopath)
+                .resolve("src")
+                .resolve(setting.getPackagePath()).equals(project.getRootDir().toPath());
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")

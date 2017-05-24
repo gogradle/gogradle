@@ -116,12 +116,15 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     @Test
     void 'project gopath will not be created if current project matches GOPATH'() {
         // when
-        String systemGopath = 'fakegopath' + File.pathSeparator + toUnixString(resource.getParentFile())
+        IOUtils.mkdir(resource, 'src/root/package')
+
+        String systemGopath = 'fakegopath' + File.pathSeparator + toUnixString(resource)
         environmentVariables.set('GOPATH', systemGopath)
-        setting.packagePath = resource.name
+        when(project.getRootDir()).thenReturn(new File(resource, 'src/root/package'))
+
         manager.prepareProjectGopathIfNecessary()
         // then
-        assert !new File(resource, '.gogradle/project_gopath').exists()
+        assert !new File(resource, 'src/root/package/.gogradle/project_gopath').exists()
         assert manager.gopath == systemGopath
     }
 
