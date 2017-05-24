@@ -18,7 +18,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.5.2'
+version '0.5.3'
 
 /************** sourcesets **************/
 sourceSets {
@@ -180,7 +180,8 @@ def updateVersion(String file, String oldVersionRegex, String newVersion) {
 
 task('updateVersion') {
     doLast {
-        updateVersion('docs/getting-started.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('docs/build-go-with-gradle.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
+        updateVersion('docs/build-go-with-gradle-en.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('docs/getting-started-cn.md', /id 'com.github.blindpirate.gogradle' version '(\w|\d|\.|\-)*'/, "id 'com.github.blindpirate.gogradle' version '${version}'")
         updateVersion('src/main/java/com/github/blindpirate/gogradle/GogradleGlobal.java', /GOGRADLE_VERSION = "(\w|\d|\.|\-)*"/, "GOGRADLE_VERSION = \"${version}\"")
         updateVersion('buildSrc/src/main/groovy/com/github/blindpirate/gogradle/TestTop1000Task.groovy', /gogradle-(\d|\.)*-all\.jar/, "gogradle-${version}-all.jar")
