@@ -52,6 +52,7 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
@@ -172,6 +173,10 @@ public final class IOUtils {
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    public static List<String> collectFileNames(List<File> files) {
+        return files.stream().map(StringUtils::toUnixString).collect(Collectors.toList());
     }
 
     public static List<String> safeList(File dir) {

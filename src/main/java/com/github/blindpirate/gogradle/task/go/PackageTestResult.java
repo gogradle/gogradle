@@ -20,10 +20,15 @@ package com.github.blindpirate.gogradle.task.go;
 import java.io.File;
 import java.util.List;
 
-public class PackageTestContext {
+public class PackageTestResult {
     private String packagePath;
     private List<File> testFiles;
     private List<String> stdout;
+    private int code;
+
+    public int getCode() {
+        return code;
+    }
 
     public String getPackagePath() {
         return packagePath;
@@ -37,39 +42,46 @@ public class PackageTestContext {
         return stdout;
     }
 
-    public static PackageTestContextBuilder builder() {
-        return new PackageTestContextBuilder();
+    public static PackageTestResultBuilder builder() {
+        return new PackageTestResultBuilder();
     }
 
-    public static final class PackageTestContextBuilder {
+    public static final class PackageTestResultBuilder {
         private String packagePath;
         private List<File> testFiles;
         private List<String> stdout;
+        private int code;
 
-        private PackageTestContextBuilder() {
+        private PackageTestResultBuilder() {
         }
 
-        public PackageTestContextBuilder withPackagePath(String packagePath) {
+        public PackageTestResultBuilder withPackagePath(String packagePath) {
             this.packagePath = packagePath;
             return this;
         }
 
-        public PackageTestContextBuilder withTestFiles(List<File> testFiles) {
+        public PackageTestResultBuilder withTestFiles(List<File> testFiles) {
             this.testFiles = testFiles;
             return this;
         }
 
-        public PackageTestContextBuilder withStdout(List<String> stdout) {
+        public PackageTestResultBuilder withStdout(List<String> stdout) {
             this.stdout = stdout;
             return this;
         }
 
-        public PackageTestContext build() {
-            PackageTestContext packageTestContext = new PackageTestContext();
-            packageTestContext.stdout = this.stdout;
-            packageTestContext.testFiles = this.testFiles;
-            packageTestContext.packagePath = this.packagePath;
-            return packageTestContext;
+        public PackageTestResultBuilder withCode(int code) {
+            this.code = code;
+            return this;
+        }
+
+        public PackageTestResult build() {
+            PackageTestResult ret = new PackageTestResult();
+            ret.stdout = this.stdout;
+            ret.testFiles = this.testFiles;
+            ret.packagePath = this.packagePath;
+            ret.code = code;
+            return ret;
         }
     }
 }
