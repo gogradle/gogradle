@@ -51,7 +51,6 @@ dependencies {
     compile gradleApi()
     compile "org.antlr:antlr4:4.6"
     compile group: 'com.google.inject', name: 'guice', version: '4.1.0'
-    compile 'org.codehaus.groovy:groovy-all:2.4.7'
     compile group: 'org.apache.commons', name: 'commons-lang3', version: '3.5'
     compile group: 'org.apache.commons', name: 'commons-collections4', version: '4.1'
     compile group: 'commons-codec', name: 'commons-codec', version: '1.10'

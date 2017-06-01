@@ -63,7 +63,7 @@ import java.util.Map;
 import java.util.Set;
 
 /**
- * The meaning of this class is suppressing guava warnings:
+ * This class is designed to suppress guava warnings:
  * <p>
  * Method: public org.gradle.api.internal.initialization.ScriptHandlerFactory
  * org.gradle.api.internal.project.DefaultProject_Decorated.getScriptHandlerFactory()
@@ -300,6 +300,11 @@ public class ProjectDecorator implements Project {
     }
 
     @Override
+    public ConfigurableFileCollection files(Object o, Action<? super ConfigurableFileCollection> action) {
+        return project.files(o, action);
+    }
+
+    @Override
     public ConfigurableFileTree fileTree(Object baseDir) {
         return project.fileTree(baseDir);
     }
@@ -307,6 +312,11 @@ public class ProjectDecorator implements Project {
     @Override
     public ConfigurableFileTree fileTree(Object baseDir, Closure configureClosure) {
         return project.fileTree(baseDir, configureClosure);
+    }
+
+    @Override
+    public ConfigurableFileTree fileTree(Object o, Action<? super ConfigurableFileTree> action) {
+        return project.fileTree(o, action);
     }
 
     @Override
@@ -385,6 +395,11 @@ public class ProjectDecorator implements Project {
     }
 
     @Override
+    public AntBuilder ant(Action<? super AntBuilder> action) {
+        return project.ant(action);
+    }
+
+    @Override
     public ConfigurationContainer getConfigurations() {
         return project.getConfigurations();
     }
@@ -402,6 +417,11 @@ public class ProjectDecorator implements Project {
     @Override
     public void artifacts(Closure configureClosure) {
         project.artifacts(configureClosure);
+    }
+
+    @Override
+    public void artifacts(Action<? super ArtifactHandler> action) {
+        project.artifacts(action);
     }
 
     @Override
