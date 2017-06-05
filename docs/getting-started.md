@@ -272,9 +272,5 @@ golang {
     
     // aka. build constraint. See https://golang.org/pkg/go/build/#hdr-Build_Constraints
     buildTags = ['appengine','anothertag']
-    
-    // Additional feature for users in mainland China,
-    // ignore it if you are not
-    fuckGfw = true
 }
 ```
