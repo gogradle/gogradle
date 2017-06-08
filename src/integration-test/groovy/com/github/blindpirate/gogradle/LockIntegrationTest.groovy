@@ -62,7 +62,7 @@ dependencies {
     @Test
     void 'dependency in build.gradle should be used in DEVELOP'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
-        build('goLock', 'goVendor')
+        build('lock', 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
         assert new File(resource, 'vendor/github.com/my/b/b1.go').exists()
 
@@ -83,7 +83,7 @@ dependencies {
 
     @Test
     void 'locked dependency should be used in REPRODUCIBLE'() {
-        build('goLock', 'goVendor')
+        build('lock', 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/a1.go').exists()
 
         Map a = getLockedDependency('build')[0]
@@ -97,10 +97,10 @@ dependencies {
 
     @Test
     void 'persistent cache should be used'() {
-        build('goVendor')
+        build('vendor')
 
         deleteDependencyTreeCache()
-        build('goVendor')
+        build('vendor')
         assert new File(resource, 'vendor/github.com/my/a/a1.go').exists()
         assert stdout.toString().contains('Resolving cached')
     }
@@ -114,15 +114,15 @@ dependencies {
     void 'command line parameter --refresh-dependencies should succeed'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
 
-        build('goVendor')
+        build('vendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
 
         GitServer.addFileToRepository(new File(repositories, 'a2'), 'commit2.go', '')
 
-        build('goVendor')
+        build('vendor')
         assert stdout.toString().contains('UP-TO-DATE')
 
-        build(['--refresh-dependencies'], 'goVendor')
+        build(['--refresh-dependencies'], 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/commit2.go').exists()
     }
 

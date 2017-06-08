@@ -28,6 +28,9 @@ public enum GogradleGlobal {
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final String GOGRADLE_BUILD_DIR_NAME = ".gogradle";
     public static final int MAX_DFS_DEPTH = 100;
+    public static final String GOGRADLE_REFRESH = "gogradle.refresh";
+    public static final String GOGRADLE_MODE = "gogradle.mode";
+    public static final String GOGRADLE_ALIAS = "gogradle.alias";
 
     private Injector injector;
 
@@ -49,7 +52,16 @@ public enum GogradleGlobal {
 
     public static boolean isRefreshDependencies() {
         return getInstance(Project.class).getGradle().getStartParameter().isRefreshDependencies()
-                || "true".equals(System.getProperty("gogradle.refresh"));
+                || "true".equals(System.getProperty(GOGRADLE_REFRESH));
+    }
+
+    public static boolean isAlias() {
+        return "true".equals(System.getProperty(GOGRADLE_ALIAS));
+    }
+
+    public static String getMode() {
+        String mode = System.getProperty(GOGRADLE_MODE);
+        return mode == null ? "" : mode;
     }
 
     public static <T> T getInstance(Key<T> key) {

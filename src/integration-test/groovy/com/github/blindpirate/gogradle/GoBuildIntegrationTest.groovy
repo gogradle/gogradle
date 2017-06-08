@@ -110,13 +110,13 @@ func main(){
     @Test
     void 'build should succeed'() {
         appendOnBuildDotGradle("""
-goBuild {
+build {
     targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
 }
 """)
 
         newBuild {
-            it.forTasks('goBuild')
+            it.forTasks('build')
         }
 
         ["darwin_amd64_myPackage", 'windows_amd64_myPackage', 'linux_386_myPackage'].each {
@@ -135,7 +135,7 @@ golang {
 ''')
 
         newBuild {
-            it.forTasks('goBuild')
+            it.forTasks('build')
         }
 
         assert runExecutable(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_myPackage") == 'HelloWorld'
@@ -158,14 +158,14 @@ golang {
     @Test
     void 'customized build should succeed'() {
         appendOnBuildDotGradle('''
-goBuild {
+build {
     doLast {
         go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
     }
 }
 ''')
         newBuild {
-            it.forTasks('goBuild')
+            it.forTasks('build')
         }
 
         assert runExecutable("${Os.getHostOs()}_${Arch.getHostArch()}_output") == 'World'

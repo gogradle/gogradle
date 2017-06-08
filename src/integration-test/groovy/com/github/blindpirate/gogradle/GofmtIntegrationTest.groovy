@@ -70,7 +70,7 @@ golang {
     @Test
     void 'gofmt should succeed'() {
         newBuild {
-            it.forTasks('gofmt')
+            it.forTasks('fmt')
         }
 
         assert new File(resource, 'main.go').getText() == '''\
@@ -98,14 +98,14 @@ func sub() {
     @Test
     void 'customized gofmt should not affect other files'() {
         writeBuildAndSettingsDotGradle(buildDotGradle + '''
-gofmt {
+fmt {
     doLast {
         gofmt '-w main.go'
     }
 }
 ''')
         newBuild {
-            it.forTasks('gofmt')
+            it.forTasks('fmt')
         }
 
         assert new File(resource, 'sub/sub.go').getText() == subDotGo

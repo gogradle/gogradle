@@ -52,7 +52,7 @@ golang {
     @Test
     void 'test and coverage report should be generated successfully'() {
         newBuild {
-            it.forTasks('goCheck')
+            it.forTasks('check')
         }
 
         assert stdout.toString().contains('1 completed, 0 failed')
@@ -80,7 +80,7 @@ golang {
         }
 
         Process process = new ProcessUtils()
-                .run([gradleBinPath, 'goTest', '--tests', 'a1_test.go', '--stacktrace'], [:], getProjectRoot())
+                .run([gradleBinPath, 'test', '--tests', 'a1_test.go', '--stacktrace'], [:], getProjectRoot())
 
         ProcessUtils.ProcessResult result = new ProcessUtils().getResult(process)
 
@@ -105,7 +105,7 @@ golang {
 
         try {
             newBuild {
-                it.forTasks('goCheck')
+                it.forTasks('check')
             }
         } catch (BuildException e) {
             println(stderr)

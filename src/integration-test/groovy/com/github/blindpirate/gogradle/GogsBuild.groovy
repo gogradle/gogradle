@@ -49,7 +49,7 @@ golang {
     goVersion='1.8'
 }
 
-goVet {
+vet {
     continueWhenFail = true
 }
 
@@ -103,7 +103,7 @@ dependencies {
         IOUtils.deleteQuitely(new File(resource, 'gogradle.lock'))
         try {
             newBuild {
-                it.forTasks('goInit')
+                it.forTasks('init')
             }
         } finally {
             println(stdout)
@@ -113,13 +113,13 @@ dependencies {
 
     void firstBuild() {
         newBuild {
-            it.forTasks('goClean', 'goBuild', 'goCheck', 'goLock')
+            it.forTasks('clean', 'build', 'check', 'lock')
         }
     }
 
     void secondBuild() {
         newBuild {
-            it.forTasks('goBuild', 'goCheck')
+            it.forTasks('build', 'check')
         }
     }
 
