@@ -156,3 +156,36 @@ vet {
 Gogradle支持自定义的go任务。详见[自定义任务](./getting-started-cn.md#自定义任务)。
 
 欲了解更多有关任务的信息，请参考[官方文档](https://docs.gradle.org/current/userguide/more_about_tasks.html)。
+
+# 任务名冲突
+
+Gogradle默认的任务名`build`/`test`很容易和其他的插件冲突。若如此，请在构建的命令行中加入参数：`-Dgogradle.alias=true`：
+
+`gradlew goBuild -Dgogradle.alias=true`
+
+此参数将相关任务重命名为：
+
+| Default Name | Alias          |
+|--------------|----------------|
+| clean        | goClean        |
+| prepare      | goPrepare      |
+| init         | goInit         |
+| dependencies | goDependencies |
+| vendor       | goVendor       |
+| lock         | goLock         |
+| build        | goBuild        |
+| test         | goTest         |
+| coverage     | goCover        |
+| vet          | goVet          |
+| fmt          | gofmt          |
+| check        | goCheck        |
+
+然后你就可以使用这些别名进行相关构建了。
+
+你也可以在全局或者项目目录下的`gradle.properties`中指定此参数，详见[Gradle文档](https://docs.gradle.org/3.3/userguide/build_environment.html#sec:gradle_configuration_properties)：
+
+例如，要使此参数变成全局的，修改`~/.gradle/gradle.properties`，若不存在则新建，加入：
+
+```properties
+org.gradle.jvmargs=-Dgogradle.alias=true
+```

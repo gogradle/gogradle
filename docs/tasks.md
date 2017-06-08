@@ -154,11 +154,44 @@ Depends on `test`. Generate coverage reports. It will be placed into `<project r
 This task is usually executed by CI to do some checking, such as test coverage rate. It depends on `test`/`fmt`/`vet` task by default.
 
 
-# Define custom task
+# Define Custom Task
 
 Gogradle support customized go task. See [Custom task](./getting-started.md#custom-task) for more details.
 
 
 That's all. More about tasks, please see the [doc](https://docs.gradle.org/current/userguide/more_about_tasks.html)
+
+## Task Name Conflict
+
+It's likely that Gogradle default task `build`/`test` conflict with other plugin. To solve this problem, add argument `-Dgogradle.alias=true` in your comman line:
+
+`gradlew goBuild -Dgogradle.alias=true`
+
+| Default Name | Alias          |
+|--------------|----------------|
+| clean        | goClean        |
+| prepare      | goPrepare      |
+| init         | goInit         |
+| dependencies | goDependencies |
+| vendor       | goVendor       |
+| lock         | goLock         |
+| build        | goBuild        |
+| test         | goTest         |
+| coverage     | goCover        |
+| vet          | goVet          |
+| fmt          | gofmt          |
+| check        | goCheck        |
+
+Then you can use these aliases to do the build.
+
+You can also specify this argument in project or global `gradle.properties`:
+
+For example, to make this argument global, modify `~/.gradle/gradle.properties` (create it if it doesn't exist) and add a line:
+
+```properties
+org.gradle.jvmargs=-Dgogradle.alias=true
+```
+
+For more details, please consult [Gradle doc](https://docs.gradle.org/3.3/userguide/build_environment.html#sec:gradle_configuration_properties)
 
 
