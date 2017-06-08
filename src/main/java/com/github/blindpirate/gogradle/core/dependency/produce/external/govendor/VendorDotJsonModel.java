@@ -102,7 +102,6 @@ public class VendorDotJsonModel {
         private void recognizeHostAndVendorPath(Map<String, Object> ret, PackagePathResolver packagePathResolver) {
             GolangPackage pkg = packagePathResolver.produce(origin).get();
 
-            Assert.isNotBlank(revision, "Illegal vendor.json: revision must exist along with origin!");
             Assert.isTrue(pkg instanceof ResolvableGolangPackage, "Cannot resolve package in vendor.json: " + origin);
 
             Path hostImportPath = ResolvableGolangPackage.class.cast(pkg).getRootPath();
