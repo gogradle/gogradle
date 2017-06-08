@@ -157,12 +157,12 @@ dependencies {
     }
 
     @Test
-    void 'up-to-date check should be always disabled if --refresh-dependencies exist'() {
-        build(['--refresh-dependencies'])
+    void 'up-to-date check should be always disabled if --refresh-dependencies or -Dgogradle.refresh=true exist'() {
+        build(['-Dgogradle.refresh=true'])
 
         build(['--refresh-dependencies'])
         assertNotUpToDate()
-        build(['--refresh-dependencies'])
+        build(['-Dgogradle.refresh=true'])
         assertNotUpToDate()
     }
 

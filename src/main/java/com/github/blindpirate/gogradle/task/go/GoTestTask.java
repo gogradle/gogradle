@@ -262,11 +262,12 @@ public class GoTestTask extends Go {
 
 
         private void logResult(String packagePath, List<TestClassResult> resultOfSinglePackage) {
-            LOGGER.quiet("Test for {} finished, {} succeed, {} failed",
+            int successCount = successCount(resultOfSinglePackage);
+            int failureCount = failureCount(resultOfSinglePackage);
+            LOGGER.quiet("Test for {} finished, {} completed, {} failed",
                     packagePath,
-                    successCount(resultOfSinglePackage),
-                    failureCount(resultOfSinglePackage)
-            );
+                    successCount + failureCount,
+                    failureCount);
         }
 
         private int successCount(List<TestClassResult> results) {

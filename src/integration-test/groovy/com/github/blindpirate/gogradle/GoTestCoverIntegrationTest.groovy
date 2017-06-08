@@ -55,8 +55,8 @@ golang {
             it.forTasks('goCheck')
         }
 
-        assert stdout.toString().contains('1 succeed, 0 failed')
-        assert stdout.toString().contains('3 succeed, 0 failed')
+        assert stdout.toString().contains('1 completed, 0 failed')
+        assert stdout.toString().contains('3 completed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
 
 
@@ -87,8 +87,8 @@ golang {
         println(result.getStderr())
 
         assert result.getStdout().contains('Found 1 files to test')
-        assert result.getStdout().contains('2 succeed, 0 failed')
-        assert !result.getStdout().contains('3 succeed, 0 failed')
+        assert result.getStdout().contains('2 completed, 0 failed')
+        assert !result.getStdout().contains('3 completed, 0 failed')
         assert result.getStdout().contains('BUILD SUCCESSFUL')
     }
 
