@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
+import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.google.inject.Key
 import org.junit.Test
@@ -40,5 +41,16 @@ class GogradleGlobalTest {
         // then
         verify(GogradleGlobal.INSTANCE.injector).getInstance(PackagePathResolver)
         verify(GogradleGlobal.INSTANCE.injector).getInstance(key)
+    }
+
+    @Test
+    @MockRefreshDependencies(false)
+    void 'jvm parameter -Dgogradle.refresh=true should succeed'() {
+        String originalValue = System.getProperty('gogradle.refresh')
+        System.setProperty('gogradle.refresh', 'true')
+
+        assert GogradleGlobal.isRefreshDependencies()
+
+        System.setProperty('gogradle.refresh', originalValue ?: '')
     }
 }

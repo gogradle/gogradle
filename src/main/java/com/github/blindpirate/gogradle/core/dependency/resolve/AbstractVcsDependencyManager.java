@@ -147,7 +147,7 @@ public abstract class AbstractVcsDependencyManager<VERSION>
             LOGGER.info("{} does not exist in {}, updating will be performed.", dependency, repoRoot);
             return true;
         } else if (GogradleGlobal.isRefreshDependencies()) {
-            LOGGER.info("Updating {} in {} since --refresh-dependencies is used.", dependency, repoRoot);
+            LOGGER.info("Updating {} in {} since refresh flag is present.", dependency, repoRoot);
             return true;
         } else {
             LOGGER.info("Skip updating {} in {}.", dependency, repoRoot);

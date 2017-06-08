@@ -48,7 +48,8 @@ public enum GogradleGlobal {
     }
 
     public static boolean isRefreshDependencies() {
-        return getInstance(Project.class).getGradle().getStartParameter().isRefreshDependencies();
+        return getInstance(Project.class).getGradle().getStartParameter().isRefreshDependencies()
+                || "true".equals(System.getProperty("gogradle.refresh"));
     }
 
     public static <T> T getInstance(Key<T> key) {

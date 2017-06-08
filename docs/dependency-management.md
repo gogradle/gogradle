@@ -38,10 +38,10 @@ dependencies {
 }
 ```
 
-By default, if you don't specify a commit, Gogradle won't do `git pull` or `hg update -u`  in local repository. You can use `--refresh-dependencies` to force Gogradle to do so:
+By default, if you don't specify a commit, Gogradle won't do `git pull` or `hg update -u`  in local repository. You can use `-Dgogradle.refresh=true` to force Gogradle to do so:
  
 ```
-gradlew goBuild --refresh-dependencies
+gradlew goBuild -Dgogradle.refresh
 ``` 
 
 
