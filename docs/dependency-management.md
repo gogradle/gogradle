@@ -41,7 +41,7 @@ dependencies {
 By default, if you don't specify a commit, Gogradle won't do `git pull` or `hg update -u`  in local repository. You can use `-Dgogradle.refresh=true` to force Gogradle to do so:
  
 ```
-gradlew goBuild -Dgogradle.refresh
+gradlew build -Dgogradle.refresh=true
 ``` 
 
 
@@ -177,13 +177,7 @@ Gogradle can lock the dependencies in current build. A file named `gogradle.lock
 You can use
 
 ```
-gradlew goLock
-```
-
-or
-
-```
-gradlew gL
+gradlew lock
 ```
 
 to generate this file.
@@ -193,7 +187,7 @@ to generate this file.
 Vendor mechanism is introduced by golang 1.5. It is fully supported but not encouraged by Gogradle. To install dependencies into vendor directory, run:
 
 ```
-gradlew goVendor
+gradlew vendor
 ```
 
 or
