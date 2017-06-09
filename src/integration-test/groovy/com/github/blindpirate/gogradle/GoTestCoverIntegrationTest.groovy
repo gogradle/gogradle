@@ -52,11 +52,11 @@ golang {
     @Test
     void 'test and coverage report should be generated successfully'() {
         newBuild {
-            it.forTasks('goCheck')
+            it.forTasks('check')
         }
 
-        assert stdout.toString().contains('1 succeed, 0 failed')
-        assert stdout.toString().contains('3 succeed, 0 failed')
+        assert stdout.toString().contains('1 completed, 0 failed')
+        assert stdout.toString().contains('3 completed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
 
 
@@ -80,15 +80,15 @@ golang {
         }
 
         Process process = new ProcessUtils()
-                .run([gradleBinPath, 'goTest', '--tests', 'a1_test.go', '--stacktrace'], [:], getProjectRoot())
+                .run([gradleBinPath, 'test', '--tests', 'a1_test.go', '--stacktrace'], [:], getProjectRoot())
 
         ProcessUtils.ProcessResult result = new ProcessUtils().getResult(process)
 
         println(result.getStderr())
 
         assert result.getStdout().contains('Found 1 files to test')
-        assert result.getStdout().contains('2 succeed, 0 failed')
-        assert !result.getStdout().contains('3 succeed, 0 failed')
+        assert result.getStdout().contains('2 completed, 0 failed')
+        assert !result.getStdout().contains('3 completed, 0 failed')
         assert result.getStdout().contains('BUILD SUCCESSFUL')
     }
 
@@ -105,7 +105,7 @@ golang {
 
         try {
             newBuild {
-                it.forTasks('goCheck')
+                it.forTasks('check')
             }
         } catch (BuildException e) {
             println(stderr)

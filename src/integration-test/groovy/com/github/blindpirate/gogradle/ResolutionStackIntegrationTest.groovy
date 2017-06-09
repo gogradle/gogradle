@@ -63,7 +63,7 @@ dependencies {
     void 'resolution stack should be printed'() {
         try {
             newBuild {
-                it.forTasks('goVendor')
+                it.forTasks('vendor')
             }
         } catch (BuildException e) {
             assert stderr.toString().replaceAll(/[a-f0-9]{40}/, '').contains("""
@@ -87,7 +87,7 @@ Resolution stack is:
 
         try {
             newBuild {
-                it.forTasks('goVendor')
+                it.forTasks('vendor')
             }
         } catch (BuildException e) {
             assert stderr.toString().contains("""\

@@ -85,9 +85,9 @@ golang {
 然后在项目文件夹下执行
 
 ```
-./gradlew goInit # *nix
+./gradlew init # *nix
 
-gradlew goInit # Windows
+gradlew init # Windows
 ```
 
 在下文中，`gradlew`命令将以统一的`gradlew <task>`形式给出，不再区分平台。这会自动扫描你的项目并识别其依赖包。特别地，如果你之前使用过`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`之一的依赖锁定工具，Gogradle能够自动识别它们生成的锁定文件。
@@ -98,7 +98,7 @@ gradlew goInit # Windows
 
 ### 构建
 
-在项目目录下运行`gradlew goBuild`或者`gradlew gB`。
+在项目目录下运行`gradlew build`。
 
 它会自动解析所有的依赖、传递性依赖，解决依赖包冲突，然后将依赖包安装到项目目录下并调用命令行执行`go build`。
 
@@ -108,15 +108,15 @@ gradlew goInit # Windows
 
 当然，如果你机器上已经安装了Go并设置了`GOPATH`，Gogradle就会直接使用它们。
 
-更多细节请阅读[goBuild任务](https://github.com/gogradle/gogradle/blob/master/docs/tasks-cn.md#gobuild)。
+更多细节请阅读[build任务](https://github.com/gogradle/gogradle/blob/master/docs/tasks-cn.md#build)。
 
 ![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/build.png)
 
-这是`goBuild`任务的截图，可以看到其中执行的任务。
+这是`build`任务的截图，可以看到其中执行的任务。
 
 ### 测试
 
-在项目目录下运行`gradlew goTest`或者`gradlew gT`。它会逐个包执行测试并生成之前我们看到的HTML格式的测试/覆盖率报告，是不是比原生的`go test`的简陋输出看上去好一点？
+在项目目录下运行`gradlew test`。它会逐个包执行测试并生成之前我们看到的HTML格式的测试/覆盖率报告，是不是比原生的`go test`的简陋输出看上去好一点？
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/failedtest.png)
 
@@ -126,11 +126,11 @@ gradlew goInit # Windows
 
 ### Check
 
-Gogradle将常用的代码检查任务封装在了`goCheck`任务中。默认情况下，它依赖`goVet`任务、`gofmt`任务和`goCover`任务，开箱即用，如图所示：
+Gogradle将常用的代码检查任务封装在了`check`任务中。默认情况下，它依赖`vet`任务、`fmt`任务和`cover`任务，开箱即用，如图所示：
 
 ![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/check.png)
 
-在这次构建中，`goBuild`依赖了`goCheck`任务，因此相关任务得到了执行。
+在这次构建中，`build`依赖了`check`任务，因此相关任务得到了执行。
 
 更多细节请阅读[Gogradle的任务](https://github.com/gogradle/gogradle/blob/master/docs/tasks-cn.md)。
 
@@ -181,7 +181,7 @@ dependencies {
 }
 ```
 
-可以看到每个依赖前都有`build`或者`test`字样，Java开发者应该很熟悉这个概念。Gogradle提供了依赖包隔离的机制，在`goBuild`任务中，只有`build`依赖生效；在`goTest`任务中，只有`test`依赖包生效。这样做的好处在于，假如我们有一个公用库A，它依赖了一些只在测试中使用的测试库，那么我们就可以将这些测试库声明为`test`依赖，这样，其他库依赖库A时，就能够清楚的知道，“哦，这些测试库是库A测试用的，所以我们没必要把它们拖到我们自己的`vendor`中来”，从而减少冗余的依赖包数量。
+可以看到每个依赖前都有`build`或者`test`字样，Java开发者应该很熟悉这个概念。Gogradle提供了依赖包隔离的机制，在`build`任务中，只有`build`依赖生效；在`test`任务中，只有`test`依赖包生效。这样做的好处在于，假如我们有一个公用库A，它依赖了一些只在测试中使用的测试库，那么我们就可以将这些测试库声明为`test`依赖，这样，其他库依赖库A时，就能够清楚的知道，“哦，这些测试库是库A测试用的，所以我们没必要把它们拖到我们自己的`vendor`中来”，从而减少冗余的依赖包数量。
 
 有关依赖管理的更多细节，请参阅[依赖管理](https://github.com/gogradle/gogradle/blob/master/docs/dependency-management-cn.md)。
 
@@ -190,7 +190,7 @@ dependencies {
 在管理依赖的过程中，我们不可避免地会遇到依赖包冲突、需要手工处理的情况。这个时候，可以使用：
 
 ```
-gradlew goDependencies
+gradlew dependencies
 ```
 
 它会打印当前的依赖树：

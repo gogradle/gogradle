@@ -69,7 +69,7 @@ repositories {
             buildDotGradle += path.resolve('build.gradle.ext').toFile().text
         } else if (!path.toFile().list().any { it.endsWith('.go') }) {
             buildDotGradle += """
-goBuild {
+build {
     doLast {
         go 'build github.com/${userAndProject[0]}/${userAndProject[1]}/...'
     }
@@ -95,11 +95,11 @@ goBuild {
             return
         }
 
-        goBuild(path)
+        build(path)
     }
 
-    private boolean goBuild(Path path) {
-        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goBuild', 'goLock', '--stacktrace').directory(path.toFile())
+    private boolean build(Path path) {
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'build', 'lock', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 
@@ -116,7 +116,7 @@ goBuild {
     }
 
     private boolean goInit(Path path) {
-        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goInit', '--stacktrace').directory(path.toFile())
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'init', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 

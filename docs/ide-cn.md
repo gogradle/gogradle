@@ -75,7 +75,7 @@ Vim需要安装[vim-go](https://github.com/fatih/vim-go)，详情请参考其文
 
 ## 准备构建脚本并初始化
 
-按照[入门指南](./getting-started-cn.md)放置`gradlew`脚本、`gradle`目录，以及`build.gradle`构建脚本。如果你的项目之前不是用Gogradle构建的，请执行`gradlew goInit`来执行初始化。
+按照[入门指南](./getting-started-cn.md)放置`gradlew`脚本、`gradle`目录，以及`build.gradle`构建脚本。如果你的项目之前不是用Gogradle构建的，请执行`gradlew init`来执行初始化。
 
 ## 导入项目到IntelliJIDEA
 
@@ -126,4 +126,4 @@ IDEA集成了Gradle，因此，你可以通过`View > ToolWindows > Gradle`来�
 
 ## Vim
 
-由于Vim是直接通过环境变量来读取GOPATH的，因此可以通过`goVendor`来安装依赖，然后通过`gradlew showGopathGoroot`或者`gradlew sGG`命令获取项目级的GOPATH和GOROOT，使用这些环境变量启动Vim即可。
+由于Vim是直接通过环境变量来读取GOPATH的，因此可以通过`vendor`来安装依赖，然后通过`gradlew showGopathGoroot`或者`gradlew sGG`命令获取项目级的GOPATH和GOROOT，使用这些环境变量启动Vim即可。

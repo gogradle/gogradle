@@ -59,7 +59,7 @@ dependencies {
     @Test
     void 'incremental installation should succeed'() {
         newBuild {
-            it.forTasks('goVendor')
+            it.forTasks('vendor')
         }
 
         assert new File(resource, 'vendor/localhost/a/a.go').exists()
@@ -90,7 +90,7 @@ dependencies {
 """)
 
         newBuild({
-            it.forTasks('goVendor')
+            it.forTasks('vendor')
         }, ['--info'])
 
         assert IOUtils.toString(new File(resource, 'vendor/localhost/a/a.go')) == ''

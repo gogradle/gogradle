@@ -51,7 +51,6 @@ public class GolangPluginSetting {
             .put(REPRODUCIBLE.toString(), REPRODUCIBLE)
             .build();
     private BuildMode buildMode = REPRODUCIBLE;
-    private static final String BUILD_MODE_KEY = "gogradle.mode";
 
     private String packagePath;
     private List<String> buildTags = new ArrayList<>();
@@ -79,7 +78,7 @@ public class GolangPluginSetting {
     }
 
     public BuildMode getBuildMode() {
-        String mode = System.getProperty(BUILD_MODE_KEY);
+        String mode = GogradleGlobal.getMode();
         if (StringUtils.isNotEmpty(mode)) {
             return Assert.isNotNull(BUILD_MODE_MAP.get(mode));
         } else {

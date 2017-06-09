@@ -10,8 +10,6 @@
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go-mini.png)
 
-# Gogradle 0.5.0 contains a breaking change of core model, please read the documentation carefully
-
 Gogradle is a gradle plugin which provides support for building golang.
 
 > 2017-04-06 Now Gogradle can build 666 of [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) **WITHOUT** any extra configuration!

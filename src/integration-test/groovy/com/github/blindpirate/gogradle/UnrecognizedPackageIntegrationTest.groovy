@@ -119,7 +119,7 @@ dependencies {
 
 """)
         newBuild {
-            it.forTasks('goVendor')
+            it.forTasks('vendor')
         }
         assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
     }

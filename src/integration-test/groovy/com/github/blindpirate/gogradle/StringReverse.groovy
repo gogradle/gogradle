@@ -53,7 +53,7 @@ dependencies {
     @AccessWeb
     void 'build string reverse example should succeed'() {
         newBuild { build ->
-            build.forTasks('goDependencies', 'goBuild')
+            build.forTasks('dependencies', 'build')
         }
 
         assertDependencyOutput()
@@ -65,7 +65,7 @@ dependencies {
 
     void buildAgain() {
         newBuild { build ->
-            build.forTasks('goDependencies')
+            build.forTasks('dependencies')
         }
 
         assertDependencyOutput()
@@ -77,7 +77,7 @@ dependencies {
         IOUtils.write(resource, 'hello.go', helloDotGo + " ")
 
         newBuild { build ->
-            build.forTasks('goDependencies')
+            build.forTasks('dependencies')
         }
 
         assertDependencyOutput()

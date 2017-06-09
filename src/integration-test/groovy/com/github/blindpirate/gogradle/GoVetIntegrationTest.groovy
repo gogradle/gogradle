@@ -74,11 +74,11 @@ func main() {
         writeGoFileWithErrorToProjectRoot()
         try {
             newBuild {
-                it.forTasks('goVet')
+                it.forTasks('vet')
             }
         } catch (BuildException e) {
             assert stderr.toString().contains('first argument to Println is os.Stderr')
-            assert stdout.toString().contains('goVet FAILED')
+            assert stdout.toString().contains('vet FAILED')
         }
     }
 
@@ -87,11 +87,11 @@ func main() {
         writeGoFileWithErrorToSub()
         try {
             newBuild {
-                it.forTasks('goVet')
+                it.forTasks('vet')
             }
         } catch (BuildException e) {
             assert stderr.toString().contains('first argument to Println is os.Stderr')
-            assert stdout.toString().contains('goVet FAILED')
+            assert stdout.toString().contains('vet FAILED')
         }
     }
 
@@ -99,12 +99,12 @@ func main() {
     void 'exception should be suppressed if continueWhenFail=true'() {
         writeGoFileWithErrorToProjectRoot()
         IOUtils.append(new File(resource, 'build.gradle'), '''
-goVet {
+vet {
     continueWhenFail = true
 }
 ''')
         newBuild {
-            it.forTasks('goVet')
+            it.forTasks('vet')
         }
     }
 
@@ -112,7 +112,7 @@ goVet {
     void 'code in vendor should not be vetted'() {
         writeGoFileWithErrorToVendor()
         newBuild {
-            it.forTasks('goVet')
+            it.forTasks('vet')
         }
     }
 

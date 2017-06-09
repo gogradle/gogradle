@@ -78,7 +78,7 @@ Set your environment variable `JAVA_HOME` to it and that's it!
 
 ## Write Build Script and Initialization
 
-Place `gradlew`/`gradle`/`build.gradle` as documented in [Getting Started](./getting-started.md), if your project is not managed by Gogradle previously, please run `gradlew goInit` now.
+Place `gradlew`/`gradle`/`build.gradle` as documented in [Getting Started](./getting-started.md), if your project is not managed by Gogradle previously, please run `gradlew init` now.
 
 ## Import project into IntelliJIDEA
 
