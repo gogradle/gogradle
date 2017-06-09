@@ -20,10 +20,13 @@ package com.github.blindpirate.gogradle.core.dependency;
 import java.io.File;
 import java.util.Map;
 
+/**
+ * Represent a set of concrete source code, e.g. a git repository with specific commit.
+ */
 public interface ResolvedDependency extends GolangDependency {
 
     /**
-     * The update time of a dependency. It will be used in resolving package conflict.
+     * The update time of a dependency package. It will be used in resolving package conflict.
      * Generally speaking, package with newest update time will win.
      *
      * @return the update time determined by the package. It may be the last modified time
@@ -38,10 +41,25 @@ public interface ResolvedDependency extends GolangDependency {
      */
     GolangDependencySet getDependencies();
 
+    /**
+     * Get a map notation of this {@code ResolvedDependency}.
+     *
+     * @return the map notation
+     */
     Map<String, Object> toLockedNotation();
 
+    /**
+     * Install to a target directory.
+     *
+     * @param targetDirectory the directory
+     */
     void installTo(File targetDirectory);
 
+    /**
+     * Get the formatted version, typically for dependency tree display.
+     *
+     * @return the formatted version
+     */
     String formatVersion();
 
 }

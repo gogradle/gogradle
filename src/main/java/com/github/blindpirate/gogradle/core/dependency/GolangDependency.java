@@ -26,13 +26,12 @@ import java.io.Serializable;
 import java.util.Set;
 
 /**
- * A {@link GolangDependency} represents a dependency
- * such as a specific version of source code or a local directory.
+ * Represents a dependency package, for example, such as a specific version of golang/x/crypto
+ * or a local directory. Typically, the minimum dependency unit is repository root directory.
  */
 public interface GolangDependency extends Dependency, Serializable, GolangCloneable {
     /**
      * The dependency's import path, e.g., golang.org/x/crypto/cmd.
-     * <p>
      * However, currently we support golang.org/x/crypto (the root path) only.
      *
      * @return dependency's import path
@@ -41,7 +40,7 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
     String getName();
 
     /**
-     * A unique identifier to locate a dependency, e.g., git commit id.
+     * An unique identifier to locate a dependency, e.g., git commit id.
      *
      * @return the version string
      */

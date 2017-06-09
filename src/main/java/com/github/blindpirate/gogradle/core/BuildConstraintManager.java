@@ -23,5 +23,4 @@ public interface BuildConstraintManager {
     void prepareConstraints();
 
     Set<String> getAllConstraints();
-
 }

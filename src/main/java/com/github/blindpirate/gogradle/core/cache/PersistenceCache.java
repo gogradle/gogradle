@@ -22,6 +22,12 @@ import org.gradle.api.Project;
 
 import java.io.File;
 
+/**
+ * A cache which persists all data in file system.
+ *
+ * @param <K> key type
+ * @param <V> value type
+ */
 public class PersistenceCache<K extends GolangCloneable, V extends GolangCloneable>
         extends CloneBackedCache<K, V> {
     private final File persistenceFile;

@@ -17,6 +17,9 @@
 
 package com.github.blindpirate.gogradle.core;
 
+/**
+ * A marker interface which promotes clone method to public and suppresses {@code CloneNotSupportedException}.
+ */
 public interface GolangCloneable extends Cloneable {
     Object clone();
 }

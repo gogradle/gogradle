@@ -26,6 +26,9 @@ import java.nio.file.Paths;
 import java.util.Objects;
 import java.util.Optional;
 
+/**
+ * Represents a golang package. In golang, a package is actually a normal directory.
+ */
 public abstract class GolangPackage implements Serializable {
     // java.io.NotSerializableException: sun.nio.fs.UnixPath
     private String pathString;

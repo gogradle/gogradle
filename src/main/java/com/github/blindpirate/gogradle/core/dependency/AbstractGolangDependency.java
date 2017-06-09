@@ -130,8 +130,7 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
     @Override
     public Object clone() {
         try {
-            AbstractGolangDependency ret = (AbstractGolangDependency) super.clone();
-            return ret;
+            return super.clone();
         } catch (CloneNotSupportedException e) {
             return null;
         }

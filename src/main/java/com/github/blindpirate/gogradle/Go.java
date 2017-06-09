@@ -38,6 +38,19 @@ import java.util.function.Consumer;
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 
+/**
+ * This class is designed to run custom go and other commands with build-scope environment variables,
+ * such as GOPATH, GOROOT, etc. A typical usage is to declare a task:
+ * <pre>
+ * {@code
+ * task myTask(type: Go) {
+ *     doLast {
+ *         go 'build -o /my/output/location github.com/my/package/cmd --my-own-cmd-arguments'
+ *     }
+ * }
+ * }
+ * </pre>
+ */
 public class Go extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(Go.class);
     private static final Consumer<Integer> DO_NOTHING = code -> {

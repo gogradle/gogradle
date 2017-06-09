@@ -20,6 +20,17 @@ package com.github.blindpirate.gogradle.core.dependency;
 import java.util.Set;
 import java.util.function.Predicate;
 
+/**
+ * Represents a dependency package defined by some notations, e.g.
+ * {@code [name:'golang/x/tools', commitId:'1a2b3c4d5e', transitive: false]}.
+ * A NotationDependency may not be concrete since it could contains an specific version,
+ * e.g. {@code [name:'golang.org/x/tools, version:'LATEST_VERSION']}
+ */
 public interface NotationDependency extends GolangDependency {
+    /**
+     * The set used to exclude some dependency packages.
+     *
+     * @return the set of predicates
+     */
     Set<Predicate<GolangDependency>> getTransitiveDepExclusions();
 }

@@ -41,6 +41,9 @@ import java.util.stream.Collector;
 
 import static java.util.Comparator.comparing;
 
+/**
+ * A container of {@code GolangDependency} whose elements are identified by name.
+ */
 public class GolangDependencySet implements Set<GolangDependency>, Serializable, GolangCloneable {
 
     public static final Collector<GolangDependency, GolangDependencySet, GolangDependencySet> COLLECTOR =

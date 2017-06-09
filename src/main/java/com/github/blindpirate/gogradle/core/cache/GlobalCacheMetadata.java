@@ -21,17 +21,34 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.common.WithApiVersion;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
+import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
 
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Stands for the metadata of a repository.
+ */
 public class GlobalCacheMetadata extends WithApiVersion {
+    /**
+     * "Original" means the urls specified in go-import meta tag of HTML.
+     *
+     * @see MetadataPackagePathResolver
+     */
     @JsonProperty("originalUrls")
     private List<String> originalUrls = new ArrayList<>();
 
+    /**
+     * The last update time and url.
+     */
     @JsonProperty("lastUpdated")
     private LastUpdated lastUpdated;
 
+    /**
+     * "Original" means the vcs type specified in go-import meta tag of HTML.
+     *
+     * @see MetadataPackagePathResolver
+     */
     @JsonProperty("originalVcs")
     private String originalVcs;
 
