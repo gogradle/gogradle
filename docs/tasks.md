@@ -131,7 +131,9 @@ If the default behavior is not expected, or you want to change the command line 
 
 ```groovy
 fmt {
-    gofmt "-r '(a) -> a' -l *.go"
+    doLast {
+        gofmt "-r '(a) -> a' -l *.go"
+    }
 }
 ```
 

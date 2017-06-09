@@ -128,7 +128,9 @@ build {
 
 ```groovy
 fmt {
-    gofmt "-r '(a) -> a' -l *.go"
+    doLast {
+        gofmt "-r '(a) -> a' -l *.go"
+    }
 }
 ```
 
