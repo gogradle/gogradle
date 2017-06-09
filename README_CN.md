@@ -8,8 +8,6 @@
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go-mini.png)
 
-# Gogradle 0.5.0包含核心模型变更，请详细阅读文档以获取相关信息
-
 > 2017-04-06 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](http://github-rank.com/star?language=Go)中的666个！
 >
 > 2017-03-20 现在Gogradle已经能够生成HTML格式的测试/覆盖率报告了！
