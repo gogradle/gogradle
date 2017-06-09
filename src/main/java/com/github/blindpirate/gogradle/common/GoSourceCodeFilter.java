@@ -30,6 +30,12 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCode
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
 
+/**
+ * Filters go source code satisfying a specific predicate. By default, files/directories whose name starts
+ * with _ or . and vendor/testdata directory will be discarded no matter what the predicate is.
+ * <p>
+ * There are two pre-defined filters to filter go build source code and go test source code.
+ */
 public class GoSourceCodeFilter extends AbstractFileFilter {
     public static final GoSourceCodeFilter BUILD_GO_FILTER = withPredicate(GoSourceCodeFilter::isBuildGoFile);
     public static final GoSourceCodeFilter TEST_GO_FILTER = withPredicate(GoSourceCodeFilter::isTestGoFile);

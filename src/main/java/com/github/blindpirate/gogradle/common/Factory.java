@@ -21,5 +21,4 @@ import java.util.Optional;
 
 public interface Factory<MATERIAL, PRODUCT> {
     Optional<PRODUCT> produce(MATERIAL material);
-
 }

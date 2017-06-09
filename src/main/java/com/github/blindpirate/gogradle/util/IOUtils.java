@@ -18,7 +18,7 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVistor;
+import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVisitor;
 import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
 import com.github.blindpirate.gogradle.crossplatform.Os;
@@ -329,7 +329,7 @@ public final class IOUtils {
         MarkDirectoryVisitor markVisitor = new MarkDirectoryVisitor(rootDir, predicate);
         walkFileTreeSafely(rootDir.toPath(), markVisitor);
 
-        DeleteUnmarkedDirectoryVistor deleteVisitor = new DeleteUnmarkedDirectoryVistor(markVisitor);
+        DeleteUnmarkedDirectoryVisitor deleteVisitor = new DeleteUnmarkedDirectoryVisitor(markVisitor);
         walkFileTreeSafely(rootDir.toPath(), deleteVisitor);
     }
 

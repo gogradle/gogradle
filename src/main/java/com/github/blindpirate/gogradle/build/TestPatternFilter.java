@@ -24,6 +24,9 @@ import java.io.File;
 import java.util.List;
 import java.util.function.Predicate;
 
+/**
+ * Filters tests files with specific patterns. Wildcards are supported.
+ */
 public class TestPatternFilter extends GoSourceCodeFilter {
     public static TestPatternFilter withPattern(List<String> patterns) {
         WildcardFileFilter wildcardFileFilter = new WildcardFileFilter(patterns);

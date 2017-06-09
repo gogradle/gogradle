@@ -72,7 +72,7 @@ class MarkAndDeleteDirectoryVisitorTest {
 
     @Test
     void 'deleting marked dir should succeed'() {
-        DeleteUnmarkedDirectoryVistor visitor = new DeleteUnmarkedDirectoryVistor(mark())
+        DeleteUnmarkedDirectoryVisitor visitor = new DeleteUnmarkedDirectoryVisitor(mark())
         IOUtils.walkFileTreeSafely(resource.toPath(), visitor)
         assert new File(resource, 'a/d/f/g').exists()
         assert !new File(resource, 'a/c').exists()

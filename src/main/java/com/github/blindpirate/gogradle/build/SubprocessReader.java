@@ -29,6 +29,11 @@ import java.util.function.Supplier;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
 
+/**
+ * A line-buffered reader to read lines from a supplier into a consumer in another thread.
+ * Lines are supplied by {@code is} and consumed by {@code consumer}. When this course ends,
+ * {@code latch} will count down.
+ */
 public class SubprocessReader extends Thread {
     private Supplier<InputStream> is;
     private CountDownLatch latch;

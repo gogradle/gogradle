@@ -26,10 +26,10 @@ import java.nio.file.Path;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
 
-public class DeleteUnmarkedDirectoryVistor extends SimpleFileVisitor<Path> {
+public class DeleteUnmarkedDirectoryVisitor extends SimpleFileVisitor<Path> {
     private MarkDirectoryVisitor markDirectoryVisitor;
 
-    public DeleteUnmarkedDirectoryVistor(MarkDirectoryVisitor markDirectoryVisitor) {
+    public DeleteUnmarkedDirectoryVisitor(MarkDirectoryVisitor markDirectoryVisitor) {
         this.markDirectoryVisitor = markDirectoryVisitor;
     }
 
