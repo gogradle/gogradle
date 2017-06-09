@@ -28,6 +28,9 @@ import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
+/**
+ * Calculates the hash value of all files in a directory as snapshot
+ */
 public class DirectorySnapshot implements Serializable {
     private String hash;
 
