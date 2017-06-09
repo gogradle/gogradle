@@ -18,7 +18,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.5.3'
+version '0.5.4'
 
 /************** sourcesets **************/
 sourceSets {
@@ -202,7 +202,7 @@ pluginBundle {
 
 compileJava.dependsOn updateVersion
 
-publishPlugins.dependsOn 'updateVersion'
+publishPlugins.dependsOn 'updateVersion', 'shadowJar'
 
 /************** wrapper **************/
 
