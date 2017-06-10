@@ -28,6 +28,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * Handles custom repositories. A {@code GolangRepositoryHandler} instance is registered into
+ * {@code Project.getRepositories}, so the following code:
+ * <p>
+ * <pre>
+ *     {@code
+ *      repositories{
+ *          golang {
+ *              root 'github.com/some/package'
+ *              dir '/path/to/the/package'
+ *          }
+ *
+ *          golang {
+ *              root 'appengine'
+ *              emptyDir()
+ *          }
+ *      }
+ * }
+ * </pre>
+ * <p>
+ * will result in two invocations of {@code GolangRepositoryHandler.configure} method.
+ */
 @Singleton
 public class GolangRepositoryHandler extends GroovyObjectSupport implements Configurable<Void> {
 
