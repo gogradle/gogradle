@@ -18,8 +18,6 @@
 package com.github.blindpirate.gogradle.util;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.common.DeleteUnmarkedDirectoryVisitor;
-import com.github.blindpirate.gogradle.common.MarkDirectoryVisitor;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import org.apache.commons.io.FileUtils;
@@ -40,15 +38,19 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.nio.ByteBuffer;
 import java.nio.file.FileVisitOption;
+import java.nio.file.FileVisitResult;
 import java.nio.file.FileVisitor;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.nio.file.SimpleFileVisitor;
+import java.nio.file.attribute.BasicFileAttributes;
 import java.nio.file.attribute.PosixFilePermissions;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.function.Predicate;
@@ -331,6 +333,72 @@ public final class IOUtils {
 
         DeleteUnmarkedDirectoryVisitor deleteVisitor = new DeleteUnmarkedDirectoryVisitor(markVisitor);
         walkFileTreeSafely(rootDir.toPath(), deleteVisitor);
+    }
+
+    static class MarkDirectoryVisitor extends SimpleFileVisitor<Path> {
+        private Set<File> markedDirectories = new HashSet<>();
+        private Set<File> ancestorsOfMarkedDirectories = new HashSet<>();
+        private Predicate<File> dirPredicate;
+        private File rootDir;
+
+        MarkDirectoryVisitor(File rootDir, Predicate<File> dirPredicate) {
+            this.dirPredicate = dirPredicate;
+            this.rootDir = rootDir;
+        }
+
+        Set<File> getMarkedDirectories() {
+            return markedDirectories;
+        }
+
+        Set<File> getAncestorsOfMarkedDirectories() {
+            return ancestorsOfMarkedDirectories;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dirPath, BasicFileAttributes attrs)
+                throws IOException {
+            File dir = dirPath.toFile();
+            if (dirPredicate.test(dir)) {
+                markedDirectories.add(dir);
+                while (!rootDir.equals(dir)) {
+                    dir = dir.getParentFile();
+                    ancestorsOfMarkedDirectories.add(dir);
+                }
+                return FileVisitResult.SKIP_SUBTREE;
+            } else {
+                return FileVisitResult.CONTINUE;
+            }
+        }
+    }
+
+    static class DeleteUnmarkedDirectoryVisitor extends SimpleFileVisitor<Path> {
+        private MarkDirectoryVisitor markDirectoryVisitor;
+
+        DeleteUnmarkedDirectoryVisitor(MarkDirectoryVisitor markDirectoryVisitor) {
+            this.markDirectoryVisitor = markDirectoryVisitor;
+        }
+
+        @Override
+        public FileVisitResult preVisitDirectory(Path dirPath, BasicFileAttributes attrs)
+                throws IOException {
+            File dir = dirPath.toFile();
+            if (isMarked(dir)) {
+                return FileVisitResult.SKIP_SUBTREE;
+            } else if (isAncestorOfMarked(dir)) {
+                return FileVisitResult.CONTINUE;
+            } else {
+                IOUtils.forceDelete(dir);
+                return FileVisitResult.SKIP_SUBTREE;
+            }
+        }
+
+        private boolean isMarked(File dir) {
+            return markDirectoryVisitor.getMarkedDirectories().contains(dir);
+        }
+
+        private boolean isAncestorOfMarked(File dir) {
+            return markDirectoryVisitor.getAncestorsOfMarkedDirectories().contains(dir);
+        }
     }
 
 }

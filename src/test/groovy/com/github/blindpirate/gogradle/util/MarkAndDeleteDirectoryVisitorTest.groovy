@@ -15,7 +15,7 @@
  *
  */
 
-package com.github.blindpirate.gogradle.common
+package com.github.blindpirate.gogradle.util
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
@@ -25,6 +25,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import java.util.function.Predicate
+
+import static com.github.blindpirate.gogradle.util.IOUtils.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -45,9 +47,9 @@ class MarkAndDeleteDirectoryVisitorTest {
 
     @Before
     void setUp() {
-        IOUtils.mkdir(resource, 'a/c')
-        IOUtils.mkdir(resource, 'a/d/f/g')
-        IOUtils.mkdir(resource, 'b/e')
+        mkdir(resource, 'a/c')
+        mkdir(resource, 'a/d/f/g')
+        mkdir(resource, 'b/e')
     }
 
     @Test
@@ -65,7 +67,7 @@ class MarkAndDeleteDirectoryVisitorTest {
             }
         })
 
-        IOUtils.walkFileTreeSafely(resource.toPath(), visitor)
+        walkFileTreeSafely(resource.toPath(), visitor)
         return visitor
     }
 
@@ -73,7 +75,7 @@ class MarkAndDeleteDirectoryVisitorTest {
     @Test
     void 'deleting marked dir should succeed'() {
         DeleteUnmarkedDirectoryVisitor visitor = new DeleteUnmarkedDirectoryVisitor(mark())
-        IOUtils.walkFileTreeSafely(resource.toPath(), visitor)
+        walkFileTreeSafely(resource.toPath(), visitor)
         assert new File(resource, 'a/d/f/g').exists()
         assert !new File(resource, 'a/c').exists()
         assert !new File(resource, 'b/e').exists()
