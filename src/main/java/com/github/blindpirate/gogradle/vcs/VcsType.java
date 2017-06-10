@@ -35,7 +35,7 @@ public enum VcsType {
 
     private Class<? extends Annotation> annoClass;
 
-    VcsType(String name, Class annoClass) {
+    VcsType(String name, Class<? extends Annotation> annoClass) {
         this.name = name;
         this.annoClass = annoClass;
     }

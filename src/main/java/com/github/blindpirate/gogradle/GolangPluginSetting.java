@@ -32,6 +32,19 @@ import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 
+/**
+ * Stores global configurations for Gogradle.
+ * A typical usage is in build.gradle:
+ * <pre>
+ *     {@code
+ *          golang {
+ *              packagePath = 'github.com/my/package'
+ *              goVersion = '1.8.3'
+ *              ...
+ *          }
+ *     }
+ * </pre>
+ */
 @Singleton
 public class GolangPluginSetting {
     private static final Map<String, TimeUnit> TIME_UNIT_MAP = ImmutableMap.<String, TimeUnit>builder()

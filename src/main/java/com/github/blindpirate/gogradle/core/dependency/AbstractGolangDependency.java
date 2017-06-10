@@ -26,6 +26,9 @@ import java.util.Collection;
 import java.util.Objects;
 import java.util.Set;
 
+/**
+ * The skeleton of a {@code GolangDependency} with several default fields.
+ */
 public abstract class AbstractGolangDependency implements GolangDependency, Serializable {
 
     private String name;

@@ -37,7 +37,7 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Conf
         Optional<GolangRepository> matched = gitRepositories.stream()
                 .filter(repo -> repo.match(name))
                 .findFirst();
-        return matched.isPresent() ? matched.get() : GolangRepository.EMPTY_INSTANCE;
+        return matched.orElse(GolangRepository.EMPTY_INSTANCE);
     }
 
     @Override

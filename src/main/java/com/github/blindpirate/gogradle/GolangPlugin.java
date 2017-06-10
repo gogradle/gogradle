@@ -42,7 +42,9 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
 import static java.util.Arrays.asList;
 
-
+/**
+ * The entry of Gogradle plugin.
+ */
 public class GolangPlugin implements Plugin<Project> {
     private Injector injector;
     private GolangPluginSetting settings;
