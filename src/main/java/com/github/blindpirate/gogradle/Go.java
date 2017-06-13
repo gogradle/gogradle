@@ -44,6 +44,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_T
  * <pre>
  * {@code
  * task myTask(type: Go) {
+ *     dependsOn 'vendor'
  *     doLast {
  *         go 'build -o /my/output/location github.com/my/package/cmd --my-own-cmd-arguments'
  *     }

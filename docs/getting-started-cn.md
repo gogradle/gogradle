@@ -120,7 +120,7 @@ HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`�
 
 ```groovy
 task golint(type: com.github.blindpirate.gogradle.Go) {
-    dependsOn vendor // 令此任务依赖vendor任务
+    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     environment MY_OWN_ENV1: 'value1', MY_OWN_ENV1: 'value2' // 设置要运行命令的环境变量
     doLast {
         run 'golint github.com/my/project' // 指定任务中运行的命令
@@ -134,6 +134,7 @@ check.dependsOn golint
 
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
+    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     doLast {
         go('build -v github.com/my/project', { stdoutLine ->
             println stderrLine
@@ -150,6 +151,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
+    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     doLast {
         go('build -v github.com/my/project', writeTo('stdout.txt'), appendTo('/this/is/absolute/path/stderr.txt'))
     }
@@ -162,6 +164,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
+    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     doLast {
         def retcode = go('build -v github.com/my/project', devNull(), devNull())
         if(retcode != 0) {
