@@ -106,6 +106,8 @@ repositories {
 }
 ```
 
+## 截图
+
 测试报告截图
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/index.png)
