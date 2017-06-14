@@ -37,8 +37,6 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.cache.CacheScope.PERSISTENCE;
-
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
     protected static final Logger LOGGER = Logging.getLogger(GitMercurialDependencyManager.class);
 
@@ -79,11 +77,20 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     protected abstract VcsType getVcsType();
 
     @Override
-    protected boolean concreteVersionExistInRepo(File repoRoot, GolangDependency dependency) {
-        String commit = dependency instanceof GitMercurialNotationDependency
-                ? GitMercurialNotationDependency.class.cast(dependency).getCommit()
-                : VcsResolvedDependency.class.cast(dependency).getVersion();
-        return getAccessor().findCommit(repoRoot, commit).isPresent();
+    protected boolean versionExistsInRepo(File repoRoot, GolangDependency dependency) {
+        if (dependency instanceof GitMercurialNotationDependency) {
+            GitMercurialNotationDependency d = (GitMercurialNotationDependency) dependency;
+            if (d.isLatest()) {
+                return true;
+            } else if (d.getTag() != null) {
+                return findMatchingTag(repoRoot, d.getTag()).isPresent();
+            } else {
+                return getAccessor().findCommit(repoRoot, d.getCommit()).isPresent();
+            }
+        } else {
+            VcsResolvedDependency d = (VcsResolvedDependency) dependency;
+            return getAccessor().findCommit(repoRoot, d.getVersion()).isPresent();
+        }
     }
 
     @Override
@@ -91,17 +98,21 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         getAccessor().checkout(repository, commit.getId());
     }
 
+    private Optional<GitMercurialCommit> findMatchingTag(File repository, String tag) {
+        Optional<GitMercurialCommit> commit = getAccessor()
+                .findCommitByTag(repository, tag);
+        if (commit.isPresent()) {
+            return commit;
+        }
+
+        return findCommitBySemVersion(repository, tag);
+    }
+
     @Override
     protected GitMercurialCommit determineVersion(File repository, NotationDependency dependency) {
         GitMercurialNotationDependency notationDependency = (GitMercurialNotationDependency) dependency;
         if (notationDependency.getTag() != null) {
-            Optional<GitMercurialCommit> commit = getAccessor()
-                    .findCommitByTag(repository, notationDependency.getTag());
-            if (commit.isPresent()) {
-                return commit.get();
-            }
-
-            commit = findCommitBySemVersion(repository, notationDependency.getTag());
+            Optional<GitMercurialCommit> commit = findMatchingTag(repository, notationDependency.getTag());
             if (commit.isPresent()) {
                 return commit.get();
             } else {
@@ -109,7 +120,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
             }
         }
 
-        if (notationDependency.getCacheScope() == PERSISTENCE) {
+        if (!notationDependency.isLatest()) {
             Optional<GitMercurialCommit> commit = getAccessor().findCommit(repository, notationDependency.getCommit());
             if (commit.isPresent()) {
                 return commit.get();

@@ -137,7 +137,7 @@ class AbstractVcsDependencyManagerTest {
     @Test
     void 'repository should not be updated if version exist'() {
         // given
-        when(subclassDelegate.concreteVersionExistInRepo(repoRoot, hostResolvedDependency)).thenReturn(true)
+        when(subclassDelegate.versionExistsInRepo(repoRoot, hostResolvedDependency)).thenReturn(true)
         // when
         manager.install(hostResolvedDependency, targetDir)
         // then
@@ -248,8 +248,8 @@ class AbstractVcsDependencyManagerTest {
         }
 
         @Override
-        protected boolean concreteVersionExistInRepo(File repoRoot, GolangDependency dependency) {
-            return subclassDelegate.concreteVersionExistInRepo(repoRoot, dependency)
+        protected boolean versionExistsInRepo(File repoRoot, GolangDependency dependency) {
+            return subclassDelegate.versionExistsInRepo(repoRoot, dependency)
         }
 
         @Override

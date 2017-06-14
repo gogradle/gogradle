@@ -31,7 +31,6 @@ import java.util.Optional;
 /**
  * Handles custom repositories. A {@code GolangRepositoryHandler} instance is registered into
  * {@code Project.getRepositories}, so the following code:
- * <p>
  * <pre>
  *     {@code
  *      repositories{
