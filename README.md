@@ -103,7 +103,7 @@ See [here](https://github.com/gogradle/samples) for examples.
 ```
 repositories {
     golang {
-        root { it.startsWith('appengine'} }
+        root { it.startsWith('appengine') }
         emptyDir()
     }
 }
