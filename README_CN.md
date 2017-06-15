@@ -100,7 +100,7 @@ Gogradle支持项目级的`GOPATH`。在构建一个项目时，你可将其clon
 ```
 repositories {
     golang {
-        root { it.startsWith('appengine'} }
+        root { it.startsWith('appengine') }
         emptyDir()
     }
 }
