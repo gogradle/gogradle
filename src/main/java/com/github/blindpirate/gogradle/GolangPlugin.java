@@ -65,7 +65,8 @@ public class GolangPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         init(project);
-        configureGlobalInjector();
+        System.setProperty("GRADLE_MAJOR_VERSION", project.getGradle().getGradleVersion().split("\\.")[0]);
+        configureGogradleGlobal();
         customizeProjectInternalServices(project);
         configureSettings(project);
         configureConfigurations(project);
@@ -88,7 +89,7 @@ public class GolangPlugin implements Plugin<Project> {
         });
     }
 
-    private void configureGlobalInjector() {
+    private void configureGogradleGlobal() {
         GogradleGlobal.INSTANCE.setInjector(injector);
     }
 

@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor
 import com.github.blindpirate.gogradle.task.go.GoTestTask
 import com.github.blindpirate.gogradle.task.go.PackageTestResult
+import com.github.blindpirate.gogradle.util.ExceptionHandler
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
@@ -29,7 +30,6 @@ import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult
 import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.testing.TestResult
-import org.gradle.internal.operations.BuildOperationProcessor
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -42,6 +42,8 @@ import org.mockito.stubbing.Answer
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
+import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.*
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -57,9 +59,6 @@ class GoTestTaskTest extends TaskTest {
     @Mock
     GoTestStdoutExtractor extractor
 
-    @Mock
-    BuildOperationProcessor buildOperationProcessor
-
     @Before
     void setUp() {
         task = buildTask(GoTestTask)
@@ -67,7 +66,6 @@ class GoTestTaskTest extends TaskTest {
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
 
         ReflectionUtils.setField(task, 'extractor', extractor)
-        ReflectionUtils.setField(task, 'buildOperationProcessor', buildOperationProcessor)
 
         IOUtils.write(resource, 'a/a1_test.go', '')
         IOUtils.write(resource, 'a/_a1_test.go', '')
@@ -175,8 +173,8 @@ class GoTestTaskTest extends TaskTest {
     void 'successful and failed result should be counted correctly'() {
         // given
         TestClassResult result = new TestClassResult(1L, 'className', 2L)
-        result.add(new TestMethodResult(1L, 'methodName', TestResult.ResultType.FAILURE, 2L, 3L))
-        result.add(new TestMethodResult(1L, 'methodName', TestResult.ResultType.SUCCESS, 2L, 3L))
+        result.add(new GoTestMethodResult(1L, 'methodName', TestResult.ResultType.FAILURE, 2L, 3L, ''))
+        result.add(new GoTestMethodResult(1L, 'methodName', TestResult.ResultType.SUCCESS, 2L, 3L, ''))
         when(extractor.extractTestResult(any(PackageTestResult))).thenReturn([result])
 
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
@@ -187,6 +185,7 @@ class GoTestTaskTest extends TaskTest {
             task.actions[0].execute(task)
             assert false
         } catch (Exception e) {
+            println(ExceptionHandler.getStackTrace(e))
             assert e.getMessage().contains('There are 1 failed tests')
         }
     }

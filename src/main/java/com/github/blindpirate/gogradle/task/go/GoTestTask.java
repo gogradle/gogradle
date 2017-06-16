@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.common.LineCollector;
+import com.github.blindpirate.gogradle.unsafe.GradleInternalAPI;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.Lists;
@@ -31,11 +32,9 @@ import org.gradle.api.Action;
 import org.gradle.api.Incubating;
 import org.gradle.api.Task;
 import org.gradle.api.internal.tasks.options.Option;
-import org.gradle.api.internal.tasks.testing.junit.report.DefaultTestReport;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.internal.operations.BuildOperationProcessor;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -72,9 +71,6 @@ public class GoTestTask extends Go {
 
     @Inject
     private GolangPluginSetting setting;
-
-    @Inject
-    private BuildOperationProcessor buildOperationProcessor;
 
     @Inject
     private GoTestStdoutExtractor extractor;
@@ -173,10 +169,8 @@ public class GoTestTask extends Go {
         }
 
         private File generateTestReport(List<TestClassResult> testResults) {
-            GoTestResultsProvider provider = new GoTestResultsProvider(testResults);
             File reportDir = new File(getProject().getRootDir(), ".gogradle/reports/test");
-            DefaultTestReport report = new DefaultTestReport(buildOperationProcessor);
-            report.generateReport(provider, reportDir);
+            GradleInternalAPI.renderTestReport(testResults, reportDir);
             return reportDir;
         }
 

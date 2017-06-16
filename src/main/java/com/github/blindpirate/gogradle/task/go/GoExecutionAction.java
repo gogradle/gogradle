@@ -66,4 +66,7 @@ public class GoExecutionAction implements ContextAwareTaskAction {
         return closure.getClass().getClassLoader();
     }
 
+    public String getActionClassName() {
+        return "GoAction";
+    }
 }

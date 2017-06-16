@@ -66,6 +66,7 @@ dependencies {
     compile group: 'com.typesafe.sbt', name: 'sbt-interface', version: '0.13.13'
     compile group: 'com.fasterxml.jackson.dataformat', name: 'jackson-dataformat-xml', version: '2.6.3'
     compile group: 'org.codehaus.woodstox', name: 'woodstox-core-asl', version: '4.4.1'
+    compile group: 'org.jooq', name: 'joor', version: '0.9.6'
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
@@ -79,6 +80,7 @@ dependencies {
 // Define integration test task
 task integrationTest(type: Test) {
     testClassesDirs = sourceSets.integrationTest.output.classesDirs
+//    testClassesDir = sourceSets.integrationTest.output.classesDir
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
@@ -88,6 +90,7 @@ project.tasks.withType(Test) {
     }
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
     it.systemProperty('GOGRADLE_ROOT', rootDir.absolutePath.replace('\\', '/'))
+    it.systemProperty("GRADLE_MAJOR_VERSION", gradle.gradleVersion.split(/\./)[0])
 }
 
 check.dependsOn javadoc, jacocoTestReport, test, integrationTest

@@ -44,14 +44,19 @@ import org.gradle.api.initialization.dsl.ScriptHandler;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.LoggingManager;
+import org.gradle.api.model.ObjectFactory;
 import org.gradle.api.plugins.Convention;
 import org.gradle.api.plugins.ExtensionContainer;
 import org.gradle.api.plugins.ObjectConfigurationAction;
 import org.gradle.api.plugins.PluginContainer;
 import org.gradle.api.plugins.PluginManager;
+import org.gradle.api.provider.PropertyState;
+import org.gradle.api.provider.Provider;
+import org.gradle.api.provider.ProviderFactory;
 import org.gradle.api.resources.ResourceHandler;
 import org.gradle.api.tasks.TaskContainer;
 import org.gradle.api.tasks.WorkResult;
+import org.gradle.normalization.InputNormalizationHandler;
 import org.gradle.process.ExecResult;
 import org.gradle.process.ExecSpec;
 import org.gradle.process.JavaExecSpec;
@@ -61,6 +66,7 @@ import java.net.URI;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  * This class is designed to suppress guava warnings:
@@ -92,6 +98,11 @@ public class ProjectDecorator implements Project {
     @Override
     public File getBuildDir() {
         return project.getBuildDir();
+    }
+
+    //    @Override
+    public void setBuildDir(File file) {
+        project.setBuildDir(file);
     }
 
     @Override
@@ -332,6 +343,26 @@ public class ProjectDecorator implements Project {
     @Override
     public FileTree tarTree(Object tarPath) {
         return project.tarTree(tarPath);
+    }
+
+    //    @Override
+    public <T> Provider<T> provider(Callable<T> callable) {
+        return project.provider(callable);
+    }
+
+    //    @Override
+    public <T> PropertyState<T> property(Class<T> aClass) {
+        return project.property(aClass);
+    }
+
+    //    @Override
+    public ProviderFactory getProviders() {
+        return project.getProviders();
+    }
+
+    //    @Override
+    public ObjectFactory getObjects() {
+        return project.getObjects();
     }
 
     @Override
@@ -590,6 +621,11 @@ public class ProjectDecorator implements Project {
         return project.copySpec();
     }
 
+    //    @Override
+    public WorkResult sync(Action<? super CopySpec> action) {
+        return project.sync(action);
+    }
+
     @Override
     public ProjectState getState() {
         return project.getState();
@@ -623,6 +659,16 @@ public class ProjectDecorator implements Project {
     @Override
     public SoftwareComponentContainer getComponents() {
         return project.getComponents();
+    }
+
+    //    @Override
+    public InputNormalizationHandler getNormalization() {
+        return project.getNormalization();
+    }
+
+    //    @Override
+    public void normalization(Action<? super InputNormalizationHandler> action) {
+        project.normalization(action);
     }
 
     @Override
