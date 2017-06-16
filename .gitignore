@@ -1,6 +1,7 @@
 .gradle
 .idea
 build/
+out/
 !src/main/java/com/github/blindpirate/gogradle/build
 !src/test/groovy/com/github/blindpirate/gogradle/build
 classes/
