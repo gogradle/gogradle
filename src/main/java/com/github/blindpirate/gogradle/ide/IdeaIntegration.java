@@ -30,6 +30,8 @@ import javax.inject.Singleton;
 import java.util.Arrays;
 import java.util.List;
 
+import static java.util.Collections.singletonList;
+
 @SuppressWarnings("checkstyle:linelength")
 @Singleton
 public class IdeaIntegration extends IdeIntegration {
@@ -84,7 +86,7 @@ public class IdeaIntegration extends IdeIntegration {
 
         ideaModuleTask.setModule(golangIdeaModule);
         ideaPlugin.getModel().setModule(golangIdeaModule);
-        ideaPlugin.getModel().getProject().setModules(Arrays.asList(golangIdeaModule));
+        ideaPlugin.getModel().getProject().setModules(singletonList(golangIdeaModule));
     }
 
     private void skipTask(String taskName) {
