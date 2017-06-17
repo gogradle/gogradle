@@ -50,7 +50,7 @@ class IdeaIntegrationTest {
     @Before
     void setUp() {
         ideaIntegration = new IdeaIntegration(manager, project, buildManager, hacker)
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         when(manager.getBinaryPath()).thenReturn(new File(resource, 'go/bin/go').toPath())
         when(manager.getGoroot()).thenReturn(new File(resource, 'go').toPath())
         when(manager.getGoVersion()).thenReturn('1.7.1')

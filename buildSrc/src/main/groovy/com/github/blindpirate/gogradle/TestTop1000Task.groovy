@@ -15,8 +15,8 @@ class TestTop1000Task extends DefaultTask {
 
     void init() {
         String now = new Date().format('yyyyMMdd-HHmmss')
-        stdout = new File(getProject().getRootDir(), "build/${now}.stdout")
-        stderr = new File(getProject().getRootDir(), "build/${now}.stderr")
+        stdout = new File(getProject().getProjectDir(), "build/${now}.stdout")
+        stderr = new File(getProject().getProjectDir(), "build/${now}.stderr")
     }
 
     void write(File file, String text) {
@@ -42,7 +42,7 @@ class TestTop1000Task extends DefaultTask {
         String buildDotGradle = """
 buildscript {
     dependencies {
-        classpath files('${getProject().getRootDir().absolutePath}/build/libs/gogradle-0.5.4-all.jar')
+        classpath files('${getProject().getProjectDir().absolutePath}/build/libs/gogradle-0.5.4-all.jar')
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
@@ -85,8 +85,8 @@ build {
         Files.deleteIfExists(gradleLink)
         Files.deleteIfExists(gradlewLink)
 
-        Files.createSymbolicLink(gradleLink, getProject().getRootDir().toPath().resolve('gradle'))
-        Files.createSymbolicLink(gradlewLink, getProject().getRootDir().toPath().resolve('gradlew'))
+        Files.createSymbolicLink(gradleLink, getProject().getProjectDir().toPath().resolve('gradle'))
+        Files.createSymbolicLink(gradlewLink, getProject().getProjectDir().toPath().resolve('gradlew'))
 
         stdout.append("Start building ${path}\n")
         stderr.append("Start building ${path}\n")

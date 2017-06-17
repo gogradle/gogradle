@@ -64,7 +64,7 @@ class GolangIdeaModuleTest {
             it.set(ideaModule, mock(it.type))
         }
         golangIdeaModule = new GolangIdeaModule(ideaModule)
-        when(golangIdeaModule.getProject().getRootDir()).thenReturn(resource)
+        when(golangIdeaModule.getProject().getProjectDir()).thenReturn(resource)
 
         when(ideaModule.getProject().getTasks()).thenReturn(taskContainer)
         when(taskContainer.getByName(PREPARE_TASK_NAME)).thenReturn(prepareTask)

@@ -42,7 +42,7 @@ class GoVetTaskTest extends TaskTest {
     void setUp() {
         task = buildTask(GoVetTask)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         if (resource) {
             IOUtils.mkdir(resource, '.dir')
             IOUtils.mkdir(resource, '_dir')

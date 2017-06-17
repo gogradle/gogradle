@@ -127,7 +127,7 @@ public class GoTestTask extends Go {
 
     private Collection<File> filterMatchedTests() {
         TestPatternFilter filter = TestPatternFilter.withPattern(testNamePattern);
-        return filterFilesRecursively(getProject().getRootDir(), filter);
+        return filterFilesRecursively(getProject().getProjectDir(), filter);
     }
 
     private Map<File, List<File>> groupByParentDir(Collection<File> files) {
@@ -145,7 +145,7 @@ public class GoTestTask extends Go {
     }
 
     private String dirToImportPath(File dir) {
-        Path relativeToProjectRoot = getProject().getRootDir().toPath().relativize(dir.toPath());
+        Path relativeToProjectRoot = getProject().getProjectDir().toPath().relativize(dir.toPath());
         Path importPath = Paths.get(setting.getPackagePath()).resolve(relativeToProjectRoot);
         return toUnixString(importPath);
     }
@@ -169,7 +169,7 @@ public class GoTestTask extends Go {
         }
 
         private File generateTestReport(List<TestClassResult> testResults) {
-            File reportDir = new File(getProject().getRootDir(), ".gogradle/reports/test");
+            File reportDir = new File(getProject().getProjectDir(), ".gogradle/reports/test");
             GradleInternalAPI.renderTestReport(testResults, reportDir);
             return reportDir;
         }
@@ -191,7 +191,7 @@ public class GoTestTask extends Go {
         private void determineTestPattern() {
             if (isEmpty(testNamePattern)) {
                 // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-                Collection<File> allTestFiles = filterFilesRecursively(getProject().getRootDir(), TEST_GO_FILTER);
+                Collection<File> allTestFiles = filterFilesRecursively(getProject().getProjectDir(), TEST_GO_FILTER);
                 this.parentDirToTestFiles = groupByParentDir(allTestFiles);
                 this.isCommandLineArguments = false;
             } else {
@@ -223,7 +223,7 @@ public class GoTestTask extends Go {
         }
 
         private void prepareCoverageProfileDir() {
-            File coverageDir = new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH);
+            File coverageDir = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
             forceMkdir(coverageDir);
             clearDirectory(coverageDir);
         }
@@ -236,7 +236,7 @@ public class GoTestTask extends Go {
 
 
             if (generateCoverageProfile) {
-                File profilesPath = new File(getProject().getRootDir(), COVERAGE_PROFILES_PATH + "/"
+                File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
                         + encodeInternally(importPath));
                 args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
                 coverageProfileGenerated = true;

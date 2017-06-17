@@ -42,7 +42,7 @@ class VendorWalkTest extends GogradleModuleSupport {
     @Test
     void 'create cascading vendor package should succeed'() {
         // when
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         LocalDirectoryDependency localPackage = LocalDirectoryDependency.fromLocal('testpackage', resource);
         GolangDependencySet dependencies = factory.produce(localPackage, resource)
         // then

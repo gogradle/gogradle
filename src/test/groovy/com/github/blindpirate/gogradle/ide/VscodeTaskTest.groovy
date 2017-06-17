@@ -42,7 +42,7 @@ class VscodeTaskTest extends TaskTest {
     void setUp() {
         task = buildTask(VscodeTask)
         if (resource != null) {
-            when(project.getRootDir()).thenReturn(resource)
+            when(project.getProjectDir()).thenReturn(resource)
             gopath = StringUtils.toUnixString(new File(resource, '.gogradle/project_gopath'))
             when(buildManager.getGopath()).thenReturn(gopath)
         }

@@ -39,7 +39,7 @@ public class VendorSnapshoter {
     @Inject
     public VendorSnapshoter(Project project) {
         this.project = project;
-        this.persistenceFile = new File(project.getRootDir(), ".gogradle/cache/VendorSnapshot.bin");
+        this.persistenceFile = new File(project.getProjectDir(), ".gogradle/cache/VendorSnapshot.bin");
     }
 
     public void loadPersistenceCache() {
@@ -55,13 +55,13 @@ public class VendorSnapshoter {
         if (lastInstallationSnapshot == null) {
             return false;
         } else {
-            return lastInstallationSnapshot.isUpToDate(project.getRootDir(), dir);
+            return lastInstallationSnapshot.isUpToDate(project.getProjectDir(), dir);
         }
     }
 
     public void updateCache(ResolvedDependency resolvedDependency, File dir) {
         if (resolvedDependency.getCacheScope() == CacheScope.PERSISTENCE) {
-            cache.put(resolvedDependency, DirectorySnapshot.of(project.getRootDir(), dir));
+            cache.put(resolvedDependency, DirectorySnapshot.of(project.getProjectDir(), dir));
         }
     }
 }

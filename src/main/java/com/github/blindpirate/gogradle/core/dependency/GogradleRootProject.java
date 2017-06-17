@@ -29,7 +29,7 @@ public class GogradleRootProject extends LocalDirectoryDependency {
     @Inject
     public GogradleRootProject(Project project) {
         super();
-        super.setDir(project.getRootDir());
+        super.setDir(project.getProjectDir());
     }
 
     public void setName(String name) {

@@ -37,7 +37,7 @@ class GogradleRootProjectTest {
 
     @Before
     void setUp() {
-        when(project.getRootDir()).thenReturn(rootDir)
+        when(project.getProjectDir()).thenReturn(rootDir)
         when(rootDir.exists()).thenReturn(true)
         when(rootDir.isDirectory()).thenReturn(true)
         rootProject = new GogradleRootProject(project)

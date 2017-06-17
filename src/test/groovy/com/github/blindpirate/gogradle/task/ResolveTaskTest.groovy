@@ -72,7 +72,7 @@ class ResolveTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         when(rootPath.toFile()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn("package")
 

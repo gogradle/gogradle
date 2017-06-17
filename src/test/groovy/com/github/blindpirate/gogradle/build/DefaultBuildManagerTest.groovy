@@ -78,7 +78,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     @Before
     void setUp() {
         manager = new DefaultBuildManager(project, binaryManager, setting, processUtils)
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         setting.packagePath = 'root/package'
 
         goroot = toUnixString(new File(resource, 'go'))
@@ -120,7 +120,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
 
         String systemGopath = 'fakegopath' + File.pathSeparator + toUnixString(resource)
         environmentVariables.set('GOPATH', systemGopath)
-        when(project.getRootDir()).thenReturn(new File(resource, 'src/root/package'))
+        when(project.getProjectDir()).thenReturn(new File(resource, 'src/root/package'))
 
         manager.prepareProjectGopathIfNecessary()
         // then

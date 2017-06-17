@@ -46,7 +46,7 @@ public class GoVetTask extends Go {
     }
 
     private List<String> allSubGoFiles() {
-        return IOUtils.safeListFiles(getProject().getRootDir()).stream()
+        return IOUtils.safeListFiles(getProject().getProjectDir()).stream()
                 .filter(File::isFile)
                 .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
                 .filter(file -> StringUtils.endsWithAny(file.getName(), ".go"))
@@ -55,7 +55,7 @@ public class GoVetTask extends Go {
     }
 
     private List<String> allSubDirectories() {
-        return IOUtils.safeListFiles(getProject().getRootDir()).stream()
+        return IOUtils.safeListFiles(getProject().getProjectDir()).stream()
                 .filter(File::isDirectory)
                 .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
                 .filter(file -> !VENDOR_DIRECTORY.equals(file.getName()))

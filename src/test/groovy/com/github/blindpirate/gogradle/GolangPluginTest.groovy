@@ -268,7 +268,7 @@ class GolangPluginTest {
 
     @Test
     void 'getting root dir from injector should succeed'() {
-        assert GogradleGlobal.getInstance(Project).getRootDir()
+        assert GogradleGlobal.getInstance(Project).getProjectDir()
     }
 
     @Test

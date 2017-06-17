@@ -33,7 +33,7 @@ public class PersistenceCache<K extends GolangCloneable, V extends GolangCloneab
     private final File persistenceFile;
 
     public PersistenceCache(Project project, String persistenceFileName) {
-        this.persistenceFile = new File(project.getRootDir(), ".gogradle/cache/" + persistenceFileName);
+        this.persistenceFile = new File(project.getProjectDir(), ".gogradle/cache/" + persistenceFileName);
     }
 
     @SuppressWarnings("unchecked")

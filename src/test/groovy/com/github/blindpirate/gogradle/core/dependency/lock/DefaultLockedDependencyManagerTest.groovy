@@ -94,7 +94,7 @@ dependencies:
         when(parser.parse([name: 'b', version: 'v2', transitive: false])).thenReturn(dependency2)
         when(parser.parse([name: 'a', version: 'v2', transitive: false])).thenReturn(dependency3)
         when(parser.parse([name: 'c', version: 'v3', transitive: false])).thenReturn(dependency4)
-        IOUtils.write(project.getRootDir(), LOCK_FILE_NAME, gogradleDotLock)
+        IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, gogradleDotLock)
     }
 
 
@@ -124,12 +124,12 @@ dependencies:
         // when
         manager.lock([dependency1, dependency2], [dependency3, dependency4])
         // then
-        assert new File(project.getRootDir(), LOCK_FILE_NAME).getText() == gogradleDotLock
+        assert new File(project.getProjectDir(), LOCK_FILE_NAME).getText() == gogradleDotLock
     }
 
     @Test
     void 'existent gogradle.lock should be overwritten'() {
-        IOUtils.write(project.getRootDir(), LOCK_FILE_NAME, 'old file content')
+        IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, 'old file content')
         'writing to gogradle.lock should succeed'()
     }
 

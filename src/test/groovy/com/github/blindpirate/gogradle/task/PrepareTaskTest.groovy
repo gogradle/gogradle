@@ -43,7 +43,7 @@ class PrepareTaskTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(PrepareTask)
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
         when(project.getGradle()).thenReturn(gradle)
     }

@@ -47,7 +47,7 @@ class GoCoverTaskTest extends TaskTest {
 
         task = buildTask(GoCoverTask)
 
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
 
         when(golangTaskContainer.get(GoTestTask).isCoverageProfileGenerated()).thenReturn(true)
@@ -62,11 +62,11 @@ class GoCoverTaskTest extends TaskTest {
 
                 if (profileArg.endsWith('a')) {
                     File srcHtml = new File(resource, "a.html")
-                    File destHtml = new File(project.getRootDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html')
+                    File destHtml = new File(project.getProjectDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html')
                     IOUtils.copyFile(srcHtml, destHtml)
                 } else {
                     File srcHtml = new File(resource, "b.html")
-                    File destHtml = new File(project.getRootDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fb.html')
+                    File destHtml = new File(project.getProjectDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fb.html')
                     IOUtils.copyFile(srcHtml, destHtml)
                 }
                 return null
@@ -79,7 +79,7 @@ class GoCoverTaskTest extends TaskTest {
         // when
         task.coverage()
         // then
-        examineCoverageHtmls(project.getRootDir())
+        examineCoverageHtmls(project.getProjectDir())
     }
 
     static void examineCoverageHtmls(File projectRoot) {

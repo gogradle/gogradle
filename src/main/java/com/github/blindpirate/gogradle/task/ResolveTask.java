@@ -92,14 +92,14 @@ public abstract class ResolveTask extends AbstractGolangTask {
     // INPUT 2: gogradle.lock
     @InputFiles
     public File getExternalLockfiles() throws IOException {
-        return new File(getProject().getRootDir(), "gogradle.lock");
+        return new File(getProject().getProjectDir(), "gogradle.lock");
     }
 
     // INPUT 3: all go files in specific configuration
     @InputFiles
     public Collection<File> getGoSourceFiles() {
         GoSourceCodeFilter filter = GoSourceCodeFilter.FILTERS.get(getConfigurationName());
-        return filterFilesRecursively(getProject().getRootDir(), filter);
+        return filterFilesRecursively(getProject().getProjectDir(), filter);
     }
 
     // INPUT 4: build tags
@@ -137,7 +137,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     @OutputFile
     public File getSerializationFile() {
-        return new File(getProject().getRootDir(), ".gogradle/cache/" + getConfigurationName() + ".bin");
+        return new File(getProject().getProjectDir(), ".gogradle/cache/" + getConfigurationName() + ".bin");
     }
 
     @TaskAction
@@ -166,7 +166,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
     }
 
     protected GolangDependencySet produceFirstLevelDependencies() {
-        return strategy.produce(gogradleRootProject, getProject().getRootDir(), visitor, getConfigurationName());
+        return strategy.produce(gogradleRootProject, getProject().getProjectDir(), visitor, getConfigurationName());
     }
 
     public DependencyTreeNode getDependencyTree() {
