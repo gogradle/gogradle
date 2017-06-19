@@ -97,9 +97,9 @@ public class GolangPlugin implements Plugin<Project> {
 
     private void configureTasks(Project project) {
         TaskContainer taskContainer = project.getTasks();
-        TASKS.entrySet().forEach(entry -> {
-            Task task = taskContainer.create(entry.getKey(), entry.getValue(), dependencyInjectionAction);
-            golangTaskContainer.put((Class) entry.getValue(), task);
+        TASKS.forEach((key, value) -> {
+            Task task = taskContainer.create(key, value, dependencyInjectionAction);
+            golangTaskContainer.put((Class) value, task);
         });
 
         project.afterEvaluate(this::afterEvaluate);
