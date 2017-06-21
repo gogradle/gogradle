@@ -42,7 +42,7 @@ class TestTop1000Task extends DefaultTask {
         String buildDotGradle = """
 buildscript {
     dependencies {
-        classpath files('${getProject().getProjectDir().absolutePath}/build/libs/gogradle-0.6.0-all.jar')
+        classpath files('${getProject().getProjectDir().absolutePath}/build/libs/gogradle-0.6.2-all.jar')
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'

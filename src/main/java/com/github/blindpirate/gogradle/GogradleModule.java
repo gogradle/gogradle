@@ -81,6 +81,7 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Provides;
 import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
+import com.google.inject.spi.InjectionPoint;
 import org.gradle.api.Project;
 import org.gradle.api.internal.project.DefaultProject;
 import org.gradle.internal.service.ServiceRegistry;
@@ -89,6 +90,8 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.reflect.Method;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * Provides configurations for Guice dependency injection.
@@ -104,6 +107,8 @@ public class GogradleModule extends AbstractModule {
 
     @Override
     protected void configure() {
+        Logger.getLogger(InjectionPoint.class.getName()).setLevel(Level.OFF);
+
         bind(Project.class).toInstance(project);
         bind(ServiceRegistry.class).toInstance(serviceRegistry);
 

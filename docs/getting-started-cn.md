@@ -13,7 +13,7 @@ Gogradle是[Gradle](https://gradle.org/)的一个插件。Gradle是一个使用G
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.6.0'
+    id 'com.github.blindpirate.gogradle' version '0.6.2'
 }
 
 golang {
