@@ -91,21 +91,6 @@ Gogradle支持项目级的`GOPATH`。在构建一个项目时，你可将其clon
 - [HTTP与Socks代理](./docs/proxy-cn.md)
 - [IDE支持](./docs/ide-cn.md)
 
-## FAQ
-
-### 如何处理 'Cannot recognized package: appengine' ?
-
-`appengine`和`appengine_internal`是GCE提供的包，因此无法获取。你可以在`build.gradle`中加入如下配置：
-
-```
-repositories {
-    golang {
-        root { it.startsWith('appengine'} }
-        emptyDir()
-    }
-}
-```
-
 ## 截图
 
 测试报告截图

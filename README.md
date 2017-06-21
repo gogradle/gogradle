@@ -94,21 +94,6 @@ See [here](https://github.com/gogradle/samples) for examples.
 - [Set Proxy For Build](./docs/proxy.md)
 - [IDE Integration](./docs/ide.md)
 
-## FAQ
-
-### How to handle 'Cannot recognized package: appengine' ?
-
-`appengine` and `appengine_internal` are GCE packages so they can't be fetched. You can add the following code in your `build.gradle`:
-
-```
-repositories {
-    golang {
-        root { it.startsWith('appengine'} }
-        emptyDir()
-    }
-}
-```
-
 ## Snapshot
 
 Test report
