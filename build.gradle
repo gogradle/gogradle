@@ -79,8 +79,11 @@ dependencies {
 /************** test **************/
 // Define integration test task
 task integrationTest(type: Test) {
-    testClassesDirs = sourceSets.integrationTest.output.classesDirs
-//    testClassesDir = sourceSets.integrationTest.output.classesDir
+    if (gradle.gradleVersion.startsWith('4')) {
+        testClassesDirs = sourceSets.integrationTest.output.classesDirs
+    } else {
+        testClassesDir = sourceSets.integrationTest.output.classesDir
+    }
     classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
