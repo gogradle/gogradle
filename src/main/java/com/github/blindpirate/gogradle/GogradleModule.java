@@ -99,6 +99,11 @@ import java.util.logging.Logger;
 public class GogradleModule extends AbstractModule {
     private final Project project;
     private final ServiceRegistry serviceRegistry;
+    private static final Logger INJECTION_POINT_LOGGER = Logger.getLogger(InjectionPoint.class.getName());
+
+    static {
+        INJECTION_POINT_LOGGER.setLevel(Level.OFF);
+    }
 
     public GogradleModule(Project project) {
         this.project = project;
@@ -107,8 +112,6 @@ public class GogradleModule extends AbstractModule {
 
     @Override
     protected void configure() {
-        Logger.getLogger(InjectionPoint.class.getName()).setLevel(Level.OFF);
-
         bind(Project.class).toInstance(project);
         bind(ServiceRegistry.class).toInstance(serviceRegistry);
 
