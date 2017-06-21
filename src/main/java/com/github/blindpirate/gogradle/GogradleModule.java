@@ -98,7 +98,7 @@ public class GogradleModule extends AbstractModule {
     private final ServiceRegistry serviceRegistry;
 
     public GogradleModule(Project project) {
-        this.project = new ProjectDecorator(project);
+        this.project = project;
         this.serviceRegistry = DefaultProject.class.cast(project).getServices();
     }
 
