@@ -18,7 +18,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.5.4'
+version '0.6.0'
 
 /************** sourcesets **************/
 sourceSets {
