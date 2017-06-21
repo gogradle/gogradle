@@ -48,7 +48,7 @@ class PersistenceNotationToResolvedCacheTest {
 
     @Before
     void setUp() {
-        when(project.getRootDir()).thenReturn(rootDir)
+        when(project.getProjectDir()).thenReturn(rootDir)
         cache = new PersistenceNotationToResolvedCache(project, packagePathResolver)
     }
 

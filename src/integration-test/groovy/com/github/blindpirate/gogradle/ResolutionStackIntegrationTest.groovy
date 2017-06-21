@@ -34,17 +34,17 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 @WithResource('')
 @WithGitRepo(repoName = 'a', fileName = 'a.go')
 class ResolutionStackIntegrationTest extends IntegrationTestSupport {
-    File repositories
+    File repository
 
     @Before
     void setUp() {
-        GitServer.addFileToRepository(repositories, 'a.go', '''
+        GitServer.addFileToRepository(repository, 'a.go', '''
 package main
 import "unrecognized"
 func main
 ''')
         GogradleLockModel model = GogradleLockModel.of([[name: 'localhost/a', url: 'http://localhost:8080/a']], [])
-        IOUtils.write(repositories, 'b/gogradle.lock', DataExchange.toYaml(model))
+        IOUtils.write(repository, 'b/gogradle.lock', DataExchange.toYaml(model))
 
         writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
@@ -53,7 +53,7 @@ golang {
 }
 dependencies {
     golang {
-        build name:'local/b',dir:'${toUnixString(new File(repositories, 'b'))}'
+        build name:'local/b',dir:'${toUnixString(new File(repository, 'b'))}'
     }
 }
 """)
@@ -70,7 +70,7 @@ dependencies {
 Cannot recognized package: unrecognized
 Resolution stack is:
 |-github.com/my/package
- |-local/b@${toUnixString(repositories)}/b
+ |-local/b@${toUnixString(repository)}/b
   |-localhost/a#""")
         }
     }

@@ -72,7 +72,7 @@ class ResolveDependencyToDependenciesCacheTest {
         when(GogradleGlobal.INSTANCE.getInstance(ProjectCacheManager)).thenReturn(projectCacheManager)
         when(GogradleGlobal.getInstance(DependencyVisitor)).thenReturn(dependencyVisitor)
         when(dependencyVisitor.visitVendorDependencies(any(ResolvedDependency), any(File), anyString())).thenReturn(GolangDependencySet.empty())
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
 
 
         LocalDirectoryDependency local1 = localDependency('this/is/local1')

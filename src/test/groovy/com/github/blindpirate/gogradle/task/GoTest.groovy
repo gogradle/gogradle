@@ -49,7 +49,7 @@ class GoTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(Go)
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
     }
 
     void letBuildManagerCallConsumer() {

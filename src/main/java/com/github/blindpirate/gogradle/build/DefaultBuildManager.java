@@ -111,7 +111,7 @@ public class DefaultBuildManager implements BuildManager {
     private boolean currentProjectMatchesSingleGopath(String gopath) {
         return Paths.get(gopath)
                 .resolve("src")
-                .resolve(setting.getPackagePath()).equals(project.getRootDir().toPath());
+                .resolve(setting.getPackagePath()).equals(project.getProjectDir().toPath());
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
@@ -122,7 +122,7 @@ public class DefaultBuildManager implements BuildManager {
                 .resolve(setting.getPackagePath());
         if (!link.toFile().exists()) {
             forceMkdir(link.getParent().toFile());
-            Path targetPath = project.getRootDir().toPath();
+            Path targetPath = project.getProjectDir().toPath();
             createSymbolicLink(link, link.getParent().relativize(targetPath));
         }
     }
@@ -136,7 +136,7 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private Path getGogradleBuildDir() {
-        return project.getRootDir().toPath()
+        return project.getProjectDir().toPath()
                 .resolve(GogradleGlobal.GOGRADLE_BUILD_DIR_NAME);
     }
 
@@ -198,7 +198,7 @@ public class DefaultBuildManager implements BuildManager {
         stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
         retcodeConsumer = retcodeConsumer == null ? code -> ensureProcessReturnZero(code, args, env) : retcodeConsumer;
 
-        Process process = processUtils.run(args, determineEnv(env), project.getRootDir());
+        Process process = processUtils.run(args, determineEnv(env), project.getProjectDir());
 
         CountDownLatch latch = new CountDownLatch(2);
 

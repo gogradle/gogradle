@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.build.DefaultBuildManager;
-import com.github.blindpirate.gogradle.common.operations.SerialBuildOperationProcessor;
 import com.github.blindpirate.gogradle.core.BuildConstraintManager;
 import com.github.blindpirate.gogradle.core.DefaultBuildConstraintManager;
 import com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager;
@@ -84,7 +83,6 @@ import com.google.inject.matcher.AbstractMatcher;
 import com.google.inject.matcher.Matchers;
 import org.gradle.api.Project;
 import org.gradle.api.internal.project.DefaultProject;
-import org.gradle.internal.operations.BuildOperationProcessor;
 import org.gradle.internal.service.ServiceRegistry;
 
 import javax.inject.Inject;
@@ -120,7 +118,6 @@ public class GogradleModule extends AbstractModule {
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
         bind(LockedDependencyManager.class).to(DefaultLockedDependencyManager.class);
-        bind(BuildOperationProcessor.class).to(SerialBuildOperationProcessor.class);
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMercurialMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitMercurialNotationConverter.class);

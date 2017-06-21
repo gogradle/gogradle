@@ -94,6 +94,10 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
         }
     }
 
+    public boolean isLatest() {
+        return LATEST_COMMIT.equals(commit);
+    }
+
     @Override
     public String toString() {
         return getClass().getSimpleName() + "{"

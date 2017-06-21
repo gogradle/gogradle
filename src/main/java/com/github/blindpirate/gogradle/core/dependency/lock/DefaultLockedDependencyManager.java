@@ -53,7 +53,7 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         GogradleLockModel model = GogradleLockModel.of(buildNotations, testNotations);
         String content = DataExchange.toYaml(model);
         content = insertWarning(content);
-        IOUtils.write(project.getRootDir(), LOCK_FILE, content);
+        IOUtils.write(project.getProjectDir(), LOCK_FILE, content);
     }
 
     private String insertWarning(String content) {

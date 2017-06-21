@@ -224,7 +224,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'commit will be searched if tag cannot be recognized'() {
         // given
-        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
+        when(notationDependency.isLatest()).thenReturn(true)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -234,8 +234,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'LATEST_COMMIT should be recognized properly'() {
         // given
-        when(notationDependency.getCommit()).thenReturn(GitMercurialNotationDependency.LATEST_COMMIT)
-        when(notationDependency.getCacheScope()).thenReturn(CacheScope.BUILD)
+        when(notationDependency.isLatest()).thenReturn(true)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -298,18 +297,26 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'version existence in repository should be determined correctly'() {
         // given
-        GitNotationDependency notationDependency = new GitNotationDependency()
-        notationDependency.name = 'git'
-        notationDependency.commit = 'commit'
+        GitNotationDependency dependencyWithCommit = new GitNotationDependency()
+        dependencyWithCommit.name = 'git'
+        dependencyWithCommit.commit = 'commit'
+
+        GitNotationDependency dependencyWithTag = new GitNotationDependency()
+        dependencyWithTag.name = 'git'
+        dependencyWithTag.tag = 'tag'
+
         GitResolvedDependency resolvedDependency = VcsResolvedDependency.builder(VcsType.GIT)
-                .withNotationDependency(notationDependency)
-                .withCommitId(notationDependency.commit)
+                .withNotationDependency(dependencyWithCommit)
+                .withCommitId(dependencyWithCommit.commit)
                 .build()
         when(accessor.findCommit(resource, 'commit')).thenReturn(Optional.of(commit))
+        when(accessor.findCommitByTag(resource, 'tag')).thenReturn(Optional.of(commit))
         // then
-        assert manager.concreteVersionExistInRepo(resource, notationDependency)
-        assert manager.concreteVersionExistInRepo(resource, resolvedDependency)
+        assert manager.versionExistsInRepo(resource, dependencyWithCommit)
+        assert manager.versionExistsInRepo(resource, dependencyWithTag)
+        assert manager.versionExistsInRepo(resource, resolvedDependency)
     }
+
 
     @Test
     void 'mismatched repository should be cleared'() {

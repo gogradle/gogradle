@@ -45,7 +45,7 @@ class VendorSnapshoterTest {
 
     @Before
     void setUp() {
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         vendorSnapshoter = new VendorSnapshoter(project)
         IOUtils.mkdir(resource, 'vendor')
     }

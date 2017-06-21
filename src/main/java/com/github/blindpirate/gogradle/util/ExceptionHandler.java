@@ -37,4 +37,13 @@ public class ExceptionHandler {
         e.printStackTrace(pw);
         return sw.toString();
     }
+
+    public static Throwable getRootCause(Throwable e) {
+        while (true) {
+            if (e.getCause() == null) {
+                return e;
+            }
+            e = e.getCause();
+        }
+    }
 }

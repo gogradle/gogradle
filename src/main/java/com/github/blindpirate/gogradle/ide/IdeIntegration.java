@@ -76,7 +76,7 @@ public abstract class IdeIntegration {
     }
 
     protected void writeFileIntoProjectRoot(String relativePath, String content) {
-        IOUtils.write(project.getRootDir(), relativePath, content);
+        IOUtils.write(project.getProjectDir(), relativePath, content);
     }
 
     protected String render(String template) {

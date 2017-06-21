@@ -42,7 +42,7 @@ class InstallTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         task = buildTask(InstallTask)
     }
 

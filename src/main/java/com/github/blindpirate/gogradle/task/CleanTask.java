@@ -30,7 +30,7 @@ public class CleanTask extends DefaultTask {
 
     @TaskAction
     public void clean() {
-        File gogradleBuildDir = new File(getProject().getRootDir(), GOGRADLE_BUILD_DIR_NAME);
+        File gogradleBuildDir = new File(getProject().getProjectDir(), GOGRADLE_BUILD_DIR_NAME);
         if (isValidDirectory(gogradleBuildDir)) {
             clearDirectory(gogradleBuildDir);
         }

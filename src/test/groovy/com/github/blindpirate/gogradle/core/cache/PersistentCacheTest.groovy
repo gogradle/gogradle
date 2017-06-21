@@ -49,7 +49,7 @@ class PersistentCacheTest {
 
     @Before
     void setUp() {
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         storageFile = new File(resource, '.gogradle/cache/cache.bin')
         cache = new PersistenceCache(project, 'cache.bin')
     }

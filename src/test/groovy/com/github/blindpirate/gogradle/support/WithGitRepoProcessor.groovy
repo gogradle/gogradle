@@ -30,7 +30,7 @@ class WithGitRepoProcessor extends GogradleRunnerProcessor<WithGitRepo> {
     @Override
     void beforeTest(Object instance, FrameworkMethod method, WithGitRepo annotation) {
         setUpGitServer(annotation.repoName(), annotation.fileName())
-        ReflectionUtils.setFieldSafely(instance, 'repositories', repoDir)
+        ReflectionUtils.setFieldSafely(instance, 'repository', repoDir)
     }
 
     @Override
@@ -40,7 +40,7 @@ class WithGitRepoProcessor extends GogradleRunnerProcessor<WithGitRepo> {
     }
 
     File setUpGitServer(String repoName, String fileName) {
-        repoDir = tmpRandomDirectory("repositories")
+        repoDir = tmpRandomDirectory("repository")
 
         GitServer.createRepository(repoDir, fileName)
 

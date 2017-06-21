@@ -17,44 +17,91 @@
 
 package com.github.blindpirate.gogradle.util;
 
-import org.gradle.api.internal.DynamicObjectUtil;
-import org.gradle.internal.metaobject.DynamicObject;
-import org.gradle.internal.metaobject.GetPropertyResult;
-import org.gradle.internal.metaobject.SetPropertyResult;
+import org.joor.ReflectException;
 
+import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
+
+import static org.joor.Reflect.on;
 
 public class ConfigureUtils {
     public static <T> T configureByMapQuietly(Map<?, ?> properties, T delegate) {
-        DynamicObject dynamicObject = DynamicObjectUtil.asDynamicObject(delegate);
+        if (properties.isEmpty()) {
+            return delegate;
+        }
 
-        properties.entrySet().forEach(entry -> {
-            String name = entry.getKey().toString();
-            Object value = entry.getValue();
-
-            SetPropertyResult setterResult = new SetPropertyResult();
-            dynamicObject.setProperty(name, value, setterResult);
+        properties.forEach((key, value) -> {
+            String setter = "set" + property(key.toString());
+            if (hasSetter(delegate, setter)) {
+                on(delegate).call(setter, value);
+            } else {
+                try {
+                    on(delegate).set(key.toString(), value);
+                } catch (Exception ignore) {
+                }
+            }
         });
 
         return delegate;
     }
 
-    public static boolean match(Map<String, Object> properties, Object target) {
-        DynamicObject dynamicObject = DynamicObjectUtil.asDynamicObject(target);
-        return properties.entrySet().stream()
-                .allMatch((entry) -> entryMatch(entry, dynamicObject));
+    private static <T> boolean hasSetter(T target, String setterName) {
+        List<Method> methods = new ArrayList<>();
+
+        Class clazz = target.getClass();
+
+        do {
+            methods.addAll(Arrays.asList(clazz.getDeclaredMethods()));
+            clazz = clazz.getSuperclass();
+        }
+        while (clazz != Object.class);
+
+        return methods.stream()
+                .anyMatch(method -> method.getName().equals(setterName) && method.getParameterCount() == 1);
     }
 
-    private static boolean entryMatch(Map.Entry<String, Object> propertyEntry, DynamicObject dynamicObject) {
+    public static boolean match(Map<String, Object> properties, Object target) {
+        return properties.entrySet().stream()
+                .allMatch((entry) -> entryMatch(entry, target));
+    }
+
+    private static boolean entryMatch(Map.Entry<String, Object> propertyEntry, Object target) {
         String name = propertyEntry.getKey();
         Object value = propertyEntry.getValue();
-        GetPropertyResult getPropertyResult = new GetPropertyResult();
-        dynamicObject.getProperty(name, getPropertyResult);
-        if (!getPropertyResult.isFound()) {
-            return false;
+        Optional<Object> result = getPojoValue(target, name);
+        return result.filter(o -> Objects.equals(value, o)).isPresent();
+    }
+
+    private static Optional<Object> getPojoValue(Object target, String name) {
+        try {
+            return Optional.of(on(target).call("get" + property(name)).get());
+        } catch (Exception e) {
+            try {
+                return Optional.of(on(target).call("is" + property(name)).get());
+            } catch (ReflectException e1) {
+                if (ExceptionHandler.getRootCause(e1) instanceof NoSuchMethodException) {
+                    return Optional.empty();
+                } else {
+                    throw e1;
+                }
+            }
+        }
+    }
+
+    private static String property(String string) {
+        int length = string.length();
+
+        if (length == 0) {
+            return "";
+        } else if (length == 1) {
+            return string.toUpperCase();
         } else {
-            return Objects.equals(getPropertyResult.getValue(), value);
+            return string.substring(0, 1).toUpperCase() + string.substring(1);
         }
     }
 }

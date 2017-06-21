@@ -51,7 +51,7 @@ class GofmtTaskTest extends TaskTest {
 
         IOUtils.write(resource, '.go/bin/go', '')
         IOUtils.write(resource, '.go/bin/gofmt', '')
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         when(goBinaryManager.getBinaryPath()).thenReturn(resource.toPath().resolve('.go/bin/go'))
 
         IOUtils.write(resource, 'a.go', '')

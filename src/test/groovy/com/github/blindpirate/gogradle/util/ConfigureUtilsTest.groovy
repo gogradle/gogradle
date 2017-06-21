@@ -17,7 +17,6 @@
 
 package com.github.blindpirate.gogradle.util
 
-import org.codehaus.groovy.runtime.typehandling.GroovyCastException
 import org.junit.Test
 
 class ConfigureUtilsTest {
@@ -55,8 +54,13 @@ class ConfigureUtilsTest {
         assert ConfigureUtils.match([:], bean)
     }
 
-    @Test(expected = GroovyCastException)
+    @Test
     void 'setting property with incompatible type should result in an exception'() {
-        ConfigureUtils.configureByMapQuietly([a: 1, b: ''], bean)
+        try {
+            ConfigureUtils.configureByMapQuietly([a: 1, b: ''], bean)
+            assert false
+        } catch (Exception e) {
+            assert ExceptionHandler.getRootCause(e) instanceof NoSuchMethodException
+        }
     }
 }

@@ -65,7 +65,8 @@ public class GolangPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         init(project);
-        configureGlobalInjector();
+        System.setProperty("GRADLE_MAJOR_VERSION", project.getGradle().getGradleVersion().split("\\.")[0]);
+        configureGogradleGlobal();
         customizeProjectInternalServices(project);
         configureSettings(project);
         configureConfigurations(project);
@@ -74,7 +75,9 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void hackIdeaPlugin() {
-        project.getPlugins().withId("idea", plugin -> injector.getInstance(IdeaIntegration.class).hack());
+        if (project.getRootDir().equals(project.getProjectDir())) {
+            project.getPlugins().withId("idea", plugin -> injector.getInstance(IdeaIntegration.class).hack());
+        }
     }
 
     private void init(Project project) {
@@ -88,15 +91,15 @@ public class GolangPlugin implements Plugin<Project> {
         });
     }
 
-    private void configureGlobalInjector() {
+    private void configureGogradleGlobal() {
         GogradleGlobal.INSTANCE.setInjector(injector);
     }
 
     private void configureTasks(Project project) {
         TaskContainer taskContainer = project.getTasks();
-        TASKS.entrySet().forEach(entry -> {
-            Task task = taskContainer.create(entry.getKey(), entry.getValue(), dependencyInjectionAction);
-            golangTaskContainer.put((Class) entry.getValue(), task);
+        TASKS.forEach((key, value) -> {
+            Task task = taskContainer.create(key, value, dependencyInjectionAction);
+            golangTaskContainer.put((Class) value, task);
         });
 
         project.afterEvaluate(this::afterEvaluate);

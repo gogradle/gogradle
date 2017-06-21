@@ -61,7 +61,7 @@ class InitTaskTest extends TaskTest {
         ReflectionUtils.setField(task, 'externalDependencyFactories', [defaultLockedDependencyManager, externalDependencyFactory])
         when(configurationManager.getByName('build')).thenReturn(build)
         when(configurationManager.getByName('test')).thenReturn(test)
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
         [build, test].each { when(it.dependencies).thenReturn(GolangDependencySet.empty()) }
     }
 

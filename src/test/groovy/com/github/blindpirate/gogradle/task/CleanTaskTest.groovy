@@ -38,7 +38,7 @@ class CleanTaskTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(CleanTask)
-        when(project.getRootDir()).thenReturn(resource)
+        when(project.getProjectDir()).thenReturn(resource)
     }
 
     @Test
