@@ -57,6 +57,8 @@ public class GoTestStdoutExtractor {
     //--- PASS: TestDiffToHTML (0.00s)
     private static final Pattern TEST_END_LINE_PATTERN
             = Pattern.compile("--- (PASS|FAIL):\\s+(\\w+)\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
+    private static final Pattern TEST_START_LINE_PATTERN
+            = Pattern.compile("=== RUN\\s+(\\w+)");
     private static final String TEST_START = "=== RUN";
     private static final String TEST_PASS = "--- PASS";
     private static final String TEST_FAIL = "--- FAIL";
@@ -202,6 +204,24 @@ public class GoTestStdoutExtractor {
                 return Optional.of(result);
             }
         }
+
+        // https://github.com/gogradle/gogradle/issues/112
+        Matcher matcher = TEST_START_LINE_PATTERN.matcher(middleLines.get(0));
+        if (matcher.find()) {
+            long id = GLOBAL_COUNTER.incrementAndGet();
+            String methodName = matcher.group(1);
+            String message = String.join("\n", middleLines);
+
+            GoTestMethodResult result = new GoTestMethodResult(id,
+                    methodName,
+                    TestResult.ResultType.FAILURE,
+                    0L,
+                    0L,
+                    message);
+            result.addFailure(message, message, message);
+            return Optional.of(result);
+        }
+
         return Optional.empty();
     }
 

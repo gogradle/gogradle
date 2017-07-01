@@ -333,6 +333,41 @@ FAIL\tgithub.com/my/package\t0.010s
         assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
     }
 
+    // https://github.com/gogradle/gogradle/issues/112
+    @Test
+    void 'extracting result with goroutine panic should succeed'() {
+        // given
+        String stdout = '''\
+=== RUN   Test_SingleKeyerSetGet
+demoStruct &{<nil>}
+panic: interface conversion: interface {} is nil, not *demo.testStr
+
+goroutine 6 [running]:
+demo.Test_SingleKeyerSetGet.func1()
+\t/Users/zhb/go/src/demo/demo_test.go:32 +0x154
+created by demo.Test_SingleKeyerSetGet
+\t/Users/zhb/go/src/demo/demo_test.go:33 +0x39
+exit status 2
+FAIL\tdemo\t0.008s
+'''
+        new File(resource, 'a_test.go').write('func Test_SingleKeyerSetGet()')
+        // when
+        PackageTestResult result = PackageTestResult.builder()
+                .withPackagePath('a/b/c')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .withCode(2)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(result)
+
+        assert results.size() == 1
+        assert results[0].className == "a.b.c.a_test_DOT_go"
+        assert results[0].results.size() == 1
+        assert results[0].results[0].name == "Test_SingleKeyerSetGet"
+        assert results[0].results[0].message.contains('panic:')
+        assert results[0].results[0].resultType == TestResult.ResultType.FAILURE
+    }
+
     @Test
     void 'extracting stdout which can cause stack overflow should succeed'() {
         // given
