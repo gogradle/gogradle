@@ -8,7 +8,7 @@
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go-mini.png)
 
-> 2017-06-23 Gogradle被授予**Gradle 2017年度插件奖**
+> 2017-06-23 Gogradle被授予**Gradle 2017年度插件奖**, [在Gradle Summit 2017上的演讲](https://www.youtube.com/watch?v=Mvf3gY1MopE&t=341s).
 > 2017-04-06 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](http://github-rank.com/star?language=Go)中的666个！
 >
 > 2017-03-20 现在Gogradle已经能够生成HTML格式的测试/覆盖率报告了！

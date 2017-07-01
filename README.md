@@ -12,7 +12,7 @@
 
 Gogradle is a gradle plugin which provides support for building golang.
 
-> 2017-06-23 Gogradle is awarded **Gradle Plugin of the Year 2017**
+> 2017-06-23 Gogradle is awarded **Gradle Plugin of the Year 2017**. See [the talk on Gradle Summit 2017](https://www.youtube.com/watch?v=Mvf3gY1MopE&t=341s).
 >
 > 2017-04-06 Now Gogradle can build 666 of [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) **WITHOUT** any extra configuration!
 >
