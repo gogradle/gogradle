@@ -1,5 +1,8 @@
 # Gogradle - a Full-featured Build Tool for Golang
 
+<img align="right" src="https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go-mini.png">
+
+
 [中文文档](./README_CN.md)
 
 [![Build Status](https://travis-ci.org/gogradle/gogradle.svg?branch=master)](https://travis-ci.org/gogradle/gogradle)
@@ -7,8 +10,6 @@
 [![Coverage Status](https://coveralls.io/repos/github/blindpirate/gogradle/badge.svg?branch=master)](https://coveralls.io/github/blindpirate/gogradle?branch=master)
 [![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
 [![Apache License 2](https://img.shields.io/badge/license-APL2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
-
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/go-mini.png)
 
 Gogradle is a gradle plugin which provides support for building golang.
 
