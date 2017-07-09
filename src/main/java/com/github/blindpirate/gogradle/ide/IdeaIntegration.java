@@ -53,26 +53,20 @@ public class IdeaIntegration extends IdeIntegration {
     }
 
     @Override
-    protected String getModuleType() {
-        return "GO_MODULE";
-    }
-
-    @Override
     protected String getModuleImlDir() {
         return ".idea/modules";
     }
 
     @Override
-    protected void generateModuleIml() {
-        String moduleImlTemplate = IOUtils.toString(
-                getClass().getClassLoader().getResourceAsStream("ide/idea_module.iml.template"));
-        writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(moduleImlTemplate));
+    protected void generateGorootConfig() {
         hacker.ensureSpecificSdkExist(goBinaryManager.getGoVersion(), goBinaryManager.getGoroot());
     }
 
     @Override
-    protected void generateGoSdkDotXml() {
-        // Nothing to do
+    protected void generateModuleIml() {
+        String moduleImlTemplate = IOUtils.toString(
+                getClass().getClassLoader().getResourceAsStream("ide/idea/module.iml.template"));
+        writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(moduleImlTemplate));
     }
 
     public void hack() {

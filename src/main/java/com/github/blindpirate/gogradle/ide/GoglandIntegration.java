@@ -20,43 +20,35 @@ package com.github.blindpirate.gogradle.ide;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.google.inject.Inject;
 import org.gradle.api.Project;
 
+import javax.inject.Inject;
 import javax.inject.Singleton;
 
-/**
- * For PHPStorm/PyCharm/WebStorm/Gogland/RubyMine/CLion
- */
 @Singleton
-@SuppressWarnings("checkstyle:linelength")
-public class JetBrainsIdeIntegration extends IdeIntegration {
-    static final String MODULE_IML_PATH = ".idea/${projectName}.iml";
-
-    private static final String GO_SDK_DOT_XML_PATH = ".idea/libraries/Go_SDK.xml";
+public class GoglandIntegration extends JetBrainsIdeIntegration {
+    private static final String MISC_XML_PATH = ".idea/misc.xml";
 
     @Inject
-    public JetBrainsIdeIntegration(GoBinaryManager goBinaryManager, Project project, BuildManager buildManager) {
+    public GoglandIntegration(GoBinaryManager goBinaryManager, Project project, BuildManager buildManager) {
         super(goBinaryManager, project, buildManager);
-    }
-
-    @Override
-    protected String getModuleImlDir() {
-        return ".idea";
     }
 
     @Override
     protected void generateModuleIml() {
         String moduleImlTemplate = IOUtils.toString(
-                getClass().getClassLoader().getResourceAsStream("ide/jetbrains/module.iml.template"));
+                getClass().getClassLoader().getResourceAsStream("ide/gogland/module.iml.template"));
         writeFileIntoProjectRoot(render(MODULE_IML_PATH), render(moduleImlTemplate));
     }
 
     @Override
     protected void generateGorootConfig() {
         String goSdkXmlTemplate = IOUtils.toString(
-                getClass().getClassLoader().getResourceAsStream("ide/jetbrains/Go_SDK.xml.template")
+                getClass().getClassLoader().getResourceAsStream("ide/gogland/misc.xml.template")
         );
-        writeFileIntoProjectRoot(render(GO_SDK_DOT_XML_PATH), render(goSdkXmlTemplate));
+        writeFileIntoProjectRoot(render(MISC_XML_PATH), render(goSdkXmlTemplate));
+    }
+
+    protected void generateGopathConfig() {
     }
 }
