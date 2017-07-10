@@ -1,5 +1,7 @@
 # IDE Integration
 
+> Attention: although it's supported by Gogradle to put your project at any place, some IDEs can't support this scenario fully. Therefore, it's recommended to conform Go's GOPATH convention and place your project at corresponding location when using an IDE.
+
 There are many IDEs supporting golang since it is static-type, e.g., [VSCode](https://github.com/Microsoft/vscode-go)/[IDEA](https://github.com/go-lang-plugin-org/go-lang-idea-plugin)/[Gogland](https://www.jetbrains.com/go/).
 
 Usually, these IDEs ask user to set `GOPATH` and prepare dependent package there before developing. Gogradle try to make it easier. Ideally, a user should be able to start development after checking out the code immediately, without understanding or setting anything.
