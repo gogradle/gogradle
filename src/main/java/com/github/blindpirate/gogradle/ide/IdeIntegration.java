@@ -28,6 +28,7 @@ import org.gradle.api.logging.Logging;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
@@ -67,7 +68,7 @@ public abstract class IdeIntegration {
     protected abstract String getModuleImlDir();
 
     protected void generateXmls() {
-        if (isProjectLevelGopath()) {
+        if (isProjectLevelGopath(buildManager.getGopath())) {
             LOGGER.warn("You're using project-level GOPATH, "
                     + "which might have issues with IDE and is not recommended.");
         }
@@ -121,14 +122,20 @@ public abstract class IdeIntegration {
         context.put("projectName", project.getName());
         context.put("moduleImlDir", getModuleImlDir());
         context.put("goVersion", goBinaryManager.getGoVersion());
-        if (isProjectLevelGopath()) {
-            context.put("gopath", "file://$PROJECT_DIR$/.gogradle/project_gopath");
+        context.put("gopaths", buildManager.getGopaths().stream()
+                .map(this::convertToJBConfitPath).collect(Collectors.toList()));
+    }
+
+    private String convertToJBConfitPath(Path path) {
+        String pathString = StringUtils.toUnixString(path);
+        if (isProjectLevelGopath(pathString)) {
+            return "file://$PROJECT_DIR$/.gogradle/project_gopath";
         } else {
-            context.put("gopath", "file://" + buildManager.getGopath());
+            return "file://" + pathString;
         }
     }
 
-    private boolean isProjectLevelGopath() {
-        return buildManager.getGopath().endsWith(".gogradle/project_gopath");
+    private boolean isProjectLevelGopath(String s) {
+        return s.endsWith(".gogradle/project_gopath");
     }
 }

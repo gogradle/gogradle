@@ -22,12 +22,14 @@ import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -77,14 +79,14 @@ class IdeaIntegrationTest {
 
     @Test
     void 'goLibraries should be correct if global GOPATH exists'() {
-        when(buildManager.getGopath()).thenReturn('global')
+        when(buildManager.getGopaths()).thenReturn([resource.toPath(), resource.toPath()])
         ideaIntegration.generateXmls()
-        assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://global"')
+        assert new File(resource, '.idea/goLibraries.xml').text.count("\"file://${toUnixString(resource)}\"")
     }
 
     @Test
     void 'goLibraries should be correct if global GOPATH not exists'() {
-        when(buildManager.getGopath()).thenReturn('projectroot/.gogradle/project_gopath')
+        when(buildManager.getGopaths()).thenReturn([new File(resource, '.gogradle/project_gopath').toPath()])
         ideaIntegration.generateXmls()
         assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://$PROJECT_DIR$/.gogradle/project_gopath"')
     }

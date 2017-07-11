@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.build;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -36,6 +37,13 @@ public interface BuildManager {
      * @return the GOPATH to be used
      */
     String getGopath();
+
+    /**
+     * Get GOPATH as a list.
+     *
+     * @return the list of GOPATHs
+     */
+    List<Path> getGopaths();
 
     /**
      * Fork a go process and run commands specified by {@code args}, under the environments

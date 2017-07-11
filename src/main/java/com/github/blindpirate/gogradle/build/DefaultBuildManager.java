@@ -40,6 +40,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -75,6 +77,7 @@ public class DefaultBuildManager implements BuildManager {
     private final GolangPluginSetting setting;
     private final ProcessUtils processUtils;
     private String gopath;
+    private List<Path> gopaths;
 
     @Inject
     public DefaultBuildManager(Project project,
@@ -93,9 +96,13 @@ public class DefaultBuildManager implements BuildManager {
         if (currentProjectMatchesGopath(systemGopath)) {
             LOGGER.quiet("Found global GOPATH: {}.", systemGopath);
             gopath = systemGopath;
+            gopaths = Arrays.stream(systemGopath.split(File.pathSeparator))
+                    .map(Paths::get).collect(Collectors.toList());
         } else {
             createProjectSymbolicLinkIfNotExist();
-            gopath = toUnixString(getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath());
+            Path path = getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath();
+            gopath = StringUtils.toUnixString(path);
+            gopaths = Collections.singletonList(path);
             LOGGER.quiet("Use project GOPATH: {}", gopath);
         }
     }
@@ -248,5 +255,10 @@ public class DefaultBuildManager implements BuildManager {
 
     public String getGopath() {
         return gopath;
+    }
+
+    @Override
+    public List<Path> getGopaths() {
+        return gopaths;
     }
 }

@@ -4,7 +4,11 @@
     <component name="GoLibraries">
       <option name="urls">
         <list>
-          <option value="file://${gopath}" />
+          ${writer ->
+            gopaths.each {
+                writer<< '<option value=' << '"' << it << '"' << ' />'
+            }
+          }
         </list>
       </option>
     </component>

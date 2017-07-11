@@ -29,6 +29,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -45,14 +46,23 @@ class JetBrainsIdeTest {
 
     JetBrainsIdeIntegration JetBrainsIdeIntegration
 
+    GoglandIntegration goglandIntegration
+
     @Before
     void setUp() {
         JetBrainsIdeIntegration = new JetBrainsIdeIntegration(manager, project, buildManager)
-        when(project.getProjectDir()).thenReturn(resource)
+        goglandIntegration = new GoglandIntegration(manager, project, buildManager)
+
+
         when(manager.getBinaryPath()).thenReturn(new File(resource, 'go/bin/go').toPath())
         when(manager.getGoroot()).thenReturn(new File(resource, 'go').toPath())
         when(manager.getGoVersion()).thenReturn('1.7.1')
-        when(buildManager.getGopath()).thenReturn('global')
+
+
+        when(project.getProjectDir()).thenReturn(resource)
+
+        when(buildManager.getGopath()).thenReturn(toUnixString(resource) + File.pathSeparator + toUnixString(resource))
+        when(buildManager.getGopaths()).thenReturn([resource.toPath(), resource.toPath()])
 
         when(project.getName()).thenReturn('MyAwesomeProject')
     }
@@ -61,16 +71,29 @@ class JetBrainsIdeTest {
     void 'xmls should be generated correctly'() {
         JetBrainsIdeIntegration.generateXmls()
 
-        assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://global"')
+        assert new File(resource, '.idea/goLibraries.xml').text.count("\"file://${toUnixString(resource)}\"") == 2
 
         String moduleIml = IOUtils.toString(new File(resource, '.idea/MyAwesomeProject.iml'))
         assert moduleIml.contains('WEB_MODULE')
         assert moduleIml.contains('Go SDK')
 
         String goSdkXml = IOUtils.toString(new File(resource, '.idea/libraries/Go_SDK.xml'))
-        assert goSdkXml.contains("file://${StringUtils.toUnixString(new File(resource, 'go/src'))}")
+        assert goSdkXml.contains("file://${toUnixString(new File(resource, 'go/src'))}")
 
         String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))
         assert modulesXml.contains('.idea/MyAwesomeProject.iml')
+    }
+
+    @Test
+    void 'xmls should be generated correctly for gogland'() {
+        goglandIntegration.generateXmls()
+
+        assert !new File(resource, '.idea/goLibraries.xml').exists()
+        assert !new File(resource, '.idea/libraries/Go_SDK.xml').exists()
+        assert new File(resource, '.idea/MyAwesomeProject.iml').exists()
+
+        assert new File(resource, '.idea/misc.xml').text.count("\"file://${toUnixString(resource)}\"") == 2
+
+        assert new File(resource, '.idea/modules.xml').text.contains('.idea/MyAwesomeProject.iml')
     }
 }

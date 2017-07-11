@@ -114,10 +114,54 @@ System.setProperty('user.home','${toUnixString(userhome)}')
     @Test
     void 'other JetBrains task should succeed'() {
         newBuild {
-            it.forTasks('gogland')
+            it.forTasks('pyCharm')
         }
         assert new File(resource, 'vendor/localhost/a/a.go').exists()
         verifyJetBrainsXml()
+    }
+
+    @Test
+    void 'gogland task should succeed'() {
+        newBuild {
+            it.forTasks('gogland')
+        }
+        assert new File(resource, 'vendor/localhost/a/a.go').exists()
+        verifyGoglandXmls()
+    }
+
+    void verifyGoglandXmls() {
+        assert !new File(resource, '.idea/goLibraries.xml').exists()
+        assert !new File(resource, '.idea/libraries').exists()
+        assert new File(resource, '.idea//awesome.iml').text.trim() == """\
+<?xml version="1.0" encoding="UTF-8"?>
+<module type="WEB_MODULE" version="4">
+  <component name="NewModuleRootManager">
+    <content url="file://\$MODULE_DIR\$" />
+    <orderEntry type="inheritedJdk" />
+    <orderEntry type="sourceFolder" forTests="false" />
+  </component>
+</module>"""
+        assert new File(resource, '.idea/misc.xml').text == """\
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="GOROOT" path="${toUnixString(resource)}" />
+    <component name="GoLibraries">
+      <option name="urls">
+        <list>
+          <option value="file://\$PROJECT_DIR\$/.gogradle/project_gopath" />
+        </list>
+      </option>
+    </component>
+</project>"""
+        assert new File(resource, '.idea/modules.xml').text.trim() == """\
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://\$PROJECT_DIR\$/.idea/awesome.iml" filepath="\$PROJECT_DIR\$/.idea/awesome.iml" />
+    </modules>
+  </component>
+</project>"""
     }
 
     void verifyIdeaXmlsCorrect() {
