@@ -63,7 +63,7 @@ testImports:
             it.forTasks('init')
         }
 
-        assert IOUtils.toString(new File(resource, 'build.gradle')).contains('''\
+        assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
         build name:'github.com/bradfitz/gomemcache', version:'2fafb84a66c4911e11a8f50955b01e74fe3ab9c5', subpackages:[".","memcache"], transitive:false
@@ -92,7 +92,7 @@ import "github.com/c/d"
             it.forTasks('init')
         }
 
-        assert IOUtils.toString(new File(resource, 'build.gradle')).contains('''\
+        assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
         build name:'github.com/a/b'

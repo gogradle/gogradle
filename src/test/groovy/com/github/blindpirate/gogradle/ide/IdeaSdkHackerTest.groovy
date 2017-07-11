@@ -188,7 +188,7 @@ class IdeaSdkHackerTest {
     }
 
     String getFileContent(String product, String version) {
-        return IOUtils.toString(new File(getLocation(product, version)))
+        return new File(getLocation(product, version)).text
     }
 
     String getLocation(String product, String version) {

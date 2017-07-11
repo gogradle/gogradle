@@ -68,12 +68,12 @@ class IdeaIntegrationTest {
         verify(hacker).ensureSpecificSdkExist('1.7.1', new File(resource, 'go').toPath())
 
 
-        String moduleIml = IOUtils.toString(new File(resource, '.idea/modules/MyAwesomeProject.iml'))
+        String moduleIml = new File(resource, '.idea/modules/MyAwesomeProject.iml').text
         assert moduleIml.contains('GO_MODULE')
         assert moduleIml.contains('Go 1.7.1')
         assert moduleIml.contains('Go SDK')
 
-        String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))
+        String modulesXml = new File(resource, '.idea/modules.xml').text
         assert modulesXml.contains('.idea/modules/MyAwesomeProject.iml')
     }
 

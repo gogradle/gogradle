@@ -73,14 +73,14 @@ class JetBrainsIdeTest {
 
         assert new File(resource, '.idea/goLibraries.xml').text.count("\"file://${toUnixString(resource)}\"") == 2
 
-        String moduleIml = IOUtils.toString(new File(resource, '.idea/MyAwesomeProject.iml'))
+        String moduleIml = new File(resource, '.idea/MyAwesomeProject.iml').text
         assert moduleIml.contains('WEB_MODULE')
         assert moduleIml.contains('Go SDK')
 
-        String goSdkXml = IOUtils.toString(new File(resource, '.idea/libraries/Go_SDK.xml'))
+        String goSdkXml = new File(resource, '.idea/libraries/Go_SDK.xml').text
         assert goSdkXml.contains("file://${toUnixString(new File(resource, 'go/src'))}")
 
-        String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))
+        String modulesXml = new File(resource, '.idea/modules.xml').text
         assert modulesXml.contains('.idea/MyAwesomeProject.iml')
     }
 
