@@ -274,6 +274,5 @@ It needs to be emphasized that Gogradle is not a toy. In an experimental project
 
 The purpose of this article is just to make a simple introduction. Please visit [https://github.com/gogradle/gogradle](https://githubu.com/gogradle/gogradle) for detailed documentation.
 
-At last, an advertisement for myself. I will have a speaking abount Gogradle at [Gradle Summit 2017](https://summit.gradle.com/conference/palo_alto/2017/06/session?id=39246) on June 23rd, 2017 in Palo Alto, welcome to attend!
+At last, you can visit [talk on Gradle Summit 2017](https://www.youtube.com/watch?v=Mvf3gY1MopE&t=350s) for a talk on Gogradle. Hope that helps.
 
-![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/summit.png)
