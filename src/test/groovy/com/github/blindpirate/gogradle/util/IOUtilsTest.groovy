@@ -160,15 +160,15 @@ class IOUtilsTest {
         IOUtils.write(resource, '')
     }
 
-    @Test(expected = UncheckedIOException)
+    @Test(expected = IOException)
     void 'exception should be thrown when trying to get text from invalid file'() {
-        IOUtils.toString(new File(resource, 'invalid'))
+         new File(resource, 'invalid').text
     }
 
     @Test
     void 'getting text from file should succeed'() {
         IOUtils.touch(new File(resource, 'file'))
-        assert IOUtils.toString(new File(resource, 'file')) == ''
+        assert new File(resource, 'file').text == ''
     }
 
     @Test
@@ -176,7 +176,7 @@ class IOUtilsTest {
     void 'file should be closed after reading'() {
         File file = new File(resource, 'test')
         IOUtils.write(file, '')
-        assert IOUtils.toString(file) == ''
+        assert file.text == ''
         assert file.delete()
     }
 

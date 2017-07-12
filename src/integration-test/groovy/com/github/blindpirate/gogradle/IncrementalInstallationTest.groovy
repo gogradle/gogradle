@@ -93,7 +93,7 @@ dependencies {
             it.forTasks('vendor')
         }, ['--info'])
 
-        assert IOUtils.toString(new File(resource, 'vendor/localhost/a/a.go')) == ''
+        assert new File(resource, 'vendor/localhost/a/a.go').text == ''
         assert stdout.toString().contains('b is up-to-date')
         assert !new File(resource, 'vendor/localhost/c').exists()
     }

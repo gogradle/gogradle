@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.ide.GoglandTask;
 import com.github.blindpirate.gogradle.ide.IdeaTask;
 import com.github.blindpirate.gogradle.ide.JetBrainsIdeTask;
 import com.github.blindpirate.gogradle.ide.VscodeTask;
@@ -88,7 +89,7 @@ public class GolangTaskContainer {
             .put(LOCK_TASK_NAME, LockTask.class)
             .put(IDEA_TASK_NAME, IdeaTask.class)
             .put(VSCODE_TASK_NAME, VscodeTask.class)
-            .put(GOGLAND_TASK_NAME, JetBrainsIdeTask.class)
+            .put(GOGLAND_TASK_NAME, GoglandTask.class)
             .put(WEBSTORM_TASK_NAME, JetBrainsIdeTask.class)
             .put(PHPSTORM_TASK_NAME, JetBrainsIdeTask.class)
             .put(PYCHARM_TASK_NAME, JetBrainsIdeTask.class)

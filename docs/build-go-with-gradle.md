@@ -283,6 +283,4 @@ repositories {
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/group.png)
 
-最后要为自己打一个广告，我将在2017年6月23日位于Palo Alto的[Gradle Summit 2017](https://summit.gradle.com/conference/palo_alto/2017/06/session?id=39246)上进行有关Gogradle的演讲，欢迎附近的小伙伴前来捧场！
-
-![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/summit.png)
+最后，[这里](https://www.youtube.com/watch?v=Mvf3gY1MopE&t=350s)是在Gradle Summit 2017上有关Gogradle的演讲。

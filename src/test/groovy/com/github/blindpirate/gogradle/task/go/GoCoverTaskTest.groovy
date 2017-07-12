@@ -83,7 +83,7 @@ class GoCoverTaskTest extends TaskTest {
     }
 
     static void examineCoverageHtmls(File projectRoot) {
-        String indexHtml = IOUtils.toString(new File(projectRoot, '.gogradle/reports/coverage/index.html'))
+        String indexHtml = new File(projectRoot, '.gogradle/reports/coverage/index.html').text
         Document document = Jsoup.parse(indexHtml)
 
         assert document.select('h1').first().text() == projectRoot.getName()

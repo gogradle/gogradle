@@ -22,12 +22,14 @@ import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.Project
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
+import static com.github.blindpirate.gogradle.util.StringUtils.*
 import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
@@ -66,25 +68,25 @@ class IdeaIntegrationTest {
         verify(hacker).ensureSpecificSdkExist('1.7.1', new File(resource, 'go').toPath())
 
 
-        String moduleIml = IOUtils.toString(new File(resource, '.idea/modules/MyAwesomeProject.iml'))
+        String moduleIml = new File(resource, '.idea/modules/MyAwesomeProject.iml').text
         assert moduleIml.contains('GO_MODULE')
         assert moduleIml.contains('Go 1.7.1')
         assert moduleIml.contains('Go SDK')
 
-        String modulesXml = IOUtils.toString(new File(resource, '.idea/modules.xml'))
+        String modulesXml = new File(resource, '.idea/modules.xml').text
         assert modulesXml.contains('.idea/modules/MyAwesomeProject.iml')
     }
 
     @Test
     void 'goLibraries should be correct if global GOPATH exists'() {
-        when(buildManager.getGopath()).thenReturn('global')
+        when(buildManager.getGopaths()).thenReturn([resource.toPath(), resource.toPath()])
         ideaIntegration.generateXmls()
-        assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://global"')
+        assert new File(resource, '.idea/goLibraries.xml').text.count("\"file://${toUnixString(resource)}\"")
     }
 
     @Test
     void 'goLibraries should be correct if global GOPATH not exists'() {
-        when(buildManager.getGopath()).thenReturn('projectroot/.gogradle/project_gopath')
+        when(buildManager.getGopaths()).thenReturn([new File(resource, '.gogradle/project_gopath').toPath()])
         ideaIntegration.generateXmls()
         assert new File(resource, '.idea/goLibraries.xml').text.contains('"file://$PROJECT_DIR$/.gogradle/project_gopath"')
     }

@@ -97,7 +97,7 @@ class InitTaskTest extends TaskTest {
         // when
         task.init()
         // then
-        assert IOUtils.toString(new File(resource, 'build.gradle')).contains('''\
+        assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
         build name:'a', transitive:false
@@ -117,7 +117,7 @@ dependencies {
         // when
         task.init()
         // then
-        assert IOUtils.toString(new File(resource, 'build.gradle')).contains('''\
+        assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
         build name:'a'

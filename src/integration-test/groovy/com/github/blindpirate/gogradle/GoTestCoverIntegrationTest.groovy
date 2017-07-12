@@ -116,7 +116,7 @@ golang {
     }
 
     void examineTestReportHtmls() {
-        String indexHtml = IOUtils.toString(new File(resource, '.gogradle/reports/test/index.html'))
+        String indexHtml = new File(resource, '.gogradle/reports/test/index.html').text
         Document index = Jsoup.parse(indexHtml)
         // our rewrite script
         assert indexHtml.contains('h1,li>a,td>a,.breadcrumbs>a')
