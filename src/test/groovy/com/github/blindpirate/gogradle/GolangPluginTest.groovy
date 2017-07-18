@@ -247,15 +247,15 @@ class GolangPluginTest {
             }
         }
 
-        GolangRepository repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b')
+        def repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/a/b').get()
 
         assert repository.getUrl(null) == 'bbbbb'
 
-        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d')
+        repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('github.com/c/d').get()
         assert repository.getUrl('name') == 'http://name'
 
         repository = GogradleGlobal.getInstance(GolangRepositoryHandler).findMatchedRepository('something else')
-        assert repository.is(GolangRepository.EMPTY_INSTANCE)
+        assert !repository.isPresent()
     }
 
     @Test

@@ -17,7 +17,6 @@
 
 package com.github.blindpirate.gogradle.vcs.git
 
-import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
@@ -110,11 +109,5 @@ class GolangRepositoryTest {
     @Test(expected = IllegalStateException)
     void 'exception should be thrown if url and name both blank'() {
         repository.match('')
-    }
-
-    @Test
-    void 'global GolangRepository singleton should be read-only'() {
-        ReflectionUtils.testUnsupportedMethods(GolangRepository.EMPTY_INSTANCE,
-                GolangRepository, ['getUrl', 'match', 'getDir', 'getVcsType'])
     }
 }

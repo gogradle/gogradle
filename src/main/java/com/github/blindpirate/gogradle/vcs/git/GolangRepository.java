@@ -19,69 +19,61 @@ package com.github.blindpirate.gogradle.vcs.git;
 
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.VcsType;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import groovy.lang.Closure;
 import org.codehaus.groovy.runtime.InvokerHelper;
 
 import java.util.Optional;
 
+@SuppressFBWarnings("UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS")
 public class GolangRepository {
     public static final String EMPTY_DIR = "GOGRADLE_EMPTY_DIR";
-    public static final GolangRepository EMPTY_INSTANCE = new GolangRepository() {
-        @Override
-        public void all() {
-            throw new UnsupportedOperationException();
-        }
 
-        @Override
-        public void root(Object root) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void url(Object urlOrClosure) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void dir(Object urlOrClosure) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void vcs(String vcs) {
-            throw new UnsupportedOperationException();
-        }
-
-        @Override
-        public void emptyDir() {
-            throw new UnsupportedOperationException();
-        }
-
-    };
-
-    private boolean all;
-    private Object rootPathPattern;
+    private boolean incomplete;
+    private Object pathPattern;
     private Object urlSubstitution;
     private Object dir;
     private VcsType vcsType = VcsType.GIT;
 
     public void all() {
-        this.all = true;
+        this.pathPattern = new Object() {
+            boolean isCase(Object candidate) {
+                return true;
+            }
+        };
     }
 
-    public void root(Object root) {
-        rootPathPattern = root;
+    public void root(Object pathPattern) {
+        this.pathPattern = pathPattern;
+    }
+
+    public void incomplete(Object pathPattern) {
+        this.pathPattern = pathPattern;
+        incomplete = true;
+    }
+
+    public boolean isIncomplete() {
+        return incomplete;
     }
 
     public void dir(Object urlOrClosure) {
+        checkIncomplete();
         dir = urlOrClosure;
     }
 
+    private void checkIncomplete() {
+        if (incomplete) {
+            throw new UnsupportedOperationException("Not supported for incomplete path!");
+        }
+    }
+
     public void url(Object urlOrClosure) {
+        checkIncomplete();
         urlSubstitution = urlOrClosure;
     }
 
     public void vcs(String vcs) {
+        checkIncomplete();
         Optional<VcsType> vcsOptional = VcsType.of(vcs);
         Assert.isTrue(vcsOptional.isPresent(), "Unknown vcs type: " + vcs);
         this.vcsType = vcsOptional.get();
@@ -92,14 +84,17 @@ public class GolangRepository {
     }
 
     public VcsType getVcsType() {
+        checkIncomplete();
         return vcsType;
     }
 
     public String getUrl(String name) {
+        checkIncomplete();
         return substitute(name, urlSubstitution);
     }
 
     private String substitute(String name, Object valueOrClousure) {
+        checkIncomplete();
         if (valueOrClousure instanceof String) {
             return (String) valueOrClousure;
         } else if (valueOrClousure instanceof Closure) {
@@ -111,22 +106,17 @@ public class GolangRepository {
     }
 
     public String getDir(String name) {
+        checkIncomplete();
         return substitute(name, dir);
     }
 
 
     public boolean match(String name) {
-        if (all) {
-            return true;
-        }
-
-        Assert.isTrue(rootPathPattern != null);
-
+        Assert.isTrue(pathPattern != null);
         return nameMatch(name);
     }
 
     private boolean nameMatch(String name) {
-        return (Boolean) InvokerHelper.invokeMethod(rootPathPattern, "isCase", name);
+        return (Boolean) InvokerHelper.invokeMethod(pathPattern, "isCase", name);
     }
-
 }
