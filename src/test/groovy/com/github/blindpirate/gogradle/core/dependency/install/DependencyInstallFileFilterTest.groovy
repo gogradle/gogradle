@@ -60,6 +60,11 @@ class DependencyInstallFileFilterTest extends FileFilterTest {
     }
 
     @Test
+    void 'file containing .so should be accepted'() {
+        allNamesAccepted(allDescendentFilter, "1.so", '1.so.1', 'libxxx.so.1.2')
+    }
+
+    @Test
     void 'file starting with _ or . should be rejected'() {
         allNamesRejected(allDescendentFilter, '_.go', '..go', '_main.go')
     }
