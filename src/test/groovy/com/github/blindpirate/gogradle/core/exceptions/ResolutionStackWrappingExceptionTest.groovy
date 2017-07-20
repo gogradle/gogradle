@@ -72,9 +72,9 @@ class ResolutionStackWrappingExceptionTest {
         assert ResolutionStackWrappingException.wrapWithResolutionStack(new Exception("message"), subsub).message.contains('''\
 message
 Resolution stack is:
-|-root
- |-sub
-  |-sub''')
++- root
+ +- sub
+  +- sub''')
     }
 
 }
