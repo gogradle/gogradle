@@ -133,6 +133,12 @@ tasks.withType(FindBugs) {
     excludeFilter = file("$rootProject.projectDir/config/findbugs/exclude.xml")
 }
 
+/************** javadoc **************/
+
+javadoc {
+    options.addStringOption('encoding', 'UTF-8')
+}
+
 /************** coverage **************/
 
 jacoco {
