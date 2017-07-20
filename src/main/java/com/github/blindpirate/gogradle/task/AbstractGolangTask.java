@@ -26,6 +26,10 @@ public class AbstractGolangTask extends DefaultTask {
     @Inject
     private GolangTaskContainer golangTaskContainer;
 
+    public AbstractGolangTask() {
+        setGroup("Gogradle");
+    }
+
     protected <T extends Task> T getTask(Class<T> clazz) {
         return golangTaskContainer.get(clazz);
     }
