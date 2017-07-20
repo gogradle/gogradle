@@ -43,7 +43,7 @@ abstract class IntegrationTestSupport {
         buildDotGradleBase = """ 
 buildscript {
     dependencies {
-        classpath files(new File(rootDir, '../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
+        classpath files('${System.getProperty('GOGRADLE_ROOT')}/build/libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar')
     }
 }
 apply plugin: 'com.github.blindpirate.gogradle'
