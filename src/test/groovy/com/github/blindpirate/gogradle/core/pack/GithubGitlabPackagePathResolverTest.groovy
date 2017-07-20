@@ -24,7 +24,7 @@ import org.junit.Test
 
 class GithubGitlabPackagePathResolverTest {
 
-    GithubGitlabPackagePathResolver resolver = new GithubGitlabPackagePathResolver()
+    GithubGitlabPackagePathResolver resolver = new GithubGitlabPackagePathResolver('github.com')
 
     @Test
     void 'resolving name should succeed'() {

@@ -21,7 +21,6 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
