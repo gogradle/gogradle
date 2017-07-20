@@ -36,6 +36,8 @@ public class ShowGopathGorootTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public ShowGopathGorootTask() {
+        setGroup("IDE");
+        setDescription("Show GOPATH and GOROOT in build.");
         dependsOn(PREPARE_TASK_NAME);
     }
 

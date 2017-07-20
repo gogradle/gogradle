@@ -69,7 +69,7 @@ Create a new file named `build.gradle` in your project root:
 
 ```
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.6.3' // Please use the latest version
+    id 'com.github.blindpirate.gogradle' version '0.6.4' // Please use the latest version
 }
 
 golang {
@@ -143,7 +143,7 @@ dependencies {
         test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // specify a commit
         test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line 
 
-        // 语义化版本：
+        // semantic version 
         build 'github.com/user/project@1.*'  // Equivalent to >=1.0.0 & <2.0.0
         build 'github.com/user/project@1.x'  // Equivalent to last line
         build 'github.com/user/project@1.X'  // Equivalent to last line
@@ -231,7 +231,7 @@ repositories {
   golang {
         root 'github.com/foo/bar'
         url 'https://github.com/my/bar.git'
-        vcs 'git' // 默认值是git,因此可省略
+        vcs 'git' // ????????????git,???????????????
     }
 }
 ```

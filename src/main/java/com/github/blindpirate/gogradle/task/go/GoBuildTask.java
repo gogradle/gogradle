@@ -54,6 +54,11 @@ public class GoBuildTask extends Go {
 
     private String outputLocation = "./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}";
 
+    public GoBuildTask() {
+        setDescription("Run build and generate output.");
+        dependsOn(INSTALL_DEPENDENCIES_TASK_NAME, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
+    }
+
     public void setTargetPlatform(String targetPlatform) {
         Matcher matcher = TARGET_PLATFORM_PATTERN.matcher(targetPlatform);
         Assert.isTrue(matcher.matches(),
@@ -75,10 +80,6 @@ public class GoBuildTask extends Go {
         Os os = Os.of(osArch[0]);
         Arch arch = Arch.of(osArch[1]);
         return Pair.of(os, arch);
-    }
-
-    public GoBuildTask() {
-        dependsOn(INSTALL_DEPENDENCIES_TASK_NAME, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
     @Override

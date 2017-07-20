@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangRepositoryHandler
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -39,25 +40,60 @@ class RepositoryHandlerPathResolverTest {
     @Mock
     GolangRepository repository
 
+    @Mock
+    GolangRepository incompleteRepository
+
     RepositoryHandlerPathResolver resolver
 
     @Before
     void setUp() {
         resolver = new RepositoryHandlerPathResolver(repositoryHandler)
-
-        when(repositoryHandler.findMatchedRepository('this/is/root/sub')).thenReturn(GolangRepository.EMPTY_INSTANCE)
-        when(repositoryHandler.findMatchedRepository('this/is/root')).thenReturn(repository)
-        when(repositoryHandler.findMatchedRepository('this/is')).thenReturn(GolangRepository.EMPTY_INSTANCE)
-        when(repositoryHandler.findMatchedRepository('this')).thenReturn(GolangRepository.EMPTY_INSTANCE)
     }
 
     @Test
     void 'only root package should be produced'() {
+        when(repositoryHandler.findMatchedRepository('this/is/root/sub')).thenReturn(Optional.empty())
+        when(repositoryHandler.findMatchedRepository('this/is/root')).thenReturn(Optional.of(repository))
+        when(repositoryHandler.findMatchedRepository('this/is')).thenReturn(Optional.empty())
+        when(repositoryHandler.findMatchedRepository('this')).thenReturn(Optional.empty())
         assert !resolver.produce('this/is').isPresent()
         assert !resolver.produce('this').isPresent()
 
         assertProducePath('this/is/root/sub')
         assertProducePath('this/is/root')
+    }
+
+    @Test
+    void 'incomplete package should be produced'() {
+        when(repositoryHandler.findMatchedRepository('this/is/root/sub')).thenReturn(Optional.empty())
+        when(repositoryHandler.findMatchedRepository('this/is/root')).thenReturn(Optional.of(repository))
+        when(repositoryHandler.findMatchedRepository('this/is')).thenReturn(Optional.of(incompleteRepository))
+        when(repositoryHandler.findMatchedRepository('this')).thenReturn(Optional.of(incompleteRepository))
+        when(incompleteRepository.isIncomplete()).thenReturn(true)
+
+        assertProducePath('this/is/root/sub')
+        assertProducePath('this/is/root')
+
+        assertIncompletePath('this/is')
+        assertIncompletePath('this')
+    }
+
+    @Test
+    void 'incomplete package should not be produced by sub path'() {
+        when(repositoryHandler.findMatchedRepository('this/is/root')).thenReturn(Optional.empty())
+        when(repositoryHandler.findMatchedRepository('this/is')).thenReturn(Optional.of(incompleteRepository))
+        when(repositoryHandler.findMatchedRepository('this')).thenReturn(Optional.of(incompleteRepository))
+        when(incompleteRepository.isIncomplete()).thenReturn(true)
+
+
+        assertIncompletePath('this/is')
+        assertIncompletePath('this')
+        assert !resolver.produce('this/is/root').isPresent()
+    }
+
+    void assertIncompletePath(String path) {
+        IncompleteGolangPackage pkg = resolver.produce(path).get()
+        assert pkg.pathString == path
     }
 
     void assertProducePath(String path) {

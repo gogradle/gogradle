@@ -34,6 +34,7 @@ public class DependenciesTask extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(DependenciesTask.class);
 
     public DependenciesTask() {
+        setDescription("Displays all dependencies.");
         dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
                 RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
     }

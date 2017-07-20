@@ -22,9 +22,9 @@ import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
-class GithubPackagePathResolverTest {
+class GithubGitlabPackagePathResolverTest {
 
-    GithubPackagePathResolver resolver = new GithubPackagePathResolver()
+    GithubGitlabPackagePathResolver resolver = new GithubGitlabPackagePathResolver('github.com')
 
     @Test
     void 'resolving name should succeed'() {

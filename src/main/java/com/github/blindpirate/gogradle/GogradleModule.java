@@ -49,7 +49,7 @@ import com.github.blindpirate.gogradle.core.dependency.produce.external.trash.Tr
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
 import com.github.blindpirate.gogradle.core.pack.BitbucketPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
-import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.GithubGitlabPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.GlobalCachePackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.IBMDevOpsPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
@@ -188,7 +188,6 @@ public class GogradleModule extends AbstractModule {
     @DefaultPackagePathResolver.PackagePathResolvers
     public List<PackagePathResolver> packagePathResolvers(
             RepositoryHandlerPathResolver repositoryHandlerPathResolver,
-            GithubPackagePathResolver githubPackagePathResolver,
             BitbucketPackagePathResolver bitbucketPackagePathResolver,
             IBMDevOpsPackagePathResolver ibmDevOpsPackagePathResolver,
             StandardPackagePathResolver standardPackagePathResolver,
@@ -198,7 +197,8 @@ public class GogradleModule extends AbstractModule {
         return CollectionUtils.immutableList(
                 repositoryHandlerPathResolver,
                 standardPackagePathResolver,
-                githubPackagePathResolver,
+                new GithubGitlabPackagePathResolver("github.com"),
+                new GithubGitlabPackagePathResolver("gitlab.com"),
                 bitbucketPackagePathResolver,
                 ibmDevOpsPackagePathResolver,
                 globalCachePackagePathResolver,

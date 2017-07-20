@@ -21,7 +21,6 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
@@ -31,18 +30,20 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 // github.com/user/project -> git@github.com:user/project.git
 // github.com/user/project -> https://github.com/user/project.git
-@Singleton
-public class GithubPackagePathResolver extends AbstractPackagePathResolver {
+public class GithubGitlabPackagePathResolver extends AbstractPackagePathResolver {
 
-    private static final String GITHUB_HOST = "github.com";
+    private final String host;
 
+    public GithubGitlabPackagePathResolver(String host) {
+        this.host = host;
+    }
 
     protected boolean isIncomplete(String packagePath) {
         return Paths.get(packagePath).getNameCount() < 3;
     }
 
     protected boolean cannotRecognize(String packagePath) {
-        return !GITHUB_HOST.equals(Paths.get(packagePath).getName(0).toString());
+        return !host.equals(Paths.get(packagePath).getName(0).toString().toLowerCase());
     }
 
     protected Optional<GolangPackage> doProduce(String packagePath) {

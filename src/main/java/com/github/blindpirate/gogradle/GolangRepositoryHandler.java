@@ -43,6 +43,10 @@ import java.util.Optional;
  *              root 'appengine'
  *              emptyDir()
  *          }
+ *
+ *          golang {
+ *              incomplete ~/gitlab\.com(\/.*)?/
+ *          }
  *      }
  * }
  * </pre>
@@ -52,20 +56,19 @@ import java.util.Optional;
 @Singleton
 public class GolangRepositoryHandler extends GroovyObjectSupport implements Configurable<Void> {
 
-    private List<GolangRepository> gitRepositories = new ArrayList<>();
+    private List<GolangRepository> golangRepositories = new ArrayList<>();
 
-    public GolangRepository findMatchedRepository(String name) {
-        Optional<GolangRepository> matched = gitRepositories.stream()
+    public Optional<GolangRepository> findMatchedRepository(String name) {
+        return golangRepositories.stream()
                 .filter(repo -> repo.match(name))
                 .findFirst();
-        return matched.orElse(GolangRepository.EMPTY_INSTANCE);
     }
 
     @Override
     public Void configure(Closure cl) {
         GolangRepository repository = new GolangRepository();
         ConfigureUtil.configure(cl, repository);
-        gitRepositories.add(repository);
+        golangRepositories.add(repository);
         return null;
     }
 }

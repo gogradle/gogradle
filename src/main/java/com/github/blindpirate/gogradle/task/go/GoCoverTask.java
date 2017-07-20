@@ -73,6 +73,7 @@ public class GoCoverTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public GoCoverTask() {
+        setDescription("Run coverage task and generate coverage report.");
         dependsOn(GolangTaskContainer.TEST_TASK_NAME);
     }
 

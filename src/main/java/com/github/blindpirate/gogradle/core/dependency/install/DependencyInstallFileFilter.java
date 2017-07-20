@@ -62,14 +62,11 @@ public class DependencyInstallFileFilter implements FileFilter {
     }
 
     private boolean acceptFileName(String name) {
-        if (startsWithAny(name, "_", ".")) {
+        if (startsWithAny(name, "_", ".") || endsWithAny(name, "_test.go")) {
             return false;
         }
-        if (endsWithAny(name, "_test.go")) {
-            return false;
-        }
-
-        return endsWithAny(name, ".go", ".asm", ".s", ".h", ".c");
+        return endsWithAny(name, ".go", ".asm", ".s", ".h", ".c", ".a", ".lib")
+                || name.contains(".so");
     }
 
     private boolean acceptDirectory(File dir) {

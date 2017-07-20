@@ -69,9 +69,9 @@ dependencies {
             assert stderr.toString().replaceAll(/[a-f0-9]{40}/, '').contains("""
 Cannot recognized package: unrecognized
 Resolution stack is:
-|-github.com/my/package
- |-local/b@${toUnixString(repository)}/b
-  |-localhost/a#""")
++- github.com/my/package
+ +- local/b@${toUnixString(repository)}/b
+  +- localhost/a#""")
         }
     }
 
@@ -93,7 +93,7 @@ Resolution stack is:
             assert stderr.toString().contains("""\
 Cannot resolve dependency:GitNotationDependency{name='localhost/a', commit='unexistent', urls='[http://localhost:8080/a]'}
 Resolution stack is:
-|-github.com/my/package
++- github.com/my/package
 """)
         }
     }

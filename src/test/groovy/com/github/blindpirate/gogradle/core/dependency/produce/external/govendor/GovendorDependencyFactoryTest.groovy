@@ -19,15 +19,13 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.govendo
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
-import com.github.blindpirate.gogradle.core.pack.GithubPackagePathResolver
+import com.github.blindpirate.gogradle.core.pack.GithubGitlabPackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
-import org.mockito.Mockito
-
 
 @RunWith(GogradleRunner)
 class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
@@ -64,7 +62,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Before
     void setUp() {
-        ReflectionUtils.setField(factory, 'packagePathResolver', new GithubPackagePathResolver())
+        ReflectionUtils.setField(factory, 'packagePathResolver', new GithubGitlabPackagePathResolver("github.com"))
     }
 
     @Test

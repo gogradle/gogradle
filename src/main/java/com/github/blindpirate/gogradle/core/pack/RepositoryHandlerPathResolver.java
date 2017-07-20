@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage;
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
@@ -48,15 +49,29 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
     public Optional<GolangPackage> produce(String packagePath) {
         Path path = Paths.get(packagePath);
 
-        for (int i = path.getNameCount(); i > 0; i--) {
+        Optional<GolangRepository> repo = repositoryHandler.findMatchedRepository(toUnixString(path));
+
+        if (repo.isPresent()) {
+            if (repo.get().isIncomplete()) {
+                return Optional.of(buildIncompletePackage(path));
+            } else {
+                return Optional.of(buildPackage(path, path, repo.get()));
+            }
+        }
+
+        for (int i = path.getNameCount() - 1; i > 0; i--) {
             Path subpath = path.subpath(0, i);
-            GolangRepository repository = repositoryHandler.findMatchedRepository(toUnixString(subpath));
-            if (repository != GolangRepository.EMPTY_INSTANCE) {
-                return Optional.of(buildPackage(path, subpath, repository));
+            Optional<GolangRepository> repository = repositoryHandler.findMatchedRepository(toUnixString(subpath));
+            if (repository.isPresent() && !repository.get().isIncomplete()) {
+                return Optional.of(buildPackage(path, subpath, repository.get()));
             }
         }
 
         return Optional.empty();
+    }
+
+    private GolangPackage buildIncompletePackage(Path path) {
+        return IncompleteGolangPackage.of(path);
     }
 
     private GolangPackage buildPackage(Path path, Path rootPath, GolangRepository repository) {

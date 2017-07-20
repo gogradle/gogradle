@@ -45,7 +45,7 @@ public class ResolutionStackWrappingException extends RuntimeException {
 
         resolutionStack.forEach(dependency -> {
             StringUtils.appendNSpaces(message, counter.getAndIncrement());
-            message.append("|-").append(dependency.resolve(null).toString()).append("\n");
+            message.append("+- ").append(dependency.resolve(null).toString()).append("\n");
         });
 
         return new ResolutionStackWrappingException(message.toString(), e);

@@ -18,7 +18,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.6.3'
+version '0.6.4'
 
 /************** sourcesets **************/
 sourceSets {
@@ -131,6 +131,12 @@ tasks.withType(FindBugs) {
         html.enabled true
     }
     excludeFilter = file("$rootProject.projectDir/config/findbugs/exclude.xml")
+}
+
+/************** javadoc **************/
+
+javadoc {
+    options.addStringOption('encoding', 'UTF-8')
 }
 
 /************** coverage **************/

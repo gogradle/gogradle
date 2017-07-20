@@ -6,6 +6,8 @@ out/
 !src/test/groovy/com/github/blindpirate/gogradle/build
 classes/
 *.iml
+*.ipr
+*.iws
 
 # Ignore Gradle GUI config
 gradle-app.setting

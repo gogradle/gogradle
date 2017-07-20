@@ -31,6 +31,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TA
 
 public class GoVetTask extends Go {
     public GoVetTask() {
+        setDescription("Run 'go vet' (https://golang.org/cmd/vet).");
         dependsOn(VENDOR_TASK_NAME);
     }
 
