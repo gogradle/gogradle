@@ -117,7 +117,7 @@ public class InitTask extends AbstractGolangTask {
                                         List<Map<String, Object>> buildDependencies,
                                         List<Map<String, Object>> testDependencies) {
         StringBuilder sb = new StringBuilder();
-        sb.append("dependencies {\n");
+        sb.append("\ndependencies {\n");
         appendNSpaces(sb, DEFAULT_INDENT);
         sb.append("golang {\n");
         buildDependencies.forEach(d -> appendOneLine(sb, "build", d));
