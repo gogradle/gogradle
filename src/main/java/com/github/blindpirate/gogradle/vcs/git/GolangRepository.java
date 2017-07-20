@@ -110,13 +110,8 @@ public class GolangRepository {
         return substitute(name, dir);
     }
 
-
     public boolean match(String name) {
         Assert.isTrue(pathPattern != null);
-        return nameMatch(name);
-    }
-
-    private boolean nameMatch(String name) {
         return (Boolean) InvokerHelper.invokeMethod(pathPattern, "isCase", name);
     }
 }

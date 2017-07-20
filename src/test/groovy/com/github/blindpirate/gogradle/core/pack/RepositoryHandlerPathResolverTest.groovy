@@ -78,6 +78,19 @@ class RepositoryHandlerPathResolverTest {
         assertIncompletePath('this')
     }
 
+    @Test
+    void 'incomplete package should not be produced by sub path'() {
+        when(repositoryHandler.findMatchedRepository('this/is/root')).thenReturn(Optional.empty())
+        when(repositoryHandler.findMatchedRepository('this/is')).thenReturn(Optional.of(incompleteRepository))
+        when(repositoryHandler.findMatchedRepository('this')).thenReturn(Optional.of(incompleteRepository))
+        when(incompleteRepository.isIncomplete()).thenReturn(true)
+
+
+        assertIncompletePath('this/is')
+        assertIncompletePath('this')
+        assert !resolver.produce('this/is/root').isPresent()
+    }
+
     void assertIncompletePath(String path) {
         IncompleteGolangPackage pkg = resolver.produce(path).get()
         assert pkg.pathString == path

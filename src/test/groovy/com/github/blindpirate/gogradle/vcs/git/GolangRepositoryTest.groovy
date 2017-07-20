@@ -30,6 +30,13 @@ class GolangRepositoryTest {
     }
 
     @Test
+    void 'repository should be incomplete if specified'() {
+        repository.incomplete('')
+        assert repository.incomplete
+        assert repository.pathPattern == ''
+    }
+
+    @Test
     void 'a repository with string name should match'() {
         repository.root('github.com/a/b')
         assert repository.match('github.com/a/b')

@@ -49,10 +49,20 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
     public Optional<GolangPackage> produce(String packagePath) {
         Path path = Paths.get(packagePath);
 
-        for (int i = path.getNameCount(); i > 0; i--) {
+        Optional<GolangRepository> repo = repositoryHandler.findMatchedRepository(toUnixString(path));
+
+        if (repo.isPresent()) {
+            if (repo.get().isIncomplete()) {
+                return Optional.of(buildIncompletePackage(path));
+            } else {
+                return Optional.of(buildPackage(path, path, repo.get()));
+            }
+        }
+
+        for (int i = path.getNameCount() - 1; i > 0; i--) {
             Path subpath = path.subpath(0, i);
             Optional<GolangRepository> repository = repositoryHandler.findMatchedRepository(toUnixString(subpath));
-            if (repository.isPresent()) {
+            if (repository.isPresent() && !repository.get().isIncomplete()) {
                 return Optional.of(buildPackage(path, subpath, repository.get()));
             }
         }
@@ -60,11 +70,11 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
         return Optional.empty();
     }
 
-    private GolangPackage buildPackage(Path path, Path rootPath, GolangRepository repository) {
-        if (repository.isIncomplete()) {
-            return IncompleteGolangPackage.of(path);
-        }
+    private GolangPackage buildIncompletePackage(Path path) {
+        return IncompleteGolangPackage.of(path);
+    }
 
+    private GolangPackage buildPackage(Path path, Path rootPath, GolangRepository repository) {
         String rootPathString = StringUtils.toUnixString(rootPath);
         VcsType vcsType = repository.getVcsType();
         String url = repository.getUrl(rootPathString);
