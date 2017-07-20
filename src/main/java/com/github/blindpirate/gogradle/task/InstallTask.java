@@ -43,6 +43,8 @@ public class InstallTask extends AbstractGolangTask {
     private File vendorDir;
 
     public InstallTask() {
+        setGroup("Internal");
+        setDescription("Internal usage only.");
         mustRunAfter(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
         vendorDir = new File(getProject().getProjectDir(), "vendor");
     }

@@ -30,6 +30,9 @@ public class IdeaTask extends AbstractGolangTask {
     private IdeaIntegration ideaIntegration;
 
     public IdeaTask() {
+        setGroup("IDE");
+        setDescription("Generate project configurations for IDEA with go plugin "
+                + "(https://github.com/go-lang-plugin-org/go-lang-idea-plugin).");
         dependsOn(VENDOR_TASK_NAME);
     }
 

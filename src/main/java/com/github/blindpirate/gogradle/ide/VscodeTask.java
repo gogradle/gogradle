@@ -36,6 +36,8 @@ public class VscodeTask extends AbstractGolangTask {
     private BuildManager buildManager;
 
     public VscodeTask() {
+        setGroup("IDE");
+        setDescription("Generate project configurations for VSCode (https://code.visualstudio.com/).");
         dependsOn(VENDOR_TASK_NAME);
     }
 

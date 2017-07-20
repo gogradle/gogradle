@@ -70,6 +70,7 @@ public class Go extends AbstractGolangTask {
     }
 
     public Go() {
+        setDescription("Custom go task.");
         dependsOn(PREPARE_TASK_NAME);
         buildManager = GogradleGlobal.getInstance(BuildManager.class);
     }

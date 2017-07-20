@@ -28,6 +28,8 @@ public class GoglandTask extends AbstractGolangTask {
     private GoglandIntegration goglandIntegration;
 
     public GoglandTask() {
+        setGroup("IDE");
+        setDescription("Generate project configurations for gogland (https://www.jetbrains.com/go/).");
         dependsOn(VENDOR_TASK_NAME);
     }
 

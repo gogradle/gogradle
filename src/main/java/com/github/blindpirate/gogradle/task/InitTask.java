@@ -64,6 +64,7 @@ public class InitTask extends AbstractGolangTask {
     private GolangConfigurationManager configurationManager;
 
     public InitTask() {
+        setDescription("Import dependencies from other dependency management tools.");
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
     }
 

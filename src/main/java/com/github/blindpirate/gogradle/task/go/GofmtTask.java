@@ -38,6 +38,7 @@ public class GofmtTask extends Go {
     private GoBinaryManager goBinaryManager;
 
     public GofmtTask() {
+        setDescription("Run gofmt (https://golang.org/cmd/gofmt/).");
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
     }
 

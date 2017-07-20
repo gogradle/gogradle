@@ -25,6 +25,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK
 public class CheckTask extends AbstractGolangTask {
 
     public CheckTask() {
+        setDescription("Run all checks.");
         dependsOn(TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME, COVERAGE_TASK_NAME);
     }
 }

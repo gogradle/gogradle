@@ -35,6 +35,7 @@ public class LockTask extends AbstractGolangTask {
     private LockedDependencyManager lockedDependencyManager;
 
     public LockTask() {
+        setDescription("Generate lockfile for current project.");
         dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
                 RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
     }

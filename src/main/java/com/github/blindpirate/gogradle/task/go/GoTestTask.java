@@ -82,6 +82,7 @@ public class GoTestTask extends Go {
     private boolean coverageProfileGenerated = false;
 
     public GoTestTask() {
+        setDescription("Run all tests.");
         dependsOn(VENDOR_TASK_NAME);
     }
 

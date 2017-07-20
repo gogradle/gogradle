@@ -23,6 +23,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_T
 
 public class VendorTask extends AbstractGolangTask {
     public VendorTask() {
+        setDescription("Install dependencies into vendor.");
         dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
                 RESOLVE_TEST_DEPENDENCIES_TASK_NAME,
                 INSTALL_DEPENDENCIES_TASK_NAME);

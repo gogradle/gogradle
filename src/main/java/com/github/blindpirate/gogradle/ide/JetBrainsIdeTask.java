@@ -28,6 +28,8 @@ public class JetBrainsIdeTask extends AbstractGolangTask {
     private JetBrainsIdeIntegration jetBrainsIdeIntegration;
 
     public JetBrainsIdeTask() {
+        setGroup("IDE");
+        setDescription("Generate project configurations for JetBrains IDEs such as PyCharm, WebStorm, etc.");
         dependsOn(VENDOR_TASK_NAME);
     }
 
