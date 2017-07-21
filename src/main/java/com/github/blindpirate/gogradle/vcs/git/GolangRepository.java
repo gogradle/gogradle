@@ -36,6 +36,7 @@ public class GolangRepository {
     private VcsType vcsType = VcsType.GIT;
 
     public void all() {
+        Assert.isNull(pathPattern);
         this.pathPattern = new Object() {
             boolean isCase(Object candidate) {
                 return true;
@@ -44,10 +45,12 @@ public class GolangRepository {
     }
 
     public void root(Object pathPattern) {
+        Assert.isNull(this.pathPattern);
         this.pathPattern = pathPattern;
     }
 
     public void incomplete(Object pathPattern) {
+        Assert.isNull(this.pathPattern);
         this.pathPattern = pathPattern;
         incomplete = true;
     }
