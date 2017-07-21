@@ -1,5 +1,6 @@
 # Repository Management 
 
+## 镜像仓库
 Gogradle支持私有仓库和仓库url替换。这实际上支持了仓库的镜像。你可以在`build.gradle`的`repositories`中声明一个仓库。
 
 > 注意：`repositories`必须放置在`dependencies`之前！！！
@@ -16,7 +17,7 @@ repositories{
 }
 ```
 
-在上面的DSK中，`root` and `url`并不一定要是字符串，它可以是任意对象。Gogradle使用Groovy内建的[`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html)方法来判定一个包的路径是否匹配该仓库的声明。
+在上面的DSK中，`root`和`url`并不一定要是字符串，它可以是任意对象。Gogradle使用Groovy内建的[`Object.isCase()`](http://mrhaki.blogspot.jp/2009/08/groovy-goodness-switch-statement.html)方法来判定一个包的路径是否匹配该仓库的声明。
 
 这意味着你可以使用正则表达式和闭包。下面的例子展示了如何使用一个`github.com`的镜像仓库。
 
@@ -31,7 +32,7 @@ repositories {
     }
 }    
 ```
-
+## 私有仓库
 另外一个应用场景是`bitbucket`的私有仓库。Go本身不支持`bitbucket.org`的私有仓库，因为Go需要通过无验证的http方法获取仓库的vcs类型和url，详见[这里](https://groups.google.com/forum/#!msg/golang-nuts/li8J9a-Tbz0/sGqklQcSR8cJ) 
 Gogradle优雅地解决了此问题：
 
@@ -47,6 +48,9 @@ repositories {
     }
 }    
 ```
+
+## 本地包依赖
+
 此外，你还可以声明一个位于本地目录中的依赖包。
 
 ```
@@ -92,3 +96,17 @@ dependencies {
     }
 }
 ```
+
+## Gitlab相关问题处理
+
+Gitlab的实现并未完全遵守[go的import路径约定](https://golang.org/cmd/go/#hdr-Relative_import_paths)，详见此[讨论](https://gitlab.com/gitlab-org/gitlab-ce/issues/35101#note_35565222)。因此，在这种情况下，Gogradle可能无法正确识别`vendor`中的包结构，从而产生莫名其妙的问题。你需要在`build.gradle`中添加如下配置：
+
+```
+repositories {
+    golang {
+        incomplete ~/yourgitlab\.com(\/\w+)?/
+    }
+}
+```
+
+这样做会通知Gogradle：类似`yourgitlab.com`和`yourgitlab.com/username`这样的路径不是一个项目的根路径。

@@ -1,5 +1,7 @@
 # Repository Management 
 
+## Mirror Repository
+
 Gogradle supports private repository and repository url substitution. Actually, it supports registry mirrors. You can declare repositories in `repositories` block of `build.gradle`.
 
 > NOTE `repositories` block must be placed before `dependencies` block !!!!
@@ -32,6 +34,8 @@ repositories {
 }    
 ```
 
+## Private Repository
+
 Another application scenario are `bitbucket` private repo. It has been reported [here](https://groups.google.com/forum/#!msg/golang-nuts/li8J9a-Tbz0/sGqklQcSR8cJ) that
 Go does not support `bitbucket` private repo since it need to use unauthenticated http request to query the vcs type and url. With Gogradle, you can solve this problem gracefully:
 
@@ -47,6 +51,8 @@ repositories {
     }
 }    
 ```
+
+## Local Package
 
 Moreover, you can declare a local directory as dependency package.
 
@@ -80,3 +86,16 @@ repositories {
     }
 }  
 ``` 
+## Gitlab Issue
+
+Gitlab implementation doesn't conform [go import convention](https://golang.org/cmd/go/#hdr-Relative_import_paths) completely, see [the discussion](https://gitlab.com/gitlab-org/gitlab-ce/issues/35101#note_35565222). In this situation, Gogradle might not be able to recognize package structure in `vendor` correctly, which leads to weird issues. You need to add the following configuration into your `build.gradle`:
+
+```
+repositories {
+    golang {
+        incomplete ~/yourgitlab\.com(\/\w+)?/
+    }
+}
+```
+
+This tells Gogradle: path like `yourgitlab.com` and `yourgitlab.com/username` is not a project root path.
