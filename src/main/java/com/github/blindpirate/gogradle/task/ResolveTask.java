@@ -78,8 +78,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
     private DependencyTreeNode dependencyTree;
 
     public ResolveTask() {
-        setGroup("Internal");
-        setDescription("Internal usage only.");
+        setGroup(null);
         dependsOn(PREPARE_TASK_NAME);
     }
 
