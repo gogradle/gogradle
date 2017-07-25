@@ -51,7 +51,7 @@ golang {
             it.forTasks('tasks')
         }
 
-        ['Gogradle tasks', 'IDE tasks', 'Internal tasks'].each {
+        ['Gogradle tasks', 'IDE tasks'].each {
             assert stdout.toString().contains(it)
         }
     }
