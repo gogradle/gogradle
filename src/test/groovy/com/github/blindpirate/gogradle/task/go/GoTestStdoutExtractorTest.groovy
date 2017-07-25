@@ -58,7 +58,7 @@ FAIL\ta\t0.006s'''
         assert result.results.size() == 1
 
         assert result.results[0].name == 'Test_A'
-        assert result.results[0].message.trim() == ''
+        assert result.results[0].message.trim().contains('Test_A')
         assert result.results[0].resultType == TestResult.ResultType.FAILURE
     }
 
@@ -96,15 +96,16 @@ FAIL\tgithub.com/my/project/a\t0.006s'''
         assert result.results.size() == 3
 
         assert result.results[0].name == 'Test_A1'
-        assert result.results[0].message.trim() == 'a1_test.go:9: Failed'
+        assert result.results[0].message.trim().contains('a1_test.go:9: Failed')
         assert result.results[0].resultType == TestResult.ResultType.FAILURE
 
         assert result.results[1].name == 'Test_A2'
-        assert result.results[1].message.trim() == 'SomeOutputWithoutNewline\n\ta1_test.go:15: Passed'
+        assert result.results[1].message.trim().contains('SomeOutputWithoutNewline')
+        assert result.results[1].message.trim().contains('a1_test.go:15: Passed')
         assert result.results[1].resultType == TestResult.ResultType.SUCCESS
 
         assert result.results[2].name == 'Test_A3'
-        assert result.results[2].message.trim() == 'a2_test.go:7: Passed'
+        assert result.results[2].message.trim().contains('a2_test.go:7: Passed')
         assert result.results[2].resultType == TestResult.ResultType.SUCCESS
     }
 
@@ -189,7 +190,7 @@ FAIL\tgithub.com/gogits/gogs/models\t0.074s'''
         assert results[0].className == 'github_DOT_com.gogits.gogs.models.a_test_DOT_go'
         assert results[0].results.size() == 1
         assert results[0].results[0].name == 'TestDiffToHTML'
-        assert results[0].results[0].message == ''
+        assert results[0].results[0].message.contains('TestDiffToHTML')
         assert results[0].results[0].resultType == TestResult.ResultType.SUCCESS
 
         assert results[1].className == 'github_DOT_com.gogits.gogs.models.b_test_DOT_go'
@@ -433,6 +434,78 @@ FAIL\tdemo\t0.008s
         assert results[0].results[0].name == "TestMarkdown"
         assert results[0].results[0].message.contains('Rendering a commit URL')
         assert results[0].results[0].resultType == TestResult.ResultType.SUCCESS
+    }
 
+    // https://github.com/gogradle/gogradle/issues/120
+    @Test
+    void 'tests containing sub tests should succeed'() {
+        // given
+        String stdout = '''
+=== RUN   TestInstantiate
+=== RUN   TestInstantiate/test:_1
+=== RUN   TestInstantiate/test:_2
+=== RUN   TestInstantiate/test:_3
+--- PASS: TestInstantiate (0.00s)
+    --- PASS: TestInstantiate/test:_1 (0.00s)
+    --- PASS: TestInstantiate/test:_2 (0.00s)
+    --- PASS: TestInstantiate/test:_3 (0.00s)
+PASS
+ok  \tdemo\t0.008s
+'''
+        IOUtils.write(resource, 'a_test.go', 'func TestInstantiate()')
+
+        // when
+        PackageTestResult context = PackageTestResult.builder()
+                .withPackagePath('my')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+        // then
+        assert results.size() == 1
+        assert results[0].className == "my.a_test_DOT_go"
+        assert results[0].results.size() == 1
+        assert results[0].results[0].name == "TestInstantiate"
+        assert results[0].results[0].message.contains('TestInstantiate/test:_1')
+        assert results[0].results[0].resultType == TestResult.ResultType.SUCCESS
+    }
+
+    @Test
+    void 'tests containing sub sub tests should succeed'() {
+        // given
+        String stdout = '''
+=== RUN   TestInstantiate
+=== RUN   TestInstantiate/test:_1
+=== RUN   TestInstantiate/test:_1/subsub
+=== RUN   TestInstantiate/test:_2
+=== RUN   TestInstantiate/test:_2/subsub
+=== RUN   TestInstantiate/test:_3
+=== RUN   TestInstantiate/test:_3/subsub
+--- PASS: TestInstantiate (0.00s)
+    --- PASS: TestInstantiate/test:_1 (0.00s)
+        --- PASS: TestInstantiate/test:_1/subsub (0.00s)
+    --- PASS: TestInstantiate/test:_2 (0.00s)
+        --- PASS: TestInstantiate/test:_2/subsub (0.00s)
+    --- PASS: TestInstantiate/test:_3 (0.00s)
+        --- PASS: TestInstantiate/test:_3/subsub (0.00s)
+PASS
+ok  \t_/Users/zhb/Projects/tmp/gogradle120\t0.009s
+'''
+        IOUtils.write(resource, 'a_test.go', 'func TestInstantiate()')
+
+        // when
+        PackageTestResult context = PackageTestResult.builder()
+                .withPackagePath('my')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+        // then
+        assert results.size() == 1
+        assert results[0].className == "my.a_test_DOT_go"
+        assert results[0].results.size() == 1
+        assert results[0].results[0].name == "TestInstantiate"
+        assert results[0].results[0].message.contains('TestInstantiate/test:_1')
+        assert results[0].results[0].resultType == TestResult.ResultType.SUCCESS
     }
 }
