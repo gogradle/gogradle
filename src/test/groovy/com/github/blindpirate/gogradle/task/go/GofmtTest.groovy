@@ -37,8 +37,8 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class GofmtTaskTest extends TaskTest {
-    GofmtTask task
+class GofmtTest extends TaskTest {
+    Gofmt task
 
     File resource
 
@@ -47,7 +47,7 @@ class GofmtTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(GofmtTask)
+        task = buildTask(Gofmt)
 
         IOUtils.write(resource, '.go/bin/go', '')
         IOUtils.write(resource, '.go/bin/gofmt', '')

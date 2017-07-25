@@ -54,9 +54,9 @@ import static org.mockito.Mockito.*
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockInjector
-class ResolveTaskTest extends TaskTest {
-    ResolveBuildDependenciesTask resolveBuildDependenciesTask
-    ResolveTestDependenciesTask resolveTestDependenciesTask
+class ResolveDependenciesTest extends TaskTest {
+    ResolveBuildDependencies resolveBuildDependenciesTask
+    ResolveTestDependenciesDependencies resolveTestDependenciesTask
 
     File resource
     @Mock
@@ -76,8 +76,8 @@ class ResolveTaskTest extends TaskTest {
         when(rootPath.toFile()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn("package")
 
-        resolveBuildDependenciesTask = buildTask(ResolveBuildDependenciesTask)
-        resolveTestDependenciesTask = buildTask(ResolveTestDependenciesTask)
+        resolveBuildDependenciesTask = buildTask(ResolveBuildDependencies)
+        resolveTestDependenciesTask = buildTask(ResolveTestDependenciesDependencies)
 
         gogradleRootProject = new GogradleRootProject(project)
         gogradleRootProject.setName('package')

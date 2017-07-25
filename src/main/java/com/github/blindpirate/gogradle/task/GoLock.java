@@ -29,12 +29,12 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
 
-public class LockTask extends AbstractGolangTask {
+public class GoLock extends AbstractGolangTask {
 
     @Inject
     private LockedDependencyManager lockedDependencyManager;
 
-    public LockTask() {
+    public GoLock() {
         setDescription("Generate lockfile for current project.");
         dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
                 RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
@@ -42,8 +42,8 @@ public class LockTask extends AbstractGolangTask {
 
     @TaskAction
     public void lock() {
-        DependencyTreeNode buildDependencyTree = getTask(ResolveBuildDependenciesTask.class).getDependencyTree();
-        DependencyTreeNode testDependencyTree = getTask(ResolveTestDependenciesTask.class).getDependencyTree();
+        DependencyTreeNode buildDependencyTree = getTask(ResolveBuildDependencies.class).getDependencyTree();
+        DependencyTreeNode testDependencyTree = getTask(ResolveTestDependenciesDependencies.class).getDependencyTree();
 
         lockedDependencyManager.lock(toResolveDependencySet(buildDependencyTree),
                 toResolveDependencySet(testDependencyTree));

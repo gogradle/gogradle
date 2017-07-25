@@ -32,9 +32,9 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class InstallTaskTest extends TaskTest {
+class GoInstallTest extends TaskTest {
 
-    InstallTask task
+    GoInstall task
 
     ResolvedDependency resolvedDependency = mockResolvedDependency('name')
 
@@ -43,7 +43,7 @@ class InstallTaskTest extends TaskTest {
     @Before
     void setUp() {
         when(project.getProjectDir()).thenReturn(resource)
-        task = buildTask(InstallTask)
+        task = buildTask(GoInstall)
     }
 
     /*
@@ -78,8 +78,8 @@ class InstallTaskTest extends TaskTest {
 
         GolangDependencySet buildSet = asGolangDependencySet(a, b)
         GolangDependencySet testSet = asGolangDependencySet(b2, f)
-        when(golangTaskContainer.get(ResolveBuildDependenciesTask).getFlatDependencies()).thenReturn(buildSet)
-        when(golangTaskContainer.get(ResolveTestDependenciesTask).getFlatDependencies()).thenReturn(testSet)
+        when(golangTaskContainer.get(ResolveBuildDependencies).getFlatDependencies()).thenReturn(buildSet)
+        when(golangTaskContainer.get(ResolveTestDependenciesDependencies).getFlatDependencies()).thenReturn(testSet)
 
         // when
         task.installDependenciesToVendor()
@@ -102,8 +102,8 @@ class InstallTaskTest extends TaskTest {
     @Test
     void 'files under vendor should be deleted'() {
         // given
-        when(golangTaskContainer.get(ResolveBuildDependenciesTask).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
-        when(golangTaskContainer.get(ResolveTestDependenciesTask).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
+        when(golangTaskContainer.get(ResolveBuildDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
+        when(golangTaskContainer.get(ResolveTestDependenciesDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
         IOUtils.write(resource, 'vendor/vendor.json', '')
         // when
         task.installDependenciesToVendor()

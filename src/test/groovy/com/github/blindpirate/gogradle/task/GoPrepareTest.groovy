@@ -31,9 +31,9 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class PrepareTaskTest extends TaskTest {
+class GoPrepareTest extends TaskTest {
 
-    PrepareTask task
+    GoPrepare task
 
     File resource
 
@@ -42,7 +42,7 @@ class PrepareTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(PrepareTask)
+        task = buildTask(GoPrepare)
         when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
         when(project.getGradle()).thenReturn(gradle)

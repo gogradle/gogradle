@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 @WithResource('')
 class ResolveTestDependenciesTaskTest extends TaskTest {
-    ResolveTestDependenciesTask task
+    ResolveTestDependenciesDependencies task
 
     File resource
 
@@ -45,7 +45,7 @@ class ResolveTestDependenciesTaskTest extends TaskTest {
     @Before
     void setUp() {
         when(project.getProjectDir()).thenReturn(resource)
-        task = buildTask(ResolveTestDependenciesTask)
+        task = buildTask(ResolveTestDependenciesDependencies)
         local = LocalDirectoryDependency.fromLocal('local', resource)
     }
 
@@ -74,7 +74,7 @@ class ResolveTestDependenciesTaskTest extends TaskTest {
         GolangDependencySet testDependencies = asGolangDependencySet(mockDependency('c'), mockDependency('d'))
 
 
-        when(getGolangTaskContainer().get(ResolveBuildDependenciesTask).getFlatDependencies()).thenReturn(buildDependencies)
+        when(getGolangTaskContainer().get(ResolveBuildDependencies).getFlatDependencies()).thenReturn(buildDependencies)
         when(strategy.produce(any(ResolvedDependency), any(File), any(DependencyVisitor), anyString())).thenReturn(testDependencies)
 
         // when

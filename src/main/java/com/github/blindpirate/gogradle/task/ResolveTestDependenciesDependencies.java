@@ -22,8 +22,8 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
 
-public class ResolveTestDependenciesTask extends ResolveTask {
-    public ResolveTestDependenciesTask() {
+public class ResolveTestDependenciesDependencies extends ResolveDependencies {
+    public ResolveTestDependenciesDependencies() {
         dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
     }
 
@@ -36,7 +36,7 @@ public class ResolveTestDependenciesTask extends ResolveTask {
     protected GolangDependencySet produceFirstLevelDependencies() {
         GolangDependencySet ret = super.produceFirstLevelDependencies();
         // this is complete build dependencies
-        ret.removeAll(getTask(ResolveBuildDependenciesTask.class).getFlatDependencies());
+        ret.removeAll(getTask(ResolveBuildDependencies.class).getFlatDependencies());
         return ret;
     }
 }

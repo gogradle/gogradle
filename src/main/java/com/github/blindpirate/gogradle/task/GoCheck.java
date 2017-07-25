@@ -17,11 +17,15 @@
 
 package com.github.blindpirate.gogradle.task;
 
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.COVERAGE_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
+import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
 
-public class ResolveBuildDependenciesTask extends ResolveTask {
-    @Override
-    public String getConfigurationName() {
-        return BUILD;
+public class GoCheck extends AbstractGolangTask {
+
+    public GoCheck() {
+        setDescription("Run all checks.");
+        dependsOn(TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME, COVERAGE_TASK_NAME);
     }
 }

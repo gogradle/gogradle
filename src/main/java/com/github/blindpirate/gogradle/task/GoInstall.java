@@ -34,15 +34,15 @@ import java.util.Optional;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
 
-public class InstallTask extends AbstractGolangTask {
-    private static final Logger LOGGER = Logging.getLogger(InstallTask.class);
+public class GoInstall extends AbstractGolangTask {
+    private static final Logger LOGGER = Logging.getLogger(GoInstall.class);
 
     @Inject
     private VendorSnapshoter vendorSnapshoter;
 
     private File vendorDir;
 
-    public InstallTask() {
+    public GoInstall() {
         setGroup(null);
         mustRunAfter(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
         vendorDir = new File(getProject().getProjectDir(), "vendor");
@@ -53,8 +53,8 @@ public class InstallTask extends AbstractGolangTask {
         IOUtils.forceMkdir(vendorDir);
         vendorSnapshoter.loadPersistenceCache();
 
-        GolangDependencySet buildSet = getTask(ResolveBuildDependenciesTask.class).getFlatDependencies();
-        GolangDependencySet testSet = getTask(ResolveTestDependenciesTask.class).getFlatDependencies();
+        GolangDependencySet buildSet = getTask(ResolveBuildDependencies.class).getFlatDependencies();
+        GolangDependencySet testSet = getTask(ResolveTestDependenciesDependencies.class).getFlatDependencies();
 
         GolangDependencySet result = GolangDependencySet.merge(buildSet, testSet);
 

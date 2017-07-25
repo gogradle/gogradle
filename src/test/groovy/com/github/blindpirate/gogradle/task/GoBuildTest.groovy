@@ -20,7 +20,7 @@ package com.github.blindpirate.gogradle.task
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
-import com.github.blindpirate.gogradle.task.go.GoBuildTask
+import com.github.blindpirate.gogradle.task.go.GoBuild
 import com.github.blindpirate.gogradle.task.go.GoExecutionAction
 import org.junit.Before
 import org.junit.Test
@@ -35,8 +35,8 @@ import static org.mockito.ArgumentMatchers.isNull
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class GoBuildTaskTest extends TaskTest {
-    GoBuildTask task
+class GoBuildTest extends TaskTest {
+    GoBuild task
 
     @Captor
     ArgumentCaptor cmdsCaptor
@@ -45,7 +45,7 @@ class GoBuildTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(GoBuildTask)
+        task = buildTask(GoBuild)
         task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
         when(buildManager.getGopath()).thenReturn('project_gopath')
         when(setting.getPackagePath()).thenReturn('my/package')
@@ -195,6 +195,6 @@ class GoBuildTaskTest extends TaskTest {
     }
 
     boolean isValidTargetPlatform(String value) {
-        return GoBuildTask.TARGET_PLATFORM_PATTERN.matcher(value).matches()
+        return GoBuild.TARGET_PLATFORM_PATTERN.matcher(value).matches()
     }
 }

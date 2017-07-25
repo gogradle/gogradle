@@ -27,15 +27,15 @@ import org.gradle.api.tasks.TaskAction;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
-public class ShowGopathGorootTask extends AbstractGolangTask {
-    private static final Logger LOGGER = Logging.getLogger(ShowGopathGorootTask.class);
+public class ShowGopathGoroot extends AbstractGolangTask {
+    private static final Logger LOGGER = Logging.getLogger(ShowGopathGoroot.class);
 
     @Inject
     private GoBinaryManager goBinaryManager;
     @Inject
     private BuildManager buildManager;
 
-    public ShowGopathGorootTask() {
+    public ShowGopathGoroot() {
         setDescription("Show GOPATH and GOROOT in build.");
         dependsOn(PREPARE_TASK_NAME);
     }

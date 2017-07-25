@@ -48,7 +48,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.go.GoCoverTask.COVERAGE_PROFILES_PATH;
+import static com.github.blindpirate.gogradle.task.go.GoCover.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
 import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
@@ -64,8 +64,8 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-public class GoTestTask extends Go {
-    private static final Logger LOGGER = Logging.getLogger(GoTestTask.class);
+public class GoTest extends Go {
+    private static final Logger LOGGER = Logging.getLogger(GoTest.class);
 
     private static final String REWRITE_SCRIPT_RESOURCE = "test/rewrite.html";
 
@@ -81,7 +81,7 @@ public class GoTestTask extends Go {
 
     private boolean coverageProfileGenerated = false;
 
-    public GoTestTask() {
+    public GoTest() {
         setDescription("Run all tests.");
         dependsOn(VENDOR_TASK_NAME);
     }
@@ -96,7 +96,7 @@ public class GoTestTask extends Go {
 
     @Option(option = "tests", description = "Sets test class or method name to be included, '*' is supported.")
     @Incubating
-    public GoTestTask setTestNamePattern(List<String> testNamePattern) {
+    public GoTest setTestNamePattern(List<String> testNamePattern) {
         this.testNamePattern = testNamePattern;
         return this;
     }
@@ -283,7 +283,7 @@ public class GoTestTask extends Go {
                 new SuffixFileFilter(".html"),
                 TrueFileFilter.INSTANCE);
         String rewriteScript = IOUtils.toString(
-                GoTestTask.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
+                GoTest.class.getClassLoader().getResourceAsStream(REWRITE_SCRIPT_RESOURCE));
         htmlFiles.forEach(htmlFile -> {
             String content = IOUtils.toString(htmlFile);
             content = content.replace("</body>", "</body>" + rewriteScript);

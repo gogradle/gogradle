@@ -32,7 +32,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.CLEAN_TAS
 /**
  * This task perform preparation such as Go executable and GOPATH.
  */
-public class PrepareTask extends DefaultTask {
+public class GoPrepare extends DefaultTask {
     @Inject
     private GoBinaryManager goBinaryManager;
 
@@ -48,7 +48,7 @@ public class PrepareTask extends DefaultTask {
     @Inject
     private GogradleRootProject gogradleRootProject;
 
-    public PrepareTask() {
+    public GoPrepare() {
         shouldRunAfter(CLEAN_TASK_NAME);
     }
 

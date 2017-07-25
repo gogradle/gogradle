@@ -42,7 +42,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_B
 import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.toList;
 
-public class GoBuildTask extends Go {
+public class GoBuild extends Go {
 
     @Inject
     private GolangPluginSetting setting;
@@ -54,7 +54,7 @@ public class GoBuildTask extends Go {
 
     private String outputLocation = "./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}";
 
-    public GoBuildTask() {
+    public GoBuild() {
         setDescription("Run build and generate output.");
         dependsOn(INSTALL_DEPENDENCIES_TASK_NAME, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
     }

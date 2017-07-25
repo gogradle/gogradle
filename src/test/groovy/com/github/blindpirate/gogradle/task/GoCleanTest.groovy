@@ -29,15 +29,15 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class CleanTaskTest extends TaskTest {
+class GoCleanTest extends TaskTest {
 
-    CleanTask task
+    GoClean task
 
     File resource
 
     @Before
     void setUp() {
-        task = buildTask(CleanTask)
+        task = buildTask(GoClean)
         when(project.getProjectDir()).thenReturn(resource)
     }
 

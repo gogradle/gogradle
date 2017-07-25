@@ -25,13 +25,13 @@ import org.junit.runner.RunWith
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 
 @RunWith(GogradleRunner)
-class CheckTaskTest extends TaskTest {
+class GoCheckTest extends TaskTest {
 
-    CheckTask task
+    GoCheck task
 
     @Before
     void setUp() {
-        task = buildTask(CheckTask)
+        task = buildTask(GoCheck)
     }
 
     @Test

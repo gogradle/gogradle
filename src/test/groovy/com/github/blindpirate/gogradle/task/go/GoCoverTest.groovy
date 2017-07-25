@@ -36,21 +36,21 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('go-test-cover.zip')
-class GoCoverTaskTest extends TaskTest {
+class GoCoverTest extends TaskTest {
 
     File resource
 
-    GoCoverTask task
+    GoCover task
 
     @Before
     void setUp() {
 
-        task = buildTask(GoCoverTask)
+        task = buildTask(GoCover)
 
         when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
 
-        when(golangTaskContainer.get(GoTestTask).isCoverageProfileGenerated()).thenReturn(true)
+        when(golangTaskContainer.get(GoTest).isCoverageProfileGenerated()).thenReturn(true)
 
         when(project.getName()).thenReturn(resource.getName())
         when(buildManager.go(anyList(), anyMap())).thenAnswer(new Answer<Object>() {
@@ -138,7 +138,7 @@ class GoCoverTaskTest extends TaskTest {
     @Test
     void 'coverage task should be skipped if no coverfile generated'() {
         // given
-        when(golangTaskContainer.get(GoTestTask).isCoverageProfileGenerated()).thenReturn(false)
+        when(golangTaskContainer.get(GoTest).isCoverageProfileGenerated()).thenReturn(false)
         // when
         task.coverage()
         // then

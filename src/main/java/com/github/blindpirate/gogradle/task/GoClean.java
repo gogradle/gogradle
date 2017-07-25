@@ -17,15 +17,22 @@
 
 package com.github.blindpirate.gogradle.task;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_TEST_DEPENDENCIES_TASK_NAME;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.TaskAction;
 
-public class VendorTask extends AbstractGolangTask {
-    public VendorTask() {
-        setDescription("Install dependencies into vendor.");
-        dependsOn(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME,
-                RESOLVE_TEST_DEPENDENCIES_TASK_NAME,
-                INSTALL_DEPENDENCIES_TASK_NAME);
+import java.io.File;
+
+import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_BUILD_DIR_NAME;
+import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
+import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
+
+public class GoClean extends DefaultTask {
+
+    @TaskAction
+    public void clean() {
+        File gogradleBuildDir = new File(getProject().getProjectDir(), GOGRADLE_BUILD_DIR_NAME);
+        if (isValidDirectory(gogradleBuildDir)) {
+            clearDirectory(gogradleBuildDir);
+        }
     }
 }

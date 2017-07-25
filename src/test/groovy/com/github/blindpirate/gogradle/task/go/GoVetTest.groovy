@@ -33,14 +33,14 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class GoVetTaskTest extends TaskTest {
-    GoVetTask task
+class GoVetTest extends TaskTest {
+    GoVet task
 
     File resource
 
     @Before
     void setUp() {
-        task = buildTask(GoVetTask)
+        task = buildTask(GoVet)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
         when(project.getProjectDir()).thenReturn(resource)
         if (resource) {

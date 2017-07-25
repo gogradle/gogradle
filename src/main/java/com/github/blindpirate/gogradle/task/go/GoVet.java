@@ -29,8 +29,8 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 
-public class GoVetTask extends Go {
-    public GoVetTask() {
+public class GoVet extends Go {
+    public GoVet() {
         setDescription("Run 'go vet' (https://golang.org/cmd/vet).");
         dependsOn(VENDOR_TASK_NAME);
     }

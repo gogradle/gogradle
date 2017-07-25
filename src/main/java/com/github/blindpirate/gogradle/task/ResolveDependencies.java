@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 
-public abstract class ResolveTask extends AbstractGolangTask {
+public abstract class ResolveDependencies extends AbstractGolangTask {
     @Inject
     private GolangPluginSetting setting;
 
@@ -77,7 +77,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     private DependencyTreeNode dependencyTree;
 
-    public ResolveTask() {
+    public ResolveDependencies() {
         setGroup(null);
         dependsOn(PREPARE_TASK_NAME);
     }

@@ -33,8 +33,8 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class ShowGopathGorootTaskTest extends TaskTest {
-    ShowGopathGorootTask task
+class ShowGopathGorootTest extends TaskTest {
+    ShowGopathGoroot task
 
     File resource
 
@@ -43,13 +43,13 @@ class ShowGopathGorootTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(ShowGopathGorootTask)
-        ReflectionUtils.setStaticFinalField(ShowGopathGorootTask, 'LOGGER', logger)
+        task = buildTask(ShowGopathGoroot)
+        ReflectionUtils.setStaticFinalField(ShowGopathGoroot, 'LOGGER', logger)
     }
 
     @After
     void cleanUp() {
-        ReflectionUtils.setStaticFinalField(ShowGopathGorootTask, 'LOGGER', Logging.getLogger(ShowGopathGorootTask))
+        ReflectionUtils.setStaticFinalField(ShowGopathGoroot, 'LOGGER', Logging.getLogger(ShowGopathGoroot))
     }
 
     @Test

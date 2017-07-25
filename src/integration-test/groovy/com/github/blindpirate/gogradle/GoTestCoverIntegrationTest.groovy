@@ -20,7 +20,7 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.task.go.GoCoverTaskTest
+import com.github.blindpirate.gogradle.task.go.GoCoverTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.StringUtils
@@ -60,7 +60,7 @@ golang {
         assert stdout.toString().contains('BUILD SUCCESSFUL')
 
 
-        GoCoverTaskTest.examineCoverageHtmls(resource)
+        GoCoverTest.examineCoverageHtmls(resource)
     }
 
 //    Caused by: org.gradle.tooling.internal.protocol.exceptions.InternalUnsupportedBuildArgumentException: Problem with provided build arguments: [--stacktrace, --tests a1_test.go].
