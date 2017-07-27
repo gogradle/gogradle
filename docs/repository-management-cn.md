@@ -110,3 +110,5 @@ repositories {
 ```
 
 这样做会通知Gogradle：类似`yourgitlab.com`和`yourgitlab.com/username`这样的路径不是一个项目的根路径。
+
+Gitlab 9.5已经修正此问题。

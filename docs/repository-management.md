@@ -99,3 +99,5 @@ repositories {
 ```
 
 This tells Gogradle: path like `yourgitlab.com` and `yourgitlab.com/username` is not a project root path.
+
+This has been fixed in Gitlab 9.5.
