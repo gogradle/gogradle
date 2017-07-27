@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 
 import javax.inject.Singleton;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -77,6 +78,9 @@ public class GolangPluginSetting {
     // if true, the plugin will make its best effort to bypass the GFW
     // designed for Chinese developer
     private boolean fuckGfw;
+
+    // A user defined source for go binaries
+    private URI goBinaryDownloadRootUri;
 
     public String getGoRoot() {
         return goRoot;
@@ -142,6 +146,18 @@ public class GolangPluginSetting {
 
     public void setFuckGfw(boolean fuckGfw) {
         this.fuckGfw = fuckGfw;
+    }
+
+    public URI getGoBinaryDownloadBaseUri() {
+        return goBinaryDownloadRootUri;
+    }
+
+    public void setGoBinaryDownloadBaseUri(String goBinaryDownloadBaseUri) {
+        setGoBinaryDownloadBaseUri(goBinaryDownloadBaseUri == null ? null : URI.create(goBinaryDownloadBaseUri));
+    }
+
+    public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUrl) {
+        this.goBinaryDownloadRootUri = goBinaryDownloadBaseUrl;
     }
 
     public void globalCacheFor(int count, String timeUnit) {

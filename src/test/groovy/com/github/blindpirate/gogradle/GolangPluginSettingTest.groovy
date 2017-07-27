@@ -108,6 +108,18 @@ class GolangPluginSettingTest {
     }
 
     @Test
+    void 'setting go binary download base uri to a String should succeed'() {
+        setting.goBinaryDownloadBaseUri = 'http://example.com/'
+        assert setting.goBinaryDownloadBaseUri == URI.create('http://example.com/')
+    }
+
+    @Test
+    void 'setting go binary download base uri to a URI should succeed'() {
+        setting.goBinaryDownloadBaseUri = URI.create('http://example.com/')
+        assert setting.goBinaryDownloadBaseUri == URI.create('http://example.com/')
+    }
+
+    @Test
     void 'setting goroot should succeed'() {
         setting.goRoot = 'goroot'
         assert setting.goRoot == 'goroot'

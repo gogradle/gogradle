@@ -19,12 +19,7 @@ package com.github.blindpirate.gogradle.crossplatform;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
-import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.CompressUtils;
-import com.github.blindpirate.gogradle.util.HttpUtils;
-import com.github.blindpirate.gogradle.util.IOUtils;
-import com.github.blindpirate.gogradle.util.ProcessUtils;
-import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.blindpirate.gogradle.util.*;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -252,8 +247,15 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private Path downloadArchive(String version) {
-        String baseUrl = urls.get(setting.isFuckGfw());
-        String url = injectVariables(baseUrl, version);
+        String url;
+        if (setting.getGoBinaryDownloadBaseUri() == null) {
+            String baseUrl = urls.get(setting.isFuckGfw());
+            url = injectVariables(baseUrl, version);
+        } else {
+            url = setting.getGoBinaryDownloadBaseUri().resolve(
+                    injectVariables("go${version}.${os}-${arch}${extension}", version)
+            ).toASCIIString();
+        }
         String archiveFileName = injectVariables(FILENAME, version);
         Path goBinaryCachePath = globalCacheManager.getGlobalGoBinCache(archiveFileName);
         forceMkdir(goBinaryCachePath.getParent().toFile());
