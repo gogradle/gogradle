@@ -214,6 +214,18 @@ class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
         verify(httpUtils).download(anyString(), any(Path))
     }
 
+    @Test
+    void 'go binary with specified version should be downloaded when a modified go binary base url has been set'() {
+        // given
+        when(setting.getGoVersion()).thenReturn('1.7.4')
+        when(setting.getGoBinaryDownloadBaseUri()).thenReturn(URI.create('http://example.com/'))
+        // then
+        assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}")
+        assert manager.getGoVersion() == '1.7.4'
+        assert manager.getGoroot() == resource.toPath().resolve('1.7.4/go')
+        verify(httpUtils).download(eq("http://example.com/go1.7.4.${Os.getHostOs().toString()}-${Arch.getHostArch().toString()}${Os.getHostOs().archiveExtension()}".toString()), any(Path))
+    }
+
     @Test(expected = UncheckedIOException)
     void 'exception should be thrown when specified version is invalid'() {
         // given
