@@ -19,7 +19,12 @@ package com.github.blindpirate.gogradle.crossplatform;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
-import com.github.blindpirate.gogradle.util.*;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.CompressUtils;
+import com.github.blindpirate.gogradle.util.HttpUtils;
+import com.github.blindpirate.gogradle.util.IOUtils;
+import com.github.blindpirate.gogradle.util.ProcessUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.filefilter.TrueFileFilter;
