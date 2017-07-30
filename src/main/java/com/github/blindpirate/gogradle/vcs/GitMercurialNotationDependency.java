@@ -100,13 +100,11 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
 
     @Override
     public String toString() {
-        return getClass().getSimpleName() + "{"
-                + "name='" + getName() + '\''
+        return "git dependency package " + getName() + '\''
                 + (commit == null ? "" : ", commit='" + commit + '\'')
                 + (tag == null ? "" : ", tag='" + tag + '\'')
                 + (getUrls() == null ? "" : ", urls='" + getUrls() + '\'')
-                + (containsAllSubpackages() ? "" : ", subpackages='" + getSubpackages() + '\'')
-                + '}';
+                + (containsAllSubpackages() ? "" : ", subpackages='" + getSubpackages() + '\'');
     }
 
     @Override
