@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.core.dependency.lock;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
 import com.github.blindpirate.gogradle.util.DataExchange;
@@ -27,6 +28,7 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -62,6 +64,7 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
 
     private List<Map<String, Object>> toNotations(Collection<? extends ResolvedDependency> flatDependencies) {
         List<Map<String, Object>> ret = flatDependencies.stream()
+                .sorted(Comparator.comparing(GolangDependency::getName)) // to have a deterministic order
                 .map(ResolvedDependency::toLockedNotation)
                 .collect(Collectors.toList());
         ret.forEach(this::deactivateTransitive);
