@@ -31,6 +31,7 @@ import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 
+import java.io.File;
 import java.util.Arrays;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
@@ -71,7 +72,12 @@ public class GolangPlugin implements Plugin<Project> {
         configureSettings(project);
         configureConfigurations(project);
         configureTasks(project);
+        configureBuildDir(project);
         hackIdeaPlugin();
+    }
+
+    private void configureBuildDir(Project project) {
+        project.setBuildDir(new File(project.getProjectDir(), ".gogradle"));
     }
 
     private void hackIdeaPlugin() {
