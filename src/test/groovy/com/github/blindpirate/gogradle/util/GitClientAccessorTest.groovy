@@ -40,12 +40,6 @@ import static org.mockito.Mockito.when
 @WithMockInjector
 class GitClientAccessorTest {
 
-//    public static void main(String[] args) {
-//        GitServer server = GitServer.newServer(new File('/Users/zhb/Projects/gogradle/src/test/resources/test-git-repos'))
-//        server.start(8080)
-//        Thread.sleep(10000000)
-//    }
-
     File resource //= new File('/Users/zhb/Projects/gogradle/src/test/resources/simple-repo')
 
     File repositories
