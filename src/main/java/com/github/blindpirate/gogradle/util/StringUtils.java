@@ -133,4 +133,9 @@ public class StringUtils {
     public static String trimToNull(String str) {
         return org.apache.commons.lang3.StringUtils.trimToNull(str);
     }
+
+    public static String capitalizeFirstLetter(String s) {
+        Assert.isNotBlank(s);
+        return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
 }
