@@ -85,8 +85,6 @@ abstract class TaskTest {
     GoglandIntegration goglandIntegration
     @Mock
     ExtensionContainerInternal extensionContainer
-    @Mock
-    GolangDependencyHandler dependencyHandler
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -124,7 +122,6 @@ abstract class TaskTest {
                       gogradleRootProject    : gogradleRootProject,
                       vendorSnapshoter       : vendorSnapshoter,
                       goglandIntegration     : goglandIntegration,
-                      dependencyHandler      : dependencyHandler,
                       jetBrainsIdeIntegration: jetBrainsIdeIntegration]
 
 

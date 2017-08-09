@@ -17,7 +17,7 @@
 
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
+import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency;
@@ -61,7 +61,7 @@ public class GoInit extends AbstractGolangTask {
     private DependencyVisitor visitor;
 
     @Inject
-    private GolangDependencyHandler dependencyHandler;
+    private GolangConfigurationManager configurationManager;
 
     public GoInit() {
         setDescription("Import dependencies from other dependency management tools.");
@@ -71,7 +71,7 @@ public class GoInit extends AbstractGolangTask {
     @TaskAction
     void init() {
         File rootDir = getProject().getProjectDir();
-        if (dependencyHandler.hasFirstLevelDependencies() || new File(rootDir, "gogradle.lock").exists()) {
+        if (dependenciesInBuildDotGradleExists() || new File(rootDir, "gogradle.lock").exists()) {
             LOGGER.warn("This project seems to have been initialized already, skip.");
             return;
         }
@@ -82,6 +82,12 @@ public class GoInit extends AbstractGolangTask {
         } else {
             initBySourceCodeScan(rootDir);
         }
+    }
+
+    private boolean dependenciesInBuildDotGradleExists() {
+        // there have been some dependencies declared in build.gradle
+        return configurationManager.getByName(BUILD).hasFirstLevelDependencies()
+                || configurationManager.getByName(TEST).hasFirstLevelDependencies();
     }
 
     private void initBySourceCodeScan(File rootDir) {

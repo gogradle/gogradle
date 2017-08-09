@@ -22,7 +22,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
-import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
@@ -76,9 +75,6 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     @Inject
     private GogradleRootProject gogradleRootProject;
 
-    @Inject
-    private GolangDependencyHandler dependencyHandler;
-
     private DependencyTreeNode dependencyTree;
 
     public ResolveDependencies() {
@@ -89,7 +85,9 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 1: dependencies declared in build.gradle
     @Input
     public HashSet<GolangDependency> getDependencies() {
+        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
+        configuration.resolveFirstLevelDependencies();
         // elements in GolangDependency are identified by name, here we want to identify them by equals
         return new HashSet<>(configuration.getDependencies());
     }
@@ -122,6 +120,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 6: --refresh-dependencies
     @Input
     public String getRefreshDependenciesFlag() {
+        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
         if (GogradleGlobal.isRefreshDependencies()) {
             return UUID.randomUUID().toString();
         } else {
@@ -163,8 +162,6 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     private void resolveDependencies() {
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
-
-        dependencyHandler.resolveFirstLevel(configuration);
 
         ResolveContext rootContext = ResolveContext.root(gogradleRootProject, configuration);
 

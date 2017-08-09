@@ -78,8 +78,7 @@ class GoInitTest extends TaskTest {
     @Test
     void 'initialization should be skipped if dependencies in build.gradle exist'() {
         // given
-        GolangDependencySet dependencySet = asGolangDependencySet(mockDependency('mock'))
-        when(test.dependencies).thenReturn(dependencySet)
+        when(build.hasFirstLevelDependencies()).thenReturn(true)
         // when
         task.init()
         // then

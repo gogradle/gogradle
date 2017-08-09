@@ -17,6 +17,8 @@
 
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.HashMap;
@@ -30,9 +32,9 @@ public class GolangConfigurationManager {
     private final Map<String, GolangConfiguration> configurations = new HashMap<>();
 
     @Inject
-    public GolangConfigurationManager() {
-        configurations.put(BUILD, new GolangConfiguration(BUILD));
-        configurations.put(TEST, new GolangConfiguration(TEST));
+    public GolangConfigurationManager(NotationParser notationParser) {
+        configurations.put(BUILD, new GolangConfiguration(BUILD, notationParser));
+        configurations.put(TEST, new GolangConfiguration(TEST, notationParser));
     }
 
     public GolangConfiguration getByName(String name) {

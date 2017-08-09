@@ -17,16 +17,25 @@
 
 package com.github.blindpirate.gogradle.core
 
+import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
+import com.github.blindpirate.gogradle.util.DependencyUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Test
+import org.mockito.Mockito
+
+import static org.mockito.Mockito.*
 
 class GolangConfigurationTest {
-    GolangConfiguration configuration = new GolangConfiguration('build')
+    NotationParser parser = mock(NotationParser)
+    GolangConfiguration configuration = new GolangConfiguration('build', parser)
 
     @Test
     void 'dependency registry should be isolated'() {
-        GolangConfiguration build = new GolangConfiguration('build')
-        GolangConfiguration test = new GolangConfiguration('test')
+        GolangConfiguration build = new GolangConfiguration('build', parser)
+        GolangConfiguration test = new GolangConfiguration('test', parser)
         assert build.dependencyRegistry instanceof DefaultDependencyRegistry
         assert !build.dependencyRegistry.is(test.dependencyRegistry)
     }
@@ -36,4 +45,28 @@ class GolangConfigurationTest {
         assert configuration.getDependencies().isEmpty()
     }
 
+    @Test
+    void 'adding first level dependency should succeed'() {
+        // when
+        configuration.addFirstLevelDependency([:], { 1 })
+        // then
+        List firstLevelDependencies = configuration.firstLevelDependencies
+        assert firstLevelDependencies.size() == 1
+        assert firstLevelDependencies[0].left == [:]
+        assert firstLevelDependencies[0].right() == 1
+        assert configuration.hasFirstLevelDependencies()
+    }
+
+    @Test
+    void 'resolving first level dependencies should succeed'() {
+        // given
+        'adding first level dependency should succeed'()
+        GolangDependency dependency = DependencyUtils.mockWithName(AbstractGolangDependency, '')
+        when(parser.parse(Mockito.any())).thenReturn(dependency)
+        // when
+        configuration.resolveFirstLevelDependencies()
+        // then
+        assert configuration.dependencies.size() == 1
+        verify(parser).parse([:])
+    }
 }

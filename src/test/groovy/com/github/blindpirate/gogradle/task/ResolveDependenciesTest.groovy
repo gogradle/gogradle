@@ -56,7 +56,7 @@ import static org.mockito.Mockito.*
 @WithMockInjector
 class ResolveDependenciesTest extends TaskTest {
     ResolveBuildDependencies resolveBuildDependenciesTask
-    ResolveTestDependenciesDependencies resolveTestDependenciesTask
+    ResolveTestDependencies resolveTestDependenciesTask
 
     File resource
     @Mock
@@ -77,7 +77,7 @@ class ResolveDependenciesTest extends TaskTest {
         when(setting.getPackagePath()).thenReturn("package")
 
         resolveBuildDependenciesTask = buildTask(ResolveBuildDependencies)
-        resolveTestDependenciesTask = buildTask(ResolveTestDependenciesDependencies)
+        resolveTestDependenciesTask = buildTask(ResolveTestDependencies)
 
         gogradleRootProject = new GogradleRootProject(project)
         gogradleRootProject.setName('package')
@@ -113,7 +113,6 @@ class ResolveDependenciesTest extends TaskTest {
         resolveBuildDependenciesTask.resolve()
         // then
         assert new File(resource, '.gogradle/cache/build.bin').exists()
-        verify(dependencyHandler).resolveFirstLevel(configuration)
         verify(projectCacheManager).loadPersistenceCache()
         verify(projectCacheManager).savePersistenceCache()
     }

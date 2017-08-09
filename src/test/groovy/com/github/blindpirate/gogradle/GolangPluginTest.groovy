@@ -120,7 +120,7 @@ class GolangPluginTest {
     }
 
     def resolveFirstLevelDependencies() {
-        injector.getInstance(GolangDependencyHandler).resolveFirstLevel(getBuildConfiguration())
+        getBuildConfiguration().resolveFirstLevelDependencies()
     }
 
     def getBuildConfiguration() {
