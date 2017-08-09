@@ -22,14 +22,12 @@ import com.github.blindpirate.gogradle.GogradleModule
 import com.github.blindpirate.gogradle.GolangPlugin
 import com.google.inject.Guice
 import com.google.inject.Injector
+import org.gradle.api.internal.plugins.ExtensionContainerInternal
 import org.gradle.api.internal.project.DefaultProject
 import org.gradle.api.internal.project.ProjectInternal
-import org.gradle.api.plugins.ExtensionContainer
 import org.junit.Before
 
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS
-import static org.mockito.Mockito.mock
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 abstract class GogradleModuleSupport {
     ProjectInternal project = mock(DefaultProject, RETURNS_DEEP_STUBS)
@@ -39,7 +37,7 @@ abstract class GogradleModuleSupport {
     @Before
     void initInjector() {
         injector = Guice.createInjector(new GogradleModule(project))
-        ExtensionContainer extensionContainer = mock(ExtensionContainer)
+        ExtensionContainerInternal extensionContainer = mock(ExtensionContainerInternal)
         when(project.getExtensions()).thenReturn(extensionContainer)
 
         when(extensionContainer.getByName(GolangPlugin.GOGRADLE_INJECTOR)).thenReturn(injector)
