@@ -71,6 +71,7 @@ class GofmtTest extends TaskTest {
     void 'gofmt should succeed'() {
         // when
         task.executeTask()
+        task.afterEvaluate()
 
         // then
         verify(buildManager).run(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
@@ -88,6 +89,7 @@ class GofmtTest extends TaskTest {
     void 'customized action should be executed successfully'() {
         // when
         task.gofmt 'whatever'
+        task.afterEvaluate()
         task.executeTask()
         // then
         verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
