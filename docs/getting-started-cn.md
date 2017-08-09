@@ -257,6 +257,10 @@ golang {
     // 可以用 goExecutable = 'IGNORE_LOCAL' 来强制指定不使用本地的go
     goExecutable = '/path/to/go/executable'
     
+    // 方便自定义仓库，Gogradle会尝试从
+    // http://my-company.com/go-distributions/go${version}.${os}-${arch}${extension} 下载go的发行版
+    goBinaryDownloadRootUri = 'http://my-company.com/go-distributions'
+    
     // 默认为<go程序所在目录>/..
     goRoot = '/path/to/my/goroot'
     

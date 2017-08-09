@@ -239,6 +239,10 @@ golang {
     // Default value is "go". Modify this when go is not in $PATH
     // You can use goExecutable = 'IGNORE_LOCAL' to ignore local go forcibly 
     goExecutable = '/path/to/go/executable'
+    
+    // For custom distribution repository. Gogradle will try to download go distributions from
+    // http://my-company.com/go-distributions/go${version}.${os}-${arch}${extension}
+    goBinaryDownloadRootUri = 'http://my-company.com/go-distributions'
 
     // If not set, GOROOT will be <directory of go binary>/..
     goRoot = '/path/to/my/goroot'
