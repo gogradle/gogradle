@@ -96,9 +96,7 @@ For example, to add a task to run [`golint`](https://github.com/golang/lint), ad
 task golint(type: com.github.blindpirate.gogradle.Go) {
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
     environment MY_OWN_ENV1: 'value1', MY_OWN_ENV1: 'value2' // set environment variables
-    doLast {
-        run 'golint github.com/my/project' // specify the command in task
-    }
+    run 'golint github.com/my/project' // specify the command in task
 }
 
 check.dependsOn golint
@@ -109,15 +107,13 @@ Note that `stdout/stderr` redirection and pipe is not available. To do a redirec
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
-    doLast {
-        go('build -v github.com/my/project', { stdoutLine ->
-            println stderrLine
-            new File('stdout.txt').append(stdoutLine)
-        }, { stderrLine ->
-            println stderrLine
-            new File('stderr.txt').append(stdoutLine)
-        })
-    }
+    go('build -v github.com/my/project', { stdoutLine ->
+        println stderrLine
+        new File('stdout.txt').append(stdoutLine)
+    }, { stderrLine ->
+        println stderrLine
+        new File('stderr.txt').append(stdoutLine)
+    })
 }
 ```
 
@@ -126,9 +122,8 @@ And more simple:
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
-    doLast {
         go('build -v github.com/my/project', writeTo('stdout.txt'), appendTo('/this/is/absolute/path/stderr.txt'))
-    }
+    
 }
 ```
 
@@ -139,10 +134,10 @@ Here is a cross-platform `/dev/null`:
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
+    go('build -v github.com/my/project', devNull(), devNull())
     doLast {
-        def retcode = go('build -v github.com/my/project', devNull(), devNull())
-        if(retcode != 0) {
-             println "return code is ${retcode}"
+        if(exitValue!=0){
+            println "return code is ${exitValue}"
         }
     }
 }

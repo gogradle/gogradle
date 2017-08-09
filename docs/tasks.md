@@ -110,9 +110,7 @@ If your main package is not located in your project root, or you want to add som
 
 ```
 build {
-    doLast {
-        go 'build -o ./gogradle/output github.com/my/package/my/subpackage --my-own-cmd-arguments'
-    }
+    go 'build -o ./gogradle/output github.com/my/package/my/subpackage --my-own-cmd-arguments'
 }
 ```
 
@@ -131,9 +129,7 @@ If the default behavior is not expected, or you want to change the command line 
 
 ```groovy
 fmt {
-    doLast {
-        gofmt "-r '(a) -> a' -l *.go"
-    }
+    gofmt "-r '(a) -> a' -l *.go"
 }
 ```
 
