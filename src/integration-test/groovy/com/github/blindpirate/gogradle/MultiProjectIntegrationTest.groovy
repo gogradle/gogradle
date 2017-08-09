@@ -86,7 +86,7 @@ func main(){
 }
 ''')
         IOUtils.write(resource, 'go2/main.go', '''
-package go1
+package go2
 import "my/common"
 func main(){
     common.Say("go2")
