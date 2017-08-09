@@ -21,6 +21,8 @@ import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
+import com.github.blindpirate.gogradle.task.go.GoBuild;
+import com.github.blindpirate.gogradle.task.go.Gofmt;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Action;
@@ -36,17 +38,13 @@ import java.util.Arrays;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.BUILD_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
-import static java.util.Arrays.asList;
 
 /**
  * The entry of Gogradle plugin.
  */
 public class GolangPlugin implements Plugin<Project> {
+    public static final String GOGRADLE_INJECTOR = "GOGRADLE_INJECTOR";
     private Injector injector;
     private GolangPluginSetting settings;
     private GolangTaskContainer golangTaskContainer;
@@ -89,6 +87,7 @@ public class GolangPlugin implements Plugin<Project> {
     private void init(Project project) {
         this.project = project;
         this.injector = initGuice();
+        this.project.getExtensions().add(GOGRADLE_INJECTOR, this.injector);
         this.settings = injector.getInstance(GolangPluginSetting.class);
         this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
         Arrays.asList(BuildMode.values()).forEach(mode -> {
@@ -98,7 +97,7 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void configureGogradleGlobal() {
-        GogradleGlobal.INSTANCE.setInjector(injector);
+        GogradleGlobal.INSTANCE.setCurrentProject(project);
     }
 
     private void configureTasks(Project project) {
@@ -107,13 +106,15 @@ public class GolangPlugin implements Plugin<Project> {
             Task task = taskContainer.create(key, value, dependencyInjectionAction);
             golangTaskContainer.put((Class) value, task);
         });
-
         project.afterEvaluate(this::afterEvaluate);
     }
 
-    private void afterEvaluate(Project p) {
-        asList(BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME).forEach(
-                task -> Go.class.cast(p.getTasks().getByName(task)).addDefaultActionIfNoCustomActions());
+    private void afterEvaluate(Project project) {
+        this.golangTaskContainer.get(GoBuild.class).afterEvaluate();
+        this.golangTaskContainer.get(Gofmt.class).afterEvaluate();
+        this.golangTaskContainer.each(task ->
+                task.doFirst(t -> GogradleGlobal.INSTANCE.setCurrentProject(project))
+        );
     }
 
     private void customizeProjectInternalServices(Project project) {
