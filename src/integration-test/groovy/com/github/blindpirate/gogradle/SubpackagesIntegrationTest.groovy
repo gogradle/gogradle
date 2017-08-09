@@ -192,7 +192,7 @@ dependencies {
         assertOnlySub1Exists()
 
         assert stdout.toString().replaceAll(/[0-9a-f]{7}/, '').contains('\\-- localhost/vcs: [sub1]')
-        assert stdout.toString().contains("Resolving cached GitNotationDependency{name='localhost/vcs'")
+        assert stdout.toString().contains("Resolving cached localhost/vcs")
 //
 //        assert new File(resource, 'vendor/localhost/vcs/sub1/sub1.go').exists()
 //        assert !new File(resource, 'vendor/localhost/vcs/sub2').exists()

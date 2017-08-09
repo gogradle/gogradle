@@ -91,7 +91,7 @@ Resolution stack is:
             }
         } catch (BuildException e) {
             assert stderr.toString().contains("""\
-Cannot resolve dependency:GitNotationDependency{name='localhost/a', commit='unexistent', urls='[http://localhost:8080/a]'}
+Cannot resolve dependency:localhost/a: commit='unexistent', urls=[http://localhost:8080/a]
 Resolution stack is:
 +- github.com/my/package
 """)
