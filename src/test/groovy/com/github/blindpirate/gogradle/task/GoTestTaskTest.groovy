@@ -19,15 +19,14 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor
 import com.github.blindpirate.gogradle.task.go.GoTest
+import com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor
 import com.github.blindpirate.gogradle.task.go.PackageTestResult
 import com.github.blindpirate.gogradle.util.ExceptionHandler
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult
-import org.gradle.api.logging.Logger
 import org.gradle.api.tasks.testing.TestResult
 import org.junit.Before
 import org.junit.Test
@@ -41,7 +40,8 @@ import org.mockito.stubbing.Answer
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
-import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.*
+import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

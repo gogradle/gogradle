@@ -23,7 +23,6 @@ import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
-import com.github.blindpirate.gogradle.core.GolangDependencyHandler
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.cache.VendorSnapshoter
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject

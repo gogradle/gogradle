@@ -28,7 +28,8 @@ import org.junit.runners.model.FrameworkMethod
 
 import java.lang.annotation.Annotation
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 abstract class GogradleGlobalProcessor<T extends Annotation> extends GogradleRunnerProcessor<T> {
     @Override

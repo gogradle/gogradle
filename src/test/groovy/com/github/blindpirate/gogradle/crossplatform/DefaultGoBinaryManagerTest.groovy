@@ -35,8 +35,7 @@ import org.mockito.stubbing.Answer
 import java.nio.file.Files
 import java.nio.file.Path
 
-import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.anyString
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

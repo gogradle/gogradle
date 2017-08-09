@@ -22,7 +22,6 @@ import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser
 import com.github.blindpirate.gogradle.util.DependencyUtils
-import com.github.blindpirate.gogradle.util.MockUtils
 import org.junit.Test
 import org.mockito.Mockito
 

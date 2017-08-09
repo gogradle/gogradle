@@ -18,7 +18,6 @@
 package com.github.blindpirate.gogradle
 
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager
-import com.github.blindpirate.gogradle.core.GolangDependencyHandler
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
@@ -45,7 +44,7 @@ import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
-import static com.github.blindpirate.gogradle.util.StringUtils.*
+import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLetter
 
 @RunWith(GogradleRunner)
 @WithProject
