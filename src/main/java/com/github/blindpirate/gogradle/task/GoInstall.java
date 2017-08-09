@@ -54,7 +54,7 @@ public class GoInstall extends AbstractGolangTask {
         vendorSnapshoter.loadPersistenceCache();
 
         GolangDependencySet buildSet = getTask(ResolveBuildDependencies.class).getFlatDependencies();
-        GolangDependencySet testSet = getTask(ResolveTestDependenciesDependencies.class).getFlatDependencies();
+        GolangDependencySet testSet = getTask(ResolveTestDependencies.class).getFlatDependencies();
 
         GolangDependencySet result = GolangDependencySet.merge(buildSet, testSet);
 

@@ -79,7 +79,7 @@ class GoInstallTest extends TaskTest {
         GolangDependencySet buildSet = asGolangDependencySet(a, b)
         GolangDependencySet testSet = asGolangDependencySet(b2, f)
         when(golangTaskContainer.get(ResolveBuildDependencies).getFlatDependencies()).thenReturn(buildSet)
-        when(golangTaskContainer.get(ResolveTestDependenciesDependencies).getFlatDependencies()).thenReturn(testSet)
+        when(golangTaskContainer.get(ResolveTestDependencies).getFlatDependencies()).thenReturn(testSet)
 
         // when
         task.installDependenciesToVendor()
@@ -103,7 +103,7 @@ class GoInstallTest extends TaskTest {
     void 'files under vendor should be deleted'() {
         // given
         when(golangTaskContainer.get(ResolveBuildDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
-        when(golangTaskContainer.get(ResolveTestDependenciesDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
+        when(golangTaskContainer.get(ResolveTestDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
         IOUtils.write(resource, 'vendor/vendor.json', '')
         // when
         task.installDependenciesToVendor()
