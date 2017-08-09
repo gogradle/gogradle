@@ -31,7 +31,7 @@ abstract class GogradleRunnerProcessor<T extends Annotation> {
 
     void afterTest(Object instance, FrameworkMethod method, T annotation) {}
 
-    boolean isMock(obj) {
+    boolean alreadyMocked(obj) {
         return obj != null && Mockito.mockingDetails(obj).isMock()
     }
 }
