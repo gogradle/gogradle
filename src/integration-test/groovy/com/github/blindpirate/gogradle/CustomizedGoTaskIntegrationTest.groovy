@@ -38,11 +38,13 @@ golang {
     packagePath='a/b/c'
 }
 
+task version(type: com.github.blindpirate.gogradle.Go){
+    go 'version'
+}
+
 task ls(type: com.github.blindpirate.gogradle.Go){
-    doLast {
-        go 'version'
-        run '${lsCmd}'
-    }
+    dependsOn 'version'
+    run '${lsCmd}'
 }
 """
         writeBuildAndSettingsDotGradle(buildDotGradle)
