@@ -93,10 +93,9 @@ class GoTestTaskTest extends TaskTest {
     @Test
     void 'all package should be tested if not specified'() {
         // when
-        task.addDefaultActionIfNoCustomActions()
-        task.actions[0].execute(task)
+        task.run()
         // then
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
                  "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
@@ -109,8 +108,7 @@ class GoTestTaskTest extends TaskTest {
     void 'nothing should happened if no tests match the specific pattern'() {
         // when
         ReflectionUtils.setField(task, 'testNamePattern', ["THIS WON'T BE MATCHED"])
-        task.addDefaultActionIfNoCustomActions()
-        task.actions[0].execute(task)
+        task.run()
         // then
         verifyNoMoreInteractions(buildManager)
     }
@@ -118,12 +116,11 @@ class GoTestTaskTest extends TaskTest {
     @Test
     void 'coverage profiles should not be generated if not specified'() {
         // when
-        task.addDefaultActionIfNoCustomActions()
         task.setGenerateCoverageProfile(false)
-        task.actions[0].execute(task)
+        task.run()
         // then
         assert !task.coverageProfileGenerated
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/a'])
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/b'])
     }
@@ -132,10 +129,9 @@ class GoTestTaskTest extends TaskTest {
     void 'specific package should be tested if pattern is set'() {
         // when
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
-        task.addDefaultActionIfNoCustomActions()
-        task.actions[0].execute(task)
+        task.run()
         // then
-        verify(buildManager).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), any(Consumer))
+        verify(buildManager).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
         List<String> args = argumentsCaptor.getValue()
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
@@ -148,7 +144,7 @@ class GoTestTaskTest extends TaskTest {
     void 'collecting stdout should succeed'() {
         // given
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
-        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), any(Consumer))).thenAnswer(new Answer<Object>() {
+        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), eq(true))).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 invocation.arguments[2].accept('stdout')
@@ -157,8 +153,7 @@ class GoTestTaskTest extends TaskTest {
         })
         ArgumentCaptor<PackageTestResult> argumentCaptor = ArgumentCaptor.forClass(PackageTestResult)
         // when
-        task.addDefaultActionIfNoCustomActions()
-        task.actions[0].execute(task)
+        task.run()
         // then
         verify(extractor).extractTestResult(argumentCaptor.capture())
         PackageTestResult context = argumentCaptor.getValue()
@@ -178,9 +173,8 @@ class GoTestTaskTest extends TaskTest {
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])
 
         // when
-        task.addDefaultActionIfNoCustomActions()
         try {
-            task.actions[0].execute(task)
+            task.run()
             assert false
         } catch (Exception e) {
             println(ExceptionHandler.getStackTrace(e))
@@ -190,28 +184,8 @@ class GoTestTaskTest extends TaskTest {
 
     @Test
     void 'nothing should happened if no matched tests found'() {
-        // when
         task.setTestNamePattern(['unexistent'])
-        task.addDefaultActionIfNoCustomActions()
-        // then
-        task.actions.size() == 0
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'leftShift should not be supported!'() {
-        task.leftShift {}
-    }
-
-    @Test
-    void 'doLast and doFirst should be warned'() {
-        // given
-        Logger mockLogger = mock(Logger)
-        ReflectionUtils.setStaticFinalField(GoTest, 'LOGGER', mockLogger)
-        // when
-        task.doFirst {}
-        task.doLast {}
-        // then
-        verify(mockLogger, times(2)).warn('WARNING: test report is not supported in customized test action.')
+        task.run()
     }
 
     @Test
@@ -221,7 +195,7 @@ class GoTestTaskTest extends TaskTest {
         List files = ['index.html', 'sub/index.html', 'sub/sub/index.html', 'sub/sub/index.nohtml']
         files.each { IOUtils.write(resource, it, html) }
         // when
-        task.addDefaultActionIfNoCustomActions()
+        task.run()
         task.rewritePackageName(resource)
         // then
         files[0..2].each { assert new File(resource, it).text.contains('<script>') }

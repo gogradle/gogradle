@@ -42,8 +42,11 @@ public class Gofmt extends Go {
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
     }
 
-    protected void doAddDefaultAction() {
-        doLast(task -> run(CollectionUtils.asStringList(getGofmtPath(), "-w", children())));
+    public void afterEvaluate() {
+        // if user doesn't configure it
+        if (CollectionUtils.isEmpty(commandLineArgs)) {
+            run(CollectionUtils.asStringList(getGofmtPath(), "-w", children()), stdoutLineConsumer, stderrLineConsumer);
+        }
     }
 
     private String getGofmtPath() {

@@ -17,142 +17,136 @@
 
 package com.github.blindpirate.gogradle.task
 
+import com.github.blindpirate.gogradle.Go
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.task.go.GoBuild
-import com.github.blindpirate.gogradle.task.go.GoExecutionAction
+import org.gradle.api.internal.tasks.TaskContainerInternal
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
-import org.mockito.Captor
+import org.mockito.Mock
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
-import java.util.function.Consumer
-
+import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLetter
 import static org.mockito.ArgumentMatchers.any
-import static org.mockito.ArgumentMatchers.isNull
-import static org.mockito.Mockito.*
+import static org.mockito.ArgumentMatchers.anyString
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GoBuildTest extends TaskTest {
     GoBuild task
 
-    @Captor
-    ArgumentCaptor cmdsCaptor
-    @Captor
-    ArgumentCaptor envCaptor
+    @Mock
+    TaskContainerInternal taskContainer
+
+    Map tasks = [:]
+    String taskName
 
     @Before
     void setUp() {
         task = buildTask(GoBuild)
-        task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
+        taskName = 'build' + capitalizeFirstLetter(Os.getHostOs().toString()) + capitalizeFirstLetter(Arch.getHostArch().toString())
         when(buildManager.getGopath()).thenReturn('project_gopath')
         when(setting.getPackagePath()).thenReturn('my/package')
+        when(project.getTasks()).thenReturn(taskContainer)
+        when(taskContainer.create(anyString(), (Class) any(Class))).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                Go task = buildTask(Go)
+                tasks.put(invocation.getArgument(0), task)
+                return task
+            }
+        })
     }
 
     @Test
-    void 'adding default action should succeed'() {
+    void 'creating default task should succeed'() {
         // when
-        task.addDefaultActionIfNoCustomActions()
-        task.actions.each { it.execute(task) }
+        task.afterEvaluate()
         // then
-        assert task.actions.size() == 1
-        verify(buildManager, times(3)).go(cmdsCaptor.capture(), envCaptor.capture(), any(Consumer), any(Consumer), isNull())
-        assert cmdsCaptor.allValues ==
-                [['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
-                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
-                 ['build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package'],
-                ]
-        assert envCaptor.allValues == [
-                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: ''],
-                [GOOS: 'linux', GOARCH: '386', GOEXE: ''],
-                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
-        ]
+
+
+        assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package']
+        assert tasks[taskName].environment == [GOOS: Os.getHostOs().toString(), GOARCH: Arch.getHostArch().toString(), GOEXE: Os.getHostOs().exeExtension()]
     }
 
     @Test
-    void 'default action should not be added if there is customized action'() {
+    void 'creating expanded tasks should succeed'() {
         // when
-        task.setTargetPlatform("${Os.hostOs}-${Arch.hostArch}")
-        task.doLast {}
-        task.addDefaultActionIfNoCustomActions()
+        task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
+        task.afterEvaluate()
         // then
-        assert task.actions.size() == 1
-    }
-
-    @Test
-    void 'custom action should be expanded when added in doLast'() {
-        // when
-        task.doLast {}
-        // then
-        assert task.actions.size() == 3
-        assert task.actions.any { it instanceof GoExecutionAction }
-    }
-
-    @Test
-    void 'custom action should be expanded when added in doFirst'() {
-        // when
-        task.doFirst {}
-        // then
-        assert task.actions.size() == 3
-        assert task.actions.any { it instanceof GoExecutionAction }
-    }
-
-    @Test(expected = UnsupportedOperationException)
-    void 'left shift should be unsupported'() {
-        task << {}
-    }
-
-    @Test
-    void 'execution of custom action should succeed'() {
-        // when
-        task.doLast {
-            go 'build -o output'
-        }
-        task.actions.each { it.execute(task) }
-        // then
-        assert task.actions.size() == 3
-        assert task.actions.any { it instanceof GoExecutionAction }
-        assert task.singleBuildEnvironment == [:]
-        verify(buildManager, times(3)).go(cmdsCaptor.capture(), envCaptor.capture(), any(Consumer), any(Consumer), isNull())
-        assert cmdsCaptor.allValues == [
-                ['build', '-o', 'output'],
-                ['build', '-o', 'output'],
-                ['build', '-o', 'output']
-        ]
-        assert envCaptor.allValues == [
-                [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: ''],
-                [GOOS: 'linux', GOARCH: '386', GOEXE: '',],
-                [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
-        ]
-    }
-
-    @Test
-    void 'other methods in GoExecutionAction should succeed'() {
-        // when
-        Closure c = {
-            go 'build -o output'
+        ['buildDarwinAmd64', 'buildLinux386', 'buildWindowsAmd64'].each {
+            assert tasks[it].commandLineArgs == ['GO', 'build', '-o', './.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}', 'my/package']
         }
 
-        task.doLast(c)
+        assert tasks['buildDarwinAmd64'].environment == [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '']
+        assert tasks['buildLinux386'].environment == [GOOS: 'linux', GOARCH: '386', GOEXE: '']
+        assert tasks['buildWindowsAmd64'].environment == [GOOS: 'windows', GOARCH: 'amd64', GOEXE: '.exe']
+    }
+
+    @Test
+    void 'setting continueWhenFail should succeed'() {
+        // when
+        task.setTargetPlatform(['darwin-amd64', 'linux-386'])
+        task.setContinueWhenFail(true)
+        task.afterEvaluate()
         // then
-        task.actions.each { it.contextualise(null) }
-        task.actions.each { assert it.classLoader == c.class.classLoader }
+        ['buildDarwinAmd64', 'buildLinux386'].each {
+            assert tasks[it].continueWhenFail
+        }
+    }
+
+    @Test
+    void 'custom action should succeed'() {
+        // when
+        task.go 'build -o output'
+        task.afterEvaluate()
+        // then
+        assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', 'output']
     }
 
     @Test
     void 'setting output location should succeed'() {
+        // when
         task.outputLocation = 'outputlocation'
-        assert task.outputLocation == 'outputlocation'
+        task.afterEvaluate()
+        // then
+        assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', 'outputlocation', 'my/package']
     }
 
-    @Test(expected = NullPointerException)
-    void 'exception should be thrown if closure throws an exception'() {
-        task.doLast {
-            throw new NullPointerException()
-        }
-        task.actions.each { it.execute(task) }
+    @Test
+    void 'redirection should be inherited'() {
+        // when
+        task.run('cmd', task.devNull(), task.devNull())
+        task.afterEvaluate()
+        // then
+        assert tasks[taskName].stdoutLineConsumer.is(task.stdoutLineConsumer)
+        assert tasks[taskName].stderrLineConsumer.is(task.stderrLineConsumer)
+    }
+
+    @Test
+    void 'custom environment should have higher priority'() {
+        // when
+        task.environment('GOOS', 'myOs')
+        task.environment('GOARCH', 'myArch')
+        task.environment('GOEXE', 'myExe')
+        task.afterEvaluate()
+        // then
+        assert tasks[taskName].environment == [GOOS: 'myOs', GOARCH: 'myArch', GOEXE: 'myExe']
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'empty target platform should result in an exception'() {
+        task.targetPlatform = []
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'setting illegal target platform list should result in an exception'() {
+        task.targetPlatform = ['a-b,']
     }
 
     @Test(expected = IllegalStateException)
@@ -173,6 +167,18 @@ class GoBuildTest extends TaskTest {
     @Test
     void 'setting target platform should succeed'() {
         task.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+        assertTargetPlatforms()
+    }
+
+    @Test
+    void 'duplicates should be removed'() {
+        task.targetPlatform = 'windows-amd64, linux-amd64, linux-386,windows-amd64'
+        assertTargetPlatforms()
+
+        task.targetPlatform = ['windows-amd64', 'linux-amd64', 'linux-386', 'windows-amd64']
+    }
+
+    private void assertTargetPlatforms() {
         assert task.targetPlatforms[0].left == Os.WINDOWS
         assert task.targetPlatforms[0].right == Arch.AMD64
         assert task.targetPlatforms[1].left == Os.LINUX
@@ -194,7 +200,8 @@ class GoBuildTest extends TaskTest {
         assert isValidTargetPlatform('\t\t\na-b\n ,\n 1-a\t\n , c-2d  ')
     }
 
+
     boolean isValidTargetPlatform(String value) {
-        return GoBuild.TARGET_PLATFORM_PATTERN.matcher(value).matches()
+        return GoBuild.TARGET_PLATFORMS_PATTERN.matcher(value).matches()
     }
 }

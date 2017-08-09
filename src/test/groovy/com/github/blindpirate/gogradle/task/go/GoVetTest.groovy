@@ -33,6 +33,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
+@WithResource('')
 class GoVetTest extends TaskTest {
     GoVet task
 
@@ -43,12 +44,10 @@ class GoVetTest extends TaskTest {
         task = buildTask(GoVet)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
         when(project.getProjectDir()).thenReturn(resource)
-        if (resource) {
-            IOUtils.mkdir(resource, '.dir')
-            IOUtils.mkdir(resource, '_dir')
-            IOUtils.mkdir(resource, 'vendor')
-            IOUtils.mkdir(resource, 'sub')
-        }
+        IOUtils.mkdir(resource, '.dir')
+        IOUtils.mkdir(resource, '_dir')
+        IOUtils.mkdir(resource, 'vendor')
+        IOUtils.mkdir(resource, 'sub')
     }
 
     @Test
@@ -57,16 +56,14 @@ class GoVetTest extends TaskTest {
     }
 
     @Test
-    @WithResource('')
     void 'go vet should succeed when .go exists in root'() {
         // given
         IOUtils.write(resource, 'main.go', '')
         // when
-        task.doAddDefaultAction()
-        task.actions.each { it.execute(task) }
+        task.vet()
         ArgumentCaptor captor = ArgumentCaptor.forClass(List)
         // then
-        verify(buildManager, times(2)).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager, times(2)).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
 
         assert captor.allValues.size() == 2
         List firstCall = captor.allValues[0]
@@ -77,14 +74,12 @@ class GoVetTest extends TaskTest {
     }
 
     @Test
-    @WithResource('')
     void 'go vet should succeed when .go not exists in root'() {
         // when
-        task.doAddDefaultAction()
-        task.actions.each { it.execute(task) }
+        task.vet()
         ArgumentCaptor captor = ArgumentCaptor.forClass(List)
         // then
-        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
         assert captor.value == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
     }
 }

@@ -17,10 +17,11 @@
 
 package com.github.blindpirate.gogradle.task.go;
 
-import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
 import com.github.blindpirate.gogradle.common.LineCollector;
+import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.unsafe.GradleInternalAPI;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
@@ -28,13 +29,13 @@ import com.google.common.collect.Lists;
 import groovy.lang.Closure;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
-import org.gradle.api.Action;
 import org.gradle.api.Incubating;
 import org.gradle.api.Task;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -42,9 +43,9 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
@@ -64,7 +65,7 @@ import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
 
-public class GoTest extends Go {
+public class GoTest extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(GoTest.class);
 
     private static final String REWRITE_SCRIPT_RESOURCE = "test/rewrite.html";
@@ -75,15 +76,24 @@ public class GoTest extends Go {
     @Inject
     private GoTestStdoutExtractor extractor;
 
+    @Inject
+    private BuildManager buildManager;
+
     private List<String> testNamePattern;
 
     private boolean generateCoverageProfile = true;
 
     private boolean coverageProfileGenerated = false;
 
+    private boolean continueWhenFail;
+
     public GoTest() {
         setDescription("Run all tests.");
         dependsOn(VENDOR_TASK_NAME);
+    }
+
+    public void setContinueWhenFail(boolean continueWhenFail) {
+        this.continueWhenFail = continueWhenFail;
     }
 
     public boolean isCoverageProfileGenerated() {
@@ -101,25 +111,16 @@ public class GoTest extends Go {
         return this;
     }
 
-    @Override
-    protected void doAddDefaultAction() {
-        super.doLast(new TestPackagesAction());
-    }
+    @TaskAction
+    public void run() {
+        prepareCoverageProfileDir();
 
-    @Override
-    public Task doLast(final Closure closure) {
-        warnNoTestReport();
-        return super.doLast(closure);
-    }
+        List<TestClassResult> testResults = doTest();
 
-    @Override
-    public Task doFirst(final Closure closure) {
-        warnNoTestReport();
-        return super.doFirst(closure);
-    }
+        File reportDir = generateTestReport(testResults);
 
-    private void warnNoTestReport() {
-        LOGGER.warn("WARNING: test report is not supported in customized test action.");
+        rewritePackageName(reportDir);
+        reportErrorIfNecessary(testResults, reportDir);
     }
 
     public Task leftShift(final Closure action) {
@@ -151,130 +152,117 @@ public class GoTest extends Go {
         return toUnixString(importPath);
     }
 
-    private class TestPackagesAction implements Action<Task> {
-        private Map<File, List<File>> parentDirToTestFiles = emptyMap();
 
-        private boolean isCommandLineArguments;
+    private File generateTestReport(List<TestClassResult> testResults) {
+        File reportDir = new File(getProject().getProjectDir(), ".gogradle/reports/test");
+        GradleInternalAPI.renderTestReport(testResults, reportDir);
+        return reportDir;
+    }
 
-        @Override
-        public void execute(Task task) {
-            determineTestPattern();
-            prepareCoverageProfileDir();
+    private List<TestClassResult> doTest() {
+        List<TestClassResult> ret = new ArrayList<>();
 
-            List<TestClassResult> testResults = doTest();
+        Map<File, List<File>> parentDirToTestFiles = determineTestPattern();
 
-            File reportDir = generateTestReport(testResults);
+        parentDirToTestFiles.forEach((parentDir, testFiles) -> {
+            String packageImportPath = dirToImportPath(parentDir);
+            PackageTestResult result = doSingleTest(packageImportPath, parentDir, testFiles);
 
-            rewritePackageName(reportDir);
-            reportErrorIfNecessary(testResults, reportDir);
-        }
+            List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(result);
+            logResult(packageImportPath, resultOfSinglePackage);
+            ret.addAll(resultOfSinglePackage);
+        });
+        return ret;
+    }
 
-        private File generateTestReport(List<TestClassResult> testResults) {
-            File reportDir = new File(getProject().getProjectDir(), ".gogradle/reports/test");
-            GradleInternalAPI.renderTestReport(testResults, reportDir);
-            return reportDir;
-        }
+    private Map<File, List<File>> determineTestPattern() {
+        if (isEmpty(testNamePattern)) {
+            // https://golang.org/cmd/go/#hdr-Description_of_package_lists
+            Collection<File> allTestFiles = filterFilesRecursively(getProject().getProjectDir(), TEST_GO_FILTER);
+            return groupByParentDir(allTestFiles);
+        } else {
+            Collection<File> filesMatchingPatterns = filterMatchedTests();
 
-        private List<TestClassResult> doTest() {
-            List<TestClassResult> ret = new ArrayList<>();
-
-            parentDirToTestFiles.forEach((parentDir, testFiles) -> {
-                String packageImportPath = dirToImportPath(parentDir);
-                PackageTestResult result = doSingleTest(packageImportPath, parentDir, testFiles);
-
-                List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(result);
-                logResult(packageImportPath, resultOfSinglePackage);
-                ret.addAll(resultOfSinglePackage);
-            });
-            return ret;
-        }
-
-        private void determineTestPattern() {
-            if (isEmpty(testNamePattern)) {
-                // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-                Collection<File> allTestFiles = filterFilesRecursively(getProject().getProjectDir(), TEST_GO_FILTER);
-                this.parentDirToTestFiles = groupByParentDir(allTestFiles);
-                this.isCommandLineArguments = false;
+            if (filesMatchingPatterns.isEmpty()) {
+                LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
+                return Collections.emptyMap();
             } else {
-                Collection<File> filesMatchingPatterns = filterMatchedTests();
+                LOGGER.quiet("Found " + filesMatchingPatterns.size() + " files to test.");
 
-                if (filesMatchingPatterns.isEmpty()) {
-                    LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
-                } else {
-                    LOGGER.quiet("Found " + filesMatchingPatterns.size() + " files to test.");
+                Map<File, List<File>> parentDirToFiles = groupByParentDir(filesMatchingPatterns);
 
-                    Map<File, List<File>> parentDirToFiles = groupByParentDir(filesMatchingPatterns);
+                parentDirToFiles.forEach((parentDir, tests) -> tests.addAll(getAllNonTestGoFiles(parentDir)));
 
-                    parentDirToFiles.forEach((parentDir, tests) -> tests.addAll(getAllNonTestGoFiles(parentDir)));
-
-                    this.parentDirToTestFiles = parentDirToFiles;
-                    this.isCommandLineArguments = true;
-                }
+                return parentDirToFiles;
             }
         }
+    }
 
 
-        private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
-            int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
-            if (totalFailureCount > 0) {
-                throw new IllegalStateException("There are " + totalFailureCount + " failed tests. Please see "
-                        + StringUtils.toUnixString(new File(reportDir, "index.html"))
-                        + " for more details.");
-            }
+    private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
+        int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
+        String message = "There are " + totalFailureCount + " failed tests. Please see "
+                + StringUtils.toUnixString(new File(reportDir, "index.html"))
+                + " for more details.";
+        if (continueWhenFail) {
+            LOGGER.error(message);
+        } else if (totalFailureCount > 0) {
+            throw new IllegalStateException(message);
+        }
+    }
+
+    private void prepareCoverageProfileDir() {
+        File coverageDir = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
+        forceMkdir(coverageDir);
+        clearDirectory(coverageDir);
+    }
+
+    private PackageTestResult doSingleTest(String importPath, File parentDir, List<File> testFiles) {
+        LineCollector lineCollector = new LineCollector();
+        List<String> args = isCommandLineArguments()
+                ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
+                : Lists.newArrayList("test", "-v", importPath);
+
+
+        if (generateCoverageProfile) {
+            File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
+                    + encodeInternally(importPath));
+            args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
+            coverageProfileGenerated = true;
         }
 
-        private void prepareCoverageProfileDir() {
-            File coverageDir = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
-            forceMkdir(coverageDir);
-            clearDirectory(coverageDir);
-        }
+        int retcode = buildManager.go(args, emptyMap(), lineCollector, lineCollector, true);
 
-        private PackageTestResult doSingleTest(String importPath, File parentDir, List<File> testFiles) {
-            LineCollector lineCollector = new LineCollector();
-            List<String> args = isCommandLineArguments
-                    ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
-                    : Lists.newArrayList("test", "-v", importPath);
+        return PackageTestResult.builder()
+                .withPackagePath(importPath)
+                .withStdout(lineCollector.getLines())
+                .withTestFiles(testFiles)
+                .withCode(retcode)
+                .build();
+    }
 
+    private boolean isCommandLineArguments() {
+        return !isEmpty(testNamePattern);
+    }
 
-            if (generateCoverageProfile) {
-                File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
-                        + encodeInternally(importPath));
-                args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
-                coverageProfileGenerated = true;
-            }
+    private void logResult(String packagePath, List<TestClassResult> resultOfSinglePackage) {
+        int successCount = successCount(resultOfSinglePackage);
+        int failureCount = failureCount(resultOfSinglePackage);
+        LOGGER.quiet("Test for {} finished, {} completed, {} failed",
+                packagePath,
+                successCount + failureCount,
+                failureCount);
+    }
 
-            AtomicInteger retcode = new AtomicInteger(0);
+    private int successCount(List<TestClassResult> results) {
+        return results.stream()
+                .mapToInt(result ->
+                        result.getResults().size() - result.getFailuresCount())
+                .sum();
+    }
 
-            buildManager.go(args, emptyMap(), lineCollector, lineCollector, retcode::set);
-
-            return PackageTestResult.builder()
-                    .withPackagePath(importPath)
-                    .withStdout(lineCollector.getLines())
-                    .withTestFiles(testFiles)
-                    .withCode(retcode.get())
-                    .build();
-        }
-
-
-        private void logResult(String packagePath, List<TestClassResult> resultOfSinglePackage) {
-            int successCount = successCount(resultOfSinglePackage);
-            int failureCount = failureCount(resultOfSinglePackage);
-            LOGGER.quiet("Test for {} finished, {} completed, {} failed",
-                    packagePath,
-                    successCount + failureCount,
-                    failureCount);
-        }
-
-        private int successCount(List<TestClassResult> results) {
-            return results.stream()
-                    .mapToInt(result ->
-                            result.getResults().size() - result.getFailuresCount())
-                    .sum();
-        }
-
-        private int failureCount(List<TestClassResult> results) {
-            return results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
-        }
+    private int failureCount(List<TestClassResult> results) {
+        return results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
     }
 
     private void rewritePackageName(File reportDir) {
@@ -290,6 +278,5 @@ public class GoTest extends Go {
             IOUtils.write(htmlFile, content);
         });
     }
-
 
 }

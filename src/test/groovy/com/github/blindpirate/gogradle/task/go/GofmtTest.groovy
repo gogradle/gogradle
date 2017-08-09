@@ -43,7 +43,7 @@ class GofmtTest extends TaskTest {
     File resource
 
     @Captor
-    ArgumentCaptor captor
+    ArgumentCaptor<List> captor
 
     @Before
     void setUp() {
@@ -58,6 +58,8 @@ class GofmtTest extends TaskTest {
         IOUtils.write(resource, '.a.go', '')
         IOUtils.mkdir(resource, 'b')
         IOUtils.mkdir(resource, 'vendor')
+
+        task.afterEvaluate()
     }
 
     @Test
@@ -68,11 +70,10 @@ class GofmtTest extends TaskTest {
     @Test
     void 'gofmt should succeed'() {
         // when
-        task.doAddDefaultAction()
-        task.actions[0].execute(task)
+        task.executeTask()
 
         // then
-        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).run(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
 
         assert captor.value[0..1] == [absolutePath('.go/bin/gofmt'), '-w']
         assert captor.value.contains(absolutePath('a.go'))
@@ -87,8 +88,9 @@ class GofmtTest extends TaskTest {
     void 'customized action should be executed successfully'() {
         // when
         task.gofmt 'whatever'
+        task.executeTask()
         // then
-        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
         assert captor.value == [absolutePath('.go/bin/gofmt'), 'whatever']
     }
 }
