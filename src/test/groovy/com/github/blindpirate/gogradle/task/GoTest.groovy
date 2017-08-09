@@ -65,23 +65,18 @@ class GoTest extends TaskTest {
                 return 0
             }
         }
-        when(buildManager.run(anyList(), anyMap(), any(Consumer), any(Consumer), isNull())).thenAnswer(answer)
-        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), isNull())).thenAnswer(answer)
-    }
-
-    @Test
-    void 'do-nothing-consumer should succeed'() {
-        Consumer c = ReflectionUtils.getStaticField(Go, 'DO_NOTHING')
-        c.accept(1)
+        when(buildManager.run(anyList(), anyMap(), any(Consumer), any(Consumer), anyBoolean())).thenAnswer(answer)
+        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), anyBoolean())).thenAnswer(answer)
     }
 
     @Test
     void 'go command should succeed'() {
         // when
         task.go('build -o "output name"')
+        task.executeTask()
         // then
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
-        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
         assert captor.getValue() == ['build', '-o', 'output name']
     }
 
@@ -94,9 +89,10 @@ class GoTest extends TaskTest {
     void 'run command should succeed'() {
         // when
         task.run('golint -v -a')
+        task.executeTask()
         // then
         ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
-        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
         assert captor.getValue() == ['golint', '-v', '-a']
     }
 
@@ -106,20 +102,16 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'invoking doAddDefaultAction should succeed'() {
-        task.doAddDefaultAction()
-    }
-
-    @Test
     void 'setting continueWhenFail should succeed'() {
         // given
         task.continueWhenFail = true
         // when
         task.go('test -v github.com/my/package')
+        task.executeTask()
         // then
-        ArgumentCaptor<Consumer> captor = ArgumentCaptor.forClass(Consumer)
-        verify(buildManager).go(anyList(), anyMap(), any(Consumer), any(Consumer), captor.capture())
-        assert captor.getValue().is(ReflectionUtils.getStaticField(Go, 'DO_NOTHING'))
+        ArgumentCaptor<List> captor = ArgumentCaptor.forClass(List)
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
+        assert captor.value == ['test', '-v', 'github.com/my/package']
     }
 
     @Test
@@ -130,14 +122,15 @@ class GoTest extends TaskTest {
         // when
         List stdout = []
         List stderr = []
-        def retcode = task.go('vet ./...', { line ->
+        task.go('vet ./...', { line ->
             stdout << line
         }, { line ->
             stderr << line
         })
+        task.executeTask()
 
         // then
-        assert retcode == 0
+        assert task.exitValue == 0
         assert stdout == stdouts
         assert stderr == stderrs
     }
@@ -150,14 +143,15 @@ class GoTest extends TaskTest {
         // when
         List stdout = []
         List stderr = []
-        def retcode = task.run('vet ./...', { line ->
+        task.run('vet ./...', { line ->
             stdout << line
         }, { line ->
             stderr << line
         })
+        task.executeTask()
 
         // then
-        assert retcode == 0
+        assert task.exitValue == 0
         assert stdout == stdouts
         assert stderr == stderrs
     }
@@ -172,9 +166,10 @@ class GoTest extends TaskTest {
         task.go('vet ./...', { line ->
             stdout << line
         })
+        task.executeTask()
 
         // then
-        assert stdout == ['stdout1', 'stdout2']
+        assert stdout == stdouts
     }
 
     @Test
@@ -187,9 +182,10 @@ class GoTest extends TaskTest {
         task.run('golint -v -a', { line ->
             stdout << line
         })
+        task.executeTask()
 
         // then
-        assert stdout == ['stdout1', 'stdout2']
+        assert stdout == stdouts
     }
 
     @Test
@@ -201,6 +197,7 @@ class GoTest extends TaskTest {
         IOUtils.write(resource, 'write.txt', 'write\n');
         // when
         task.go('vet ./...', task.appendTo('append.txt'), task.writeTo(new File(resource, 'write.txt').absolutePath))
+        task.executeTask()
 
         // then
         assert new File(resource, 'append.txt').text == 'append\nstdout1\nstdout2\n'
@@ -214,6 +211,7 @@ class GoTest extends TaskTest {
         letBuildManagerCallConsumer()
         // when
         task.go('vet ./...', task.appendTo('append.txt'), task.writeTo(new File(resource, 'write.txt').absolutePath))
+        task.executeTask()
 
         // then
         assert new File(resource, 'append.txt').text == 'stdout1\nstdout2\n'
@@ -223,9 +221,9 @@ class GoTest extends TaskTest {
     @Test
     void 'setting environment should succeed'() {
         task.environment(['a': '1'])
-        assert ReflectionUtils.getField(task, 'overallEnvironment') == [a: '1']
+        assert ReflectionUtils.getField(task, 'environment') == [a: '1']
         task.environment('b', '2')
-        assert ReflectionUtils.getField(task, 'overallEnvironment') == [a: '1', b: '2']
+        assert ReflectionUtils.getField(task, 'environment') == [a: '1', b: '2']
     }
 
 }

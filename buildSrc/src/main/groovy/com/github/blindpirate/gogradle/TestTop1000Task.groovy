@@ -70,9 +70,7 @@ repositories {
         } else if (!path.toFile().list().any { it.endsWith('.go') }) {
             buildDotGradle += """
 build {
-    doLast {
-        go 'build github.com/${userAndProject[0]}/${userAndProject[1]}/...'
-    }
+    go 'build github.com/${userAndProject[0]}/${userAndProject[1]}/...'
 }
 """
         }

@@ -22,17 +22,18 @@ import com.github.blindpirate.gogradle.ide.GoglandTask;
 import com.github.blindpirate.gogradle.ide.IdeaTask;
 import com.github.blindpirate.gogradle.ide.JetBrainsIdeTask;
 import com.github.blindpirate.gogradle.ide.VscodeTask;
-import com.github.blindpirate.gogradle.task.go.GoBuildTask;
-import com.github.blindpirate.gogradle.task.go.GoCoverTask;
-import com.github.blindpirate.gogradle.task.go.GoTestTask;
-import com.github.blindpirate.gogradle.task.go.GoVetTask;
-import com.github.blindpirate.gogradle.task.go.GofmtTask;
+import com.github.blindpirate.gogradle.task.go.GoBuild;
+import com.github.blindpirate.gogradle.task.go.GoCover;
+import com.github.blindpirate.gogradle.task.go.GoTest;
+import com.github.blindpirate.gogradle.task.go.GoVet;
+import com.github.blindpirate.gogradle.task.go.Gofmt;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.Task;
 
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Singleton
 public class GolangTaskContainer {
@@ -75,18 +76,18 @@ public class GolangTaskContainer {
 
 
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
-            .put(PREPARE_TASK_NAME, PrepareTask.class)
-            .put(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, ResolveBuildDependenciesTask.class)
-            .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependenciesTask.class)
+            .put(PREPARE_TASK_NAME, GoPrepare.class)
+            .put(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, ResolveBuildDependencies.class)
+            .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependencies.class)
             .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
-            .put(BUILD_TASK_NAME, GoBuildTask.class)
-            .put(TEST_TASK_NAME, GoTestTask.class)
-            .put(VENDOR_TASK_NAME, VendorTask.class)
-            .put(INSTALL_DEPENDENCIES_TASK_NAME, InstallTask.class)
-            .put(INIT_TASK_NAME, InitTask.class)
-            .put(CLEAN_TASK_NAME, CleanTask.class)
-            .put(CHECK_TASK_NAME, CheckTask.class)
-            .put(LOCK_TASK_NAME, LockTask.class)
+            .put(BUILD_TASK_NAME, GoBuild.class)
+            .put(TEST_TASK_NAME, GoTest.class)
+            .put(VENDOR_TASK_NAME, GoVendor.class)
+            .put(INSTALL_DEPENDENCIES_TASK_NAME, GoInstall.class)
+            .put(INIT_TASK_NAME, GoInit.class)
+            .put(CLEAN_TASK_NAME, GoClean.class)
+            .put(CHECK_TASK_NAME, GoCheck.class)
+            .put(LOCK_TASK_NAME, GoLock.class)
             .put(IDEA_TASK_NAME, IdeaTask.class)
             .put(VSCODE_TASK_NAME, VscodeTask.class)
             .put(GOGLAND_TASK_NAME, GoglandTask.class)
@@ -95,10 +96,10 @@ public class GolangTaskContainer {
             .put(PYCHARM_TASK_NAME, JetBrainsIdeTask.class)
             .put(RUBYMINE_TASK_NAME, JetBrainsIdeTask.class)
             .put(CLION_TASK_NAME, JetBrainsIdeTask.class)
-            .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGorootTask.class)
-            .put(COVERAGE_TASK_NAME, GoCoverTask.class)
-            .put(GOVET_TASK_NAME, GoVetTask.class)
-            .put(GOFMT_TASK_NAME, GofmtTask.class)
+            .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGoroot.class)
+            .put(COVERAGE_TASK_NAME, GoCover.class)
+            .put(GOVET_TASK_NAME, GoVet.class)
+            .put(GOFMT_TASK_NAME, Gofmt.class)
             .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
@@ -110,5 +111,9 @@ public class GolangTaskContainer {
     @SuppressWarnings("unchecked")
     public <T extends Task> T get(Class<T> clazz) {
         return (T) this.tasks.get(clazz);
+    }
+
+    public void each(Consumer<Task> consumer) {
+        tasks.values().forEach(consumer::accept);
     }
 }

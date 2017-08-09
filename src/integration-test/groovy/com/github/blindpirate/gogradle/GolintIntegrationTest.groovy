@@ -42,9 +42,7 @@ golang {
 }
 
 task golint(type: com.github.blindpirate.gogradle.Go){
-    doLast {
-        run 'golint a/b/c'
-    }
+    run 'golint a/b/c'
 }
 """
         mainDotGo = '''

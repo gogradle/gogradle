@@ -99,9 +99,7 @@ func sub() {
     void 'customized gofmt should not affect other files'() {
         writeBuildAndSettingsDotGradle(buildDotGradle + '''
 fmt {
-    doLast {
-        gofmt '-w main.go'
-    }
+    gofmt '-w main.go'
 }
 ''')
         newBuild {

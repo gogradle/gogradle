@@ -33,17 +33,20 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
-public class GofmtTask extends Go {
+public class Gofmt extends Go {
     @Inject
     private GoBinaryManager goBinaryManager;
 
-    public GofmtTask() {
+    public Gofmt() {
         setDescription("Run gofmt (https://golang.org/cmd/gofmt/).");
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
     }
 
-    protected void doAddDefaultAction() {
-        doLast(task -> run(CollectionUtils.asStringList(getGofmtPath(), "-w", children())));
+    public void afterEvaluate() {
+        // if user doesn't configure it
+        if (CollectionUtils.isEmpty(commandLineArgs)) {
+            run(CollectionUtils.asStringList(getGofmtPath(), "-w", children()), stdoutLineConsumer, stderrLineConsumer);
+        }
     }
 
     private String getGofmtPath() {

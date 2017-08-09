@@ -22,6 +22,8 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.core.mode.BuildMode
+import com.github.blindpirate.gogradle.crossplatform.Arch
+import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.Git
@@ -30,7 +32,6 @@ import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
-import com.github.blindpirate.gogradle.vcs.git.GolangRepository
 import com.github.blindpirate.gogradle.vcs.mercurial.HgClientAccessor
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialDependencyManager
 import com.google.inject.Injector
@@ -42,8 +43,8 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.*
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
+import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLetter
 
 @RunWith(GogradleRunner)
 @WithProject
@@ -87,6 +88,8 @@ class GolangPluginTest {
             }
         }
 
+        resolveFirstLevelDependencies()
+
         assert getDependencySet('build').size() == 1
 
         def dependency = findFirstInDependencies()
@@ -105,6 +108,8 @@ class GolangPluginTest {
             }
         }
 
+        resolveFirstLevelDependencies()
+
         assert getDependencySet('build').size() == 1
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
@@ -113,12 +118,20 @@ class GolangPluginTest {
         assert dependency instanceof GitMercurialNotationDependency
     }
 
+    def resolveFirstLevelDependencies() {
+        getBuildConfiguration().resolveFirstLevelDependencies()
+    }
+
+    def getBuildConfiguration() {
+        return injector.getInstance(GolangConfigurationManager).getByName('build')
+    }
+
     def findFirstInDependencies() {
-        return injector.getInstance(GolangConfigurationManager).getByName('build').dependencies.first()
+        return getBuildConfiguration().dependencies.first()
     }
 
     def findFirstInDependencies(String name) {
-        return injector.getInstance(GolangConfigurationManager).getByName('build').dependencies.find {
+        return getBuildConfiguration().dependencies.find {
             it.name == name
         }
     }
@@ -150,6 +163,8 @@ class GolangPluginTest {
             }
         }
 
+        resolveFirstLevelDependencies()
+
         assert getDependencySet('build').size() == 4
 
         def ab = findFirstInDependencies('github.com/a/b')
@@ -174,6 +189,8 @@ class GolangPluginTest {
             }
         }
 
+        resolveFirstLevelDependencies()
+
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
         assert dependency instanceof LocalDirectoryDependency
@@ -188,6 +205,8 @@ class GolangPluginTest {
                 }
             }
         }
+
+        resolveFirstLevelDependencies()
 
         def dependency = findFirstInDependencies()
         assert dependency instanceof LocalDirectoryDependency
@@ -209,6 +228,8 @@ class GolangPluginTest {
             }
         }
 
+        resolveFirstLevelDependencies()
+
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0-RELEASE'
         assert getExclusionSpecs(ab).size() == 1
@@ -227,6 +248,8 @@ class GolangPluginTest {
                 build name: 'github.com/a/b', transitive: false
             }
         }
+
+        resolveFirstLevelDependencies()
 
         assert !getExclusionSpecs(findFirstInDependencies()).isEmpty()
     }
@@ -282,9 +305,9 @@ class GolangPluginTest {
 
     @Test
     void 'default action should be added after evaluation'() {
-        project.getPlugins().getPlugin('com.github.blindpirate.gogradle').afterEvaluate(project)
-        [BUILD_TASK_NAME, TEST_TASK_NAME, GOFMT_TASK_NAME].each {
-            assert project.getTasksByName(it, false).first().actions.size() == 1
-        }
+        project.getPlugins().getPlugin('com.github.blindpirate.gogradle')
+        assert project.getTasksByName('build' +
+                capitalizeFirstLetter(Os.getHostOs().toString()) +
+                capitalizeFirstLetter(Arch.getHostArch().toString()), false)
     }
 }

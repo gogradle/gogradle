@@ -59,20 +59,20 @@ import static com.github.blindpirate.gogradle.util.StringUtils.substring;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Arrays.asList;
 
-public class GoCoverTask extends AbstractGolangTask {
+public class GoCover extends AbstractGolangTask {
 
     public static final String COVERAGE_PROFILES_PATH = ".gogradle/reports/coverage/profiles";
     private static final String COVERAGE_HTMLS_PATH = ".gogradle/reports/coverage";
     private static final String COVERAGE_HTML_STATIC_PATH = ".gogradle/reports/coverage/static";
     private static final String COVERAGE_STATIC_RESOURCE = "/coverage/static/";
-    private static final Logger LOGGER = Logging.getLogger(GoCoverTask.class);
+    private static final Logger LOGGER = Logging.getLogger(GoCover.class);
 
     @Inject
     private GolangPluginSetting setting;
     @Inject
     private BuildManager buildManager;
 
-    public GoCoverTask() {
+    public GoCover() {
         setDescription("Run coverage task and generate coverage report.");
         dependsOn(GolangTaskContainer.TEST_TASK_NAME);
     }
@@ -91,7 +91,7 @@ public class GoCoverTask extends AbstractGolangTask {
     }
 
     private boolean profileGeneratedInTest() {
-        return getTask(GoTestTask.class).isCoverageProfileGenerated();
+        return getTask(GoTest.class).isCoverageProfileGenerated();
     }
 
     private void copyStaticResources() {

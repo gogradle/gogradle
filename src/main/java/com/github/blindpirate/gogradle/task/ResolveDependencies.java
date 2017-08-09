@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 
-public abstract class ResolveTask extends AbstractGolangTask {
+public abstract class ResolveDependencies extends AbstractGolangTask {
     @Inject
     private GolangPluginSetting setting;
 
@@ -77,16 +77,17 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     private DependencyTreeNode dependencyTree;
 
-    public ResolveTask() {
-        setGroup("Internal");
-        setDescription("Internal usage only.");
+    public ResolveDependencies() {
+        setGroup(null);
         dependsOn(PREPARE_TASK_NAME);
     }
 
     // INPUT 1: dependencies declared in build.gradle
     @Input
     public HashSet<GolangDependency> getDependencies() {
+        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
+        configuration.resolveFirstLevelDependencies();
         // elements in GolangDependency are identified by name, here we want to identify them by equals
         return new HashSet<>(configuration.getDependencies());
     }
@@ -119,6 +120,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
     // INPUT 6: --refresh-dependencies
     @Input
     public String getRefreshDependenciesFlag() {
+        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
         if (GogradleGlobal.isRefreshDependencies()) {
             return UUID.randomUUID().toString();
         } else {
@@ -160,6 +162,7 @@ public abstract class ResolveTask extends AbstractGolangTask {
 
     private void resolveDependencies() {
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
+
         ResolveContext rootContext = ResolveContext.root(gogradleRootProject, configuration);
 
         gogradleRootProject.setDependencies(produceFirstLevelDependencies());

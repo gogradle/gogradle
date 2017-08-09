@@ -32,18 +32,23 @@ public enum GogradleGlobal {
     public static final String GOGRADLE_MODE = "gogradle.mode";
     public static final String GOGRADLE_ALIAS = "gogradle.alias";
 
-    private Injector injector;
+    // For multi-project
+    private ThreadLocal<Injector> currentInjector = new ThreadLocal<>();
 
     public Injector getInjector() {
-        return injector;
+        return currentInjector.get();
     }
 
-    void setInjector(Injector injector) {
-        this.injector = injector;
+    public void setCurrentProject(Project project) {
+        if (project == null) {
+            currentInjector.set(null);
+        } else {
+            currentInjector.set((Injector) project.getExtensions().getByName(GolangPlugin.GOGRADLE_INJECTOR));
+        }
     }
 
     public static <T> T getInstance(Class<T> clazz) {
-        return INSTANCE.injector.getInstance(clazz);
+        return INSTANCE.getInjector().getInstance(clazz);
     }
 
     public static boolean isOffline() {

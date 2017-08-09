@@ -20,12 +20,14 @@ package com.github.blindpirate.gogradle;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
+import com.google.inject.Injector;
 import groovy.lang.Closure;
 import org.apache.tools.ant.types.Commandline;
-import org.gradle.api.internal.AbstractTask;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
 import java.nio.file.Path;
@@ -36,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
+import static com.github.blindpirate.gogradle.GolangPlugin.GOGRADLE_INJECTOR;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 
 /**
@@ -45,125 +48,129 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_T
  * {@code
  * task myTask(type: Go) {
  *     dependsOn 'vendor'
- *     doLast {
- *         go 'build -o /my/output/location github.com/my/package/cmd --my-own-cmd-arguments'
- *     }
+ *     go 'build -o /my/output/location github.com/my/package/cmd --my-own-cmd-arguments'
  * }
  * }
  * </pre>
  */
 public class Go extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(Go.class);
-    private static final Consumer<Integer> DO_NOTHING = code -> {
-    };
+
+    private static final String GO = "GO";
 
     protected BuildManager buildManager;
 
-    private Map<String, String> singleBuildEnvironment = new HashMap<>();
+    protected List<String> commandLineArgs;
 
-    private Map<String, String> overallEnvironment = new HashMap<>();
+    protected Consumer<String> stdoutLineConsumer;
 
-    private boolean continueWhenFail;
+    protected Consumer<String> stderrLineConsumer;
+
+    protected Map<String, String> environment = new HashMap<>();
+
+    protected boolean continueWhenFail;
+
+    private int exitValue = -1;
+
+    public Go() {
+        setDescription("Custom go task.");
+        dependsOn(PREPARE_TASK_NAME);
+        Injector injector = (Injector) getProject().getExtensions().getByName(GOGRADLE_INJECTOR);
+        this.buildManager = injector.getInstance(BuildManager.class);
+    }
+
+    @TaskAction
+    public void executeTask() {
+        if (CollectionUtils.isEmpty(commandLineArgs)) {
+            return;
+        }
+        if (GO == commandLineArgs.get(0)) {
+            exitValue = buildManager.go(commandLineArgs.subList(1, commandLineArgs.size()),
+                    environment,
+                    stdoutLineConsumer,
+                    stderrLineConsumer,
+                    continueWhenFail);
+        } else {
+            exitValue = buildManager.run(commandLineArgs,
+                    environment,
+                    stdoutLineConsumer,
+                    stderrLineConsumer,
+                    continueWhenFail);
+        }
+    }
+
+    public void environment(Map<String, String> map) {
+        environment.putAll(map);
+    }
+
+    public void environment(String key, String value) {
+        environment.put(key, value);
+    }
+
+    public int getExitValue() {
+        return exitValue;
+    }
 
     public void setContinueWhenFail(boolean continueWhenFail) {
         this.continueWhenFail = continueWhenFail;
     }
 
-    public Go() {
-        setDescription("Custom go task.");
-        dependsOn(PREPARE_TASK_NAME);
-        buildManager = GogradleGlobal.getInstance(BuildManager.class);
+    public void go(String arg) {
+        go(arg, null, null);
     }
 
-    public void environment(Map<String, String> map) {
-        overallEnvironment.putAll(map);
+    public void go(List<String> args) {
+        go(args, (Closure) null, null);
     }
 
-    public void environment(String key, String value) {
-        overallEnvironment.put(key, value);
-    }
-
-    private Map<String, String> getBuildEnvironment() {
-        Map<String, String> ret = new HashMap<>(overallEnvironment);
-        ret.putAll(singleBuildEnvironment);
-        return ret;
-    }
-
-    public Map<String, String> getSingleBuildEnvironment() {
-        return singleBuildEnvironment;
-    }
-
-    public void setSingleBuildEnvironment(Map<String, String> singleBuildEnvironment) {
-        this.singleBuildEnvironment = singleBuildEnvironment;
-    }
-
-    public void addDefaultActionIfNoCustomActions() {
-        if (!AbstractTask.class.cast(this).isHasCustomActions()) {
-            doAddDefaultAction();
-        }
-    }
-
-    protected void doAddDefaultAction() {
-    }
-
-    public int go(String arg) {
-        return go(arg, null, null);
-    }
-
-    public int go(List<String> args) {
-        return go(args, null, null);
-    }
-
-    public int go(String arg, Closure stdoutLineConsumer) {
+    public void go(String arg, Closure stdoutLineConsumer) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        return go(extractArgs(arg), stdoutLineConsumer, null);
+        go(extractArgs(arg), stdoutLineConsumer, null);
     }
 
-    public int go(String arg, Closure stdoutLineConsumer, Closure stderrLineConsumer) {
+    public void go(String arg, Closure stdoutLineConsumer, Closure stderrLineConsumer) {
         Assert.isNotBlank(arg, "Arguments must not be null!");
-        return go(extractArgs(arg), stdoutLineConsumer, stderrLineConsumer);
+        go(extractArgs(arg), stdoutLineConsumer, stderrLineConsumer);
     }
 
-    public int go(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
-        Consumer<String> stdoutLineConsumer =
+    public void go(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
+        run(CollectionUtils.asStringList(GO, args), stdoutLineClosure, stderrLineClosure);
+    }
+
+    public void go(List<String> args, Consumer<String> stdoutLineConsumer, Consumer<String> stderrLineConsumer) {
+        run(CollectionUtils.asStringList(GO, args), stdoutLineConsumer, stderrLineConsumer);
+    }
+
+    public void run(String arg) {
+        run(arg, null, null);
+    }
+
+    public void run(List<String> args) {
+        run(args, (Closure) null, null);
+    }
+
+    public void run(String arg, Closure stdoutLineClosure) {
+        Assert.isNotBlank(arg, "Arguments must not be null!");
+        run(extractArgs(arg), stdoutLineClosure, null);
+    }
+
+    public void run(String arg, Closure stdoutLineClosure, Closure stderrLineClosure) {
+        Assert.isNotBlank(arg, "Arguments must not be null!");
+        run(extractArgs(arg), stdoutLineClosure, stderrLineClosure);
+    }
+
+    public void run(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
+        commandLineArgs = args;
+        this.stdoutLineConsumer =
                 stdoutLineClosure == null ? LOGGER::quiet : new ClosureLineConsumer(stdoutLineClosure);
-        Consumer<String> stderrLineConsumer =
+        this.stderrLineConsumer =
                 stderrLineClosure == null ? LOGGER::error : new ClosureLineConsumer(stderrLineClosure);
-        return buildManager.go(args,
-                getBuildEnvironment(),
-                stdoutLineConsumer,
-                stderrLineConsumer,
-                continueWhenFail ? DO_NOTHING : null);
     }
 
-    public int run(String arg) {
-        return run(arg, null, null);
-    }
-
-    public int run(List<String> args) {
-        return run(args, null, null);
-    }
-
-    public int run(String arg, Closure stdoutLineClosure) {
-        Assert.isNotBlank(arg, "Arguments must not be null!");
-        return run(extractArgs(arg), stdoutLineClosure, null);
-    }
-
-    public int run(String arg, Closure stdoutLineClosure, Closure stderrLineClosure) {
-        Assert.isNotBlank(arg, "Arguments must not be null!");
-        return run(extractArgs(arg), stdoutLineClosure, stderrLineClosure);
-    }
-
-    public int run(List<String> args, Closure stdoutLineClosure, Closure stderrLineClosure) {
-        Consumer<String> stdoutLineConsumer =
-                stdoutLineClosure == null ? LOGGER::quiet : new ClosureLineConsumer(stdoutLineClosure);
-        Consumer<String> stderrLineConsumer =
-                stderrLineClosure == null ? LOGGER::error : new ClosureLineConsumer(stderrLineClosure);
-        return buildManager.run(args,
-                getBuildEnvironment(),
-                stdoutLineConsumer,
-                stderrLineConsumer,
-                continueWhenFail ? DO_NOTHING : null);
+    public void run(List<String> args, Consumer<String> stdoutLineConsumer, Consumer<String> stderrLineConsumer) {
+        commandLineArgs = args;
+        this.stdoutLineConsumer = stdoutLineConsumer;
+        this.stderrLineConsumer = stderrLineConsumer;
     }
 
     public Closure appendTo(String file) {
@@ -182,7 +189,7 @@ public class Go extends AbstractGolangTask {
         };
     }
 
-    protected List<String> extractArgs(String arg) {
+    private List<String> extractArgs(String arg) {
         return Arrays.asList(Commandline.translateCommandline(arg));
     }
 

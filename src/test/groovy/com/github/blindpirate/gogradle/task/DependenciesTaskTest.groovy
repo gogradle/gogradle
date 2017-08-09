@@ -47,8 +47,8 @@ class DependenciesTaskTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(DependenciesTask)
-        when(golangTaskContainer.get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(buildTree)
-        when(golangTaskContainer.get(ResolveTestDependenciesTask).getDependencyTree()).thenReturn(testTree)
+        when(golangTaskContainer.get(ResolveBuildDependencies).getDependencyTree()).thenReturn(buildTree)
+        when(golangTaskContainer.get(ResolveTestDependencies).getDependencyTree()).thenReturn(testTree)
         when(buildTree.output()).thenReturn('build output')
         when(testTree.output()).thenReturn('test output')
         ReflectionUtils.setStaticFinalField(DependenciesTask, 'LOGGER', logger)

@@ -17,9 +17,18 @@
 
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.core.dependency.AbstractGolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.DefaultDependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
+import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import groovy.lang.Closure;
+import org.apache.commons.lang3.tuple.Pair;
+import org.gradle.util.ConfigureUtil;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class GolangConfiguration {
 
@@ -29,9 +38,12 @@ public class GolangConfiguration {
     private final String name;
     private final GolangDependencySet dependencies = new GolangDependencySet();
     private final DependencyRegistry dependencyRegistry = new DefaultDependencyRegistry();
+    private final List<Pair<Object, Closure>> firstLevelDependencies = new ArrayList<>();
+    private final NotationParser<Object> notationParser;
 
-    public GolangConfiguration(String name) {
+    public GolangConfiguration(String name, NotationParser notationParser) {
         this.name = name;
+        this.notationParser = notationParser;
     }
 
     public DependencyRegistry getDependencyRegistry() {
@@ -44,5 +56,24 @@ public class GolangConfiguration {
 
     public String getName() {
         return name;
+    }
+
+    public void addFirstLevelDependency(Object notation, Closure closure) {
+        firstLevelDependencies.add(Pair.of(notation, closure));
+    }
+
+    public GolangDependency create(Object dependencyNotation, Closure configureClosure) {
+        // first level
+        GolangDependency dependency = notationParser.parse(dependencyNotation);
+        AbstractGolangDependency.class.cast(dependency).setFirstLevel(true);
+        return ConfigureUtil.configure(configureClosure, dependency);
+    }
+
+    public void resolveFirstLevelDependencies() {
+        firstLevelDependencies.forEach(pair -> dependencies.add(create(pair.getLeft(), pair.getRight())));
+    }
+
+    public boolean hasFirstLevelDependencies() {
+        return !firstLevelDependencies.isEmpty();
     }
 }

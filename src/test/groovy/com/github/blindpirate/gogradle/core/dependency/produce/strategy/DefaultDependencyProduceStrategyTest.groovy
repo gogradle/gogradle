@@ -18,12 +18,11 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.strategy
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest
 import com.github.blindpirate.gogradle.core.dependency.VendorResolvedDependencyForTest
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.*
+import static com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependencyTest.ResolvedDependencyForTest
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

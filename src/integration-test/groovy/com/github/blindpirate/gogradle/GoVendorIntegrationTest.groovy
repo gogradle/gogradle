@@ -29,7 +29,7 @@ import org.junit.runner.RunWith
 @RunWith(GogradleRunner)
 @WithResource('')
 @WithMockGo
-class VendorTaskIntegrationTest extends IntegrationTestSupport {
+class GoVendorIntegrationTest extends IntegrationTestSupport {
     /*
     vendor/github.com/user/a
       |- a.go

@@ -18,54 +18,62 @@
 package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.GogradleGlobal
+import com.github.blindpirate.gogradle.GolangPlugin
 import com.google.inject.Injector
 import org.gradle.StartParameter
 import org.gradle.api.Project
 import org.gradle.api.invocation.Gradle
+import org.gradle.api.plugins.ExtensionContainer
 import org.junit.runners.model.FrameworkMethod
 
 import java.lang.annotation.Annotation
 
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
 abstract class GogradleGlobalProcessor<T extends Annotation> extends GogradleRunnerProcessor<T> {
     @Override
     void beforeTest(Object instance, FrameworkMethod method, T annotation) {
-        if (!isMock(GogradleGlobal.INSTANCE.getInjector())) {
-            GogradleGlobal.INSTANCE.injector = mock(Injector)
+        if (!alreadyMocked(GogradleGlobal.INSTANCE.getInjector())) {
+            Project project = mockProject()
+            GogradleGlobal.INSTANCE.setCurrentProject(project)
+
+            Gradle gradle = mockGradle(project)
+            mockStartParameter(gradle)
         }
 
-        Project project = mockProject()
-        Gradle gradle = mockGradle(project)
-        StartParameter startParameter = mockStartParameter(gradle)
+        doMock(GogradleGlobal.INSTANCE.getInjector().getInstance(Project).gradle.startParameter, annotation)
+    }
 
-        doMock(startParameter, annotation)
+    Project mockProject() {
+        Project project = mock(Project)
+        ExtensionContainer extensionContainer = mock(ExtensionContainer)
+        Injector injector = mock(Injector)
+
+        when(injector.getInstance(Project)).thenReturn(project)
+        when(project.getExtensions()).thenReturn(extensionContainer)
+        when(extensionContainer.getByName(GolangPlugin.GOGRADLE_INJECTOR)).thenReturn(injector)
+        return project
     }
 
     StartParameter mockStartParameter(Gradle gradle) {
         StartParameter startParameter = mock(StartParameter)
         when(gradle.getStartParameter()).thenReturn(startParameter)
-        return gradle.getStartParameter()
+        return startParameter
     }
 
     Gradle mockGradle(Project project) {
         Gradle gradle = mock(Gradle)
         when(project.getGradle()).thenReturn(gradle)
-        return project.getGradle()
+        return gradle
     }
 
-    abstract void doMock(StartParameter startParameter, T annotation)
+    void doMock(StartParameter startParameter, T annotation) {
 
-    Project mockProject() {
-        Project project = mock(Project)
-        when(GogradleGlobal.INSTANCE.getInstance(Project)).thenReturn(project)
-        return GogradleGlobal.INSTANCE.getInstance(Project)
     }
 
     @Override
     void afterTest(Object instance, FrameworkMethod method, T annotation) {
-        if (isMock(GogradleGlobal.INSTANCE.getInjector())) {
-            reset(GogradleGlobal.INSTANCE.getInjector())
-        }
+        GogradleGlobal.INSTANCE.setCurrentProject(null)
     }
 }

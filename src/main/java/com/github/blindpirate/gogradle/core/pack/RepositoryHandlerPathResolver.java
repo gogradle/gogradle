@@ -26,9 +26,9 @@ import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
-import groovy.lang.Singleton;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;

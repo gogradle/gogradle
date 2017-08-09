@@ -17,15 +17,22 @@
 
 package com.github.blindpirate.gogradle.task;
 
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.COVERAGE_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOFMT_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.GOVET_TASK_NAME;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TEST_TASK_NAME;
+import org.gradle.api.DefaultTask;
+import org.gradle.api.tasks.TaskAction;
 
-public class CheckTask extends AbstractGolangTask {
+import java.io.File;
 
-    public CheckTask() {
-        setDescription("Run all checks.");
-        dependsOn(TEST_TASK_NAME, GOFMT_TASK_NAME, GOVET_TASK_NAME, COVERAGE_TASK_NAME);
+import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_BUILD_DIR_NAME;
+import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
+import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
+
+public class GoClean extends DefaultTask {
+
+    @TaskAction
+    public void clean() {
+        File gogradleBuildDir = new File(getProject().getProjectDir(), GOGRADLE_BUILD_DIR_NAME);
+        if (isValidDirectory(gogradleBuildDir)) {
+            clearDirectory(gogradleBuildDir);
+        }
     }
 }

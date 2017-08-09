@@ -62,7 +62,7 @@ func main() {
     }
 
     void writeGoFileWithErrorToVendor() {
-        IOUtils.write(resource, '.tmp/main.go', goFileWithVetError)
+        IOUtils.write(resource, 'vendor/main.go', goFileWithVetError)
     }
 
     void writeGoFileWithErrorToSub() {

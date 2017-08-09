@@ -110,9 +110,7 @@ build {
 
 ```
 build {
-    doLast {
-        go 'build -o ./gogradle/output github.com/my/package/my/subpackage --my-own-cmd-arguments'
-    }
+    go 'build -o ./gogradle/output github.com/my/package/my/subpackage --my-own-cmd-arguments'
 }
 ```
 
@@ -128,9 +126,7 @@ build {
 
 ```groovy
 fmt {
-    doLast {
-        gofmt "-r '(a) -> a' -l *.go"
-    }
+    gofmt "-r '(a) -> a' -l *.go"
 }
 ```
 

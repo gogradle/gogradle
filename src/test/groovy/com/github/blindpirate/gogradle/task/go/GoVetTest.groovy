@@ -25,30 +25,34 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
-class GoVetTaskTest extends TaskTest {
-    GoVetTask task
+@WithResource('')
+class GoVetTest extends TaskTest {
+    GoVet task
 
     File resource
 
+    @Captor
+    ArgumentCaptor<List> captor
+
     @Before
     void setUp() {
-        task = buildTask(GoVetTask)
+        task = buildTask(GoVet)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
         when(project.getProjectDir()).thenReturn(resource)
-        if (resource) {
-            IOUtils.mkdir(resource, '.dir')
-            IOUtils.mkdir(resource, '_dir')
-            IOUtils.mkdir(resource, 'vendor')
-            IOUtils.mkdir(resource, 'sub')
-        }
+        IOUtils.mkdir(resource, '.dir')
+        IOUtils.mkdir(resource, '_dir')
+        IOUtils.mkdir(resource, 'vendor')
+        IOUtils.mkdir(resource, 'sub')
     }
 
     @Test
@@ -57,16 +61,13 @@ class GoVetTaskTest extends TaskTest {
     }
 
     @Test
-    @WithResource('')
     void 'go vet should succeed when .go exists in root'() {
         // given
         IOUtils.write(resource, 'main.go', '')
         // when
-        task.doAddDefaultAction()
-        task.actions.each { it.execute(task) }
-        ArgumentCaptor captor = ArgumentCaptor.forClass(List)
+        task.vet()
         // then
-        verify(buildManager, times(2)).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager, times(2)).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
 
         assert captor.allValues.size() == 2
         List firstCall = captor.allValues[0]
@@ -77,14 +78,27 @@ class GoVetTaskTest extends TaskTest {
     }
 
     @Test
-    @WithResource('')
     void 'go vet should succeed when .go not exists in root'() {
         // when
-        task.doAddDefaultAction()
-        task.actions.each { it.execute(task) }
-        ArgumentCaptor captor = ArgumentCaptor.forClass(List)
+        task.vet()
         // then
-        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), isNull())
+        verify(buildManager).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
         assert captor.value == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
+    }
+
+    @Test
+    void 'custom action should be executed if specified'() {
+        // given
+        task.go('tool vet xxx', null, {})
+        task.continueWhenFail = true
+        // when
+        task.vet()
+        // then
+        ArgumentCaptor captor1 = ArgumentCaptor.forClass(Consumer)
+        ArgumentCaptor captor2 = ArgumentCaptor.forClass(Consumer)
+        verify(buildManager).go(captor.capture(), anyMap(), captor1.capture(), captor2.capture(), eq(true))
+        assert captor.value == ['tool', 'vet', 'xxx']
+        assert captor1.value.class.name.contains('Lambda')
+        assert captor2.value.class.name.contains('Go$ClosureLineConsumer')
     }
 }

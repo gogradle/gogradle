@@ -159,9 +159,7 @@ golang {
     void 'customized build should succeed'() {
         appendOnBuildDotGradle('''
 build {
-    doLast {
-        go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
-    }
+    go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
 }
 ''')
         newBuild {

@@ -37,11 +37,11 @@ import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class InitTaskTest extends TaskTest {
+class GoInitTest extends TaskTest {
 
     File resource
 
-    InitTask task
+    GoInit task
 
     @Mock
     ExternalDependencyFactory externalDependencyFactory
@@ -57,7 +57,7 @@ class InitTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(InitTask)
+        task = buildTask(GoInit)
         ReflectionUtils.setField(task, 'externalDependencyFactories', [defaultLockedDependencyManager, externalDependencyFactory])
         when(configurationManager.getByName('build')).thenReturn(build)
         when(configurationManager.getByName('test')).thenReturn(test)
@@ -78,8 +78,7 @@ class InitTaskTest extends TaskTest {
     @Test
     void 'initialization should be skipped if dependencies in build.gradle exist'() {
         // given
-        GolangDependencySet dependencySet = asGolangDependencySet(mockDependency('mock'))
-        when(test.dependencies).thenReturn(dependencySet)
+        when(build.hasFirstLevelDependencies()).thenReturn(true)
         // when
         task.init()
         // then

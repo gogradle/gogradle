@@ -46,9 +46,9 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.util.StringUtils.appendNSpaces;
 
-public class InitTask extends AbstractGolangTask {
+public class GoInit extends AbstractGolangTask {
     private static final int DEFAULT_INDENT = 4;
-    private static final Logger LOGGER = Logging.getLogger(InitTask.class);
+    private static final Logger LOGGER = Logging.getLogger(GoInit.class);
 
     @Inject
     @DefaultDependencyVisitor.ExternalDependencyFactories
@@ -63,7 +63,7 @@ public class InitTask extends AbstractGolangTask {
     @Inject
     private GolangConfigurationManager configurationManager;
 
-    public InitTask() {
+    public GoInit() {
         setDescription("Import dependencies from other dependency management tools.");
         dependsOn(GolangTaskContainer.PREPARE_TASK_NAME);
     }
@@ -86,8 +86,8 @@ public class InitTask extends AbstractGolangTask {
 
     private boolean dependenciesInBuildDotGradleExists() {
         // there have been some dependencies declared in build.gradle
-        return !configurationManager.getByName(BUILD).getDependencies().isEmpty()
-                || !configurationManager.getByName(TEST).getDependencies().isEmpty();
+        return configurationManager.getByName(BUILD).hasFirstLevelDependencies()
+                || configurationManager.getByName(TEST).hasFirstLevelDependencies();
     }
 
     private void initBySourceCodeScan(File rootDir) {

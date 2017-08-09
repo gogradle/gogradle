@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleGlobal
+import com.github.blindpirate.gogradle.GolangPlugin
 import com.github.blindpirate.gogradle.GolangPluginSetting
 import com.github.blindpirate.gogradle.build.BuildManager
 import com.github.blindpirate.gogradle.core.BuildConstraintManager
@@ -37,6 +38,7 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
 import org.gradle.api.internal.AbstractTask
+import org.gradle.api.internal.plugins.ExtensionContainerInternal
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.util.Path
 import org.junit.Before
@@ -80,6 +82,8 @@ abstract class TaskTest {
     GogradleRootProject gogradleRootProject
     @Mock
     GoglandIntegration goglandIntegration
+    @Mock
+    ExtensionContainerInternal extensionContainer
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -119,6 +123,9 @@ abstract class TaskTest {
                       goglandIntegration     : goglandIntegration,
                       jetBrainsIdeIntegration: jetBrainsIdeIntegration]
 
+
+        when(project.getExtensions()).thenReturn(extensionContainer)
+        when(extensionContainer.getByName(GolangPlugin.GOGRADLE_INJECTOR)).thenReturn(GogradleGlobal.INSTANCE.injector)
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
         fields.each { fieldName, fieldInstance ->

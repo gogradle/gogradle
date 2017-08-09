@@ -25,10 +25,10 @@ import org.gradle.internal.service.ServiceRegistry
 import org.junit.runners.model.FrameworkMethod
 
 import static org.mockito.ArgumentMatchers.any
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.mock
+import static org.mockito.Mockito.when
 
-class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector> {
-
+class WithMockInjectorProcessor extends GogradleGlobalProcessor<WithMockInjector> {
     void setUpMockProgressMonitor(Injector injector) {
         ProgressLogger mockLogger = mock(ProgressLogger)
         ServiceRegistry mockServiceRegistry = mock(ServiceRegistry)
@@ -40,16 +40,7 @@ class WithMockInjectorProcessor extends GogradleRunnerProcessor<WithMockInjector
 
     @Override
     void beforeTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
-        if (!isMock(GogradleGlobal.INSTANCE.getInjector())) {
-            GogradleGlobal.INSTANCE.injector = mock(Injector)
-        }
+        super.beforeTest(instance, method, annotation)
         setUpMockProgressMonitor(GogradleGlobal.INSTANCE.getInjector())
-    }
-
-    @Override
-    void afterTest(Object instance, FrameworkMethod method, WithMockInjector annotation) {
-        if (isMock(GogradleGlobal.INSTANCE.getInjector())) {
-            reset(GogradleGlobal.INSTANCE.getInjector())
-        }
     }
 }

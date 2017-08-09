@@ -34,8 +34,8 @@ import static org.mockito.Mockito.verify
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-class LockTaskTest extends TaskTest {
-    LockTask task
+class GoLockTest extends TaskTest {
+    GoLock task
 
     ResolvedDependency build = mockResolvedDependency('build')
     ResolvedDependency test = mockResolvedDependency('test')
@@ -47,7 +47,7 @@ class LockTaskTest extends TaskTest {
 
     @Before
     void setUp() {
-        task = buildTask(LockTask)
+        task = buildTask(GoLock)
     }
 
     @Test
@@ -61,8 +61,8 @@ class LockTaskTest extends TaskTest {
         // given
         GolangDependencySet buildSet = asGolangDependencySet(build)
         GolangDependencySet testSet = asGolangDependencySet(test)
-        when(golangTaskContainer.get(ResolveBuildDependenciesTask).getDependencyTree()).thenReturn(buildTree)
-        when(golangTaskContainer.get(ResolveTestDependenciesTask).getDependencyTree()).thenReturn(testTree)
+        when(golangTaskContainer.get(ResolveBuildDependencies).getDependencyTree()).thenReturn(buildTree)
+        when(golangTaskContainer.get(ResolveTestDependencies).getDependencyTree()).thenReturn(testTree)
         when(buildTree.flatten()).thenReturn(buildSet)
         when(testTree.flatten()).thenReturn(testSet)
         // when

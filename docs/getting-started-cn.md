@@ -122,9 +122,7 @@ HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`�
 task golint(type: com.github.blindpirate.gogradle.Go) {
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     environment MY_OWN_ENV1: 'value1', MY_OWN_ENV1: 'value2' // 设置要运行命令的环境变量
-    doLast {
-        run 'golint github.com/my/project' // 指定任务中运行的命令
-    }
+    run 'golint github.com/my/project' // 指定任务中运行的命令
 }
 
 check.dependsOn golint
@@ -135,15 +133,13 @@ check.dependsOn golint
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
-    doLast {
-        go('build -v github.com/my/project', { stdoutLine ->
-            println stderrLine
-            new File('stdout.txt').append(stdoutLine)
-        }, { stderrLine ->
-            println stderrLine
-            new File('stderr.txt').append(stdoutLine)
-        })
-    }
+    go('build -v github.com/my/project', { stdoutLine ->
+        println stderrLine
+        new File('stdout.txt').append(stdoutLine)
+    }, { stderrLine ->
+        println stderrLine
+        new File('stderr.txt').append(stdoutLine)
+    })
 }
 ```
 
@@ -152,9 +148,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
-    doLast {
-        go('build -v github.com/my/project', writeTo('stdout.txt'), appendTo('/this/is/absolute/path/stderr.txt'))
-    }
+    go('build -v github.com/my/project', writeTo('stdout.txt'), appendTo('/this/is/absolute/path/stderr.txt'))
 }
 ```
 
@@ -165,10 +159,10 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
+    go('build -v github.com/my/project', devNull(), devNull())
     doLast {
-        def retcode = go('build -v github.com/my/project', devNull(), devNull())
-        if(retcode != 0) {
-             println "return code is ${retcode}"
+        if(exitValue!=0){
+            println "return code is ${exitValue}"
         }
     }
 }
@@ -262,6 +256,10 @@ golang {
     // 默认为"go"。若go不在$PATH中，可以使用此配置指定其位置
     // 可以用 goExecutable = 'IGNORE_LOCAL' 来强制指定不使用本地的go
     goExecutable = '/path/to/go/executable'
+    
+    // 方便自定义仓库，Gogradle会尝试从
+    // http://my-company.com/go-distributions/go${version}.${os}-${arch}${extension} 下载go的发行版
+    goBinaryDownloadRootUri = 'http://my-company.com/go-distributions'
     
     // 默认为<go程序所在目录>/..
     goRoot = '/path/to/my/goroot'
