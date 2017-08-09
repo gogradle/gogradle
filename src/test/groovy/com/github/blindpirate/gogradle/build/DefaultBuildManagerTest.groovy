@@ -153,7 +153,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
         manager.prepareProjectGopathIfNecessary()
         setting.buildTags = ['a', 'b', 'c']
         // when
-        manager.run(['golint'], [:], null, null, null)
+        int retcode = manager.run(['golint'], [:], null, null)
         // then
         verify(processUtils).run(['golint'],
                 [GOPATH: getProjectGopath(),
@@ -162,6 +162,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
                  GOARCH: Arch.getHostArch().toString(),
                  GOEXE : Os.getHostOs().exeExtension()],
                 resource)
+        assert retcode == 0
     }
 
     @Test
@@ -209,14 +210,13 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
         when(process.getErrorStream()).thenReturn(new ByteArrayInputStream('stderr'.getBytes(DEFAULT_CHARSET)))
         Consumer stdoutLineConsumer = mock(Consumer)
         Consumer stderrLineConsumer = mock(Consumer)
-        Consumer retcodeConsumer = mock(Consumer)
         // when
-        manager.go(['build'], [:], stdoutLineConsumer, stderrLineConsumer, retcodeConsumer)
+        int retcode = manager.go(['build'], [:], stdoutLineConsumer, stderrLineConsumer)
         // then
         verify(stdoutLineConsumer).accept('stdout')
         verify(stdoutLineConsumer).accept('anotherline')
         verify(stderrLineConsumer).accept('stderr')
-        verify(retcodeConsumer).accept(0)
+        assert retcode == 0
     }
 
     @Test

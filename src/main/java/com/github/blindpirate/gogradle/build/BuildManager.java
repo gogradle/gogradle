@@ -68,14 +68,18 @@ public interface BuildManager {
      * @param env                extra environment variables to be passed to go
      * @param stdoutLineConsumer the consumer by which stdout line is consumed
      * @param stderrLineConsumer the consumer by which stderr line is consumed
-     * @param retcodeConsumer    the consumer by which ret code is consumed
      * @return return code of go command
      */
     int go(List<String> args,
            Map<String, String> env,
            Consumer<String> stdoutLineConsumer,
+           Consumer<String> stderrLineConsumer);
+
+    int go(List<String> args,
+           Map<String, String> env,
+           Consumer<String> stdoutLineConsumer,
            Consumer<String> stderrLineConsumer,
-           Consumer<Integer> retcodeConsumer);
+           boolean continueWhenFail);
 
     /**
      * Fork a process and run commands specified by {@code args}, under the environments
@@ -90,13 +94,17 @@ public interface BuildManager {
      * @param env                extra environment variables to be passed to go
      * @param stdoutLineConsumer the consumer by which stdout line is consumed
      * @param stderrLineConsumer the consumer by which stderr line is consumed
-     * @param retcodeConsumer    the consumer by which ret code is consumed
      * @return return code of go command
      */
     int run(List<String> args,
             Map<String, String> env,
             Consumer<String> stdoutLineConsumer,
+            Consumer<String> stderrLineConsumer);
+
+    int run(List<String> args,
+            Map<String, String> env,
+            Consumer<String> stdoutLineConsumer,
             Consumer<String> stderrLineConsumer,
-            Consumer<Integer> retcodeConsumer);
+            boolean continueWhenFail);
 
 }

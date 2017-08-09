@@ -149,17 +149,7 @@ public class DefaultBuildManager implements BuildManager {
 
     @Override
     public int go(List<String> args, Map<String, String> env) {
-        return go(args, env, null, null, null);
-    }
-
-    @Override
-    public int go(List<String> args,
-                  Map<String, String> env,
-                  Consumer<String> stdoutLineConsumer,
-                  Consumer<String> stderrLineConsumer,
-                  Consumer<Integer> retcodeConsumer) {
-        List<String> cmdAndArgs = asStringList(getGoBinary(), insertBuildTags(args));
-        return run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
+        return go(args, env, null, null);
     }
 
     private List<String> insertBuildTags(List<String> cmd) {
@@ -177,16 +167,41 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
+    public int go(List<String> args,
+                  Map<String, String> env,
+                  Consumer<String> stdoutLineConsumer,
+                  Consumer<String> stderrLineConsumer) {
+        return go(args, env, stdoutLineConsumer, stderrLineConsumer, false);
+    }
+
+    @Override
+    public int go(List<String> args,
+                  Map<String, String> env,
+                  Consumer<String> stdoutLineConsumer,
+                  Consumer<String> stderrLineConsumer,
+                  boolean continueWhenFail) {
+        List<String> cmdAndArgs = asStringList(getGoBinary(), insertBuildTags(args));
+        return run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, continueWhenFail);
+    }
+
+    @Override
+    public int run(List<String> args, Map<String, String> env,
+                   Consumer<String> stdoutLineConsumer,
+                   Consumer<String> stderrLineConsumer) {
+        return run(args, env, stdoutLineConsumer, stderrLineConsumer, false);
+    }
+
+    @Override
     public int run(List<String> args, Map<String, String> env,
                    Consumer<String> stdoutLineConsumer,
                    Consumer<String> stderrLineConsumer,
-                   Consumer<Integer> retcodeConsumer) {
+                   boolean continueWhenFail) {
         Map<String, String> finalEnv = determineEnv(env);
 
         @SuppressWarnings("unchecked")
         List<String> finalArgs = renderArgs(args, (Map) finalEnv);
 
-        return doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, retcodeConsumer);
+        return doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, continueWhenFail);
     }
 
     @SuppressWarnings("unchecked")
@@ -200,10 +215,9 @@ public class DefaultBuildManager implements BuildManager {
                       Map<String, String> env,
                       Consumer<String> stdoutLineConsumer,
                       Consumer<String> stderrLineConsumer,
-                      Consumer<Integer> retcodeConsumer) {
+                      boolean continueWhenFail) {
         stdoutLineConsumer = stdoutLineConsumer == null ? LOGGER::quiet : stdoutLineConsumer;
         stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
-        retcodeConsumer = retcodeConsumer == null ? code -> ensureProcessReturnZero(code, args, env) : retcodeConsumer;
 
         Process process = processUtils.run(args, determineEnv(env), project.getProjectDir());
 
@@ -219,10 +233,11 @@ public class DefaultBuildManager implements BuildManager {
         }
 
         try {
-            int retcode = process.waitFor();
-
-            retcodeConsumer.accept(retcode);
-            return retcode;
+            int ret = process.waitFor();
+            if (!continueWhenFail) {
+                ensureProcessReturnZero(ret, args, env);
+            }
+            return ret;
         } catch (InterruptedException e) {
             throw ExceptionHandler.uncheckException(e);
         }
