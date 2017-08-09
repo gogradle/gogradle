@@ -82,18 +82,18 @@ dependencies:
     @Before
     void setUp() {
         ReflectionUtils.setField(manager, 'project', project)
-        when(dependency1.getName()).thenReturn('a')
-        when(dependency2.getName()).thenReturn('b')
-        when(dependency3.getName()).thenReturn('a')
-        when(dependency4.getName()).thenReturn('c')
+        when(dependency1.getName()).thenReturn('b')
+        when(dependency2.getName()).thenReturn('a')
+        when(dependency3.getName()).thenReturn('c')
+        when(dependency4.getName()).thenReturn('a')
         when(standardPackagePathResolver.isStandardPackage(any(Path))).thenReturn(false)
     }
 
     void prepareGogradleDotLock() {
-        when(parser.parse([name: 'a', version: 'v1', transitive: false])).thenReturn(dependency1)
-        when(parser.parse([name: 'b', version: 'v2', transitive: false])).thenReturn(dependency2)
-        when(parser.parse([name: 'a', version: 'v2', transitive: false])).thenReturn(dependency3)
-        when(parser.parse([name: 'c', version: 'v3', transitive: false])).thenReturn(dependency4)
+        when(parser.parse([name: 'b', version: 'v2', transitive: false])).thenReturn(dependency1)
+        when(parser.parse([name: 'a', version: 'v1', transitive: false])).thenReturn(dependency2)
+        when(parser.parse([name: 'c', version: 'v3', transitive: false])).thenReturn(dependency3)
+        when(parser.parse([name: 'a', version: 'v2', transitive: false])).thenReturn(dependency4)
         IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, gogradleDotLock)
     }
 
@@ -116,10 +116,10 @@ dependencies:
     @Test
     void 'writing to gogradle.lock should succeed'() {
         // given
-        when(dependency1.toLockedNotation()).thenReturn([name: 'a', version: 'v1'])
-        when(dependency2.toLockedNotation()).thenReturn([name: 'b', version: 'v2'])
-        when(dependency3.toLockedNotation()).thenReturn([name: 'a', version: 'v2'])
-        when(dependency4.toLockedNotation()).thenReturn([name: 'c', version: 'v3'])
+        when(dependency1.toLockedNotation()).thenReturn([name: 'b', version: 'v2'])
+        when(dependency2.toLockedNotation()).thenReturn([name: 'a', version: 'v1'])
+        when(dependency3.toLockedNotation()).thenReturn([name: 'c', version: 'v3'])
+        when(dependency4.toLockedNotation()).thenReturn([name: 'a', version: 'v2'])
 
         // when
         manager.lock([dependency1, dependency2], [dependency3, dependency4])
