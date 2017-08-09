@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
 import com.github.blindpirate.gogradle.core.GolangConfigurationManager;
+import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager;
 import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
@@ -74,6 +75,9 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     @Inject
     private GogradleRootProject gogradleRootProject;
+
+    @Inject
+    private GolangDependencyHandler dependencyHandler;
 
     private DependencyTreeNode dependencyTree;
 
@@ -159,6 +163,9 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     private void resolveDependencies() {
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
+
+        dependencyHandler.resolveFirstLevel(configuration);
+
         ResolveContext rootContext = ResolveContext.root(gogradleRootProject, configuration);
 
         gogradleRootProject.setDependencies(produceFirstLevelDependencies());

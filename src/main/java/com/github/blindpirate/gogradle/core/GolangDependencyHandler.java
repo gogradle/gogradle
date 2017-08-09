@@ -23,17 +23,22 @@ import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import groovy.lang.MissingMethodException;
-import groovy.lang.Singleton;
+import org.apache.commons.lang3.tuple.Triple;
 import org.gradle.util.CollectionUtils;
 import org.gradle.util.ConfigureUtil;
 
 import javax.inject.Inject;
+import javax.inject.Singleton;
+import java.util.ArrayList;
 import java.util.List;
+
+import static org.apache.commons.lang3.tuple.Triple.of;
 
 @Singleton
 public class GolangDependencyHandler extends GroovyObjectSupport {
     private final NotationParser notationParser;
     private final GolangConfigurationManager configurationManager;
+    private final List<Triple<GolangConfiguration, Object, Closure>> firstLevelDependencies = new ArrayList<>();
 
     @Inject
     public GolangDependencyHandler(GolangConfigurationManager configurationManager,
@@ -62,17 +67,8 @@ public class GolangDependencyHandler extends GroovyObjectSupport {
         return null;
     }
 
-    public void add(String configurationName, Object dependencyNotation) {
-        add(configurationName, dependencyNotation, null);
-    }
-
-    public void add(String configurationName, Object dependencyNotation, Closure configureClosure) {
-        doAdd(configurationManager.getByName(configurationName), dependencyNotation, configureClosure);
-    }
-
     private void doAdd(GolangConfiguration configuration, Object dependencyNotation, Closure configureClosure) {
-        GolangDependency dependency = create(dependencyNotation, configureClosure);
-        configuration.getDependencies().add(dependency);
+        firstLevelDependencies.add(of(configuration, dependencyNotation, configureClosure));
     }
 
     public GolangDependency create(Object dependencyNotation, Closure configureClosure) {
@@ -80,6 +76,16 @@ public class GolangDependencyHandler extends GroovyObjectSupport {
         GolangDependency dependency = notationParser.parse(dependencyNotation);
         AbstractGolangDependency.class.cast(dependency).setFirstLevel(true);
         return ConfigureUtil.configure(configureClosure, dependency);
+    }
+
+    public void resolveFirstLevel(GolangConfiguration configuration) {
+        firstLevelDependencies.stream()
+                .filter(triple -> configuration.equals(triple.getLeft()))
+                .forEach(triple -> configuration.getDependencies().add(create(triple.getMiddle(), triple.getRight())));
+    }
+
+    public boolean hasFirstLevelDependencies() {
+        return !firstLevelDependencies.isEmpty();
     }
 }
 

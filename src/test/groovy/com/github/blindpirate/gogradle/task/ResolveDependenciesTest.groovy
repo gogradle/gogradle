@@ -113,6 +113,7 @@ class ResolveDependenciesTest extends TaskTest {
         resolveBuildDependenciesTask.resolve()
         // then
         assert new File(resource, '.gogradle/cache/build.bin').exists()
+        verify(dependencyHandler).resolveFirstLevel(configuration)
         verify(projectCacheManager).loadPersistenceCache()
         verify(projectCacheManager).savePersistenceCache()
     }

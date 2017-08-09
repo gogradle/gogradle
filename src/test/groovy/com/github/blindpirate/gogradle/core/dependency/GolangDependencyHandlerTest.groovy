@@ -60,12 +60,6 @@ class GolangDependencyHandlerTest {
     }
 
     @Test
-    void 'adding configuration should succeed'() {
-        handler.add('build', 'notation')
-        verify(dependencies).add(dependency)
-    }
-
-    @Test
     void 'creating dependency should succeed'() {
         assert handler.create('notation', null).is(dependency)
     }

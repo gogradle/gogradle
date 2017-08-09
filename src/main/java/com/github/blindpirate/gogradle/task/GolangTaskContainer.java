@@ -33,6 +33,7 @@ import org.gradle.api.Task;
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Consumer;
 
 @Singleton
 public class GolangTaskContainer {
@@ -110,5 +111,9 @@ public class GolangTaskContainer {
     @SuppressWarnings("unchecked")
     public <T extends Task> T get(Class<T> clazz) {
         return (T) this.tasks.get(clazz);
+    }
+
+    public void each(Consumer<Task> consumer) {
+        tasks.values().forEach(consumer::accept);
     }
 }
