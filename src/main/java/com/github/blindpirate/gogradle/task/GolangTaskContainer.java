@@ -78,7 +78,7 @@ public class GolangTaskContainer {
     public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
             .put(PREPARE_TASK_NAME, GoPrepare.class)
             .put(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, ResolveBuildDependencies.class)
-            .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependenciesDependencies.class)
+            .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependencies.class)
             .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
             .put(BUILD_TASK_NAME, GoBuild.class)
             .put(TEST_TASK_NAME, GoTest.class)

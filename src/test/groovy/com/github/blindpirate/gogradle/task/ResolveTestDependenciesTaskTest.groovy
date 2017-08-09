@@ -36,7 +36,7 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 @WithResource('')
 class ResolveTestDependenciesTaskTest extends TaskTest {
-    ResolveTestDependenciesDependencies task
+    ResolveTestDependencies task
 
     File resource
 
@@ -45,7 +45,7 @@ class ResolveTestDependenciesTaskTest extends TaskTest {
     @Before
     void setUp() {
         when(project.getProjectDir()).thenReturn(resource)
-        task = buildTask(ResolveTestDependenciesDependencies)
+        task = buildTask(ResolveTestDependencies)
         local = LocalDirectoryDependency.fromLocal('local', resource)
     }
 

@@ -62,7 +62,7 @@ class GoLockTest extends TaskTest {
         GolangDependencySet buildSet = asGolangDependencySet(build)
         GolangDependencySet testSet = asGolangDependencySet(test)
         when(golangTaskContainer.get(ResolveBuildDependencies).getDependencyTree()).thenReturn(buildTree)
-        when(golangTaskContainer.get(ResolveTestDependenciesDependencies).getDependencyTree()).thenReturn(testTree)
+        when(golangTaskContainer.get(ResolveTestDependencies).getDependencyTree()).thenReturn(testTree)
         when(buildTree.flatten()).thenReturn(buildSet)
         when(testTree.flatten()).thenReturn(testSet)
         // when

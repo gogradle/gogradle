@@ -42,7 +42,7 @@ public class DependenciesTask extends AbstractGolangTask {
     @TaskAction
     public void displayDependencies() {
         DependencyTreeNode buildTree = getTask(ResolveBuildDependencies.class).getDependencyTree();
-        DependencyTreeNode testTree = getTask(ResolveTestDependenciesDependencies.class).getDependencyTree();
+        DependencyTreeNode testTree = getTask(ResolveTestDependencies.class).getDependencyTree();
         display(BUILD, buildTree);
         display(TEST, testTree);
     }
