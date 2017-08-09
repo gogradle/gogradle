@@ -25,6 +25,9 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
+import org.mockito.Captor
+
+import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
@@ -37,6 +40,9 @@ class GoVetTest extends TaskTest {
     GoVet task
 
     File resource
+
+    @Captor
+    ArgumentCaptor<List> captor
 
     @Before
     void setUp() {
@@ -60,7 +66,6 @@ class GoVetTest extends TaskTest {
         IOUtils.write(resource, 'main.go', '')
         // when
         task.vet()
-        ArgumentCaptor captor = ArgumentCaptor.forClass(List)
         // then
         verify(buildManager, times(2)).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
 
@@ -76,9 +81,24 @@ class GoVetTest extends TaskTest {
     void 'go vet should succeed when .go not exists in root'() {
         // when
         task.vet()
-        ArgumentCaptor captor = ArgumentCaptor.forClass(List)
         // then
         verify(buildManager).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
         assert captor.value == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
+    }
+
+    @Test
+    void 'custom action should be executed if specified'() {
+        // given
+        task.go('tool vet xxx', null, {})
+        task.continueWhenFail = true
+        // when
+        task.vet()
+        // then
+        ArgumentCaptor captor1 = ArgumentCaptor.forClass(Consumer)
+        ArgumentCaptor captor2 = ArgumentCaptor.forClass(Consumer)
+        verify(buildManager).go(captor.capture(), anyMap(), captor1.capture(), captor2.capture(), eq(true))
+        assert captor.value == ['tool', 'vet', 'xxx']
+        assert captor1.value.class.name.contains('Lambda')
+        assert captor2.value.class.name.contains('Go$ClosureLineConsumer')
     }
 }
