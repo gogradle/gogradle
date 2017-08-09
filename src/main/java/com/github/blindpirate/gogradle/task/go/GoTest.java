@@ -123,10 +123,6 @@ public class GoTest extends AbstractGolangTask {
         reportErrorIfNecessary(testResults, reportDir);
     }
 
-    public Task leftShift(final Closure action) {
-        throw new UnsupportedOperationException("Left shift is not supported since it's deprecated officially");
-    }
-
     private Collection<File> filterMatchedTests() {
         TestPatternFilter filter = TestPatternFilter.withPattern(testNamePattern);
         return filterFilesRecursively(getProject().getProjectDir(), filter);

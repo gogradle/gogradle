@@ -231,21 +231,6 @@ public class GoTestStdoutExtractor {
         return result;
     }
 
-    private String mapToResultLine(int index, List<String> lines, int testResultLineIndex) {
-        String line = lines.get(index);
-        if (index == testResultLineIndex) {
-            int testFailIndex = line.indexOf(TEST_FAIL);
-            int testPassIndex = line.indexOf(TEST_PASS);
-            if (testFailIndex > 0 || testPassIndex > 0) {
-                // they seemed to omit a new line
-                return line.substring(0, testFailIndex > 0 ? testFailIndex : testPassIndex);
-            } else {
-                return "";
-            }
-        }
-        return lines.get(index);
-    }
-
     private Map<File, String> loadTestFiles(List<File> testFiles) {
         return testFiles.
                 stream()
