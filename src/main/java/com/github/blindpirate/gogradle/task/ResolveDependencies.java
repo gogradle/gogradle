@@ -131,6 +131,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 7: local dependencies
     @InputFiles
     public List<File> getLocalDirDependencies() {
+        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
         return configurationManager.getByName(getConfigurationName())
                 .getDependencies().stream()
                 .filter(dependency -> dependency instanceof LocalDirectoryDependency)
