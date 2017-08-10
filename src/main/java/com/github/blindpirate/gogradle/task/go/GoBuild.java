@@ -112,6 +112,7 @@ public class GoBuild extends Go {
         // intentionally empty
     }
 
+    @Deprecated
     public void setTargetPlatform(String targetPlatform) {
         Matcher matcher = TARGET_PLATFORMS_PATTERN.matcher(targetPlatform);
         Assert.isTrue(matcher.matches(),
