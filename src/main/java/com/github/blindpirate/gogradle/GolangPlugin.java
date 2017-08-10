@@ -71,12 +71,7 @@ public class GolangPlugin implements Plugin<Project> {
         configureSettings(project);
         configureConfigurations(project);
         configureTasks(project);
-        configureBuildDir(project);
         hackIdeaPlugin();
-    }
-
-    private void configureBuildDir(Project project) {
-        project.setBuildDir(new File(project.getProjectDir(), ".gogradle"));
     }
 
     private void hackIdeaPlugin() {
