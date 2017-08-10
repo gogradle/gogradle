@@ -113,4 +113,29 @@ func main(){
 
         assert new File(resource, 'multi.ipr').exists()
     }
+
+    @Test
+    void 'each project should have a different injector instance'() {
+        // given
+        new File(resource, 'build.gradle').append('''
+allprojects {
+    if(it.name.startsWith('go')){
+        it.task(type: com.github.blindpirate.gogradle.Go, 'printInjector') {
+            doLast {
+                println "injector:${-> com.github.blindpirate.gogradle.GogradleGlobal.INSTANCE.getInjector().hashCode()}"
+            }
+        }
+    }
+}
+''')
+        // when
+        newBuild {
+            it.forTasks(':go1:printInjector', ':go2:printInjector')
+        }
+
+        // then
+        def matchers = (stdout.toString() =~ /injector:(\d+)/)
+        assert matchers.size() == 2
+        assert matchers[0][1] != matchers[1][1]
+    }
 }
