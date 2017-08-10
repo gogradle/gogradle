@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle;
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.ide.IdeaIntegration;
+import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.task.go.GoBuild;
 import com.github.blindpirate.gogradle.task.go.Gofmt;
@@ -112,9 +113,11 @@ public class GolangPlugin implements Plugin<Project> {
     private void afterEvaluate(Project project) {
         this.golangTaskContainer.get(GoBuild.class).afterEvaluate();
         this.golangTaskContainer.get(Gofmt.class).afterEvaluate();
-        this.golangTaskContainer.each(task ->
-                task.doFirst(t -> GogradleGlobal.INSTANCE.setCurrentProject(project))
-        );
+        // AbstractGolangTask should set project into thread local before it executes
+        // otherwise, subtle issues occur in multiproject
+        project.getTasks().matching(task -> task instanceof AbstractGolangTask)
+                .forEach(task ->
+                        task.doFirst(t -> GogradleGlobal.INSTANCE.setCurrentProject(project)));
     }
 
     private void customizeProjectInternalServices(Project project) {
