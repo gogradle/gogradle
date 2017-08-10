@@ -92,7 +92,7 @@ go build github.com/my/project -o .gogradle/windows_amd64_project
 ```
 build {
     // 交叉编译的输出选项，注意，要求go 1.5+
-    targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+    targetPlatform = ['windows-amd64', 'linux-amd64', 'linux-386']
     
     // 输出文件的路径，可以是绝对路径（相对于项目目录）或者相对路径
     // 其中的${}占位符会在交叉编译时被渲染

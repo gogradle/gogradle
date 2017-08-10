@@ -92,7 +92,7 @@ You can configure it as follows:
 ```
 build {
     // Cross-compile output
-    targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+    targetPlatform = ['windows-amd64', 'linux-amd64', 'linux-386']
     
     // Output location, can be relative path (to project root) or absolute path
     // The ${} placeholder will be rendered in cross-compile
