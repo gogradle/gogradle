@@ -3,8 +3,6 @@
 ## 镜像仓库
 Gogradle支持私有仓库和仓库url替换。这实际上支持了仓库的镜像。你可以在`build.gradle`的`repositories`中声明一个仓库。
 
-> 注意：`repositories`必须放置在`dependencies`之前！！！
-
 例如，你想要把一个特定的包替换成自己的实现，可以这样做：
 
 ```
