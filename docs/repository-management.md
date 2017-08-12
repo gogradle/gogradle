@@ -4,8 +4,6 @@
 
 Gogradle supports private repository and repository url substitution. Actually, it supports registry mirrors. You can declare repositories in `repositories` block of `build.gradle`.
 
-> NOTE `repositories` block must be placed before `dependencies` block !!!!
-
 For example, you may want to substitute a specific package with your own implementation, just do as follows:
 
 ```
