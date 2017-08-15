@@ -63,7 +63,7 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
         return result;
     }
 
-    private void updateCache(String packagePath, GolangPackage golangPackage) {
+    public void updateCache(String packagePath, GolangPackage golangPackage) {
         // if github.com/a/b/c is resolved, then all its subpath are resolved:
         // github.com/a/b
         // github.com/a
