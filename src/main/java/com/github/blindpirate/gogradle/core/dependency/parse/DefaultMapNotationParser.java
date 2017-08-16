@@ -26,17 +26,18 @@ import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependenc
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
-import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.util.MapUtils.getString;
+import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URL_KEY;
 import static java.util.Collections.singletonList;
 
 /**
@@ -47,12 +48,12 @@ import static java.util.Collections.singletonList;
 public class DefaultMapNotationParser implements MapNotationParser {
     private final DirMapNotationParser dirMapNotationParser;
     private final VendorMapNotationParser vendorMapNotationParser;
-    private final PackagePathResolver packagePathResolver;
+    private final DefaultPackagePathResolver packagePathResolver;
 
     @Inject
     public DefaultMapNotationParser(DirMapNotationParser dirMapNotationParser,
                                     VendorMapNotationParser vendorMapNotationParser,
-                                    PackagePathResolver packagePathResolver) {
+                                    DefaultPackagePathResolver packagePathResolver) {
         this.dirMapNotationParser = dirMapNotationParser;
         this.vendorMapNotationParser = vendorMapNotationParser;
         this.packagePathResolver = packagePathResolver;
@@ -62,7 +63,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
     public NotationDependency parse(Map<String, Object> notation) {
         Assert.isTrue(notation.containsKey(NAME_KEY), "Name must be specified!");
 
-        String packagePath = MapUtils.getString(notation, NAME_KEY);
+        String packagePath = getString(notation, NAME_KEY);
 
         GolangPackage pkg = packagePathResolver.produce(packagePath).get();
 
@@ -70,7 +71,15 @@ public class DefaultMapNotationParser implements MapNotationParser {
             String rootPathString = ResolvableGolangPackage.class.cast(pkg).getRootPathString();
             notation.put(NAME_KEY, rootPathString);
             notation.put(PACKAGE_KEY, ResolvableGolangPackage.class.cast(pkg).resolve(rootPathString).get());
-        } else {
+        } else if (pkg instanceof UnrecognizedGolangPackage) {
+            // https://github.com/gogradle/gogradle/issues/141
+            if (notation.containsKey(DIR_KEY)) {
+                pkg = LocalDirectoryGolangPackage.of(packagePath, packagePath, getString(notation, DIR_KEY));
+                packagePathResolver.updateCache(packagePath, pkg);
+            } else if (notation.containsKey(URL_KEY)) {
+                pkg = adaptAsVcsPackage(notation, packagePath);
+                packagePathResolver.updateCache(packagePath, pkg);
+            }
             notation.put(PACKAGE_KEY, pkg);
         }
 
@@ -78,51 +87,32 @@ public class DefaultMapNotationParser implements MapNotationParser {
             return dirMapNotationParser.parse(notation);
         } else if (notation.containsKey(VENDOR_PATH_KEY)) {
             return vendorMapNotationParser.parse(notation);
-        } else {
-            return parseWithVcs(notation, pkg);
-        }
-    }
-
-    private NotationDependency parseWithVcs(Map<String, Object> notation, GolangPackage pkg) {
-        if (pkg instanceof VcsGolangPackage) {
+        } else if (pkg instanceof VcsGolangPackage) {
             return parseVcsPackage(notation, (VcsGolangPackage) pkg);
         } else if (pkg instanceof UnrecognizedGolangPackage) {
-            return parseUnrecognizedPackage(notation, (UnrecognizedGolangPackage) pkg);
+            return UnrecognizedNotationDependency.of((UnrecognizedGolangPackage) pkg);
         } else {
             throw DependencyResolutionException.cannotParseNotation(notation);
         }
     }
 
-    private NotationDependency parseUnrecognizedPackage(Map<String, Object> notation,
-                                                        UnrecognizedGolangPackage pkg) {
-        String url = MapUtils.getString(notation, GitMercurialNotationDependency.URL_KEY);
-        if (url == null) {
-            return UnrecognizedNotationDependency.of(pkg);
-        } else {
-            VcsGolangPackage vcsPkg = adaptAsVcsPackage(notation, pkg, url);
-            notation.put(PACKAGE_KEY, vcsPkg);
-            return parseVcsPackage(notation, vcsPkg);
-        }
-    }
-
     private VcsGolangPackage adaptAsVcsPackage(Map<String, Object> notation,
-                                               UnrecognizedGolangPackage pkg,
-                                               String url) {
+                                               String rootPath) {
+        String url = MapUtils.getString(notation, URL_KEY);
         return VcsGolangPackage.builder()
                 .withSubstitutedVcsInfo(determineVcs(notation), singletonList(url))
-                .withPath(pkg.getPath())
-                .withRootPath(pkg.getPath())
+                .withPath(rootPath)
+                .withRootPath(rootPath)
                 .build();
     }
 
     private NotationDependency parseVcsPackage(Map<String, Object> notation, VcsGolangPackage pkg) {
         verifyVcs(notation, pkg);
-
         return pkg.getVcsType().getService(MapNotationParser.class).parse(notation);
     }
 
     private VcsType determineVcs(Map<String, Object> notation) {
-        String vcs = MapUtils.getString(notation, VCS_KEY);
+        String vcs = getString(notation, VCS_KEY);
         if (vcs == null) {
             notation.put(VCS_KEY, VcsType.GIT.getName());
             return VcsType.GIT;
@@ -132,12 +122,11 @@ public class DefaultMapNotationParser implements MapNotationParser {
     }
 
     private void verifyVcs(Map<String, Object> notation, VcsGolangPackage pkg) {
-        String declaredVcs = MapUtils.getString(notation, VCS_KEY);
+        String declaredVcs = getString(notation, VCS_KEY);
         if (StringUtils.isNotBlank(declaredVcs)) {
             String actualVcs = pkg.getVcsType().getName();
             Assert.isTrue(declaredVcs.equals(actualVcs),
                     "Vcs type not match: declared is " + declaredVcs + " but actual is " + actualVcs);
         }
     }
-
 }

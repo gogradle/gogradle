@@ -29,31 +29,27 @@ import org.junit.runner.RunWith
 @WithIsolatedUserhome
 @WithMockGo
 class UnrecognizedPackageIntegrationTest extends IntegrationTestSupport {
-
-    String unrecognized1Go = """
-package main
-import (
-"unrecognized2"
-"unrecognized2/sub"
-)
-"""
-    String unrecognized2Go = """
-package main
-import (
-"unrecognized3"
-"unrecognized3/sub"
-"unrecognized3/sub/sub"
-)
-"""
-
     @Before
     void setUp() {
         IOUtils.mkdir(resource, 'project')
         IOUtils.mkdir(resource, 'unrecognized1')
         IOUtils.mkdir(resource, 'unrecognized2')
 
-        IOUtils.write(resource, 'unrecognized1/main.go', unrecognized1Go)
-        IOUtils.write(resource, 'unrecognized2/main.go', unrecognized2Go)
+        IOUtils.write(resource, 'unrecognized1/main.go', '''
+package main
+import (
+"unrecognized2"
+"unrecognized2/sub"
+)
+''')
+        IOUtils.write(resource, 'unrecognized2/main.go', '''
+package main
+import (
+"unrecognized3"
+"unrecognized3/sub"
+"unrecognized3/sub/sub"
+)
+''')
     }
 
     String getResourceDir(String dirName) {
@@ -63,16 +59,9 @@ import (
     @Test
     void 'build should succeed if unrecognized package is excluded'() {
         writeBuildAndSettingsDotGradle("""
-System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
-buildscript {
-    dependencies {
-        classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
-    }
-}
-apply plugin: 'com.github.blindpirate.gogradle'
+${buildDotGradleBase}
 golang {
     packagePath='my/project'
-    goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
 dependencies {
     golang {
@@ -90,18 +79,11 @@ dependencies {
 
     @Test
     @WithGitRepo(repoName = 'helloworld', fileName = 'helloworld.go')
-    void 'build should succeed if url of unrecognized package is provided'() {
+    void 'build should succeed if url of unrecognized package is provided as repository'() {
         writeBuildAndSettingsDotGradle("""
-System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
-buildscript {
-    dependencies {
-        classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
-    }
-}
-apply plugin: 'com.github.blindpirate.gogradle'
+${buildDotGradleBase}
 golang {
     packagePath='my/project'
-    goExecutable='${StringUtils.toUnixString(goBinPath)}'
 }
 
 repositories {
@@ -124,19 +106,61 @@ dependencies {
         assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
     }
 
+    // https://github.com/gogradle/gogradle/issues/141
     @Test
-    void 'build should succeed if unrecognized package is provided as dir'() {
+    @WithGitRepo(repoName = 'helloworld', fileName = 'helloworld.go')
+    void 'build should succeed if url of unrecognized package is provided directly'() {
         writeBuildAndSettingsDotGradle("""
-System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')
-buildscript {
-    dependencies {
-        classpath files(new File(rootDir, '../../../libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar'))
-    }
-}
-apply plugin: 'com.github.blindpirate.gogradle'
+${buildDotGradleBase}
 golang {
     packagePath='my/project'
-    goExecutable='${StringUtils.toUnixString(goBinPath)}'
+}
+
+dependencies {
+    golang {
+        build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}') 
+        build (name:'unrecognized2', url: 'http://localhost:8080/helloworld') 
+    }
+}
+
+""")
+        newBuild {
+            it.forTasks('vendor')
+        }
+        assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
+    }
+
+    @Test
+    void 'build should succeed if unrecognized package is provided as dir directly'() {
+        writeBuildAndSettingsDotGradle("""
+${buildDotGradleBase}
+golang {
+    packagePath='my/project'
+}
+
+dependencies {
+    golang {
+        build (name:'unrecognized1', dir: '${getResourceDir("unrecognized1")}'){
+            exclude name:'unrecognized3'
+        }
+        build (name:'unrecognized2', dir:'${getResourceDir("unrecognized2")}'){
+            exclude name:'unrecognized3'
+        }
+    }
+}
+
+""")
+        newBuild {
+            it.forTasks('resolveBuildDependencies')
+        }
+    }
+
+    @Test
+    void 'build should succeed if unrecognized package is provided as repository dir'() {
+        writeBuildAndSettingsDotGradle("""
+${buildDotGradleBase}
+golang {
+    packagePath='my/project'
 }
 
 repositories {
