@@ -24,9 +24,12 @@ import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.MockUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.Git
 import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsType
@@ -47,13 +50,15 @@ import static org.mockito.Mockito.*
 @WithMockInjector
 class DefaultMapNotationParserTest {
 
+    File resource
+
     DefaultMapNotationParser parser
     @Mock
     DirMapNotationParser dirMapNotationParser
     @Mock
     VendorMapNotationParser vendorMapNotationParser
     @Mock
-    PackagePathResolver packagePathResolver
+    DefaultPackagePathResolver packagePathResolver
     @Mock
     MapNotationParser gitMapNotationParser
     @Mock
@@ -106,7 +111,7 @@ class DefaultMapNotationParserTest {
         verify(dirMapNotationParser).parse(captor.capture())
         assert captor.value.name == 'unrecognized'
         assert captor.value.dir == 'dir'
-        assert captor.value.package instanceof UnrecognizedGolangPackage
+        assert captor.value.package instanceof LocalDirectoryGolangPackage
     }
 
     @Test
@@ -248,5 +253,28 @@ class DefaultMapNotationParserTest {
         reset(packagePathResolver)
         when(packagePathResolver.produce('fmt')).thenReturn(of(StandardGolangPackage.of('fmt')))
         parser.parse([name: 'fmt'])
+    }
+
+    @Test
+    void 'unrecognized package should recognized if url exist'() {
+        // when
+        parser.parse([name: 'unrecognized', url: 'url'])
+        // then
+        ArgumentCaptor nameCaptor = ArgumentCaptor.forClass(String)
+        verify(packagePathResolver).updateCache(nameCaptor.capture(), captor.capture())
+        assert nameCaptor.value == 'unrecognized'
+        assert captor.value instanceof VcsGolangPackage
+    }
+
+    @Test
+    @WithResource('')
+    void 'unrecognized package should recognized if dir exist'() {
+        // when
+        parser.parse([name: 'unrecognized', dir: "${StringUtils.toUnixString(resource)}"])
+        // then
+        ArgumentCaptor nameCaptor = ArgumentCaptor.forClass(String)
+        verify(packagePathResolver).updateCache(nameCaptor.capture(), captor.capture())
+        assert nameCaptor.value == 'unrecognized'
+        assert captor.value instanceof LocalDirectoryGolangPackage
     }
 }
