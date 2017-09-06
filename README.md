@@ -118,3 +118,9 @@ If you like Gogradle, star it please.
 Please feel free to submit an [issue](https://github.com/blindpirate/gogradle/issues/new).
 
 Fork and [PR](https://github.com/blindpirate/gogradle/pulls) are always welcomed.
+
+## Contributor Guide
+
+Gogradle is developed in IntelliJ IDEA. You can run `./gradlew idea` and open the generated `.ipr` files in IDEA.
+
+Please make sure all checks passed via `./gradlew check`.
