@@ -127,22 +127,13 @@ class GolangPluginSettingTest {
 
     @Test
     void 'setting global cache time should succeed'() {
-        assertCacheTimeEquals(1, 'second', 1)
-        assertCacheTimeEquals(1, 'second', 1)
-        assertCacheTimeEquals(1, 'minute', 60)
-        assertCacheTimeEquals(1, 'minutes', 60)
-        assertCacheTimeEquals(2, 'hour', 3600 * 2)
-        assertCacheTimeEquals(2, 'hours', 3600 * 2)
-        assertCacheTimeEquals(3, 'day', 3600 * 24 * 3)
-        assertCacheTimeEquals(3, 'days', 3600 * 24 * 3)
+        assertCacheTimeEquals(1, TimeUnit.SECONDS, 1)
+        assertCacheTimeEquals(1, TimeUnit.MINUTES, 60)
+        assertCacheTimeEquals(2, TimeUnit.HOURS, 3600 * 2)
+        assertCacheTimeEquals(3, TimeUnit.DAYS, 3600 * 24 * 3)
     }
 
-    @Test(expected = IllegalStateException)
-    void 'setting an unsupported time unit should fail'() {
-        setting.globalCacheFor(1, 'year')
-    }
-
-    void assertCacheTimeEquals(int count, String unit, long expectedResult) {
+    void assertCacheTimeEquals(int count, TimeUnit unit, long expectedResult) {
         setting.globalCacheFor(count, unit)
         assert setting.getGlobalCacheSecond() == expectedResult
     }
