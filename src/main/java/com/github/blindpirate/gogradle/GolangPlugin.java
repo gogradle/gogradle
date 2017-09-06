@@ -89,7 +89,7 @@ public class GolangPlugin implements Plugin<Project> {
             project.getExtensions().add(mode.toString(), mode);
             project.getExtensions().add(mode.getAbbr(), mode);
         });
-        Arrays.asList(TimeUnit.values()).forEach(timeUnit -> {
+        Arrays.asList(CacheTimeUnit.values()).forEach(timeUnit -> {
             final String name = timeUnit.name();
             project.getExtensions().add(name, timeUnit);
             project.getExtensions().add(name.substring(0, name.length() - 1), timeUnit);

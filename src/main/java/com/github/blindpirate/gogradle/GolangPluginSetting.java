@@ -17,20 +17,19 @@
 
 package com.github.blindpirate.gogradle;
 
-import com.github.blindpirate.gogradle.core.mode.BuildMode;
-import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.ImmutableMap;
-
+import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP;
+import com.github.blindpirate.gogradle.core.mode.BuildMode;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.StringUtils;
+
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
+
 
 /**
  * Stores global configurations for Gogradle.
@@ -47,12 +46,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
  */
 @Singleton
 public class GolangPluginSetting {
-    private static final Map<String, BuildMode> BUILD_MODE_MAP = ImmutableMap.<String, BuildMode>builder()
-            .put(DEVELOP.getAbbr(), DEVELOP)
-            .put(DEVELOP.toString(), DEVELOP)
-            .put(REPRODUCIBLE.getAbbr(), REPRODUCIBLE)
-            .put(REPRODUCIBLE.toString(), REPRODUCIBLE)
-            .build();
+
     private BuildMode buildMode = REPRODUCIBLE;
 
     private String packagePath;
@@ -83,17 +77,18 @@ public class GolangPluginSetting {
         return goExecutable == null ? "go" : goExecutable;
     }
 
+    @Nonnull
     public BuildMode getBuildMode() {
         String mode = GogradleGlobal.getMode();
         if (StringUtils.isNotEmpty(mode)) {
-            return Assert.isNotNull(BUILD_MODE_MAP.get(mode));
+            return BuildMode.fromString(mode);
         } else {
             return buildMode;
         }
     }
 
-    public void setBuildMode(String buildMode) {
-        this.buildMode = Assert.isNotNull(BUILD_MODE_MAP.get(buildMode));
+    public void setBuildMode(@Nonnull String buildMode) {
+        this.buildMode = BuildMode.fromString(buildMode);
     }
 
     public void setBuildMode(BuildMode buildMode) {
@@ -149,8 +144,12 @@ public class GolangPluginSetting {
         this.goBinaryDownloadRootUri = goBinaryDownloadBaseUrl;
     }
 
-    public void globalCacheFor(int count, TimeUnit timeUnit) {
-        globalCacheSecond = timeUnit.toSeconds(count);
+    public void globalCacheFor(int duration, @Nonnull String timeUnit) {
+        globalCacheSecond = CacheTimeUnit.fromString(timeUnit).toSeconds(duration);
+    }
+
+    public void globalCacheFor(int duration, @Nonnull CacheTimeUnit timeUnit) {
+        globalCacheSecond = timeUnit.toSeconds(duration);
     }
 
     public long getGlobalCacheSecond() {
