@@ -121,7 +121,8 @@ Gogradle支持项目级的`GOPATH`。在构建一个项目时，你可将其clon
 
 欲和我一起改进Gogradle，请提交[PR](https://github.com/blindpirate/gogradle/pulls)。
 
+## 如何改进
 
+我们推荐在IntelliJ IDEA中开发Gogradle，你可以运行`./gradlew idea`然后在IDEA中打开生成的`.ipr`文件。
 
-
-
+请通过`./gradlew check`确保所有检查通过。
