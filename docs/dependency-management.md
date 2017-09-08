@@ -140,7 +140,7 @@ There isn't dependency package in golang's world, golang just treat a ordinary d
 
 ## Dependency Resolution
 
-Dependency resolution is the process in which a dependency is resolved to some concrete code. This process usually relies on vcs such as Git. The ultimate goal of Gogradle is providing support for all four vcs (Git/Mercurial/Svn/Bazaar) with pure Java implementation. Currently only Git is supported. 
+Dependency resolution is the process in which a dependency is resolved to some concrete code. This process usually relies on vcs such as Git. The ultimate goal of Gogradle is providing support for all four vcs (Git/Mercurial/Svn/Bazaar). Currently only Git and Mercurial is supported. 
 
 ## Transitive Dependency
 
