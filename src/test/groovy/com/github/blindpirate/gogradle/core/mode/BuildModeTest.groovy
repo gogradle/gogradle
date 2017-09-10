@@ -23,6 +23,8 @@ import com.github.blindpirate.gogradle.util.DependencyUtils
 import org.junit.Before
 import org.junit.Test
 
+import static com.github.blindpirate.gogradle.core.mode.BuildMode.*
+
 class BuildModeTest {
     GolangDependencySet declared = GolangDependencySet.empty()
     GolangDependencySet locked = GolangDependencySet.empty()
@@ -50,5 +52,18 @@ class BuildModeTest {
         GolangDependencySet result = BuildMode.REPRODUCIBLE.determine(declared, locked)
         // then
         assert result.any { it.is(lockedC) }
+    }
+
+    @Test
+    void 'fromString should succeed'() {
+        assert DEVELOP == fromString("DEVELOP")
+        assert DEVELOP == fromString("DEV")
+        assert REPRODUCIBLE == fromString("REPRODUCIBLE")
+        assert REPRODUCIBLE == fromString("REP")
+    }
+
+    @Test(expected = IllegalArgumentException)
+    void 'invalid build mode should throw exception'(){
+        fromString('DEVE')
     }
 }

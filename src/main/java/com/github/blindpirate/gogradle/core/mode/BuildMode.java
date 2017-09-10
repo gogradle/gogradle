@@ -17,7 +17,14 @@
 
 package com.github.blindpirate.gogradle.core.mode;
 
+import javax.annotation.Nonnull;
+import java.util.Optional;
+
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+
+import static java.text.MessageFormat.format;
+import static java.util.Arrays.stream;
+
 
 public enum BuildMode {
     DEVELOP("DEV") {
@@ -35,9 +42,9 @@ public enum BuildMode {
         }
     };
 
-    private String abbr;
+    private final String abbr;
 
-    BuildMode(String abbr) {
+    BuildMode(@Nonnull String abbr) {
         this.abbr = abbr;
     }
 
@@ -47,4 +54,25 @@ public enum BuildMode {
 
     public abstract GolangDependencySet determine(GolangDependencySet declaredDependencies,
                                                   GolangDependencySet lockedDependencies);
+
+    /**
+     * Convert a string to an instance of {@link BuildMode}.
+     *
+     * @param string the string to be converted
+     * @return the instance of {@link BuildMode}
+     * @throws IllegalArgumentException if the string cannot be converted
+     */
+    @Nonnull
+    public static BuildMode fromString(@Nonnull String string) {
+        final String proposed = string.toUpperCase();
+        final Optional<BuildMode> bm = stream(values())
+                .filter(v -> v.name().equals(proposed) || v.abbr.equals(proposed))
+                .findAny();
+
+        if (bm.isPresent()) {
+            return bm.get();
+        } else {
+            throw new IllegalArgumentException(format("Unable to convert {} to an instance of BuildMode", string));
+        }
+    }
 }

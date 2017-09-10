@@ -20,18 +20,17 @@ package com.github.blindpirate.gogradle;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.ImmutableMap;
 
+import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP;
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
+
 
 /**
  * Stores global configurations for Gogradle.
@@ -48,22 +47,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
  */
 @Singleton
 public class GolangPluginSetting {
-    private static final Map<String, TimeUnit> TIME_UNIT_MAP = ImmutableMap.<String, TimeUnit>builder()
-            .put("second", TimeUnit.SECONDS)
-            .put("seconds", TimeUnit.SECONDS)
-            .put("minute", TimeUnit.MINUTES)
-            .put("minutes", TimeUnit.MINUTES)
-            .put("hour", TimeUnit.HOURS)
-            .put("hours", TimeUnit.HOURS)
-            .put("day", TimeUnit.DAYS)
-            .put("days", TimeUnit.DAYS)
-            .build();
-    private static final Map<String, BuildMode> BUILD_MODE_MAP = ImmutableMap.<String, BuildMode>builder()
-            .put(DEVELOP.getAbbr(), DEVELOP)
-            .put(DEVELOP.toString(), DEVELOP)
-            .put(REPRODUCIBLE.getAbbr(), REPRODUCIBLE)
-            .put(REPRODUCIBLE.toString(), REPRODUCIBLE)
-            .build();
+
     private BuildMode buildMode = REPRODUCIBLE;
 
     private String packagePath;
@@ -94,17 +78,18 @@ public class GolangPluginSetting {
         return goExecutable == null ? "go" : goExecutable;
     }
 
+    @Nonnull
     public BuildMode getBuildMode() {
         String mode = GogradleGlobal.getMode();
         if (StringUtils.isNotEmpty(mode)) {
-            return Assert.isNotNull(BUILD_MODE_MAP.get(mode));
+            return BuildMode.fromString(mode);
         } else {
             return buildMode;
         }
     }
 
-    public void setBuildMode(String buildMode) {
-        this.buildMode = Assert.isNotNull(BUILD_MODE_MAP.get(buildMode));
+    public void setBuildMode(@Nonnull String buildMode) {
+        this.buildMode = BuildMode.fromString(buildMode);
     }
 
     public void setBuildMode(BuildMode buildMode) {
@@ -160,10 +145,15 @@ public class GolangPluginSetting {
         this.goBinaryDownloadRootUri = goBinaryDownloadBaseUrl;
     }
 
-    public void globalCacheFor(int count, String timeUnit) {
-        TimeUnit unit = TIME_UNIT_MAP.get(timeUnit);
-        Assert.isTrue(unit != null, "Time unit " + timeUnit + " is not supported!");
-        globalCacheSecond = unit.toSeconds(count);
+    public void globalCacheFor(int duration, @Nonnull String timeUnit) {
+        if (!timeUnit.toUpperCase().endsWith("S")) {
+            timeUnit += "S";
+        }
+        globalCacheFor(duration, TimeUnit.valueOf(timeUnit.toUpperCase()));
+    }
+
+    public void globalCacheFor(int duration, @Nonnull TimeUnit timeUnit) {
+        globalCacheSecond = timeUnit.toSeconds(duration);
     }
 
     public long getGlobalCacheSecond() {

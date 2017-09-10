@@ -21,6 +21,8 @@ import com.github.blindpirate.gogradle.core.mode.BuildMode
 import org.junit.Before
 import org.junit.Test
 
+import javax.annotation.Nonnull
+
 class GolangPluginSettingTest {
     GolangPluginSetting setting = new GolangPluginSetting()
 
@@ -127,7 +129,16 @@ class GolangPluginSettingTest {
 
     @Test
     void 'setting global cache time should succeed'() {
-        assertCacheTimeEquals(1, 'second', 1)
+        assertCacheTimeEquals(1, 'SECONDS', 1)
+        assertCacheTimeEquals(1, 'SECOND', 1)
+        assertCacheTimeEquals(1, 'MINUTE', 60)
+        assertCacheTimeEquals(1, 'MINUTES', 60)
+        assertCacheTimeEquals(2, 'HOUR', 3600 * 2)
+        assertCacheTimeEquals(2, 'HOURS', 3600 * 2)
+        assertCacheTimeEquals(3, 'DAY', 3600 * 24 * 3)
+        assertCacheTimeEquals(3, 'DAYS', 3600 * 24 * 3)
+
+        assertCacheTimeEquals(1, 'seconds', 1)
         assertCacheTimeEquals(1, 'second', 1)
         assertCacheTimeEquals(1, 'minute', 60)
         assertCacheTimeEquals(1, 'minutes', 60)
@@ -137,15 +148,13 @@ class GolangPluginSettingTest {
         assertCacheTimeEquals(3, 'days', 3600 * 24 * 3)
     }
 
-    @Test(expected = IllegalStateException)
+    @Test(expected = IllegalArgumentException)
     void 'setting an unsupported time unit should fail'() {
         setting.globalCacheFor(1, 'year')
     }
 
-    void assertCacheTimeEquals(int count, String unit, long expectedResult) {
+    private void assertCacheTimeEquals(int count, @Nonnull String unit, long expectedResult) {
         setting.globalCacheFor(count, unit)
         assert setting.getGlobalCacheSecond() == expectedResult
     }
-
-
 }
