@@ -227,6 +227,16 @@ public class GoTest extends AbstractGolangTask {
 
         int retcode = buildManager.go(args, emptyMap(), lineCollector, lineCollector, true);
 
+        if (LOGGER.isInfoEnabled()) {
+            if (isCommandLineArguments()) {
+                LOGGER.info("Result:");
+            } else {
+                LOGGER.info("Result of package {}:", importPath);
+            }
+
+            LOGGER.info(lineCollector.getOutput());
+        }
+
         return PackageTestResult.builder()
                 .withPackagePath(importPath)
                 .withStdout(lineCollector.getLines())

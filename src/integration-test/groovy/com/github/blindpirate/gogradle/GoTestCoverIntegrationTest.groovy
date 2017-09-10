@@ -51,14 +51,14 @@ golang {
 
     @Test
     void 'test and coverage report should be generated successfully'() {
-        newBuild {
+        newBuild({
             it.forTasks('check')
-        }
+        }, ['--info'])
 
         assert stdout.toString().contains('1 completed, 0 failed')
         assert stdout.toString().contains('3 completed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
-
+        assert stdout.toString().contains('=== RUN   Test_B1_1')
 
         GoCoverTest.examineCoverageHtmls(resource)
     }
