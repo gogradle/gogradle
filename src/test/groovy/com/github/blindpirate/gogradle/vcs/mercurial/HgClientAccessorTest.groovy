@@ -79,7 +79,12 @@ class HgClientAccessorTest {
 
     @Test
     void 'finding changeset by tag should succeed'() {
-        assert accessor.findCommitByTag(resource, 'commit2_tag').get().id == '1eaebd519f4c3f7d793b9ff42328d4383d672529'
+        assert accessor.findCommitByTagOrBranch(resource, 'commit2_tag').get().id == '1eaebd519f4c3f7d793b9ff42328d4383d672529'
+    }
+
+    @Test
+    void 'finding changeset by branch should succeed'() {
+        assert accessor.findCommitByTagOrBranch(resource, 'default').get().id == '620889544e2db8b064180431bcd1bb965704f4c2'
     }
 
     @Test

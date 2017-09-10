@@ -100,7 +100,7 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     private Optional<GitMercurialCommit> findMatchingTag(File repository, String tag) {
         Optional<GitMercurialCommit> commit = getAccessor()
-                .findCommitByTag(repository, tag);
+                .findCommitByTagOrBranch(repository, tag);
         if (commit.isPresent()) {
             return commit;
         }

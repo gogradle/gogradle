@@ -101,13 +101,13 @@ public class GitClientAccessor extends GitMercurialAccessor {
     }
 
     @Override
-    public Optional<GitMercurialCommit> findCommitByTag(File repository, String tag) {
-        return findCommitOrTag(repository, tag);
+    public Optional<GitMercurialCommit> findCommitByTagOrBranch(File repository, String tag) {
+        return findCommitTagOrBranch(repository, tag);
     }
 
-    private Optional<GitMercurialCommit> findCommitOrTag(File repoRoot, String tagOrCommit) {
+    private Optional<GitMercurialCommit> findCommitTagOrBranch(File repoRoot, String commitTagOrBranch) {
         return run(repoRoot,
-                asList("git", "log", tagOrCommit, "-1", "--pretty=format:%H:%ct"),
+                asList("git", "log", commitTagOrBranch, "-1", "--pretty=format:%H:%ct"),
                 result -> {
                     String[] commitAndTime = result.getStdout().split(":");
                     String commit = commitAndTime[0];
@@ -142,7 +142,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
 
     @Override
     public Optional<GitMercurialCommit> findCommit(File repository, String commit) {
-        return findCommitOrTag(repository, commit);
+        return findCommitTagOrBranch(repository, commit);
     }
 
     @Override

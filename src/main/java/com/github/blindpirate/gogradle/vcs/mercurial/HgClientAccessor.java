@@ -94,7 +94,7 @@ public class HgClientAccessor extends GitMercurialAccessor {
 
 
     @Override
-    public Optional<GitMercurialCommit> findCommitByTag(File repository, String tag) {
+    public Optional<GitMercurialCommit> findCommitByTagOrBranch(File repository, String tag) {
         return findCommitByTagOrCommit(repository, tag);
     }
 

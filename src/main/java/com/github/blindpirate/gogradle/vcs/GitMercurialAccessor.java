@@ -52,7 +52,7 @@ public abstract class GitMercurialAccessor implements VcsAccessor {
     @Override
     public abstract long lastCommitTimeOfPath(File repoRoot, Path relativePath);
 
-    public abstract Optional<GitMercurialCommit> findCommitByTag(File repository, String tag);
+    public abstract Optional<GitMercurialCommit> findCommitByTagOrBranch(File repository, String tag);
 
     public abstract List<GitMercurialCommit> getAllTags(File repository);
 
