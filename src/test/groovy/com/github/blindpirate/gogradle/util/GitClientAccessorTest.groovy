@@ -106,13 +106,19 @@ class GitClientAccessorTest {
     @Test
     @WithResource('out-of-date-repo.zip')
     void 'getting a tag should succeed'() {
-        assert accessor.findCommitByTag(resource, '1.0.0').get().id == '8f593bdb1d3fbd799a85d6ccf7b38373847ee045'
+        assert accessor.findCommitByTagOrBranch(resource, '1.0.0').get().id == '8f593bdb1d3fbd799a85d6ccf7b38373847ee045'
+    }
+
+    @Test
+    @WithResource('out-of-date-repo.zip')
+    void 'getting a branch should succeed'() {
+        assert accessor.findCommitByTagOrBranch(resource, 'master').get().id == 'd5a49603787eb132fad5bbdcaaca764ba0982137'
     }
 
     @Test
     @WithResource('out-of-date-repo.zip')
     void 'getting an inexistent tag should fail'() {
-        assert !accessor.findCommitByTag(resource, 'nonexistence').isPresent()
+        assert !accessor.findCommitByTagOrBranch(resource, 'nonexistence').isPresent()
     }
 
     @Test

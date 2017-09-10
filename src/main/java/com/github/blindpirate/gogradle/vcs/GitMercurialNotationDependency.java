@@ -56,6 +56,15 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
         this.commit = commit;
     }
 
+    // branch is a special tag
+    public String getBranch() {
+        return tag;
+    }
+
+    public void setBranch(String branch) {
+        this.tag = branch;
+    }
+
     public void setTag(String tag) {
         this.tag = tag;
     }
@@ -87,10 +96,10 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
 
     @Override
     public CacheScope getCacheScope() {
-        if (StringUtils.isBlank(commit) || LATEST_COMMIT.equals(commit)) {
-            return CacheScope.BUILD;
-        } else {
+        if (StringUtils.isNotBlank(commit) && !LATEST_COMMIT.equals(commit)) {
             return CacheScope.PERSISTENCE;
+        } else {
+            return CacheScope.BUILD;
         }
     }
 
@@ -102,7 +111,7 @@ public abstract class GitMercurialNotationDependency extends AbstractNotationDep
     public String toString() {
         String ret = getName() + ':'
                 + (commit == null ? "" : " commit='" + commit + "',")
-                + (tag == null ? "" : " tag='" + tag + "',")
+                + (tag == null ? "" : " tag/branch='" + tag + "',")
                 + (getUrls() == null ? "" : " urls=" + getUrls() + ",")
                 + (containsAllSubpackages() ? "" : " subpackages='" + getSubpackages() + "',");
         return ret.substring(0, ret.length() - 1);

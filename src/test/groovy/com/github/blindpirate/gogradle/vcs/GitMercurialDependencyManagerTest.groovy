@@ -203,7 +203,7 @@ class GitMercurialDependencyManagerTest {
     void 'dependency with tag should be resolved successfully'() {
         // given
         when(notationDependency.getTag()).thenReturn('tag')
-        when(accessor.findCommitByTag(resource, 'tag')).thenReturn(of(commit))
+        when(accessor.findCommitByTagOrBranch(resource, 'tag')).thenReturn(of(commit))
         // when
         manager.resolve(resolveContext, notationDependency)
         // then
@@ -214,7 +214,7 @@ class GitMercurialDependencyManagerTest {
     void 'tag should be interpreted as sem version if commit not found'() {
         // given
         when(notationDependency.getTag()).thenReturn('~1.0.0')
-        when(accessor.findCommitByTag(resource, '~1.0.0')).thenReturn(empty())
+        when(accessor.findCommitByTagOrBranch(resource, '~1.0.0')).thenReturn(empty())
         GitMercurialCommit satisfiedCommit = GitMercurialCommit.of('commitId', '1.0.1', 321L)
         when(accessor.getAllTags(resource)).thenReturn([satisfiedCommit])
         // then
@@ -310,7 +310,7 @@ class GitMercurialDependencyManagerTest {
                 .withCommitId(dependencyWithCommit.commit)
                 .build()
         when(accessor.findCommit(resource, 'commit')).thenReturn(Optional.of(commit))
-        when(accessor.findCommitByTag(resource, 'tag')).thenReturn(Optional.of(commit))
+        when(accessor.findCommitByTagOrBranch(resource, 'tag')).thenReturn(Optional.of(commit))
         // then
         assert manager.versionExistsInRepo(resource, dependencyWithCommit)
         assert manager.versionExistsInRepo(resource, dependencyWithTag)

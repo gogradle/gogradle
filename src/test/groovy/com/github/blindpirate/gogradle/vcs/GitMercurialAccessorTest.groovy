@@ -107,7 +107,7 @@ class GitMercurialAccessorTest {
         }
 
         @Override
-        Optional<GitMercurialCommit> findCommitByTag(File repository, String tag) {
+        Optional<GitMercurialCommit> findCommitByTagOrBranch(File repository, String tag) {
             return null
         }
 
