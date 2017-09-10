@@ -129,7 +129,16 @@ class GolangPluginSettingTest {
 
     @Test
     void 'setting global cache time should succeed'() {
-        assertCacheTimeEquals(1, 'second', 1)
+        assertCacheTimeEquals(1, 'SECONDS', 1)
+        assertCacheTimeEquals(1, 'SECOND', 1)
+        assertCacheTimeEquals(1, 'MINUTE', 60)
+        assertCacheTimeEquals(1, 'MINUTES', 60)
+        assertCacheTimeEquals(2, 'HOUR', 3600 * 2)
+        assertCacheTimeEquals(2, 'HOURS', 3600 * 2)
+        assertCacheTimeEquals(3, 'DAY', 3600 * 24 * 3)
+        assertCacheTimeEquals(3, 'DAYS', 3600 * 24 * 3)
+
+        assertCacheTimeEquals(1, 'seconds', 1)
         assertCacheTimeEquals(1, 'second', 1)
         assertCacheTimeEquals(1, 'minute', 60)
         assertCacheTimeEquals(1, 'minutes', 60)

@@ -35,6 +35,7 @@ import org.gradle.api.plugins.ExtensionAware;
 import org.gradle.api.tasks.TaskContainer;
 
 import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
@@ -89,7 +90,7 @@ public class GolangPlugin implements Plugin<Project> {
             project.getExtensions().add(mode.toString(), mode);
             project.getExtensions().add(mode.getAbbr(), mode);
         });
-        Arrays.asList(CacheTimeUnit.values()).forEach(timeUnit -> {
+        Arrays.asList(TimeUnit.values()).forEach(timeUnit -> {
             final String name = timeUnit.name();
             project.getExtensions().add(name, timeUnit);
             project.getExtensions().add(name.substring(0, name.length() - 1), timeUnit);

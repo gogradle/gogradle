@@ -60,7 +60,7 @@ golang {
     buildMode = DEVELOP
     packagePath = 'github.com/my/project'
     goVersion = '1.7.1'
-    globalCacheFor 1, DAY
+    globalCacheFor 0, SECOND 
     goExecutable = '${StringUtils.toUnixString(goBinPath)}'
 }
 

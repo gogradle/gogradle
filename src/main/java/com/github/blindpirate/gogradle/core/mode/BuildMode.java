@@ -30,16 +30,14 @@ public enum BuildMode {
     DEVELOP("DEV") {
         @Override
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
-                                             GolangDependencySet lockedDependencies)
-        {
+                                             GolangDependencySet lockedDependencies) {
             return declaredDependencies;
         }
     },
     REPRODUCIBLE("REP") {
         @Override
         public GolangDependencySet determine(GolangDependencySet declaredDependencies,
-                                             GolangDependencySet lockedDependencies)
-        {
+                                             GolangDependencySet lockedDependencies) {
             return lockedDependencies;
         }
     };
@@ -67,9 +65,9 @@ public enum BuildMode {
     @Nonnull
     public static BuildMode fromString(@Nonnull String string) {
         final String proposed = string.toUpperCase();
-        final Optional<BuildMode> bm = stream(values()).filter(v -> v.name().equals(proposed)
-                                                                    || v.abbr.equals(proposed))
-                                                       .findAny();
+        final Optional<BuildMode> bm = stream(values())
+                .filter(v -> v.name().equals(proposed) || v.abbr.equals(proposed))
+                .findAny();
 
         if (bm.isPresent()) {
             return bm.get();

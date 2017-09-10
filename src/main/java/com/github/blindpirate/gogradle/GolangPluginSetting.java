@@ -17,15 +17,16 @@
 
 package com.github.blindpirate.gogradle;
 
+import com.github.blindpirate.gogradle.core.mode.BuildMode;
+import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.StringUtils;
+
 import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
-
-import com.github.blindpirate.gogradle.core.mode.BuildMode;
-import com.github.blindpirate.gogradle.util.Assert;
-import com.github.blindpirate.gogradle.util.StringUtils;
+import java.util.concurrent.TimeUnit;
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
@@ -145,10 +146,13 @@ public class GolangPluginSetting {
     }
 
     public void globalCacheFor(int duration, @Nonnull String timeUnit) {
-        globalCacheSecond = CacheTimeUnit.fromString(timeUnit).toSeconds(duration);
+        if (!timeUnit.toUpperCase().endsWith("S")) {
+            timeUnit += "S";
+        }
+        globalCacheFor(duration, TimeUnit.valueOf(timeUnit.toUpperCase()));
     }
 
-    public void globalCacheFor(int duration, @Nonnull CacheTimeUnit timeUnit) {
+    public void globalCacheFor(int duration, @Nonnull TimeUnit timeUnit) {
         globalCacheSecond = timeUnit.toSeconds(duration);
     }
 
