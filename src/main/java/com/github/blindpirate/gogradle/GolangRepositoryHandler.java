@@ -23,6 +23,7 @@ import groovy.lang.GroovyObjectSupport;
 import org.gradle.util.Configurable;
 import org.gradle.util.ConfigureUtil;
 
+import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.List;
@@ -65,6 +66,7 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Conf
     }
 
     @Override
+    @Nullable
     public Void configure(Closure cl) {
         GolangRepository repository = new GolangRepository();
         ConfigureUtil.configure(cl, repository);
