@@ -161,13 +161,10 @@ golang {
         new File(resource, 'd/d1_test.go.fail').renameTo(new File(resource, 'd/d1_test.go'))
 
         try {
-            newBuild {
-                it.forTasks('test', 'cover')
-            }
+            newBuild('test', 'cover', '--info')
         } catch (BuildException e) {
-            println(stderr)
-            println(stdout)
             assert stderr.toString().contains('There are 4 failed tests')
+            assert stdout.toString().contains('FAIL: Test_A1_1')
             examineTestReportHtmls()
         }
     }
