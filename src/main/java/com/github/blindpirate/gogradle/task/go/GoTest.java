@@ -31,6 +31,7 @@ import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Incubating;
 import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
+import org.gradle.api.logging.LogLevel;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.TaskAction;
@@ -44,6 +45,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
@@ -213,6 +215,7 @@ public class GoTest extends AbstractGolangTask {
 
     private PackageTestResult doSingleTest(String importPath, File parentDir, List<File> testFiles) {
         LineCollector lineCollector = new LineCollector();
+
         List<String> args = isCommandLineArguments()
                 ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
                 : Lists.newArrayList("test", "-v", importPath);
@@ -225,7 +228,9 @@ public class GoTest extends AbstractGolangTask {
             coverageProfileGenerated = true;
         }
 
-        int retcode = buildManager.go(args, emptyMap(), lineCollector, lineCollector, true);
+        Consumer<String> outputConsumer = LOGGER.isEnabled(LogLevel.INFO)
+                ? lineCollector.andThen(LOGGER::info) : lineCollector;
+        int retcode = buildManager.go(args, emptyMap(), outputConsumer, outputConsumer, true);
 
         return PackageTestResult.builder()
                 .withPackagePath(importPath)
