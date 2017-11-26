@@ -20,9 +20,9 @@ package com.github.blindpirate.gogradle.vcs.git;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency;
 
-public class GitNotationDependency extends GitMercurialNotationDependency {
+public class GitNotationDependency extends VcsNotationDependency {
     @Override
     protected ResolvedDependency doResolve(ResolveContext context) {
         return GogradleGlobal.getInstance(GitDependencyManager.class).resolve(context, this);

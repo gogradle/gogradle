@@ -226,7 +226,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     private void fetchSpecifiedVersion(String version) {
-        goroot = globalCacheManager.getGlobalGoBinCache(version).resolve("go");
+        goroot = globalCacheManager.getGlobalGoBinCacheDir(version).toPath().resolve("go");
         goVersion = version;
 
         binaryPath = goroot.resolve("bin/go" + Os.getHostOs().exeExtension());
@@ -247,7 +247,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private void downloadSpecifiedVersion(String version) {
         Path archivePath = downloadArchive(version);
         CompressUtils.decompressZipOrTarGz(archivePath.toFile(),
-                globalCacheManager.getGlobalGoBinCache(version).toFile());
+                globalCacheManager.getGlobalGoBinCacheDir(version));
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
@@ -262,14 +262,14 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
             ).toASCIIString();
         }
         String archiveFileName = injectVariables(FILENAME, version);
-        Path goBinaryCachePath = globalCacheManager.getGlobalGoBinCache(archiveFileName);
-        forceMkdir(goBinaryCachePath.getParent().toFile());
+        File goBinaryCachePath = globalCacheManager.getGlobalGoBinCacheDir(archiveFileName);
+        forceMkdir(goBinaryCachePath.getParentFile());
         try {
-            httpUtils.download(url, goBinaryCachePath);
+            httpUtils.download(url, goBinaryCachePath.toPath());
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
-        return goBinaryCachePath;
+        return goBinaryCachePath.toPath();
     }
 
     private String injectVariables(String template, String version) {

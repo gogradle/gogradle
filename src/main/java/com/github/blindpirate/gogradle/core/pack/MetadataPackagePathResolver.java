@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.HttpUtils;
@@ -96,9 +97,10 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
     }
 
     private GolangPackage buildPackageInfo(String packagePath, GoImportMetaTag metaTag) {
+        GolangRepository repository = GolangRepository.newOriginalRepository(metaTag.vcs, metaTag.repoUrl);
         return VcsGolangPackage.builder()
                 .withPath(Paths.get(packagePath))
-                .withOriginalVcsInfo(metaTag.vcs, Arrays.asList(metaTag.repoUrl))
+                .withRepository(repository)
                 .withRootPath(Paths.get(metaTag.rootPath))
                 .build();
     }

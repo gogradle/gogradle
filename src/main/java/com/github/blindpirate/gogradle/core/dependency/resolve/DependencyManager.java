@@ -24,9 +24,6 @@ import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import java.io.File;
 
 public interface DependencyManager {
-
-
-
     /**
      * Resolves a dependency.
      * During this process, right version will be determined by VCS.

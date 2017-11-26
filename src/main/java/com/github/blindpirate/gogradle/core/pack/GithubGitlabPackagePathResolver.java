@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
@@ -51,10 +52,12 @@ public class GithubGitlabPackagePathResolver extends AbstractPackagePathResolver
         String sshUrl = String.format("git@%s.git", toUnixString(path.subpath(0, 3)).replaceFirst("/", ":"));
         String httpsUrl = String.format("https://%s.git", toUnixString(path.subpath(0, 3)));
 
+        GolangRepository repository = GolangRepository.newOriginalRepository(VcsType.GIT, Arrays.asList(httpsUrl, sshUrl));
+
         GolangPackage info = VcsGolangPackage.builder()
                 .withPath(path)
-                .withOriginalVcsInfo(VcsType.GIT, Arrays.asList(httpsUrl, sshUrl))
                 .withRootPath(path.subpath(0, 3))
+                .withRepository(repository)
                 .build();
         return Optional.of(info);
     }

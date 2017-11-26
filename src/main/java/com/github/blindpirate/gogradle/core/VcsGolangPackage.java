@@ -17,10 +17,8 @@
 
 package com.github.blindpirate.gogradle.core;
 
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-import java.io.Serializable;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -28,34 +26,10 @@ import java.util.Objects;
 import java.util.Optional;
 
 public class VcsGolangPackage extends ResolvableGolangPackage {
-    private VcsInfo originalVcsInfo;
-    private VcsInfo substitutedVcsInfo;
+    private GolangRepository repository;
 
     protected VcsGolangPackage(Path rootPath, Path path) {
         super(rootPath, path);
-    }
-
-    public VcsType getVcsType() {
-        return determineVcs().vcsType;
-    }
-
-    public List<String> getUrls() {
-        return determineVcs().urls;
-    }
-
-    private VcsInfo determineVcs() {
-        if (substitutedVcsInfo != null) {
-            return substitutedVcsInfo;
-        }
-        return originalVcsInfo;
-    }
-
-    public VcsInfo getOriginalVcsInfo() {
-        return originalVcsInfo;
-    }
-
-    public VcsInfo getSubstitutedVcsInfo() {
-        return substitutedVcsInfo;
     }
 
     @Override
@@ -79,9 +53,20 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
     private GolangPackage sameRoot(Path packagePath) {
         return builder().withPath(packagePath)
                 .withRootPath(getRootPath())
-                .withOriginalVcsInfo(originalVcsInfo)
-                .withSubstitutedVcsInfo(substitutedVcsInfo)
+                .withRepository(repository)
                 .build();
+    }
+
+    public GolangRepository getRepository() {
+        return repository;
+    }
+
+    public VcsType getVcs() {
+        return repository.getVcsType();
+    }
+
+    public List<String> getUrls() {
+        return repository.getUrls();
     }
 
     public static Builder builder() {
@@ -91,8 +76,7 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
     public static final class Builder {
         private Path path;
         private Path rootPath;
-        private VcsInfo originalVcsInfo;
-        private VcsInfo substitutedVcsInfo;
+        private GolangRepository repository;
 
         private Builder() {
         }
@@ -115,35 +99,14 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
             return this;
         }
 
-        public Builder withOriginalVcsInfo(VcsType vcsType, List<String> urls) {
-            this.originalVcsInfo = new VcsInfo(vcsType, urls);
+        public Builder withRepository(GolangRepository repository) {
+            this.repository = repository;
             return this;
         }
-
-        public Builder withSubstitutedVcsInfo(VcsType vcsType, List<String> urls) {
-            this.substitutedVcsInfo = new VcsInfo(vcsType, urls);
-            return this;
-        }
-
-        public Builder withOriginalVcsInfo(VcsInfo originalVcsInfo) {
-            this.originalVcsInfo = originalVcsInfo;
-            return this;
-        }
-
-        public Builder withSubstitutedVcsInfo(VcsInfo substitutedVcsInfo) {
-            this.substitutedVcsInfo = substitutedVcsInfo;
-            return this;
-        }
-
 
         public VcsGolangPackage build() {
             VcsGolangPackage ret = new VcsGolangPackage(rootPath, path);
-
-            ret.originalVcsInfo = originalVcsInfo;
-            ret.substitutedVcsInfo = substitutedVcsInfo;
-
-            Assert.isTrue(originalVcsInfo != null || substitutedVcsInfo != null);
-
+            ret.repository = repository;
             return ret;
         }
     }
@@ -153,8 +116,7 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
         return "VcsGolangPackage{"
                 + "path='" + getPathString() + '\''
                 + ", rootPath='" + getRootPathString() + '\''
-                + ", vcsType=" + getVcsType()
-                + ", urls='" + getUrls() + '\''
+                + ", repo=" + repository
                 + '}';
     }
 
@@ -164,48 +126,48 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
             return false;
         }
         VcsGolangPackage that = (VcsGolangPackage) o;
-        return Objects.equals(determineVcs(), that.determineVcs());
+        return Objects.equals(repository, that.repository);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), determineVcs());
+        return Objects.hash(super.hashCode(), repository);
     }
 
-    public static class VcsInfo implements Serializable {
-        private VcsType vcsType = VcsType.GIT;
-        private List<String> urls;
-
-        private VcsInfo(VcsType vcsType, List<String> urls) {
-            this.vcsType = vcsType;
-            this.urls = urls;
-        }
-
-        public VcsType getVcsType() {
-            return vcsType;
-        }
-
-        public List<String> getUrls() {
-            return urls;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) {
-                return true;
-            }
-            if (o == null || getClass() != o.getClass()) {
-                return false;
-            }
-            VcsInfo vcsInfo = (VcsInfo) o;
-            return vcsType == vcsInfo.vcsType
-                    && Objects.equals(urls, vcsInfo.urls);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(vcsType, urls);
-        }
-    }
+//    public static class VcsInfo implements Serializable {
+//        private VcsType vcsType = VcsType.GIT;
+//        private List<String> urls;
+//
+//        private VcsInfo(VcsType vcsType, List<String> urls) {
+//            this.vcsType = vcsType;
+//            this.urls = urls;
+//        }
+//
+//        public VcsType getVcsType() {
+//            return vcsType;
+//        }
+//
+//        public List<String> getUrls() {
+//            return urls;
+//        }
+//
+//        @Override
+//        public boolean equals(Object o) {
+//            if (this == o) {
+//                return true;
+//            }
+//            if (o == null || getClass() != o.getClass()) {
+//                return false;
+//            }
+//            VcsInfo vcsInfo = (VcsInfo) o;
+//            return vcsType == vcsInfo.vcsType
+//                    && Objects.equals(urls, vcsInfo.urls);
+//        }
+//
+//        @Override
+//        public int hashCode() {
+//            return Objects.hash(vcsType, urls);
+//        }
+//    }
 }
 

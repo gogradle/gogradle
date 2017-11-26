@@ -84,11 +84,11 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
 
     // these two methods exist in case of user's typo and should should not be called internally
     public void setSubpackage(Collection<String> subpackages) {
-        this.subpackages = ImmutableSet.copyOf(subpackages);
+        this.setSubpackages(subpackages);
     }
 
     public void setSubpackage(String subpackage) {
-        this.subpackages = ImmutableSet.of(subpackage);
+        this.setSubpackages(subpackage);
     }
 
     @Override

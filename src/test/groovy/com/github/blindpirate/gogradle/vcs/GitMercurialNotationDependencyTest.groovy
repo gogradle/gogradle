@@ -37,7 +37,7 @@ import static org.mockito.Mockito.when
 @WithMockInjector
 class GitMercurialNotationDependencyTest {
 
-    GitMercurialNotationDependency dependency = new GitNotationDependency()
+    VcsNotationDependency dependency = new GitNotationDependency()
 
     @Mock
     GitDependencyManager gitDependencyManager
@@ -76,8 +76,8 @@ class GitMercurialNotationDependencyTest {
     @Test
     void 'git dependencies with same name and commit but not url should not be equal'() {
         // when
-        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'LATEST_COMMIT')
-        GitMercurialNotationDependency dependency2 = withNameAndCommit('name', 'LATEST_COMMIT')
+        VcsNotationDependency dependency1 = withNameAndCommit('name', 'LATEST_COMMIT')
+        VcsNotationDependency dependency2 = withNameAndCommit('name', 'LATEST_COMMIT')
         // then
         assert dependency1 == dependency2
 
@@ -90,8 +90,8 @@ class GitMercurialNotationDependencyTest {
     @Test
     void 'git dependencies with different name or commit should not be equal'() {
         // when
-        GitMercurialNotationDependency dependency1 = withNameAndCommit('name', 'LATEST_COMMIT')
-        GitMercurialNotationDependency dependency2 = withNameAndCommit('name', '12345')
+        VcsNotationDependency dependency1 = withNameAndCommit('name', 'LATEST_COMMIT')
+        VcsNotationDependency dependency2 = withNameAndCommit('name', '12345')
         // then
         assert dependency1 != dependency2
     }
@@ -112,7 +112,7 @@ class GitMercurialNotationDependencyTest {
         assert !dependency.equals(null)
         assert dependency != new LocalDirectoryDependency()
 
-        GitMercurialNotationDependency dependency2 = new GitNotationDependency()
+        VcsNotationDependency dependency2 = new GitNotationDependency()
         dependency2.name = 'github.com/a/b'
         dependency2.commit = 'commitId'
         dependency2.url = 'url'
@@ -135,8 +135,8 @@ class GitMercurialNotationDependencyTest {
         assert dependency.hashCode() != dependency2.hashCode()
     }
 
-    GitMercurialNotationDependency withNameAndCommit(String name, String commit) {
-        GitMercurialNotationDependency ret = new GitNotationDependency()
+    VcsNotationDependency withNameAndCommit(String name, String commit) {
+        VcsNotationDependency ret = new GitNotationDependency()
         ret.setName(name)
         ret.setCommit(commit)
         return ret

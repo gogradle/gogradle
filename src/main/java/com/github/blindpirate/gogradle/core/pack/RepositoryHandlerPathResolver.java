@@ -19,13 +19,14 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.IncompleteGolangPackage;
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -34,7 +35,6 @@ import java.nio.file.Paths;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static java.util.Collections.singletonList;
 
 @Singleton
 public class RepositoryHandlerPathResolver implements PackagePathResolver {
@@ -49,7 +49,7 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
     public Optional<GolangPackage> produce(String packagePath) {
         Path path = Paths.get(packagePath);
 
-        Optional<GolangRepository> repo = repositoryHandler.findMatchedRepository(toUnixString(path));
+        Optional<GolangRepositoryPattern> repo = repositoryHandler.findMatchedRepository(toUnixString(path));
 
         if (repo.isPresent()) {
             if (repo.get().isIncomplete()) {
@@ -61,7 +61,7 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
 
         for (int i = path.getNameCount() - 1; i > 0; i--) {
             Path subpath = path.subpath(0, i);
-            Optional<GolangRepository> repository = repositoryHandler.findMatchedRepository(toUnixString(subpath));
+            Optional<GolangRepositoryPattern> repository = repositoryHandler.findMatchedRepository(toUnixString(subpath));
             if (repository.isPresent() && !repository.get().isIncomplete()) {
                 return Optional.of(buildPackage(path, subpath, repository.get()));
             }
@@ -74,7 +74,7 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
         return IncompleteGolangPackage.of(path);
     }
 
-    private GolangPackage buildPackage(Path path, Path rootPath, GolangRepository repository) {
+    private GolangPackage buildPackage(Path path, Path rootPath, GolangRepositoryPattern repository) {
         String rootPathString = StringUtils.toUnixString(rootPath);
         VcsType vcsType = repository.getVcsType();
         String url = repository.getUrl(rootPathString);
@@ -83,10 +83,11 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
         Assert.isTrue(url != null || dir != null, "You must specify dir or url for " + rootPathString);
 
         if (url != null) {
+            GolangRepository repo = GolangRepository.newOriginalRepository(vcsType, url);
             return VcsGolangPackage.builder()
                     .withPath(path)
                     .withRootPath(rootPath)
-                    .withSubstitutedVcsInfo(vcsType, singletonList(url))
+                    .withRepository(repo)
                     .build();
         } else {
             return LocalDirectoryGolangPackage.of(rootPath, path, dir);

@@ -27,7 +27,7 @@ import com.github.blindpirate.gogradle.util.DataExchange
 import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.google.inject.Key
@@ -66,7 +66,7 @@ class DefaultGlobalCacheManagerTest {
     @Mock
     GolangPluginSetting setting
     @Mock
-    GitMercurialNotationDependency notationDependency
+    VcsNotationDependency notationDependency
     @Mock
     VcsResolvedDependency resolvedDependency
     @Mock
@@ -95,7 +95,7 @@ class DefaultGlobalCacheManagerTest {
 
     @Test
     void 'getting files in global binary cache directory should succeed'() {
-        assert cacheManager.getGlobalGoBinCache('1.7.1') == new File(resource, 'go/binary/1.7.1').toPath()
+        assert cacheManager.getGlobalGoBinCacheDir('1.7.1') == new File(resource, 'go/binary/1.7.1').toPath()
     }
 
     @Test

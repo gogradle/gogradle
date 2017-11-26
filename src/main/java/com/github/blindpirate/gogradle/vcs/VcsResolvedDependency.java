@@ -17,39 +17,34 @@
 
 package com.github.blindpirate.gogradle.vcs;
 
+import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager;
-import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
-import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency;
-import com.github.blindpirate.gogradle.vcs.mercurial.MercurialResolvedDependency;
 
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.SUBPACKAGES_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VCS_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URLS_KEY;
 
-public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
+public class VcsResolvedDependency extends AbstractResolvedDependency {
     private static final int COMMIT_PREFIX_LENGTH = 7;
     private String tag;
-    private String url;
 
-    protected VcsResolvedDependency(String name,
-                                    String url,
-                                    String commitId,
-                                    long commitTime) {
+    private VcsResolvedDependency(String name,
+                                  String commitId,
+                                  long commitTime) {
         super(name, commitId, commitTime);
-        this.url = url;
     }
 
-    public abstract VcsType getVcsType();
-
-    public String getUrl() {
-        return url;
+    public VcsType getVcsType() {
+        return getPackage().getVcs();
     }
 
     @Override
@@ -62,8 +57,8 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
         Map<String, Object> ret = MapUtils.asMap(
                 NAME_KEY, getName(),
                 VCS_KEY, getVcsType().getName(),
-                GitMercurialNotationDependency.URL_KEY, getUrl(),
-                GitMercurialNotationDependency.COMMIT_KEY, getVersion());
+                URLS_KEY, getPackage().getUrls(),
+                VcsNotationDependency.COMMIT_KEY, getVersion());
         if (!containsAllSubpackages()) {
             ret.put(SUBPACKAGES_KEY, new ArrayList<>(getSubpackages()));
         }
@@ -90,37 +85,39 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
             return false;
         }
         VcsResolvedDependency that = (VcsResolvedDependency) o;
-        return Objects.equals(getVcsType(), that.getVcsType())
-                && Objects.equals(url, that.url);
+        return Objects.equals(getName(), that.getName())
+                && Objects.equals(getVersion(), that.getVersion())
+                && Objects.equals(getUrls(), that.getUrls());
+    }
+
+    private List<String> getUrls() {
+        return getPackage().getRepository().getUrls();
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(url, getVersion(), getName(), getVcsType());
+        return Objects.hash(getName(), getVersion(), getUrls());
     }
 
-    public static GitMercurialResolvedDependencyBuilder builder(VcsType vcsType) {
-        return new GitMercurialResolvedDependencyBuilder(vcsType);
+    @Override
+    public VcsGolangPackage getPackage() {
+        return (VcsGolangPackage) super.getPackage();
+    }
+
+    public static GitMercurialResolvedDependencyBuilder builder() {
+        return new GitMercurialResolvedDependencyBuilder();
     }
 
     public static final class GitMercurialResolvedDependencyBuilder {
-        private VcsType vcsType;
-        private GitMercurialNotationDependency notationDependency;
-        private String url;
+        private VcsNotationDependency notationDependency;
         private String commitId;
         private long commitTime;
 
-        private GitMercurialResolvedDependencyBuilder(VcsType vcsType) {
-            this.vcsType = vcsType;
-        }
-
-        public GitMercurialResolvedDependencyBuilder withUrl(String repoUrl) {
-            this.url = repoUrl;
-            return this;
+        private GitMercurialResolvedDependencyBuilder() {
         }
 
         public GitMercurialResolvedDependencyBuilder withNotationDependency(NotationDependency notationDependency) {
-            this.notationDependency = (GitMercurialNotationDependency) notationDependency;
+            this.notationDependency = (VcsNotationDependency) notationDependency;
             return this;
         }
 
@@ -136,16 +133,11 @@ public abstract class VcsResolvedDependency extends AbstractResolvedDependency {
 
         public VcsResolvedDependency build() {
             VcsResolvedDependency ret;
-            Assert.isTrue(vcsType == VcsType.GIT || vcsType == VcsType.MERCURIAL);
-            if (vcsType == VcsType.GIT) {
-                ret = new GitResolvedDependency(notationDependency.getName(), url, commitId, commitTime);
-            } else {
-                ret = new MercurialResolvedDependency(notationDependency.getName(), url, commitId, commitTime);
-            }
+            ret = new VcsResolvedDependency(notationDependency.getName(), commitId, commitTime);
             ret.tag = notationDependency.getTag();
+            ret.setPackage(notationDependency.getPackage());
             ret.setSubpackages(notationDependency.getSubpackages());
             ret.setFirstLevel(notationDependency.isFirstLevel());
-            ret.setPackage(notationDependency.getPackage());
             return ret;
         }
     }

@@ -28,7 +28,7 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
-import com.github.blindpirate.gogradle.vcs.git.GolangRepository
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -97,7 +97,7 @@ class LocalDirectoryDependencyTest {
     @Test
     void 'version of empty local dependency is 0'() {
         LocalDirectoryDependency local = new LocalDirectoryDependency()
-        local.dir = GolangRepository.EMPTY_DIR
+        local.dir = GolangRepositoryPattern.EMPTY_DIR
         assert local.updateTime == 0L
     }
 
@@ -160,7 +160,7 @@ class LocalDirectoryDependencyTest {
     void 'empty dir should be handled properly'() {
         // given
         dependency = new LocalDirectoryDependency()
-        dependency.setDir(GolangRepository.EMPTY_DIR)
+        dependency.setDir(GolangRepositoryPattern.EMPTY_DIR)
 
         // then
         assert dependency.resolve(null).is(dependency)

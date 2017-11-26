@@ -25,8 +25,8 @@ import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.NAME_KEY;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.COMMIT_KEY;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.TAG_KEY;
 
 // github.com/a/b
 // github.com/a/b@v1.0.0

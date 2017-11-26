@@ -23,7 +23,7 @@ import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.github.blindpirate.gogradle.vcs.git.GolangRepository
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -38,10 +38,10 @@ class RepositoryHandlerPathResolverTest {
     GolangRepositoryHandler repositoryHandler
 
     @Mock
-    GolangRepository repository
+    GolangRepositoryPattern repository
 
     @Mock
-    GolangRepository incompleteRepository
+    GolangRepositoryPattern incompleteRepository
 
     RepositoryHandlerPathResolver resolver
 

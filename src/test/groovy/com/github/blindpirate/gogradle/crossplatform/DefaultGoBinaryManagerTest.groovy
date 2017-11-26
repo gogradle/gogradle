@@ -35,7 +35,6 @@ import org.mockito.stubbing.Answer
 import java.nio.file.Files
 import java.nio.file.Path
 
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -65,7 +64,7 @@ class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
         when(processUtils.run(['go', 'version'], null, null)).thenReturn(process)
         when(processUtils.getResult(process)).thenReturn(processResult)
 
-        when(cacheManager.getGlobalGoBinCache(anyString())).thenAnswer(new Answer<Object>() {
+        when(cacheManager.getGlobalGoBinCacheDir(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 return resource.toPath().resolve(invocation.getArgument(0))

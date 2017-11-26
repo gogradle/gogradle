@@ -32,6 +32,8 @@ import java.nio.file.Paths;
 import java.util.List;
 import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata.*;
+
 @Singleton
 public class GlobalCachePackagePathResolver implements PackagePathResolver {
     private final GlobalCacheManager globalCacheManager;
@@ -49,14 +51,17 @@ public class GlobalCachePackagePathResolver implements PackagePathResolver {
             for (int i = path.getNameCount(); i > 0; i--) {
                 Path subpath = path.subpath(0, i);
                 Optional<GlobalCacheMetadata> metadata = globalCacheManager.getMetadata(subpath);
-                if (metadata.isPresent() && metadata.get().getOriginalVcs() != null) {
-                    VcsType vcsType = VcsType.of(metadata.get().getOriginalVcs()).get();
-                    List<String> urls = metadata.get().getOriginalUrls();
+                if (!metadata.isPresent()) {
+                    continue;
+                }
 
+                Optional<GlobalCacheMetadata.GolangRepositoryMetadata> originalRepo = metadata.get()
+                        .getRepositories().stream().filter(GolangRepositoryMetadata::isOriginal).findFirst();
+                if (originalRepo.isPresent()) {
                     VcsGolangPackage pkg = VcsGolangPackage.builder()
                             .withPath(packagePath)
                             .withRootPath(subpath)
-                            .withOriginalVcsInfo(vcsType, urls)
+                            .withRepository(originalRepo.get())
                             .build();
                     return Optional.of(pkg);
                 }

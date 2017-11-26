@@ -38,6 +38,7 @@ import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.dependency.produce.DefaultDependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor;
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory;
+import com.github.blindpirate.gogradle.core.dependency.produce.external.dep.DepDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.glide.GlideDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.glock.GlockDependencyFactory;
 import com.github.blindpirate.gogradle.core.dependency.produce.external.godep.GodepDependencyFactory;
@@ -161,6 +162,7 @@ public class GogradleModule extends AbstractModule {
     @DefaultDependencyVisitor.ExternalDependencyFactories
     public List<ExternalDependencyFactory> externalDependencyFactories(
             DefaultLockedDependencyManager lockedDependencyManager,
+            DepDependencyFactory depDependencyFactory,
             GodepDependencyFactory godepDependencyFactory,
             GlideDependencyFactory glideDependencyFactory,
             GovendorDependencyFactory govendorDependencyFactory,
@@ -171,6 +173,7 @@ public class GogradleModule extends AbstractModule {
             GpmDependencyFactory gpmDependencyFactory) {
         return CollectionUtils.immutableList(
                 lockedDependencyManager,
+                depDependencyFactory,
                 godepDependencyFactory,
                 glideDependencyFactory,
                 govendorDependencyFactory,

@@ -44,6 +44,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
 import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
@@ -213,6 +214,7 @@ public class GoTest extends AbstractGolangTask {
 
     private PackageTestResult doSingleTest(String importPath, File parentDir, List<File> testFiles) {
         LineCollector lineCollector = new LineCollector();
+
         List<String> args = isCommandLineArguments()
                 ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
                 : Lists.newArrayList("test", "-v", importPath);
@@ -225,17 +227,9 @@ public class GoTest extends AbstractGolangTask {
             coverageProfileGenerated = true;
         }
 
-        int retcode = buildManager.go(args, emptyMap(), lineCollector, lineCollector, true);
+        Consumer<String> consumer = determineLineConsumer(lineCollector, importPath);
 
-        if (LOGGER.isInfoEnabled()) {
-            if (isCommandLineArguments()) {
-                LOGGER.info("Result:");
-            } else {
-                LOGGER.info("Result of package {}:", importPath);
-            }
-
-            LOGGER.info(lineCollector.getOutput());
-        }
+        int retcode = buildManager.go(args, emptyMap(), consumer, consumer, true);
 
         return PackageTestResult.builder()
                 .withPackagePath(importPath)
@@ -243,6 +237,19 @@ public class GoTest extends AbstractGolangTask {
                 .withTestFiles(testFiles)
                 .withCode(retcode)
                 .build();
+    }
+
+    private Consumer<String> determineLineConsumer(LineCollector lineCollector, String importPath) {
+        if (!LOGGER.isInfoEnabled()) {
+            return lineCollector;
+        } else {
+            if (isCommandLineArguments()) {
+                LOGGER.info("Result:");
+            } else {
+                LOGGER.info("Result of package {}:", importPath);
+            }
+            return lineCollector.andThen(LOGGER::info);
+        }
     }
 
     private boolean isCommandLineArguments() {

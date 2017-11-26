@@ -20,9 +20,9 @@ package com.github.blindpirate.gogradle.vcs.mercurial;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency;
 
-public class MercurialNotationDependency extends GitMercurialNotationDependency {
+public class MercurialNotationDependency extends VcsNotationDependency {
     @Override
     protected ResolvedDependency doResolve(ResolveContext context) {
         return GogradleGlobal.getInstance(MercurialDependencyManager.class).resolve(context, this);
