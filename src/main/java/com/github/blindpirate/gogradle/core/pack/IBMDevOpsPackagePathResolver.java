@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
@@ -37,10 +38,11 @@ public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
     protected Optional<GolangPackage> doProduce(String packagePath) {
         Path path = Paths.get(packagePath);
         Path rootPath = path.subpath(0, 4);
+        GolangRepository repository = GolangRepository.newOriginalRepository(VcsType.GIT, HTTPS + toUnixString(rootPath));
         GolangPackage pkg = VcsGolangPackage.builder()
                 .withPath(path)
                 .withRootPath(rootPath)
-                .withOriginalVcsInfo(VcsType.GIT, singletonList(HTTPS + toUnixString(rootPath)))
+                .withRepository(repository)
                 .build();
         return Optional.of(pkg);
     }

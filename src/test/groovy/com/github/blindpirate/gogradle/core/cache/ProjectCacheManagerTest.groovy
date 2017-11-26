@@ -20,7 +20,7 @@ package com.github.blindpirate.gogradle.core.cache
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +41,7 @@ class ProjectCacheManagerTest {
     @Mock
     PersistenceNotationToResolvedCache persistenceNotationToResolvedCache
     @Mock
-    GitMercurialNotationDependency notationDependency
+    VcsNotationDependency notationDependency
     @Mock
     ResolvedDependency resolvedDependency
     @Mock

@@ -57,7 +57,7 @@ import static org.mockito.Mockito.*
 @WithMockInjector
 class GitMercurialDependencyManagerTest {
 
-    GitMercurialNotationDependency notationDependency = mockWithName(GitMercurialNotationDependency, 'github.com/a/b')
+    VcsNotationDependency notationDependency = mockWithName(VcsNotationDependency, 'github.com/a/b')
     VcsResolvedDependency resolvedDependency = mockWithName(VcsResolvedDependency, 'github.com/a/b')
 
     String DEFAULT_BRANCH = 'DEFAULT_BRANCH'
@@ -102,7 +102,7 @@ class GitMercurialDependencyManagerTest {
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
         when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(CALL_CALLABLE_ANSWER)
-        when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(resource.toPath())
+        when(cacheManager.getGlobalCacheRepoDir(anyString())).thenReturn(resource.toPath())
         when(accessor.findCommit(resource, commitId)).thenReturn(of(commit))
         when(accessor.headCommitOfBranch(resource, 'MockDefault')).thenReturn(commit)
         when(commit.getId()).thenReturn(commitId)
@@ -288,7 +288,7 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyResolutionException)
     void 'exception in locked block should not be swallowed'() {
         // given
-        when(cacheManager.runWithGlobalCacheLock(any(GitMercurialNotationDependency), any(Callable)))
+        when(cacheManager.runWithGlobalCacheLock(any(VcsNotationDependency), any(Callable)))
                 .thenThrow(new IOException())
         // when
         manager.resolve(resolveContext, notationDependency)
@@ -334,7 +334,7 @@ class GitMercurialDependencyManagerTest {
         // given
         File globalCache = IOUtils.mkdir(resource, 'globalCache')
         File projectGopath = IOUtils.mkdir(resource, 'projectGopath')
-        when(cacheManager.getGlobalPackageCachePath(anyString())).thenReturn(globalCache.toPath())
+        when(cacheManager.getGlobalCacheRepoDir(anyString())).thenReturn(globalCache.toPath())
         when(resolvedDependency.getVersion()).thenReturn(commitId)
         // when
         manager.install(resolvedDependency, projectGopath)
@@ -345,7 +345,7 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyInstallationException)
     void 'exception in install process should be wrapped'() {
         // given
-        when(cacheManager.getGlobalPackageCachePath(anyString())).thenThrow(IllegalStateException)
+        when(cacheManager.getGlobalCacheRepoDir(anyString())).thenThrow(IllegalStateException)
         // then
         manager.install(resolvedDependency, resource)
     }

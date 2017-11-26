@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.DataExchange;
 import com.github.blindpirate.gogradle.util.HttpUtils;
@@ -31,6 +32,7 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -63,9 +65,12 @@ public class BitbucketPackagePathResolver extends AbstractPackagePathResolver {
                 .map(BitbucketApiModel.LinksBean.CloneBean::getHref)
                 .collect(Collectors.toList());
         // make sure https:// is in front of ssh://
-        urls.sort(String::compareTo);
+        Collections.sort(urls);
+
+        GolangRepository repository = GolangRepository.newOriginalRepository(packageInfo.scm, urls);
+
         return VcsGolangPackage.builder()
-                .withOriginalVcsInfo(VcsType.of(packageInfo.scm).get(), urls)
+                .withRepository(repository)
                 .withPath(path)
                 .withRootPath(path.subpath(0, 3))
                 .build();

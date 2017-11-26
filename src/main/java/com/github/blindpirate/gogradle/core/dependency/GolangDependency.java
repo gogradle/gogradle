@@ -64,7 +64,7 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
     ResolvedDependency resolve(ResolveContext context);
 
     /**
-     * A dependency is seen as "first-level" when it is defined in build.gradle or gogradle.lock of root project.
+     * A dependency is said to be "first-level" when it is defined in build.gradle or gogradle.lock of root project.
      *
      * @return <code>true</code> if it is "first-level", <code>false</code> otherwise.
      */
@@ -76,7 +76,6 @@ public interface GolangDependency extends Dependency, Serializable, GolangClonea
      * @return the cache scope
      */
     CacheScope getCacheScope();
-
 
     /**
      * This dependencies sub packages. A sub package is a string representing the relative path to the repo root.

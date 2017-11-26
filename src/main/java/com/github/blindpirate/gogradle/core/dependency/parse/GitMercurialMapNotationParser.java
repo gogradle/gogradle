@@ -21,7 +21,7 @@ import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency;
 import com.github.blindpirate.gogradle.vcs.mercurial.MercurialNotationDependency;
@@ -32,28 +32,20 @@ import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.COMMIT_KEY;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.LATEST_COMMIT;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.TAG_KEY;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URLS_KEY;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.URL_KEY;
-import static com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency.VERSION_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.COMMIT_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.LATEST_COMMIT;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.TAG_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URLS_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URL_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.VERSION_KEY;
 
 @Singleton
-public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParser<GitMercurialNotationDependency> {
+public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParser<VcsNotationDependency> {
     @Override
     protected void preConfigure(Map<String, Object> notation) {
         String version = getString(notation, VERSION_KEY);
         String tag = getString(notation, TAG_KEY);
         String commit = getString(notation, COMMIT_KEY);
-
-        VcsGolangPackage pkg = MapUtils.getValue(notation, PACKAGE_KEY, VcsGolangPackage.class);
-        notation.put(URLS_KEY, pkg.getUrls());
-
-        if (pkg.getSubstitutedVcsInfo() != null) {
-            // Remove url in map since url has been specified in repositories
-            notation.remove(URL_KEY);
-        }
 
         if (allBlank(version, tag, commit)) {
             notation.put("commit", LATEST_COMMIT);
@@ -78,7 +70,7 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         } else {
             VcsGolangPackage pkg = MapUtils.getValue(notationMap, PACKAGE_KEY, VcsGolangPackage.class);
             Assert.isTrue(pkg != null, "Cannot found vcs in " + notationMap);
-            return pkg.getVcsType();
+            return pkg.getVcs();
         }
     }
 }

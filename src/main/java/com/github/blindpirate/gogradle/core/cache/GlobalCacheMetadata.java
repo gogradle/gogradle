@@ -20,77 +20,123 @@ package com.github.blindpirate.gogradle.core.cache;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.common.WithApiVersion;
+import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
-import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Stands for the metadata of a repository.
+ * Stands for the metadata of a package.
+ * <pre>
+ *     {@code
+ *     ---
+ *     apiVersion: "0.8.0"
+ *     package: "github.com/golang/tools
+ *     repositories:
+ *     - vcs: "git"
+ *       urls:
+ *       - "https://github.com/golang/tools.git"
+ *       - "git@github.com:golang/tools.git"
+ *       lastUpdatedTime: 1491460172634
+ *       dir: 1a2b3c4d
+ *       original: true
+ *     }
+ * </pre>
  */
 public class GlobalCacheMetadata extends WithApiVersion {
-    /**
-     * "Original" means the urls specified in go-import meta tag of HTML.
-     *
-     * @see MetadataPackagePathResolver
-     */
-    @JsonProperty("originalUrls")
-    private List<String> originalUrls = new ArrayList<>();
 
-    /**
-     * The last update time and url.
-     */
-    @JsonProperty("lastUpdated")
-    private LastUpdated lastUpdated;
+    @JsonProperty("package")
+    private String pkg;
 
-    /**
-     * "Original" means the vcs type specified in go-import meta tag of HTML.
-     *
-     * @see MetadataPackagePathResolver
-     */
-    @JsonProperty("originalVcs")
-    private String originalVcs;
-
-    public String getOriginalVcs() {
-        return originalVcs;
-    }
-
-    public List<String> getOriginalUrls() {
-        return originalUrls;
-    }
+    @JsonProperty("repositories")
+    private List<GolangRepositoryMetadata> repositories;
 
     @JsonIgnore
-    public String getLastUpdateUrl() {
-        return lastUpdated.url;
-    }
-
-    @JsonIgnore
-    public long getLastUpdateTime() {
-        return lastUpdated.time;
-    }
-
+    private boolean dirty;
 
     public static GlobalCacheMetadata newMetadata(VcsGolangPackage pkg) {
         GlobalCacheMetadata metadata = new GlobalCacheMetadata();
-        if (pkg.getOriginalVcsInfo() != null) {
-            metadata.originalUrls = pkg.getOriginalVcsInfo().getUrls();
-            metadata.originalVcs = pkg.getOriginalVcsInfo().getVcsType().getName();
-        }
-        metadata.lastUpdated = new LastUpdated();
+        metadata.pkg = pkg.getRootPathString();
+        metadata.repositories = new ArrayList<>();
+        metadata.repositories.add(new GolangRepositoryMetadata(pkg.getRepository()));
+        metadata.dirty = true;
         return metadata;
     }
 
-    public void update(String currentUrl) {
-        lastUpdated = new LastUpdated();
-        lastUpdated.time = System.currentTimeMillis();
-        lastUpdated.url = currentUrl;
+    public List<GolangRepositoryMetadata> getRepositories() {
+        return repositories;
     }
 
-    private static class LastUpdated {
-        @JsonProperty("time")
-        private long time;
-        @JsonProperty("url")
-        private String url;
+    public void addRepository(GolangRepository repository) {
+        dirty = true;
+        repositories.add(new GolangRepositoryMetadata(repository));
     }
+
+    public boolean isDirty() {
+        return dirty;
+    }
+
+    public static class GolangRepositoryMetadata extends GolangRepository {
+        /**
+         * The last update time.
+         */
+        @JsonProperty("lastUpdatedTime")
+        private long lastUpdatedTime;
+
+        /**
+         * The directory name where this repository locates.
+         */
+        @JsonProperty("dir")
+        private String dir;
+
+        private GolangRepositoryMetadata(GolangRepository repository) {
+            this.urls = repository.getUrls();
+            this.dir= getUrlHash();
+            this.original = repository.isOriginal();
+            this.vcs = repository.getVcsType();
+        }
+
+        public long getLastUpdatedTime() {
+            return lastUpdatedTime;
+        }
+
+        public void updated() {
+            this.lastUpdatedTime = System.currentTimeMillis();
+        }
+
+        public String getDir() {
+            return dir;
+        }
+
+        private String getUrlHash() {
+            String combined = CollectionUtils.toSorted(getUrls()).stream()
+                    .collect(StringBuilder::new, StringBuilder::append, null).toString();
+            return DigestUtils.md5Hex(combined);
+        }
+
+
+    }
+
+//
+//
+//    public static GlobalCacheMetadata newMetadata(VcsGolangPackage pkg) {
+//        GlobalCacheMetadata metadata = new GlobalCacheMetadata();
+//        if (pkg.getOriginalVcsInfo() != null) {
+//            metadata.originalUrls = pkg.getOriginalVcsInfo().getUrls();
+//            metadata.originalVcs = pkg.getOriginalVcsInfo().getVcsType().getName();
+//        }
+//        metadata.lastUpdated = new LastUpdated();
+//        return metadata;
+//    }
+//
+//    public void update(String currentUrl) {
+//        lastUpdated = new LastUpdated();
+//        lastUpdated.time = System.currentTimeMillis();
+//        lastUpdated.url = currentUrl;
+//    }
+
+
 }

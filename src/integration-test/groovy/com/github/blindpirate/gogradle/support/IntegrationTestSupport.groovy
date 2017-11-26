@@ -135,4 +135,16 @@ golang {
         return goBinPath.replace('\\', '/')
     }
 
+    void init() {
+        IOUtils.deleteQuitely(new File(resource, 'gogradle.lock'))
+        try {
+            newBuild {
+                it.forTasks('init')
+            }
+        } finally {
+            println(stdout)
+            println(stderr)
+        }
+    }
+
 }

@@ -95,6 +95,9 @@ public final class IOUtils {
     }
 
     public static boolean dirIsEmpty(File directory) {
+        if (!directory.exists()) {
+            return true;
+        }
         String[] files = Assert.isNotNull(directory.list());
         return files.length == 0;
     }

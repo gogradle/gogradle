@@ -22,7 +22,7 @@ import java.util.List;
 import java.util.function.Consumer;
 
 public class LineCollector implements Consumer<String> {
-    private List<String> lines = new ArrayList<>();
+    private final List<String> lines = new ArrayList<>();
 
     @Override
     public synchronized void accept(String s) {

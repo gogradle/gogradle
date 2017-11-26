@@ -17,11 +17,12 @@
 
 package com.github.blindpirate.gogradle.vcs.git
 
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
-class GolangRepositoryTest {
-    GolangRepository repository = new GolangRepository()
+class GolangRepositoryPatternTest {
+    GolangRepositoryPattern repository = new GolangRepositoryPattern()
 
     @Test
     void 'a repository should match all repos if declared as `all`'() {
@@ -84,7 +85,7 @@ class GolangRepositoryTest {
         assert repository.getDir('name') == null
 
         repository.emptyDir()
-        assert repository.getDir(null) == GolangRepository.EMPTY_DIR
+        assert repository.getDir(null) == GolangRepositoryPattern.EMPTY_DIR
     }
 
     @Test

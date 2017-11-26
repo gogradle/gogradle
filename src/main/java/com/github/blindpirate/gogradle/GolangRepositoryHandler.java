@@ -17,7 +17,7 @@
 
 package com.github.blindpirate.gogradle;
 
-import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 import groovy.lang.Closure;
 import groovy.lang.GroovyObjectSupport;
 import org.gradle.util.Configurable;
@@ -57,9 +57,9 @@ import java.util.Optional;
 @Singleton
 public class GolangRepositoryHandler extends GroovyObjectSupport implements Configurable<Void> {
 
-    private List<GolangRepository> golangRepositories = new ArrayList<>();
+    private List<GolangRepositoryPattern> golangRepositories = new ArrayList<>();
 
-    public Optional<GolangRepository> findMatchedRepository(String name) {
+    public Optional<GolangRepositoryPattern> findMatchedRepository(String name) {
         return golangRepositories.stream()
                 .filter(repo -> repo.match(name))
                 .findFirst();
@@ -68,7 +68,7 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Conf
     @Override
     @Nullable
     public Void configure(Closure cl) {
-        GolangRepository repository = new GolangRepository();
+        GolangRepositoryPattern repository = new GolangRepositoryPattern();
         ConfigureUtil.configure(cl, repository);
         golangRepositories.add(repository);
         return null;

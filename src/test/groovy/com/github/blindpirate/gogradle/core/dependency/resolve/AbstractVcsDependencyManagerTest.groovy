@@ -27,7 +27,7 @@ import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import org.junit.Before
 import org.junit.Test
@@ -77,7 +77,7 @@ class AbstractVcsDependencyManagerTest {
     ProjectCacheManager projectCacheManager
 
     VcsResolvedDependency hostResolvedDependency = DependencyUtils.mockWithName(VcsResolvedDependency, 'vcs')
-    GitMercurialNotationDependency notationDependency = DependencyUtils.mockWithName(GitMercurialNotationDependency, 'vcs')
+    VcsNotationDependency notationDependency = DependencyUtils.mockWithName(VcsNotationDependency, 'vcs')
 
     File resource
 
@@ -108,7 +108,7 @@ class AbstractVcsDependencyManagerTest {
 
         when(notationDependency.getName()).thenReturn('vcs')
         when(vendorResolvedDependency.getName()).thenReturn('thisisvendor')
-        when(globalCacheManager.getGlobalPackageCachePath('vcs')).thenReturn(repoRoot.toPath())
+        when(globalCacheManager.getGlobalCacheRepoDir('vcs')).thenReturn(repoRoot.toPath())
 
         when(notationDependency.getUrls()).thenReturn(['url'])
         when(hostResolvedDependency.getUrl()).thenReturn('url')

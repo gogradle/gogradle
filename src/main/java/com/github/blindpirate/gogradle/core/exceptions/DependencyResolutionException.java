@@ -21,7 +21,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.VendorNotationDependency;
-import com.github.blindpirate.gogradle.vcs.GitMercurialNotationDependency;
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency;
 import org.gradle.api.GradleException;
 
 import java.io.File;
@@ -44,10 +44,10 @@ public final class DependencyResolutionException extends GradleException {
     }
 
     public static DependencyResolutionException cannotFindGitCommit(
-            GitMercurialNotationDependency gitMercurialNotationDependency) {
-        return new DependencyResolutionException("Cannot find commit " + gitMercurialNotationDependency.getCommit()
+            VcsNotationDependency vcsNotationDependency) {
+        return new DependencyResolutionException("Cannot find commit " + vcsNotationDependency.getCommit()
                 + " in repository of "
-                + gitMercurialNotationDependency.getName()
+                + vcsNotationDependency.getName()
                 + ", did they delete this commit?");
     }
 
@@ -70,7 +70,7 @@ public final class DependencyResolutionException extends GradleException {
     public static DependencyResolutionException cannotFindGitTag(NotationDependency dependency, String tag) {
         return new DependencyResolutionException("Cannot find tag " + tag
                 + " in repository of "
-                + GitMercurialNotationDependency.class.cast(dependency).getName()
+                + VcsNotationDependency.class.cast(dependency).getName()
                 + ", did they delete this tag?");
     }
 }

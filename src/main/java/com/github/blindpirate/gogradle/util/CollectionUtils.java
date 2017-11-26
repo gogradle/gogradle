@@ -61,4 +61,15 @@ public class CollectionUtils {
     public static <T> List<T> flatten(List<List<T>> lists) {
         return lists.stream().collect(ArrayList::new, ArrayList::addAll, ArrayList::addAll);
     }
+
+    public static <T extends Comparable<? super T>> List<T> toSorted(Collection<T> c) {
+        List<T> ret = new ArrayList<>(c);
+        Collections.sort(ret);
+        return ret;
+    }
+
+
+    public static boolean containsAny(final Collection<?> coll1, final Collection<?> coll2) {
+        return org.apache.commons.collections4.CollectionUtils.containsAny(coll1, coll2);
+    }
 }

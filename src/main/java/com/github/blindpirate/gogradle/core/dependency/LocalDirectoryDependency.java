@@ -26,7 +26,7 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.github.blindpirate.gogradle.vcs.git.GolangRepository;
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 
@@ -60,7 +60,7 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
     }
 
     public void setDir(String dir) {
-        if (!GolangRepository.EMPTY_DIR.equals(dir)) {
+        if (!GolangRepositoryPattern.EMPTY_DIR.equals(dir)) {
             setDir(new File(dir));
         }
     }

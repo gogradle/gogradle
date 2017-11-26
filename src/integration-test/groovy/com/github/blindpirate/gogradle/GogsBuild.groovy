@@ -80,10 +80,10 @@ vet {
         assert processUtils.getStdout(processUtils.run(firstBuildResult.absolutePath)).contains('Gogs')
         assert new File(resource, 'gogradle.lock').exists()
 
-        secondBuild()
-
-        File secondBuildResult = getOutputExecutable()
-        assert processUtils.getStdout(processUtils.run(secondBuildResult.absolutePath)).contains('Gogs')
+//        secondBuild()
+//
+//        File secondBuildResult = getOutputExecutable()
+//        assert processUtils.getStdout(processUtils.run(secondBuildResult.absolutePath)).contains('Gogs')
 //        assert secondBuildResult.lastModified() > lastModified
 //        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
     }
@@ -97,18 +97,6 @@ dependencies {
     }
 }
 ''')
-    }
-
-    void init() {
-        IOUtils.deleteQuitely(new File(resource, 'gogradle.lock'))
-        try {
-            newBuild {
-                it.forTasks('init')
-            }
-        } finally {
-            println(stdout)
-            println(stderr)
-        }
     }
 
     void firstBuild() {

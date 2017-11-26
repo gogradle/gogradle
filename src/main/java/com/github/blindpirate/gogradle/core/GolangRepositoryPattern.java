@@ -15,7 +15,7 @@
  *
  */
 
-package com.github.blindpirate.gogradle.vcs.git;
+package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.VcsType;
@@ -26,7 +26,7 @@ import org.codehaus.groovy.runtime.InvokerHelper;
 import java.util.Optional;
 
 @SuppressFBWarnings("UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS")
-public class GolangRepository {
+public class GolangRepositoryPattern {
     public static final String EMPTY_DIR = "GOGRADLE_EMPTY_DIR";
 
     private boolean incomplete;

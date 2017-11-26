@@ -35,7 +35,7 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 class VcsResolvedDependencyTest {
     @Mock
-    GitMercurialNotationDependency notationDependency
+    VcsNotationDependency notationDependency
     @Mock
     Spec exclusionSpec
 
