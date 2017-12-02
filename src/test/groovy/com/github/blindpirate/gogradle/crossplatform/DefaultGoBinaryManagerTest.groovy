@@ -67,7 +67,7 @@ class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
         when(cacheManager.getGlobalGoBinCacheDir(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                return resource.toPath().resolve(invocation.getArgument(0))
+                return resource.toPath().resolve(invocation.getArgument(0)).toFile()
             }
         })
 

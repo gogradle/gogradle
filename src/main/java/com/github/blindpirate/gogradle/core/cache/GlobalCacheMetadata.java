@@ -34,7 +34,7 @@ import java.util.List;
  *     {@code
  *     ---
  *     apiVersion: "0.8.0"
- *     package: "github.com/golang/tools
+ *     package: "github.com/golang/tools"
  *     repositories:
  *     - vcs: "git"
  *       urls:
@@ -79,6 +79,10 @@ public class GlobalCacheMetadata extends WithApiVersion {
         return dirty;
     }
 
+    public String getPackage() {
+        return pkg;
+    }
+
     public static class GolangRepositoryMetadata extends GolangRepository {
         /**
          * The last update time.
@@ -92,9 +96,12 @@ public class GlobalCacheMetadata extends WithApiVersion {
         @JsonProperty("dir")
         private String dir;
 
+        public GolangRepositoryMetadata() {
+        }
+
         private GolangRepositoryMetadata(GolangRepository repository) {
             this.urls = repository.getUrls();
-            this.dir= getUrlHash();
+            this.dir = getUrlHash();
             this.original = repository.isOriginal();
             this.vcs = repository.getVcsType();
         }
@@ -112,31 +119,19 @@ public class GlobalCacheMetadata extends WithApiVersion {
         }
 
         private String getUrlHash() {
-            String combined = CollectionUtils.toSorted(getUrls()).stream()
-                    .collect(StringBuilder::new, StringBuilder::append, null).toString();
+            String combined = String.join("", CollectionUtils.toSorted(getUrls()));
             return DigestUtils.md5Hex(combined);
         }
 
+        @Override
+        public boolean equals(Object o) {
+            return super.equals(o);
+        }
 
+        @Override
+        public int hashCode() {
+            return super.hashCode();
+        }
     }
-
-//
-//
-//    public static GlobalCacheMetadata newMetadata(VcsGolangPackage pkg) {
-//        GlobalCacheMetadata metadata = new GlobalCacheMetadata();
-//        if (pkg.getOriginalVcsInfo() != null) {
-//            metadata.originalUrls = pkg.getOriginalVcsInfo().getUrls();
-//            metadata.originalVcs = pkg.getOriginalVcsInfo().getVcsType().getName();
-//        }
-//        metadata.lastUpdated = new LastUpdated();
-//        return metadata;
-//    }
-//
-//    public void update(String currentUrl) {
-//        lastUpdated = new LastUpdated();
-//        lastUpdated.time = System.currentTimeMillis();
-//        lastUpdated.url = currentUrl;
-//    }
-
 
 }

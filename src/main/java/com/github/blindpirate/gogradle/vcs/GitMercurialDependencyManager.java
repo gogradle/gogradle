@@ -36,6 +36,8 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
+
 public abstract class GitMercurialDependencyManager extends AbstractVcsDependencyManager<GitMercurialCommit> {
     protected static final Logger LOGGER = Logging.getLogger(GitMercurialDependencyManager.class);
 
@@ -109,7 +111,11 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     @Override
     protected GitMercurialCommit determineVersion(File repoDir, NotationDependency dependency) {
         VcsNotationDependency notationDependency = (VcsNotationDependency) dependency;
-        if (!notationDependency.isLatest()) {
+        if (notationDependency.isLatest()) {
+            // use HEAD of master branch
+            return getAccessor().headCommitOfBranch(repoDir, getAccessor().getDefaultBranch(repoDir));
+        }
+        if (isNotBlank(notationDependency.getCommit())) {
             Optional<GitMercurialCommit> commit = getAccessor().findCommit(repoDir, notationDependency.getCommit());
             if (commit.isPresent()) {
                 return commit.get();
@@ -118,17 +124,15 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
             }
         }
 
-        if (notationDependency.getTag() != null) {
-            Optional<GitMercurialCommit> commit = findMatchingTag(repoDir, notationDependency.getTag());
-            if (commit.isPresent()) {
-                return commit.get();
-            } else {
-                throw DependencyResolutionException.cannotFindGitTag(dependency, notationDependency.getTag());
-            }
+        Assert.isTrue(notationDependency.getTag() != null);
+
+        Optional<GitMercurialCommit> commit = findMatchingTag(repoDir, notationDependency.getTag());
+        if (commit.isPresent()) {
+            return commit.get();
+        } else {
+            throw DependencyResolutionException.cannotFindGitTag(dependency, notationDependency.getTag());
         }
 
-        // use HEAD of master branch
-        return getAccessor().headCommitOfBranch(repoDir, getAccessor().getDefaultBranch(repoDir));
     }
 
     private Optional<GitMercurialCommit> findCommitBySemVersion(File repository, String semVersionExpression) {
@@ -161,10 +165,6 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     @Override
     protected void initRepository(String dependencyName, List<String> urls, File repoRoot) {
         tryCloneWithUrls(dependencyName, urls, repoRoot);
-    }
-
-    protected String getCurrentRepositoryRemoteUrl(File globalCacheRepoRoot) {
-        return getAccessor().getRemoteUrl(globalCacheRepoRoot);
     }
 
     private void tryCloneWithUrls(String name, List<String> urls, File directory) {

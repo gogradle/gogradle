@@ -19,9 +19,7 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
-import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
 import com.github.blindpirate.gogradle.core.dependency.*
@@ -32,24 +30,22 @@ import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
-import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import java.util.concurrent.Callable
 import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.APPLY_FUNCTION_ANSWER
-import static com.github.blindpirate.gogradle.core.dependency.resolve.AbstractVcsDependencyManagerTest.CALL_CALLABLE_ANSWER
 import static com.github.blindpirate.gogradle.util.DependencyUtils.mockWithName
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.LATEST_COMMIT
 import static java.util.Optional.empty
 import static java.util.Optional.of
 import static org.mockito.Matchers.any
-import static org.mockito.Matchers.anyString
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -57,8 +53,8 @@ import static org.mockito.Mockito.*
 @WithMockInjector
 class GitMercurialDependencyManagerTest {
 
-    VcsNotationDependency notationDependency = mockWithName(VcsNotationDependency, 'github.com/a/b')
-    VcsResolvedDependency resolvedDependency = mockWithName(VcsResolvedDependency, 'github.com/a/b')
+    VcsNotationDependency notationDependency = mockWithName(VcsNotationDependency, 'github.com/user/package')
+    VcsResolvedDependency resolvedDependency = mockWithName(VcsResolvedDependency, 'github.com/user/package')
 
     String DEFAULT_BRANCH = 'DEFAULT_BRANCH'
 
@@ -75,6 +71,10 @@ class GitMercurialDependencyManagerTest {
     @Mock
     GitMercurialCommit commit
     @Mock
+    GitMercurialCommit tagCommit
+    @Mock
+    GitMercurialCommit headCommit
+    @Mock
     ResolveContext resolveContext
     @Mock
     ProjectCacheManager projectCacheManager
@@ -82,12 +82,8 @@ class GitMercurialDependencyManagerTest {
     GitMercurialDependencyManager manager
 
     String commitId = '1' * 40
-    String repoUrl = 'https://github.com/a/b.git'
-    GolangPackage thePackage = VcsGolangPackage.builder()
-            .withPath('github.com/a/b')
-            .withRootPath('github.com/a/b')
-            .withOriginalVcsInfo(VcsType.GIT, [repoUrl])
-            .build()
+    String tag = 'tag'
+    VcsGolangPackage pkg = MockUtils.mockRootVcsPackage()
 
     File resource
 
@@ -101,28 +97,39 @@ class GitMercurialDependencyManagerTest {
 
         when(configuration.getDependencyRegistry()).thenReturn(dependencyRegistry)
 
-        when(cacheManager.runWithGlobalCacheLock(any(GolangDependency), any(Callable))).thenAnswer(CALL_CALLABLE_ANSWER)
-        when(cacheManager.getGlobalCacheRepoDir(anyString())).thenReturn(resource.toPath())
+        when(cacheManager.getGlobalCacheRepoDir()).thenReturn(resource)
         when(accessor.findCommit(resource, commitId)).thenReturn(of(commit))
-        when(accessor.headCommitOfBranch(resource, 'MockDefault')).thenReturn(commit)
+        when(accessor.headCommitOfBranch(resource, 'MockDefault')).thenReturn(headCommit)
+        when(accessor.findCommitByTagOrBranch(resource, tag)).thenReturn(of(tagCommit))
         when(commit.getId()).thenReturn(commitId)
         when(commit.getCommitTime()).thenReturn(123000L)
+        when(tagCommit.getId()).thenReturn('tagCommit')
+        when(headCommit.getId()).thenReturn('headCommit')
 
-        when(accessor.getRemoteUrl(resource)).thenReturn(repoUrl)
         when(accessor.getDefaultBranch(resource)).thenReturn(DEFAULT_BRANCH)
+        when(notationDependency.getPackage()).thenReturn(pkg)
+        when(notationDependency.getCacheScope()).thenCallRealMethod()
+        when(notationDependency.isLatest()).thenCallRealMethod()
 
-        when(notationDependency.getUrls()).thenReturn([repoUrl])
-        when(notationDependency.getCommit()).thenReturn(commitId)
-        when(notationDependency.getCacheScope()).thenReturn(CacheScope.PERSISTENCE)
-        when(notationDependency.getPackage()).thenReturn(thePackage)
+        when(resolvedDependency.getPackage()).thenReturn(pkg)
 
         when(resolveContext.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
+    }
+
+    def withOnlyTag(String t){
+        when(notationDependency.getTag()).thenReturn(t)
+        when(notationDependency.getCommit()).thenReturn(null)
+    }
+
+    def withOnlyCommit(String c){
+        when(notationDependency.getTag()).thenReturn(null)
+        when(notationDependency.getCommit()).thenReturn(c)
     }
 
     @Test
     void 'notation dependency should be created successfully'() {
         // given
-        when(notationDependency.getTag()).thenReturn('tag')
+        withOnlyTag(tag)
         when(notationDependency.isFirstLevel()).thenReturn(true)
         // when
         ResolvedDependency result = manager.createResolvedDependency(notationDependency, resource, commit, resolveContext)
@@ -132,9 +139,9 @@ class GitMercurialDependencyManagerTest {
     }
 
     void assertResolvedDependency(ResolvedDependency result) {
-        assert result.name == 'github.com/a/b'
-        assert ReflectionUtils.getField(result, 'url') == repoUrl
-        assert ReflectionUtils.getField(result, 'tag') == 'tag'
+        assert result.name == 'github.com/user/package'
+        assert result.getPackage() == pkg
+        assert ReflectionUtils.getField(result, 'tag') == tag
         assert result.version == commitId
         assert result.updateTime == 123000L
         assert result.firstLevel
@@ -144,16 +151,32 @@ class GitMercurialDependencyManagerTest {
     @MockRefreshDependencies(false)
     void 'existed repository should not be updated if no --refresh-dependencies'() {
         // given:
-        when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
+        withOnlyCommit(commit.id)
+        when(cacheManager.currentRepositoryIsUpToDate()).thenReturn(false)
         // when:
         manager.resolve(resolveContext, notationDependency)
         // then:
         verify(accessor, times(0)).update(resource)
+        verify(cacheManager, times(0)).repoUpdated()
+    }
+
+    @Test
+    @MockRefreshDependencies(true)
+    @MockOffline(false)
+    void 'existed repository should be updated if --refresh-dependencies'() {
+        // given:
+        withOnlyCommit(commit.id)
+        when(cacheManager.currentRepositoryIsUpToDate()).thenReturn(false)
+        // when:
+        manager.resolve(resolveContext, notationDependency)
+        // then:
+        verify(accessor).update(resource)
     }
 
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown if commit not found'() {
         // given
+        withOnlyCommit(commit.id)
         when(accessor.findCommit(resource, commitId)).thenReturn(Optional.empty())
         // then
         manager.determineVersion(resource, notationDependency)
@@ -162,58 +185,49 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyResolutionException)
     void 'exception should be thrown if tag not found'() {
         // given
-        when(notationDependency.getTag()).thenReturn('tag')
+        withOnlyTag('inexistent')
         // then
         manager.determineVersion(resource, notationDependency)
     }
 
     @Test
-    @MockRefreshDependencies(true)
-    @MockOffline(false)
-    void 'existed repository should be updated if --refresh-dependencies'() {
-        // given:
-        when(cacheManager.currentRepositoryIsUpToDate(notationDependency)).thenReturn(false)
-        // when:
-        manager.resolve(resolveContext, notationDependency)
-        // then:
-        verify(accessor).update(resource)
-    }
-
-    @Test
     void 'empty repository should be cloned'() {
         // given
+        withOnlyCommit(commit.id)
         IOUtils.clearDirectory(resource)
         // when
         manager.resolve(resolveContext, notationDependency)
         // then
-        verify(accessor).clone(repoUrl, resource)
+        verify(accessor).clone(pkg.urls[0], resource)
     }
 
     @Test
     @MockOffline(true)
     void 'pull should not be executed if offline'() {
+        // given:
+        withOnlyCommit(commit.id)
         // when:
         manager.resolve(resolveContext, notationDependency)
         // then:
         verify(accessor, times(0)).update(resource)
+        verify(cacheManager, times(0)).repoUpdated()
     }
 
     @Test
     @MockRefreshDependencies(false)
     void 'dependency with tag should be resolved successfully'() {
         // given
-        when(notationDependency.getTag()).thenReturn('tag')
-        when(accessor.findCommitByTagOrBranch(resource, 'tag')).thenReturn(of(commit))
+        withOnlyTag(tag)
         // when
         manager.resolve(resolveContext, notationDependency)
         // then
-        verify(accessor).checkout(resource, commitId)
+        verify(accessor).checkout(resource, 'tagCommit')
     }
 
     @Test
     void 'tag should be interpreted as sem version if commit not found'() {
         // given
-        when(notationDependency.getTag()).thenReturn('~1.0.0')
+        withOnlyTag('~1.0.0')
         when(accessor.findCommitByTagOrBranch(resource, '~1.0.0')).thenReturn(empty())
         GitMercurialCommit satisfiedCommit = GitMercurialCommit.of('commitId', '1.0.1', 321L)
         when(accessor.getAllTags(resource)).thenReturn([satisfiedCommit])
@@ -224,7 +238,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'commit will be searched if tag cannot be recognized'() {
         // given
-        when(notationDependency.isLatest()).thenReturn(true)
+        withOnlyCommit(LATEST_COMMIT)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -234,7 +248,7 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'LATEST_COMMIT should be recognized properly'() {
         // given
-        when(notationDependency.isLatest()).thenReturn(true)
+        withOnlyCommit(LATEST_COMMIT)
         // when
         manager.determineVersion(resource, notationDependency)
         // then
@@ -253,12 +267,13 @@ class GitMercurialDependencyManagerTest {
     @Test
     void 'every url should be tried until success'() {
         // given
-        when(notationDependency.getUrls()).thenReturn(['url1', 'url2'])
-        when(accessor.clone('url1', resource)).thenThrow(IOException)
+        withOnlyCommit(commit.id)
+        IOUtils.clearDirectory(resource)
+        when(accessor.clone(pkg.urls[0], resource)).thenThrow(IOException)
         // when
         manager.resolve(resolveContext, notationDependency)
         // then
-        verify(accessor).clone('url2', resource)
+        verify(accessor).clone(pkg.urls[1], resource)
     }
 
     @Test
@@ -272,7 +287,7 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyResolutionException)
     void 'trying to resolve an inexistent commit should result in an exception'() {
         // given
-        when(notationDependency.getCommit()).thenReturn('inexistent')
+        withOnlyCommit('inexistent')
         // when
         manager.resolve(resolveContext, notationDependency)
     }
@@ -280,16 +295,7 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyResolutionException)
     void 'trying to resolve an inexistent tag should result in an exception'() {
         // given
-        when(notationDependency.getTag()).thenReturn('inexistent')
-        // when
-        manager.resolve(resolveContext, notationDependency)
-    }
-
-    @Test(expected = DependencyResolutionException)
-    void 'exception in locked block should not be swallowed'() {
-        // given
-        when(cacheManager.runWithGlobalCacheLock(any(VcsNotationDependency), any(Callable)))
-                .thenThrow(new IOException())
+        withOnlyTag('inexistent')
         // when
         manager.resolve(resolveContext, notationDependency)
     }
@@ -305,7 +311,7 @@ class GitMercurialDependencyManagerTest {
         dependencyWithTag.name = 'git'
         dependencyWithTag.tag = 'tag'
 
-        GitResolvedDependency resolvedDependency = VcsResolvedDependency.builder(VcsType.GIT)
+        VcsResolvedDependency resolvedDependency = VcsResolvedDependency.builder()
                 .withNotationDependency(dependencyWithCommit)
                 .withCommitId(dependencyWithCommit.commit)
                 .build()
@@ -317,24 +323,12 @@ class GitMercurialDependencyManagerTest {
         assert manager.versionExistsInRepo(resource, resolvedDependency)
     }
 
-
-    @Test
-    void 'mismatched repository should be cleared'() {
-        // given
-        when(notationDependency.getUrls()).thenReturn(['anotherUrl'])
-        IOUtils.write(resource, 'some file', 'file content')
-        // when
-        manager.resolve(resolveContext, notationDependency)
-        // then
-        assert IOUtils.dirIsEmpty(resource)
-    }
-
     @Test
     void 'installing a resolved dependency should succeed'() {
         // given
         File globalCache = IOUtils.mkdir(resource, 'globalCache')
         File projectGopath = IOUtils.mkdir(resource, 'projectGopath')
-        when(cacheManager.getGlobalCacheRepoDir(anyString())).thenReturn(globalCache.toPath())
+        when(cacheManager.getGlobalCacheRepoDir()).thenReturn(globalCache)
         when(resolvedDependency.getVersion()).thenReturn(commitId)
         // when
         manager.install(resolvedDependency, projectGopath)
@@ -345,7 +339,7 @@ class GitMercurialDependencyManagerTest {
     @Test(expected = DependencyInstallationException)
     void 'exception in install process should be wrapped'() {
         // given
-        when(cacheManager.getGlobalCacheRepoDir(anyString())).thenThrow(IllegalStateException)
+        when(cacheManager.getGlobalCacheRepoDir()).thenThrow(IllegalStateException)
         // then
         manager.install(resolvedDependency, resource)
     }

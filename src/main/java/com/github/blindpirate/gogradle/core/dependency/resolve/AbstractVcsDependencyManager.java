@@ -60,7 +60,6 @@ public abstract class AbstractVcsDependencyManager<VERSION>
         try {
             globalCacheManager.startSession((VcsGolangPackage) dependency.getPackage());
 
-
             resolveRepository(dependency);
 
             File vcsRoot = globalCacheManager.getGlobalCacheRepoDir();
@@ -149,10 +148,8 @@ public abstract class AbstractVcsDependencyManager<VERSION>
 
     protected abstract void initRepository(String name, List<String> urls, File repoRoot);
 
-
     private boolean repositoryNeedInit(File repoRoot) {
         return IOUtils.dirIsEmpty(repoRoot);
     }
 
-    protected abstract String getCurrentRepositoryRemoteUrl(File globalCacheRepoRoot);
 }

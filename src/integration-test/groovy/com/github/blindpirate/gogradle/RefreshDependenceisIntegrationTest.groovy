@@ -40,6 +40,7 @@ class RefreshDependenceisIntegrationTest extends IntegrationTestSupport {
 ${buildDotGradleBase}
 golang {
     packagePath = 'github.com/my/package'
+    globalCacheFor 0, SECOND
 }
 
 dependencies {

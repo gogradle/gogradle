@@ -35,8 +35,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.allBlank;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.COMMIT_KEY;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.LATEST_COMMIT;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.TAG_KEY;
-import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URLS_KEY;
-import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URL_KEY;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.VERSION_KEY;
 
 @Singleton
@@ -70,7 +68,7 @@ public class GitMercurialMapNotationParser extends AutoConfigureMapNotationParse
         } else {
             VcsGolangPackage pkg = MapUtils.getValue(notationMap, PACKAGE_KEY, VcsGolangPackage.class);
             Assert.isTrue(pkg != null, "Cannot found vcs in " + notationMap);
-            return pkg.getVcs();
+            return pkg.getVcsType();
         }
     }
 }

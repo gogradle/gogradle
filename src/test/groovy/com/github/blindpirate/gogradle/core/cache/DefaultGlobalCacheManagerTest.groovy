@@ -20,16 +20,15 @@ package com.github.blindpirate.gogradle.core.cache
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangPluginSetting
+import com.github.blindpirate.gogradle.core.GolangRepository
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.DataExchange
-import com.github.blindpirate.gogradle.util.MockUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils
-import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
+import com.github.blindpirate.gogradle.util.*
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
 import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
+import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
 import org.apache.commons.io.FileUtils
 import org.gradle.api.Project
@@ -37,8 +36,6 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
-import org.mockito.invocation.InvocationOnMock
-import org.mockito.stubbing.Answer
 
 import java.nio.channels.FileChannel
 import java.nio.channels.FileLock
@@ -48,11 +45,10 @@ import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
 import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_BINARAY_CACHE_PATH
-import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.GO_METADATA_PATH
+import static com.github.blindpirate.gogradle.core.cache.DefaultGlobalCacheManager.REPO_CACHE_PATH
 import static com.github.blindpirate.gogradle.util.IOUtils.mkdir
 import static com.github.blindpirate.gogradle.util.IOUtils.write
 import static org.mockito.ArgumentMatchers.any
-import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -76,8 +72,6 @@ class DefaultGlobalCacheManagerTest {
 
     VcsGolangPackage pkg = MockUtils.mockRootVcsPackage()
 
-    VcsGolangPackage substitutedPkg = MockUtils.mockSubstitutedRootVcsPackage()
-
     ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
     @Before
@@ -95,7 +89,7 @@ class DefaultGlobalCacheManagerTest {
 
     @Test
     void 'getting files in global binary cache directory should succeed'() {
-        assert cacheManager.getGlobalGoBinCacheDir('1.7.1') == new File(resource, 'go/binary/1.7.1').toPath()
+        assert cacheManager.getGlobalGoBinCacheDir('1.7.1') == new File(resource, 'go/binary/1.7.1')
     }
 
     @Test
@@ -104,173 +98,137 @@ class DefaultGlobalCacheManagerTest {
         cacheManager.ensureGlobalCacheExistAndWritable()
         // then
         assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
-        assert new File(resource, GO_BINARAY_CACHE_PATH).exists()
-        assert new File(resource, GO_METADATA_PATH).exists()
+        assert new File(resource, REPO_CACHE_PATH).exists()
     }
 
     @Test
     void 'lock file should be initialized'() {
         // when
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateCurrentDependencyLock(notationDependency)
-        } as Callable)
+        cacheManager.startSession(pkg)
+        cacheManager.endSession()
 
         // then
-        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
-        assert metadata.lastUpdateTime == 0
-        assert metadata.lastUpdateUrl == null
-        assert metadata.originalVcs == 'git'
-        assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/repo/github.com/user/package/gogradle-metadata'), GlobalCacheMetadata)
+        assert metadata.getPackage() == 'github.com/user/package'
+        assert metadata.repositories.size() == 1
+        assert metadata.repositories[0].lastUpdatedTime == 0
+        assert metadata.repositories[0].vcs == 'git'
+        assert metadata.repositories[0].original
+        assert metadata.repositories[0].urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+        assert metadata.repositories[0].dir ==~ /[0-9a-z]{32}/
     }
 
     @Test
-    void 'lock file should be initialized properly if no original urls provided'() {
-        // given
-        when(notationDependency.getPackage()).thenReturn(substitutedPkg)
+    void 'lock file should be updated'() {
         // when
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateCurrentDependencyLock(notationDependency)
-        } as Callable)
+        cacheManager.startSession(pkg)
+        cacheManager.repoUpdated()
+        cacheManager.endSession()
         // then
-        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
-        assert metadata.lastUpdateTime == 0
-        assert metadata.lastUpdateUrl == null
-        assert metadata.originalVcs == null
-        assert metadata.originalUrls == []
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/repo/github.com/user/package/gogradle-metadata'), GlobalCacheMetadata)
+        assert metadata.getPackage() == 'github.com/user/package'
+        assert metadata.repositories.size() == 1
+        assert System.currentTimeMillis() - metadata.repositories[0].lastUpdatedTime < 5 * 1000
+        assert metadata.repositories[0].vcs == 'git'
+        assert metadata.repositories[0].original
+        assert metadata.repositories[0].urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+        assert metadata.repositories[0].dir ==~ /[0-9a-z]{32}/
     }
 
     @Test
-    void 'lock file should be updated successfully'() {
-        // create
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            // create
-            cacheManager.updateCurrentDependencyLock(notationDependency)
-        } as Callable)
+    void 'repositories should be added to lock file successfully'() {
+        // given
+        cacheManager.startSession(pkg)
+        cacheManager.endSession()
 
-        GlobalCacheMetadata old = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
-
-        // update1
-        // a shorter data (with fewer bytes) may cause issue
-        when(accessor.getRemoteUrl(new File(resource, 'go/gopath/github.com/user/package'))).thenReturn('u')
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateCurrentDependencyLock(notationDependency)
-        } as Callable)
-        GlobalCacheMetadata updated1 = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
-
-        // update2
-        when(notationDependency.getPackage()).thenReturn(substitutedPkg)
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            cacheManager.updateCurrentDependencyLock(notationDependency)
-        } as Callable)
-        GlobalCacheMetadata updated2 = DataExchange.parseYaml(new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage'), GlobalCacheMetadata)
+        // when
+        GolangRepository anotherRepo = GolangRepository.newSubstitutedRepository(VcsType.MERCURIAL, ['anotherUrl'])
+        pkg = VcsGolangPackage.builder().withPath('github.com/user/package').withRootPath('github.com/user/package').withRepository(anotherRepo).build()
+        cacheManager.startSession(pkg)
+        cacheManager.endSession()
 
         // then
-        assert old.originalVcs == updated1.originalVcs
-        assert old.originalUrls == updated1.originalUrls
-        assert (-1000L..1000L).contains(updated1.getLastUpdateTime() - System.currentTimeMillis())
-        assert old.originalVcs == updated2.originalVcs
-        assert old.originalUrls == updated2.originalUrls
+        GlobalCacheMetadata metadata = DataExchange.parseYaml(new File(resource, 'go/repo/github.com/user/package/gogradle-metadata'), GlobalCacheMetadata)
+        assert metadata.getPackage() == 'github.com/user/package'
+        assert metadata.repositories.size() == 2
+        assert metadata.repositories[1].lastUpdatedTime == 0
+        assert !metadata.repositories[1].original
+        assert metadata.repositories[1].vcs == 'hg'
+        assert metadata.repositories[1].urls == ['anotherUrl']
+        assert metadata.repositories[1].dir ==~ /[0-9a-z]{32}/
+        assert metadata.repositories[0].dir != metadata.repositories[1].dir
     }
 
     @Test(expected = UncheckedIOException)
-    void 'exception should be thrown if IOException occurs in updateing lock file'() {
-        FileChannel channel = mock(FileChannel, new Answer() {
-            @Override
-            Object answer(InvocationOnMock invocation) throws Throwable {
-                throw new IOException()
-            }
-        })
-        ReflectionUtils.getField(cacheManager, 'fileChannels').set(channel)
-        cacheManager.updateCurrentDependencyLock(notationDependency)
+    void 'exception should be thrown if IOException occurs in updating lock file'() {
+        IOUtils.forceMkdir(new File(resource, 'go/repo/github.com/user/package/gogradle-metadata'))
+        cacheManager.startSession(pkg)
+        cacheManager.endSession()
+    }
+
+    String getMetadataYaml(long updateTime) {
+        return """---
+apiVersion: "0.8.0"
+package: "github.com/user/package"
+repositories:
+- vcs: "git"
+  urls:
+  - "git@github.com:user/package.git"
+  - "https://github.com/user/package.git"
+  lastUpdatedTime: ${updateTime}
+  dir: 1a2b3c4d
+  original: true 
+"""
     }
 
     @Test
-    void 'dependency should be considered as out-of-date'() {
+    void 'repo should be considered as out-of-date'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
-originalUrls:
-  - git@github.com:user/package.git
-  - https://github.com/user/package.git
-originalVcs:
-  git
-lastUpdated:
-  time: ${System.currentTimeMillis() - 2000}
-  url: https://github.com/user/package.git
-""")
+        write(resource, 'go/repo/github.com/user/package/gogradle-metadata', getMetadataYaml(System.currentTimeMillis() - 200 * 1000L))
+
         // then
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.currentRepositoryIsUpToDate(notationDependency)
-        } as Callable)
+        cacheManager.startSession(pkg)
+        assert !cacheManager.currentRepositoryIsUpToDate()
+        cacheManager.endSession()
     }
 
     @Test
-    void 'dependency should be considered as out-of-date if url not match current url in repo'() {
-        // given
-        when(notationDependency.getUrls()).thenReturn(['another url'])
-        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
-originalUrls:
-  - git@github.com:user/package.git
-  - https://github.com/user/package.git
-originalVcs:
-  git
-lastUpdated:
-  time: ${System.currentTimeMillis()}
-  url: https://github.com/user/package.git
-""")
-        // then
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.currentRepositoryIsUpToDate(notationDependency)
-        } as Callable)
-    }
-
-    @Test
-    void 'dependency should be considered as up-to-date'() {
+    void 'repo should be considered as out-of-date if url not match current url in repo'() {
         // given
         when(setting.getGlobalCacheSecond()).thenReturn(1L)
-        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
-originalUrls:
-  - git@github.com:user/package.git
-  - https://github.com/user/package.git
-originalVcs:
-  git
-lastUpdated:
-  time: ${System.currentTimeMillis()}
-  url: https://github.com/user/package.git
-""")
-        // then
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert cacheManager.currentRepositoryIsUpToDate(notationDependency)
-        } as Callable)
-    }
+        write(resource, 'go/repo/github.com/user/package/gogradle-metadata', getMetadataYaml(System.currentTimeMillis()))
 
-    @Test
-    void 'dependency should be considered as out-of-date if metadata does not exist'() {
-        cacheManager.runWithGlobalCacheLock(notationDependency, {
-            assert !cacheManager.currentRepositoryIsUpToDate(notationDependency)
-        } as Callable)
-    }
-
-    @Test
-    void 'getting metadata of a package should succeed'() {
-        // given
-        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', """
-originalUrls:
-  - git@github.com:user/package.git
-  - https://github.com/user/package.git
-originalVcs:
-  git
-lastUpdated:
-  time: 123
-  url: https://github.com/user/package.git
-""")
         // when
-        GlobalCacheMetadata metadata = cacheManager.getMetadata(Paths.get('github.com/user/package')).get()
+        GolangRepository anotherRepo = GolangRepository.newSubstitutedRepository(VcsType.MERCURIAL, ['anotherUrl'])
+        pkg = VcsGolangPackage.builder().withPath('github.com/user/package').withRootPath('github.com/user/package').withRepository(anotherRepo).build()
+        cacheManager.startSession(pkg)
+
         // then
-        assert metadata.lastUpdateTime == 123L
-        assert metadata.lastUpdateUrl == 'https://github.com/user/package.git'
-        assert metadata.originalVcs == 'git'
-        assert metadata.originalUrls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+        assert !cacheManager.currentRepositoryIsUpToDate()
+        cacheManager.endSession()
+    }
+
+    @Test
+    void 'repo should be considered as up-to-date'() {
+        // given
+        when(setting.getGlobalCacheSecond()).thenReturn(1L)
+        write(resource, 'go/repo/github.com/user/package/gogradle-metadata', getMetadataYaml(System.currentTimeMillis()))
+        // then
+        cacheManager.startSession(pkg)
+        assert cacheManager.currentRepositoryIsUpToDate()
+        cacheManager.endSession()
+    }
+
+    @Test
+    void 'getting repo dir of a package should succeed'() {
+        // given
+        write(resource, 'go/repo/github.com/user/package/gogradle-metadata', getMetadataYaml(0L))
+        // then
+        cacheManager.startSession(pkg)
+        assert cacheManager.getGlobalCacheRepoDir() == new File(resource, 'go/repo/github.com/user/package/1a2b3c4d')
+        cacheManager.endSession()
+        assert ReflectionUtils.getField(cacheManager, 'sessions').get() == null
     }
 
     @Test
@@ -281,10 +239,10 @@ lastUpdated:
     @Test
     void 'empty result should be returned if it is locked by another process'() {
         // given
-        write(resource, 'go/metadata/github.com%2Fuser%2Fpackage', '----\n')
+        write(resource, 'go/repo/github.com/user/package/gogradle-metadata', '----\n')
         Thread.start {
             new ProcessUtils().runProcessWithCurrentClasspath(LockProcess,
-                    [new File(resource, 'go/metadata/github.com%2Fuser%2Fpackage').getAbsolutePath()],
+                    [new File(resource, 'go/repo/github.com/user/package/gogradle-metadata').getAbsolutePath()],
                     [:])
         }
 
@@ -296,7 +254,7 @@ lastUpdated:
 
     @Test
     void 'empty result should be returned if IOException occurs in metadata reading'() {
-        mkdir(resource, 'go/metadata/github.com%2Fuser%2Fpackage')
+        mkdir(resource, 'go/repo/github.com/user/package/gogradle-metadata')
         assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
     }
 
@@ -326,7 +284,9 @@ lastUpdated:
         // when
         int i = 0
         Callable thread = {
-            cacheManager.runWithGlobalCacheLock(notationDependency, { 1000.times { i++ } })
+            cacheManager.startSession(pkg)
+            1000.times { i++ }
+            cacheManager.endSession()
         }
         List futures = (1..10).collect { threadPool.submit(thread as Callable) }
 
@@ -338,14 +298,15 @@ lastUpdated:
     @Test
     void 'multi-process access should be serialized'() {
         // when
-        String filePath = new File(resource, 'shared').getAbsolutePath()
-
         ProcessUtils processUtils = new ProcessUtils()
 
         Callable runOneProcess = {
-            cacheManager.runWithGlobalCacheLock(notationDependency, {
-                processUtils.runProcessWithCurrentClasspath(CounterProcess, [filePath], [:])
-            })
+            cacheManager.startSession(pkg)
+            def result = processUtils.runProcessWithCurrentClasspath(CounterProcess,
+                    [new File(resource, 'go/repo/github.com/user/package/testfile').absolutePath], [:])
+            cacheManager.endSession()
+
+            return result
         }
 
         List futures = (1..10).collect {
@@ -353,11 +314,11 @@ lastUpdated:
         }
 
         // then
-        assert futures.any { it.get().code == CounterProcess.SUCCESS }
+        assert futures.every { it.get().code == CounterProcess.SUCCESS }
     }
 
     class CounterProcess {
-        public static final int ERROR = 1
+        public static final int ERROR = 2
         public static final int SUCCESS = 0
 
         static void main(String[] args) {

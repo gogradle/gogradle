@@ -19,13 +19,10 @@ package com.github.blindpirate.gogradle.core.cache;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
-import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
-import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 
 /**
  * Manages global cache which users should never know.
@@ -45,14 +42,33 @@ public interface GlobalCacheManager {
      */
     void ensureGlobalCacheExistAndWritable();
 
+    /**
+     * Starts a session with given package.
+     *
+     * @param pkg e.g. golang.org/x/tools
+     */
     void startSession(VcsGolangPackage pkg);
 
+    /**
+     * Terminates current session (in the same thread).
+     */
     void endSession();
 
+    /**
+     * Notifies that the repository in current session has been updated.
+     */
     void repoUpdated();
 
     /**
-     * Get the go repository in global cache corresponding to {@code pkg}
+     * Check if the repository in current session has been updated recently.
+     *
+     * @return {@code true} if the package is up-to-date, {@code false} otherwise.
+     * @see GolangPluginSetting#getGlobalCacheSecond()
+     */
+    boolean currentRepositoryIsUpToDate();
+
+    /**
+     * Get the go repository in global cache in current session
      *
      * @return the location of that repository in global cache
      */
@@ -74,11 +90,5 @@ public interface GlobalCacheManager {
      */
     Optional<GlobalCacheMetadata> getMetadata(Path packagePath);
 
-    /**
-     * Check if the repository corresponding to a dependency package has been updated recently in global cache.
-     *
-     * @return {@code true} if the package is up-to-date, {@code false} otherwise.
-     * @see GolangPluginSetting#getGlobalCacheSecond()
-     */
-    boolean currentRepositoryIsUpToDate();
+
 }

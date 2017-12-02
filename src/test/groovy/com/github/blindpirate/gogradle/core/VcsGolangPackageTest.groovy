@@ -21,6 +21,8 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
+import static com.github.blindpirate.gogradle.core.GolangRepository.*
+
 class VcsGolangPackageTest {
     VcsGolangPackage vcsGolangPackage = MockUtils.mockVcsPackage()
 
@@ -78,27 +80,27 @@ class VcsGolangPackageTest {
         assert vcsGolangPackage != VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user/package')
-                .withOriginalVcsInfo(VcsType.MERCURIAL, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newOriginalRepository(VcsType.MERCURIAL, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
         assert vcsGolangPackage != VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user/package')
-                .withOriginalVcsInfo(VcsType.GIT, [])
+                .withRepository(newOriginalRepository(VcsType.GIT, []))
                 .build()
         assert vcsGolangPackage != VcsGolangPackage.builder()
                 .withPath('github.com/user/package/b')
                 .withRootPath('github.com/user/package')
-                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newOriginalRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
         assert vcsGolangPackage != VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user')
-                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newOriginalRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
         assert vcsGolangPackage == VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user/package')
-                .withSubstitutedVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newSubstitutedRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
     }
 

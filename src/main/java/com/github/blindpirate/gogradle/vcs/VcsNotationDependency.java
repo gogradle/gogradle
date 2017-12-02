@@ -77,7 +77,7 @@ public abstract class VcsNotationDependency extends AbstractNotationDependency {
 
     @Override
     public CacheScope getCacheScope() {
-        if (StringUtils.isNotBlank(commit) && !LATEST_COMMIT.equals(commit)) {
+        if (StringUtils.isNotBlank(getCommit()) && !LATEST_COMMIT.equals(getCommit())) {
             return CacheScope.PERSISTENCE;
         } else {
             return CacheScope.BUILD;
@@ -85,7 +85,7 @@ public abstract class VcsNotationDependency extends AbstractNotationDependency {
     }
 
     public boolean isLatest() {
-        return LATEST_COMMIT.equals(commit);
+        return LATEST_COMMIT.equals(getCommit());
     }
 
     @Override

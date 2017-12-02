@@ -43,7 +43,7 @@ public class DefaultNotationConverter implements NotationConverter {
         String packagePath = extractPackagePath(notation);
         GolangPackage packageInfo = packagePathResolver.produce(packagePath).get();
         if (packageInfo instanceof VcsGolangPackage) {
-            VcsType vcsType = VcsGolangPackage.class.cast(packageInfo).getVcs();
+            VcsType vcsType = VcsGolangPackage.class.cast(packageInfo).getVcsType();
             return vcsType.getNotationConverter().convert(notation);
         } else {
             return MapUtils.asMap(MapNotationParser.NAME_KEY, notation);

@@ -24,7 +24,6 @@ import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.DataExchange;
 import com.github.blindpirate.gogradle.util.HttpUtils;
-import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;

@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.core;
 
+import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import java.nio.file.Path;
@@ -61,7 +62,7 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
         return repository;
     }
 
-    public VcsType getVcs() {
+    public VcsType getVcsType() {
         return repository.getVcsType();
     }
 
@@ -106,6 +107,7 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
 
         public VcsGolangPackage build() {
             VcsGolangPackage ret = new VcsGolangPackage(rootPath, path);
+            Assert.isNotNull(repository);
             ret.repository = repository;
             return ret;
         }
@@ -116,7 +118,8 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
         return "VcsGolangPackage{"
                 + "path='" + getPathString() + '\''
                 + ", rootPath='" + getRootPathString() + '\''
-                + ", repo=" + repository
+                + ", vcsType=" + getVcsType()
+                + ", urls='" + getUrls() + '\''
                 + '}';
     }
 
@@ -134,40 +137,5 @@ public class VcsGolangPackage extends ResolvableGolangPackage {
         return Objects.hash(super.hashCode(), repository);
     }
 
-//    public static class VcsInfo implements Serializable {
-//        private VcsType vcsType = VcsType.GIT;
-//        private List<String> urls;
-//
-//        private VcsInfo(VcsType vcsType, List<String> urls) {
-//            this.vcsType = vcsType;
-//            this.urls = urls;
-//        }
-//
-//        public VcsType getVcsType() {
-//            return vcsType;
-//        }
-//
-//        public List<String> getUrls() {
-//            return urls;
-//        }
-//
-//        @Override
-//        public boolean equals(Object o) {
-//            if (this == o) {
-//                return true;
-//            }
-//            if (o == null || getClass() != o.getClass()) {
-//                return false;
-//            }
-//            VcsInfo vcsInfo = (VcsInfo) o;
-//            return vcsType == vcsInfo.vcsType
-//                    && Objects.equals(urls, vcsInfo.urls);
-//        }
-//
-//        @Override
-//        public int hashCode() {
-//            return Objects.hash(vcsType, urls);
-//        }
-//    }
 }
 

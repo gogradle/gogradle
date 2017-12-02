@@ -27,8 +27,8 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Optional;
 
+import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static java.util.Collections.singletonList;
 
 @Singleton
 public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
@@ -38,7 +38,7 @@ public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
     protected Optional<GolangPackage> doProduce(String packagePath) {
         Path path = Paths.get(packagePath);
         Path rootPath = path.subpath(0, 4);
-        GolangRepository repository = GolangRepository.newOriginalRepository(VcsType.GIT, HTTPS + toUnixString(rootPath));
+        GolangRepository repository = newOriginalRepository(VcsType.GIT, HTTPS + toUnixString(rootPath));
         GolangPackage pkg = VcsGolangPackage.builder()
                 .withPath(path)
                 .withRootPath(rootPath)
