@@ -26,6 +26,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION;
 import static com.github.blindpirate.gogradle.core.cache.Cache.DEFAULT_LRU_CAPACITY;
 
 @Singleton
@@ -39,7 +40,8 @@ public class VendorSnapshoter {
     @Inject
     public VendorSnapshoter(Project project) {
         this.project = project;
-        this.persistenceFile = new File(project.getProjectDir(), ".gogradle/cache/VendorSnapshot.bin");
+        this.persistenceFile = new File(project.getProjectDir(),
+                ".gogradle/cache/VendorSnapshot-" + GOGRADLE_COMPATIBLE_VERSION + ".bin");
     }
 
     public void loadPersistenceCache() {
