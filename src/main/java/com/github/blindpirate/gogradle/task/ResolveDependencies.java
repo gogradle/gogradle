@@ -17,7 +17,6 @@
 
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
 import com.github.blindpirate.gogradle.core.GolangConfiguration;
@@ -50,6 +49,9 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION;
+import static com.github.blindpirate.gogradle.GogradleGlobal.INSTANCE;
+import static com.github.blindpirate.gogradle.GogradleGlobal.isRefreshDependencies;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 
@@ -85,7 +87,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 1: dependencies declared in build.gradle
     @Input
     public HashSet<GolangDependency> getDependencies() {
-        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
+        INSTANCE.setCurrentProject(getProject());
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
         configuration.resolveFirstLevelDependencies();
         // elements in GolangDependency are identified by name, here we want to identify them by equals
@@ -120,8 +122,8 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 6: --refresh-dependencies
     @Input
     public String getRefreshDependenciesFlag() {
-        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
-        if (GogradleGlobal.isRefreshDependencies()) {
+        INSTANCE.setCurrentProject(getProject());
+        if (isRefreshDependencies()) {
             return UUID.randomUUID().toString();
         } else {
             return "";
@@ -131,7 +133,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 7: local dependencies
     @InputFiles
     public List<File> getLocalDirDependencies() {
-        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
+        INSTANCE.setCurrentProject(getProject());
         return configurationManager.getByName(getConfigurationName())
                 .getDependencies().stream()
                 .filter(dependency -> dependency instanceof LocalDirectoryDependency)
@@ -142,7 +144,8 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     @OutputFile
     public File getSerializationFile() {
-        return new File(getProject().getProjectDir(), ".gogradle/cache/" + getConfigurationName() + ".bin");
+        return new File(getProject().getProjectDir(),
+                ".gogradle/cache/" + getConfigurationName()+"-"+ GOGRADLE_COMPATIBLE_VERSION + ".bin");
     }
 
     @TaskAction
