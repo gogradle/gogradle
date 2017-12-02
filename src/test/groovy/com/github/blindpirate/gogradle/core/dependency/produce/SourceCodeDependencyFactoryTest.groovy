@@ -37,6 +37,7 @@ import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
+import static com.github.blindpirate.gogradle.core.GolangRepository.*
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 
@@ -75,7 +76,7 @@ class SourceCodeDependencyFactoryTest {
                     GolangPackage ret = VcsGolangPackage.builder()
                             .withPath(path)
                             .withRootPath(rootPath)
-                            .withOriginalVcsInfo(VcsType.GIT, ["https://${rootPath}.git"])
+                            .withRepository(newOriginalRepository(VcsType.GIT, ["https://${rootPath}.git"]))
                             .build()
                     return Optional.of(ret)
                 } else {

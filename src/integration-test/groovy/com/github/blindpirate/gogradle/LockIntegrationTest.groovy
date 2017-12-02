@@ -112,7 +112,7 @@ dependencies {
 
     @Test
     void 'command line parameter --refresh-dependencies should succeed'() {
-        IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
+        IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}\n')
 
         build('vendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
@@ -122,6 +122,7 @@ dependencies {
         build('vendor')
         assert stdout.toString().contains('UP-TO-DATE')
 
+        IOUtils.append(new File(resource, 'build.gradle'), 'golang { globalCacheFor(0, MINUTE) }')
         build(['--refresh-dependencies'], 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/commit2.go').exists()
     }

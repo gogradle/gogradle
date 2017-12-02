@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.DependencyUtils
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Test
@@ -226,15 +227,15 @@ class GolangDependencySetTest {
 
     private void verifyResult(GolangDependencySet result) {
         def gitDependency = result.find { it instanceof GitNotationDependency }
-        assert gitDependency.name == 'gitDependency'
+        assert gitDependency.name == 'github.com/user/package'
         assert gitDependency.commit == 'commit'
-        assert gitDependency.urls == ['url']
+        assert gitDependency.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
         assert gitDependency.firstLevel
 
         def vendorDependency = result.find { it instanceof VendorNotationDependency }
         assert vendorDependency.name == 'vendorDependency'
         assert vendorDependency.hostNotationDependency.commit == 'commit'
-        assert vendorDependency.hostNotationDependency.urls == ['url']
+        assert vendorDependency.hostNotationDependency.urls ==  ['git@github.com:user/package.git', 'https://github.com/user/package.git']
         assert vendorDependency.hostNotationDependency.firstLevel
         assert vendorDependency.vendorPath == 'vendor/path'
 
@@ -261,9 +262,9 @@ class GolangDependencySetTest {
 
     GitNotationDependency newGitDependency() {
         GitNotationDependency ret = new GitNotationDependency()
-        ret.name = 'gitDependency'
+        ret.name = 'github.com/user/package'
         ret.commit = 'commit'
-        ret.url = 'url'
+        ret.package = MockUtils.mockRootVcsPackage()
         ret.firstLevel = true
         return ret
     }

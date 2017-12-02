@@ -32,6 +32,7 @@ import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationP
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.SUBPACKAGES_KEY;
 import static com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser.VCS_KEY;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URLS_KEY;
+import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URL_KEY;
 
 public class VcsResolvedDependency extends AbstractResolvedDependency {
     private static final int COMMIT_PREFIX_LENGTH = 7;
@@ -44,7 +45,7 @@ public class VcsResolvedDependency extends AbstractResolvedDependency {
     }
 
     public VcsType getVcsType() {
-        return getPackage().getVcs();
+        return getPackage().getVcsType();
     }
 
     @Override
@@ -57,8 +58,12 @@ public class VcsResolvedDependency extends AbstractResolvedDependency {
         Map<String, Object> ret = MapUtils.asMap(
                 NAME_KEY, getName(),
                 VCS_KEY, getVcsType().getName(),
-                URLS_KEY, getPackage().getUrls(),
                 VcsNotationDependency.COMMIT_KEY, getVersion());
+        if (getUrls().size() == 1) {
+            ret.put(URL_KEY, getUrls().get(0));
+        } else {
+            ret.put(URLS_KEY, getUrls());
+        }
         if (!containsAllSubpackages()) {
             ret.put(SUBPACKAGES_KEY, new ArrayList<>(getSubpackages()));
         }
@@ -86,6 +91,7 @@ public class VcsResolvedDependency extends AbstractResolvedDependency {
         }
         VcsResolvedDependency that = (VcsResolvedDependency) o;
         return Objects.equals(getName(), that.getName())
+                && Objects.equals(getVcsType(), that.getVcsType())
                 && Objects.equals(getVersion(), that.getVersion())
                 && Objects.equals(getUrls(), that.getUrls());
     }
@@ -96,7 +102,7 @@ public class VcsResolvedDependency extends AbstractResolvedDependency {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getName(), getVersion(), getUrls());
+        return Objects.hash(getName(), getVcsType(), getVersion(), getUrls());
     }
 
     @Override

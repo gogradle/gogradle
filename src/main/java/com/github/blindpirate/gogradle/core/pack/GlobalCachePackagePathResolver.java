@@ -23,16 +23,14 @@ import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheManager;
 import com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
-import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.List;
 import java.util.Optional;
 
-import static com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata.*;
+import static com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata.GolangRepositoryMetadata;
 
 @Singleton
 public class GlobalCachePackagePathResolver implements PackagePathResolver {

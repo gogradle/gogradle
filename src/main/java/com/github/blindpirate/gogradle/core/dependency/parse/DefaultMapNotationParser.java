@@ -35,15 +35,13 @@ import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URLS_KEY;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URL_KEY;
-import static java.util.Collections.*;
+import static java.util.Collections.singletonList;
 
 /**
  * Converts a map notation to a {@link NotationDependency}
@@ -125,7 +123,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
 
     private NotationDependency parseVcsPackage(Map<String, Object> notation, VcsGolangPackage pkg) {
         verifyVcs(notation, pkg);
-        return pkg.getVcs().getService(MapNotationParser.class).parse(notation);
+        return pkg.getVcsType().getService(MapNotationParser.class).parse(notation);
     }
 
     private VcsType determineVcs(Map<String, Object> notation) {
@@ -141,7 +139,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
     private void verifyVcs(Map<String, Object> notation, VcsGolangPackage pkg) {
         String declaredVcs = getString(notation, VCS_KEY);
         if (StringUtils.isNotBlank(declaredVcs)) {
-            String actualVcs = pkg.getVcs().getName();
+            String actualVcs = pkg.getVcsType().getName();
             Assert.isTrue(declaredVcs.equals(actualVcs),
                     "Vcs type not match: declared is " + declaredVcs + " but actual is " + actualVcs);
         }

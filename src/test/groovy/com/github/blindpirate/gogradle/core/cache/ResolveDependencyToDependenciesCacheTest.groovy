@@ -19,6 +19,8 @@ package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.GolangRepository
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
@@ -89,11 +91,7 @@ class ResolveDependencyToDependenciesCacheTest {
 
         when(resolver.produce('this/is/local1')).thenReturn(of(LocalDirectoryGolangPackage.of('this/is/local1', 'this/is/local1', toUnixString(resource))))
         when(resolver.produce('this/is/local2')).thenReturn(of(LocalDirectoryGolangPackage.of('this/is/local2', 'this/is/local2', toUnixString(resource))))
-        when(resolver.produce('this/is/vcs')).thenReturn(of(VcsGolangPackage.builder()
-                .withPath('this/is/vcs')
-                .withRootPath('this/is/vcs')
-                .withOriginalVcsInfo(VcsType.GIT, ['url'])
-                .build()))
+        when(resolver.produce('this/is/vcs')).thenReturn(of(vcsPackage('this/is/vcs',['url'])))
         when(resolver.produce('this/is/vendor')).thenReturn(of(UnrecognizedGolangPackage.of('this/is/vendor')))
 
 
@@ -108,11 +106,7 @@ class ResolveDependencyToDependenciesCacheTest {
 
     @Test
     void 'cache should be discarded if vcs url changed'() {
-        when(resolver.produce('this/is/vcs')).thenReturn(of(VcsGolangPackage.builder()
-                .withPath('this/is/vcs')
-                .withRootPath('this/is/vcs')
-                .withOriginalVcsInfo(VcsType.GIT, ['anotherurl'])
-                .build()))
+        when(resolver.produce('this/is/vcs')).thenReturn(of(vcsPackage('this/is/vcs', ['anotherurl'])))
 
         cache.load()
         assert ReflectionUtils.getField(cache, 'container').isEmpty()
@@ -120,11 +114,7 @@ class ResolveDependencyToDependenciesCacheTest {
 
     @Test
     void 'cache should be discarded if vcs path changed'() {
-        when(resolver.produce('this/is/vcs')).thenReturn(of(VcsGolangPackage.builder()
-                .withPath('this/is/vcs')
-                .withRootPath('this/is')
-                .withOriginalVcsInfo(VcsType.GIT, ['url'])
-                .build()))
+        when(resolver.produce('this/is/vcs')).thenReturn(of(vcsPackage('this/is', 'this/is/vcs', ['url'])))
 
         cache.load()
         assert ReflectionUtils.getField(cache, 'container').isEmpty()
@@ -132,11 +122,7 @@ class ResolveDependencyToDependenciesCacheTest {
 
     @Test
     void 'cache should be discarded if unrecognized path changed'() {
-        when(resolver.produce('this/is/vendor')).thenReturn(of(VcsGolangPackage.builder()
-                .withPath('this/is/vendor')
-                .withRootPath('this/is/vendor')
-                .withOriginalVcsInfo(VcsType.GIT, ['url'])
-                .build()))
+        when(resolver.produce('this/is/vendor')).thenReturn(of(vcsPackage('this/is/vendor', ['url'])))
 
         cache.load()
         assert ReflectionUtils.getField(cache, 'container').isEmpty()
@@ -165,14 +151,25 @@ class ResolveDependencyToDependenciesCacheTest {
     GitNotationDependency vcsDependency(String name) {
         GitNotationDependency ret = new GitNotationDependency()
         ret.name = name
-        ret.url = 'url'
         ret.commit = 'commit'
         ret.package = VcsGolangPackage.builder()
                 .withPath(name)
                 .withRootPath(name)
-                .withOriginalVcsInfo(VcsType.GIT, ['url'])
+                .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, ['url']))
                 .build()
         return ret
+    }
+
+    GolangPackage vcsPackage(String name, List urls) {
+        vcsPackage(name, name, urls)
+    }
+
+    GolangPackage vcsPackage(String root, String name, List urls) {
+        return VcsGolangPackage.builder()
+                .withPath(name)
+                .withRootPath(root)
+                .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, urls))
+                .build()
     }
 
 

@@ -21,19 +21,22 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
-import com.github.blindpirate.gogradle.vcs.VcsType
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository
+import static com.github.blindpirate.gogradle.core.GolangRepository.newSubstitutedRepository
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
+import static com.github.blindpirate.gogradle.vcs.VcsType.GIT
+import static com.github.blindpirate.gogradle.vcs.VcsType.MERCURIAL
 
 @RunWith(GogradleRunner)
 class GitMercurialMapNotationParserTest {
     VcsGolangPackage pkg = VcsGolangPackage.builder()
             .withPath('github.com/a/b')
             .withRootPath('github.com/a/b')
-            .withOriginalVcsInfo(VcsType.GIT, ['url'])
+            .withRepository(newOriginalRepository(GIT, ['url']))
             .build()
 
     GitMercurialMapNotationParser parser = new GitMercurialMapNotationParser()
@@ -66,7 +69,7 @@ class GitMercurialMapNotationParserTest {
         pkg = VcsGolangPackage.builder()
                 .withRootPath('bitbucket.org/a/b')
                 .withPath('bitbucket.org/a/b')
-                .withOriginalVcsInfo(VcsType.MERCURIAL, ['url'])
+                .withRepository(newOriginalRepository(MERCURIAL, ['url']))
                 .build()
         VcsNotationDependency dependency = parser.parse([name: 'bitbucket.org/a/b', version: 'v1.0.0', vcs: 'hg', package: pkg])
         // then
@@ -78,28 +81,17 @@ class GitMercurialMapNotationParserTest {
     }
 
     @Test
-    void 'url in map notation should not be overwritten'() {
-        // when
-        VcsNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: pkg])
-        // then
-        assert dependency.name == 'github.com/a/b'
-        assertEmpty(dependency, 'tag',)
-        assert dependency.urls == ['specifiedUrl']
-        assert dependency.commit == VcsNotationDependency.LATEST_COMMIT
-    }
-
-    @Test
     void 'url in map notation should be removed when urls have already been substituted'() {
         // when
         pkg = VcsGolangPackage.builder()
                 .withRootPath('github.com/a/b')
                 .withPath('github.com/a/b')
-                .withSubstitutedVcsInfo(VcsType.GIT, ['url'])
+                .withRepository(newSubstitutedRepository(GIT, ['url']))
                 .build()
         VcsNotationDependency dependency = parser.parse([name: 'github.com/a/b', url: 'specifiedUrl', package: pkg])
         // then
         assert dependency.name == 'github.com/a/b'
-        assertEmpty(dependency, 'tag', 'url')
+        assertEmpty(dependency, 'tag')
         assert dependency.urls == ['url']
         assert dependency.commit == VcsNotationDependency.LATEST_COMMIT
     }
@@ -127,12 +119,12 @@ class GitMercurialMapNotationParserTest {
     }
 
     @Test
-    void 'map notation without version should be filled with NEWEST_VERSION'() {
+    void 'map notation without version should be filled with LATEST_COMMIT'() {
         // when
         VcsNotationDependency dependency = parser.parse([name: 'github.com/a/b', package: pkg])
 
         // then
-        assertEmpty(dependency, 'tag', 'url')
+        assertEmpty(dependency, 'tag')
         assert dependency.commit == VcsNotationDependency.LATEST_COMMIT
         assert dependency.version == VcsNotationDependency.LATEST_COMMIT
     }

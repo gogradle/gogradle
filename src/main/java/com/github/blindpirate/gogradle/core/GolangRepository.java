@@ -1,16 +1,17 @@
 package com.github.blindpirate.gogradle.core;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.blindpirate.gogradle.core.pack.MetadataPackagePathResolver;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
 
-import java.util.ArrayList;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
 
-public class GolangRepository {
+public class GolangRepository implements Serializable {
     /**
      * The repository urls.
      */
@@ -33,6 +34,7 @@ public class GolangRepository {
         return vcs.getName();
     }
 
+    @JsonIgnore
     public VcsType getVcsType() {
         return vcs;
     }
@@ -69,28 +71,27 @@ public class GolangRepository {
         return new GolangRepositoryBuilder();
     }
 
-    private static List<String> toSorted(List<String> urls) {
-        List<String> sorted = new ArrayList<>(urls);
-        Collections.sort(sorted);
-        return sorted;
-    }
-
     public boolean match(GolangRepository anotherRepo) {
         return CollectionUtils.containsAny(getUrls(), anotherRepo.getUrls());
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         GolangRepository that = (GolangRepository) o;
-        return Objects.equals(toSorted(urls), toSorted(that.urls)) &&
-                vcs == that.vcs;
+
+        return !CollectionUtils.intersection(this.urls, that.urls).isEmpty()
+                && vcs == that.vcs;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(toSorted(urls), vcs);
+        return Objects.hash(vcs);
     }
 
     public static final class GolangRepositoryBuilder {

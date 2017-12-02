@@ -66,7 +66,7 @@ class LocalDirectoryGolangPackageTest {
         assert pkg != VcsGolangPackage.builder()
                 .withRootPath('this/is/root')
                 .withPath("this/is/root/sub")
-                .withOriginalVcsInfo(VcsType.GIT, ['url'])
+                .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, ['url']))
                 .build()
         assert pkg == of('this/is/root', 'this/is/root/sub', '')
         assert pkg != of('this/is/root', 'this/is/root', '')

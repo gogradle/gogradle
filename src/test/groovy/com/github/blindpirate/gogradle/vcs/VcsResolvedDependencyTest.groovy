@@ -19,6 +19,9 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.GolangRepository
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -47,10 +50,20 @@ class VcsResolvedDependencyTest {
     }
 
     VcsResolvedDependency newResolvedDependency(VcsType type) {
-        return VcsResolvedDependency.builder(type)
+        return newResolvedDependency(type, ['url'])
+    }
+
+    VcsResolvedDependency newResolvedDependency(VcsType type, List<String> urls) {
+        GolangRepository repository = GolangRepository.newOriginalRepository(type, urls)
+        VcsGolangPackage pkg = VcsGolangPackage.builder()
+                .withRepository(repository)
+                .withRootPath('github.com/a/b')
+                .withPath('github.com/a/b')
+                .build()
+        when(notationDependency.getPackage()).thenReturn(pkg)
+        return VcsResolvedDependency.builder()
                 .withCommitId('commitId')
                 .withCommitTime(42L)
-                .withUrl('url')
                 .withNotationDependency(notationDependency)
                 .build()
     }
@@ -67,6 +80,14 @@ class VcsResolvedDependencyTest {
         VcsResolvedDependency dependency = newResolvedDependency(VcsType.GIT)
         // then
         assert dependency.toLockedNotation() == [name: 'package', commit: 'commitId', vcs: 'git', url: 'url']
+    }
+
+    @Test
+    void 'a resolved dependency with urls should be converted to notation successfully'() {
+        // given
+        VcsResolvedDependency dependency = newResolvedDependency(VcsType.GIT, ['url1', 'url2'])
+        // then
+        assert dependency.toLockedNotation() == [name: 'package', commit: 'commitId', vcs: 'git', urls: ['url1', 'url2']]
     }
 
     @Test

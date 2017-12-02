@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency.parse
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangRepository
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.StandardGolangPackage
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
@@ -42,6 +43,7 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
+import static com.github.blindpirate.gogradle.core.GolangRepository.newSubstitutedRepository
 import static java.util.Optional.of
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
@@ -81,13 +83,13 @@ class DefaultMapNotationParserTest {
                     return of(VcsGolangPackage.builder()
                             .withPath(path)
                             .withRootPath('original')
-                            .withOriginalVcsInfo(VcsType.GIT, ['originalUrl'])
+                            .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, ['originalUrl']))
                             .build())
                 } else if (path.startsWith('substituted')) {
                     return of(VcsGolangPackage.builder()
                             .withPath(path)
                             .withRootPath('substituted')
-                            .withSubstitutedVcsInfo(VcsType.GIT, ['substitutedUrl'])
+                            .withRepository(newSubstitutedRepository(VcsType.GIT, ['substitutedUrl']))
                             .build())
                 } else if (path.startsWith('local')) {
                     return of(LocalDirectoryGolangPackage.of('local', path, 'dir'))
@@ -154,11 +156,11 @@ class DefaultMapNotationParserTest {
         assert captor.value.name == 'unrecognized'
         assert captor.value.url == 'url'
         assert captor.value.package instanceof VcsGolangPackage
-        assert captor.value.package.originalVcsInfo == null
         assert captor.value.package.pathString == 'unrecognized'
         assert captor.value.package.rootPathString == 'unrecognized'
-        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.MERCURIAL
-        assert captor.value.package.substitutedVcsInfo.urls == ['url']
+        assert captor.value.package.vcsType == VcsType.MERCURIAL
+        assert captor.value.package.urls == ['url']
+        assert !captor.value.package.repository.original
     }
 
     @Test
@@ -170,11 +172,11 @@ class DefaultMapNotationParserTest {
         assert captor.value.name == 'unrecognized'
         assert captor.value.url == 'url'
         assert captor.value.package instanceof VcsGolangPackage
-        assert captor.value.package.originalVcsInfo == null
         assert captor.value.package.pathString == 'unrecognized'
         assert captor.value.package.rootPathString == 'unrecognized'
-        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.GIT
-        assert captor.value.package.substitutedVcsInfo.urls == ['url']
+        assert captor.value.package.vcsType == VcsType.GIT
+        assert captor.value.package.urls == ['url']
+        assert !captor.value.package.repository.original
     }
 
     @Test
@@ -187,9 +189,9 @@ class DefaultMapNotationParserTest {
         assert captor.value.package instanceof VcsGolangPackage
         assert captor.value.package.pathString == 'original'
         assert captor.value.package.rootPathString == 'original'
-        assert captor.value.package.originalVcsInfo.vcsType == VcsType.GIT
-        assert captor.value.package.originalVcsInfo.urls == ['originalUrl']
-        assert captor.value.package.substitutedVcsInfo == null
+        assert captor.value.package.vcsType == VcsType.GIT
+        assert captor.value.package.urls == ['originalUrl']
+        assert captor.value.package.repository.original
     }
 
     @Test
@@ -202,20 +204,20 @@ class DefaultMapNotationParserTest {
         assert captor.value.package instanceof VcsGolangPackage
         assert captor.value.package.pathString == 'original'
         assert captor.value.package.rootPathString == 'original'
-        assert captor.value.package.originalVcsInfo.vcsType == VcsType.GIT
-        assert captor.value.package.originalVcsInfo.urls == ['originalUrl']
-        assert captor.value.package.substitutedVcsInfo == null
+        assert captor.value.package.vcsType == VcsType.GIT
+        assert captor.value.package.urls == ['originalUrl']
+        assert captor.value.package.repository.original
     }
 
     @Test
-    void 'vcs package with url and vcs should be parsed successfully'() {
+    void 'vcs and url in map should overwrite vcs package'() {
         // given
         reset(packagePathResolver)
         when(packagePathResolver.produce(anyString())).thenReturn(of(
                 VcsGolangPackage.builder()
                         .withRootPath('substituted')
                         .withPath('substituted')
-                        .withSubstitutedVcsInfo(VcsType.MERCURIAL, ['substitutedUrl'])
+                        .withRepository(newSubstitutedRepository(VcsType.GIT, ['substitutedUrl']))
                         .build()
         ))
         // when
@@ -226,9 +228,9 @@ class DefaultMapNotationParserTest {
         assert captor.value.package instanceof VcsGolangPackage
         assert captor.value.package.pathString == 'substituted'
         assert captor.value.package.rootPathString == 'substituted'
-        assert captor.value.package.originalVcsInfo == null
-        assert captor.value.package.substitutedVcsInfo.vcsType == VcsType.MERCURIAL
-        assert captor.value.package.substitutedVcsInfo.urls == ['substitutedUrl']
+        assert captor.value.package.vcsType == VcsType.MERCURIAL
+        assert captor.value.package.urls == ['url']
+        assert !captor.value.package.repository.original
     }
 
     @Test

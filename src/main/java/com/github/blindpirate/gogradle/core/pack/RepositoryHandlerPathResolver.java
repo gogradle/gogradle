@@ -20,13 +20,13 @@ package com.github.blindpirate.gogradle.core.pack;
 import com.github.blindpirate.gogradle.GolangRepositoryHandler;
 import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.GolangRepository;
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 import com.github.blindpirate.gogradle.core.IncompleteGolangPackage;
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -61,7 +61,8 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
 
         for (int i = path.getNameCount() - 1; i > 0; i--) {
             Path subpath = path.subpath(0, i);
-            Optional<GolangRepositoryPattern> repository = repositoryHandler.findMatchedRepository(toUnixString(subpath));
+            Optional<GolangRepositoryPattern> repository =
+                    repositoryHandler.findMatchedRepository(toUnixString(subpath));
             if (repository.isPresent() && !repository.get().isIncomplete()) {
                 return Optional.of(buildPackage(path, subpath, repository.get()));
             }

@@ -19,10 +19,13 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangRepository
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.CacheScope
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext
 import com.github.blindpirate.gogradle.support.WithMockInjector
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.junit.Before
@@ -35,7 +38,7 @@ import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithMockInjector
-class GitMercurialNotationDependencyTest {
+class VcsNotationDependencyTest {
 
     VcsNotationDependency dependency = new GitNotationDependency()
 
@@ -47,9 +50,9 @@ class GitMercurialNotationDependencyTest {
 
     @Before
     void setUp() {
-        dependency.name = 'github.com/a/b'
+        dependency.name = 'github.com/user/package'
         dependency.commit = 'commitId'
-        dependency.url = 'url'
+        dependency.package = MockUtils.mockRootVcsPackage()
     }
 
     @Test
@@ -82,9 +85,17 @@ class GitMercurialNotationDependencyTest {
         assert dependency1 == dependency2
 
         // when
-        dependency1.setUrl('git@github.com:a/b.git')
-        dependency2.setUrl('https://github.com/a/b.git')
+        dependency1.setPackage(withUrl('git@github.com:user/package.git'))
+        dependency2.setPackage(withUrl('https://github.com/user/package.git'))
         assert dependency1 != dependency2
+    }
+
+    VcsGolangPackage withUrl(String url) {
+        return VcsGolangPackage.builder()
+                .withRootPath('github.com/user/package')
+                .withPath('github.com/user/package')
+                .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, url))
+                .build()
     }
 
     @Test
@@ -98,12 +109,12 @@ class GitMercurialNotationDependencyTest {
 
     @Test
     void 'toString should succeed'() {
-        dependency.url = 'https://github.com/a/b.git'
-        assert dependency.toString() == "github.com/a/b: commit='commitId', urls=[https://github.com/a/b.git]"
+        dependency.setPackage(withUrl('https://github.com/user/package.git'))
+        assert dependency.toString() == "github.com/user/package: commit='commitId', urls=[https://github.com/user/package.git]"
         dependency.tag = '1.0.0'
-        assert dependency.toString() == "github.com/a/b: commit='commitId', tag/branch='1.0.0', urls=[https://github.com/a/b.git]"
+        assert dependency.toString() == "github.com/user/package: commit='commitId', tag/branch='1.0.0', urls=[https://github.com/user/package.git]"
         dependency.commit = null
-        assert dependency.toString() == "github.com/a/b: tag/branch='1.0.0', urls=[https://github.com/a/b.git]"
+        assert dependency.toString() == "github.com/user/package: tag/branch='1.0.0', urls=[https://github.com/user/package.git]"
     }
 
     @Test
@@ -113,17 +124,17 @@ class GitMercurialNotationDependencyTest {
         assert dependency != new LocalDirectoryDependency()
 
         VcsNotationDependency dependency2 = new GitNotationDependency()
-        dependency2.name = 'github.com/a/b'
+        dependency2.name = 'github.com/user/package'
         dependency2.commit = 'commitId'
-        dependency2.url = 'url'
+        dependency2.setPackage(MockUtils.mockRootVcsPackage())
         assert dependency == dependency2
         assert dependency.hashCode() == dependency2.hashCode()
 
-        dependency2.url = 'anotherurl'
+        dependency2.setPackage(withUrl('anotherurl'))
         assert dependency != dependency2
         assert dependency.hashCode() != dependency2.hashCode()
 
-        dependency2.url = 'url'
+        dependency2.setPackage(withUrl('url'))
         dependency2.name = 'github.com/a/c'
         assert dependency != dependency2
         assert dependency.hashCode() != dependency2.hashCode()
@@ -139,6 +150,7 @@ class GitMercurialNotationDependencyTest {
         VcsNotationDependency ret = new GitNotationDependency()
         ret.setName(name)
         ret.setCommit(commit)
+        ret.setPackage(MockUtils.mockRootVcsPackage())
         return ret
     }
 }

@@ -20,8 +20,10 @@ package com.github.blindpirate.gogradle.util;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import static java.util.Arrays.asList;
@@ -71,5 +73,11 @@ public class CollectionUtils {
 
     public static boolean containsAny(final Collection<?> coll1, final Collection<?> coll2) {
         return org.apache.commons.collections4.CollectionUtils.containsAny(coll1, coll2);
+    }
+
+    public static <T> Set<T> intersection(final Collection<T> c1, final Collection<T> c2) {
+        Set<T> set = new HashSet<>(c1);
+        set.retainAll(c2);
+        return set;
     }
 }

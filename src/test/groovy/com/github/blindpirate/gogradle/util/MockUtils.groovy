@@ -33,6 +33,8 @@ import org.mockito.stubbing.Answer
 import java.nio.file.Paths
 import java.util.function.Function
 
+import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository
+import static com.github.blindpirate.gogradle.core.GolangRepository.newSubstitutedRepository
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
@@ -74,22 +76,22 @@ class MockUtils {
         return VcsGolangPackage.builder()
                 .withPath('github.com/user/package/a')
                 .withRootPath('github.com/user/package')
-                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newOriginalRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
     }
 
     static boolean isMockVcsPackage(VcsGolangPackage pkg) {
         return pkg.path == Paths.get('github.com/user/package/a') &&
                 pkg.rootPath == Paths.get('github.com/user/package') &&
-                pkg.originalVcsInfo.vcsType == VcsType.GIT &&
-                pkg.originalVcsInfo.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
+                pkg.vcsType == VcsType.GIT &&
+                pkg.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
     }
 
     static VcsGolangPackage mockRootVcsPackage() {
         return VcsGolangPackage.builder()
                 .withPath('github.com/user/package')
                 .withRootPath('github.com/user/package')
-                .withOriginalVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newOriginalRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
     }
 
@@ -97,7 +99,7 @@ class MockUtils {
         return VcsGolangPackage.builder()
                 .withPath('github.com/user/package')
                 .withRootPath('github.com/user/package')
-                .withSubstitutedVcsInfo(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git'])
+                .withRepository(newSubstitutedRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
                 .build()
     }
 

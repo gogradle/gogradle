@@ -24,10 +24,10 @@ import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
 import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static java.util.Arrays.asList;
 
 // github.com/user/project -> git@github.com:user/project.git
 // github.com/user/project -> https://github.com/user/project.git
@@ -49,10 +49,11 @@ public class GithubGitlabPackagePathResolver extends AbstractPackagePathResolver
 
     protected Optional<GolangPackage> doProduce(String packagePath) {
         Path path = Paths.get(packagePath);
-        String sshUrl = String.format("git@%s.git", toUnixString(path.subpath(0, 3)).replaceFirst("/", ":"));
+        String sshUrl = String.format("git@%s.git", toUnixString(path.subpath(0, 3))
+                .replaceFirst("/", ":"));
         String httpsUrl = String.format("https://%s.git", toUnixString(path.subpath(0, 3)));
 
-        GolangRepository repository = GolangRepository.newOriginalRepository(VcsType.GIT, Arrays.asList(httpsUrl, sshUrl));
+        GolangRepository repository = GolangRepository.newOriginalRepository(VcsType.GIT, asList(httpsUrl, sshUrl));
 
         GolangPackage info = VcsGolangPackage.builder()
                 .withPath(path)

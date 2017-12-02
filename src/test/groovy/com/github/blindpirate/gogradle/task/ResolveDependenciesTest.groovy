@@ -27,10 +27,10 @@ import com.github.blindpirate.gogradle.support.MockRefreshDependencies
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
-import com.github.blindpirate.gogradle.vcs.VcsType
+import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
-import com.github.blindpirate.gogradle.vcs.git.GitResolvedDependency
 import org.gradle.api.internal.tasks.TaskExecutionOutcome
 import org.gradle.api.internal.tasks.TaskStateInternal
 import org.gradle.api.tasks.TaskState
@@ -125,12 +125,11 @@ class ResolveDependenciesTest extends TaskTest {
         NotationDependency d3 = new GitNotationDependency()
         d3.name = 'd3'
         d3.commit = 'commit'
-        d3.url = 'url'
         d3.transitive = false
+        d3.package = MockUtils.mockRootVcsPackage()
 
-        ResolvedDependency d3Resolved = GitResolvedDependency.builder(VcsType.GIT)
+        ResolvedDependency d3Resolved = VcsResolvedDependency.builder()
                 .withCommitId('commit')
-                .withUrl('url')
                 .withNotationDependency(d3)
                 .build()
         ReflectionUtils.setField(d3, 'resolvedDependency', d3Resolved)
@@ -174,12 +173,12 @@ class ResolveDependenciesTest extends TaskTest {
         GitNotationDependency d3NotationDependency = tree.children[0].originalDependency.dependencies.first()
         assert d3NotationDependency.name == 'd3'
         assert d3NotationDependency.commit == 'commit'
-        assert d3NotationDependency.urls == ['url']
+        assert d3NotationDependency.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
         assert d3NotationDependency.transitiveDepExclusions == [NO_TRANSITIVE_DEP_PREDICATE] as Set
-        GitResolvedDependency d3ResolvedDependency = ReflectionUtils.getField(d3NotationDependency, 'resolvedDependency')
+        VcsResolvedDependency d3ResolvedDependency = ReflectionUtils.getField(d3NotationDependency, 'resolvedDependency')
         assert d3ResolvedDependency.name == 'd3'
         assert d3ResolvedDependency.version == 'commit'
-        assert d3ResolvedDependency.url == 'url'
+        assert d3ResolvedDependency.urls == ['git@github.com:user/package.git', 'https://github.com/user/package.git']
 
 
         assertTreeNodeIs(tree.children[1], 'd2')
