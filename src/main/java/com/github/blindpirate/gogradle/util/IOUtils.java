@@ -206,6 +206,10 @@ public final class IOUtils {
         }
     }
 
+    public static void append(File baseDir, String file, String str) {
+        append(new File(baseDir, file), str);
+    }
+
     public static void append(File file, String str) {
         try {
             FileUtils.write(file, str, GogradleGlobal.DEFAULT_CHARSET, true);

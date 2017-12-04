@@ -15,13 +15,11 @@
  *
  */
 
-package com.github.blindpirate.gogradle.task
+package com.github.blindpirate.gogradle.task.go
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.task.go.GoTest
-import com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor
-import com.github.blindpirate.gogradle.task.go.PackageTestResult
+import com.github.blindpirate.gogradle.task.TaskTest
 import com.github.blindpirate.gogradle.util.ExceptionHandler
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -41,7 +39,6 @@ import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
 import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult
-import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
@@ -77,12 +74,14 @@ class GoTestTaskTest extends TaskTest {
         IOUtils.write(resource, 'b/b1.go', '')
         IOUtils.write(resource, 'b/b2.go', '')
 
-        IOUtils.mkdir(resource, 'c/testdata/c_test.go')
+        IOUtils.write(resource, 'c/testdata/c_test.go', '')
         IOUtils.write(resource, 'c/c.go', '')
         IOUtils.write(resource, 'c/c.nongo', '')
 
         IOUtils.mkdir(resource, 'd')
         IOUtils.mkdir(resource, 'vendor')
+        IOUtils.write(resource, 'vendor/vendor.go', '')
+        IOUtils.write(resource, 'vendor/vendor_test.go', '')
     }
 
     @Test
@@ -98,10 +97,10 @@ class GoTestTaskTest extends TaskTest {
         verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
-                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa".toString()])
+                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa.out".toString()])
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/b',
-                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb".toString()])
+                 "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fb.out".toString()])
     }
 
     @Test
@@ -200,5 +199,37 @@ class GoTestTaskTest extends TaskTest {
         // then
         files[0..2].each { assert new File(resource, it).text.contains('<script>') }
         assert new File(resource, 'sub/sub/index.nohtml').text == html
+    }
+
+    @Test
+    void 'getting report directory should succeed'() {
+        task.reportDir == new File(resource, '.gogradle/reports/test')
+    }
+
+    @Test
+    void 'getting test name pattern should succeed'() {
+        task.setTestNamePattern(['pattern'])
+        assert task.testNamePattern == ['pattern']
+    }
+
+    @Test
+    void 'getting all test go files should succeed'() {
+        assert task.getAllGoFiles()*.name as Set == ['a1_test.go', 'a2_test.go', 'a1.go', 'a2.go', 'b1_test.go', 'b2_test.go', 'b1.go', 'b2.go', 'c_test.go', 'c.go', 'vendor.go', 'vendor_test.go'] as Set
+    }
+
+    @Test
+    void 'getting go version should succeed'() {
+        // when
+        task.getGoVersion()
+        // then
+        verify(goBinaryManager).getGoVersion()
+    }
+
+    @Test
+    void 'getting build tags should succeed'() {
+        // when
+        task.getBuildTags()
+        // then
+        verify(setting).getBuildTags()
     }
 }

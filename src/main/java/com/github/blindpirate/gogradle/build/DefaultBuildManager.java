@@ -208,6 +208,7 @@ public class DefaultBuildManager implements BuildManager {
     private List<String> renderArgs(List<String> args, Map<String, String> env) {
         Map<String, Object> context = new HashMap<>(env);
         context.put("PROJECT_NAME", project.getName());
+        context.put("PROJECT_VERSION", project.getVersion());
         return args.stream().map(s -> render(s, context)).collect(Collectors.toList());
     }
 

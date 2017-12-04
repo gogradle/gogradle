@@ -30,6 +30,7 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.util.StringUtils.endsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
 import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 
 public class DependencyInstallFileFilter implements FileFilter {
@@ -73,7 +74,7 @@ public class DependencyInstallFileFilter implements FileFilter {
         if (fileNameEqualsAny(dir, TESTDATA_DIRECTORY, VENDOR_DIRECTORY)) {
             return false;
         }
-        if (fileNameStartsWithAny(dir, "_", ".")) {
+        if (fileNameStartsWithDotOrUnderline(dir)) {
             return false;
         }
 

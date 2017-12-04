@@ -53,7 +53,7 @@ public class GoBuild extends Go {
     private static final Pattern TARGET_PLATFORM_PATTERN
             = Pattern.compile("\\w+-\\w+");
 
-    private String outputLocation = "./.gogradle/${GOOS}_${GOARCH}_${PROJECT_NAME}";
+    private String outputLocation = "./.gogradle/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}";
 
     private List<Pair<Os, Arch>> targetPlatforms = singletonList(Pair.of(Os.getHostOs(), Arch.getHostArch()));
 

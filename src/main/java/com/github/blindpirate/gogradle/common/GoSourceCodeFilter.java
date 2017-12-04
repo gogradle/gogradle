@@ -69,7 +69,7 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
 
     @Override
     protected boolean acceptFile(File file) {
-        if (StringUtils.fileNameStartsWithAny(file, "_", ".")) {
+        if (StringUtils.fileNameStartsWithDotOrUnderline(file)) {
             return false;
         }
         return filePredicate.test(file);
@@ -77,7 +77,7 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
 
     @Override
     protected boolean acceptDir(File dir) {
-        if (StringUtils.fileNameStartsWithAny(dir, "_", ".")) {
+        if (StringUtils.fileNameStartsWithDotOrUnderline(dir)) {
             return false;
         }
         if (fileNameEqualsAny(dir, TESTDATA_DIRECTORY, VENDOR_DIRECTORY)) {
