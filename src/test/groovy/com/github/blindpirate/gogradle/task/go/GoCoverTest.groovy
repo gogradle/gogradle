@@ -35,7 +35,7 @@ import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
-@WithResource('go-test-cover.zip')
+@WithResource('go-test-cover')
 class GoCoverTest extends TaskTest {
 
     File resource
@@ -60,7 +60,7 @@ class GoCoverTest extends TaskTest {
                 // -html=github.com%2Fmy%2Fproject%2Fa
                 String profileArg = args[2]
 
-                if (profileArg.endsWith('a')) {
+                if (profileArg.endsWith('a.out')) {
                     File srcHtml = new File(resource, "a.html")
                     File destHtml = new File(project.getProjectDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html')
                     IOUtils.copyFile(srcHtml, destHtml)

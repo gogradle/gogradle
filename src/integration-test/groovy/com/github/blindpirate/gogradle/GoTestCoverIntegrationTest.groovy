@@ -32,7 +32,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
-@WithResource('go-test-cover.zip')
+@WithResource('go-test-cover')
 class GoTestCoverIntegrationTest extends IntegrationTestSupport {
 
     String buildDotGradle
@@ -51,16 +51,41 @@ golang {
 
     @Test
     void 'test and coverage report should be generated successfully'() {
-        newBuild({
-            it.forTasks('check')
-        }, ['--info'])
+        normalTest()
+        assertNormalTestNoUpToDateResult()
+        GoCoverTest.examineCoverageHtmls(resource)
 
+        normalTest()
+        assertNormalTestUpToDateResult()
+
+        IOUtils.append(resource, 'a/a1.go', '\n')
+        normalTest()
+        assertNormalTestNoUpToDateResult()
+
+        IOUtils.forceDelete(new File(resource,'.gogradle/reports/test/index.html'))
+        normalTest()
+        assertNormalTestNoUpToDateResult()
+    }
+
+    def normalTest() {
+        newBuild({
+            it.forTasks('test', 'cover')
+        }, ['--info'])
+    }
+
+    def assertNormalTestNoUpToDateResult() {
         assert stdout.toString().contains('1 completed, 0 failed')
         assert stdout.toString().contains('3 completed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
+        assert !stdout.toString().contains(':test UP-TO-DATE')
         assert stdout.toString().contains('=== RUN   Test_B1_1')
+    }
 
-        GoCoverTest.examineCoverageHtmls(resource)
+    def assertNormalTestUpToDateResult() {
+        assert !stdout.toString().contains('1 completed, 0 failed')
+        assert stdout.toString().contains(':test UP-TO-DATE')
+        assert stdout.toString().contains('BUILD SUCCESSFUL')
+        assert !stdout.toString().contains('=== RUN   Test_B1_1')
     }
 
 //    Caused by: org.gradle.tooling.internal.protocol.exceptions.InternalUnsupportedBuildArgumentException: Problem with provided build arguments: [--stacktrace, --tests a1_test.go].
@@ -73,6 +98,32 @@ golang {
 //    at org.gradle.tooling.internal.provider.ProviderStartParameterConverter.toStartParameter(ProviderStartParameterConverter.java:79)
     @Test
     void 'test with --tests should succeed'() {
+        ProcessUtils.ProcessResult result = runTestsWithPattern(['--tests', 'a1_test.go'])
+        assertTestPatternNoUpToDateResult(result)
+
+        result = runTestsWithPattern(['--tests', 'a1_test.go'])
+        assertTestPatternUpToDateResult(result)
+
+        result = runTestsWithPattern(['--tests', 'a1_test.go', '--tests', 'whatever'])
+        assertTestPatternNoUpToDateResult(result)
+    }
+
+    def assertTestPatternNoUpToDateResult(def result) {
+        assert result.getStdout().contains('Found 1 files to test')
+        assert result.getStdout().contains('2 completed, 0 failed')
+        assert !result.getStdout().contains('3 completed, 0 failed')
+        assert !result.getStdout().contains(':test UP-TO-DATE')
+        assert result.getStdout().contains('BUILD SUCCESSFUL')
+    }
+
+    def assertTestPatternUpToDateResult(def result) {
+        assert !result.getStdout().contains('Found 1 files to test')
+        assert !result.getStdout().contains('2 completed, 0 failed')
+        assert result.getStdout().contains(':test UP-TO-DATE')
+        assert result.getStdout().contains('BUILD SUCCESSFUL')
+    }
+
+    def runTestsWithPattern(List args) {
         assert System.getProperty('GRADLE_DIST_HOME')
         String gradleBinPath = new File("${StringUtils.toUnixString(System.getProperty('GRADLE_DIST_HOME'))}/bin/gradle")
         if (Os.getHostOs() == Os.WINDOWS) {
@@ -80,17 +131,15 @@ golang {
         }
 
         Process process = new ProcessUtils()
-                .run([gradleBinPath, 'test', '--tests', 'a1_test.go', '--stacktrace'], [:], getProjectRoot())
+                .run([gradleBinPath, 'test', '--stacktrace'] + args, [:], getProjectRoot())
 
-        ProcessUtils.ProcessResult result = new ProcessUtils().getResult(process)
+        def result = new ProcessUtils().getResult(process)
 
-        println(result.getStderr())
+        println(result.stderr)
 
-        assert result.getStdout().contains('Found 1 files to test')
-        assert result.getStdout().contains('2 completed, 0 failed')
-        assert !result.getStdout().contains('3 completed, 0 failed')
-        assert result.getStdout().contains('BUILD SUCCESSFUL')
+        return result
     }
+
 
     @Test
     void 'test report should be generated if test fails'() {
@@ -105,7 +154,7 @@ golang {
 
         try {
             newBuild {
-                it.forTasks('check')
+                it.forTasks('test', 'cover')
             }
         } catch (BuildException e) {
             println(stderr)

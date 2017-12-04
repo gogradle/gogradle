@@ -193,12 +193,17 @@ public class GoCover extends AbstractGolangTask {
             PackageCoverage ret = elements.stream()
                     .map(this::extractFileCoverageInfo)
                     .collect(PackageCoverage::new, PackageCoverage::add, PackageCoverage::add);
-            ret.name = decodeInternally(profileFile.getName());
+            ret.name = decodeInternally(removeOutExtension(profileFile));
             ret.url = htmlFile.getName();
             return ret;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
         }
+    }
+
+    private String removeOutExtension(File profileFile) {
+        // file.out -> file
+        return profileFile.getName().substring(0, profileFile.getName().length() - 4);
     }
 
     // <option value="file0">github.com/gogits/gogs/models/access.go (0.0%)</option>
@@ -226,7 +231,7 @@ public class GoCover extends AbstractGolangTask {
 
     private File profileFileToHtmlFile(File profile) {
         File htmlOutputDir = new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH);
-        return new File(htmlOutputDir, profile.getName() + ".html");
+        return new File(htmlOutputDir, removeOutExtension(profile) + ".html");
     }
 
     public void setMaxPackageLines(List<PackageCoverage> packages) {

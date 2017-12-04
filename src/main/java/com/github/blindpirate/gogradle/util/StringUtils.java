@@ -68,6 +68,10 @@ public class StringUtils {
         return startsWithAny(file.getName(), prefix);
     }
 
+    public static boolean fileNameStartsWithDotOrUnderline(File file) {
+        return fileNameStartsWithAny(file, "_", ".");
+    }
+
     public static boolean fileNameEndsWithAny(File file, String... prefix) {
         return endsWithAny(file.getName(), prefix);
     }

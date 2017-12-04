@@ -20,7 +20,9 @@ package com.github.blindpirate.gogradle.task.go;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.build.TestPatternFilter;
+import com.github.blindpirate.gogradle.common.AbstractFileFilter;
 import com.github.blindpirate.gogradle.common.LineCollector;
+import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.unsafe.GradleInternalAPI;
 import com.github.blindpirate.gogradle.util.IOUtils;
@@ -33,6 +35,10 @@ import org.gradle.api.internal.tasks.options.Option;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.Input;
+import org.gradle.api.tasks.InputFiles;
+import org.gradle.api.tasks.Optional;
+import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
@@ -57,7 +63,7 @@ import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursivel
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
-import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.groupingBy;
@@ -77,6 +83,9 @@ public class GoTest extends AbstractGolangTask {
 
     @Inject
     private BuildManager buildManager;
+
+    @Inject
+    private GoBinaryManager goBinaryManager;
 
     private List<String> testNamePattern;
 
@@ -116,10 +125,47 @@ public class GoTest extends AbstractGolangTask {
 
         List<TestClassResult> testResults = doTest();
 
-        File reportDir = generateTestReport(testResults);
+        generateTestReport(testResults);
 
-        rewritePackageName(reportDir);
-        reportErrorIfNecessary(testResults, reportDir);
+        rewritePackageName(getReportDir());
+
+        reportErrorIfNecessary(testResults, getReportDir());
+    }
+
+    @Input
+    @Optional
+    List<String> getTestNamePattern() {
+        return testNamePattern;
+    }
+
+    @Input
+    String getGoVersion() {
+        return goBinaryManager.getGoVersion();
+    }
+
+    @Input
+    List<String> getBuildTags() {
+        return setting.getBuildTags();
+    }
+
+    @InputFiles
+    Collection<File> getAllGoFiles() {
+        return IOUtils.filterFilesRecursively(getProject().getProjectDir(), new AbstractFileFilter() {
+            @Override
+            protected boolean acceptFile(File file) {
+                return !StringUtils.fileNameStartsWithDotOrUnderline(file) && fileNameEndsWithAny(file, ".go");
+            }
+
+            @Override
+            protected boolean acceptDir(File dir) {
+                return !StringUtils.fileNameStartsWithDotOrUnderline(dir);
+            }
+        });
+    }
+
+    @OutputDirectory
+    File getReportDir() {
+        return new File(getProject().getProjectDir(), ".gogradle/reports/test");
     }
 
     private Collection<File> filterMatchedTests() {
@@ -135,7 +181,7 @@ public class GoTest extends AbstractGolangTask {
     private List<File> getAllNonTestGoFiles(File dir) {
         return safeListFiles(dir).stream()
                 .filter(file -> file.getName().endsWith(".go"))
-                .filter(file -> !fileNameStartsWithAny(file, "_", "."))
+                .filter(file -> !fileNameStartsWithDotOrUnderline(file))
                 .filter(file -> !fileNameEndsWithAny(file, "_test.go"))
                 .filter(File::isFile)
                 .collect(toList());
@@ -148,10 +194,8 @@ public class GoTest extends AbstractGolangTask {
     }
 
 
-    private File generateTestReport(List<TestClassResult> testResults) {
-        File reportDir = new File(getProject().getProjectDir(), ".gogradle/reports/test");
-        GradleInternalAPI.renderTestReport(testResults, reportDir);
-        return reportDir;
+    private void generateTestReport(List<TestClassResult> testResults) {
+        GradleInternalAPI.renderTestReport(testResults, getReportDir());
     }
 
     private List<TestClassResult> doTest() {
@@ -222,7 +266,7 @@ public class GoTest extends AbstractGolangTask {
 
         if (generateCoverageProfile) {
             File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
-                    + encodeInternally(importPath));
+                    + encodeInternally(importPath) + ".out");
             args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
             coverageProfileGenerated = true;
         }

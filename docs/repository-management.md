@@ -45,7 +45,6 @@ repositories {
         url { 
             "ssh://hg@bitbucket.org/myprivaterepo/${it.split('/')[2]}" 
         }
-        
     }
 }    
 ```
