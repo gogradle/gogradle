@@ -86,7 +86,7 @@ class ResolveDependencyToDependenciesCacheTest {
         LRUMap map = new LRUMap()
         map[local1] = DependencyUtils.asGolangDependencySet(vcsDependency, local2, vendor)
 
-        IOUtils.serialize(map, new File(resource, ".gogradle/cache/${PersistenceResolvedToDependenciesCache.simpleName}.bin"))
+        IOUtils.serialize(map, new File(resource, ".gogradle/cache/${PersistenceResolvedToDependenciesCache.simpleName}-${GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION}.bin"))
 
 
         when(resolver.produce('this/is/local1')).thenReturn(of(LocalDirectoryGolangPackage.of('this/is/local1', 'this/is/local1', toUnixString(resource))))

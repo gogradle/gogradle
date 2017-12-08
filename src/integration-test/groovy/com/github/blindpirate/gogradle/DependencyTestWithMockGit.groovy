@@ -159,8 +159,8 @@ dependencies {
     void 'project-level cache should be used in second resolution'() {
         firstBuild()
 
-        IOUtils.forceDelete(new File(projectRoot, '.gogradle/cache/build.bin'))
-        IOUtils.forceDelete(new File(projectRoot, '.gogradle/cache/test.bin'))
+        IOUtils.forceDelete(new File(projectRoot, ".gogradle/cache/build-${GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION}.bin"))
+        IOUtils.forceDelete(new File(projectRoot, ".gogradle/cache/test-${GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION}.bin"))
         repositories.listFiles().each {
             if (!['firstlevel-a', 'firstlevel-c', 'firstlevel-d'].contains(it.name)) {
                 IOUtils.forceDelete(it)

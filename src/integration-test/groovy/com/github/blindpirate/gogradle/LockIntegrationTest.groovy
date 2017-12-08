@@ -128,7 +128,7 @@ dependencies {
     }
 
     void deleteDependencyTreeCache() {
-        new File(resource, '.gogradle/cache/build.bin').delete()
+        new File(resource, ".gogradle/cache/build-${GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION}.bin").delete()
     }
 
     void deleteDotGogradle() {

@@ -29,7 +29,6 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCode
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
 import static com.github.blindpirate.gogradle.util.StringUtils.endsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
-import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
 import static com.github.blindpirate.gogradle.util.StringUtils.startsWithAny;
 
