@@ -100,8 +100,8 @@ func main(){
             it.forTasks('build')
         }
 
-        assert new File(resource, "go1/.gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_go1").exists()
-        assert new File(resource, "go2/.gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_go2").exists()
+        assert new File(resource, "go1/.gogradle/go1-${Os.getHostOs()}-${Arch.getHostArch()}").exists()
+        assert new File(resource, "go2/.gogradle/go2-${Os.getHostOs()}-${Arch.getHostArch()}").exists()
         assert new File(resource, "build/libs/multi.jar").exists()
     }
 

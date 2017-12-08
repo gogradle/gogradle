@@ -119,11 +119,11 @@ build {
             it.forTasks('build')
         }
 
-        ["darwin_amd64_myPackage", 'windows_amd64_myPackage', 'linux_386_myPackage'].each {
+        ["myPackage-darwin-amd64", 'myPackage-windows-amd64', 'myPackage-linux-386'].each {
             assert new File(resource, ".gogradle/${it}").exists()
         }
 
-        assert runExecutable(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_myPackage") == 'Hello'
+        assert runExecutable(".gogradle/myPackage-${Os.getHostOs()}-${Arch.getHostArch()}") == 'Hello'
     }
 
     @Test
@@ -138,7 +138,7 @@ golang {
             it.forTasks('build')
         }
 
-        assert runExecutable(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_myPackage") == 'HelloWorld'
+        assert runExecutable(".gogradle/myPackage-${Os.getHostOs()}-${Arch.getHostArch()}") == 'HelloWorld'
     }
 
     void appendOnBuildDotGradle(String s) {

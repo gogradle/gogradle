@@ -247,7 +247,7 @@ repositories:
         }
 
         // wait for another process to start and lock
-        Thread.sleep(1000)
+        Thread.sleep(5000)
 
         assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
     }
@@ -266,7 +266,7 @@ repositories:
             try {
                 channel = new RandomAccessFile(lockFile, "rw").getChannel()
                 lock = channel.lock()
-                Thread.sleep(3000)
+                Thread.sleep(10000)
             } finally {
                 if (lock != null) {
                     println("${new Date()}: release ${lockFile.absolutePath}")

@@ -145,7 +145,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     @OutputFile
     public File getSerializationFile() {
         return new File(getProject().getProjectDir(),
-                ".gogradle/cache/" + getConfigurationName()+"-"+ GOGRADLE_COMPATIBLE_VERSION + ".bin");
+                ".gogradle/cache/" + getConfigurationName() + "-" + GOGRADLE_COMPATIBLE_VERSION + ".bin");
     }
 
     @TaskAction

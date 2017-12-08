@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.core.cache
 
+import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -61,7 +62,7 @@ class VendorSnapshoterTest {
         vendorSnapshoter.loadPersistenceCache()
 
         // then
-        assert new File(resource, '.gogradle/cache/VendorSnapshot.bin').exists()
+        assert new File(resource, ".gogradle/cache/VendorSnapshot-${GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION}.bin").exists()
         assert ReflectionUtils.getField(vendorSnapshoter, 'cache').get(dependency) instanceof DirectorySnapshot
     }
 

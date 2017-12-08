@@ -112,7 +112,7 @@ dependencies {
     }
 
     File getOutputExecutable() {
-        Path gogsBinPath = resource.toPath().resolve(".gogradle/${Os.getHostOs()}_${Arch.getHostArch()}_gogs")
+        Path gogsBinPath = resource.toPath().resolve(".gogradle/gogs-${Os.getHostOs()}-${Arch.getHostArch()}")
         if (Os.getHostOs() == Os.WINDOWS) {
             gogsBinPath.renameTo(gogsBinPath.toString() + '.exe')
         }
