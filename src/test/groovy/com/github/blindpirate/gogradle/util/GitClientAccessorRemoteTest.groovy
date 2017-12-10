@@ -108,4 +108,16 @@ class GitClientAccessorRemoteTest {
 
         assert accessor.getDefaultBranch(clone) == 'default'
     }
+
+    @Test
+    void 'getting remote tag should succeed'() {
+        accessor.clone("http://localhost:${DEFAULT_PORT}/a", clone)
+        git('tag v1.0', repo)
+
+        assert !accessor.findCommitByTagOrBranch(clone, 'v1.0').isPresent()
+
+        accessor.update(clone)
+
+        assert accessor.findCommitByTagOrBranch(clone, 'v1.0').get().id.startsWith(initialCommit)
+    }
 }
