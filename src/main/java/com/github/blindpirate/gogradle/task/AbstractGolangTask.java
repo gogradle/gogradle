@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.task;
 
+import com.github.blindpirate.gogradle.GogradleGlobal;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.Task;
 
@@ -32,5 +33,11 @@ public class AbstractGolangTask extends DefaultTask {
 
     protected <T extends Task> T getTask(Class<T> clazz) {
         return golangTaskContainer.get(clazz);
+    }
+
+    protected void setGogradleGlobalContext() {
+        // AbstractGolangTask should set project into thread local before it executes
+        // otherwise, subtle issues occur in multiproject
+        GogradleGlobal.INSTANCE.setCurrentProject(getProject());
     }
 }

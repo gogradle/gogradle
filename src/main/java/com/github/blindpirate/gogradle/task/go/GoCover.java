@@ -79,6 +79,8 @@ public class GoCover extends AbstractGolangTask {
 
     @TaskAction
     public void coverage() {
+        setGogradleGlobalContext();
+
         if (profileGeneratedInTest()) {
             safeListFiles(new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH))
                     .forEach(this::analyzeProfile);

@@ -38,6 +38,8 @@ public class IdeaTask extends AbstractGolangTask {
 
     @TaskAction
     public void generateXmlsForIdea() {
+        setGogradleGlobalContext();
+
         ideaIntegration.generateXmls();
     }
 }

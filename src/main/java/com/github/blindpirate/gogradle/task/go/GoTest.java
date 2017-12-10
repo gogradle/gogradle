@@ -121,14 +121,12 @@ public class GoTest extends AbstractGolangTask {
 
     @TaskAction
     public void run() {
+        setGogradleGlobalContext();
+
         prepareCoverageProfileDir();
-
         List<TestClassResult> testResults = doTest();
-
         generateTestReport(testResults);
-
         rewritePackageName(getReportDir());
-
         reportErrorIfNecessary(testResults, getReportDir());
     }
 

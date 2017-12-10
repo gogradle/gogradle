@@ -38,6 +38,8 @@ public class GoVet extends Go {
 
     @TaskAction
     public void vet() {
+        setGogradleGlobalContext();
+
         if (CollectionUtils.isEmpty(commandLineArgs)) {
             vet(allSubGoFiles());
             vet(allSubDirectories());
