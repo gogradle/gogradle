@@ -24,6 +24,11 @@ import com.github.blindpirate.gogradle.task.go.GoCoverTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.StringUtils
+import org.apache.commons.exec.CommandLine
+import org.apache.commons.exec.DefaultExecutor
+import org.apache.commons.exec.ExecuteException
+import org.apache.commons.exec.ExecuteResultHandler
+import org.apache.commons.exec.PumpStreamHandler
 import org.gradle.tooling.BuildException
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
@@ -98,7 +103,7 @@ golang {
 //    at org.gradle.tooling.internal.provider.ProviderStartParameterConverter.toStartParameter(ProviderStartParameterConverter.java:79)
     @Test
     void 'test with --tests should succeed'() {
-        ProcessUtils.ProcessResult result = runTestsWithPattern(['--tests', 'a1_test.go'])
+        def result = runTestsWithPattern(['--tests', 'a1_test.go'])
         assertTestPatternNoUpToDateResult(result)
 
         result = runTestsWithPattern(['--tests', 'a1_test.go'])
@@ -108,19 +113,19 @@ golang {
         assertTestPatternNoUpToDateResult(result)
     }
 
-    def assertTestPatternNoUpToDateResult(def result) {
-        assert result.getStdout().contains('Found 1 files to test')
-        assert result.getStdout().contains('2 completed, 0 failed')
-        assert !result.getStdout().contains('3 completed, 0 failed')
-        assert !result.getStdout().contains(':test UP-TO-DATE')
-        assert result.getStdout().contains('BUILD SUCCESSFUL')
+    def assertTestPatternNoUpToDateResult(def stdout) {
+        assert stdout.contains('Found 1 files to test')
+        assert stdout.contains('2 completed, 0 failed')
+        assert !stdout.contains('3 completed, 0 failed')
+        assert !stdout.contains(':test UP-TO-DATE')
+        assert stdout.contains('BUILD SUCCESSFUL')
     }
 
-    def assertTestPatternUpToDateResult(def result) {
-        assert !result.getStdout().contains('Found 1 files to test')
-        assert !result.getStdout().contains('2 completed, 0 failed')
-        assert result.getStdout().contains(':test UP-TO-DATE')
-        assert result.getStdout().contains('BUILD SUCCESSFUL')
+    def assertTestPatternUpToDateResult(def stdout) {
+        assert !stdout.contains('Found 1 files to test')
+        assert !stdout.contains('2 completed, 0 failed')
+        assert stdout.contains(':test UP-TO-DATE')
+        assert stdout.contains('BUILD SUCCESSFUL')
     }
 
     def runTestsWithPattern(List args) {
@@ -130,14 +135,17 @@ golang {
             gradleBinPath += '.bat'
         }
 
-        Process process = new ProcessUtils()
-                .run([gradleBinPath, 'test', '--stacktrace', '--info'] + args, [:], getProjectRoot())
+        ByteArrayOutputStream out = new ByteArrayOutputStream()
 
-        def result = new ProcessUtils().getResult(process)
+        CommandLine cmd = new CommandLine(gradleBinPath)
+        cmd.addArguments('test','-s','--info')
+        cmd.addArguments(args as String [])
+        DefaultExecutor executor = new DefaultExecutor()
+        executor.setWorkingDirectory(getProjectRoot())
+        executor.setStreamHandler(new PumpStreamHandler(out))
+        executor.execute(cmd)
 
-        println(result.stderr)
-
-        return result
+        return out.toString()
     }
 
 
