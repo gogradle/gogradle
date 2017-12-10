@@ -79,8 +79,8 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
             ensureDirExistAndWritable(lockFile.getParentFile().toPath());
 
             this.fileChannel = createLockFileIfNecessary(lockFile);
-            this.metadata = getMetadataFromFile(fileChannel).orElse(GlobalCacheMetadata.newMetadata(pkg));
             this.fileLock = fileChannel.lock();
+            this.metadata = getMetadataFromFile(fileChannel).orElse(GlobalCacheMetadata.newMetadata(pkg));
 
             Optional<GolangRepositoryMetadata> matched = findMatchedRepository(metadata, pkg.getRepository());
             if (!matched.isPresent()) {
