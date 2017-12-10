@@ -23,6 +23,6 @@ public class DependencyProductionException extends RuntimeException {
     }
 
     public static DependencyProductionException cannotRecognizePackage(String importPath) {
-        return new DependencyProductionException("Cannot recognized package:" + importPath);
+        return new DependencyProductionException("Cannot recognize package:" + importPath);
     }
 }

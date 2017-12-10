@@ -41,12 +41,7 @@ dependencies {
 }
 ```
 
-By default, if you don't specify a commit, Gogradle won't do `git pull` or `hg update -u`  in local repository. You can use `-Dgogradle.refresh=true` to force Gogradle to do so:
- 
-```
-gradlew build -Dgogradle.refresh=true
-``` 
-
+By default, if you don't specify a commit/tag/branch, Gogradle will perform `git fetch` or `hg update -u`  in local repository each time to make sure the latest remote version are used. 
 
 [SemVersion](http://semver.org/) is supported in dependency declaration. In Git, a "version" is just a tag. Gogradle doesn't recommend to use SemVersion since it may break reproducibility of build.
 

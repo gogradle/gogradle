@@ -33,8 +33,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 @WithResource('')
 @WithMockGo
 class NoTransitiveInLockIntegrationTest extends IntegrationTestSupport {
-    File resource
-
     @Before
     void setUp() {
         GogradleLockModel bModel = GogradleLockModel.of([[name: 'c', 'dir': toUnixString(new File(resource, 'c'))]], [])

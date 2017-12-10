@@ -1,6 +1,6 @@
 # FAQ
 
-## 如何处理 'Cannot recognized package: appengine' ?
+## 如何处理 'Cannot recognize package: appengine' ?
 
 `appengine`和`appengine_internal`是GCE提供的包，因此无法获取。你可以在`build.gradle`中加入如下配置：
 

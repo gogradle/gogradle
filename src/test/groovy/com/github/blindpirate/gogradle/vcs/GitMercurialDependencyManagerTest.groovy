@@ -75,6 +75,8 @@ class GitMercurialDependencyManagerTest {
     @Mock
     GitMercurialCommit headCommit
     @Mock
+    GitMercurialCommit branchCommit
+    @Mock
     ResolveContext resolveContext
     @Mock
     ProjectCacheManager projectCacheManager
@@ -83,6 +85,7 @@ class GitMercurialDependencyManagerTest {
 
     String commitId = '1' * 40
     String tag = 'tag'
+    String branch = 'branch'
     VcsGolangPackage pkg = MockUtils.mockRootVcsPackage()
 
     File resource
@@ -101,9 +104,11 @@ class GitMercurialDependencyManagerTest {
         when(accessor.findCommit(resource, commitId)).thenReturn(of(commit))
         when(accessor.headCommitOfBranch(resource, 'MockDefault')).thenReturn(headCommit)
         when(accessor.findCommitByTagOrBranch(resource, tag)).thenReturn(of(tagCommit))
+        when(accessor.headCommitOfBranch(resource, branch)).thenReturn(branchCommit)
         when(commit.getId()).thenReturn(commitId)
         when(commit.getCommitTime()).thenReturn(123000L)
         when(tagCommit.getId()).thenReturn('tagCommit')
+        when(branchCommit.getId()).thenReturn('branchCommit')
         when(headCommit.getId()).thenReturn('headCommit')
 
         when(accessor.getDefaultBranch(resource)).thenReturn(DEFAULT_BRANCH)
@@ -116,14 +121,22 @@ class GitMercurialDependencyManagerTest {
         when(resolveContext.getDependencyRegistry()).thenReturn(mock(DependencyRegistry))
     }
 
-    def withOnlyTag(String t){
+    def withOnlyTag(String t) {
         when(notationDependency.getTag()).thenReturn(t)
         when(notationDependency.getCommit()).thenReturn(null)
+        when(notationDependency.getBranch()).thenReturn(null)
     }
 
-    def withOnlyCommit(String c){
+    def withOnlyCommit(String c) {
         when(notationDependency.getTag()).thenReturn(null)
         when(notationDependency.getCommit()).thenReturn(c)
+        when(notationDependency.getBranch()).thenReturn(null)
+    }
+
+    def withOnlyBranch(String b) {
+        when(notationDependency.getBranch()).thenReturn(b)
+        when(notationDependency.getCommit()).thenReturn(null)
+        when(notationDependency.getTag()).thenReturn(null)
     }
 
     @Test
@@ -222,6 +235,17 @@ class GitMercurialDependencyManagerTest {
         manager.resolve(resolveContext, notationDependency)
         // then
         verify(accessor).checkout(resource, 'tagCommit')
+    }
+
+    @Test
+    @MockRefreshDependencies(false)
+    void 'dependency with branch should be resolved successfully'() {
+        // given
+        withOnlyBranch(branch)
+        // when
+        manager.resolve(resolveContext, notationDependency)
+        // then
+        verify(accessor).checkout(resource, 'branchCommit')
     }
 
     @Test

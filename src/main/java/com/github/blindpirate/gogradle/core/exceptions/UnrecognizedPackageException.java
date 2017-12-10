@@ -25,6 +25,6 @@ public class UnrecognizedPackageException extends RuntimeException {
     }
 
     public static UnrecognizedPackageException cannotRecognizePackage(UnrecognizedGolangPackage pkg) {
-        return new UnrecognizedPackageException("Cannot recognized package: " + pkg.getPathString());
+        return new UnrecognizedPackageException("Cannot recognize package: " + pkg.getPathString());
     }
 }

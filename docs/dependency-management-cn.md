@@ -41,11 +41,7 @@ dependencies {
 }
 ```
 
-默认情况下，如果你的声明没有指定commit的话，Gogradle就不会对本地缓存中的仓库执行`git pull`或者`hg update -u`。若期望如此，请使用`-Dgogradle.refresh=true`：
-
-```
-gradlew build -Dgogradle.refresh=true
-```
+默认情况下，如果你的声明没有指定commit/tag/branch的话，Gogradle会每次执行`git fetch`或者`hg update -u`，以保证获取远端的最新版本。
 
 依赖声明支持[语义化版本](http://semver.org/)。在Git中，"版本"即Git的tag。
 

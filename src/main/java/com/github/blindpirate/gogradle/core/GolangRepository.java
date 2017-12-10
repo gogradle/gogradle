@@ -63,6 +63,10 @@ public class GolangRepository implements Serializable {
         return builder().withUrls(urls).withVcs(vcs).withOriginal(true).build();
     }
 
+    public static GolangRepository newSubstitutedRepository(VcsType vcs, String url) {
+        return newSubstitutedRepository(vcs, Collections.singletonList(url));
+    }
+
     public static GolangRepository newSubstitutedRepository(VcsType vcs, List<String> urls) {
         return builder().withUrls(urls).withVcs(vcs).withOriginal(false).build();
     }

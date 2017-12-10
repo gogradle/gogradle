@@ -34,13 +34,10 @@ import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
-import org.mockito.ArgumentCaptor
 import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import java.nio.file.Path
-import java.util.concurrent.Callable
 import java.util.function.Function
 
 import static org.mockito.ArgumentMatchers.any

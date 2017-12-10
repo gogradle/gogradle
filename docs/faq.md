@@ -1,6 +1,6 @@
 # FAQ
 
-## How to tackle 'Cannot recognized package: appengine' ?
+## How to tackle 'Cannot recognize package: appengine' ?
 
 `appengine` and `appengine_internal` are GCE packages so they can't be fetched. You can add the following code in your `build.gradle`:
 

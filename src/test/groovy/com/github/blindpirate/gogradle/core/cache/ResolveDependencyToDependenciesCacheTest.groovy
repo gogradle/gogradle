@@ -19,11 +19,7 @@ package com.github.blindpirate.gogradle.core.cache
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangPackage
-import com.github.blindpirate.gogradle.core.GolangRepository
-import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
-import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage
-import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.*
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency

@@ -32,6 +32,8 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -45,6 +47,7 @@ import static java.util.Optional.of;
 public class GitClientAccessor extends GitMercurialAccessor {
     private static final String MASTER_BRANCH = "master";
     private Boolean gitClientExists;
+    private static final Pattern FETCH_HEAD_MASTER_PATTERN = Pattern.compile("([0-9a-f]+)[\\s\\w-]+branch 'master' of");
 
     @Inject
     public GitClientAccessor(ProcessUtils processUtils) {
@@ -148,7 +151,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
     @Override
     public GitMercurialCommit headCommitOfBranch(File repository, String branch) {
         return run(repository,
-                asList("git", "log", branch, "-1", "--pretty=format:%H:%ct"),
+                asList("git", "log", determineHeadRevision(repository, branch), "-1", "--pretty=format:%H:%ct"),
                 result -> {
                     String[] commitAndTime = result.getStdout().split(":");
                     String commit = commitAndTime[0];
@@ -158,15 +161,42 @@ public class GitClientAccessor extends GitMercurialAccessor {
         );
     }
 
+    private String determineHeadRevision(File repository, String branch) {
+        File fetchHead = new File(repository, ".git/FETCH_HEAD");
+        if (fetchHead.exists()) {
+            List<String> lines = IOUtils.readLines(fetchHead);
+            Optional<String> remoteBranchHeadCommit = findRemoteBranchHeadCommit(lines, branch);
+            if (remoteBranchHeadCommit.isPresent()) {
+                return remoteBranchHeadCommit.get();
+            }
+        }
+        // fall back to branch name
+        return branch;
+    }
+
+    private Optional<String> findRemoteBranchHeadCommit(List<String> lines, String branch) {
+//        42958134b46b814ac54a740b784dcd67afae282c        not-for-merge   branch 'master' of github.com:gradle/gradle
+//        ef7f1b475b1309a47e98acdf7183bf8e0c65b729        not-for-merge   branch 'oehme/performance/config-time' of github.com:gradle/gradle
+//        42958134b46b814ac54a740b784dcd67afae282c                branch 'master' of github.com:gradle/gradle
+        Pattern pattern = "master".equals(branch)
+                ? FETCH_HEAD_MASTER_PATTERN
+                : Pattern.compile("([0-9a-f]+)[\\s\\w-]+branch '" + branch + "' of");
+        for (String line : lines) {
+            Matcher matcher = pattern.matcher(line);
+            if (matcher.find()) {
+                return Optional.of(matcher.group(1));
+            }
+        }
+        return Optional.empty();
+    }
+
     @Override
     public void update(File repoRoot) {
         runWithProgress(repoRoot,
-                asList("git", "pull", "--all", "--progress"),
+                asList("git", "fetch", "--all", "--progress"),
                 GitClientLineConsumer.NO_OP,
                 GitClientLineConsumer.of("Updating " + repoRoot.getAbsolutePath()));
         run(repoRoot, asList("git", "submodule", "update", "--init", "--recursive"));
-
-        checkout(repoRoot, getDefaultBranch(repoRoot));
     }
 
     @Override

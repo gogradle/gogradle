@@ -17,10 +17,10 @@
 
 package com.github.blindpirate.gogradle.core.mode;
 
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+
 import javax.annotation.Nonnull;
 import java.util.Optional;
-
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 
 import static java.text.MessageFormat.format;
 import static java.util.Arrays.stream;

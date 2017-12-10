@@ -79,11 +79,14 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
         if (dependency instanceof VcsNotationDependency) {
             VcsNotationDependency d = (VcsNotationDependency) dependency;
             if (d.isLatest()) {
-                return true;
+                return false;
             } else if (d.getCommit() != null) {
                 return getAccessor().findCommit(repoRoot, d.getCommit()).isPresent();
             } else if (d.getTag() != null) {
                 return findMatchingTag(repoRoot, d.getTag()).isPresent();
+            } else if (d.getBranch() != null) {
+                // we see branch as volatile, always perform pull when a branch was specified
+                return false;
             } else {
                 throw new IllegalStateException("Shouldn't be here: " + dependency);
             }
@@ -110,29 +113,30 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected GitMercurialCommit determineVersion(File repoDir, NotationDependency dependency) {
-        VcsNotationDependency notationDependency = (VcsNotationDependency) dependency;
-        if (notationDependency.isLatest()) {
+        VcsNotationDependency notationDep = (VcsNotationDependency) dependency;
+        if (notationDep.isLatest()) {
             // use HEAD of master branch
             return getAccessor().headCommitOfBranch(repoDir, getAccessor().getDefaultBranch(repoDir));
         }
-        if (isNotBlank(notationDependency.getCommit())) {
-            Optional<GitMercurialCommit> commit = getAccessor().findCommit(repoDir, notationDependency.getCommit());
+        if (isNotBlank(notationDep.getCommit())) {
+            Optional<GitMercurialCommit> commit = getAccessor().findCommit(repoDir, notationDep.getCommit());
             if (commit.isPresent()) {
                 return commit.get();
             } else {
-                throw DependencyResolutionException.cannotFindGitCommit(notationDependency);
+                throw DependencyResolutionException.cannotFindGitCommit(notationDep);
             }
         }
 
-        Assert.isTrue(notationDependency.getTag() != null);
-
-        Optional<GitMercurialCommit> commit = findMatchingTag(repoDir, notationDependency.getTag());
-        if (commit.isPresent()) {
-            return commit.get();
-        } else {
-            throw DependencyResolutionException.cannotFindGitTag(dependency, notationDependency.getTag());
+        if (isNotBlank(notationDep.getTag())) {
+            Optional<GitMercurialCommit> commit = findMatchingTag(repoDir, notationDep.getTag());
+            if (commit.isPresent()) {
+                return commit.get();
+            } else {
+                throw DependencyResolutionException.cannotFindGitTag(dependency, notationDep.getTag(), repoDir);
+            }
         }
 
+        return getAccessor().headCommitOfBranch(repoDir, notationDep.getBranch());
     }
 
     private Optional<GitMercurialCommit> findCommitBySemVersion(File repository, String semVersionExpression) {
@@ -153,11 +157,9 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
 
     @Override
     protected void updateRepository(GolangDependency dependency, File repoRoot) {
-        getAccessor().checkout(repoRoot, getAccessor().getDefaultBranch(repoRoot));
-
         String url = getAccessor().getRemoteUrl(repoRoot);
 
-        LOGGER.info("Pulling {} from {}", dependency, url);
+        LOGGER.info("Fetching {} from {}", dependency, url);
 
         getAccessor().update(repoRoot);
     }

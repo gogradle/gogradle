@@ -21,7 +21,8 @@ import com.github.blindpirate.gogradle.util.MockUtils
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Test
 
-import static com.github.blindpirate.gogradle.core.GolangRepository.*
+import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository
+import static com.github.blindpirate.gogradle.core.GolangRepository.newSubstitutedRepository
 
 class VcsGolangPackageTest {
     VcsGolangPackage vcsGolangPackage = MockUtils.mockVcsPackage()

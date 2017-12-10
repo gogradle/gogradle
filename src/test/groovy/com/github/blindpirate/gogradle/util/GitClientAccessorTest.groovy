@@ -40,7 +40,7 @@ import static org.mockito.Mockito.when
 @WithMockInjector
 class GitClientAccessorTest {
 
-    File resource //= new File('/Users/zhb/Projects/gogradle/src/test/resources/simple-repo')
+    File resource
 
     File repositories
 
@@ -59,12 +59,6 @@ class GitClientAccessorTest {
         accessor = new GitClientAccessor(processUtils)
         when(processUtils.runAndGetStdout(['git', 'version'] as String[])).thenThrow(IOException)
         accessor.ensureClientExists()
-    }
-
-    @Test
-    @WithResource('out-of-date-repo.zip')
-    void 'getting head commit of master branch should succeed'() {
-        assert accessor.headCommitOfBranch(resource, 'master').id.length() == 40
     }
 
     @Test
@@ -190,4 +184,5 @@ class GitClientAccessorTest {
         accessor.checkout(resource, INITIAL_COMMIT)
         accessor.lastCommitTimeOfPath(resource, Paths.get('helloworld.go'))
     }
+
 }
