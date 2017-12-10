@@ -67,10 +67,16 @@ public final class DependencyResolutionException extends GradleException {
                 + " does not exist in transitive dependencies of " + resolvedDependency);
     }
 
-    public static DependencyResolutionException cannotFindGitTag(NotationDependency dependency, String tag) {
+    public static DependencyResolutionException cannotFindGitTag(NotationDependency dependency, String tag, File repo) {
         return new DependencyResolutionException("Cannot find tag " + tag
-                + " in repository of "
+                + " in repository " + repo + " of "
                 + VcsNotationDependency.class.cast(dependency).getName()
                 + ", did they delete this tag?");
+    }
+
+    public static DependencyResolutionException cannotFindGitBranch(NotationDependency dep, String branch, File repo) {
+        return new DependencyResolutionException("Cannot find branch " + branch
+                + " in repository " + repo + " of "
+                + VcsNotationDependency.class.cast(dep).getName());
     }
 }

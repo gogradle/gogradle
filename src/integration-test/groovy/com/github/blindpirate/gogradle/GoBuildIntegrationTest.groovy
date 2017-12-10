@@ -109,6 +109,12 @@ func main(){
 
     @Test
     void 'build should succeed'() {
+        appendOnBuildDotGradle('''
+project.version = 1.0
+build {
+    outputLocation = './.gogradle/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
+}
+''')
         appendOnBuildDotGradle("""
 build {
     targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
@@ -119,11 +125,11 @@ build {
             it.forTasks('build')
         }
 
-        ["myPackage-darwin-amd64", 'myPackage-windows-amd64', 'myPackage-linux-386'].each {
+        ["myPackage-1.0-darwin-amd64", 'myPackage-1.0-windows-amd64', 'myPackage-1.0-linux-386'].each {
             assert new File(resource, ".gogradle/${it}").exists()
         }
 
-        assert runExecutable(".gogradle/myPackage-${Os.getHostOs()}-${Arch.getHostArch()}") == 'Hello'
+        assert runExecutable(".gogradle/myPackage-1.0-${Os.getHostOs()}-${Arch.getHostArch()}") == 'Hello'
     }
 
     @Test

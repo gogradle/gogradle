@@ -112,9 +112,12 @@ class VcsNotationDependencyTest {
         dependency.setPackage(withUrl('https://github.com/user/package.git'))
         assert dependency.toString() == "github.com/user/package: commit='commitId', urls=[https://github.com/user/package.git]"
         dependency.tag = '1.0.0'
-        assert dependency.toString() == "github.com/user/package: commit='commitId', tag/branch='1.0.0', urls=[https://github.com/user/package.git]"
+        assert dependency.toString() == "github.com/user/package: commit='commitId', tag='1.0.0', urls=[https://github.com/user/package.git]"
         dependency.commit = null
-        assert dependency.toString() == "github.com/user/package: tag/branch='1.0.0', urls=[https://github.com/user/package.git]"
+        assert dependency.toString() == "github.com/user/package: tag='1.0.0', urls=[https://github.com/user/package.git]"
+        dependency.tag = null
+        dependency.branch = 'master'
+        assert dependency.toString() == "github.com/user/package: branch='master', urls=[https://github.com/user/package.git]"
     }
 
     @Test

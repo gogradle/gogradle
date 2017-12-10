@@ -49,6 +49,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     goExecutable = '${StringUtils.toUnixString(goBinPath)}'
+    packagePath = 'my/package'
 }
 """
         if (userhome != null) {
@@ -96,6 +97,16 @@ golang {
 
     BuildLauncher newBuild(Closure closure) {
         newBuild(closure, [])
+    }
+
+    BuildLauncher newBuild(String... taskAndArgs) {
+        newBuild(taskAndArgs.findAll({ !it.startsWith('-') }), taskAndArgs.findAll({ it.startsWith('-') }))
+    }
+
+    BuildLauncher newBuild(List tasks, List args) {
+        newBuild({
+            it.forTasks(tasks as String[])
+        }, args)
     }
 
     Object buildAction(Closure closure) {
@@ -147,4 +158,7 @@ golang {
         }
     }
 
+    void setUpDebug() {
+        IOUtils.write(getProjectRoot(), 'gradle.properties', 'org.gradle.jvmargs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005')
+    }
 }

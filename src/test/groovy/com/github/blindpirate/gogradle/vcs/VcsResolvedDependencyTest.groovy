@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle.vcs
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.GolangRepository
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager

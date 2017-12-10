@@ -84,7 +84,7 @@ public class RepositoryHandlerPathResolver implements PackagePathResolver {
         Assert.isTrue(url != null || dir != null, "You must specify dir or url for " + rootPathString);
 
         if (url != null) {
-            GolangRepository repo = GolangRepository.newOriginalRepository(vcsType, url);
+            GolangRepository repo = GolangRepository.newSubstitutedRepository(vcsType, url);
             return VcsGolangPackage.builder()
                     .withPath(path)
                     .withRootPath(rootPath)

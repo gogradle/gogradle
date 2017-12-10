@@ -37,7 +37,7 @@ import org.mockito.Mockito
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import static com.github.blindpirate.gogradle.core.GolangRepository.*
+import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 

@@ -53,6 +53,7 @@ public class VcsResolvedDependency extends AbstractResolvedDependency {
         return getVcsType().getService(DependencyManager.class);
     }
 
+    // NOTE: Don't modify it if unnecessary. It's part of cross-version protocol
     @Override
     public Map<String, Object> toLockedNotation() {
         Map<String, Object> ret = MapUtils.asMap(

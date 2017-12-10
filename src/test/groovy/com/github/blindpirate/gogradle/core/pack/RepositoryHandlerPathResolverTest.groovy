@@ -19,11 +19,11 @@ package com.github.blindpirate.gogradle.core.pack
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.GolangRepositoryHandler
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern
 import com.github.blindpirate.gogradle.core.IncompleteGolangPackage
 import com.github.blindpirate.gogradle.core.LocalDirectoryGolangPackage
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.vcs.VcsType
-import com.github.blindpirate.gogradle.core.GolangRepositoryPattern
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith

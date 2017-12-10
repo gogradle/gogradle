@@ -27,9 +27,9 @@ import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.Git
-import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
 import com.github.blindpirate.gogradle.vcs.Mercurial
 import com.github.blindpirate.gogradle.vcs.VcsAccessor
+import com.github.blindpirate.gogradle.vcs.VcsNotationDependency
 import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import com.github.blindpirate.gogradle.vcs.git.GitDependencyManager
 import com.github.blindpirate.gogradle.vcs.mercurial.HgClientAccessor

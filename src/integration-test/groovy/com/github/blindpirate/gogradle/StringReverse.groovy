@@ -41,7 +41,7 @@ golang {
 }
 dependencies {
     golang {
-        build 'github.com/golang/example'
+        build name: 'github.com/golang/example', commit: '46695d81d1fae905a270fb7db8a4d11a334562fe', subpackages: 'stringutil'
     }
 }
 """
@@ -86,11 +86,9 @@ dependencies {
     }
 
     void assertDependencyOutput() {
-        // "golang.org/x/tools:0d047c8" -> "golang.org/x/tools"
-        assert stdout.toString().replaceAll(/:[a-fA-F0-9]{7}/, '').contains('''
+        assert stdout.toString().contains('''
 example
-\\-- github.com/golang/example
-    \\-- golang.org/x/tools
+\\-- github.com/golang/example:46695d8 [stringutil]
 ''')
     }
 

@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
+import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.core.dependency.install.LocalDirectoryDependencyManager;
 import com.github.blindpirate.gogradle.core.dependency.parse.DirMapNotationParser;
@@ -26,7 +27,6 @@ import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionExcep
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.github.blindpirate.gogradle.core.GolangRepositoryPattern;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 

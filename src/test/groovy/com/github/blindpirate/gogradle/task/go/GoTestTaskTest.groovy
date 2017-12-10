@@ -39,6 +39,7 @@ import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
 import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult
+import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)

@@ -69,7 +69,11 @@ public class ProcessUtils {
     }
 
     public Process run(String... args) {
-        return run(Arrays.asList(args), null, null);
+        return run(Arrays.asList(args));
+    }
+
+    public Process run(List<String> args) {
+        return run(args, null, null);
     }
 
     public ProcessResult getResult(Process process) {
@@ -98,8 +102,8 @@ public class ProcessUtils {
 
     // this should be moved to test source set since it's only used in test
     public ProcessResult runProcessWithCurrentClasspath(Class mainClass,
-                                                 List<String> args,
-                                                 Map<String, String> envs) {
+                                                        List<String> args,
+                                                        Map<String, String> envs) {
         String currentClasspath = System.getProperty("java.class.path");
 
         List<String> cmds = Lists.newArrayList("java", "-cp", currentClasspath, mainClass.getName());

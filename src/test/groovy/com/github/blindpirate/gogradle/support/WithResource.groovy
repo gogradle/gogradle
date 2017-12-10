@@ -33,5 +33,5 @@ import java.lang.annotation.Target
      * A temp empty directory will be used if it's a empty string.
      * @return
      */
-    String value()
+    String value() default ""
 }

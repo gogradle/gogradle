@@ -18,10 +18,11 @@
 package com.github.blindpirate.gogradle.support
 
 import com.github.blindpirate.gogradle.util.IOUtils
+import com.github.blindpirate.gogradle.util.ProcessUtils
+import org.apache.tools.ant.types.Commandline
 import org.eclipse.jetty.server.Server
 import org.eclipse.jetty.servlet.ServletHandler
 import org.eclipse.jetty.servlet.ServletHolder
-import org.eclipse.jgit.api.Git
 import org.eclipse.jgit.errors.RepositoryNotFoundException
 import org.eclipse.jgit.http.server.GitServlet
 import org.eclipse.jgit.lib.Repository
@@ -38,6 +39,7 @@ class GitServer {
     private Map<String, Repository> repos = [:]
 
     private Server server
+    private static ProcessUtils processUtils = new ProcessUtils()
 
     static GitServer newServer() {
         return new GitServer()
@@ -95,36 +97,39 @@ class GitServer {
                 .build()
     }
 
-    static void createRepository(File dir, String fileName) {
-        Repository repository = FileRepositoryBuilder.create(new File(dir, '.git'))
-        repository.create()
-        Git git
-        try {
-            git = new Git(repository)
-            IOUtils.write(dir, fileName, '')
-            git.add().addFilepattern('.').call()
-            git.commit().setMessage('commit').call()
-        } finally {
-            if (git != null) {
-                git.close()
-            }
-        }
+    static ProcessUtils.ProcessResult git(String arg, File workingDir) {
+        List args = Commandline.translateCommandline(arg) as List
+        Process process = processUtils.run(['git'] + args, null, workingDir)
+        ProcessUtils.ProcessResult result = processUtils.getResult(process)
+        assert result.code == 0: result.stderr
+        result
     }
 
-    static void addFileToRepository(File dir, String fileName, String fileContent) {
-        Repository repository = FileRepositoryBuilder.create(new File(dir, '.git'))
-        Git git
-        try {
-            git = new Git(repository)
-            IOUtils.write(new File(dir, fileName), fileContent)
-            git.add().addFilepattern(fileName).call()
-            git.commit().setMessage('commit').call()
-        } finally {
-            if (git != null) {
-                git.close()
-            }
-        }
+    static String createRepository(File dir, String fileName) {
+        git("init", dir)
+        git("config --local commit.gpgsign false", dir)
+        IOUtils.write(dir, fileName, '')
+        git("add .", dir)
+        def result = git("commit -m commit", dir)
+        return extractCommitFromStdout(result.stdout)
     }
 
+    static String addFileToRepository(File dir, String fileName, String fileContent = '') {
+        IOUtils.write(new File(dir, fileName), fileContent)
+        git("add " + fileName, dir)
+        def result = git("commit -m commit", dir)
+        return extractCommitFromStdout(result.stdout)
+    }
+
+    private static String extractCommitFromStdout(String stdout) {
+        // [master 310e0ab] commit message
+        def m = (stdout.split('\n')[0]) =~ /.+([0-9a-z]{7}).+/
+        m.find()
+        return m.group(1)
+    }
+
+    static  void newBranch(File dir, String branch) {
+        git("checkout -b " + branch, dir)
+    }
 }
 

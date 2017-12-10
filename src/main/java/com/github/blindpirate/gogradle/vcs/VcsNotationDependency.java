@@ -36,6 +36,7 @@ public abstract class VcsNotationDependency extends AbstractNotationDependency {
     public static final String COMMIT_KEY = "commit";
     private String commit;
     private String tag;
+    private String branch;
 
     public String getCommit() {
         return commit;
@@ -49,13 +50,12 @@ public abstract class VcsNotationDependency extends AbstractNotationDependency {
         this.commit = commit;
     }
 
-    // branch is a special tag
     public String getBranch() {
-        return tag;
+        return branch;
     }
 
     public void setBranch(String branch) {
-        this.tag = branch;
+        this.branch = branch;
     }
 
     public void setTag(String tag) {
@@ -92,7 +92,8 @@ public abstract class VcsNotationDependency extends AbstractNotationDependency {
     public String toString() {
         String ret = getName() + ':'
                 + (commit == null ? "" : " commit='" + commit + "',")
-                + (tag == null ? "" : " tag/branch='" + tag + "',")
+                + (tag == null ? "" : " tag='" + tag + "',")
+                + (branch == null ? "" : " branch='" + branch + "',")
                 + (getUrls() == null ? "" : " urls=" + getUrls() + ",")
                 + (containsAllSubpackages() ? "" : " subpackages='" + getSubpackages() + "',");
         return ret.substring(0, ret.length() - 1);

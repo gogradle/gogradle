@@ -62,7 +62,7 @@ dependencies {
     @Test
     void 'dependency in build.gradle should be used in DEVELOP'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
-        build('lock', 'vendor')
+        newBuild('lock', 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
         assert new File(resource, 'vendor/github.com/my/b/b1.go').exists()
 
@@ -83,7 +83,7 @@ dependencies {
 
     @Test
     void 'locked dependency should be used in REPRODUCIBLE'() {
-        build('lock', 'vendor')
+        newBuild('lock', 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/a1.go').exists()
 
         Map a = getLockedDependency('build')[0]
@@ -97,10 +97,10 @@ dependencies {
 
     @Test
     void 'persistent cache should be used'() {
-        build('vendor')
+        newBuild('vendor')
 
         deleteDependencyTreeCache()
-        build('vendor')
+        newBuild('vendor')
         assert new File(resource, 'vendor/github.com/my/a/a1.go').exists()
         assert stdout.toString().contains('Resolving cached')
     }
@@ -114,16 +114,16 @@ dependencies {
     void 'command line parameter --refresh-dependencies should succeed'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}\n')
 
-        build('vendor')
+        newBuild('vendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
 
         GitServer.addFileToRepository(new File(repositories, 'a2'), 'commit2.go', '')
 
-        build('vendor')
+        newBuild('vendor')
         assert stdout.toString().contains('UP-TO-DATE')
 
         IOUtils.append(new File(resource, 'build.gradle'), 'golang { globalCacheFor(0, MINUTE) }')
-        build(['--refresh-dependencies'], 'vendor')
+        newBuild('--refresh-dependencies', 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/commit2.go').exists()
     }
 
@@ -133,16 +133,6 @@ dependencies {
 
     void deleteDotGogradle() {
         IOUtils.clearDirectory(new File(resource, '.gogradle'))
-    }
-
-    void build(List arguments, String... tasks) {
-        newBuild({
-            it.forTasks(tasks)
-        }, arguments)
-    }
-
-    void build(String... tasks) {
-        build([], tasks)
     }
 
     @Override

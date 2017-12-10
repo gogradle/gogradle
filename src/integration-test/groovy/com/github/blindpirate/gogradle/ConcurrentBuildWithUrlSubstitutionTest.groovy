@@ -17,7 +17,9 @@
 
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.cache.GlobalCacheMetadata
 import com.github.blindpirate.gogradle.support.*
+import com.github.blindpirate.gogradle.util.DataExchange
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.After
@@ -69,8 +71,8 @@ class ConcurrentBuildWithUrlSubstitutionTest {
         gitServer.stop()
     }
 
-    // 5 concurrent build with original repository
-    // 5 concurrent build with substituted repository
+    // 5 concurrent build with repo1
+    // 5 concurrent build with repo2
     @Test
     void 'concurrent test should succeed'() {
         List<Future> futures = []
@@ -85,10 +87,22 @@ class ConcurrentBuildWithUrlSubstitutionTest {
 
         (1..TOTAL_THREAD_NUM / 2).each {
             assert new File(resource, "project${it}/vendor/github.com/my/project/1.go").exists()
+            assert !new File(resource, "project${it}/vendor/github.com/my/project/2.go").exists()
         }
         (TOTAL_THREAD_NUM / 2 + 1..TOTAL_THREAD_NUM).each {
+            assert !new File(resource, "project${it}/vendor/github.com/my/project/1.go").exists()
             assert new File(resource, "project${it}/vendor/github.com/my/project/2.go").exists()
         }
+
+        def metadata = DataExchange.parseYaml(new File(userhome, 'go/repo/github.com/my/project/gogradle-metadata').text, GlobalCacheMetadata)
+        assert metadata.repositories.size() == 2
+        metadata.repositories.each {
+            assert it.vcs == 'git'
+            assert !it.original
+            assert new File(userhome, "go/repo/github.com/my/project/${it.dir}/.git").exists()
+            assert System.currentTimeMillis() - it.lastUpdatedTime < 60000L
+        }
+        assert metadata.repositories*.urls.flatten() as Set == ['http://localhost:8080/repo1', 'http://localhost:8080/repo2'] as Set
     }
 
     Future buildWithRepo(int number, String repoUrl) {

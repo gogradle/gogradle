@@ -76,6 +76,8 @@ dependencies {
     testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.2.v20170220'
     testCompile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.2.v20170220'
     testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '4.6.1.201703071140-r'
+
+    integrationTestCompile 'com.github.tomakehurst:wiremock:2.12.0'
 }
 /************** test **************/
 // Define integration test task

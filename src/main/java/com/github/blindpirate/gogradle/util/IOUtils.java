@@ -75,6 +75,7 @@ public final class IOUtils {
     }
 
     public static File mkdir(File baseDir, String newDirName) {
+        Assert.isNotNull(baseDir);
         File ret = new File(baseDir, newDirName);
         forceMkdir(ret);
         return ret;
