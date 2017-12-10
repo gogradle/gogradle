@@ -62,7 +62,7 @@ golang {
         normalTest()
         assertNormalTestNoUpToDateResult()
 
-        IOUtils.forceDelete(new File(resource,'.gogradle/reports/test/index.html'))
+        IOUtils.forceDelete(new File(resource, '.gogradle/reports/test/index.html'))
         normalTest()
         assertNormalTestNoUpToDateResult()
     }
@@ -131,7 +131,7 @@ golang {
         }
 
         Process process = new ProcessUtils()
-                .run([gradleBinPath, 'test', '--stacktrace'] + args, [:], getProjectRoot())
+                .run([gradleBinPath, 'test', '--stacktrace', '--info'] + args, [:], getProjectRoot())
 
         def result = new ProcessUtils().getResult(process)
 
