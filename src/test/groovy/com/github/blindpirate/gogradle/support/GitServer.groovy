@@ -41,6 +41,11 @@ class GitServer {
     private Server server
     private static ProcessUtils processUtils = new ProcessUtils()
 
+    static  {
+        git('config --global user.email "test@test.com"',null)
+        git('config --global user.name "test"',null)
+    }
+
     static GitServer newServer() {
         return new GitServer()
     }
@@ -128,7 +133,7 @@ class GitServer {
         return m.group(1)
     }
 
-    static  void newBranch(File dir, String branch) {
+    static void newBranch(File dir, String branch) {
         git("checkout -b " + branch, dir)
     }
 }
