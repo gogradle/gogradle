@@ -78,6 +78,7 @@ dependencies {
     testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '4.6.1.201703071140-r'
 
     integrationTestCompile 'com.github.tomakehurst:wiremock:2.12.0'
+    integrationTestCompile 'org.apache.commons:commons-exec:1.3'
 }
 /************** test **************/
 // Define integration test task
