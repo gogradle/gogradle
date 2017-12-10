@@ -43,6 +43,8 @@ public class VscodeTask extends AbstractGolangTask {
 
     @TaskAction
     public void addGopathToSettingsDotJson() {
+        setGogradleGlobalContext();
+
         File settingsDotJson = new File(getProject().getProjectDir(), ".vscode/settings.json");
         if (!settingsDotJson.exists()) {
             IOUtils.write(settingsDotJson, "{}");

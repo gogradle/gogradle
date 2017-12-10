@@ -70,6 +70,8 @@ public class GoInit extends AbstractGolangTask {
 
     @TaskAction
     void init() {
+        setGogradleGlobalContext();
+
         File rootDir = getProject().getProjectDir();
         if (dependenciesInBuildDotGradleExists() || new File(rootDir, "gogradle.lock").exists()) {
             LOGGER.warn("This project seems to have been initialized already, skip.");

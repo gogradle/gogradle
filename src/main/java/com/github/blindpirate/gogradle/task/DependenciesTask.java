@@ -41,6 +41,8 @@ public class DependenciesTask extends AbstractGolangTask {
 
     @TaskAction
     public void displayDependencies() {
+        setGogradleGlobalContext();
+
         DependencyTreeNode buildTree = getTask(ResolveBuildDependencies.class).getDependencyTree();
         DependencyTreeNode testTree = getTask(ResolveTestDependencies.class).getDependencyTree();
         display(BUILD, buildTree);

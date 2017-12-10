@@ -42,6 +42,8 @@ public class GoLock extends AbstractGolangTask {
 
     @TaskAction
     public void lock() {
+        setGogradleGlobalContext();
+
         DependencyTreeNode buildDependencyTree = getTask(ResolveBuildDependencies.class).getDependencyTree();
         DependencyTreeNode testDependencyTree = getTask(ResolveTestDependencies.class).getDependencyTree();
 

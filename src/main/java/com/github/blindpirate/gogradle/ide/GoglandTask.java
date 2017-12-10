@@ -35,6 +35,8 @@ public class GoglandTask extends AbstractGolangTask {
 
     @TaskAction
     public void generateXmls() {
+        setGogradleGlobalContext();
+
         goglandIntegration.generateXmls();
     }
 }

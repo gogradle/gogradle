@@ -24,7 +24,6 @@ import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
@@ -49,7 +48,7 @@ public class GoBuild extends Go {
     private GolangPluginSetting setting;
 
     private static final Pattern TARGET_PLATFORMS_PATTERN
-            = Pattern.compile("(\\s*\\w+\\-\\w+\\s*)(,\\s*\\w+-\\w+\\s*)*");
+            = Pattern.compile("(\\s*\\w+-\\w+\\s*)(,\\s*\\w+-\\w+\\s*)*");
     private static final Pattern TARGET_PLATFORM_PATTERN
             = Pattern.compile("\\w+-\\w+");
 
@@ -105,11 +104,6 @@ public class GoBuild extends Go {
                 + capitalizeFirstLetter(os.toString())
                 + capitalizeFirstLetter(arch.toString());
         return getProject().getTasks().create(taskName, Go.class);
-    }
-
-    @TaskAction
-    public void executeTask() {
-        // intentionally empty
     }
 
     @Deprecated

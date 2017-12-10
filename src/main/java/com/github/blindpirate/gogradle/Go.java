@@ -81,6 +81,8 @@ public class Go extends AbstractGolangTask {
 
     @TaskAction
     public void executeTask() {
+        setGogradleGlobalContext();
+
         if (CollectionUtils.isEmpty(commandLineArgs)) {
             return;
         }

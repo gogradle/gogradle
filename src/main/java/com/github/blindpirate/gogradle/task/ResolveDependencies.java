@@ -150,6 +150,8 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     @TaskAction
     public void resolve() {
+        setGogradleGlobalContext();
+
         projectCacheManager.loadPersistenceCache();
         try {
             resolveDependencies();

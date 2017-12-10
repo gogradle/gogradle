@@ -50,6 +50,8 @@ public class GoInstall extends AbstractGolangTask {
 
     @TaskAction
     public void installDependenciesToVendor() {
+        setGogradleGlobalContext();
+
         IOUtils.forceMkdir(vendorDir);
         vendorSnapshoter.loadPersistenceCache();
 

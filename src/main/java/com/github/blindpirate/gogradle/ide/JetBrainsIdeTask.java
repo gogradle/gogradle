@@ -35,6 +35,8 @@ public class JetBrainsIdeTask extends AbstractGolangTask {
 
     @TaskAction
     public void generateXmls() {
+        setGogradleGlobalContext();
+
         jetBrainsIdeIntegration.generateXmls();
     }
 }
