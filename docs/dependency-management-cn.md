@@ -31,9 +31,6 @@ dependencies {
         build 'github.com/user/project@1.0.0-RELEASE' // Specify a version(tag in Git)
         build name:'github.com/user/project', tag:'1.0.0-RELEASE' // Equivalent to last line
         
-        build 'github.com/user/project@master' // Specify a branch 
-        build name:'github.com/user/project', branch:'master' // Equivalent to last line
-    
         test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
         test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
         build name:'github.com/user/project', version:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
@@ -41,7 +38,11 @@ dependencies {
 }
 ```
 
-默认情况下，如果你的声明没有指定commit/tag/branch的话，Gogradle会每次执行`git fetch`或者`hg update -u`，以保证获取远端的最新版本。
+默认情况下，如果你的声明没有指定commit的话，Gogradle就不会对本地缓存中的仓库执行`git pull`或者`hg update -u`。若期望如此，请使用`-Dgogradle.refresh=true`：
+
+```
+gradlew build -Dgogradle.refresh=true
+```
 
 依赖声明支持[语义化版本](http://semver.org/)。在Git中，"版本"即Git的tag。
 
