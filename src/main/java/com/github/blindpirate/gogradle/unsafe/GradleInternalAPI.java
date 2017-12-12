@@ -21,12 +21,12 @@ import com.github.blindpirate.gogradle.task.go.GoTestResultsProvider;
 import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Action;
-import org.gradle.api.internal.tasks.testing.junit.report.DefaultTestReport;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.invocation.Gradle;
 import org.gradle.internal.operations.BuildOperationQueue;
 import org.gradle.internal.operations.MultipleBuildOperationFailures;
 import org.gradle.internal.operations.RunnableBuildOperation;
+import org.gradle.util.GradleVersion;
 
 import java.io.File;
 import java.lang.reflect.Constructor;
@@ -44,6 +44,9 @@ import static org.joor.Reflect.on;
  */
 @SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_INFERRED")
 public class GradleInternalAPI {
+    private static final GradleVersion GRADLE_4_0 = GradleVersion.version("4.0");
+    private static final GradleVersion GRADLE_4_4 = GradleVersion.version("4.4");
+
     public static void renderTestReport(List<TestClassResult> testResults, File outputDir) {
         GoTestResultsProvider provider = new GoTestResultsProvider(testResults);
         try {
@@ -51,20 +54,29 @@ public class GradleInternalAPI {
                     ? "org.gradle.internal.operations.BuildOperationExecutor"
                     : "org.gradle.internal.operations.BuildOperationProcessor";
 
+            String testReportClassName = isAfterGradle44()
+                    ? "org.gradle.api.internal.tasks.testing.report.DefaultTestReport"
+                    : "org.gradle.api.internal.tasks.testing.junit.report.DefaultTestReport";
+
             Class buildOperationProcessorClass = Class.forName(executorClassName);
-            Constructor<DefaultTestReport> constructor =
-                    DefaultTestReport.class.getConstructor(buildOperationProcessorClass);
+            Class defaultTestReportClass = Class.forName(testReportClassName);
+            Constructor constructor = defaultTestReportClass.getConstructor(buildOperationProcessorClass);
             Object buildOperationExecutor = Proxy.newProxyInstance(Gradle.class.getClassLoader(),
                     new Class[]{buildOperationProcessorClass},
                     new BuildOperationExecutorOrProcessor());
-            constructor.newInstance(buildOperationExecutor).generateReport(provider, outputDir);
+
+            on(constructor.newInstance(buildOperationExecutor)).call("generateReport", provider, outputDir);
         } catch (ReflectiveOperationException e) {
             throw ExceptionHandler.uncheckException(e);
         }
     }
 
     private static boolean isGradle4() {
-        return "4".equals(System.getProperty("GRADLE_MAJOR_VERSION"));
+        return GradleVersion.current().compareTo(GRADLE_4_0) >= 0;
+    }
+
+    private static boolean isAfterGradle44() {
+        return GradleVersion.current().compareTo(GRADLE_4_4) >= 0;
     }
 
     private static class BuildOperationExecutorOrProcessor implements InvocationHandler {
@@ -78,11 +90,20 @@ public class GradleInternalAPI {
                 // Gradle 4.0
                 // org.gradle.internal.operations.BuildOperationExecutor.runAll(RunnableBuildOperation)
                 runAction(args);
+            } else if ("run".equals(method.getName()) && args[0] instanceof RunnableBuildOperation) {
+                // Gradle 4.4
+                runOperation(args);
             } else {
                 throw new UnsupportedOperationException();
             }
 
             return null;
+        }
+
+        private void runOperation(Object[] args) {
+            BuildOperationQueue queue = new SerialBuildOperationQueue();
+            queue.add((RunnableBuildOperation) args[0]);
+            queue.waitForCompletion();
         }
 
         @SuppressWarnings("unchecked")

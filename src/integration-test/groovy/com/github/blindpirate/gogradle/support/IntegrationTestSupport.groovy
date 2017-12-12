@@ -49,7 +49,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 golang {
     goExecutable = '${StringUtils.toUnixString(goBinPath)}'
-    packagePath = 'my/package'
+    packagePath = 'github.com/my/project'
 }
 """
         if (userhome != null) {

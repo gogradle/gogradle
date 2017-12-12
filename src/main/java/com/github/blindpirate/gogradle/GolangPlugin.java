@@ -64,7 +64,6 @@ public class GolangPlugin implements Plugin<Project> {
     @Override
     public void apply(Project project) {
         init(project);
-        System.setProperty("GRADLE_MAJOR_VERSION", project.getGradle().getGradleVersion().split("\\.")[0]);
         configureGogradleGlobal();
         customizeProjectInternalServices(project);
         configureSettings(project);

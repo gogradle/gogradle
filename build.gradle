@@ -13,9 +13,11 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id "com.gradle.plugin-publish" version "0.9.7"
     id "co.riiid.gradle" version "0.4.2"
+    id "org.jetbrains.kotlin.jvm" version "1.2.0"
 }
 
 apply from: 'config/scripts/coverage.gradle'
+apply plugin: 'kotlin'
 
 group 'com.github.blindpirate'
 version '0.7.0'
@@ -32,6 +34,10 @@ sourceSets {
         groovy.srcDir 'src/integration-test/groovy'
         resources.srcDir 'src/integration-test/resources'
     }
+    crossVersionTest {
+        kotlin.srcDir 'src/cross-version-test/kotlin'
+        resources.srcDir 'src/cross-version-test/resources'
+    }
 }
 
 /************** dependencies **************/
@@ -44,6 +50,11 @@ dependencies {
     integrationTestCompile sourceSets.test.output
     integrationTestCompile configurations.testCompile
     integrationTestRuntime configurations.testRuntime
+
+    crossVersionTestCompile sourceSets.main.output
+    crossVersionTestCompile sourceSets.test.output
+    crossVersionTestCompile sourceSets.integrationTest.output
+    crossVersionTestCompile configurations.testCompile
 
     antlr "org.antlr:antlr4:4.6"
 
@@ -72,37 +83,47 @@ dependencies {
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
     testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
-    testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.6.1.201703071140-r'
+    testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.5.3.201708160445-r'
     testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.2.v20170220'
     testCompile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.2.v20170220'
-    testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '4.6.1.201703071140-r'
+    testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit.http.server', version: '4.5.3.201708160445-r'
 
     integrationTestCompile 'com.github.tomakehurst:wiremock:2.12.0'
     integrationTestCompile 'org.apache.commons:commons-exec:1.3'
+
+    crossVersionTestCompile 'org.jetbrains.kotlin:kotlin-stdlib-jdk8'
+    crossVersionTestCompile 'org.jetbrains.kotlin:kotlin-test-junit'
+    crossVersionTestCompile 'org.jetbrains.kotlin:kotlin-test'
+    crossVersionTestCompile 'org.jetbrains.kotlin:kotlin-reflect'
+    crossVersionTestCompile gradleTestKit()
 }
 /************** test **************/
 // Define integration test task
-task integrationTest(type: Test) {
-    if (gradle.gradleVersion.startsWith('4')) {
-        testClassesDirs = sourceSets.integrationTest.output.classesDirs
-    } else {
-        testClassesDir = sourceSets.integrationTest.output.classesDir
+['integrationTest', 'crossVersionTest'].each { taskName ->
+    tasks.create(name: taskName, type: Test) {
+        if (gradle.gradleVersion.startsWith('4')) {
+            testClassesDirs = sourceSets[taskName].output.classesDirs
+        } else {
+            testClassesDir = sourceSets[taskName].output.classesDir
+        }
+        classpath = sourceSets[taskName].runtimeClasspath
     }
-    classpath = sourceSets.integrationTest.runtimeClasspath
 }
 
 project.tasks.withType(Test) {
+    mustRunAfter findbugsMain
     if (gradle.startParameter.isOffline()) {
         it.systemProperty("TEST_ARE_OFFLINE", 'true')
     }
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
     it.systemProperty('GOGRADLE_ROOT', rootDir.absolutePath.replace('\\', '/'))
-    it.systemProperty("GRADLE_MAJOR_VERSION", gradle.gradleVersion.split(/\./)[0])
 }
 
-check.dependsOn javadoc, jacocoTestReport, test, integrationTest
-integrationTest.mustRunAfter test
+check.dependsOn javadoc, jacocoTestReport, test, integrationTest, crossVersionTest
 integrationTest.dependsOn shadowJar
+integrationTest.mustRunAfter test
+crossVersionTest.dependsOn shadowJar
+crossVersionTest.mustRunAfter test, integrationTest
 
 /************** testTop1000 **********/
 
@@ -213,4 +234,23 @@ compileJava.dependsOn updateVersion
 
 publishPlugins.dependsOn 'updateVersion', 'shadowJar'
 
+/************** kotlin **************/
+compileKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+compileTestKotlin {
+    kotlinOptions {
+        jvmTarget = "1.8"
+    }
+}
+
+/************** shadow **************/
+
+shadowJar {
+    dependencies {
+        exclude 'org/gradle/**', 'groovy/**'
+    }
+}
 

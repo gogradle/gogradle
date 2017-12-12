@@ -41,9 +41,11 @@ class GitServer {
     private Server server
     private static ProcessUtils processUtils = new ProcessUtils()
 
-    static  {
-        git('config --global user.email "test@test.com"',null)
-        git('config --global user.name "test"',null)
+    static {
+        if (System.getenv("APPVEYOR") != null) {
+            git('config --global user.email "bo@gradle.com"', null)
+            git('config --global user.name "Bo Zhang"', null)
+        }
     }
 
     static GitServer newServer() {
