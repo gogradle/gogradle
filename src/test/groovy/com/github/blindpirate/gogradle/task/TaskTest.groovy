@@ -31,9 +31,6 @@ import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.produce.strategy.GogradleRootProduceStrategy
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeFactory
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager
-import com.github.blindpirate.gogradle.ide.GoglandIntegration
-import com.github.blindpirate.gogradle.ide.IdeaIntegration
-import com.github.blindpirate.gogradle.ide.JetBrainsIdeIntegration
 import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
@@ -69,19 +66,13 @@ abstract class TaskTest {
     @Mock
     LockedDependencyManager lockedDependencyManager
     @Mock
-    IdeaIntegration ideaIntegration
-    @Mock
     GolangConfigurationManager configurationManager
     @Mock
     ProjectCacheManager projectCacheManager
     @Mock
-    JetBrainsIdeIntegration jetBrainsIdeIntegration
-    @Mock
     VendorSnapshoter vendorSnapshoter
     @Mock
     GogradleRootProject gogradleRootProject
-    @Mock
-    GoglandIntegration goglandIntegration
     @Mock
     ExtensionContainerInternal extensionContainer
     // This is a real task container for test tasks to fetch notationDependency tasks from
@@ -115,13 +106,10 @@ abstract class TaskTest {
                       goBinaryManager        : goBinaryManager,
                       buildConstraintManager : buildConstraintManager,
                       lockedDependencyManager: lockedDependencyManager,
-                      ideaIntegration        : ideaIntegration,
                       configurationManager   : configurationManager,
                       projectCacheManager    : projectCacheManager,
                       gogradleRootProject    : gogradleRootProject,
-                      vendorSnapshoter       : vendorSnapshoter,
-                      goglandIntegration     : goglandIntegration,
-                      jetBrainsIdeIntegration: jetBrainsIdeIntegration]
+                      vendorSnapshoter       : vendorSnapshoter]
 
 
         when(project.getExtensions()).thenReturn(extensionContainer)

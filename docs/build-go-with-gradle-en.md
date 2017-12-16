@@ -31,7 +31,7 @@ Gogradle is a Gradle plugin providing Go build support. You can simply think it 
   - Gogradle is compatible with `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`. When looking up a package's transitive dependencies, it can recognize these tools automatically.
 - Gogradle has many extra features:
   - Test and coverage HTML reports generation
-  - Full IDE support (IntelliJIDEA/VSCode/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim), especially deep integration with IntellijIDEA.
+  - IDE support
   - Repository substitution and management, easy to set a mirror repository.
 
 Gogradle is [here](https://github.com/gogradle/gogradle). Its objective is not to replace other tools but to give an extra choice to developers. If you've been bothered by issues mentioned above, or you're familiar with Java and Gradle, Gogradle is your choice.
@@ -49,7 +49,7 @@ Since IntelliJIDEA supports Gradle natively, I do some hacking to it and make it
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
-Gogradle will resolve that package and all its transitive packages, fix potential conflict, and install it into `vendor`. Other IDE has no native Gradle support so some command line stuff is required. Gogradle support `IntelliJIDEA/VSCode/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim`. See [IDE integration](https://github.com/gogradle/gogradle/blob/master/docs/ide.md) for more details.
+Gogradle will resolve that package and all its transitive packages, fix potential conflict, and install it into `vendor`. Other IDE has no native Gradle support so some command line stuff is required. Gogradle support IDE. See [IDE integration](https://github.com/gogradle/gogradle/blob/master/docs/ide.md) for more details.
 
 ## Get started 
 
@@ -57,7 +57,7 @@ Assume you have a computer with only operation system and `Git`, let's talk abou
 
 ### Install JRE and IDE
 
-All Gogradle needs is a JVM. Now you need to [install JDK or JRE 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). However, if you decide to use JetBrains IDE (IntellijIDEA/Gogland/WebStorm/PhpStorm/PyCharm/RubyMine/CLion), You can leverage the JRE shipped with it without extra installation. See [IDE integration](https://github.com/gogradle/gogradle/blob/master/docs/ide.md) to set configure that. Similarly, if you decide to use VSCode or Vim, you should install corresponding plugins as described in that documentatin.
+All Gogradle needs is a JVM. Now you need to [install JDK or JRE 8+](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html). However, if you decide to use JetBrains IDE (IntellijIDEA/GoLand/WebStorm/PhpStorm/PyCharm/RubyMine/CLion), You can leverage the JRE shipped with it without extra installation. See [IDE integration](https://github.com/gogradle/gogradle/blob/master/docs/ide.md) to set configure that. Similarly, if you decide to use VSCode or Vim, you should install corresponding plugins as described in that documentation.
 
 ### Copy Gogradle scripts
 

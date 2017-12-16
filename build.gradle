@@ -218,15 +218,19 @@ task('updateVersion') {
 }
 
 pluginBundle {
-    website = 'https://github.com/blindpirate/gogradle'
-    vcsUrl = 'https://github.com/blindpirate/gogradle'
-    description = 'Full-featured Build Support for Golang'
-    tags = ['go', 'golang', 'build', 'test']
     plugins {
         golangPlugin {
+            website = 'https://github.com/blindpirate/gogradle'
+            vcsUrl = 'https://github.com/blindpirate/gogradle'
+            description = 'Full-featured Build Support for Golang'
+            tags = ['go', 'golang', 'build', 'test']
             id = 'com.github.blindpirate.gogradle'
             displayName = 'Gogradle - Full-featured Build Plugin for Golang'
         }
+
+        golangIdeaPlugin {
+        }
+
     }
 }
 

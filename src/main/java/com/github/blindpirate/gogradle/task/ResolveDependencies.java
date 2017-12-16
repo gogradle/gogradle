@@ -50,7 +50,6 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION;
-import static com.github.blindpirate.gogradle.GogradleGlobal.INSTANCE;
 import static com.github.blindpirate.gogradle.GogradleGlobal.isRefreshDependencies;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
@@ -87,7 +86,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 1: dependencies declared in build.gradle
     @Input
     public HashSet<GolangDependency> getDependencies() {
-        INSTANCE.setCurrentProject(getProject());
+        setGogradleGlobalContext();
         GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
         configuration.resolveFirstLevelDependencies();
         // elements in GolangDependency are identified by name, here we want to identify them by equals
@@ -122,7 +121,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 6: --refresh-dependencies
     @Input
     public String getRefreshDependenciesFlag() {
-        INSTANCE.setCurrentProject(getProject());
+        setGogradleGlobalContext();
         if (isRefreshDependencies()) {
             return UUID.randomUUID().toString();
         } else {
@@ -133,7 +132,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 7: local dependencies
     @InputFiles
     public List<File> getLocalDirDependencies() {
-        INSTANCE.setCurrentProject(getProject());
+        setGogradleGlobalContext();
         return configurationManager.getByName(getConfigurationName())
                 .getDependencies().stream()
                 .filter(dependency -> dependency instanceof LocalDirectoryDependency)

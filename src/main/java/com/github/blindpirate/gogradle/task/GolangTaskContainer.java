@@ -18,22 +18,21 @@
 package com.github.blindpirate.gogradle.task;
 
 import com.github.blindpirate.gogradle.GogradleGlobal;
-import com.github.blindpirate.gogradle.ide.GoglandTask;
-import com.github.blindpirate.gogradle.ide.IdeaTask;
-import com.github.blindpirate.gogradle.ide.JetBrainsIdeTask;
-import com.github.blindpirate.gogradle.ide.VscodeTask;
 import com.github.blindpirate.gogradle.task.go.GoBuild;
 import com.github.blindpirate.gogradle.task.go.GoCover;
 import com.github.blindpirate.gogradle.task.go.GoTest;
 import com.github.blindpirate.gogradle.task.go.GoVet;
 import com.github.blindpirate.gogradle.task.go.Gofmt;
 import com.google.common.collect.ImmutableMap;
+import com.google.inject.Injector;
+import org.gradle.api.Action;
+import org.gradle.api.Project;
 import org.gradle.api.Task;
+import org.gradle.api.tasks.TaskContainer;
 
 import javax.inject.Singleton;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.function.Consumer;
 
 @Singleton
 public class GolangTaskContainer {
@@ -53,14 +52,6 @@ public class GolangTaskContainer {
     public static final String CLEAN_TASK_NAME = determineAlias("clean", "goClean");
     public static final String TEST_TASK_NAME = determineAlias("test", "goTest");
     public static final String VENDOR_TASK_NAME = determineAlias("vendor", "goVendor");
-    public static final String IDEA_TASK_NAME = "goIdea";
-    public static final String GOGLAND_TASK_NAME = "gogland";
-    public static final String WEBSTORM_TASK_NAME = "webStorm";
-    public static final String PHPSTORM_TASK_NAME = "phpStorm";
-    public static final String PYCHARM_TASK_NAME = "pyCharm";
-    public static final String VSCODE_TASK_NAME = "vscode";
-    private static final String RUBYMINE_TASK_NAME = "rubyMine";
-    private static final String CLION_TASK_NAME = "cLion";
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
     public static final String COVERAGE_TASK_NAME = determineAlias("coverage", "goCover");
     public static final String GOFMT_TASK_NAME = determineAlias("fmt", "gofmt");
@@ -74,37 +65,42 @@ public class GolangTaskContainer {
         }
     }
 
+    private static final Map<String, Class<? extends Task>> TASKS =
+            ImmutableMap.<String, Class<? extends Task>>builder()
+                    .put(PREPARE_TASK_NAME, GoPrepare.class)
+                    .put(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, ResolveBuildDependencies.class)
+                    .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependencies.class)
+                    .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
+                    .put(BUILD_TASK_NAME, GoBuild.class)
+                    .put(TEST_TASK_NAME, GoTest.class)
+                    .put(VENDOR_TASK_NAME, GoVendor.class)
+                    .put(INSTALL_DEPENDENCIES_TASK_NAME, GoInstall.class)
+                    .put(INIT_TASK_NAME, GoInit.class)
+                    .put(CLEAN_TASK_NAME, GoClean.class)
+                    .put(CHECK_TASK_NAME, GoCheck.class)
+                    .put(LOCK_TASK_NAME, GoLock.class)
+                    .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGoroot.class)
+                    .put(COVERAGE_TASK_NAME, GoCover.class)
+                    .put(GOVET_TASK_NAME, GoVet.class)
+                    .put(GOFMT_TASK_NAME, Gofmt.class)
+                    .build();
 
-    public static final Map<String, Class<? extends Task>> TASKS = ImmutableMap.<String, Class<? extends Task>>builder()
-            .put(PREPARE_TASK_NAME, GoPrepare.class)
-            .put(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, ResolveBuildDependencies.class)
-            .put(RESOLVE_TEST_DEPENDENCIES_TASK_NAME, ResolveTestDependencies.class)
-            .put(DEPENDENCIES_TASK_NAME, DependenciesTask.class)
-            .put(BUILD_TASK_NAME, GoBuild.class)
-            .put(TEST_TASK_NAME, GoTest.class)
-            .put(VENDOR_TASK_NAME, GoVendor.class)
-            .put(INSTALL_DEPENDENCIES_TASK_NAME, GoInstall.class)
-            .put(INIT_TASK_NAME, GoInit.class)
-            .put(CLEAN_TASK_NAME, GoClean.class)
-            .put(CHECK_TASK_NAME, GoCheck.class)
-            .put(LOCK_TASK_NAME, GoLock.class)
-            .put(IDEA_TASK_NAME, IdeaTask.class)
-            .put(VSCODE_TASK_NAME, VscodeTask.class)
-            .put(GOGLAND_TASK_NAME, GoglandTask.class)
-            .put(WEBSTORM_TASK_NAME, JetBrainsIdeTask.class)
-            .put(PHPSTORM_TASK_NAME, JetBrainsIdeTask.class)
-            .put(PYCHARM_TASK_NAME, JetBrainsIdeTask.class)
-            .put(RUBYMINE_TASK_NAME, JetBrainsIdeTask.class)
-            .put(CLION_TASK_NAME, JetBrainsIdeTask.class)
-            .put(SHOW_GOPATH_GOROOT_TASK_NAME, ShowGopathGoroot.class)
-            .put(COVERAGE_TASK_NAME, GoCover.class)
-            .put(GOVET_TASK_NAME, GoVet.class)
-            .put(GOFMT_TASK_NAME, Gofmt.class)
-            .build();
 
     private Map<Class<? extends Task>, Task> tasks = new HashMap<>();
 
-    public <T extends Task> void put(Class<T> clazz, T task) {
+    private Injector injector;
+
+    private Project project;
+
+    private Action<Task> dependencyInjectionAction = task -> injector.injectMembers(task);
+
+    public GolangTaskContainer init(Project project, Injector injector) {
+        this.project = project;
+        this.injector = injector;
+        return this;
+    }
+
+    public <T extends Task> void put(Class<? extends Task> clazz, T task) {
         this.tasks.put(clazz, task);
     }
 
@@ -113,7 +109,8 @@ public class GolangTaskContainer {
         return (T) this.tasks.get(clazz);
     }
 
-    public void each(Consumer<Task> consumer) {
-        tasks.values().forEach(consumer::accept);
+    public void createCoreTasks() {
+        TaskContainer taskContainer = project.getTasks();
+        TASKS.forEach((key, value) -> tasks.put(value, taskContainer.create(key, value, dependencyInjectionAction)));
     }
 }

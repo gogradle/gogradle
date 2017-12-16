@@ -19,26 +19,21 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
-import com.github.blindpirate.gogradle.ide.IdeaIntegration;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.github.blindpirate.gogradle.task.go.GoBuild;
 import com.github.blindpirate.gogradle.task.go.Gofmt;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
-import org.gradle.api.Action;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
-import org.gradle.api.Task;
 import org.gradle.api.artifacts.ConfigurationContainer;
 import org.gradle.api.plugins.ExtensionAware;
-import org.gradle.api.tasks.TaskContainer;
 
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
-import static com.github.blindpirate.gogradle.task.GolangTaskContainer.TASKS;
 
 /**
  * The entry of Gogradle plugin.
@@ -49,17 +44,6 @@ public class GolangPlugin implements Plugin<Project> {
     private GolangPluginSetting settings;
     private GolangTaskContainer golangTaskContainer;
     private Project project;
-    private Action<? super Task> dependencyInjectionAction = new Action<Task>() {
-        @Override
-        public void execute(Task task) {
-            injector.injectMembers(task);
-        }
-    };
-
-    // This is invoked by gradle, not our Guice.
-    private Injector initGuice() {
-        return Guice.createInjector(new GogradleModule(project));
-    }
 
     @Override
     public void apply(Project project) {
@@ -68,22 +52,16 @@ public class GolangPlugin implements Plugin<Project> {
         customizeProjectInternalServices(project);
         configureSettings(project);
         configureConfigurations(project);
-        configureTasks(project);
-        hackIdeaPlugin();
-    }
-
-    private void hackIdeaPlugin() {
-        if (project.getRootDir().equals(project.getProjectDir())) {
-            project.getPlugins().withId("idea", plugin -> injector.getInstance(IdeaIntegration.class).hack());
-        }
+        createCoreTasks(project);
     }
 
     private void init(Project project) {
         this.project = project;
-        this.injector = initGuice();
-        this.project.getExtensions().add(GOGRADLE_INJECTOR, this.injector);
-        this.settings = injector.getInstance(GolangPluginSetting.class);
-        this.golangTaskContainer = injector.getInstance(GolangTaskContainer.class);
+        injector = initGuice();
+        project.getExtensions().add(GOGRADLE_INJECTOR, this.injector);
+        GogradleGlobal.INSTANCE.setCurrentProject(project);
+        settings = injector.getInstance(GolangPluginSetting.class);
+        golangTaskContainer = injector.getInstance(GolangTaskContainer.class).init(project, injector);
         Arrays.asList(BuildMode.values()).forEach(mode -> {
             project.getExtensions().add(mode.toString(), mode);
             project.getExtensions().add(mode.getAbbr(), mode);
@@ -95,16 +73,16 @@ public class GolangPlugin implements Plugin<Project> {
         });
     }
 
+    private Injector initGuice() {
+        return Guice.createInjector(new GogradleModule(project));
+    }
+
     private void configureGogradleGlobal() {
         GogradleGlobal.INSTANCE.setCurrentProject(project);
     }
 
-    private void configureTasks(Project project) {
-        TaskContainer taskContainer = project.getTasks();
-        TASKS.forEach((key, value) -> {
-            Task task = taskContainer.create(key, value, dependencyInjectionAction);
-            golangTaskContainer.put((Class) value, task);
-        });
+    private void createCoreTasks(Project project) {
+        golangTaskContainer.createCoreTasks();
         project.afterEvaluate(this::afterEvaluate);
     }
 

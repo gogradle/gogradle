@@ -36,7 +36,7 @@ Gogradle就是一个支持构建Go语言的插件。简单而言，你可以将G
   - Gogradle兼容`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`工具。在查找一个依赖包的传递性依赖时，它能够自动识别这些工具的锁定文件
 - Gogradle提供了许多的额外Feature
   - 测试和覆盖率HTML报告生成   
-  - 全系列IDE支持（IntelliJIDEA/VSCode/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim），尤其是IntellijIDEA的深度集成
+  - IDE支持
   - 使用动态语言特性完成仓库的声明和替换，可轻易地实现镜像仓库
 
 Gogradle的项目地址在这里：[https://github.com/gogradle/gogradle](https://github.com/gogradle/gogradle)。它的目标不是取代其他的工具，只是为开发者提供一些额外的选项。如果你曾被上述问题困扰，或者你曾是Java开发者，熟悉Gradle，那么Gogradle是你不二的选择。
@@ -54,7 +54,7 @@ Gogradle的项目地址在这里：[https://github.com/gogradle/gogradle](https:
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
 
-Gogradle会自动解析该包及所有的传递性依赖，解决所有可能的冲突，然后将其安装到`vendor`目录中。其他的IDE没有原生的Gradle支持，因此需要一些命令行操作。Gogradle支持`IntelliJIDEA/VSCode/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim`，详见[IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)。
+Gogradle会自动解析该包及所有的传递性依赖，解决所有可能的冲突，然后将其安装到`vendor`目录中。其他的IDE没有原生的Gradle支持，因此需要一些命令行操作。Gogradle支持IDE，详见[IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)。
 
 ## 从头开始
 
@@ -62,7 +62,7 @@ Gogradle会自动解析该包及所有的传递性依赖，解决所有可能的
 
 ### 安装JRE及IDE
 
-Gogradle所需的一切仅仅是一个JVM。现在你需要安装JDK或者JRE 8+，在[这里](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)下载。不过，如果你决定使用JetBrains系列的IDE（IntellijIDEA/Gogland/WebStorm/PhpStorm/PyCharm/RubyMine/CLion）之一，那么你可以利用其自带的JRE，而无需额外安装。详见[Gogradle IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)设置使用其自带的JRE。同样，如果你决定使用VSCode或者Vim，也按照该文档描述，安装相应的插件。
+Gogradle所需的一切仅仅是一个JVM。现在你需要安装JDK或者JRE 8+，在[这里](http://www.oracle.com/technetwork/java/javase/downloads/jdk8-downloads-2133151.html)下载。不过，如果你决定使用JetBrains系列的IDE（IntellijIDEA/GoLand/WebStorm/PhpStorm/PyCharm/RubyMine/CLion）之一，那么你可以利用其自带的JRE，而无需额外安装。详见[Gogradle IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)设置使用其自带的JRE。同样，如果你决定使用VSCode或者Vim，也按照该文档描述，安装相应的插件。
 
 ### 拷贝Gradle脚本
 

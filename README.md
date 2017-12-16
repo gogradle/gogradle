@@ -41,7 +41,7 @@ Gogradle implements most features of `glide` and adds some extra features:
 
 - Test and coverage reports generation
 - Multi-version management of Go
-- Full IDE support (IntelliJIDEA/VSCode/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim), especially deep integration with IntelliJIDEA
+- IDE support
 - Declaration and substitution of repositories, which can be used as mirror repositories
 
 If you puzzled over these issues, or you were a Java developer and familiar with Gradle, Gogradle is your choice!  
@@ -77,7 +77,7 @@ Gogradle's objective is not replacing other tools, it only provides an option fo
 - Native syntax of gradle
 - Additional features for users in mainland China who are behind the [GFW](https://en.wikipedia.org/wiki/Great_Firewall)
 - Supports shadowsocks proxy 
-- IDE support (IntelliJIDEA/Gogland/Webstorm/PhpStorm/PyCharm/RubyMine/CLion/Vim)
+- IDE support
 - Test and coverage report generation
 - Incremental build 
 

@@ -10,7 +10,7 @@
   - init
 - IDE任务
   - goIdea
-  - gogland/phpStorm/webStorm/rubyMine/cLion/pyCharm
+  - goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
   - vscode
 - 依赖相关任务
   - resolveBuildDependencies
@@ -51,7 +51,7 @@
 
 依赖`vendor`任务，生成IntelliJIDEA的工程文件，支持社区版和旗舰版。需要安装Go插件，详见[IDE支持](./ide-cn.md)。
 
-## gogland/phpStorm/webStorm/rubyMine/cLion/pyCharm
+## goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
 
 依赖`vendor`任务，生成这些IDE的相关工程文件。需要安装Go插件，详见[IDE支持](./ide-cn.md)。
 

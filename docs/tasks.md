@@ -10,7 +10,7 @@ A task unit executed independently is usually called [Task](https://docs.gradle.
   - init
 - IDE tasks
   - goIdea
-  - gogland/phpStorm/webStorm/rubyMine/cLion/pyCharm
+  - goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
   - vscode
 - Dependency tasks
   - resolveBuildDependencies
@@ -51,7 +51,7 @@ Depends on `prepare`. Perform migration from other package management tools. Cur
 
 Depends on `vendor`. Generates project files for `IntelliJIDEA`. Supports Community Edition and Ultimate Edition. Needs Go plugin. See [IDE integration](./ide.md) for more details.
 
-## gogland/phpStorm/webStorm/rubyMine/cLion/pyCharm
+## goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
 
 Depends on `vendor`. Generates project files for these IDEs. Needs Go plugin. See [IDE integration](./ide.md) for more details.
 
