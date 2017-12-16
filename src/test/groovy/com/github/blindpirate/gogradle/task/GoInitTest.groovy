@@ -90,18 +90,19 @@ class GoInitTest extends TaskTest {
         // given
         when(externalDependencyFactory.canRecognize(any(File))).thenReturn(true)
         when(externalDependencyFactory.extractNotations(resource, 'build')).thenReturn(
-                [[name: 'a', transitive: false], [name: 'b', url: 'url']]
+                [[name: 'a', transitive: false], [name: 'b', url: 'url'], [name: 'c', host: [name: 'd', url: 'd-url'], vendorPath: 'vendor/c']]
         )
-        when(externalDependencyFactory.extractNotations(resource, 'test')).thenReturn([[name: 'c']])
+        when(externalDependencyFactory.extractNotations(resource, 'test')).thenReturn([[name: 'e', urls: ['url1', 'url2']]])
         // when
         task.init()
         // then
         assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
-        build name:'a', transitive:false
-        build name:'b', url:'url'
-        test name:'c'
+        build(['name':'a', 'transitive':false])
+        build(['name':'b', 'url':'url'])
+        build(['name':'c', 'host':['name':'d', 'url':'d-url'], 'vendorPath':'vendor/c'])
+        test(['name':'e', 'urls':['url1', 'url2']])
     }
 }''')
     }
@@ -119,21 +120,11 @@ dependencies {
         assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
-        build name:'a'
-        build name:'b'
-        test name:'c'
+        build(['name':'a'])
+        build(['name':'b'])
+        test(['name':'c'])
     }
 }''')
-    }
-
-    @Test(expected = IllegalStateException)
-    void 'exception should be thrown if unrecognized notation type exists'() {
-        // given
-        when(externalDependencyFactory.canRecognize(any(File))).thenReturn(true)
-        when(externalDependencyFactory.extractNotations(resource, 'build')).thenReturn([[name: 'a', unknownType: 1]])
-        when(externalDependencyFactory.extractNotations(resource, 'test')).thenReturn([])
-        // when
-        task.init()
     }
 
     @Test
