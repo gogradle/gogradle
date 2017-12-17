@@ -111,7 +111,7 @@ dependencies {
 }
 
 project.tasks.withType(Test) {
-    mustRunAfter findbugsMain
+    mustRunAfter findbugsMain, findbugsTest, findbugsIntegrationTest, findbugsCrossVersionTest
     if (gradle.startParameter.isOffline()) {
         it.systemProperty("TEST_ARE_OFFLINE", 'true')
     }
