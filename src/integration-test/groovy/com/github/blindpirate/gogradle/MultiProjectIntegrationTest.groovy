@@ -46,7 +46,6 @@ buildscript {
 apply plugin: 'java'
 
 allprojects {
-    apply plugin: 'idea'
     if(it.name.startsWith('go')){
         it.apply plugin:'com.github.blindpirate.gogradle'
         it.dependencies {
@@ -96,22 +95,11 @@ func main(){
 
     @Test
     void 'root project is java and sub is go'() {
-        newBuild {
-            it.forTasks('build')
-        }
+        newBuild('build', '--parallel')
 
         assert new File(resource, "go1/.gogradle/go1-${Os.getHostOs()}-${Arch.getHostArch()}").exists()
         assert new File(resource, "go2/.gogradle/go2-${Os.getHostOs()}-${Arch.getHostArch()}").exists()
         assert new File(resource, "build/libs/multi.jar").exists()
-    }
-
-    @Test
-    void 'run idea when root project is java and sub is go'() {
-        newBuild {
-            it.forTasks('idea')
-        }
-
-        assert new File(resource, 'multi.ipr').exists()
     }
 
     @Test
