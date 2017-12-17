@@ -73,7 +73,8 @@ public class SourceCodeDependencyFactory {
     private GolangDependencySet createDependencies(ResolvedDependency resolvedDependency, Set<String> importPaths) {
         Set<String> rootPackagePaths =
                 importPaths.stream()
-                        .filter(path -> !path.startsWith(resolvedDependency.getName()) && !path.startsWith(gogradleRootProject.getName()))
+                        .filter(path -> !path.startsWith(resolvedDependency.getName())
+                                && !path.startsWith(gogradleRootProject.getName()))
                         .map(this::getRootPath)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
@@ -106,7 +107,7 @@ public class SourceCodeDependencyFactory {
         }
 
         if (info instanceof IncompleteGolangPackage) {
-            throw new IllegalStateException("Incomplete package " + info.getPathString() + ", something must be wrong.");
+            throw new IllegalStateException("Incomplete package " + info.getPathString() + ", something must be wrong");
         }
 
         String rootPath = ResolvableGolangPackage.class.cast(info).getRootPathString();

@@ -108,8 +108,8 @@ public class GoInit extends AbstractGolangTask {
     }
 
     private void initByExternalLockfiles(ExternalDependencyFactory factory, File rootDir) {
-        List<Map<String, Object>> buildDependencies = factory.extractNotations(rootDir, BUILD);
-        List<Map<String, Object>> testDependencies = factory.extractNotations(rootDir, TEST);
+        List<Map<String, Object>> buildDependencies = factory.extractNotations(gogradleRootProject, rootDir, BUILD);
+        List<Map<String, Object>> testDependencies = factory.extractNotations(gogradleRootProject, rootDir, TEST);
         appendToBuildDotGradle(rootDir, buildDependencies, testDependencies);
     }
 

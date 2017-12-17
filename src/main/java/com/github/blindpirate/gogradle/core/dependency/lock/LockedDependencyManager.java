@@ -27,7 +27,7 @@ public interface LockedDependencyManager {
     void lock(Collection<? extends ResolvedDependency> flatBuildDependencies,
               Collection<? extends ResolvedDependency> flatTestDependencies);
 
-    GolangDependencySet produce(File rootDir, String configuration);
+    GolangDependencySet produce(ResolvedDependency resolvedDependency, File rootDir, String configuration);
 
     boolean canRecognize(File rootDir);
 }

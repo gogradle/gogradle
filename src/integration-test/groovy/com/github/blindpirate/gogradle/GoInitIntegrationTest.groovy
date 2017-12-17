@@ -66,9 +66,9 @@ testImports:
         assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
-        build name:'github.com/bradfitz/gomemcache', version:'2fafb84a66c4911e11a8f50955b01e74fe3ab9c5', subpackages:[".","memcache"], transitive:false
-        build name:'github.com/urfave/cli', version:'0bdeddeeb0f650497d603c4ad7b20cfe685682f6', transitive:false
-        test name:'github.com/go-macaron/cache', version:'56173531277692bc2925924d51fda1cd0a6b8178', subpackages:[".","redis","memcache"], transitive:false
+        build(['name':'github.com/bradfitz/gomemcache', 'version':'2fafb84a66c4911e11a8f50955b01e74fe3ab9c5', 'subpackages':['.', 'memcache'], 'transitive':false])
+        build(['name':'github.com/urfave/cli', 'version':'0bdeddeeb0f650497d603c4ad7b20cfe685682f6', 'transitive':false])
+        test(['name':'github.com/go-macaron/cache', 'version':'56173531277692bc2925924d51fda1cd0a6b8178', 'subpackages':['.', 'redis', 'memcache'], 'transitive':false])
     }
 }''')
         newBuild {
@@ -95,8 +95,8 @@ import "github.com/c/d"
         assert new File(resource, 'build.gradle').text.contains('''\
 dependencies {
     golang {
-        build name:'github.com/a/b'
-        test name:'github.com/c/d'
+        build(['name':'github.com/a/b'])
+        test(['name':'github.com/c/d'])
     }
 }''')
     }

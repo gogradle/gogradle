@@ -65,7 +65,7 @@ class DefaultDependencyVisitorTest {
         // given:
         when(external1.canRecognize(rootDir)).thenReturn(false)
         when(external2.canRecognize(rootDir)).thenReturn(true)
-        when(external2.produce(rootDir, 'build')).thenReturn(dependencySet)
+        when(external2.produce(resolvedDependency, rootDir, 'build')).thenReturn(dependencySet)
 
         // then:
         assert visitor.visitExternalDependencies(resolvedDependency, rootDir, 'build') == dependencySet

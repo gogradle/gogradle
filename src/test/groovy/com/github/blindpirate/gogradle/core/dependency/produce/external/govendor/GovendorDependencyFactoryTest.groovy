@@ -26,11 +26,13 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
+import org.mockito.Mockito
 
 @RunWith(GogradleRunner)
 class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @InjectMocks
     GovendorDependencyFactory factory
+
     String vendorDotJson = '''
             {
                 "comment": "",
@@ -54,6 +56,18 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
                         "path": "github.com/Sirupsen/logrus",
                         "revision": "0700fa570d7bcc1b3e46ee127c4489fd25f4daa3",
                         "revisionTime": "2017-03-21T17:14:25Z"
+                    },
+                    {
+                        "path": "plugin",
+                        "revision": ""
+                    },
+                    {
+                        "path": "github.com/my/package",
+                        "revision" : "whatever"
+                    },
+                    {
+                        "path": "github.com/target/package",
+                        "revision" : "whatever"
                     }
             ],
                 "rootPath": "github.com/kardianos/govendor"
@@ -62,6 +76,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
 
     @Before
     void setUp() {
+        Mockito.when(parentDependency.getName()).thenReturn("github.com/my/package")
         ReflectionUtils.setField(factory, 'packagePathResolver', new GithubGitlabPackagePathResolver("github.com"))
     }
 
@@ -75,7 +90,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson(vendorDotJson)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name      : 'github.com/Bowery/prompt',
                          version   : 'd43c2707a6c5a152a344c64bb4fed657e2908a81',
@@ -95,7 +110,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson('This is corrupted')
         // then
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
     }
 
     @Test(expected = IllegalStateException)
@@ -103,7 +118,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson('{"package":[{}]}')
         // then
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
     }
 
     @Test
@@ -111,7 +126,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson('{"package":[{"path":"a"}]}')
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'a', transitive: false])
     }
@@ -139,7 +154,7 @@ class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareVendorDotJson(vendorDotJsonWithExtraProperties)
         // then
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
     }
 
     void prepareVendorDotJson(String s) {

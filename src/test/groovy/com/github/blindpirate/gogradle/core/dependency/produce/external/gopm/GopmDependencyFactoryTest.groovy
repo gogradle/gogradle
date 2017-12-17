@@ -50,7 +50,7 @@ include = public|scripts|templates'''
         // given
         IOUtils.write(resource, '.gopmfile', dotGopmfile)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
 
         // then
         verifyMapParsed([name: 'github.com/a/b'])
@@ -67,7 +67,7 @@ include = public|scripts|templates'''
         // given
         IOUtils.write(resource, '.gopmfile', '[target]\npath = github.com/gogits/gogs')
         // then
-        assert factory.produce(resource, 'build').isEmpty()
+        assert factory.produce(parentDependency, resource, 'build').isEmpty()
     }
 
     @Test
@@ -78,7 +78,7 @@ path = github.com/gogits/gogs
 [deps]
 ''')
         // then
-        assert factory.produce(resource, 'build').isEmpty()
+        assert factory.produce(parentDependency, resource, 'build').isEmpty()
     }
 
     String misorderedDotGompfile1 = '''
@@ -132,7 +132,7 @@ path = github.com/gogits/gogs
         // given
         IOUtils.write(resource, '.gopmfile', dotGopmfile)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/c/d'])
     }

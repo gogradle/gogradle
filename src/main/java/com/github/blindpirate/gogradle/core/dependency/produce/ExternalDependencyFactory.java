@@ -17,7 +17,9 @@
 
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver;
@@ -50,6 +52,9 @@ public abstract class ExternalDependencyFactory {
     @Inject
     private StandardPackagePathResolver standardPackagePathResolver;
 
+    @Inject
+    private GogradleRootProject gogradleRootProject;
+
     /**
      * Relative paths of the identity file.
      * For example, "Godeps/Godeps.json","glide.yaml"
@@ -58,27 +63,30 @@ public abstract class ExternalDependencyFactory {
      */
     public abstract String identityFileName();
 
-    public GolangDependencySet produce(File rootDir, String configuration) {
-        List<Map<String, Object>> mapNotations = extractNotations(rootDir, configuration);
+    public GolangDependencySet produce(ResolvedDependency resolvedDependency, File rootDir, String configuration) {
+        List<Map<String, Object>> mapNotations = extractNotations(resolvedDependency, rootDir, configuration);
 
-        mapNotations = removeStandardPackages(mapNotations);
+        mapNotations = removeStandardAndParentPackages(mapNotations, resolvedDependency);
         return parseMany(mapNotations, mapNotationParser);
     }
 
     @SuppressWarnings("unchecked")
-    public List<Map<String, Object>> extractNotations(File rootDir, String configuration) {
+    public List<Map<String, Object>> extractNotations(ResolvedDependency parent, File rootDir, String configuration) {
         File identityFile = identityFile(rootDir);
-        return adapters.get(configuration).apply(identityFile);
+        return removeStandardAndParentPackages(adapters.get(configuration).apply(identityFile), parent);
     }
 
     public boolean canRecognize(File rootDir) {
         return identityFile(rootDir).isFile();
     }
 
-    private List<Map<String, Object>> removeStandardPackages(List<Map<String, Object>> packages) {
+    private List<Map<String, Object>> removeStandardAndParentPackages(List<Map<String, Object>> packages,
+                                                                      ResolvedDependency resolvedDependency) {
         return packages.stream().filter(pkg -> {
             String path = MapUtils.getString(pkg, MapNotationParser.NAME_KEY, "");
-            return !standardPackagePathResolver.isStandardPackage(Paths.get(path));
+            return !standardPackagePathResolver.isStandardPackage(Paths.get(path))
+                    && !path.startsWith(resolvedDependency.getName())
+                    && !path.startsWith(gogradleRootProject.getName());
         }).collect(Collectors.toList());
     }
 

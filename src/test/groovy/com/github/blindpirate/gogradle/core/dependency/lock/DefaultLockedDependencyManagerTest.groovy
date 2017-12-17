@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency.lock
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
@@ -50,6 +51,11 @@ class DefaultLockedDependencyManagerTest {
     MapNotationParser parser
     @Mock
     StandardPackagePathResolver standardPackagePathResolver
+    @Mock
+    ResolvedDependency targetDependency
+    @Mock
+    GogradleRootProject gogradleRootProject
+
     @InjectMocks
     DefaultLockedDependencyManager manager
     GolangDependency dependency1 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
@@ -82,6 +88,8 @@ dependencies:
     @Before
     void setUp() {
         ReflectionUtils.setField(manager, 'project', project)
+        when(targetDependency.getName()).thenReturn('github.com/target/package')
+        when(gogradleRootProject.getName()).thenReturn('github.com/my/package')
         when(dependency1.getName()).thenReturn('b')
         when(dependency2.getName()).thenReturn('a')
         when(dependency3.getName()).thenReturn('c')
@@ -104,8 +112,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.produce(project.rootDir, 'build')
-        GolangDependencySet testResult = manager.produce(project.rootDir, 'test')
+        GolangDependencySet buildResult = manager.produce(targetDependency, project.rootDir, 'build')
+        GolangDependencySet testResult = manager.produce(targetDependency, project.rootDir, 'test')
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }
@@ -132,10 +140,5 @@ dependencies:
         IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, 'old file content')
         'writing to gogradle.lock should succeed'()
     }
-
-//    @Test
-//    void 'empty dependencies should be returned if gogradle.lock does not exist'() {
-//        assert manager.getLockedDependencies().isEmpty()
-//    }
 }
 

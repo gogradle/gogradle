@@ -60,7 +60,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         prepareGodepsDotJson(GodepsDotJson)
 
         // when:
-        godepDependencyFactory.produce(resource, 'build')
+        godepDependencyFactory.produce(parentDependency, resource, 'build')
         // then:
         verifyMapParsed([name      : "github.com/kr/fs",
                          version   : '2788f0dbd16903de03cb8186e5c7d97b69ad387b',
@@ -75,7 +75,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareGodepsDotJson('This is a corrupted Godeps.json')
         // then
-        godepDependencyFactory.produce(resource, 'build')
+        godepDependencyFactory.produce(parentDependency, resource, 'build')
     }
 
     @Test(expected = IllegalStateException)
@@ -87,7 +87,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
 }
 ''')
         // then
-        godepDependencyFactory.produce(resource, 'build')
+        godepDependencyFactory.produce(parentDependency, resource, 'build')
     }
 
     @Test
@@ -99,7 +99,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
 }
 ''')
         // when
-        godepDependencyFactory.produce(resource, 'build')
+        godepDependencyFactory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'a', transitive: false])
 
@@ -122,7 +122,7 @@ class GodepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         prepareGodepsDotJson(GodepsDotJsonWithExtraAndMissingProperties)
         // when
-        godepDependencyFactory.produce(resource, 'build')
+        godepDependencyFactory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'a', version: 'b', transitive: false])
     }

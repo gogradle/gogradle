@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory
@@ -89,10 +90,10 @@ class GoInitTest extends TaskTest {
     void 'init by external model should succeed'() {
         // given
         when(externalDependencyFactory.canRecognize(any(File))).thenReturn(true)
-        when(externalDependencyFactory.extractNotations(resource, 'build')).thenReturn(
+        when(externalDependencyFactory.extractNotations(gogradleRootProject, resource, 'build')).thenReturn(
                 [[name: 'a', transitive: false], [name: 'b', url: 'url'], [name: 'c', host: [name: 'd', url: 'd-url'], vendorPath: 'vendor/c']]
         )
-        when(externalDependencyFactory.extractNotations(resource, 'test')).thenReturn([[name: 'e', urls: ['url1', 'url2']]])
+        when(externalDependencyFactory.extractNotations(gogradleRootProject, resource, 'test')).thenReturn([[name: 'e', urls: ['url1', 'url2']]])
         // when
         task.init()
         // then

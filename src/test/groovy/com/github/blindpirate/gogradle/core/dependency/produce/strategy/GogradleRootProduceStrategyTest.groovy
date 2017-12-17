@@ -151,8 +151,8 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
 
     void lockedDependencies(GolangDependency... dependencies) {
         GolangDependencySet set = asGolangDependencySet(dependencies)
-        when(lockedDependencyManager.produce(rootDir, 'build')).thenReturn(set)
-        when(lockedDependencyManager.produce(rootDir, 'test')).thenReturn(set)
+        when(lockedDependencyManager.produce(resolvedDependency, rootDir, 'build')).thenReturn(set)
+        when(lockedDependencyManager.produce(resolvedDependency, rootDir, 'test')).thenReturn(set)
     }
 
 }

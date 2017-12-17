@@ -36,9 +36,9 @@ class DepDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'Gopkg.lock', godepDotLock)
         // when
-        depDependencyFactory.produce(resource, 'build')
+        depDependencyFactory.produce(parentDependency, resource, 'build')
         // then
-        assert depDependencyFactory.produce(resource, 'test').isEmpty()
+        assert depDependencyFactory.produce(parentDependency, resource, 'test').isEmpty()
         verifyMapParsed([branch     : "parse-constraints-with-dash-in-pre",
                          name       : "github.com/Masterminds/semver",
                          subpackages: ['...'],

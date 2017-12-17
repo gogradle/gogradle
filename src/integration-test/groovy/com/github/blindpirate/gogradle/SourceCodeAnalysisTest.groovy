@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle
 
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory
@@ -42,6 +43,9 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     @Mock
     ResolvedDependency resolvedDependency
 
+    @Mock
+    GogradleRootProject gogradleRootProject
+
     @Test
     @AccessWeb
     void 'imports should be parsed correctly'() {
@@ -54,6 +58,7 @@ class SourceCodeAnalysisTest extends GogradleModuleSupport {
     void assertImportsAre(Set subpackages, Set expect) {
         // given
         when(resolvedDependency.getName()).thenReturn("name")
+        when(gogradleRootProject.getName()).thenReturn("github.com/my/project")
         when(resolvedDependency.getSubpackages()).thenReturn(subpackages as Set)
 
         // when

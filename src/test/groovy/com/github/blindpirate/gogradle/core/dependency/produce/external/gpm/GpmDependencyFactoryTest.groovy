@@ -44,7 +44,7 @@ code.google.com/p/go.example/hello/...    ae081cd1d6cc  # And so are Mercurial o
         // given
         writeGodeps()
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/nu7hatch/gotrail', tag: 'v0.0.2', transitive: false])
         verifyMapParsed([name: 'github.com/replicon/fast-archiver', tag: 'v1.02', transitive: false])
@@ -55,7 +55,7 @@ code.google.com/p/go.example/hello/...    ae081cd1d6cc  # And so are Mercurial o
     @Test
     void 'test dependencies should be empty'() {
         writeGodeps()
-        assert factory.produce(resource, 'test').isEmpty()
+        assert factory.produce(parentDependency, resource, 'test').isEmpty()
     }
 
     @Test

@@ -60,7 +60,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifest)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name      : 'github.com/wadey/gocovmerge',
                          vcs       : 'git',
@@ -97,7 +97,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifestMissingImportpath)
         // then
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
     }
 
     String manifestWithExtraProperties = '''
@@ -132,7 +132,7 @@ class GvtGbvendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifestWithExtraProperties)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name      : 'github.com/wadey/gocovmerge',
                          vcs       : 'git',

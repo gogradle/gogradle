@@ -33,7 +33,7 @@ class GlideDependencyFactoryTest extends ExternalDependencyFactoryTest {
     @Test
     void 'test dependencies should be empty'() {
         prepareGlideDotLock(glideDotLock)
-        factory.produce(resource, 'test')
+        factory.produce(parentDependency, resource, 'test')
         verifyMapParsed([name: 'test', version: 'testVersion', transitive: false])
     }
 
@@ -68,7 +68,7 @@ testImports:
         prepareGlideDotLock(glideDotLock)
 
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/codegangsta/cli', version: '1efa31f08b9333f1bd4882d61f9d668a70cd902e', transitive: false])
         verifyMapParsed([name: 'github.com/Masterminds/semver', version: '8d0431362b544d1a3536cca26684828866a7de09', transitive: false])
@@ -92,7 +92,7 @@ testImports: []
         // given
         prepareGlideDotLock(glideDotLockMissingName)
         // then
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
     }
 
     String glideDotLockMissingVersion = '''
@@ -108,7 +108,7 @@ testImports: []
         // given
         prepareGlideDotLock(glideDotLockMissingVersion)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/codegangsta/cli', transitive: false])
     }
@@ -126,7 +126,7 @@ imports:
         // given
         prepareGlideDotLock(glideDotLockWithExtraAndMissingProperties)
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
 
         verifyMapParsed([name      : 'github.com/codegangsta/cli',
@@ -137,8 +137,8 @@ imports:
     @Test
     void 'corrupt glide.lock should not cause exception'() {
         prepareGlideDotLock('hash: xxx')
-        assert factory.produce(resource, 'build').isEmpty()
-        assert factory.produce(resource, 'test').isEmpty()
+        assert factory.produce(parentDependency, resource, 'build').isEmpty()
+        assert factory.produce(parentDependency, resource, 'test').isEmpty()
     }
 
     void prepareGlideDotLock(String glideDotLock) {

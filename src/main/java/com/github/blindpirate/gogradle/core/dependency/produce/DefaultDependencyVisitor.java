@@ -61,7 +61,7 @@ public class DefaultDependencyVisitor implements DependencyVisitor {
                                                          String configuration) {
         for (ExternalDependencyFactory factory : externalDependencyFactories) {
             if (factory.canRecognize(rootDir)) {
-                return factory.produce(rootDir, configuration);
+                return factory.produce(dependency, rootDir, configuration);
             }
         }
         return GolangDependencySet.empty();

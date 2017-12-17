@@ -59,7 +59,7 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
                                        File projectRoot,
                                        DependencyVisitor visitor,
                                        String configuration) {
-        GolangDependencySet result = determineDependencies(projectRoot, configuration);
+        GolangDependencySet result = determineDependencies(dependency, projectRoot, configuration);
 
         setFirstLevel(result);
 
@@ -70,12 +70,15 @@ public class GogradleRootProduceStrategy implements DependencyProduceStrategy {
         }
     }
 
-    private GolangDependencySet determineDependencies(File projectRoot, String configuration) {
+    private GolangDependencySet determineDependencies(ResolvedDependency dependency,
+                                                      File projectRoot,
+                                                      String configuration) {
         // Here we can just fetch them from internal container
         GolangDependencySet declaredDependencies = getDependenciesInBuildDotGradle(configuration);
         if (lockedDependencyManager.canRecognize(projectRoot)) {
             // gogradle.lock exists
-            GolangDependencySet lockedDependencies = lockedDependencyManager.produce(projectRoot, configuration);
+            GolangDependencySet lockedDependencies =
+                    lockedDependencyManager.produce(dependency, projectRoot, configuration);
             return settings.getBuildMode().determine(declaredDependencies, lockedDependencies);
         } else {
             return declaredDependencies;

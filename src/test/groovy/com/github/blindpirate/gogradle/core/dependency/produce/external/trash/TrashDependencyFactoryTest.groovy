@@ -45,7 +45,7 @@ github.com/go-check/check 4ed411733c5785b40214c70bce814c3a3a689609 https://githu
 github.com/opencontainers/runtime-spec 1c7c27d043c2a5e513a44084d2b10d77d1402b8c # specs
 ''')
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/Sirupsen/logrus', tag: 'v0.10.0', transitive: false])
         verifyMapParsed([name: 'github.com/cloudfoundry-incubator/candiedyaml', version: '99c3df8', transitive: false])
@@ -74,7 +74,7 @@ import:
   version: 55a459c2d9da2b078f0725e5fb324823b2c71702
 ''')
         // when
-        factory.produce(resource, 'build')
+        factory.produce(parentDependency, resource, 'build')
         // then
         verifyMapParsed([name: 'github.com/Sirupsen/logrus', tag: 'v0.8.7', url: 'https://github.com/imikushin/logrus.git', transitive: false])
         verifyMapParsed([name: 'github.com/codegangsta/cli', version: 'b5232bb2934f606f9f27a1305f1eea224e8e8b88', transitive: false])

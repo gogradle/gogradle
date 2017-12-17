@@ -18,7 +18,9 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external
 
 import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
 import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
@@ -43,12 +45,18 @@ class ExternalDependencyFactoryTest {
     AbstractResolvedDependency module
     @Mock
     StandardPackagePathResolver standardPackagePathResolver
+    @Mock
+    ResolvedDependency parentDependency
+    @Mock
+    GogradleRootProject gogradleRootProject
 
     @Before
     void superSetUp() {
         when(mapNotationParser.parse(anyMap())).thenReturn(dependency)
         when(dependency.getName()).thenReturn('name')
         when(standardPackagePathResolver.isStandardPackage(any(Path))).thenReturn(false)
+        when(gogradleRootProject.getName()).thenReturn('github.com/my/project')
+        when(parentDependency.getName()).thenReturn('github.com/target/project')
     }
 
     void verifyMapParsed(Map map) {
