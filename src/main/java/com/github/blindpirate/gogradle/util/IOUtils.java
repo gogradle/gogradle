@@ -196,7 +196,7 @@ public final class IOUtils {
     }
 
     public static boolean isValidDirectory(File dir) {
-        return dir.exists() && dir.isDirectory();
+        return dir.isDirectory();
     }
 
     public static String toString(InputStream inputStream) {
