@@ -18,9 +18,11 @@
 package com.github.blindpirate.gogradle.core.dependency.produce;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.IncompleteGolangPackage;
 import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
 import com.github.blindpirate.gogradle.core.StandardGolangPackage;
 import com.github.blindpirate.gogradle.core.UnrecognizedGolangPackage;
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
@@ -47,14 +49,17 @@ public class SourceCodeDependencyFactory {
     private final GoImportExtractor goImportExtractor;
     private final PackagePathResolver packagePathResolver;
     private final NotationParser notationParser;
+    private final GogradleRootProject gogradleRootProject;
 
     @Inject
     public SourceCodeDependencyFactory(PackagePathResolver packagePathResolver,
                                        NotationParser notationParser,
-                                       GoImportExtractor goImportExtractor) {
+                                       GoImportExtractor goImportExtractor,
+                                       GogradleRootProject gogradleRootProject) {
         this.packagePathResolver = packagePathResolver;
         this.notationParser = notationParser;
         this.goImportExtractor = goImportExtractor;
+        this.gogradleRootProject = gogradleRootProject;
     }
 
     public GolangDependencySet produce(ResolvedDependency resolvedDependency,
@@ -68,7 +73,7 @@ public class SourceCodeDependencyFactory {
     private GolangDependencySet createDependencies(ResolvedDependency resolvedDependency, Set<String> importPaths) {
         Set<String> rootPackagePaths =
                 importPaths.stream()
-                        .filter(path -> !path.startsWith(resolvedDependency.getName()))
+                        .filter(path -> !path.startsWith(resolvedDependency.getName()) && !path.startsWith(gogradleRootProject.getName()))
                         .map(this::getRootPath)
                         .filter(Optional::isPresent)
                         .map(Optional::get)
@@ -98,6 +103,10 @@ public class SourceCodeDependencyFactory {
 
         if (info instanceof UnrecognizedGolangPackage) {
             return Optional.of(importPath);
+        }
+
+        if (info instanceof IncompleteGolangPackage) {
+            throw new IllegalStateException("Incomplete package " + info.getPathString() + ", something must be wrong.");
         }
 
         String rootPath = ResolvableGolangPackage.class.cast(info).getRootPathString();

@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.*
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
@@ -50,6 +51,8 @@ class SourceCodeDependencyFactoryTest {
     NotationParser notationParser
     @Mock
     BuildConstraintManager buildConstraintManager
+    @Mock
+    GogradleRootProject gogradleRootProject
 
     GoImportExtractor extractor
 
@@ -63,15 +66,18 @@ class SourceCodeDependencyFactoryTest {
     @Before
     void setUp() {
         extractor = new GoImportExtractor(buildConstraintManager)
-        factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor)
+        factory = new SourceCodeDependencyFactory(packagePathResolver, notationParser, extractor, gogradleRootProject)
         when(resolvedDependency.getName()).thenReturn('root/package')
         when(resolvedDependency.getSubpackages()).thenReturn(['...'] as Set)
         when(buildConstraintManager.getAllConstraints()).thenReturn([] as Set)
+        when(gogradleRootProject.getName()).thenReturn('github.com/my/package')
         when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
                 String path = invocation.getArgument(0)
-                if (path.startsWith('github.com')) {
+                if (path.startsWith('github.com/incomplete')) {
+                    return Optional.of(IncompleteGolangPackage.of('github.com/incomplete'))
+                } else if (path.startsWith('github.com')) {
                     String rootPath = path.split('/')[0..2].join('/')
                     GolangPackage ret = VcsGolangPackage.builder()
                             .withPath(path)
@@ -101,7 +107,7 @@ class SourceCodeDependencyFactoryTest {
     }
 
     @Test
-    void 'self dependency should be ignored'() {
+    void 'self dependency and root project should be ignored'() {
         // given
         IOUtils.write(resource, 'main.go', '''
 package main
@@ -109,6 +115,7 @@ import (
     "root/package/a"
     "root/package/a/b"
     "root/package/a/b/c"
+    "github.com/my/package"
 )
 func Whatever(){}
 ''')
@@ -318,6 +325,18 @@ func Whatever(){}
         assert result.collect {
             it.name
         }.minus(['github.com/a/b', 'github.com/a/b/c', 'github.com/a/b/c/d']).isEmpty()
+    }
+
+    @Test(expected = IllegalStateException)
+    void 'exception should be thrown if import package is incomplete'() {
+        IOUtils.write(resource, 'main.go', '''
+package main
+import (
+        "github.com/incomplete"
+    )
+func main(){}
+''')
+        factory.produce(resolvedDependency, resource, 'build')
     }
 
     String mainDotGo = '''
