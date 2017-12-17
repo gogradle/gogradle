@@ -67,7 +67,7 @@ repositories {
             stdout.append('Found extend build.gradle\n')
             stderr.append('Found extend build.gradle\n')
             buildDotGradle += path.resolve('build.gradle.ext').toFile().text
-        } else if (!path.toFile().list().any { it.endsWith('.go') }) {
+        } else if (!path.toFile().list().any { it.endsWith('.go') && !it.endsWith('_test.go') }) {
             buildDotGradle += """
 build {
     go 'build github.com/${userAndProject[0]}/${userAndProject[1]}/...'
