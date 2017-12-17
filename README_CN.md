@@ -36,7 +36,7 @@ Gogradle实现了`glide`的绝大部分功能，并添加了一些额外的功�
 
 - 测试和覆盖率报告生成
 - Go的多版本管理
-- 全系列IDE支持（IntelliJIDEA/VSCode/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim），尤其是IntellijIDEA的深度集成
+- IDE支持
 - 使用动态语言特性完成仓库的声明和替换——即镜像仓库
 
 如果你曾被上述问题之一困扰，又或者你曾是Java开发者、熟悉Gradle，那么Gogradle是你不二的选择！
@@ -71,7 +71,7 @@ Gogradle的目标不是取代其他的工具，而是为开发者提供一个额
 - 原生的Gradle语法
 - 额外为中国大陆开发者提供的特性，你懂的
 - Shadowsocks支持
-- IDE支持（IntelliJIDEA/WebStorm/PhpStorm/PyCharm/RubyMine/CLion/Gogland/Vim）
+- IDE支持
 - 测试和覆盖率报告生成
 - 增量构建
 

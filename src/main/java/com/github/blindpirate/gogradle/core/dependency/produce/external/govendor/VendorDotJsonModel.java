@@ -106,7 +106,6 @@ public class VendorDotJsonModel {
 
             Path hostImportPath = ResolvableGolangPackage.class.cast(pkg).getRootPath();
             Path vendorPath = hostImportPath.relativize(Paths.get(origin));
-
             Map<String, Object> host = asMapWithoutNull("name", toUnixString(hostImportPath),
                     "version", revision);
 

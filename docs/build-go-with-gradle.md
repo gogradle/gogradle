@@ -50,10 +50,6 @@ Gogradle的项目地址在这里：[https://github.com/gogradle/gogradle](https:
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coverage.png)
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coveragepackage.png)
 
-因为IntelliJIDEA原生支持Gradle，所以我做了一些Hack，使Gogradle能够与其深度集成。假设你在IDEA中开发时，需要引入一个新的代码包，所要做的是事情就是在`build.gradle`中添加一行声明，然后点击下图中的刷新按钮：
-
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
-
 Gogradle会自动解析该包及所有的传递性依赖，解决所有可能的冲突，然后将其安装到`vendor`目录中。其他的IDE没有原生的Gradle支持，因此需要一些命令行操作。Gogradle支持IDE，详见[IDE支持](https://github.com/gogradle/gogradle/blob/master/docs/ide-cn.md)。
 
 ## 从头开始

@@ -227,10 +227,6 @@ pluginBundle {
             id = 'com.github.blindpirate.gogradle'
             displayName = 'Gogradle - Full-featured Build Plugin for Golang'
         }
-
-        golangIdeaPlugin {
-        }
-
     }
 }
 

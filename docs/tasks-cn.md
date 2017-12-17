@@ -8,10 +8,6 @@
   - showGopathGoroot
 - 初始化任务
   - init
-- IDE任务
-  - goIdea
-  - goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
-  - vscode
 - 依赖相关任务
   - resolveBuildDependencies
   - resolveTestDependencies
@@ -46,18 +42,6 @@
 ## init
 
 依赖`prepare`任务。执行从其他包管理工具的迁移工作。当前支持的包管理工具有：`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`。
-
-## goIdea
-
-依赖`vendor`任务，生成IntelliJIDEA的工程文件，支持社区版和旗舰版。需要安装Go插件，详见[IDE支持](./ide-cn.md)。
-
-## goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
-
-依赖`vendor`任务，生成这些IDE的相关工程文件。需要安装Go插件，详见[IDE支持](./ide-cn.md)。
-
-## vscode
-
-依赖`vendor`任务，生成`.vscode/settings.json`。需要安装Go插件，详见[IDE支持](./ide-cn.md)。
 
 ## resolveBuildDependencies/resolveTestDependencies
 

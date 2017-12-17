@@ -8,10 +8,6 @@ A task unit executed independently is usually called [Task](https://docs.gradle.
   - showGopathGoroot
 - Initialization tasks
   - init
-- IDE tasks
-  - goIdea
-  - goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
-  - vscode
 - Dependency tasks
   - resolveBuildDependencies
   - resolveTestDependencies
@@ -46,18 +42,6 @@ Depends on `prepare`. Because Gogradle support project-level `GOPATH` and multip
 ## init
 
 Depends on `prepare`. Perform migration from other package management tools. Currently `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm` are supported.
-
-## goIdea
-
-Depends on `vendor`. Generates project files for `IntelliJIDEA`. Supports Community Edition and Ultimate Edition. Needs Go plugin. See [IDE integration](./ide.md) for more details.
-
-## goLand/phpStorm/webStorm/rubyMine/cLion/pyCharm
-
-Depends on `vendor`. Generates project files for these IDEs. Needs Go plugin. See [IDE integration](./ide.md) for more details.
-
-## vscode
-
-Depends on `vendor`. Generates `.vscode/settings.json` for VSCode. Need Go plugin. See [IDE integration](./ide.md) for more details.
 
 ## resolveBuildDependencies/resolveTestDependencies
 

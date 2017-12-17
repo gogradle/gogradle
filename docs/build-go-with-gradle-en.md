@@ -45,10 +45,6 @@ And coverage report:
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coverage.png)
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/coveragepackage.png)
 
-Since IntelliJIDEA supports Gradle natively, I do some hacking to it and make it support Gogradle totally. Assume you're developing with IDEA, if you want to import a new package, what you need to do is just and a line of declaration of that package, and click the refresh button in the following image:
-
-![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/gradle.png)
-
 Gogradle will resolve that package and all its transitive packages, fix potential conflict, and install it into `vendor`. Other IDE has no native Gradle support so some command line stuff is required. Gogradle support IDE. See [IDE integration](https://github.com/gogradle/gogradle/blob/master/docs/ide.md) for more details.
 
 ## Get started 
