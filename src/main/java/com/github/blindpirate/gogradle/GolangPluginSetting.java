@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
+import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
@@ -48,6 +49,14 @@ import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 @Singleton
 public class GolangPluginSetting {
 
+    // https://storage.googleapis.com/golang/go1.7.4.windows-386.zip
+    // https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz
+    private static final String BINARY_URL = "https://storage.googleapis.com/golang/" + DefaultGoBinaryManager.FILENAME;
+
+    // http://golangtc.com/static/go/1.7.4/go1.7.4.windows-386.zip
+    // http://golangtc.com/static/go/1.7.4/go1.7.4.linux-amd64.tar.gz
+    private static final String BINARY_URL_GFW = "http://golangtc.com/static/go/${version}/" + DefaultGoBinaryManager.FILENAME;
+
     private BuildMode buildMode = REPRODUCIBLE;
 
     private String packagePath;
@@ -59,12 +68,7 @@ public class GolangPluginSetting {
     private String goExecutable;
     private String goRoot;
 
-    // if true, the plugin will make its best effort to bypass the GFW
-    // designed for Chinese developer
-    private boolean fuckGfw;
-
-    // A user defined source for go binaries
-    private URI goBinaryDownloadRootUri;
+    private String goBinaryDownloadTemplate = BINARY_URL;
 
     public String getGoRoot() {
         return goRoot;
@@ -125,24 +129,47 @@ public class GolangPluginSetting {
         this.goExecutable = goExecutable;
     }
 
+    /** @deprecated {@link #getGoBinaryDownloadTemplate} */
     public boolean isFuckGfw() {
-        return fuckGfw;
+        return BINARY_URL_GFW.equals(goBinaryDownloadTemplate);
     }
 
+    /** @deprecated {@link #setGoBinaryDownloadTemplate} */
     public void setFuckGfw(boolean fuckGfw) {
-        this.fuckGfw = fuckGfw;
+        if(fuckGfw) {
+            fuckGfw();
+        }
+        else{
+            setGoBinaryDownloadTemplate(BINARY_URL);
+        }
     }
 
-    public URI getGoBinaryDownloadBaseUri() {
-        return goBinaryDownloadRootUri;
+    public void fuckGfw() {
+        goBinaryDownloadTemplate = BINARY_URL_GFW;
     }
 
+    public String getGoBinaryDownloadTemplate() {
+        return goBinaryDownloadTemplate;
+    }
+
+    /** @deprecated use {@link #setGoBinaryDownloadTemplate} */
     public void setGoBinaryDownloadBaseUri(String goBinaryDownloadBaseUri) {
         setGoBinaryDownloadBaseUri(goBinaryDownloadBaseUri == null ? null : URI.create(goBinaryDownloadBaseUri));
     }
 
-    public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUrl) {
-        this.goBinaryDownloadRootUri = goBinaryDownloadBaseUrl;
+    /** @deprecated use {@link #setGoBinaryDownloadTemplate} */
+    public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUri) {
+        setGoBinaryDownloadTemplate(goBinaryDownloadBaseUri == null ? null :
+                goBinaryDownloadBaseUri.resolve("/") + DefaultGoBinaryManager.FILENAME);
+    }
+
+    public void setGoBinaryDownloadTemplate(URI goBinaryDownloadTemplateUri) {
+        setGoBinaryDownloadTemplate(goBinaryDownloadTemplateUri == null ? null :
+                goBinaryDownloadTemplateUri.toASCIIString());
+    }
+
+    public void setGoBinaryDownloadTemplate(String goBinaryDownloadTemplate) {
+        this.goBinaryDownloadTemplate = goBinaryDownloadTemplate;
     }
 
     public void globalCacheFor(int duration, @Nonnull String timeUnit) {

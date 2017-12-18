@@ -25,7 +25,6 @@ import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.ImmutableMap;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.tuple.Pair;
@@ -40,7 +39,6 @@ import java.io.UncheckedIOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Map;
 import java.util.Optional;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -48,23 +46,13 @@ import java.util.regex.Pattern;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.IOUtils.toRealPath;
 import static com.github.blindpirate.gogradle.util.ProcessUtils.ProcessResult;
-import static java.lang.Boolean.FALSE;
-import static java.lang.Boolean.TRUE;
 import static org.apache.commons.io.FileUtils.listFiles;
 
 @Singleton
 public class DefaultGoBinaryManager implements GoBinaryManager {
     private static final Logger LOGGER = Logging.getLogger(DefaultGoBinaryManager.class);
-    // https://storage.googleapis.com/golang/go1.7.4.windows-386.zip
-    // https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz
-    private static final String URL
-            = "https://storage.googleapis.com/golang/go${version}.${os}-${arch}${extension}";
-    // http://golangtc.com/static/go/1.7.4/go1.7.4.windows-386.zip
-    // http://golangtc.com/static/go/1.7.4/go1.7.4.linux-amd64.tar.gz
-    private static final String URL_UNDER_GFW
-            = "http://golangtc.com/static/go/${version}/go${version}.${os}-${arch}${extension}";
 
-    private static final String FILENAME = "go${version}.${os}-${arch}${extension}";
+    public static final String FILENAME = "go${version}.${os}-${arch}${extension}";
 
     private static final String NEWEST_VERSION_URL
             = "http://gogradle.oss-cn-hongkong.aliyuncs.com/newest-stable-go-version.txt";
@@ -73,11 +61,6 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private static final Pattern GO_VERSION_OUTPUT_REGEX = Pattern.compile("go version go((\\d|\\.)+) .+");
 
     private static final String IGNORE_LOCAL = "IGNORE_LOCAL";
-
-    private static Map<Boolean, String> urls = ImmutableMap.of(
-            TRUE, URL_UNDER_GFW,
-            FALSE, URL);
-
 
     private final GolangPluginSetting setting;
     private final GlobalCacheManager globalCacheManager;
@@ -252,15 +235,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private Path downloadArchive(String version) {
-        String url;
-        if (setting.getGoBinaryDownloadBaseUri() == null) {
-            String baseUrl = urls.get(setting.isFuckGfw());
-            url = injectVariables(baseUrl, version);
-        } else {
-            url = setting.getGoBinaryDownloadBaseUri().resolve(
-                    injectVariables("go${version}.${os}-${arch}${extension}", version)
-            ).toASCIIString();
-        }
+        String url = injectVariables(setting.getGoBinaryDownloadTemplate(), version);
         String archiveFileName = injectVariables(FILENAME, version);
         File goBinaryCachePath = globalCacheManager.getGlobalGoBinCacheDir(archiveFileName);
         forceMkdir(goBinaryCachePath.getParentFile());
