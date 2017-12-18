@@ -239,6 +239,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
         String archiveFileName = injectVariables(FILENAME, version);
         File goBinaryCachePath = globalCacheManager.getGlobalGoBinCacheDir(archiveFileName);
         forceMkdir(goBinaryCachePath.getParentFile());
+        LOGGER.warn("downloading {} -> {}", url, goBinaryCachePath.getAbsolutePath());
         try {
             httpUtils.download(url, goBinaryCachePath.toPath());
         } catch (IOException e) {

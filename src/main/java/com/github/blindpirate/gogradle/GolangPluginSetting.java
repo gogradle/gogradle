@@ -55,7 +55,8 @@ public class GolangPluginSetting {
 
     // http://golangtc.com/static/go/1.7.4/go1.7.4.windows-386.zip
     // http://golangtc.com/static/go/1.7.4/go1.7.4.linux-amd64.tar.gz
-    private static final String BINARY_URL_GFW = "http://golangtc.com/static/go/${version}/" + DefaultGoBinaryManager.FILENAME;
+    private static final String BINARY_URL_GFW = "http://golangtc.com/static/go/${version}/"
+            + DefaultGoBinaryManager.FILENAME;
 
     private BuildMode buildMode = REPRODUCIBLE;
 
@@ -136,10 +137,9 @@ public class GolangPluginSetting {
 
     /** @deprecated {@link #setGoBinaryDownloadTemplate} */
     public void setFuckGfw(boolean fuckGfw) {
-        if(fuckGfw) {
+        if (fuckGfw) {
             fuckGfw();
-        }
-        else{
+        } else {
             setGoBinaryDownloadTemplate(BINARY_URL);
         }
     }
@@ -159,13 +159,13 @@ public class GolangPluginSetting {
 
     /** @deprecated use {@link #setGoBinaryDownloadTemplate} */
     public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUri) {
-        setGoBinaryDownloadTemplate(goBinaryDownloadBaseUri == null ? null :
-                goBinaryDownloadBaseUri.resolve("/") + DefaultGoBinaryManager.FILENAME);
+        setGoBinaryDownloadTemplate(goBinaryDownloadBaseUri == null ? null
+                : goBinaryDownloadBaseUri.resolve("/") + DefaultGoBinaryManager.FILENAME);
     }
 
     public void setGoBinaryDownloadTemplate(URI goBinaryDownloadTemplateUri) {
-        setGoBinaryDownloadTemplate(goBinaryDownloadTemplateUri == null ? null :
-                goBinaryDownloadTemplateUri.toASCIIString());
+        setGoBinaryDownloadTemplate(goBinaryDownloadTemplateUri == null ? null
+                : goBinaryDownloadTemplateUri.toASCIIString());
     }
 
     public void setGoBinaryDownloadTemplate(String goBinaryDownloadTemplate) {
