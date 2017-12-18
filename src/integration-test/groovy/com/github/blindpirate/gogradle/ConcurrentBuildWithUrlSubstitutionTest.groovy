@@ -100,7 +100,7 @@ class ConcurrentBuildWithUrlSubstitutionTest {
             assert it.vcs == 'git'
             assert !it.original
             assert new File(userhome, "go/repo/github.com/my/project/${it.dir}/.git").exists()
-            assert System.currentTimeMillis() - it.lastUpdatedTime < 60000L
+            assert System.currentTimeMillis() - it.lastUpdatedTime < 120000L
         }
         assert metadata.repositories*.urls.flatten() as Set == ['http://localhost:8080/repo1', 'http://localhost:8080/repo2'] as Set
     }
