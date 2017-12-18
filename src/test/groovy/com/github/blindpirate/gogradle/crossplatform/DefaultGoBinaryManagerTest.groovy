@@ -62,6 +62,7 @@ class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
     void setUp() {
         Process process = mock(Process)
         when(setting.getGoExecutable()).thenReturn("go")
+        when(setting.getGoBinaryDownloadTemplate()).thenReturn('http://example.com/go${version}.${os}-${arch}${extension}')
         when(processUtils.run(['go', 'version'], null, null)).thenReturn(process)
         when(processUtils.getResult(process)).thenReturn(processResult)
 
@@ -217,7 +218,6 @@ class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
     void 'go binary with specified version should be downloaded when a modified go binary base url has been set'() {
         // given
         when(setting.getGoVersion()).thenReturn('1.7.4')
-        when(setting.getGoBinaryDownloadBaseUri()).thenReturn(URI.create('http://example.com/'))
         // then
         assert manager.getBinaryPath() == resource.toPath().resolve("1.7.4/go/bin/go${Os.getHostOs().exeExtension()}")
         assert manager.getGoVersion() == '1.7.4'

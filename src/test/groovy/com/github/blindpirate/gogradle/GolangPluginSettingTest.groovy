@@ -104,21 +104,40 @@ class GolangPluginSettingTest {
     }
 
     @Test
-    void 'setting fuckGfw should succeed'() {
+    void 'setting fuckGfw should succeed (backwards compatiblity)'() {
         setting.fuckGfw = true
         assert setting.fuckGfw
     }
 
     @Test
-    void 'setting go binary download base uri to a String should succeed'() {
-        setting.goBinaryDownloadBaseUri = 'http://example.com/'
-        assert setting.goBinaryDownloadBaseUri == URI.create('http://example.com/')
+    void 'setting fuckGfw changes the binary download uri'() {
+        def before = setting.goBinaryDownloadTemplate
+        setting.fuckGfw()
+        assert before != setting.goBinaryDownloadTemplate
     }
 
     @Test
-    void 'setting go binary download base uri to a URI should succeed'() {
+    void 'setting go binary download base uri to a String should succeed (backwards compatiblity)'() {
+        setting.goBinaryDownloadBaseUri = 'http://example.com/'
+        assert setting.goBinaryDownloadTemplate == 'http://example.com/go${version}.${os}-${arch}${extension}'
+    }
+
+    @Test
+    void 'setting go binary download base uri to a URI should succeed (backwards compatiblity)'() {
         setting.goBinaryDownloadBaseUri = URI.create('http://example.com/')
-        assert setting.goBinaryDownloadBaseUri == URI.create('http://example.com/')
+        assert setting.goBinaryDownloadTemplate == 'http://example.com/go${version}.${os}-${arch}${extension}'
+    }
+
+    @Test
+    void 'setting go binary download uri to a URI should succeed'() {
+        setting.goBinaryDownloadTemplate = URI.create('http://example.com/wherever?youName=it')
+        assert setting.goBinaryDownloadTemplate == 'http://example.com/wherever?youName=it'
+    }
+
+    @Test
+    void 'setting go binary download uri to a String should succeed'() {
+        setting.goBinaryDownloadTemplate = 'http://example.com/wherever?youName=it'
+        assert setting.goBinaryDownloadTemplate == 'http://example.com/wherever?youName=it'
     }
 
     @Test
