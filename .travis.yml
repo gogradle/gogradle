@@ -6,6 +6,8 @@ cache:
 env:
   global:
     - GOGS_DIR=/home/travis/gogs
+    - DEP_DIR=/home/travis/dep
+    - EXAMPLES_DIR=/home/travis/examples
     - JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=256m
 jdk:
   - oraclejdk8
@@ -29,6 +31,8 @@ before_script:
 
 before_install:
   - mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
+  - mkdir ~/dep && git clone https://github.com/golang/dep.git ~/dep
+  - mkdir ~/examples && git clone https://github.com/gogradle/examples.git ~/examples
   - free -mt
 
 after_failure:

@@ -94,7 +94,7 @@ build {
 
 ```
 build {
-    go 'build -o ./gogradle/output github.com/my/package/my/subpackage --my-own-cmd-arguments'
+    go 'build -o ./gogradle/output --my-own-cmd-arguments github.com/my/package/my/subpackage'
 }
 ```
 
