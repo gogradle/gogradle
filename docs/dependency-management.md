@@ -31,6 +31,9 @@ dependencies {
         build 'github.com/user/project@1.0.0-RELEASE' // Specify a version(tag in Git)
         build name:'github.com/user/project', tag:'1.0.0-RELEASE' // Equivalent to last line
         
+        build 'github.com/user/project@master' // Specify a branch 
+        build name:'github.com/user/project', branch:'master' // Equivalent to last line
+        
         test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
         test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
         test name:'github.com/user/project', version:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
@@ -38,12 +41,7 @@ dependencies {
 }
 ```
 
-By default, if you don't specify a commit, Gogradle won't do `git pull` or `hg update -u`  in local repository. You can use `-Dgogradle.refresh=true` to force Gogradle to do so:
- 
-```
-gradlew build -Dgogradle.refresh=true
-``` 
-
+By default, if you don't specify a commit/tag/branch, Gogradle will perform `git fetch` or `hg update -u`  in local repository each time to make sure the latest remote version are used. 
 
 [SemVersion](http://semver.org/) is supported in dependency declaration. In Git, a "version" is just a tag. Gogradle doesn't recommend to use SemVersion since it may break reproducibility of build.
 
