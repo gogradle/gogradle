@@ -226,6 +226,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
         assert manager.insertBuildTags([]) == []
         assert manager.insertBuildTags(['build']) == ['build', '-tags', "'a b c'"]
         assert manager.insertBuildTags(['build', 'package']) == ['build', '-tags', "'a b c'", 'package']
+        assert manager.insertBuildTags(['tool', 'vet', 'package']) == ['tool', 'vet', '-tags', "'a b c'", 'package']
     }
 
     @Test(expected = BuildException)
