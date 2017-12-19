@@ -68,6 +68,14 @@ public class ProcessUtils {
         return getStdout(run(args));
     }
 
+    public String runAndGetStderr(String... args) {
+        return getResult(run(args)).stderr;
+    }
+
+    public String runAndGetStdout(File workingDir, String... args) {
+        return getStdout(run(Arrays.asList(args), null, workingDir));
+    }
+
     public Process run(String... args) {
         return run(Arrays.asList(args));
     }
