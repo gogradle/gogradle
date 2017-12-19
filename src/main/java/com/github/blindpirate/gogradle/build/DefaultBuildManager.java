@@ -157,12 +157,14 @@ public class DefaultBuildManager implements BuildManager {
             return cmd;
         }
 
+        // support: go tool vet -tags whatever packag
+        int tagsOffset = "tool".equals(cmd.get(0)) ? 2 : 1;
         List<String> ret = new ArrayList<>(cmd);
         // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
-        ret.add(1, "-tags");
+        ret.add(tagsOffset, "-tags");
 
         String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
-        ret.add(2, "'" + tagsArg + "'");
+        ret.add(tagsOffset + 1, "'" + tagsArg + "'");
         return ret;
     }
 
