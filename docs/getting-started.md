@@ -241,8 +241,8 @@ golang {
     goExecutable = '/path/to/go/executable'
     
     // For custom distribution repository. Gogradle will try to download go distributions from
-    // http://my-company.com/go-distributions/go${version}.${os}-${arch}${extension}
-    goBinaryDownloadRootUri = 'http://my-company.com/go-distributions'
+    // http://golangtc.com/static/go/${version}/go${version}.${os}-${arch}${extension}
+    goBinaryDownloadTemplate == 'http://golangtc.com/static/go/${version}/go${version}.${os}-${arch}${extension}'
 
     // If not set, GOROOT will be <directory of go binary>/..
     goRoot = '/path/to/my/goroot'

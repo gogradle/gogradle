@@ -130,12 +130,6 @@ public class GolangPluginSetting {
         this.goExecutable = goExecutable;
     }
 
-    /** @deprecated {@link #getGoBinaryDownloadTemplate} */
-    public boolean isFuckGfw() {
-        return BINARY_URL_GFW.equals(goBinaryDownloadTemplate);
-    }
-
-    /** @deprecated {@link #setGoBinaryDownloadTemplate} */
     public void setFuckGfw(boolean fuckGfw) {
         if (fuckGfw) {
             fuckGfw();
@@ -152,12 +146,18 @@ public class GolangPluginSetting {
         return goBinaryDownloadTemplate;
     }
 
-    /** @deprecated use {@link #setGoBinaryDownloadTemplate} */
+    /**
+     * @deprecated use {@link #setGoBinaryDownloadTemplate}
+     */
+    @Deprecated
     public void setGoBinaryDownloadBaseUri(String goBinaryDownloadBaseUri) {
         setGoBinaryDownloadBaseUri(goBinaryDownloadBaseUri == null ? null : URI.create(goBinaryDownloadBaseUri));
     }
 
-    /** @deprecated use {@link #setGoBinaryDownloadTemplate} */
+    /**
+     * @deprecated use {@link #setGoBinaryDownloadTemplate}
+     */
+    @Deprecated
     public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUri) {
         setGoBinaryDownloadTemplate(goBinaryDownloadBaseUri == null ? null
                 : goBinaryDownloadBaseUri.resolve("/") + DefaultGoBinaryManager.FILENAME);

@@ -104,9 +104,9 @@ class GolangPluginSettingTest {
     }
 
     @Test
-    void 'setting fuckGfw should succeed (backwards compatiblity)'() {
+    void 'setting fuckGfw should succeed'() {
         setting.fuckGfw = true
-        assert setting.fuckGfw
+        assert setting.goBinaryDownloadTemplate == 'http://golangtc.com/static/go/${version}/go${version}.${os}-${arch}${extension}'
     }
 
     @Test
