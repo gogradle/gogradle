@@ -198,7 +198,7 @@ github.com/aws/aws-sdk-go
 
 ```
 
-This is denpendency tree of [aws-sdk-go](https://github.com/aws/aws-sdk-go) at `31484500fe`. 
+This is dependency tree of [aws-sdk-go](https://github.com/aws/aws-sdk-go) at `31484500fe`. 
 
 Arrow `->` indicates that the dependency conflicts with another dependency and is resolved to another version; star `*` indicates this node's descendants are ignored because they have been displayed before.
 
