@@ -148,6 +148,8 @@ public class GolangPluginSetting {
 
     /**
      * @deprecated use {@link #setGoBinaryDownloadTemplate}
+     *
+     * @param goBinaryDownloadBaseUri the URI
      */
     @Deprecated
     public void setGoBinaryDownloadBaseUri(String goBinaryDownloadBaseUri) {
@@ -156,6 +158,8 @@ public class GolangPluginSetting {
 
     /**
      * @deprecated use {@link #setGoBinaryDownloadTemplate}
+     *
+     * @param goBinaryDownloadBaseUri the URI
      */
     @Deprecated
     public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUri) {
