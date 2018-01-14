@@ -66,7 +66,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
     public NotationDependency parse(Map<String, Object> notation) {
         Assert.isTrue(notation.containsKey(NAME_KEY), "Name must be specified!");
 
-        GolangPackage pkg = determinPackage(notation);
+        GolangPackage pkg = determinePackage(notation);
 
         if (pkg instanceof ResolvableGolangPackage) {
             String rootPathString = ResolvableGolangPackage.class.cast(pkg).getRootPathString();
@@ -89,7 +89,7 @@ public class DefaultMapNotationParser implements MapNotationParser {
         }
     }
 
-    private GolangPackage determinPackage(Map<String, Object> notation) {
+    private GolangPackage determinePackage(Map<String, Object> notation) {
         String packagePath = getString(notation, NAME_KEY);
         if (notation.containsKey(DIR_KEY)) {
             GolangPackage pkg = LocalDirectoryGolangPackage.of(packagePath, packagePath, getString(notation, DIR_KEY));
