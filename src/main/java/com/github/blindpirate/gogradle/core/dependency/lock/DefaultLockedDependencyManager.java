@@ -31,6 +31,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
@@ -66,6 +67,7 @@ public class DefaultLockedDependencyManager extends ExternalDependencyFactory im
         List<Map<String, Object>> ret = flatDependencies.stream()
                 .sorted(Comparator.comparing(GolangDependency::getName)) // to have a deterministic order
                 .map(ResolvedDependency::toLockedNotation)
+                .filter(Objects::nonNull)
                 .collect(Collectors.toList());
         ret.forEach(this::deactivateTransitive);
         return ret;

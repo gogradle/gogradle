@@ -93,6 +93,10 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public Map<String, Object> toLockedNotation() {
+        if (rootDir == EMPTY_DIR) {
+            // https://github.com/gogradle/gogradle/issues/183
+            return null;
+        }
         LOGGER.warn("You are locking {} which exists only on your local filesystem, "
                 + "which may cause issues on other one's computer.", getRootDir());
         Map<String, Object> ret = MapUtils.asMap(
