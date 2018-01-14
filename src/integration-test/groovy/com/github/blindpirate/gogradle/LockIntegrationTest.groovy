@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.support.*
 import com.github.blindpirate.gogradle.util.DataExchange
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import com.github.blindpirate.gogradle.vcs.git.GitClientAccessor
 import org.junit.Before
 import org.junit.Test
@@ -60,6 +61,46 @@ dependencies {
     }
 
     @Test
+    void 'locking emptyDir() should not throw NPE'() {
+        // https://github.com/gogradle/gogradle/issues/183
+        IOUtils.mkdir(userhome, 'local')
+        IOUtils.write(userhome, 'local/a.go', '''
+package main
+import (
+    "github.com/my/c"
+)
+func Whatever(){}
+''')
+
+        writeBuildAndSettingsDotGradle("""
+${buildDotGradleBase}
+
+dependencies {
+    golang {
+        build name:'github.com/my/a', dir: '${StringUtils.toUnixString(new File(userhome, 'local'))}'
+    }
+}
+
+repositories {
+    golang {
+        root 'github.com/my/c'
+        emptyDir()
+    }
+}
+""")
+
+        IOUtils.deleteQuitely(new File(getProjectRoot(), 'gogradle.lock'))
+
+        // when
+        newBuild('lock')
+
+        // then
+        Map a = getLockedDependency('build')[0]
+        assert a.name == 'github.com/my/a'
+        assert a.dir == StringUtils.toUnixString(new File(userhome, 'local'))
+    }
+
+    @Test
     void 'dependency in build.gradle should be used in DEVELOP'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
         newBuild('lock', 'vendor')
@@ -77,8 +118,6 @@ dependencies {
         assert b.vcs == 'git'
         assert b.url == 'http://localhost:8080/b1'
         assert b.commit.length() == 40
-
-
     }
 
     @Test
