@@ -119,5 +119,4 @@ public class SourceCodeDependencyFactory {
         return importPath.startsWith(".");
     }
 
-
 }

@@ -96,12 +96,12 @@ public class GolangRepositoryPattern {
         return substitute(name, urlSubstitution);
     }
 
-    private String substitute(String name, Object valueOrClousure) {
+    private String substitute(String name, Object valueOrClosure) {
         checkIncomplete();
-        if (valueOrClousure instanceof String) {
-            return (String) valueOrClousure;
-        } else if (valueOrClousure instanceof Closure) {
-            Closure closure = (Closure) valueOrClousure;
+        if (valueOrClosure instanceof String) {
+            return (String) valueOrClosure;
+        } else if (valueOrClosure instanceof Closure) {
+            Closure closure = (Closure) valueOrClosure;
             return Assert.isNotNull(closure.call(name)).toString();
         } else {
             return null;
