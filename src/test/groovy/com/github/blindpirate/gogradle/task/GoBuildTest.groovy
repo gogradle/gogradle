@@ -68,7 +68,6 @@ class GoBuildTest extends TaskTest {
         task.afterEvaluate()
         // then
 
-
         assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
         assert tasks[taskName].environment == [GOOS: Os.getHostOs().toString(), GOARCH: Arch.getHostArch().toString(), GOEXE: Os.getHostOs().exeExtension()]
     }
@@ -107,6 +106,7 @@ class GoBuildTest extends TaskTest {
         task.afterEvaluate()
         // then
         assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', 'output']
+        assert task.commandLineArgs == []
     }
 
     @Test

@@ -27,6 +27,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +82,10 @@ public class GoBuild extends Go {
 
             this.dependsOn(task);
         });
+
+        if (this.commandLineArgs != null) {
+            this.commandLineArgs = Collections.emptyList();
+        }
     }
 
     private void configureCommandLineArgs(Go task) {
