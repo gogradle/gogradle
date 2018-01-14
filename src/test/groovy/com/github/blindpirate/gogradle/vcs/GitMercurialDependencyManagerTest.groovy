@@ -212,6 +212,7 @@ class GitMercurialDependencyManagerTest {
         manager.resolve(resolveContext, notationDependency)
         // then
         verify(accessor).clone(pkg.urls[0], resource)
+        verify(accessor).update(resource)
     }
 
     @Test

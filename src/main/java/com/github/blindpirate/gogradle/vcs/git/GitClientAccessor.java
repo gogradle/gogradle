@@ -195,7 +195,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
         runWithProgress(repoRoot,
                 asList("git", "fetch", "--all", "--progress"),
                 GitClientLineConsumer.NO_OP,
-                GitClientLineConsumer.of("Updating " + repoRoot.getAbsolutePath()));
+                GitClientLineConsumer.of("Updating in " + repoRoot.getAbsolutePath()));
         run(repoRoot, asList("git", "submodule", "update", "--init", "--recursive"));
     }
 
