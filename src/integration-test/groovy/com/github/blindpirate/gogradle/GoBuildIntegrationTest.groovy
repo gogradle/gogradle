@@ -168,11 +168,27 @@ build {
     go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
 }
 ''')
-        newBuild {
-            it.forTasks('build')
-        }
+        newBuild('build', '--info')
 
+        buildActionShouldExecuteOnlyOnce(stdout.toString())
         assert runExecutable("${Os.getHostOs()}_${Arch.getHostArch()}_output") == 'World'
+    }
+
+    def buildActionShouldExecuteOnlyOnce(String infoLog) {
+        List<String> lines = infoLog.split(/\n/)
+
+//        :buildDarwinAmd64 (Thread[Task worker for ':',5,main]) completed. Took 0.288 secs.
+//        :build (Thread[Task worker for ':',5,main]) completed. Took 0.253 secs.)
+        List<Double> buildTimes = lines.collect {
+            if (it ==~ /^:build.*?Took ([\d.]+) secs.$/) {
+                return (it =~ /^:build.*?Took ([\d.]+) secs.$/)[0][1].toDouble()
+            } else {
+                return null
+            }
+        }.grep(Double)
+        assert buildTimes.size() == 2
+        // empty build task should take no more than 100ms
+        assert buildTimes[1] < 0.1
     }
 
     @Override
