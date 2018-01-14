@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -175,7 +176,7 @@ build {
     }
 
     def buildActionShouldExecuteOnlyOnce(String infoLog) {
-        List<String> lines = infoLog.split(/\n/)
+        List<String> lines = StringUtils.splitAndTrim(infoLog, /\n/)
 
 //        :buildDarwinAmd64 (Thread[Task worker for ':',5,main]) completed. Took 0.288 secs.
 //        :build (Thread[Task worker for ':',5,main]) completed. Took 0.253 secs.)
