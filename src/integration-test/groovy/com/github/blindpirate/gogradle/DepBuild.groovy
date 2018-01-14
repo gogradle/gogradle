@@ -80,7 +80,7 @@ test.enabled = false
         }
         IOUtils.chmodAddX(gogsBinPath)
         // I don't know why dep prints command to stderr...
-        assert processUtils.runAndGetStderr(depBinary.absolutePath).contains('dep is a tool for managing dependencies for Go projects')
+        assert processUtils.runAndGetStderr(depBinary.absolutePath).contains('Dep is a tool for managing dependencies for Go projects')
     }
 
     void firstBuild() {
