@@ -63,6 +63,14 @@ golang {
 
         // then
         assert new File(projectRoot, 'vendor/a/2.go').exists()
+
+        // when
+        // https://github.com/gogradle/gogradle/issues/184#issuecomment-355498314
+        IOUtils.clearDirectory(new File(userhome, 'go/repo'))
+        GitServer.git('checkout master', repoRoot)
+
+        // then
+        newBuild('clean', 'vendor')
     }
 
     @Override

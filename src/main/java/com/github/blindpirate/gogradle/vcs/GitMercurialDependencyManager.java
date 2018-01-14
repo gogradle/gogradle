@@ -159,7 +159,11 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     protected void updateRepository(GolangDependency dependency, File repoRoot) {
         String url = getAccessor().getRemoteUrl(repoRoot);
 
-        LOGGER.info("Fetching {} from {}", dependency, url);
+        if (dependency == null) {
+            LOGGER.info("Fetching from {}", url);
+        } else {
+            LOGGER.info("Fetching {} from {}", dependency, url);
+        }
 
         getAccessor().update(repoRoot);
     }
@@ -167,6 +171,8 @@ public abstract class GitMercurialDependencyManager extends AbstractVcsDependenc
     @Override
     protected void initRepository(String dependencyName, List<String> urls, File repoRoot) {
         tryCloneWithUrls(dependencyName, urls, repoRoot);
+        // https://github.com/gogradle/gogradle/issues/184#issuecomment-355498314
+        updateRepository(null, repoRoot);
     }
 
     private void tryCloneWithUrls(String name, List<String> urls, File directory) {
