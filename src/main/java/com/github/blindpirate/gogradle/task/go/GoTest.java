@@ -95,6 +95,9 @@ public class GoTest extends AbstractGolangTask {
 
     private boolean continueWhenFail;
 
+    private Consumer<List<TestClassResult>> generateTestReport =
+        testResults -> GradleInternalAPI.renderTestReport(testResults, getReportDir());
+
     public GoTest() {
         setDescription("Run all tests.");
         dependsOn(VENDOR_TASK_NAME);
@@ -112,6 +115,14 @@ public class GoTest extends AbstractGolangTask {
         this.generateCoverageProfile = generateCoverageProfile;
     }
 
+    public void setGenerateTestReport(Consumer<List<TestClassResult>> generateTestReport) {
+        this.generateTestReport = generateTestReport;
+    }
+
+    public void setGenerateTestReport(groovy.lang.Closure generateTestReport) {
+        this.generateTestReport = testResults -> generateTestReport.call(testResults);
+    }
+
     @Option(option = "tests", description = "Sets test class or method name to be included, '*' is supported.")
     @Incubating
     public GoTest setTestNamePattern(List<String> testNamePattern) {
@@ -125,7 +136,7 @@ public class GoTest extends AbstractGolangTask {
 
         prepareCoverageProfileDir();
         List<TestClassResult> testResults = doTest();
-        generateTestReport(testResults);
+        generateTestReport.accept(testResults);
         rewritePackageName(getReportDir());
         reportErrorIfNecessary(testResults, getReportDir());
     }
@@ -189,11 +200,6 @@ public class GoTest extends AbstractGolangTask {
         Path relativeToProjectRoot = getProject().getProjectDir().toPath().relativize(dir.toPath());
         Path importPath = Paths.get(setting.getPackagePath()).resolve(relativeToProjectRoot);
         return toUnixString(importPath);
-    }
-
-
-    private void generateTestReport(List<TestClassResult> testResults) {
-        GradleInternalAPI.renderTestReport(testResults, getReportDir());
     }
 
     private List<TestClassResult> doTest() {
