@@ -13,7 +13,7 @@ A task unit executed independently is usually called [Task](https://docs.gradle.
   - resolveTestDependencies
   - installDependencies
   - dependencies
-  - venodr
+  - vendor
   - lock
 - Build tasks
   - build
