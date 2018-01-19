@@ -63,13 +63,13 @@ public class GolangPlugin implements Plugin<Project> {
         settings = injector.getInstance(GolangPluginSetting.class);
         golangTaskContainer = injector.getInstance(GolangTaskContainer.class).init(project, injector);
         Arrays.asList(BuildMode.values()).forEach(mode -> {
-            project.getExtensions().add(mode.toString(), mode);
-            project.getExtensions().add(mode.getAbbr(), mode);
+            project.getExtensions().add(BuildMode.class, mode.toString(), mode);
+            project.getExtensions().add(BuildMode.class, mode.getAbbr(), mode);
         });
         Arrays.asList(TimeUnit.values()).forEach(timeUnit -> {
             final String name = timeUnit.name();
-            project.getExtensions().add(name, timeUnit);
-            project.getExtensions().add(name.substring(0, name.length() - 1), timeUnit);
+            project.getExtensions().add(TimeUnit.class, name, timeUnit);
+            project.getExtensions().add(TimeUnit.class, name.substring(0, name.length() - 1), timeUnit);
         });
     }
 
