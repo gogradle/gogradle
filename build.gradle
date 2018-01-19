@@ -18,7 +18,6 @@ plugins {
 }
 
 apply from: 'config/scripts/coverage.gradle'
-apply plugin: 'kotlin'
 
 group 'com.github.blindpirate'
 version '0.8.1'
