@@ -1,3 +1,4 @@
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import com.github.blindpirate.gogradle.TestTop1000Task
 
 /************** plugins **************/
@@ -235,12 +236,7 @@ compileJava.dependsOn updateVersion
 publishPlugins.dependsOn 'updateVersion', 'shadowJar'
 
 /************** kotlin **************/
-compileKotlin {
-    kotlinOptions {
-        jvmTarget = "1.8"
-    }
-}
-compileTestKotlin {
+tasks.withType(KotlinCompile) {
     kotlinOptions {
         jvmTarget = "1.8"
     }
