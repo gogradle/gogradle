@@ -31,12 +31,16 @@ sourceSets {
         }
     }
     integrationTest {
-        groovy.srcDir 'src/integration-test/groovy'
-        resources.srcDir 'src/integration-test/resources'
+        java.srcDirs = []
+        groovy.srcDirs = ['src/integration-test/groovy']
+        kotlin.srcDirs = []
+        resources.srcDirs = ['src/integration-test/resources']
     }
     crossVersionTest {
-        kotlin.srcDir 'src/cross-version-test/kotlin'
-        resources.srcDir 'src/cross-version-test/resources'
+        java.srcDirs = []
+        groovy.srcDirs = []
+        kotlin.srcDirs = ['src/cross-version-test/kotlin']
+        resources.srcDirs = ['src/cross-version-test/resources']
     }
 }
 
