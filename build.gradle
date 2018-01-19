@@ -12,7 +12,7 @@ plugins {
     id 'antlr'
     id 'com.github.kt3k.coveralls' version '2.7.1'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
-    id "com.gradle.plugin-publish" version "0.9.7"
+    id "com.gradle.plugin-publish" version "0.9.9"
     id "co.riiid.gradle" version "0.4.2"
     id "org.jetbrains.kotlin.jvm" version "1.2.0"
 }
