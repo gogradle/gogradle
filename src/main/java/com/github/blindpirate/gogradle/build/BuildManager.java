@@ -79,7 +79,7 @@ public interface BuildManager {
            Map<String, String> env,
            Consumer<String> stdoutLineConsumer,
            Consumer<String> stderrLineConsumer,
-           boolean continueWhenFail);
+           boolean continueOnFailure);
 
     /**
      * Fork a process and run commands specified by {@code args}, under the environments
@@ -105,6 +105,6 @@ public interface BuildManager {
             Map<String, String> env,
             Consumer<String> stdoutLineConsumer,
             Consumer<String> stderrLineConsumer,
-            boolean continueWhenFail);
+            boolean continueOnFailure);
 
 }

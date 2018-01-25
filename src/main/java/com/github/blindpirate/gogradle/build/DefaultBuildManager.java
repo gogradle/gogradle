@@ -181,9 +181,9 @@ public class DefaultBuildManager implements BuildManager {
                   Map<String, String> env,
                   Consumer<String> stdoutLineConsumer,
                   Consumer<String> stderrLineConsumer,
-                  boolean continueWhenFail) {
+                  boolean continueOnFailure) {
         List<String> cmdAndArgs = asStringList(getGoBinary(), insertBuildTags(args));
-        return run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, continueWhenFail);
+        return run(cmdAndArgs, env, stdoutLineConsumer, stderrLineConsumer, continueOnFailure);
     }
 
     @Override
@@ -197,13 +197,13 @@ public class DefaultBuildManager implements BuildManager {
     public int run(List<String> args, Map<String, String> env,
                    Consumer<String> stdoutLineConsumer,
                    Consumer<String> stderrLineConsumer,
-                   boolean continueWhenFail) {
+                   boolean continueOnFailure) {
         Map<String, String> finalEnv = determineEnv(env);
 
         @SuppressWarnings("unchecked")
         List<String> finalArgs = renderArgs(args, (Map) finalEnv);
 
-        return doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, continueWhenFail);
+        return doRun(finalArgs, finalEnv, stdoutLineConsumer, stderrLineConsumer, continueOnFailure);
     }
 
     @SuppressWarnings("unchecked")
@@ -218,7 +218,7 @@ public class DefaultBuildManager implements BuildManager {
                       Map<String, String> env,
                       Consumer<String> stdoutLineConsumer,
                       Consumer<String> stderrLineConsumer,
-                      boolean continueWhenFail) {
+                      boolean continueOnFailure) {
         stdoutLineConsumer = stdoutLineConsumer == null ? LOGGER::quiet : stdoutLineConsumer;
         stderrLineConsumer = stderrLineConsumer == null ? LOGGER::error : stderrLineConsumer;
 
@@ -237,7 +237,7 @@ public class DefaultBuildManager implements BuildManager {
 
         try {
             int ret = process.waitFor();
-            if (!continueWhenFail) {
+            if (!continueOnFailure) {
                 ensureProcessReturnZero(ret, args, env);
             }
             return ret;
