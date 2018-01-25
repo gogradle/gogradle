@@ -120,7 +120,7 @@ fmt {
 
 ```groovy
 vet {
-    continueWhenFail = true
+    continueOnFailure = true
 }
 ```
 

@@ -50,7 +50,7 @@ golang {
 }
 
 vet {
-    continueWhenFail = true
+    continueOnFailure = true
 }
 
 """
