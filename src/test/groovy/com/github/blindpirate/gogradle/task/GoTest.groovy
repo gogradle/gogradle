@@ -102,9 +102,9 @@ class GoTest extends TaskTest {
     }
 
     @Test
-    void 'setting continueWhenFail should succeed'() {
+    void 'setting continueOnFailure should succeed'() {
         // given
-        task.continueWhenFail = true
+        task.continueOnFailure = true
         // when
         task.go('test -v github.com/my/package')
         task.executeTask()

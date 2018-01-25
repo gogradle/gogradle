@@ -90,7 +90,7 @@ class GoVetTest extends TaskTest {
     void 'custom action should be executed if specified'() {
         // given
         task.go('tool vet xxx', null, {})
-        task.continueWhenFail = true
+        task.continueOnFailure = true
         // when
         task.vet()
         // then

@@ -124,7 +124,7 @@ Since `go vet` is inaccurate, you can ignore the error:
 
 ```groovy
 vet {
-    continueWhenFail = true
+    continueOnFailure = true
 }
 ```
 ## coverage

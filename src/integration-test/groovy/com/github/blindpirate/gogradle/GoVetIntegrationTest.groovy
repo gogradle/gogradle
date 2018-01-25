@@ -96,11 +96,11 @@ func main() {
     }
 
     @Test
-    void 'exception should be suppressed if continueWhenFail=true'() {
+    void 'exception should be suppressed if continueOnFailure=true'() {
         writeGoFileWithErrorToProjectRoot()
         IOUtils.append(new File(resource, 'build.gradle'), '''
 vet {
-    continueWhenFail = true
+    continueOnFailure = true
 }
 ''')
         newBuild {
