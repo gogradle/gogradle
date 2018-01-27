@@ -22,7 +22,7 @@ class CrossVersionTestOnExamples {
     }
 
     fun crossVersionTest(function: (String) -> Unit) {
-        listOf("3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4").forEach {
+        listOf("3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4", "4.5").forEach {
             println("Start building with $it.")
             function(it)
         }

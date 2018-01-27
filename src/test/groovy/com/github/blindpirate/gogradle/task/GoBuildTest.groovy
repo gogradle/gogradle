@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.Go
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.go.GoBuild
 import org.gradle.api.internal.tasks.TaskContainerInternal
 import org.junit.Before
@@ -30,13 +31,20 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
+import java.util.function.Consumer
+
 import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLetter
 import static org.mockito.ArgumentMatchers.any
+import static org.mockito.ArgumentMatchers.anyBoolean
+import static org.mockito.ArgumentMatchers.anyList
+import static org.mockito.ArgumentMatchers.anyMap
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 class GoBuildTest extends TaskTest {
+    File resource
+
     GoBuild task
 
     @Mock
@@ -67,8 +75,7 @@ class GoBuildTest extends TaskTest {
         // when
         task.afterEvaluate()
         // then
-
-        assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
+        assert tasks[taskName].goActions[0].args == ['build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
         assert tasks[taskName].environment == [GOOS: Os.getHostOs().toString(), GOARCH: Arch.getHostArch().toString(), GOEXE: Os.getHostOs().exeExtension()]
     }
 
@@ -79,7 +86,7 @@ class GoBuildTest extends TaskTest {
         task.afterEvaluate()
         // then
         ['buildDarwinAmd64', 'buildLinux386', 'buildWindowsAmd64'].each {
-            assert tasks[it].commandLineArgs == ['GO', 'build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
+            assert tasks[it].goActions[0].args == ['build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
         }
 
         assert tasks['buildDarwinAmd64'].environment == [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '']
@@ -88,14 +95,14 @@ class GoBuildTest extends TaskTest {
     }
 
     @Test
-    void 'setting continueWhenFail should succeed'() {
+    void 'setting continueOnFailure should succeed'() {
         // when
         task.setTargetPlatform(['darwin-amd64', 'linux-386'])
-        task.setContinueWhenFail(true)
+        task.setContinueOnFailure(true)
         task.afterEvaluate()
         // then
         ['buildDarwinAmd64', 'buildLinux386'].each {
-            assert tasks[it].continueWhenFail
+            assert tasks[it].continueOnFailure
         }
     }
 
@@ -105,8 +112,8 @@ class GoBuildTest extends TaskTest {
         task.go 'build -o output'
         task.afterEvaluate()
         // then
-        assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', 'output']
-        assert task.commandLineArgs == []
+        assert tasks[taskName].goActions[0].args == ['build', '-o', 'output']
+        assert task.goActions.empty
     }
 
     @Test
@@ -115,13 +122,16 @@ class GoBuildTest extends TaskTest {
         task.outputLocation = 'outputlocation'
         task.afterEvaluate()
         // then
-        assert tasks[taskName].commandLineArgs == ['GO', 'build', '-o', 'outputlocation', 'my/package']
+        assert tasks[taskName].goActions[0].args == ['build', '-o', 'outputlocation', 'my/package']
     }
 
     @Test
     void 'redirection should be inherited'() {
         // when
-        task.run('cmd', task.devNull(), task.devNull())
+        task.run('cmd') {
+            stdout devNull()
+            stderr devNull()
+        }
         task.afterEvaluate()
         // then
         assert tasks[taskName].stdoutLineConsumer.is(task.stdoutLineConsumer)
@@ -200,8 +210,48 @@ class GoBuildTest extends TaskTest {
         assert isValidTargetPlatform('\t\t\na-b\n ,\n 1-a\t\n , c-2d  ')
     }
 
-
     boolean isValidTargetPlatform(String value) {
         return GoBuild.TARGET_PLATFORMS_PATTERN.matcher(value).matches()
+    }
+
+    @Test
+    @WithResource('')
+    void 'custom action should inherit stdout and stderr correctly'() {
+        // given
+        def stdouts = ['line1', 'line2']
+        def returnValues = [-1, 0, 1, -1, 0, 1].iterator()
+
+        when(buildManager.go(anyList(), anyMap(), any(Consumer), any(Consumer), anyBoolean())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                Consumer stdoutLineConsumer = invocation.getArgument(2)
+
+                stdouts.each { stdoutLineConsumer.accept(it) }
+                return returnValues.next()
+            }
+        })
+
+        task.go('action1') {
+            stdout appendTo(new File(resource, 'action1.out').absolutePath)
+        }
+        task.go('action2')
+        task.go('action3')
+
+        task.stdout task.appendTo(new File(resource, 'stdout.out').absolutePath)
+        task.continueOnFailure = true
+        task.setTargetPlatform(['darwin-amd64', 'linux-386'])
+        task.afterEvaluate()
+
+        // when
+        ['buildDarwinAmd64', 'buildLinux386'].each {
+            tasks[it].executeTask()
+        }
+        // then
+        ['buildDarwinAmd64', 'buildLinux386'].each {
+            assert tasks[it].exitValues == [-1, 0, 1]
+            assert tasks[it].exitValue == -1
+        }
+        assert new File(resource, 'action1.out').text == 'line1\nline2\n' * 2
+        assert new File(resource, 'stdout.out').text == 'line1\nline2\n' * 4
     }
 }

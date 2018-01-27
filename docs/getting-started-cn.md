@@ -133,13 +133,16 @@ check.dependsOn golint
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
-    go('build -v github.com/my/project', { stdoutLine ->
-        println stderrLine
-        new File('stdout.txt').append(stdoutLine)
-    }, { stderrLine ->
-        println stderrLine
-        new File('stderr.txt').append(stdoutLine)
-    })
+    go('build -v github.com/my/project') {
+        stdout { stdoutLine ->
+            println stderrLine
+            new File('stdout.txt').append(stdoutLine)
+        }
+        stderr { stderrLine ->
+            println stderrLine
+            new File('stderr.txt').append(stderrLine)
+        }
+    }   
 }
 ```
 
@@ -148,7 +151,10 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
-    go('build -v github.com/my/project', writeTo('stdout.txt'), appendTo('/this/is/absolute/path/stderr.txt'))
+    go('build -v github.com/my/project') {
+        stdout writeTo('stdout.txt')
+        stderr appendTo('/this/is/absolute/path/stderr.txt')
+    } 
 }
 ```
 
@@ -157,9 +163,13 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 如果希望实现一个跨平台的`/dev/null`，需要：
 
 ```
-task myTee(type: com.github.blindpirate.gogradle.Go){
+task outputToDevNull(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
-    go('build -v github.com/my/project', devNull(), devNull())
+    go('build -v github.com/my/project') {
+        stdout devNull()
+        stderr devNull()
+    }    
+    
     doLast {
         if(exitValue!=0){
             println "return code is ${exitValue}"

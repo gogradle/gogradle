@@ -27,7 +27,7 @@ import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
 import java.util.ArrayList;
-import java.util.Collections;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -39,12 +39,10 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.INSTALL_D
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.RESOLVE_BUILD_DEPENDENCIES_TASK_NAME;
 import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLetter;
 import static com.github.blindpirate.gogradle.util.StringUtils.splitAndTrim;
-import static java.util.Arrays.asList;
 import static java.util.Collections.singletonList;
 import static java.util.stream.Collectors.toList;
 
 public class GoBuild extends Go {
-
     @Inject
     private GolangPluginSetting setting;
 
@@ -65,36 +63,40 @@ public class GoBuild extends Go {
         this.outputLocation = outputLocation;
     }
 
+    @Override
     public void afterEvaluate() {
         targetPlatforms.forEach(osArchPair -> {
             Os os = osArchPair.getLeft();
             Arch arch = osArchPair.getRight();
 
             Go task = createSingleGoTask(os, arch);
-
             task.dependsOn(INSTALL_DEPENDENCIES_TASK_NAME, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
-
-            configureEnvironment(os, arch, task);
-
-            task.setContinueWhenFail(this.continueWhenFail);
-
-            configureCommandLineArgs(task);
-
-            this.dependsOn(task);
+            configureSubTask(task, os, arch);
         });
 
-        if (this.commandLineArgs != null) {
-            this.commandLineArgs = Collections.emptyList();
+        if (!this.goActions.isEmpty()) {
+            this.goActions.clear();
         }
     }
 
-    private void configureCommandLineArgs(Go task) {
-        if (this.commandLineArgs == null) {
-            task.go(asList("build", "-o", this.outputLocation, setting.getPackagePath()),
-                    this.stdoutLineConsumer,
-                    this.stderrLineConsumer);
+    private void configureSubTask(Go subTask, Os os, Arch arch) {
+        configureStdoutStderr(subTask);
+        subTask.setContinueOnFailure(continueOnFailure);
+        configureActions(subTask);
+        configureEnvironment(os, arch, subTask);
+        this.dependsOn(subTask);
+    }
+
+    private void configureStdoutStderr(Go subTask) {
+        subTask.stdout(this.stdoutLineConsumer);
+        subTask.stderr(this.stderrLineConsumer);
+    }
+
+    private void configureActions(Go task) {
+        if (goActions.isEmpty()) {
+            task.go(Arrays.asList("build", "-o", this.outputLocation, setting.getPackagePath()));
         } else {
-            task.run(this.commandLineArgs, this.stdoutLineConsumer, this.stderrLineConsumer);
+            goActions.forEach(task::addGoAction);
         }
     }
 

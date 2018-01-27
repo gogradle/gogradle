@@ -44,8 +44,8 @@ public class Gofmt extends Go {
 
     public void afterEvaluate() {
         // if user doesn't configure it
-        if (CollectionUtils.isEmpty(commandLineArgs)) {
-            run(CollectionUtils.asStringList(getGofmtPath(), "-w", children()), stdoutLineConsumer, stderrLineConsumer);
+        if (CollectionUtils.isEmpty(goActions)) {
+            run(CollectionUtils.asStringList(getGofmtPath(), "-w", children()));
         }
     }
 

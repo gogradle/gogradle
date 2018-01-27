@@ -58,8 +58,6 @@ class GofmtTest extends TaskTest {
         IOUtils.write(resource, '.a.go', '')
         IOUtils.mkdir(resource, 'b')
         IOUtils.mkdir(resource, 'vendor')
-
-        task.afterEvaluate()
     }
 
     @Test
@@ -70,11 +68,11 @@ class GofmtTest extends TaskTest {
     @Test
     void 'gofmt should succeed'() {
         // when
-        task.executeTask()
         task.afterEvaluate()
+        task.executeTask()
 
         // then
-        verify(buildManager).run(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
+        verify(buildManager).run(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
 
         assert captor.value[0..1] == [absolutePath('.go/bin/gofmt'), '-w']
         assert captor.value.contains(absolutePath('a.go'))
