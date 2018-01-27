@@ -32,10 +32,11 @@ import org.gradle.api.tasks.TaskContainer;
 
 import javax.inject.Singleton;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 @Singleton
-public class GolangTaskContainer {
+public class GolangTaskContainer implements Iterable<Task> {
     // prepare everything
     public static final String PREPARE_TASK_NAME = determineAlias("prepare", "goPrepare");
     // produce all dependencies by analyzing build.gradle
@@ -112,5 +113,10 @@ public class GolangTaskContainer {
     public void createCoreTasks() {
         TaskContainer taskContainer = project.getTasks();
         TASKS.forEach((key, value) -> tasks.put(value, taskContainer.create(key, value, dependencyInjectionAction)));
+    }
+
+    @Override
+    public Iterator<Task> iterator() {
+        return tasks.values().iterator();
     }
 }

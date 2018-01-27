@@ -31,6 +31,9 @@ public class AbstractGolangTask extends DefaultTask {
         setGroup("Gogradle");
     }
 
+    public void afterEvaluate() {
+    }
+
     protected <T extends Task> T getTask(Class<T> clazz) {
         return golangTaskContainer.get(clazz);
     }

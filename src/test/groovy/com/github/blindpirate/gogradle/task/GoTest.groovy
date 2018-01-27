@@ -26,14 +26,14 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.ArgumentCaptor
+import org.mockito.Captor
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
 import java.util.function.Consumer
 
 import static org.mockito.ArgumentMatchers.*
-import static org.mockito.Mockito.verify
-import static org.mockito.Mockito.when
+import static org.mockito.Mockito.*
 
 @RunWith(GogradleRunner)
 class GoTest extends TaskTest {
@@ -45,6 +45,9 @@ class GoTest extends TaskTest {
     List stderrs = ['stderr1', 'stderr2']
 
     File resource
+
+    @Captor
+    ArgumentCaptor<List> captor
 
     @Before
     void setUp() {
@@ -120,19 +123,22 @@ class GoTest extends TaskTest {
         letBuildManagerCallConsumer()
 
         // when
-        List stdout = []
-        List stderr = []
-        task.go('vet ./...', { line ->
-            stdout << line
-        }, { line ->
-            stderr << line
-        })
+        List stdoutArray = []
+        List stderrArray = []
+        task.go('vet ./...') {
+            stdout { line ->
+                stdoutArray << line
+            }
+            stderr { line ->
+                stderrArray << line
+            }
+        }
         task.executeTask()
 
         // then
         assert task.exitValue == 0
-        assert stdout == stdouts
-        assert stderr == stderrs
+        assert stdoutArray == stdouts
+        assert stderrArray == stderrs
     }
 
     @Test
@@ -141,19 +147,22 @@ class GoTest extends TaskTest {
         letBuildManagerCallConsumer()
 
         // when
-        List stdout = []
-        List stderr = []
-        task.run('vet ./...', { line ->
-            stdout << line
-        }, { line ->
-            stderr << line
-        })
+        List stdoutArray = []
+        List stderrArray = []
+        task.run('vet ./...') {
+            stdout { line ->
+                stdoutArray << line
+            }
+            stderr { line ->
+                stderrArray << line
+            }
+        }
         task.executeTask()
 
         // then
         assert task.exitValue == 0
-        assert stdout == stdouts
-        assert stderr == stderrs
+        assert stdoutArray == stdouts
+        assert stderrArray == stderrs
     }
 
     @Test
@@ -162,14 +171,16 @@ class GoTest extends TaskTest {
         letBuildManagerCallConsumer()
 
         // when
-        List stdout = []
-        task.go('vet ./...', { line ->
-            stdout << line
-        })
+        List stdoutArray = []
+        task.go('vet ./...') {
+            stdout { line ->
+                stdoutArray << line
+            }
+        }
         task.executeTask()
 
         // then
-        assert stdout == stdouts
+        assert stdoutArray == stdouts
     }
 
     @Test
@@ -178,14 +189,16 @@ class GoTest extends TaskTest {
         letBuildManagerCallConsumer()
 
         // when
-        List stdout = []
-        task.run('golint -v -a', { line ->
-            stdout << line
-        })
+        List stdoutArray = []
+        task.run('golint -v -a') {
+            stdout { line ->
+                stdoutArray << line
+            }
+        }
         task.executeTask()
 
         // then
-        assert stdout == stdouts
+        assert stdoutArray == stdouts
     }
 
     @Test
@@ -196,7 +209,10 @@ class GoTest extends TaskTest {
         IOUtils.write(resource, 'append.txt', 'append\n');
         IOUtils.write(resource, 'write.txt', 'write\n');
         // when
-        task.go('vet ./...', task.appendTo('append.txt'), task.writeTo(new File(resource, 'write.txt').absolutePath))
+        task.go('vet ./...') {
+            stdout appendTo('append.txt')
+            stderr writeTo(new File(resource, 'write.txt').absolutePath)
+        }
         task.executeTask()
 
         // then
@@ -210,7 +226,10 @@ class GoTest extends TaskTest {
         // given
         letBuildManagerCallConsumer()
         // when
-        task.go('vet ./...', task.appendTo('append.txt'), task.writeTo(new File(resource, 'write.txt').absolutePath))
+        task.go('vet ./...') {
+            stdout appendTo('append.txt')
+            stderr writeTo(new File(resource, 'write.txt').absolutePath)
+        }
         task.executeTask()
 
         // then
@@ -226,4 +245,68 @@ class GoTest extends TaskTest {
         assert ReflectionUtils.getField(task, 'environment') == [a: '1', b: '2']
     }
 
+    @Test
+    void 'env in action should overwrite env in task'() {
+        // given
+        task.environment('a', '1')
+        task.go('whatever1') {
+            environment('a', '2')
+        }
+        task.go('whatever2')
+
+        // when
+        task.executeTask()
+
+        // then
+        verify(buildManager, times(2)).go(anyList(), captor.capture(), any(Consumer), any(Consumer), eq(false))
+
+        assert captor.allValues == [[a: '2'], [a: '1']]
+    }
+
+    @Test
+    void 'continueOnFailure in action should overwrite that in task'() {
+        // given
+        task.continueOnFailure = true
+        task.go('whatever1') {
+            continueOnFailure = false
+        }
+        task.go('whatever2')
+
+        // when
+        task.executeTask()
+
+        // then
+        verify(buildManager).go(eq(['whatever1']), anyMap(), any(Consumer), any(Consumer), eq(false))
+        verify(buildManager).go(eq(['whatever2']), anyMap(), any(Consumer), any(Consumer), eq(true))
+    }
+
+    @Test
+    void 'consumer in action should overwrite that in task'() {
+        // given
+        def list1 = []
+        def list2 = []
+        task.stdout {
+            list1.add(it)
+        }
+        task.go('whatever1') {
+            stdout {
+                list2.add(it)
+            }
+        }
+
+        letBuildManagerCallConsumer()
+
+        // when
+        task.executeTask()
+        // then
+        assert list1 == []
+        assert list2 == ['stdout1', 'stdout2']
+
+        // when
+        task.go('whatever2')
+        task.executeTask()
+        // then
+        assert list1 == ['stdout1', 'stdout2']
+        assert list2 == ['stdout1', 'stdout2', 'stdout1', 'stdout2']
+    }
 }

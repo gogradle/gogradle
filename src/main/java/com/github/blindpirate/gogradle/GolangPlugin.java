@@ -19,9 +19,8 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
+import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
-import com.github.blindpirate.gogradle.task.go.GoBuild;
-import com.github.blindpirate.gogradle.task.go.Gofmt;
 import com.google.inject.Guice;
 import com.google.inject.Injector;
 import org.gradle.api.Plugin;
@@ -87,8 +86,11 @@ public class GolangPlugin implements Plugin<Project> {
     }
 
     private void afterEvaluate(Project project) {
-        this.golangTaskContainer.get(GoBuild.class).afterEvaluate();
-        this.golangTaskContainer.get(Gofmt.class).afterEvaluate();
+        this.golangTaskContainer.forEach(task -> {
+            if (task instanceof AbstractGolangTask) {
+                AbstractGolangTask.class.cast(task).afterEvaluate();
+            }
+        });
     }
 
     private void customizeProjectInternalServices(Project project) {

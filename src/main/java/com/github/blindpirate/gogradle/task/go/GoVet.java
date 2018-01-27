@@ -21,7 +21,6 @@ import com.github.blindpirate.gogradle.Go;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import org.gradle.api.tasks.TaskAction;
 
 import java.io.File;
 import java.util.List;
@@ -36,25 +35,17 @@ public class GoVet extends Go {
         dependsOn(VENDOR_TASK_NAME);
     }
 
-    @TaskAction
-    public void vet() {
-        setGogradleGlobalContext();
-
-        if (CollectionUtils.isEmpty(commandLineArgs)) {
+    @Override
+    public void afterEvaluate() {
+        if (CollectionUtils.isEmpty(goActions)) {
             vet(allSubGoFiles());
             vet(allSubDirectories());
-        } else {
-            super.executeTask();
         }
     }
 
     private void vet(List<String> fileNames) {
         if (!fileNames.isEmpty()) {
-            buildManager.go(CollectionUtils.asStringList("tool", "vet", fileNames),
-                    environment,
-                    stdoutLineConsumer,
-                    stderrLineConsumer,
-                    continueWhenFail);
+            go(CollectionUtils.asStringList("tool", "vet", fileNames));
         }
     }
 

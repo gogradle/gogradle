@@ -107,13 +107,16 @@ Note that `stdout/stderr` redirection and pipe is not available. To do a redirec
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
-    go('build -v github.com/my/project', { stdoutLine ->
-        println stderrLine
-        new File('stdout.txt').append(stdoutLine)
-    }, { stderrLine ->
-        println stderrLine
-        new File('stderr.txt').append(stdoutLine)
-    })
+    go('build -v github.com/my/project') {
+        stdout { stdoutLine ->
+            println stderrLine
+            new File('stdout.txt').append(stdoutLine)
+        }
+        stderr { stderrLine ->
+            println stderrLine
+            new File('stderr.txt').append(stderrLine)
+        }
+    }    
 }
 ```
 
@@ -122,8 +125,10 @@ And more simple:
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
-        go('build -v github.com/my/project', writeTo('stdout.txt'), appendTo('/this/is/absolute/path/stderr.txt'))
-    
+    go('build -v github.com/my/project') {
+        stdout writeTo('stdout.txt')
+        stderr appendTo('/this/is/absolute/path/stderr.txt')
+    } 
 }
 ```
 
@@ -132,9 +137,13 @@ This code snippet tells Gogradle to run `build -v github.com/my/project`, and wr
 Here is a cross-platform `/dev/null`:
 
 ```
-task myTee(type: com.github.blindpirate.gogradle.Go){
+task outputToDevNull(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
-    go('build -v github.com/my/project', devNull(), devNull())
+    go('build -v github.com/my/project') {
+        stdout devNull()
+        stderr devNull()
+    }    
+    
     doLast {
         if(exitValue!=0){
             println "return code is ${exitValue}"

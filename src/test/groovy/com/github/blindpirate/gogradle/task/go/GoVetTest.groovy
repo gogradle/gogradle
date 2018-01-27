@@ -65,9 +65,10 @@ class GoVetTest extends TaskTest {
         // given
         IOUtils.write(resource, 'main.go', '')
         // when
-        task.vet()
+        task.afterEvaluate()
+        task.executeTask()
         // then
-        verify(buildManager, times(2)).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
+        verify(buildManager, times(2)).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
 
         assert captor.allValues.size() == 2
         List firstCall = captor.allValues[0]
@@ -80,19 +81,23 @@ class GoVetTest extends TaskTest {
     @Test
     void 'go vet should succeed when .go not exists in root'() {
         // when
-        task.vet()
+        task.afterEvaluate()
+        task.executeTask()
         // then
-        verify(buildManager).go(captor.capture(), anyMap(), isNull(), isNull(), eq(false))
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
         assert captor.value == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
     }
 
     @Test
     void 'custom action should be executed if specified'() {
         // given
-        task.go('tool vet xxx', null, {})
+        task.go('tool vet xxx') {
+            stderr {}
+        }
         task.continueOnFailure = true
         // when
-        task.vet()
+        task.afterEvaluate()
+        task.executeTask()
         // then
         ArgumentCaptor captor1 = ArgumentCaptor.forClass(Consumer)
         ArgumentCaptor captor2 = ArgumentCaptor.forClass(Consumer)

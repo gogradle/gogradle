@@ -37,8 +37,13 @@ import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny
  * There are two pre-defined filters to filter go build source code and go test source code.
  */
 public class GoSourceCodeFilter extends AbstractFileFilter {
-    public static final GoSourceCodeFilter BUILD_GO_FILTER = withPredicate(GoSourceCodeFilter::isBuildGoFile);
-    public static final GoSourceCodeFilter TEST_GO_FILTER = withPredicate(GoSourceCodeFilter::isTestGoFile);
+    private static final Predicate<File> BUILD_GO_FILE_PREDICATE = GoSourceCodeFilter::isBuildGoFile;
+    private static final Predicate<File> TEST_GO_FILE_PREDICATE = GoSourceCodeFilter::isTestGoFile;
+    private static final Predicate<File> ALL_GO_FILE_PREDICATE = BUILD_GO_FILE_PREDICATE.or(TEST_GO_FILE_PREDICATE);
+
+    public static final GoSourceCodeFilter BUILD_GO_FILTER = withPredicate(BUILD_GO_FILE_PREDICATE);
+    public static final GoSourceCodeFilter TEST_GO_FILTER = withPredicate(TEST_GO_FILE_PREDICATE);
+    public static final GoSourceCodeFilter ALL_GO_FILTER = withPredicate(ALL_GO_FILE_PREDICATE);
 
     public static final Map<String, Predicate<File>> PREDICATES = ImmutableMap.of(
             BUILD, GoSourceCodeFilter::isBuildGoFile,

@@ -17,6 +17,8 @@
 
 package com.github.blindpirate.gogradle.util;
 
+import groovy.lang.Closure;
+import org.gradle.util.ConfigureUtil;
 import org.joor.ReflectException;
 
 import java.lang.reflect.Method;
@@ -103,5 +105,9 @@ public class ConfigureUtils {
         } else {
             return string.substring(0, 1).toUpperCase() + string.substring(1);
         }
+    }
+
+    public static void configure(Object target, Closure<?> configureClosure) {
+        ConfigureUtil.configure(configureClosure, target);
     }
 }
