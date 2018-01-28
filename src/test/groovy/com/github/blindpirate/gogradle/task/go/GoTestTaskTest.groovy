@@ -92,10 +92,13 @@ class GoTestTaskTest extends TaskTest {
 
     @Test
     void 'all package should be tested if not specified'() {
+        // given
+        task.environment('a', '1')
+        task.environment('b', '2')
         // when
         task.run()
         // then
-        verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
+        verify(buildManager, times(2)).go(argumentsCaptor.capture(), eq([a: '1', b: '2']), any(Consumer), any(Consumer), eq(true))
         assert argumentsCaptor.getAllValues().contains(
                 ['test', '-v', 'github.com/my/package/a',
                  "-coverprofile=${StringUtils.toUnixString(resource)}/.gogradle/reports/coverage/profiles/github.com%2Fmy%2Fpackage%2Fa.out".toString()])
