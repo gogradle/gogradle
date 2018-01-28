@@ -127,6 +127,7 @@ public class GoCover extends AbstractGolangTask {
                 safeListFiles(new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH))
                         .stream()
                         .map(this::extractCoverageInfo)
+                        .filter(PackageCoverage::isNotEmpty)
                         .collect(Collectors.toList());
         long totalMissedLines = calculateTotalMissedLines(packageCoverages);
         long totalLines = calculateLines(packageCoverages);
@@ -305,6 +306,10 @@ public class GoCover extends AbstractGolangTask {
         private void add(PackageCoverage another) {
             coveredLineCount += another.coveredLineCount;
             uncoveredLineCount += another.uncoveredLineCount;
+        }
+
+        public static boolean isNotEmpty(PackageCoverage packageCoverage) {
+            return packageCoverage.coveredLineCount != 0 || packageCoverage.uncoveredLineCount != 0;
         }
     }
 

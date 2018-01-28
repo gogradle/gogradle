@@ -64,7 +64,7 @@ class GoCoverTest extends TaskTest {
                     File srcHtml = new File(resource, "a.html")
                     File destHtml = new File(project.getProjectDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html')
                     IOUtils.copyFile(srcHtml, destHtml)
-                } else {
+                } else if (profileArg.endsWith('b.out')) {
                     File srcHtml = new File(resource, "b.html")
                     File destHtml = new File(project.getProjectDir(), '.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fb.html')
                     IOUtils.copyFile(srcHtml, destHtml)
@@ -144,6 +144,29 @@ class GoCoverTest extends TaskTest {
         // then
         // no htmls generated
         assert !new File(resource, '.gogradle/reports/coverage').list().any { it.endsWith('html') }
+    }
+
+    @Test
+    @WithResource('')
+    void 'coverage task should not throw exception when empty coverage html is generated'() {
+        // given
+        IOUtils.write(resource, '.gogradle/reports/coverage/profiles/github.com%252Fmy%252Fproject.out', '')
+        IOUtils.write(resource, '.gogradle/reports/coverage/github.com%252Fmy%252Fproject.html', '''
+<!DOCTYPE html>
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=utf-8"></head>
+<body>
+<div id="topbar">
+    <div id="nav">
+        <select id="files"></select>
+    </div>
+</div>
+<div id="content">
+</div>
+</body>
+</html>
+''')
+        // when
+        task.coverage()
     }
 
     @Test(expected = UncheckedIOException)

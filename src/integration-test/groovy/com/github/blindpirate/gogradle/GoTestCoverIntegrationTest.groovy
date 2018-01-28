@@ -55,6 +55,35 @@ golang {
     }
 
     @Test
+    @WithResource('')
+    void 'setting env in test should succeed'() {
+        // given
+        IOUtils.write(resource, '1_test.go', '''
+package main
+
+import "testing"
+import "os"
+
+func Test_Env(t *testing.T){
+    if "1" == os.Getenv("FOO") {
+         t.Log("Passed")
+    } else {
+         t.Error("Failed")
+    }
+}
+''')
+        new File(resource, 'build.gradle').append('''
+test {
+    environment('FOO','1')
+}
+''')
+        // when
+        normalTest()
+        // then
+        assert stdout.toString().contains('1 completed, 0 failed')
+    }
+
+    @Test
     void 'test and coverage report should be generated successfully'() {
         normalTest()
         assertNormalTestNoUpToDateResult()
@@ -73,9 +102,7 @@ golang {
     }
 
     def normalTest() {
-        newBuild({
-            it.forTasks('test', 'cover')
-        }, ['--info'])
+        newBuild('test', 'cover', '--info')
     }
 
     def assertNormalTestNoUpToDateResult() {
@@ -138,8 +165,8 @@ golang {
         ByteArrayOutputStream out = new ByteArrayOutputStream()
 
         CommandLine cmd = new CommandLine(gradleBinPath)
-        cmd.addArguments('test','-s','--info')
-        cmd.addArguments(args as String [])
+        cmd.addArguments('test', '-s', '--info')
+        cmd.addArguments(args as String[])
         DefaultExecutor executor = new DefaultExecutor()
         executor.setWorkingDirectory(getProjectRoot())
         executor.setStreamHandler(new PumpStreamHandler(out))
