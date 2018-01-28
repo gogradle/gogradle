@@ -48,6 +48,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -65,7 +66,6 @@ import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static java.util.Collections.emptyMap;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.joining;
 import static java.util.stream.Collectors.toList;
@@ -93,15 +93,31 @@ public class GoTest extends AbstractGolangTask {
 
     private boolean coverageProfileGenerated = false;
 
-    private boolean continueWhenFail;
+    private boolean continueOnFailure;
+
+    private Map<String, String> environment = new HashMap<>();
 
     public GoTest() {
         setDescription("Run all tests.");
         dependsOn(VENDOR_TASK_NAME);
     }
 
-    public void setContinueWhenFail(boolean continueWhenFail) {
-        this.continueWhenFail = continueWhenFail;
+    public void environment(String key, String value) {
+        environment.put(key, value);
+    }
+
+    public void environment(Map<String, String> map) {
+        environment.putAll(map);
+    }
+
+    @Deprecated
+    public void setContinueWhenFail(boolean continueOnFailure) {
+        LOGGER.warn("continueWhenFail is deprecated, please use continueOnFailure instead.");
+        this.continueOnFailure = continueOnFailure;
+    }
+
+    public void setContinueOnFailure(boolean continueOnFailure) {
+        this.continueOnFailure = continueOnFailure;
     }
 
     public boolean isCoverageProfileGenerated() {
@@ -235,13 +251,12 @@ public class GoTest extends AbstractGolangTask {
         }
     }
 
-
     private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
         int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
         String message = "There are " + totalFailureCount + " failed tests. Please see "
                 + StringUtils.toUnixString(new File(reportDir, "index.html"))
                 + " for more details.";
-        if (continueWhenFail) {
+        if (continueOnFailure) {
             LOGGER.error(message);
         } else if (totalFailureCount > 0) {
             throw new IllegalStateException(message);
@@ -271,7 +286,7 @@ public class GoTest extends AbstractGolangTask {
 
         Consumer<String> consumer = determineLineConsumer(lineCollector, importPath);
 
-        int retcode = buildManager.go(args, emptyMap(), consumer, consumer, true);
+        int retcode = buildManager.go(args, environment, consumer, consumer, true);
 
         return PackageTestResult.builder()
                 .withPackagePath(importPath)
