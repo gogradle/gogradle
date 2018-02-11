@@ -46,7 +46,7 @@ If you puzzled over these issues, or you were a Java developer and familiar with
 
 Gogradle's objective is not replacing other tools, it only provides an option for developers.
 
-Gogradle is NOT a toy. 52% of its code are tests to assure its quality. We also tested [Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) as real world scenarios.
+Gogradle is NOT a toy. 52% of its code are tests to assure its quality. We also tested [Github's top 1000 Go repositories](https://github.com/search?l=&o=desc&q=stars%3A%3E1+language%3AGo&ref=advsearch&s=stars&type=Repositories&utf8=%E2%9C%93) as real world scenarios.
 
 ## Feature
 
