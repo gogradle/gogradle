@@ -27,6 +27,7 @@ import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.google.common.collect.ImmutableSet;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.gradle.api.Project;
 import org.gradle.api.logging.Logger;
@@ -45,6 +46,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -69,6 +71,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 public class DefaultBuildManager implements BuildManager {
     private static final String PROJECT_GOPATH = "project_gopath";
     private static final String SRC = "src";
+    private static final Set<String> TOOL_COMMANDS_SUPPORTING_BUILD_TAG = ImmutableSet.of("vet");
 
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
 
@@ -157,7 +160,11 @@ public class DefaultBuildManager implements BuildManager {
             return cmd;
         }
 
-        // support: go tool vet -tags whatever packag
+        if (isToolCmdButNotSupportTags(cmd)) {
+            return cmd;
+        }
+
+        // support: go tool vet -tags whatever package
         int tagsOffset = "tool".equals(cmd.get(0)) ? 2 : 1;
         List<String> ret = new ArrayList<>(cmd);
         // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
@@ -166,6 +173,15 @@ public class DefaultBuildManager implements BuildManager {
         String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
         ret.add(tagsOffset + 1, "'" + tagsArg + "'");
         return ret;
+    }
+
+    // Currently, only go tool vet supports tags:
+    // tool vet xxx -> false
+    // tool cover xxx -> true
+    private boolean isToolCmdButNotSupportTags(List<String> cmd) {
+        return cmd.size() >= 2
+                && "tool".equals(cmd.get(0))
+                && !TOOL_COMMANDS_SUPPORTING_BUILD_TAG.contains(cmd.get(1));
     }
 
     @Override
