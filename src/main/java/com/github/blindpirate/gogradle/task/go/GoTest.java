@@ -63,6 +63,7 @@ import static com.github.blindpirate.gogradle.util.IOUtils.encodeInternally;
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
 import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
+import static com.github.blindpirate.gogradle.util.StringUtils.*;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -72,8 +73,8 @@ import static java.util.stream.Collectors.toList;
 
 public class GoTest extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(GoTest.class);
-
     private static final String REWRITE_SCRIPT_RESOURCE = "test/rewrite.html";
+    private static final String TEST_REPORT_DIR = ".gogradle/reports/test";
 
     @Inject
     private GolangPluginSetting setting;
@@ -167,19 +168,24 @@ public class GoTest extends AbstractGolangTask {
         return IOUtils.filterFilesRecursively(getProject().getProjectDir(), new AbstractFileFilter() {
             @Override
             protected boolean acceptFile(File file) {
-                return !StringUtils.fileNameStartsWithDotOrUnderline(file) && fileNameEndsWithAny(file, ".go");
+                return !fileNameStartsWithDotOrUnderline(file) && fileNameEndsWithAny(file, ".go");
             }
 
             @Override
             protected boolean acceptDir(File dir) {
-                return !StringUtils.fileNameStartsWithDotOrUnderline(dir);
+                return !fileNameStartsWithDotOrUnderline(dir);
             }
         });
     }
 
     @OutputDirectory
     File getReportDir() {
-        return new File(getProject().getProjectDir(), ".gogradle/reports/test");
+        return new File(getProject().getProjectDir(), TEST_REPORT_DIR);
+    }
+
+    @OutputDirectory
+    File getCoverageDir() {
+        return new File(getProject().getProjectDir(), GoCover.COVERAGE_PROFILES_PATH);
     }
 
     private Collection<File> filterMatchedTests() {
@@ -254,7 +260,7 @@ public class GoTest extends AbstractGolangTask {
     private void reportErrorIfNecessary(List<TestClassResult> results, File reportDir) {
         int totalFailureCount = results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
         String message = "There are " + totalFailureCount + " failed tests. Please see "
-                + StringUtils.toUnixString(new File(reportDir, "index.html"))
+                + toUnixString(new File(reportDir, "index.html"))
                 + " for more details.";
         if (continueOnFailure) {
             LOGGER.error(message);
@@ -280,19 +286,19 @@ public class GoTest extends AbstractGolangTask {
         if (generateCoverageProfile) {
             File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
                     + encodeInternally(importPath) + ".out");
-            args.add("-coverprofile=" + StringUtils.toUnixString(profilesPath.getAbsolutePath()));
+            args.add("-coverprofile=" + toUnixString(profilesPath.getAbsolutePath()));
             coverageProfileGenerated = true;
         }
 
         Consumer<String> consumer = determineLineConsumer(lineCollector, importPath);
 
-        int retcode = buildManager.go(args, environment, consumer, consumer, true);
+        int retCode = buildManager.go(args, environment, consumer, consumer, true);
 
         return PackageTestResult.builder()
                 .withPackagePath(importPath)
                 .withStdout(lineCollector.getLines())
                 .withTestFiles(testFiles)
-                .withCode(retcode)
+                .withCode(retCode)
                 .build();
     }
 
