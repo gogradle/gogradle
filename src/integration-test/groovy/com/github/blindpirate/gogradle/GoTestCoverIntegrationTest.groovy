@@ -93,10 +93,12 @@ test {
         assertNormalTestUpToDateResult()
 
         IOUtils.append(resource, 'a/a1.go', '\n')
+        IOUtils.forceDelete(new File(resource,'.gogradle/reports/coverage/profile'))
         normalTest()
         assertNormalTestNoUpToDateResult()
 
         IOUtils.forceDelete(new File(resource, '.gogradle/reports/test/index.html'))
+        IOUtils.forceDelete(new File(resource,'.gogradle/reports/coverage/index.html'))
         normalTest()
         assertNormalTestNoUpToDateResult()
     }
@@ -110,12 +112,14 @@ test {
         assert stdout.toString().contains('3 completed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
         assert !stdout.toString().contains(':test UP-TO-DATE')
+        assert !stdout.toString().contains(':cover UP-TO-DATE')
         assert stdout.toString().contains('=== RUN   Test_B1_1')
     }
 
     def assertNormalTestUpToDateResult() {
         assert !stdout.toString().contains('1 completed, 0 failed')
         assert stdout.toString().contains(':test UP-TO-DATE')
+        assert stdout.toString().contains(':cover UP-TO-DATE')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
         assert !stdout.toString().contains('=== RUN   Test_B1_1')
     }

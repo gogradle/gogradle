@@ -80,6 +80,12 @@ class GoCoverTest extends TaskTest {
         task.coverage()
         // then
         examineCoverageHtmls(project.getProjectDir())
+        assert task.inputCoverageDirectory == new File(resource, '.gogradle/reports/coverage/profiles')
+        assert task.outputHtmls as Set == [
+                new File(resource,'.gogradle/reports/coverage/index.html'),
+                new File(resource,'.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fa.html'),
+                new File(resource,'.gogradle/reports/coverage/github.com%2Fmy%2Fproject%2Fb.html')
+        ] as Set
     }
 
     static void examineCoverageHtmls(File projectRoot) {

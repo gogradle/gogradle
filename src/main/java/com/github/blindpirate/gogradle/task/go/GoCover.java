@@ -28,6 +28,8 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.InputDirectory;
+import org.gradle.api.tasks.OutputFiles;
 import org.gradle.api.tasks.TaskAction;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -92,6 +94,19 @@ public class GoCover extends AbstractGolangTask {
         }
     }
 
+    @InputDirectory
+    public File getInputCoverageDirectory() {
+        return new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
+    }
+
+    @OutputFiles
+    public List<File> getOutputHtmls() {
+        return safeListFiles(new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH))
+                .stream()
+                .filter(file -> file.isFile() && file.getName().endsWith(".html"))
+                .collect(Collectors.toList());
+    }
+
     private boolean profileGeneratedInTest() {
         return getTask(GoTest.class).isCoverageProfileGenerated();
     }
@@ -109,17 +124,14 @@ public class GoCover extends AbstractGolangTask {
     }
 
     private void updateCoverageHtmls() {
-        safeListFiles(new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH))
-                .stream()
-                .filter(File::isFile)
-                .forEach(file -> {
-                    String html = IOUtils.toString(file);
-                    html = html.replace("<select id=\"files\">",
-                            "<a href=\"index.html\" style=\"color:white;\">"
-                                    + getProject().getName()
-                                    + "</a><span style=\"color: white;\"> &gt; </span><select id=\"files\">");
-                    write(file, html);
-                });
+        getOutputHtmls().forEach(file -> {
+            String html = IOUtils.toString(file);
+            html = html.replace("<select id=\"files\">",
+                    "<a href=\"index.html\" style=\"color:white;\">"
+                            + getProject().getName()
+                            + "</a><span style=\"color: white;\"> &gt; </span><select id=\"files\">");
+            write(file, html);
+        });
     }
 
     private void writeIndexHtml() {
@@ -157,7 +169,7 @@ public class GoCover extends AbstractGolangTask {
                 .stream()
                 .map(PackageCoverage::getTotalLineCount)
                 .max(Long::compare);
-        return ret.isPresent() ? ret.get() : 0L;
+        return ret.orElse(0L);
     }
 
     private long calculateLines(List<PackageCoverage> packageCoverages) {
