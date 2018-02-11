@@ -10,7 +10,7 @@
 
 > 2017-06-23 Gogradle荣获**Gradle 2017年度插件奖**, 请参阅[在Gradle Summit 2017上的演讲](https://www.youtube.com/watch?v=Mvf3gY1MopE&t=341s).
 >
-> 2017-12-17 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](http://github-rank.com/star?language=Go)中的817个！
+> 2017-12-17 现在Gogradle可以在**不做任何额外设置**的情况下构建[Github's top 1000](https://github.com/search?l=&o=desc&q=stars%3A%3E1+language%3AGo&ref=advsearch&s=stars&type=Repositories&utf8=%E2%9C%93)中的817个！
 >
 > 2017-03-20 现在Gogradle已经能够生成HTML格式的测试/覆盖率报告了！
 
@@ -41,7 +41,7 @@ Gogradle实现了`glide`的绝大部分功能，并添加了一些额外的功�
 
 Gogradle的目标不是取代其他的工具，而是为开发者提供一个额外的选项。
 
-Gogradle不是一个玩具，它的代码中有52%是测试。此外，我们还使用[Github's top 1000 Go repositories](http://github-rank.com/star?language=Go) 进行真实环境下的测试。
+Gogradle不是一个玩具，它的代码中有52%是测试。此外，我们还使用[Github's top 1000 Go repositories](https://github.com/search?l=&o=desc&q=stars%3A%3E1+language%3AGo&ref=advsearch&s=stars&type=Repositories&utf8=%E2%9C%93) 进行真实环境下的测试。
 
 ## 功能特性
 
