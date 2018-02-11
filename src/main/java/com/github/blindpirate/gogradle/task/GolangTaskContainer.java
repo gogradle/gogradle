@@ -54,7 +54,7 @@ public class GolangTaskContainer implements Iterable<Task> {
     public static final String TEST_TASK_NAME = determineAlias("test", "goTest");
     public static final String VENDOR_TASK_NAME = determineAlias("vendor", "goVendor");
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
-    public static final String COVERAGE_TASK_NAME = determineAlias("coverage", "goCover");
+    public static final String COVERAGE_TASK_NAME = determineAlias("cover", "goCover");
     public static final String GOFMT_TASK_NAME = determineAlias("fmt", "gofmt");
     public static final String GOVET_TASK_NAME = determineAlias("vet", "goVet");
 
