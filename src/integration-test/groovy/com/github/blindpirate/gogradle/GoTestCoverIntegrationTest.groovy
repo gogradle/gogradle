@@ -92,13 +92,13 @@ test {
         normalTest()
         assertNormalTestUpToDateResult()
 
-        IOUtils.append(resource, 'a/a1.go', '\n')
-        IOUtils.forceDelete(new File(resource,'.gogradle/reports/coverage/profile'))
+        // append at head to change the coverage profile
+        IOUtils.write(resource, 'a/a1.go', '\n\n\n' + new File(resource, 'a/a1.go').text)
         normalTest()
         assertNormalTestNoUpToDateResult()
 
         IOUtils.forceDelete(new File(resource, '.gogradle/reports/test/index.html'))
-        IOUtils.forceDelete(new File(resource,'.gogradle/reports/coverage/index.html'))
+        IOUtils.forceDelete(new File(resource, '.gogradle/reports/coverage/index.html'))
         normalTest()
         assertNormalTestNoUpToDateResult()
     }

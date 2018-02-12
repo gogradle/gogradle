@@ -50,8 +50,6 @@ class GoCoverTest extends TaskTest {
         when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/project')
 
-        when(golangTaskContainer.get(GoTest).isCoverageProfileGenerated()).thenReturn(true)
-
         when(project.getName()).thenReturn(resource.getName())
         when(buildManager.go(anyList(), anyMap())).thenAnswer(new Answer<Object>() {
             @Override
@@ -139,17 +137,6 @@ class GoCoverTest extends TaskTest {
 
         // static resources
         assert new File(projectRoot, '.gogradle/reports/coverage/static').listFiles().size() > 4
-    }
-
-    @Test
-    void 'coverage task should be skipped if no coverfile generated'() {
-        // given
-        when(golangTaskContainer.get(GoTest).isCoverageProfileGenerated()).thenReturn(false)
-        // when
-        task.coverage()
-        // then
-        // no htmls generated
-        assert !new File(resource, '.gogradle/reports/coverage').list().any { it.endsWith('html') }
     }
 
     @Test

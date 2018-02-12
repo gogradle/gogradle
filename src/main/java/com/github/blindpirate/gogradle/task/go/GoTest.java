@@ -90,8 +90,6 @@ public class GoTest extends AbstractGolangTask {
 
     private boolean generateCoverageProfile = true;
 
-    private boolean coverageProfileGenerated = false;
-
     private boolean continueOnFailure;
 
     private Map<String, String> environment = new HashMap<>();
@@ -117,10 +115,6 @@ public class GoTest extends AbstractGolangTask {
 
     public void setContinueOnFailure(boolean continueOnFailure) {
         this.continueOnFailure = continueOnFailure;
-    }
-
-    public boolean isCoverageProfileGenerated() {
-        return coverageProfileGenerated;
     }
 
     public void setGenerateCoverageProfile(boolean generateCoverageProfile) {
@@ -285,7 +279,6 @@ public class GoTest extends AbstractGolangTask {
             File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
                     + encodeInternally(importPath) + ".out");
             args.add("-coverprofile=" + toUnixString(profilesPath.getAbsolutePath()));
-            coverageProfileGenerated = true;
         }
 
         Consumer<String> consumer = determineLineConsumer(lineCollector, importPath);
