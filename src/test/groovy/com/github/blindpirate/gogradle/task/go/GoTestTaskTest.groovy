@@ -122,7 +122,6 @@ class GoTestTaskTest extends TaskTest {
         task.setGenerateCoverageProfile(false)
         task.run()
         // then
-        assert !task.coverageProfileGenerated
         verify(buildManager, times(2)).go(argumentsCaptor.capture(), anyMap(), any(Consumer), any(Consumer), eq(true))
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/a'])
         assert argumentsCaptor.getAllValues().contains(['test', '-v', 'github.com/my/package/b'])

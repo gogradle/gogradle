@@ -26,10 +26,9 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.NumberUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.InputDirectory;
-import org.gradle.api.tasks.OutputFiles;
+import org.gradle.api.tasks.OutputDirectory;
+import org.gradle.api.tasks.SkipWhenEmpty;
 import org.gradle.api.tasks.TaskAction;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -67,7 +66,6 @@ public class GoCover extends AbstractGolangTask {
     private static final String COVERAGE_HTMLS_PATH = ".gogradle/reports/coverage";
     private static final String COVERAGE_HTML_STATIC_PATH = ".gogradle/reports/coverage/static";
     private static final String COVERAGE_STATIC_RESOURCE = "/coverage/static/";
-    private static final Logger LOGGER = Logging.getLogger(GoCover.class);
 
     @Inject
     private GolangPluginSetting setting;
@@ -83,32 +81,29 @@ public class GoCover extends AbstractGolangTask {
     public void coverage() {
         setGogradleGlobalContext();
 
-        if (profileGeneratedInTest()) {
-            safeListFiles(new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH))
-                    .forEach(this::analyzeProfile);
-            writeIndexHtml();
-            updateCoverageHtmls();
-            copyStaticResources();
-        } else {
-            LOGGER.warn("No coverage profile generated in test task, skip.");
-        }
+        List<File> coverageFiles = safeListFiles(new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH));
+        coverageFiles.forEach(this::analyzeProfile);
+        writeIndexHtml();
+        updateCoverageHtmls();
+        copyStaticResources();
     }
 
     @InputDirectory
+    @SkipWhenEmpty
     public File getInputCoverageDirectory() {
         return new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
     }
 
-    @OutputFiles
-    public List<File> getOutputHtmls() {
+    @OutputDirectory
+    public File getCoverageDirectory() {
+        return new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH);
+    }
+
+    private List<File> getOutputHtmls() {
         return safeListFiles(new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH))
                 .stream()
                 .filter(file -> file.isFile() && file.getName().endsWith(".html"))
                 .collect(Collectors.toList());
-    }
-
-    private boolean profileGeneratedInTest() {
-        return getTask(GoTest.class).isCoverageProfileGenerated();
     }
 
     private void copyStaticResources() {
