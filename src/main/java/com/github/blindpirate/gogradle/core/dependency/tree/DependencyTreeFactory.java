@@ -22,13 +22,12 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.ResolutionStackWrappingException;
-import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Singleton;
 import java.util.HashSet;
-import java.util.List;
+import java.util.LinkedList;
+import java.util.Queue;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 /**
  * Resolve all dependencies including transitive ones of a package and build a tree.
@@ -63,33 +62,42 @@ public class DependencyTreeFactory {
         return node;
     }
 
-    private void resolve(ResolvedDependency resolvedDependency, ResolveContext context) {
-        if (!context.getDependencyRegistry().register(resolvedDependency)) {
-            // current dependency is older
-            return;
-        }
-
-        try {
-            // BFS order
-            List<Pair<ResolveContext, ResolvedDependency>> subResolution = resolvedDependency
-                    .getDependencies()
-                    .stream()
-                    .map(dependency -> createSubContextAndResolve(dependency, context))
-                    .collect(Collectors.toList());
-
-            subResolution
-                    .forEach(contextAndResult -> resolve(contextAndResult.getRight(), contextAndResult.getLeft()));
-        } catch (ResolutionStackWrappingException e) {
-            throw e;
-        } catch (Throwable e) {
-            throw ResolutionStackWrappingException.wrapWithResolutionStack(e, context);
+    private void resolve(ResolvedDependency rootProject, ResolveContext context) {
+        // BFS order
+        Queue<ResolveOperation> queue = new LinkedList<>();
+        queue.add(new ResolveOperation(rootProject, context));
+        while (!queue.isEmpty()) {
+            ResolveOperation item = queue.remove();
+            if (context.getDependencyRegistry().register(item.dependencyToPropagate)) {
+                try {
+                    item.dependencyToPropagate
+                            .getDependencies()
+                            .stream()
+                            .map(dep -> createSubContextAndResolve(dep, item.context))
+                            .forEach(queue::add);
+                } catch (ResolutionStackWrappingException e) {
+                    throw e;
+                } catch (Throwable e) {
+                    throw ResolutionStackWrappingException.wrapWithResolutionStack(e, context);
+                }
+            }
         }
     }
 
-    private Pair<ResolveContext, ResolvedDependency> createSubContextAndResolve(GolangDependency dependency,
-                                                                                ResolveContext parentContext) {
+    private ResolveOperation createSubContextAndResolve(GolangDependency dependency,
+                                                        ResolveContext parentContext) {
         ResolveContext subContext = parentContext.createSubContext(dependency);
         ResolvedDependency resolvedDependency = dependency.resolve(subContext);
-        return Pair.of(subContext, resolvedDependency);
+        return new ResolveOperation(resolvedDependency, subContext);
+    }
+
+    private static class ResolveOperation {
+        private ResolvedDependency dependencyToPropagate;
+        private ResolveContext context;
+
+        private ResolveOperation(ResolvedDependency dependencyToPropagate, ResolveContext context) {
+            this.dependencyToPropagate = dependencyToPropagate;
+            this.context = context;
+        }
     }
 }
