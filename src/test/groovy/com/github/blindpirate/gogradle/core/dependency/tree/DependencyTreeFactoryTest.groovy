@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.*
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InOrder
@@ -37,8 +38,8 @@ import static org.mockito.Mockito.when
 class DependencyTreeFactoryTest {
     DependencyTreeFactory factory = new DependencyTreeFactory()
 
-    @Mock
-    DependencyRegistry registry
+    // a3 > a2 > a1, e2 > e1, f2 > f1
+    DependencyRegistry registry = new MockDependencyRegistry()
 
     @Mock
     ResolveContext context
@@ -60,14 +61,36 @@ class DependencyTreeFactoryTest {
     ResolvedDependency c
     @Mock
     ResolvedDependency d
+    @Mock
+    ResolvedDependency e1
+    @Mock
+    ResolvedDependency e2
+    @Mock
+    ResolvedDependency f1
+    @Mock
+    ResolvedDependency f2
+
+    Map dependencyToNameMap = [:]
 
     @Before
     void setUp() {
-        [rootProject, a1, a2, a3, b, c, d].each {
+        dependencyToNameMap[rootProject] = 'rootProject'
+        dependencyToNameMap[a1] = 'a1'
+        dependencyToNameMap[a2] = 'a2'
+        dependencyToNameMap[a3] = 'a3'
+        dependencyToNameMap[b] = 'b'
+        dependencyToNameMap[c] = 'c'
+        dependencyToNameMap[d] = 'd'
+        dependencyToNameMap[e1] = 'e1'
+        dependencyToNameMap[e2] = 'e2'
+        dependencyToNameMap[f1] = 'f1'
+        dependencyToNameMap[f2] = 'f2'
+
+        [rootProject, a1, a2, a3, b, c, d, e1, e2, f1, f2].each {
             when(it.resolve(isNull())).thenReturn(it)
             when(it.resolve(any(ResolveContext))).thenReturn(it)
             when(it.getDependencies()).thenReturn(GolangDependencySet.empty())
-            when(registry.register(it)).thenReturn(true)
+            when(it.getName()).thenReturn(getDependencyName(dependencyToNameMap[it]))
         }
 
         DependencyTreeNode.metaClass.getChildren = {
@@ -83,10 +106,6 @@ class DependencyTreeFactoryTest {
         when(configuration.getDependencyRegistry()).thenReturn(registry)
     }
 
-    void bind(ResolvedDependency dependency, String name) {
-        when(dependency.getName()).thenReturn(name)
-        when(registry.retrieve(name)).thenReturn(dependency)
-    }
 
     void bindDependencies(ResolvedDependency dependency, GolangDependency... dependencies) {
         def set = asGolangDependencySet(dependencies)
@@ -97,58 +116,76 @@ class DependencyTreeFactoryTest {
     void 'dependency conflict should be resolved'() {
         /*
         rootProject
-            |-- a1 -> a2
-            |   \\- c
-            \\- b
-                \\- a2
-                    \\- d
-                        \\- a3 -> a2
+            |-- a1 -> a3
+            |   \- c
+            \- b
+                \- a3
+                    \- d
+                        \- a2 -> a3
 
        the result is:
 
        rootProject
-            |-- a2
-            |   \\- d
-            |       \\- a2 (*)
-            \\- b
-                \\- a2 (*)
+            |-- a3
+            |   \- d
+            |       \- a3 (*)
+            \- b
+                \- a3 (*)
          */
         // given
-        // a2 is newer than a1 and a3
-        when(a1.getName()).thenReturn('a')
-        when(a3.getName()).thenReturn('a')
-        when(registry.register(a3)).thenReturn(false)
-
-        bind(rootProject, 'rootProject')
-        bind(a2, 'a')
-        bind(b, 'b')
-        bind(c, 'c')
-        bind(d, 'd')
-
         bindDependencies(rootProject, a1, b)
         bindDependencies(a1, c)
-        bindDependencies(b, a2)
-        bindDependencies(a2, d)
-        bindDependencies(d, a3)
+        bindDependencies(b, a3)
+        bindDependencies(a3, d)
+        bindDependencies(d, a2)
         // when
         DependencyTreeNode rootNode = factory.getTree(context, rootProject)
         // then
-        assertChildrenOfNodeAre(rootNode, a2, b)
+        assertChildrenOfNodeAre(rootNode, a3, b)
         assertChildrenOfNodeAre(rootNode.children[0], d)
-        assertChildrenOfNodeAre(rootNode.children[1], a2)
-        assertChildrenOfNodeAre(rootNode.children[0].children[0], a2)
+        assertChildrenOfNodeAre(rootNode.children[1], a3)
+        assertChildrenOfNodeAre(rootNode.children[0].children[0], a3)
     }
 
     @Test
+    @Ignore("https://github.com/gogradle/gogradle/issues/207")
     void 'resolution order should be BFS instead of DFS'() {
-        'dependency conflict should be resolved'()
-        InOrder order = inOrder(rootProject, a1, a2, a3, b, c, d)
-        order.verify(a1).resolve(context)
+        /*
+    rootProject
+        |-- b
+        |   \- e2
+        |     \- f1
+        \- e1
+            \- f2
+
+    the result is:
+
+    rootProject
+        |-- b
+        |   \- e2
+        |       \- f1
+        \- e1 -> e2
+    */
+        // given
+        bindDependencies(rootProject, b, e1)
+        bindDependencies(b, e2)
+        bindDependencies(e2, f1)
+        bindDependencies(e1, f2)
+
+        // when
+        DependencyTreeNode rootNode = factory.getTree(context, rootProject)
+
+        // then
+        assertChildrenOfNodeAre(rootNode, b, e2)
+        assertChildrenOfNodeAre(rootNode.children[0], e2)
+        assertChildrenOfNodeAre(rootNode.children[0].children[0], f1)
+
+        InOrder order = inOrder(rootProject, b, e1, e2, f1, f2)
         order.verify(b).resolve(context)
-        order.verify(c).resolve(context)
-        order.verify(a2).resolve(context)
-        order.verify(d).resolve(context)
-        order.verify(a3).resolve(context)
+        order.verify(e1).resolve(context)
+        order.verify(e2).resolve(context)
+        order.verify(f2).resolve(context)
+        order.verify(f1).resolve(context)
     }
 
     @Test
@@ -161,12 +198,12 @@ class DependencyTreeFactoryTest {
         order.verify(b).resolve(context)
         order.verify(context).createSubContext(c)
         order.verify(c).resolve(context)
-        order.verify(context).createSubContext(a2)
-        order.verify(a2).resolve(context)
-        order.verify(context).createSubContext(d)
-        order.verify(d).resolve(context)
         order.verify(context).createSubContext(a3)
         order.verify(a3).resolve(context)
+        order.verify(context).createSubContext(d)
+        order.verify(d).resolve(context)
+        order.verify(context).createSubContext(a2)
+        order.verify(a2).resolve(context)
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {
@@ -174,6 +211,53 @@ class DependencyTreeFactoryTest {
         assert children.size() == expectedChildren.size()
         children.each {
             assert expectedChildren.contains(it.getFinalDependency())
+        }
+    }
+
+
+    class MockDependencyRegistry implements DependencyRegistry {
+        Map<String, ResolvedDependency> registeredDependencies = [:]
+
+        @Override
+        boolean register(ResolvedDependency dependency) {
+            String fieldName = dependencyToNameMap[dependency]
+            String dependencyName = getDependencyName(fieldName)
+            int dependencyVersion = getDependencyVersion(fieldName)
+
+            String existingDependency = registeredDependencies[dependencyName]
+            if (existingDependency == null) {
+                registeredDependencies[dependencyName] = dependency
+                return true
+            } else {
+                int existingVersion = getDependencyVersion(existingDependency)
+                if (existingVersion < dependencyVersion) {
+                    registeredDependencies[dependencyName] = dependency
+                    return true
+                } else {
+                    return false
+                }
+            }
+        }
+
+        @Override
+        ResolvedDependency retrieve(String name) {
+            return registeredDependencies[name]
+        }
+    }
+
+    String getDependencyName(String name) {
+        if (name == 'rootProject') {
+            return name
+        } else {
+            return name.substring(0, 1)
+        }
+    }
+
+    Integer getDependencyVersion(String name) {
+        if (name == 'rootProject' || name.length() == 1) {
+            return 1
+        } else {
+            return name.substring(1, 2).toInteger()
         }
     }
 }

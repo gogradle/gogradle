@@ -146,4 +146,10 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
     public int compareTo(DependencyTreeNode o) {
         return this.name.compareTo(o.name);
     }
+
+    @Override
+    public String toString() {
+        return
+                "" + originalDependency + " -> " + finalDependency;
+    }
 }
