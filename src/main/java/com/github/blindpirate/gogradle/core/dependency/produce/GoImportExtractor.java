@@ -34,7 +34,6 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -55,15 +54,12 @@ public class GoImportExtractor {
         this.buildConstraintManager = buildConstraintManager;
     }
 
-    public Set<String> getImportPaths(File dir, Set<String> subpackages, String configuration) {
-        Predicate<File> buildOrTest = GoSourceCodeFilter.PREDICATES.get(configuration);
-        Predicate<File> inSubpackages = InSubpackagesPredicate.withRootDirAndSubpackages(dir, subpackages);
-
-        GoSourceCodeFilter sourceCodeFilter = GoSourceCodeFilter.withPredicate(buildOrTest.and(inSubpackages));
-
-        Collection<File> files = IOUtils.filterFilesRecursively(dir, sourceCodeFilter);
-
-        return files.stream().map(IOUtils::toString)
+    public Set<String> getImportPaths(File projectDir, Set<String> subpackages, String configuration) {
+        Predicate<File> inSubpackages = InSubpackagesPredicate.withRootDirAndSubpackages(projectDir, subpackages);
+        return GoSourceCodeFilter.filterGoFiles(projectDir, configuration)
+                .stream()
+                .filter(inSubpackages::test)
+                .map(IOUtils::toString)
                 .map(this::extract)
                 .collect(HashSet::new, HashSet::addAll, HashSet::addAll);
     }
