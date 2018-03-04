@@ -317,7 +317,7 @@ public class Go extends AbstractGolangTask {
             if (filePath.isAbsolute()) {
                 this.file = filePath.toFile();
             } else {
-                this.file = new File(getProject().getProjectDir(), file);
+                this.file = new File(getProjectDir(), file);
             }
 
             if (!append) {

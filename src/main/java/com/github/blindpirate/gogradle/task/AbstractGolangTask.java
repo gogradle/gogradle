@@ -22,6 +22,7 @@ import org.gradle.api.DefaultTask;
 import org.gradle.api.Task;
 
 import javax.inject.Inject;
+import java.io.File;
 
 public class AbstractGolangTask extends DefaultTask {
     @Inject
@@ -42,5 +43,9 @@ public class AbstractGolangTask extends DefaultTask {
         // AbstractGolangTask should set project into thread local before it executes
         // otherwise, subtle issues occur in multiproject
         GogradleGlobal.INSTANCE.setCurrentProject(getProject());
+    }
+
+    protected File getProjectDir() {
+        return getProject().getProjectDir();
     }
 }

@@ -81,7 +81,7 @@ public class GoCover extends AbstractGolangTask {
     public void coverage() {
         setGogradleGlobalContext();
 
-        List<File> coverageFiles = safeListFiles(new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH));
+        List<File> coverageFiles = safeListFiles(new File(getProjectDir(), COVERAGE_PROFILES_PATH));
         coverageFiles.forEach(this::analyzeProfile);
         writeIndexHtml();
         updateCoverageHtmls();
@@ -91,29 +91,29 @@ public class GoCover extends AbstractGolangTask {
     @InputDirectory
     @SkipWhenEmpty
     public File getInputCoverageDirectory() {
-        return new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
+        return new File(getProjectDir(), COVERAGE_PROFILES_PATH);
     }
 
     @OutputDirectory
     public File getCoverageDirectory() {
-        return new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH);
+        return new File(getProjectDir(), COVERAGE_HTMLS_PATH);
     }
 
     private List<File> getOutputHtmls() {
-        return safeListFiles(new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH))
+        return safeListFiles(new File(getProjectDir(), COVERAGE_HTMLS_PATH))
                 .stream()
                 .filter(file -> file.isFile() && file.getName().endsWith(".html"))
                 .collect(Collectors.toList());
     }
 
     private void copyStaticResources() {
-        mkdir(getProject().getProjectDir(), COVERAGE_HTML_STATIC_PATH);
+        mkdir(getProjectDir(), COVERAGE_HTML_STATIC_PATH);
         List<String> files = asList("bundle.gif", "down.gif", "greenbar.gif", "group.gif",
                 "package.gif", "redbar.gif", "report.gif", "sort.gif", "source.gif", "up.gif");
 
         files.forEach(fileName -> {
             URL url = getClass().getResource(COVERAGE_STATIC_RESOURCE + fileName);
-            File file = new File(getProject().getProjectDir(), COVERAGE_HTML_STATIC_PATH + "/" + fileName);
+            File file = new File(getProjectDir(), COVERAGE_HTML_STATIC_PATH + "/" + fileName);
             copyURLToFile(url, file);
         });
     }
@@ -131,7 +131,7 @@ public class GoCover extends AbstractGolangTask {
 
     private void writeIndexHtml() {
         List<PackageCoverage> packageCoverages =
-                safeListFiles(new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH))
+                safeListFiles(new File(getProjectDir(), COVERAGE_PROFILES_PATH))
                         .stream()
                         .map(this::extractCoverageInfo)
                         .filter(PackageCoverage::isNotEmpty)
@@ -156,7 +156,7 @@ public class GoCover extends AbstractGolangTask {
         String template = IOUtils.toString(getClass().getClassLoader()
                 .getResourceAsStream("coverage/templates/index.html.template"));
         String html = render(template, context);
-        write(getProject().getProjectDir(), COVERAGE_HTMLS_PATH + "/index.html", html);
+        write(getProjectDir(), COVERAGE_HTMLS_PATH + "/index.html", html);
     }
 
     private long calculateMaxPackageLines(List<PackageCoverage> packageCoverages) {
@@ -229,7 +229,7 @@ public class GoCover extends AbstractGolangTask {
 
     private long countLinesInFile(String filePath) {
         Path relativePath = Paths.get(setting.getPackagePath()).relativize(Paths.get(filePath));
-        return countLines(getProject().getProjectDir().toPath().resolve(relativePath));
+        return countLines(getProjectDir().toPath().resolve(relativePath));
     }
 
     private void analyzeProfile(File profile) {
@@ -240,7 +240,7 @@ public class GoCover extends AbstractGolangTask {
     }
 
     private File profileFileToHtmlFile(File profile) {
-        File htmlOutputDir = new File(getProject().getProjectDir(), COVERAGE_HTMLS_PATH);
+        File htmlOutputDir = new File(getProjectDir(), COVERAGE_HTMLS_PATH);
         return new File(htmlOutputDir, removeOutExtension(profile) + ".html");
     }
 

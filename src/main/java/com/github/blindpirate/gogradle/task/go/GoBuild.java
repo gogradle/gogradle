@@ -106,7 +106,7 @@ public class GoBuild extends Go {
             subTask.getInputs().property("buildTags", (Callable<List<String>>) () -> setting.getBuildTags());
             subTask.getInputs().property("goVersion", (Callable<String>) () -> binaryManager.getGoVersion());
             subTask.getInputs().property("goEnv", getEnv(os, arch));
-            subTask.getOutputs().file(new File(getProject().getProjectDir(), getOutputLocation()));
+            subTask.getOutputs().file(new File(getProjectDir(), getOutputLocation()));
         }
     }
 

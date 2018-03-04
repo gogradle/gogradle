@@ -61,7 +61,7 @@ public class Gofmt extends Go {
 
     // A workaround because gofmt on Windows doesn't ignore .gogradle
     protected List<String> children() {
-        return IOUtils.safeListFiles(getProject().getProjectDir())
+        return IOUtils.safeListFiles(getProjectDir())
                 .stream()
                 .filter(file -> !startsWithAny(file.getName(), "_", "."))
                 .filter(file -> !VendorDependencyFactory.VENDOR_DIRECTORY.equals(file.getName()))

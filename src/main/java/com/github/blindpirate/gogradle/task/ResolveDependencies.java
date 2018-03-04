@@ -94,7 +94,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     // INPUT 2: gogradle.lock
     @InputFiles
     public File getExternalLockfiles() {
-        return new File(getProject().getProjectDir(), "gogradle.lock");
+        return new File(getProjectDir(), "gogradle.lock");
     }
 
     // INPUT 3: all go files in specific configuration
@@ -140,7 +140,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     @OutputFile
     public File getSerializationFile() {
-        return new File(getProject().getProjectDir(),
+        return new File(getProjectDir(),
                 ".gogradle/cache/" + getConfigurationName() + "-" + GOGRADLE_COMPATIBLE_VERSION + ".bin");
     }
 
@@ -173,7 +173,7 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     }
 
     protected GolangDependencySet produceFirstLevelDependencies() {
-        return strategy.produce(gogradleRootProject, getProject().getProjectDir(), visitor, getConfigurationName());
+        return strategy.produce(gogradleRootProject, getProjectDir(), visitor, getConfigurationName());
     }
 
     public DependencyTreeNode getDependencyTree() {
