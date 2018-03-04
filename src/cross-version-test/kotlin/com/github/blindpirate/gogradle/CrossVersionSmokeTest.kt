@@ -37,7 +37,9 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
     fun crossVersionTestShouldSucceed() {
         super.writeBuildAndSettingsDotGradle(buildDotGradleBase)
 
-        listOf("3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4", "4.5").forEach {
+        listOf(
+                //"3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1",
+                "4.4", "4.5.1", "4.6").forEach {
             GradleRunner.create()
                     .withProjectDir(resource)
                     .withArguments("cover", "test", "--info")
