@@ -163,12 +163,12 @@ public class GoTest extends AbstractGolangTask {
 
     @OutputDirectory
     File getReportDir() {
-        return new File(getProject().getProjectDir(), TEST_REPORT_DIR);
+        return new File(getProjectDir(), TEST_REPORT_DIR);
     }
 
     @OutputDirectory
     File getCoverageDir() {
-        return new File(getProject().getProjectDir(), GoCover.COVERAGE_PROFILES_PATH);
+        return new File(getProjectDir(), GoCover.COVERAGE_PROFILES_PATH);
     }
 
     private Map<File, List<File>> groupByParentDir(Collection<File> files) {
@@ -186,7 +186,7 @@ public class GoTest extends AbstractGolangTask {
     }
 
     private String dirToImportPath(File dir) {
-        Path relativeToProjectRoot = getProject().getProjectDir().toPath().relativize(dir.toPath());
+        Path relativeToProjectRoot = getProjectDir().toPath().relativize(dir.toPath());
         Path importPath = Paths.get(setting.getPackagePath()).resolve(relativeToProjectRoot);
         return toUnixString(importPath);
     }
@@ -248,7 +248,7 @@ public class GoTest extends AbstractGolangTask {
     }
 
     private void prepareCoverageProfileDir() {
-        File coverageDir = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH);
+        File coverageDir = new File(getProjectDir(), COVERAGE_PROFILES_PATH);
         forceMkdir(coverageDir);
         clearDirectory(coverageDir);
     }
@@ -262,7 +262,7 @@ public class GoTest extends AbstractGolangTask {
 
 
         if (generateCoverageProfile) {
-            File profilesPath = new File(getProject().getProjectDir(), COVERAGE_PROFILES_PATH + "/"
+            File profilesPath = new File(getProjectDir(), COVERAGE_PROFILES_PATH + "/"
                     + encodeInternally(importPath) + ".out");
             args.add("-coverprofile=" + toUnixString(profilesPath.getAbsolutePath()));
         }

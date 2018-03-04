@@ -45,7 +45,7 @@ public class GoInstall extends AbstractGolangTask {
     public GoInstall() {
         setGroup(null);
         mustRunAfter(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
-        vendorDir = new File(getProject().getProjectDir(), "vendor");
+        vendorDir = new File(getProjectDir(), "vendor");
     }
 
     @TaskAction
@@ -72,7 +72,7 @@ public class GoInstall extends AbstractGolangTask {
     }
 
     private void installIfNecessary(GolangDependency dependency) {
-        File targetDir = new File(getProject().getProjectDir(), "vendor/" + dependency.getName());
+        File targetDir = new File(getProjectDir(), "vendor/" + dependency.getName());
         IOUtils.forceMkdir(targetDir);
         if (IOUtils.dirIsEmpty(targetDir)) {
             ResolvedDependency resolvedDependency = (ResolvedDependency) dependency;
