@@ -97,6 +97,7 @@ golang {
         }
     }
 
+    @Deprecated
     BuildLauncher newBuild(Closure closure) {
         newBuild(closure, [])
     }

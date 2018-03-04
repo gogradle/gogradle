@@ -105,7 +105,7 @@ public class GoBuild extends Go {
                     () -> GoSourceCodeFilter.filterGoFiles(getProjectDir(), PROJECT_AND_VENDOR_BUILD_FILES));
             subTask.getInputs().property("buildTags", (Callable<List<String>>) () -> setting.getBuildTags());
             subTask.getInputs().property("goVersion", (Callable<String>) () -> binaryManager.getGoVersion());
-            subTask.getInputs().property("goEnv", getEnv(os, arch));
+            subTask.getInputs().property("environment", getEffectiveEnvironment(os, arch));
             subTask.getOutputs().file(new File(getProjectDir(), getOutputLocation()));
         }
     }
@@ -128,7 +128,7 @@ public class GoBuild extends Go {
     }
 
     private void configureEnvironment(Os os, Arch arch, Go task) {
-        Map<String, String> env = getEnv(os, arch);
+        Map<String, String> env = getEffectiveEnvironment(os, arch);
         env.putAll(this.environment);
         task.environment(env);
     }
@@ -173,9 +173,11 @@ public class GoBuild extends Go {
         return Pair.of(os, arch);
     }
 
-    private Map<String, String> getEnv(Os os, Arch arch) {
-        return MapUtils.asMap("GOOS", os.toString(),
+    private Map<String, String> getEffectiveEnvironment(Os os, Arch arch) {
+        Map<String, String> result = MapUtils.asMap("GOOS", os.toString(),
                 "GOARCH", arch.toString(),
                 "GOEXE", os.exeExtension());
+        result.putAll(environment);
+        return result;
     }
 }
