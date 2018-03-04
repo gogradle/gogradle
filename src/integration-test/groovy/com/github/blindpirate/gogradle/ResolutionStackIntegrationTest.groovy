@@ -62,9 +62,7 @@ dependencies {
     @Test
     void 'resolution stack should be printed'() {
         try {
-            newBuild {
-                it.forTasks('vendor')
-            }
+            newBuild('vendor')
         } catch (BuildException e) {
             assert stderr.toString().replaceAll(/[a-f0-9]{40}/, '').contains("""
 Cannot recognize package: unrecognized
