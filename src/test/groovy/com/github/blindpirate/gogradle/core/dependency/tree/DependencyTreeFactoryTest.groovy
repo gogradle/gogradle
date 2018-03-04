@@ -20,6 +20,8 @@ package com.github.blindpirate.gogradle.core.dependency.tree
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
 import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException
+import com.github.blindpirate.gogradle.core.exceptions.ResolutionStackWrappingException
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.junit.Before
 import org.junit.Ignore
@@ -41,14 +43,11 @@ class DependencyTreeFactoryTest {
     // a3 > a2 > a1, e2 > e1, f2 > f1
     DependencyRegistry registry = new MockDependencyRegistry()
 
-    @Mock
     ResolveContext context
     @Mock
     GolangConfiguration configuration
-
     @Mock
     ResolvedDependency rootProject
-
     @Mock
     ResolvedDependency a1
     @Mock
@@ -86,6 +85,8 @@ class DependencyTreeFactoryTest {
         dependencyToNameMap[f1] = 'f1'
         dependencyToNameMap[f2] = 'f2'
 
+        context = ResolveContext.root(rootProject, configuration)
+
         [rootProject, a1, a2, a3, b, c, d, e1, e2, f1, f2].each {
             when(it.resolve(isNull())).thenReturn(it)
             when(it.resolve(any(ResolveContext))).thenReturn(it)
@@ -100,9 +101,6 @@ class DependencyTreeFactoryTest {
             return ReflectionUtils.getField(delegate, 'finalDependency')
         }
 
-        when(context.getDependencyRegistry()).thenReturn(registry)
-        when(context.getConfiguration()).thenReturn(configuration)
-        when(context.createSubContext(any(GolangDependency))).thenReturn(context)
         when(configuration.getDependencyRegistry()).thenReturn(registry)
     }
 
@@ -110,6 +108,30 @@ class DependencyTreeFactoryTest {
     void bindDependencies(ResolvedDependency dependency, GolangDependency... dependencies) {
         def set = asGolangDependencySet(dependencies)
         when(dependency.getDependencies()).thenReturn(set)
+    }
+
+    @Test
+    void 'stacktrace should be properly formed on resolution failure'() {
+        // given:
+        bindDependencies(rootProject, b)
+        bindDependencies(b, c)
+        bindDependencies(c, d)
+        when(d.resolve(any(ResolveContext))).thenThrow(DependencyResolutionException.cannotParseNotation('123456'))
+
+        // when
+        try {
+            factory.getTree(context, rootProject)
+            assert false
+        }
+        catch (ResolutionStackWrappingException e) {
+            assert e.toString().contains('''
+Cannot parse notation 123456
+Resolution stack is:
++- rootProject
+ +- b
+  +- c
+''')
+        }
     }
 
     @Test
@@ -191,19 +213,13 @@ class DependencyTreeFactoryTest {
     @Test
     void 'sub context should be created before resolution'() {
         'dependency conflict should be resolved'()
-        InOrder order = inOrder(context, a1, a2, a3, b, c, d)
-        order.verify(context).createSubContext(a1)
-        order.verify(a1).resolve(context)
-        order.verify(context).createSubContext(b)
-        order.verify(b).resolve(context)
-        order.verify(context).createSubContext(c)
-        order.verify(c).resolve(context)
-        order.verify(context).createSubContext(a3)
-        order.verify(a3).resolve(context)
-        order.verify(context).createSubContext(d)
-        order.verify(d).resolve(context)
-        order.verify(context).createSubContext(a2)
-        order.verify(a2).resolve(context)
+        InOrder order = inOrder(a1, a2, a3, b, c, d)
+        order.verify(a1).resolve(any(ResolveContext))
+        order.verify(b).resolve(any(ResolveContext))
+        order.verify(c).resolve(any(ResolveContext))
+        order.verify(a3).resolve(any(ResolveContext))
+        order.verify(d).resolve(any(ResolveContext))
+        order.verify(a2).resolve(any(ResolveContext))
     }
 
     void assertChildrenOfNodeAre(DependencyTreeNode node, ResolvedDependency... expectedChildren) {

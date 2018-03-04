@@ -75,10 +75,8 @@ public class DependencyTreeFactory {
                             .stream()
                             .map(dep -> createSubContextAndResolve(dep, item.context))
                             .forEach(queue::add);
-                } catch (ResolutionStackWrappingException e) {
-                    throw e;
                 } catch (Throwable e) {
-                    throw ResolutionStackWrappingException.wrapWithResolutionStack(e, context);
+                    throw ResolutionStackWrappingException.wrapWithResolutionStack(e, item.context);
                 }
             }
         }
