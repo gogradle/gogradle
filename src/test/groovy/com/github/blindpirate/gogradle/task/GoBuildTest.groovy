@@ -82,7 +82,7 @@ class GoBuildTest extends TaskTest {
     @Test
     void 'creating expanded tasks should succeed'() {
         // when
-        task.setTargetPlatform('darwin-amd64,linux-386,windows-amd64')
+        task.setTargetPlatform(['darwin-amd64','linux-386','windows-amd64'])
         task.afterEvaluate()
         // then
         ['buildDarwinAmd64', 'buildLinux386', 'buildWindowsAmd64'].each {

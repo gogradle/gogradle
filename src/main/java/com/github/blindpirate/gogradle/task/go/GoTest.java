@@ -19,8 +19,6 @@ package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.build.BuildManager;
-import com.github.blindpirate.gogradle.build.TestPatternFilter;
-import com.github.blindpirate.gogradle.common.AbstractFileFilter;
 import com.github.blindpirate.gogradle.common.LineCollector;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
@@ -52,7 +50,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
 
-import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.TEST_GO_FILTER;
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.SourceSetType.PROJECT_TEST_AND_VENDOR_BUILD_FILES;
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.SourceSetType.PROJECT_TEST_FILES_ONLY;
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.filterGoFiles;
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.filterTestsMatchingPattern;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 import static com.github.blindpirate.gogradle.task.go.GoCover.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
@@ -157,17 +158,7 @@ public class GoTest extends AbstractGolangTask {
 
     @InputFiles
     Collection<File> getAllGoFiles() {
-        return IOUtils.filterFilesRecursively(getProject().getProjectDir(), new AbstractFileFilter() {
-            @Override
-            protected boolean acceptFile(File file) {
-                return !fileNameStartsWithDotOrUnderline(file) && fileNameEndsWithAny(file, ".go");
-            }
-
-            @Override
-            protected boolean acceptDir(File dir) {
-                return !fileNameStartsWithDotOrUnderline(dir);
-            }
-        });
+        return filterGoFiles(getProjectDir(), PROJECT_TEST_AND_VENDOR_BUILD_FILES);
     }
 
     @OutputDirectory
@@ -178,11 +169,6 @@ public class GoTest extends AbstractGolangTask {
     @OutputDirectory
     File getCoverageDir() {
         return new File(getProject().getProjectDir(), GoCover.COVERAGE_PROFILES_PATH);
-    }
-
-    private Collection<File> filterMatchedTests() {
-        TestPatternFilter filter = TestPatternFilter.withPattern(testNamePattern);
-        return filterFilesRecursively(getProject().getProjectDir(), filter);
     }
 
     private Map<File, List<File>> groupByParentDir(Collection<File> files) {
@@ -217,7 +203,7 @@ public class GoTest extends AbstractGolangTask {
 
         parentDirToTestFiles.forEach((parentDir, testFiles) -> {
             String packageImportPath = dirToImportPath(parentDir);
-            PackageTestResult result = doSingleTest(packageImportPath, parentDir, testFiles);
+            PackageTestResult result = doSingleTest(packageImportPath, testFiles);
 
             List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(result);
             logResult(packageImportPath, resultOfSinglePackage);
@@ -229,10 +215,10 @@ public class GoTest extends AbstractGolangTask {
     private Map<File, List<File>> determineTestPattern() {
         if (isEmpty(testNamePattern)) {
             // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-            Collection<File> allTestFiles = filterFilesRecursively(getProject().getProjectDir(), TEST_GO_FILTER);
+            Collection<File> allTestFiles = filterGoFiles(getProjectDir(), PROJECT_TEST_FILES_ONLY);
             return groupByParentDir(allTestFiles);
         } else {
-            Collection<File> filesMatchingPatterns = filterMatchedTests();
+            Collection<File> filesMatchingPatterns = filterTestsMatchingPattern(getProjectDir(), testNamePattern);
 
             if (filesMatchingPatterns.isEmpty()) {
                 LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");
@@ -267,7 +253,7 @@ public class GoTest extends AbstractGolangTask {
         clearDirectory(coverageDir);
     }
 
-    private PackageTestResult doSingleTest(String importPath, File parentDir, List<File> testFiles) {
+    private PackageTestResult doSingleTest(String importPath, List<File> testFiles) {
         LineCollector lineCollector = new LineCollector();
 
         List<String> args = isCommandLineArguments()

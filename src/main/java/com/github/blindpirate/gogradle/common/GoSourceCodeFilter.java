@@ -18,58 +18,133 @@
 package com.github.blindpirate.gogradle.common;
 
 import com.github.blindpirate.gogradle.util.StringUtils;
-import com.google.common.collect.ImmutableMap;
+import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
-import java.util.Map;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.SourceSetType.PROJECT_BUILD_FILES_ONLY;
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.SourceSetType.PROJECT_TEST_FILES_ONLY;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
-import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory.TESTDATA_DIRECTORY;
 import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
+import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
 
 /**
  * Filters go source code satisfying a specific predicate. By default, files/directories whose name starts
- * with _ or . and vendor/testdata directory will be discarded no matter what the predicate is.
+ * with _ or . and testdata directory will be discarded no matter what the predicate is.
  * <p>
- * There are two pre-defined filters to filter go build source code and go test source code.
  */
 public class GoSourceCodeFilter extends AbstractFileFilter {
-    private static final Predicate<File> BUILD_GO_FILE_PREDICATE = GoSourceCodeFilter::isBuildGoFile;
-    private static final Predicate<File> TEST_GO_FILE_PREDICATE = GoSourceCodeFilter::isTestGoFile;
-    private static final Predicate<File> ALL_GO_FILE_PREDICATE = BUILD_GO_FILE_PREDICATE.or(TEST_GO_FILE_PREDICATE);
+    public enum SourceSetType {
+        /**
+         * All non-test go files in project directory, not including any files in vendor directory
+         */
+        PROJECT_BUILD_FILES_ONLY(true, false, false),
+        /**
+         * All *_test.go files in project directory, not including any files in vendor directory
+         */
+        PROJECT_TEST_FILES_ONLY(false, true, false),
 
-    public static final GoSourceCodeFilter BUILD_GO_FILTER = withPredicate(BUILD_GO_FILE_PREDICATE);
-    public static final GoSourceCodeFilter TEST_GO_FILTER = withPredicate(TEST_GO_FILE_PREDICATE);
-    public static final GoSourceCodeFilter ALL_GO_FILTER = withPredicate(ALL_GO_FILE_PREDICATE);
+        /**
+         * All non-test go files in project directory as well as all non-test go files in vendor directory
+         */
+        PROJECT_AND_VENDOR_BUILD_FILES(true, false, true),
 
-    public static final Map<String, Predicate<File>> PREDICATES = ImmutableMap.of(
-            BUILD, GoSourceCodeFilter::isBuildGoFile,
-            TEST, GoSourceCodeFilter::isTestGoFile);
+        /**
+         * All *.go files in project directory as well as all non-test go files in vendor directory
+         */
+        PROJECT_TEST_AND_VENDOR_BUILD_FILES(true, true, true);
 
+        private boolean containsProjectBuildFiles;
+        private boolean containsProjectTestFiles;
+        private boolean containsVendorBuildFiles;
 
-    public static final Map<String, GoSourceCodeFilter> FILTERS = ImmutableMap.of(
-            BUILD, BUILD_GO_FILTER,
-            TEST, TEST_GO_FILTER);
+        SourceSetType(boolean containsProjectBuildFiles,
+                      boolean containsProjectTestFiles,
+                      boolean containsVendorBuildFiles) {
+            this.containsProjectBuildFiles = containsProjectBuildFiles;
+            this.containsProjectTestFiles = containsProjectTestFiles;
+            this.containsVendorBuildFiles = containsVendorBuildFiles;
+        }
+    }
+
+    public static Collection<File> filterGoFiles(File projectDir, String configuration) {
+        return BUILD.equals(configuration)
+                ? filterGoFiles(projectDir, PROJECT_BUILD_FILES_ONLY)
+                : filterGoFiles(projectDir, PROJECT_TEST_FILES_ONLY);
+    }
+
+    public static Collection<File> filterGoFiles(File projectDir, SourceSetType sourceSetType) {
+        Collection<File> projectGoFiles = filterProjectGoFiles(projectDir, sourceSetType);
+        if (sourceSetType.containsVendorBuildFiles && isValidDirectory(new File(projectDir, VENDOR_DIRECTORY))) {
+            Set<File> result = new HashSet<>(projectGoFiles);
+            result.addAll(filterVendorGoFiles(projectDir));
+            return result;
+        } else {
+            return projectGoFiles;
+        }
+    }
+
+    /**
+     * Filters tests files with specific patterns. Wildcards are supported.
+     */
+    public static Collection<File> filterTestsMatchingPattern(File projectDir, List<String> patterns) {
+        WildcardFileFilter wildcardFileFilter = new WildcardFileFilter(patterns);
+        return filterGoFiles(projectDir, PROJECT_TEST_FILES_ONLY)
+                .stream()
+                .filter(wildcardFileFilter::accept)
+                .collect(Collectors.toList());
+    }
+
+    private static Collection<File> filterVendorGoFiles(File projectDir) {
+        Predicate<File> goFilesPredicate = file -> containThisFile(file, true, false);
+        return filterFilesRecursively(new File(projectDir, VENDOR_DIRECTORY), new GoSourceCodeFilter(goFilesPredicate));
+    }
+
+    private static Collection<File> filterProjectGoFiles(File projectDir, SourceSetType sourceSetType) {
+        Predicate<File> notVendorPredicate = dir -> !isVendorDirectoryOfProject(dir, projectDir);
+        Predicate<File> projectGoFilesPredicate = file -> containThisFile(file, sourceSetType);
+
+        return filterFilesRecursively(projectDir, new GoSourceCodeFilter(projectGoFilesPredicate, notVendorPredicate));
+    }
+
+    private static boolean containThisFile(File file, SourceSetType sourceSetType) {
+        return containThisFile(file, sourceSetType.containsProjectBuildFiles, sourceSetType.containsProjectTestFiles);
+    }
+
+    private static boolean containThisFile(File file, boolean containsBuildFiles, boolean containsTestFiles) {
+        String fileName = file.getName();
+        if (!fileName.endsWith(".go")) {
+            return false;
+        }
+        if (fileName.endsWith("_test.go")) {
+            return containsTestFiles;
+        }
+        return containsBuildFiles;
+    }
+
+    private static boolean isVendorDirectoryOfProject(File dir, File projectDir) {
+        return VENDOR_DIRECTORY.equals(dir.getName()) && projectDir.equals(dir.getParentFile());
+    }
 
     private Predicate<File> filePredicate;
+    private Predicate<File> dirPredicate;
 
-    protected static boolean isBuildGoFile(File file) {
-        return file.getName().endsWith(".go") && !file.getName().endsWith("_test.go");
+    private GoSourceCodeFilter(Predicate<File> filePredicate) {
+        this(filePredicate, dir -> true);
     }
 
-    protected static boolean isTestGoFile(File file) {
-        return file.getName().endsWith("_test.go");
-    }
-
-    public static GoSourceCodeFilter withPredicate(Predicate<File> predicate) {
-        return new GoSourceCodeFilter(predicate);
-    }
-
-    protected GoSourceCodeFilter(Predicate<File> filePredicate) {
+    private GoSourceCodeFilter(Predicate<File> filePredicate, Predicate<File> dirPredicate) {
         this.filePredicate = filePredicate;
+        this.dirPredicate = dirPredicate;
     }
 
     @Override
@@ -85,9 +160,9 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
         if (StringUtils.fileNameStartsWithDotOrUnderline(dir)) {
             return false;
         }
-        if (fileNameEqualsAny(dir, TESTDATA_DIRECTORY, VENDOR_DIRECTORY)) {
+        if (fileNameEqualsAny(dir, TESTDATA_DIRECTORY)) {
             return false;
         }
-        return true;
+        return dirPredicate.test(dir);
     }
 }

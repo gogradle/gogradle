@@ -217,7 +217,7 @@ class GoTestTaskTest extends TaskTest {
 
     @Test
     void 'getting all test go files should succeed'() {
-        assert task.getAllGoFiles()*.name as Set == ['a1_test.go', 'a2_test.go', 'a1.go', 'a2.go', 'b1_test.go', 'b2_test.go', 'b1.go', 'b2.go', 'c_test.go', 'c.go', 'vendor.go', 'vendor_test.go'] as Set
+        assert task.getAllGoFiles()*.name as Set == ['a1_test.go', 'a2_test.go', 'a1.go', 'a2.go', 'b1_test.go', 'b2_test.go', 'b1.go', 'b2.go', 'c.go', 'vendor.go'] as Set
     }
 
     @Test

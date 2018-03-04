@@ -42,7 +42,6 @@ import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
 import java.io.File;
-import java.io.IOException;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -52,7 +51,6 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION;
 import static com.github.blindpirate.gogradle.GogradleGlobal.isRefreshDependencies;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME;
-import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 
 public abstract class ResolveDependencies extends AbstractGolangTask {
     @Inject
@@ -95,15 +93,14 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
 
     // INPUT 2: gogradle.lock
     @InputFiles
-    public File getExternalLockfiles() throws IOException {
+    public File getExternalLockfiles() {
         return new File(getProject().getProjectDir(), "gogradle.lock");
     }
 
     // INPUT 3: all go files in specific configuration
     @InputFiles
     public Collection<File> getGoSourceFiles() {
-        GoSourceCodeFilter filter = GoSourceCodeFilter.FILTERS.get(getConfigurationName());
-        return filterFilesRecursively(getProject().getProjectDir(), filter);
+        return GoSourceCodeFilter.filterGoFiles(getProjectDir(), getConfigurationName());
     }
 
     // INPUT 4: build tags
