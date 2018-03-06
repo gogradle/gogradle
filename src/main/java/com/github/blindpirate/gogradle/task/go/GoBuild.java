@@ -32,6 +32,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -103,10 +104,14 @@ public class GoBuild extends Go {
         if (noCustomActions() || outputLocation != null) {
             subTask.getInputs().files((Callable<Collection<File>>)
                     () -> GoSourceCodeFilter.filterGoFiles(getProjectDir(), PROJECT_AND_VENDOR_BUILD_FILES));
-            subTask.getInputs().property("buildTags", (Callable<List<String>>) () -> setting.getBuildTags());
-            subTask.getInputs().property("goVersion", (Callable<String>) () -> binaryManager.getGoVersion());
-            subTask.getInputs().property("environment", getEffectiveEnvironment(os, arch));
+
             subTask.getOutputs().file(new File(getProjectDir(), getOutputLocation()));
+
+            Map<String, Object> inputProperties = new HashMap<>();
+            inputProperties.put("buildTags", (Callable<List<String>>) () -> setting.getBuildTags());
+            inputProperties.put("goVersion", (Callable<String>) () -> binaryManager.getGoVersion());
+            inputProperties.put("environment", getEffectiveEnvironment(os, arch));
+            subTask.getInputs().properties(inputProperties);
         }
     }
 
