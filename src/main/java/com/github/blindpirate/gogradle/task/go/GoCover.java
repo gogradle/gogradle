@@ -26,6 +26,8 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.NumberUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.google.common.collect.ImmutableMap;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.InputDirectory;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.SkipWhenEmpty;
@@ -66,6 +68,7 @@ public class GoCover extends AbstractGolangTask {
     private static final String COVERAGE_HTMLS_PATH = ".gogradle/reports/coverage";
     private static final String COVERAGE_HTML_STATIC_PATH = ".gogradle/reports/coverage/static";
     private static final String COVERAGE_STATIC_RESOURCE = "/coverage/static/";
+    private static final Logger LOGGER = Logging.getLogger(GoCover.class);
 
     @Inject
     private GolangPluginSetting setting;
@@ -138,7 +141,10 @@ public class GoCover extends AbstractGolangTask {
                         .collect(Collectors.toList());
         long totalMissedLines = calculateTotalMissedLines(packageCoverages);
         long totalLines = calculateLines(packageCoverages);
-        int totalCoverageRate = NumberUtils.percentage(totalLines - totalMissedLines, totalLines);
+        long coveredLines = totalLines - totalMissedLines;
+        int totalCoverageRate = NumberUtils.percentage(coveredLines, totalLines);
+
+        LOGGER.info("Total coverage: {}", NumberUtils.formatPercentage(coveredLines, totalLines));
 
         sortByName(packageCoverages);
         sortByCoverageRate(packageCoverages);
@@ -205,6 +211,7 @@ public class GoCover extends AbstractGolangTask {
                     .collect(PackageCoverage::new, PackageCoverage::add, PackageCoverage::add);
             ret.name = decodeInternally(removeOutExtension(profileFile));
             ret.url = htmlFile.getName();
+            LOGGER.info("Coverage of package {}: {}", ret.name, ret.formatCoverageRate());
             return ret;
         } catch (IOException e) {
             throw new UncheckedIOException(e);
@@ -224,6 +231,7 @@ public class GoCover extends AbstractGolangTask {
         String filePath = fileAndCoverage.substring(0, lastLeftParenIndex - 1);
         Double coverage = Double.parseDouble(substring(fileAndCoverage, lastLeftParenIndex + 1, -2));
         long lineCount = countLinesInFile(filePath);
+
         return new FileCoverage(coverage, lineCount);
     }
 
@@ -291,6 +299,10 @@ public class GoCover extends AbstractGolangTask {
 
         public int getCoveredLineRate() {
             return NumberUtils.percentage(coveredLineCount, coveredLineCount + uncoveredLineCount);
+        }
+
+        public String formatCoverageRate() {
+            return NumberUtils.formatPercentage(coveredLineCount, getTotalLineCount());
         }
 
         public long getCoveredLineWidth() {

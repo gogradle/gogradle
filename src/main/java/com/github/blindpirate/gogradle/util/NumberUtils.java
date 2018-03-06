@@ -21,4 +21,9 @@ public class NumberUtils {
     public static int percentage(Number numerator, Number denominator) {
         return (int) Math.round(100 * numerator.doubleValue() / denominator.doubleValue());
     }
+
+    public static String formatPercentage(Number numerator, Number denominator) {
+        return String.format("%.2f%%", 100.0 * numerator.doubleValue() / denominator.doubleValue());
+    }
 }
+
