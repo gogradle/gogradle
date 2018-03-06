@@ -114,6 +114,10 @@ test {
         assert !stdout.toString().contains(':test UP-TO-DATE')
         assert !stdout.toString().contains(':cover UP-TO-DATE')
         assert stdout.toString().contains('=== RUN   Test_B1_1')
+        assert stdout.toString().contains('Coverage of package github.com/my/project/a:')
+        assert stdout.toString().contains('Coverage of package github.com/my/project/b:')
+        assert stdout.toString().contains('Total coverage:')
+
     }
 
     def assertNormalTestUpToDateResult() {
