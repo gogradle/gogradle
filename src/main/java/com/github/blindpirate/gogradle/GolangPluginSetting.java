@@ -18,7 +18,7 @@
 package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
-import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
+import com.github.blindpirate.gogradle.core.pack.GloballyIgnoredPackages;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
@@ -26,10 +26,15 @@ import javax.annotation.Nonnull;
 import javax.inject.Singleton;
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static com.github.blindpirate.gogradle.core.mode.BuildMode.REPRODUCIBLE;
+import static com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager.FILENAME;
 import static com.github.blindpirate.gogradle.util.StringUtils.isNotBlank;
 
 
@@ -51,12 +56,11 @@ public class GolangPluginSetting {
 
     // https://storage.googleapis.com/golang/go1.7.4.windows-386.zip
     // https://storage.googleapis.com/golang/go1.7.4.linux-amd64.tar.gz
-    private static final String BINARY_URL = "https://storage.googleapis.com/golang/" + DefaultGoBinaryManager.FILENAME;
+    private static final String BINARY_URL = "https://storage.googleapis.com/golang/" + FILENAME;
 
     // http://golangtc.com/static/go/1.7.4/go1.7.4.windows-386.zip
     // http://golangtc.com/static/go/1.7.4/go1.7.4.linux-amd64.tar.gz
-    private static final String BINARY_URL_GFW = "http://golangtc.com/static/go/${version}/"
-            + DefaultGoBinaryManager.FILENAME;
+    private static final String BINARY_URL_GFW = "http://golangtc.com/static/go/${version}/" + FILENAME;
 
     private BuildMode buildMode = REPRODUCIBLE;
 
@@ -70,6 +74,9 @@ public class GolangPluginSetting {
     private String goRoot;
 
     private String goBinaryDownloadTemplate = BINARY_URL;
+
+    private Set<String> ignoredPackages = new HashSet<>();
+    private boolean userHasCustomizedIgnoredPackages = false;
 
     public String getGoRoot() {
         return goRoot;
@@ -147,9 +154,8 @@ public class GolangPluginSetting {
     }
 
     /**
-     * @deprecated use {@link #setGoBinaryDownloadTemplate}
-     *
      * @param goBinaryDownloadBaseUri the URI
+     * @deprecated use {@link #setGoBinaryDownloadTemplate}
      */
     @Deprecated
     public void setGoBinaryDownloadBaseUri(String goBinaryDownloadBaseUri) {
@@ -157,14 +163,13 @@ public class GolangPluginSetting {
     }
 
     /**
-     * @deprecated use {@link #setGoBinaryDownloadTemplate}
-     *
      * @param goBinaryDownloadBaseUri the URI
+     * @deprecated use {@link #setGoBinaryDownloadTemplate}
      */
     @Deprecated
     public void setGoBinaryDownloadBaseUri(URI goBinaryDownloadBaseUri) {
         setGoBinaryDownloadTemplate(goBinaryDownloadBaseUri == null ? null
-                : goBinaryDownloadBaseUri.resolve("/") + DefaultGoBinaryManager.FILENAME);
+                : goBinaryDownloadBaseUri.resolve("/") + FILENAME);
     }
 
     public void setGoBinaryDownloadTemplate(URI goBinaryDownloadTemplateUri) {
@@ -189,6 +194,29 @@ public class GolangPluginSetting {
 
     public long getGlobalCacheSecond() {
         return globalCacheSecond;
+    }
+
+    /**
+     * Ignore some packages globally. This will make these packages be "empty".
+     *
+     * @param pkg the packages to be ignored
+     * @see {@link GloballyIgnoredPackages}
+     */
+    public void ignorePackage(String... pkg) {
+        ignoredPackages.addAll(Arrays.asList(pkg));
+    }
+
+    public Set<String> getIgnoredPackages() {
+        return ignoredPackages;
+    }
+
+    public void setIgnoredPackages(Collection<String> ignoredPackages) {
+        userHasCustomizedIgnoredPackages = true;
+        this.ignoredPackages = new HashSet<>(ignoredPackages);
+    }
+
+    boolean isUserHasCustomizedIgnoredPackages() {
+        return userHasCustomizedIgnoredPackages;
     }
 
     public void verify() {

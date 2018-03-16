@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
 import com.github.blindpirate.gogradle.core.dependency.resolve.DependencyManager
 import com.github.blindpirate.gogradle.core.mode.BuildMode
+import com.github.blindpirate.gogradle.core.pack.GloballyIgnoredPackages
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.WithProject
@@ -42,6 +43,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import static com.github.blindpirate.gogradle.core.GolangRepositoryPattern.EMPTY_DIR
 import static com.github.blindpirate.gogradle.core.dependency.AbstractNotationDependency.PropertiesExclusionPredicate
 import static com.github.blindpirate.gogradle.util.DependencyUtils.getExclusionSpecs
 import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLetter
@@ -309,5 +311,24 @@ class GolangPluginTest {
         assert project.getTasksByName('build' +
                 capitalizeFirstLetter(Os.getHostOs().toString()) +
                 capitalizeFirstLetter(Arch.getHostArch().toString()), false)
+    }
+
+    @Test
+    void 'default excluded packages should be added'() {
+        project.getPlugins().getPlugin(GolangPlugin).afterEvaluate()
+        def handler = injector.getInstance(GolangRepositoryHandler)
+        GloballyIgnoredPackages.PKGS.each {
+            assert handler.findMatchedRepository(it).get().dir == EMPTY_DIR
+        }
+    }
+
+    @Test
+    void 'default excluded packages should not be added if user specify some'() {
+        injector.getInstance(GolangPluginSetting).setIgnoredPackages([])
+        project.getPlugins().getPlugin(GolangPlugin).afterEvaluate()
+        def handler = injector.getInstance(GolangRepositoryHandler)
+        GloballyIgnoredPackages.PKGS.each {
+            assert !handler.findMatchedRepository(it).isPresent()
+        }
     }
 }

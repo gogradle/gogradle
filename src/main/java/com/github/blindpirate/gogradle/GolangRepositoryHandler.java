@@ -73,4 +73,11 @@ public class GolangRepositoryHandler extends GroovyObjectSupport implements Conf
         golangRepositories.add(repository);
         return null;
     }
+
+    public void addEmptyRepo(String repo) {
+        GolangRepositoryPattern repositoryPattern = new GolangRepositoryPattern();
+        repositoryPattern.root(repo);
+        repositoryPattern.emptyDir();
+        golangRepositories.add(repositoryPattern);
+    }
 }

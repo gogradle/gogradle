@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle;
 
 import com.github.blindpirate.gogradle.core.GolangDependencyHandler;
 import com.github.blindpirate.gogradle.core.mode.BuildMode;
+import com.github.blindpirate.gogradle.core.pack.GloballyIgnoredPackages;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
 import com.github.blindpirate.gogradle.task.GolangTaskContainer;
 import com.google.inject.Guice;
@@ -26,6 +27,8 @@ import com.google.inject.Injector;
 import org.gradle.api.Plugin;
 import org.gradle.api.Project;
 import org.gradle.api.artifacts.ConfigurationContainer;
+import org.gradle.api.logging.Logger;
+import org.gradle.api.logging.Logging;
 import org.gradle.api.plugins.ExtensionAware;
 
 import java.util.Arrays;
@@ -39,9 +42,11 @@ import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
  */
 public class GolangPlugin implements Plugin<Project> {
     public static final String GOGRADLE_INJECTOR = "GOGRADLE_INJECTOR";
+    private static final Logger LOGGER = Logging.getLogger(GolangPlugin.class);
     private Injector injector;
     private GolangPluginSetting settings;
     private GolangTaskContainer golangTaskContainer;
+    private GolangRepositoryHandler golangRepositoryHandler;
     private Project project;
 
     @Override
@@ -61,6 +66,7 @@ public class GolangPlugin implements Plugin<Project> {
         GogradleGlobal.INSTANCE.setCurrentProject(project);
         settings = injector.getInstance(GolangPluginSetting.class);
         golangTaskContainer = injector.getInstance(GolangTaskContainer.class).init(project, injector);
+        golangRepositoryHandler = injector.getInstance(GolangRepositoryHandler.class);
         Arrays.asList(BuildMode.values()).forEach(mode -> {
             project.getExtensions().add(BuildMode.class, mode.toString(), mode);
             project.getExtensions().add(BuildMode.class, mode.getAbbr(), mode);
@@ -91,6 +97,18 @@ public class GolangPlugin implements Plugin<Project> {
                 AbstractGolangTask.class.cast(task).afterEvaluate();
             }
         });
+        registerGloballyIgnoredPackages();
+    }
+
+    private void registerGloballyIgnoredPackages() {
+        if (!settings.isUserHasCustomizedIgnoredPackages()) {
+            settings.setIgnoredPackages(GloballyIgnoredPackages.PKGS);
+        }
+
+        if (!settings.getIgnoredPackages().isEmpty()) {
+            LOGGER.info("Ignore packages globally: {}", String.join(",", settings.getIgnoredPackages()));
+            settings.getIgnoredPackages().forEach(golangRepositoryHandler::addEmptyRepo);
+        }
     }
 
     private void customizeProjectInternalServices(Project project) {
