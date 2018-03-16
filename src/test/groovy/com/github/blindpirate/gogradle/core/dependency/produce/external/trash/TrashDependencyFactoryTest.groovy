@@ -18,7 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.trash
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.dependency.produce.external.AbstractExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -26,7 +26,7 @@ import org.mockito.InjectMocks
 
 
 @RunWith(GogradleRunner)
-class TrashDependencyFactoryTest extends ExternalDependencyFactoryTest {
+class TrashDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
 
     @InjectMocks
     TrashDependencyFactory factory

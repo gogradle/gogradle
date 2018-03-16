@@ -19,13 +19,11 @@ package com.github.blindpirate.gogradle.core.dependency.lock
 
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.parse.MapNotationParser
-import com.github.blindpirate.gogradle.core.pack.StandardPackagePathResolver
+import com.github.blindpirate.gogradle.core.dependency.produce.external.AbstractExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
@@ -35,26 +33,14 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
-import org.mockito.Mock
-
-import java.nio.file.Path
 
 import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfaces
-import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithProject
-class DefaultLockedDependencyManagerTest {
+class DefaultLockedDependencyManagerTest extends AbstractExternalDependencyFactoryTest {
     Project project
-    @Mock
-    MapNotationParser parser
-    @Mock
-    StandardPackagePathResolver standardPackagePathResolver
-    @Mock
-    ResolvedDependency targetDependency
-    @Mock
-    GogradleRootProject gogradleRootProject
 
     @InjectMocks
     DefaultLockedDependencyManager manager
@@ -88,20 +74,17 @@ dependencies:
     @Before
     void setUp() {
         ReflectionUtils.setField(manager, 'project', project)
-        when(targetDependency.getName()).thenReturn('github.com/target/package')
-        when(gogradleRootProject.getName()).thenReturn('github.com/my/package')
         when(dependency1.getName()).thenReturn('b')
         when(dependency2.getName()).thenReturn('a')
         when(dependency3.getName()).thenReturn('c')
         when(dependency4.getName()).thenReturn('a')
-        when(standardPackagePathResolver.isStandardPackage(any(Path))).thenReturn(false)
     }
 
     void prepareGogradleDotLock() {
-        when(parser.parse([name: 'b', version: 'v2', transitive: false])).thenReturn(dependency1)
-        when(parser.parse([name: 'a', version: 'v1', transitive: false])).thenReturn(dependency2)
-        when(parser.parse([name: 'c', version: 'v3', transitive: false])).thenReturn(dependency3)
-        when(parser.parse([name: 'a', version: 'v2', transitive: false])).thenReturn(dependency4)
+        when(mapNotationParser.parse([name: 'b', version: 'v2', transitive: false])).thenReturn(dependency1)
+        when(mapNotationParser.parse([name: 'a', version: 'v1', transitive: false])).thenReturn(dependency2)
+        when(mapNotationParser.parse([name: 'c', version: 'v3', transitive: false])).thenReturn(dependency3)
+        when(mapNotationParser.parse([name: 'a', version: 'v2', transitive: false])).thenReturn(dependency4)
         IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, gogradleDotLock)
     }
 
@@ -112,8 +95,8 @@ dependencies:
         // given
         prepareGogradleDotLock()
         // when
-        GolangDependencySet buildResult = manager.produce(targetDependency, project.rootDir, 'build')
-        GolangDependencySet testResult = manager.produce(targetDependency, project.rootDir, 'test')
+        GolangDependencySet buildResult = manager.produce(parentDependency, project.rootDir, 'build')
+        GolangDependencySet testResult = manager.produce(parentDependency, project.rootDir, 'test')
         // then
         assert buildResult.any { it.is(dependency1) }
         assert buildResult.any { it.is(dependency2) }
@@ -140,5 +123,7 @@ dependencies:
         IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, 'old file content')
         'writing to gogradle.lock should succeed'()
     }
+
+
 }
 
