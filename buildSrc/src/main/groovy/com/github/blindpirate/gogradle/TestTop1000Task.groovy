@@ -33,7 +33,11 @@ class TestTop1000Task extends DefaultTask {
 
     void testAll(String path) {
         init()
-        new File(path).eachDir { buildOne(it.toPath()) }
+        def dirs = new File(path).listFiles().findAll { it.isDirectory() }
+        Collections.shuffle(dirs)
+        dirs.each {
+            buildOne(it.toPath())
+        }
     }
 
     void buildOne(Path path) {
