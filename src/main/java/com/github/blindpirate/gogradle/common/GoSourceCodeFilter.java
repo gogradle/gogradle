@@ -17,10 +17,10 @@
 
 package com.github.blindpirate.gogradle.common;
 
-import com.github.blindpirate.gogradle.util.StringUtils;
 import org.apache.commons.io.filefilter.WildcardFileFilter;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
@@ -36,6 +36,7 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
 import static com.github.blindpirate.gogradle.util.IOUtils.isValidDirectory;
 import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEqualsAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
 
 /**
  * Filters go source code satisfying a specific predicate. By default, files/directories whose name starts
@@ -149,7 +150,7 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
 
     @Override
     protected boolean acceptFile(File file) {
-        if (StringUtils.fileNameStartsWithDotOrUnderline(file)) {
+        if (fileNameStartsWithDotOrUnderline(file)) {
             return false;
         }
         return filePredicate.test(file);
@@ -157,7 +158,10 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
 
     @Override
     protected boolean acceptDir(File dir) {
-        if (StringUtils.fileNameStartsWithDotOrUnderline(dir)) {
+        if (Files.isSymbolicLink(dir.toPath())) {
+            return false;
+        }
+        if (fileNameStartsWithDotOrUnderline(dir)) {
             return false;
         }
         if (fileNameEqualsAny(dir, TESTDATA_DIRECTORY)) {
