@@ -18,7 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.govendor
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.dependency.produce.external.AbstractExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.core.pack.GithubGitlabPackagePathResolver
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -29,7 +29,7 @@ import org.mockito.InjectMocks
 import org.mockito.Mockito
 
 @RunWith(GogradleRunner)
-class GovendorDependencyFactoryTest extends ExternalDependencyFactoryTest {
+class GovendorDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     @InjectMocks
     GovendorDependencyFactory factory
 

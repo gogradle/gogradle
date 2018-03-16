@@ -18,14 +18,14 @@
 package com.github.blindpirate.gogradle.core.dependency.produce.external.gopm
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.dependency.produce.external.ExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.dependency.produce.external.AbstractExternalDependencyFactoryTest
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
 @RunWith(GogradleRunner)
-class GopmDependencyFactoryTest extends ExternalDependencyFactoryTest {
+class GopmDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     @InjectMocks
     GopmDependencyFactory factory
 

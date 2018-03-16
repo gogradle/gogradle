@@ -23,6 +23,7 @@ import groovy.text.GStringTemplateEngine;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -42,6 +43,13 @@ public class StringUtils {
                 .map(org.apache.commons.lang3.StringUtils::trimToNull)
                 .filter(Objects::nonNull)
                 .toArray(String[]::new);
+    }
+
+    public static boolean pathStartsWith(String a, String b){
+        Path aPath = Paths.get(a);
+        Path bPath = Paths.get(b);
+
+        return aPath.startsWith(bPath);
     }
 
     public static boolean isNotBlank(String s) {

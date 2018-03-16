@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
 import static com.github.blindpirate.gogradle.util.DependencySetUtils.parseMany;
+import static com.github.blindpirate.gogradle.util.StringUtils.*;
 import static com.google.common.collect.ImmutableMap.of;
 
 public abstract class ExternalDependencyFactory {
@@ -57,7 +58,7 @@ public abstract class ExternalDependencyFactory {
 
     /**
      * Relative paths of the identity file.
-     * For example, "Godeps/Godeps.json","glide.yaml"
+     * For example, "Godeps/Godeps.json", "glide.yaml"
      *
      * @return name of that file
      */
@@ -85,8 +86,8 @@ public abstract class ExternalDependencyFactory {
         return packages.stream().filter(pkg -> {
             String path = MapUtils.getString(pkg, MapNotationParser.NAME_KEY, "");
             return !standardPackagePathResolver.isStandardPackage(Paths.get(path))
-                    && !path.startsWith(resolvedDependency.getName())
-                    && !path.startsWith(gogradleRootProject.getName());
+                    && !pathStartsWith(path, resolvedDependency.getName())
+                    && !pathStartsWith(path, gogradleRootProject.getName());
         }).collect(Collectors.toList());
     }
 
