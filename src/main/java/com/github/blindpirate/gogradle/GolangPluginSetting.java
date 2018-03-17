@@ -200,7 +200,7 @@ public class GolangPluginSetting {
      * Ignore some packages globally. This will make these packages be "empty".
      *
      * @param pkg the packages to be ignored
-     * @see {@link GloballyIgnoredPackages}
+     * @see GloballyIgnoredPackages
      */
     public void ignorePackage(String... pkg) {
         ignoredPackages.addAll(Arrays.asList(pkg));
