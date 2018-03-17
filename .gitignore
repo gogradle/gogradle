@@ -1,5 +1,6 @@
 .gradle
 .idea
+nohup.out
 build/
 out/
 !src/main/java/com/github/blindpirate/gogradle/build
