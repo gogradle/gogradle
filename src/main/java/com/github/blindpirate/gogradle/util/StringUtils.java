@@ -28,6 +28,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
@@ -149,5 +150,19 @@ public class StringUtils {
     public static String capitalizeFirstLetter(String s) {
         Assert.isNotBlank(s);
         return s.substring(0, 1).toUpperCase() + s.substring(1);
+    }
+
+    public static Stream<String> eachSubPath(String packagePath) {
+        Path path = Paths.get(packagePath);
+        return IntStream.range(0, path.getNameCount())
+                .mapToObj(i -> path.subpath(0, i + 1))
+                .map(StringUtils::toUnixString);
+    }
+
+    public static Stream<String> eachSubPathReverse(String packagePath) {
+        Path path = Paths.get(packagePath);
+        return IntStream.range(0, path.getNameCount())
+                .mapToObj(i -> path.subpath(0, path.getNameCount() - i))
+                .map(StringUtils::toUnixString);
     }
 }

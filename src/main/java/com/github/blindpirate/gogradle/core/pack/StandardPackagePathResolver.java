@@ -28,6 +28,7 @@ import java.nio.file.Paths;
 import java.util.Optional;
 import java.util.Set;
 
+// https://golang.org/pkg/#stdlib
 @Singleton
 public class StandardPackagePathResolver implements PackagePathResolver {
 

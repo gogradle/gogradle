@@ -16,7 +16,7 @@ import org.junit.runner.RunWith
 class ApacheThriftIntegrationTest extends IntegrationTestSupport {
     @Before
     void setUp() {
-        writeBuildAndSettingsDotGradle('')
+        writeBuildAndSettingsDotGradle(buildDotGradleBase)
         IOUtils.write(resource, 'a.go', '''
 package main 
 import "git.apache.org/thrift.git/lib/go/thrift"
@@ -29,6 +29,9 @@ func Say(s string){
     @Test
     void 'depending on thrift should succeed'() {
         newBuild('dependencies')
+        assert stdout.toString().contains('''\
+github.com/my/project
+\\-- git.apache.org/thrift.git''')
     }
 
     @Override
