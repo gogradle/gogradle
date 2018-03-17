@@ -25,7 +25,6 @@ import com.github.blindpirate.gogradle.vcs.VcsType;
 import javax.inject.Singleton;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository;
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -35,16 +34,15 @@ public class IBMDevOpsPackagePathResolver extends AbstractPackagePathResolver {
     private static final String HUB_JAZZ_HOST = "hub.jazz.net";
 
     @Override
-    protected Optional<GolangPackage> doProduce(String packagePath) {
+    protected GolangPackage doProduce(String packagePath) {
         Path path = Paths.get(packagePath);
         Path rootPath = path.subpath(0, 4);
         GolangRepository repository = newOriginalRepository(VcsType.GIT, HTTPS + toUnixString(rootPath));
-        GolangPackage pkg = VcsGolangPackage.builder()
+        return VcsGolangPackage.builder()
                 .withPath(path)
                 .withRootPath(rootPath)
                 .withRepository(repository)
                 .build();
-        return Optional.of(pkg);
     }
 
     @Override

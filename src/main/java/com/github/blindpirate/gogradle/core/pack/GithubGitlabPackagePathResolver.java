@@ -24,7 +24,6 @@ import com.github.blindpirate.gogradle.vcs.VcsType;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Optional;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 import static java.util.Arrays.asList;
@@ -47,7 +46,7 @@ public class GithubGitlabPackagePathResolver extends AbstractPackagePathResolver
         return !host.equals(Paths.get(packagePath).getName(0).toString().toLowerCase());
     }
 
-    protected Optional<GolangPackage> doProduce(String packagePath) {
+    protected GolangPackage doProduce(String packagePath) {
         Path path = Paths.get(packagePath);
         String sshUrl = String.format("git@%s.git", toUnixString(path.subpath(0, 3))
                 .replaceFirst("/", ":"));
@@ -55,11 +54,10 @@ public class GithubGitlabPackagePathResolver extends AbstractPackagePathResolver
 
         GolangRepository repository = GolangRepository.newOriginalRepository(VcsType.GIT, asList(httpsUrl, sshUrl));
 
-        GolangPackage info = VcsGolangPackage.builder()
+        return VcsGolangPackage.builder()
                 .withPath(path)
                 .withRootPath(path.subpath(0, 3))
                 .withRepository(repository)
                 .build();
-        return Optional.of(info);
     }
 }
