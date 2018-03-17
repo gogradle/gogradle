@@ -32,11 +32,11 @@ public abstract class AbstractPackagePathResolver implements PackagePathResolver
         } else if (isIncomplete(packagePath)) {
             return Optional.of(IncompleteGolangPackage.of(packagePath));
         } else {
-            return doProduce(packagePath);
+            return Optional.of(doProduce(packagePath));
         }
     }
 
-    protected abstract Optional<GolangPackage> doProduce(String packagePath);
+    protected abstract GolangPackage doProduce(String packagePath);
 
     protected abstract boolean isIncomplete(String packagePath);
 

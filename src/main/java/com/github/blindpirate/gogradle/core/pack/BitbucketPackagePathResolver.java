@@ -33,7 +33,6 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
@@ -53,10 +52,10 @@ public class BitbucketPackagePathResolver extends AbstractPackagePathResolver {
     }
 
     @Override
-    protected Optional<GolangPackage> doProduce(String packagePath) {
+    protected GolangPackage doProduce(String packagePath) {
         Path path = Paths.get(packagePath);
         BitbucketApiModel packageInfo = queryByApi(path);
-        return Optional.of(buildByApiResponse(path, packageInfo));
+        return buildByApiResponse(path, packageInfo);
     }
 
     private GolangPackage buildByApiResponse(Path path, BitbucketApiModel packageInfo) {

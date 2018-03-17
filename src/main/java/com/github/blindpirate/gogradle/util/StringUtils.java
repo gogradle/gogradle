@@ -45,7 +45,7 @@ public class StringUtils {
                 .toArray(String[]::new);
     }
 
-    public static boolean pathStartsWith(String a, String b){
+    public static boolean pathStartsWith(String a, String b) {
         Path aPath = Paths.get(a);
         Path bPath = Paths.get(b);
 
