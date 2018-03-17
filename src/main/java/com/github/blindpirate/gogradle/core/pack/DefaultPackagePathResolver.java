@@ -26,14 +26,13 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.lang.annotation.Retention;
 import java.lang.annotation.Target;
-import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static com.github.blindpirate.gogradle.util.StringUtils.eachSubPathReverse;
 import static java.lang.annotation.ElementType.FIELD;
 import static java.lang.annotation.ElementType.METHOD;
 import static java.lang.annotation.ElementType.PARAMETER;
@@ -68,12 +67,7 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
         // github.com/a/b
         // github.com/a
         // github.com
-        Path path = Paths.get(packagePath);
-        for (int i = path.getNameCount(); i > 0; --i) {
-            Path current = path.subpath(0, i);
-            String currentPathStr = toUnixString(current);
-            cache.put(currentPathStr, golangPackage.resolve(current).get());
-        }
+        eachSubPathReverse(packagePath).forEach(subPath -> cache.put(subPath, golangPackage.resolve(subPath).get()));
     }
 
     private Optional<GolangPackage> tryToFetchFromCache(String packagePath) {
@@ -81,16 +75,11 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
         // github.com/a/b
         // github.com/a
         // github.com
-        Path path = Paths.get(packagePath);
-        for (int i = path.getNameCount(); i > 0; --i) {
-            Path current = path.subpath(0, i);
-            GolangPackage existentPackage = cache.get(toUnixString(current));
-
-            if (existentPackage != null) {
-                return existentPackage.resolve(path);
-            }
-        }
-        return Optional.empty();
+        return eachSubPathReverse(packagePath)
+                .map(cache::get)
+                .filter(Objects::nonNull)
+                .findFirst()
+                .flatMap(pkg -> pkg.resolve(packagePath));
     }
 
     @BindingAnnotation

@@ -32,16 +32,18 @@ class VcsPackagePathResolverTest {
 
     @Test
     void 'can produce package with .vcs'() {
-        verifyVcs(VcsType.GIT, 'a.git', ['git://a.git', 'https://a.git', 'http://a.git', 'git+ssh://a.git', 'ssh://a.git'])
-        verifyVcs(VcsType.MERCURIAL, 'a.hg', ['https://a.hg', 'http://a.hg', 'ssh://a.hg'])
-        verifyVcs(VcsType.SVN, 'a.svn', ['https://a.svn', 'http://a.svn', 'svn://a.svn', 'svn+ssh://a.svn'])
-        verifyVcs(VcsType.BAZAAR, 'a.bzr', ['https://a.bzr', 'http://a.bzr', 'bzr://a.bzr', 'bzr+ssh://a.bzr'])
+        verifyVcs(VcsType.GIT, 'a.git/b', 'a.git', ['git://a.git', 'https://a.git', 'http://a.git', 'git+ssh://a.git', 'ssh://a.git'])
+        verifyVcs(VcsType.MERCURIAL, 'a.hg/b/c', 'a.hg', ['https://a.hg', 'http://a.hg', 'ssh://a.hg'])
+        verifyVcs(VcsType.SVN, 'a.svn/b.git/c.hg/d.bzr/e', 'a.svn', ['https://a.svn', 'http://a.svn', 'svn://a.svn', 'svn+ssh://a.svn'])
+        verifyVcs(VcsType.BAZAAR, 'a.bzr/b.bzr/c.bzr/d.bzr', 'a.bzr', ['https://a.bzr', 'http://a.bzr', 'bzr://a.bzr', 'bzr+ssh://a.bzr'])
     }
 
-    void verifyVcs(VcsType vcsType, String s, List<String> urls) {
-        VcsGolangPackage pkg = resolver.produce(s).get()
+    void verifyVcs(VcsType vcsType, String packagePath, String rootPath, List<String> urls) {
+        VcsGolangPackage pkg = resolver.produce(packagePath).get()
         assert pkg.repository.getVcsType() == vcsType
         assert pkg.repository.original
         assert pkg.repository.urls == urls
+        assert pkg.pathString == packagePath
+        assert pkg.rootPathString == rootPath
     }
 }
