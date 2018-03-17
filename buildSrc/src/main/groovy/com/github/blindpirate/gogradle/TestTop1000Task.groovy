@@ -41,8 +41,8 @@ class TestTop1000Task extends DefaultTask {
     }
 
     void buildOne(Path path) {
-        String dirName = path.getFileName()
-        String[] userAndProject = dirName.split(/_/)
+        // https://github.com/user/project.git -> github.com/user/project
+        String packagePath = 'git config --get remote.origin.url'.execute([], path.toFile()).text[8..-6]
         String buildDotGradle = """
 buildscript {
     dependencies {
@@ -52,7 +52,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
-    packagePath = "github.com/${userAndProject[0]}/${userAndProject[1]}" // path of project to be built 
+    packagePath = "${packagePath}" // path of project to be built 
 }
 
 repositories {
@@ -74,7 +74,7 @@ repositories {
         } else if (!path.toFile().list().any { it.endsWith('.go') && !it.endsWith('_test.go') }) {
             buildDotGradle += """
 build {
-    go 'build github.com/${userAndProject[0]}/${userAndProject[1]}/...'
+    go 'build ${packagePath}/...'
 }
 """
         }
