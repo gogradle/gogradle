@@ -41,7 +41,6 @@ import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWit
 /**
  * Filters go source code satisfying a specific predicate. By default, files/directories whose name starts
  * with _ or . and testdata directory will be discarded no matter what the predicate is.
- * <p>
  */
 public class GoSourceCodeFilter extends AbstractFileFilter {
     public enum SourceSetType {
@@ -96,6 +95,9 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
 
     /**
      * Filters tests files with specific patterns. Wildcards are supported.
+     * @param projectDir the project root directory.
+     * @param patterns the pattern list
+     * @return all files in the project directory (recursively) matching the patterns
      */
     public static Collection<File> filterTestsMatchingPattern(File projectDir, List<String> patterns) {
         WildcardFileFilter wildcardFileFilter = new WildcardFileFilter(patterns);

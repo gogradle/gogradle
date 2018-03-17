@@ -10,7 +10,7 @@ import java.util.List;
  * which confuses many users. Now some packages are excluded by default
  * via {@link com.github.blindpirate.gogradle.GolangRepositoryHandler#addEmptyRepo(String)}
  *
- * @see {@link com.github.blindpirate.gogradle.GolangPluginSetting#ignoredPackages}
+ * @see com.github.blindpirate.gogradle.GolangPluginSetting#ignoredPackages
  */
 public class GloballyIgnoredPackages {
     public static final List<String> PKGS = ImmutableList.of(
