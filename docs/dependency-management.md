@@ -200,4 +200,20 @@ This task will copy all resolved `build` and `test` dependencies into vendor dir
 
 Some well-known 3rd-party packages' source code contains unrecognizable import declarations, which confuses users a lot when Gogradle says, "Cannot recognize package xxx".
 For example, `github.com/golang/mock` contains an import declaration `import "a"`, which prevents Gogradle performing further source code analysis. 
-To resolve this problem, since 0.9, Gogradle excludes some of such packages by default. 
+To resolve this problem, since 0.9, Gogradle excludes [some of such packages](https://github.com/gogradle/gogradle/blob/master/src/main/java/com/github/blindpirate/gogradle/core/pack/GloballyIgnoredPackages.java) by default. 
+
+To add some packages which should be excluded, add the following snippet to `build.gradle`
+
+```
+golang {
+    ignorePackage('package1', 'package2')
+}
+```
+
+If it happens that you don't want these packages to be excluded, try the following configuration:
+
+```
+golang {
+    ignoredPackages = []
+}
+``` 

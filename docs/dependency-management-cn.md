@@ -210,3 +210,24 @@ gradlew lock
 
 生成依赖锁定文件。
 
+## 全局排除的包
+
+一些广泛使用的包中的import声明包含无法识别的包声明，这样会导致Gogradle报错"Cannot recognize package xxx"，从而使用户感到迷惑。
+例如，`github.com/golang/mock`包含声明`import "a"`，这会阻碍Gogradle进行进一步的代码分析。
+为解决此问题，从0.9开始，Gogradle默认排除了[一些这样的包](https://github.com/gogradle/gogradle/blob/master/src/main/java/com/github/blindpirate/gogradle/core/pack/GloballyIgnoredPackages.java)。
+
+欲增加默认排除的包，在`build.gradle`中加入：
+
+```
+golang {
+    ignorePackage('package1', 'package2')
+}
+```
+
+如果你碰巧需要被排除的包，使用下列配置：
+
+```
+golang {
+    ignoredPackages = []
+}
+``` 
