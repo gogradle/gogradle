@@ -135,7 +135,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     go('build -v github.com/my/project') {
         stdout { stdoutLine ->
-            println stderrLine
+            println stdoutLine
             new File('stdout.txt').append(stdoutLine)
         }
         stderr { stderrLine ->
