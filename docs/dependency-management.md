@@ -36,7 +36,7 @@ dependencies {
         
         test 'github.com/user/project#d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Specify a commit
         test name:'github.com/user/project', commit:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
-        test name:'github.com/user/project', version:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
+        test name:'github.com/user/project', version:'d3fbe10ecf7294331763e5c219bb5aa3a6a86e80' // Equivalent to last line
     }
 }
 ```
@@ -196,3 +196,8 @@ gradlew gV
 
 This task will copy all resolved `build` and `test` dependencies into vendor directory. 
 
+## Global exclude packages
+
+Some well-known 3rd-party packages' source code contains unrecognizable import declarations, which confuses users a lot when Gogradle says, "Cannot recognize package xxx".
+For example, `github.com/golang/mock` contains an import declaration `import "a"`, which prevents Gogradle performing further source code analysis. 
+To resolve this problem, since 0.9, Gogradle excludes some of such packages by default. 
