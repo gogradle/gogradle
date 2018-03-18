@@ -1,4 +1,4 @@
-Gogradle 0.9.0 Release Note
+``Gogradle 0.9.0 Release Note
 
 ## What's new in Gogradle 0.9.0
 
@@ -51,6 +51,15 @@ test {
     environment ENV2: 'VALUE', ENV3: 'VALUE3'
 }
 ```
+
+### Exclude some packages by default
+
+To improve user experience, Gogradle excludes some unrecognizable packages by default since 0.9. See [Global exclude packages](docs/dependency-management.md#global-exclude-packages)
+for more details.
+
+### Support repositories ending with .vcs
+
+Now [repositories ending with `.vcs`](https://golang.org/cmd/go/#hdr-Remote_import_paths) are supported by Gogradle.
 
 ## Potential breaking changes
 
@@ -110,8 +119,9 @@ You can still use this property, but Gogradle will render a deprecation warning 
 
 ## Fixed bugs
 
-- https://github.com/gogradle/gogradle/issues/181
-- https://github.com/gogradle/gogradle/issues/183
+- [Running vet task scans files in vendor directory](https://github.com/gogradle/gogradle/issues/181)
+- [Lock throws NullPointerException](https://github.com/gogradle/gogradle/issues/183)
+- [ResolveDependencies Task Can not get dependencies from transitivity gogradle.lock file](https://github.com/gogradle/gogradle/issues/210)
 
 ## Contributors
 
@@ -123,4 +133,4 @@ You can still use this property, but Gogradle will render a deprecation warning 
 
 ## Contribute
 
-Please don't hesitate to report bugs or request features. All kinds of contributions are always welcomed.
+Please don't hesitate to report bugs or request features. Any contributions are always welcomed.
