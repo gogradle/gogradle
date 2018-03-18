@@ -69,16 +69,21 @@ func main() {
         IOUtils.write(resource, 'sub/main.go', goFileWithVetError)
     }
 
+    void vetFailed() {
+        String err = stderr.toString()
+        String out = stdout.toString()
+        assert err.contains('first argument to Println is os.Stderr') ||
+                err.contains('Println does not take io.Writer but has first arg os.Stderr')
+        assert out.contains('vet FAILED')
+    }
+
     @Test
     void 'exception should be thrown if error exists in project root'() {
         writeGoFileWithErrorToProjectRoot()
         try {
-            newBuild {
-                it.forTasks('vet')
-            }
+            newBuild('vet')
         } catch (BuildException e) {
-            assert stderr.toString().contains('first argument to Println is os.Stderr')
-            assert stdout.toString().contains('vet FAILED')
+            vetFailed()
         }
     }
 
@@ -86,12 +91,9 @@ func main() {
     void 'exception should be thrown if error exists in sub package'() {
         writeGoFileWithErrorToSub()
         try {
-            newBuild {
-                it.forTasks('vet')
-            }
+            newBuild('vet')
         } catch (BuildException e) {
-            assert stderr.toString().contains('first argument to Println is os.Stderr')
-            assert stdout.toString().contains('vet FAILED')
+            vetFailed()
         }
     }
 
@@ -103,17 +105,13 @@ vet {
     continueOnFailure = true
 }
 ''')
-        newBuild {
-            it.forTasks('vet')
-        }
+        newBuild('vet')
     }
 
     @Test
     void 'code in vendor should not be vetted'() {
         writeGoFileWithErrorToVendor()
-        newBuild {
-            it.forTasks('vet')
-        }
+        newBuild('vet')
     }
 
     @Override
