@@ -149,7 +149,6 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
 
     @Override
     public String toString() {
-        return
-                "" + originalDependency + " -> " + finalDependency;
+        return "" + originalDependency + " -> " + finalDependency;
     }
 }

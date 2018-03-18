@@ -109,7 +109,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
     dependsOn vendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
     go('build -v github.com/my/project') {
         stdout { stdoutLine ->
-            println stderrLine
+            println stdoutLine
             new File('stdout.txt').append(stdoutLine)
         }
         stderr { stderrLine ->
