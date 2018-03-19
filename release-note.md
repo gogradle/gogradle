@@ -1,6 +1,6 @@
-``Gogradle 0.9.0 Release Note
+# Gogradle 0.9 Release Note
 
-## What's new in Gogradle 0.9.0
+## What's new in Gogradle 0.9
 
 ### Incremental support for `build` task
 
