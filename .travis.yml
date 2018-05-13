@@ -28,6 +28,8 @@ before_script:
   - sudo service riak stop || true
   - sudo service rsync stop || true
   - sudo service x11-common stop || true
+  - git config --global user.email 'bo@gradle.com'
+  - git config --global user.name 'Bo'
 
 before_install:
   - mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
@@ -40,6 +42,9 @@ after_failure:
   - cat /home/travis/gogs/.gogradle/reports/test/packages/*
   - cat /home/travis/gogs/.gogradle/reports/test/classes/*
   - cat /home/travis/gogs/.gogradle/reports/test/index.html
+
+sudo: required
+dist: precise
 
 
 
