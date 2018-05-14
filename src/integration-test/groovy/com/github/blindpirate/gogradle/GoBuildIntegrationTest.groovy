@@ -131,7 +131,7 @@ func main(){
         assert runExecutable(".gogradle/myPackage-1.0-${Os.getHostOs()}-${Arch.getHostArch()}") == 'Hello'
 
         ["myPackage-1.0-darwin-amd64", 'myPackage-1.0-windows-amd64', 'myPackage-1.0-linux-386'].each {
-            assert new File(resource, ".gogradle/${it}").delete()
+            IOUtils.forceDelete(new File(resource, ".gogradle/${it}"))
         }
 
         newBuild('build', '-i')
