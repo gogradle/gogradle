@@ -74,17 +74,16 @@ class GitClientAccessorRemoteTest {
     void 'getting head commit of remote master should succeed if remote repo is force updated'() {
         accessor.clone("http://localhost:${DEFAULT_PORT}/a", clone)
         IOUtils.forceDelete(new File(repo, 'commit1.go'))
+        IOUtils.write(repo, 'commit2.go', '')
         git('add .', repo)
-//        You asked to amend the most recent commit, but doing so would make
-//        it empty. You can repeat your command with --allow-empty, or you can
-//        remove the commit entirely with "git reset HEAD^".
-        git('commit --amend -m amend --allow-empty', repo)
+        git('commit --amend -m amend', repo)
 
         accessor.update(clone)
         String head = accessor.headCommitOfBranch(clone, accessor.getDefaultBranch(clone)).id
         accessor.checkout(clone, head)
 
         assert !new File(clone, 'commit1.go').exists()
+        assert new File(clone, 'commit2.go').exists()
     }
 
     @Test
