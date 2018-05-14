@@ -25,6 +25,7 @@ import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
+import com.github.blindpirate.gogradle.util.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 
 import javax.inject.Inject;
@@ -105,7 +106,7 @@ public class GoBuild extends Go {
             subTask.getInputs().files((Callable<Collection<File>>)
                     () -> GoSourceCodeFilter.filterGoFiles(getProjectDir(), PROJECT_AND_VENDOR_BUILD_FILES));
 
-            subTask.getOutputs().file(new File(getProjectDir(), getOutputLocation()));
+            subTask.getOutputs().file(new File(getProjectDir(), getRenderedOutputLocation(os, arch)));
 
             Map<String, Object> inputProperties = new HashMap<>();
             inputProperties.put("buildTags", (Callable<List<String>>) () -> setting.getBuildTags());
@@ -113,6 +114,13 @@ public class GoBuild extends Go {
             inputProperties.put("environment", getEffectiveEnvironment(os, arch));
             subTask.getInputs().properties(inputProperties);
         }
+    }
+
+    private String getRenderedOutputLocation(Os os, Arch arch) {
+        Map<String, Object> context = new HashMap<>(getEffectiveEnvironment(os, arch));
+        context.put("PROJECT_NAME", getProject().getName());
+        context.put("PROJECT_VERSION", getProject().getVersion());
+        return StringUtils.render(getOutputLocation(), context);
     }
 
     public String getOutputLocation() {

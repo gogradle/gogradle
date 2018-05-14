@@ -110,24 +110,35 @@ func main(){
     @Test
     void 'build should succeed'() {
         appendOnBuildDotGradle('''
-project.version = 1.0
-build {
-    outputLocation = './.gogradle/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
-}
-''')
+            project.version = 1.0
+            build {
+                outputLocation = './.gogradle/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
+            }
+            ''')
         appendOnBuildDotGradle("""
-build {
-    targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
-}
-""")
+            build {
+                targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
+            }
+            """)
 
         newBuild('build')
+
+        assert !buildUpToDate()
 
         ["myPackage-1.0-darwin-amd64", 'myPackage-1.0-windows-amd64', 'myPackage-1.0-linux-386'].each {
             assert new File(resource, ".gogradle/${it}").exists()
         }
-
         assert runExecutable(".gogradle/myPackage-1.0-${Os.getHostOs()}-${Arch.getHostArch()}") == 'Hello'
+
+        ["myPackage-1.0-darwin-amd64", 'myPackage-1.0-windows-amd64', 'myPackage-1.0-linux-386'].each {
+            assert new File(resource, ".gogradle/${it}").delete()
+        }
+
+        newBuild('build', '-i')
+
+        assert !stdout.toString().contains(':buildDarwinAmd64 UP-TO-DATE')
+        assert !stdout.toString().contains(':buildWindowsAmd64 UP-TO-DATE')
+        assert !stdout.toString().contains(':buildLinux386 UP-TO-DATE')
     }
 
     @Test
