@@ -44,7 +44,7 @@ after_failure:
   - cat /home/travis/gogs/.gogradle/reports/test/index.html
 
 sudo: required
-dist: precise
+dist: trusty
 
 
 
