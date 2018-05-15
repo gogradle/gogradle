@@ -131,7 +131,7 @@ func main(){
         assert runExecutable(".gogradle/myPackage-1.0-${Os.getHostOs()}-${Arch.getHostArch()}") == 'Hello'
 
         ["myPackage-1.0-darwin-amd64", 'myPackage-1.0-windows-amd64', 'myPackage-1.0-linux-386'].each {
-            IOUtils.forceDelete(new File(resource, ".gogradle/${it}"))
+            new File(resource, ".gogradle/${it}").delete()
         }
 
         newBuild('build', '-i')
@@ -165,7 +165,11 @@ func main(){
         }
         IOUtils.chmodAddX(exe)
 
-        return processUtils.getResult(processUtils.run(exe.toFile().absolutePath)).stdout
+        String ret = processUtils.getResult(processUtils.run(exe.toFile().absolutePath)).stdout
+        if (Os.getHostOs() == Os.WINDOWS) {
+            exe.renameTo(exe.toString() - '.exe')
+        }
+        return ret
     }
 
     @Test
