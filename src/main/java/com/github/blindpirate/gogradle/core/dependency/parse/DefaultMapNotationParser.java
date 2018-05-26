@@ -28,6 +28,7 @@ import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.core.dependency.UnrecognizedNotationDependency;
 import com.github.blindpirate.gogradle.core.exceptions.DependencyResolutionException;
 import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
@@ -38,6 +39,7 @@ import javax.inject.Singleton;
 import java.util.List;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
 import static com.github.blindpirate.gogradle.util.MapUtils.getString;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URLS_KEY;
 import static com.github.blindpirate.gogradle.vcs.VcsNotationDependency.URL_KEY;
@@ -56,10 +58,10 @@ public class DefaultMapNotationParser implements MapNotationParser {
     @Inject
     public DefaultMapNotationParser(DirMapNotationParser dirMapNotationParser,
                                     VendorMapNotationParser vendorMapNotationParser,
-                                    DefaultPackagePathResolver packagePathResolver) {
+                                    @AllPackagePathResolvers PackagePathResolver packagePathResolver) {
         this.dirMapNotationParser = dirMapNotationParser;
         this.vendorMapNotationParser = vendorMapNotationParser;
-        this.packagePathResolver = packagePathResolver;
+        this.packagePathResolver = (DefaultPackagePathResolver) packagePathResolver;
     }
 
     @Override

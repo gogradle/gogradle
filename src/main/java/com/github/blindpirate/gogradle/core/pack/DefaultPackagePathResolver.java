@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.FactoryUtil;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.google.inject.BindingAnnotation;
@@ -46,8 +47,8 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
     private final List<PackagePathResolver> delegates;
 
     @Inject
-    public DefaultPackagePathResolver(@PackagePathResolvers List<PackagePathResolver> delegates) {
-        this.delegates = delegates;
+    public DefaultPackagePathResolver(PackagePathResolver... delegates) {
+        this.delegates = CollectionUtils.immutableList(delegates);
     }
 
     @Override
@@ -85,6 +86,12 @@ public class DefaultPackagePathResolver implements PackagePathResolver {
     @BindingAnnotation
     @Target({FIELD, PARAMETER, METHOD})
     @Retention(RUNTIME)
-    public @interface PackagePathResolvers {
+    public @interface AllPackagePathResolvers {
+    }
+
+    @BindingAnnotation
+    @Target({FIELD, PARAMETER, METHOD})
+    @Retention(RUNTIME)
+    public @interface OriginalPackagePathResolvers {
     }
 }

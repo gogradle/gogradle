@@ -28,6 +28,8 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.nio.file.Path;
 
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
+
 
 /**
  * A {@link VendorDependencyFactory} is a factory that reads vendor directory and resolves them to
@@ -40,7 +42,7 @@ public class VendorDependencyFactory {
     private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public VendorDependencyFactory(PackagePathResolver packagePathResolver) {
+    public VendorDependencyFactory(@AllPackagePathResolvers PackagePathResolver packagePathResolver) {
         this.packagePathResolver = packagePathResolver;
     }
 

@@ -31,6 +31,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.GogradleGlobal.GOGRADLE_COMPATIBLE_VERSION;
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
 
 
 @Singleton
@@ -40,7 +41,8 @@ public class PersistenceResolvedToDependenciesCache
     private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public PersistenceResolvedToDependenciesCache(Project project, PackagePathResolver packagePathResolver) {
+    public PersistenceResolvedToDependenciesCache(Project project,
+                                                  @AllPackagePathResolvers PackagePathResolver packagePathResolver) {
         super(project, "PersistenceResolvedToDependenciesCache-"
                 + GOGRADLE_COMPATIBLE_VERSION + ".bin");
         this.packagePathResolver = packagePathResolver;

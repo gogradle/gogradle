@@ -38,8 +38,7 @@ public class FirstPassVendorDirectoryVisitor extends SimpleFileVisitor<Path> {
 
     private final Path parentVendor;
 
-    public FirstPassVendorDirectoryVisitor(Path parentVendor,
-                                           PackagePathResolver packagePathResolver) {
+    public FirstPassVendorDirectoryVisitor(Path parentVendor, PackagePathResolver packagePathResolver) {
         this.packagePathResolver = packagePathResolver;
         this.parentVendor = parentVendor;
     }

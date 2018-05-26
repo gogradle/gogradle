@@ -52,7 +52,7 @@ class DefaultPackagePathResolverTest {
 
     @Before
     void setUp() {
-        resolver = new DefaultPackagePathResolver([resolver1, resolver2])
+        resolver = new DefaultPackagePathResolver(resolver1, resolver2)
         when(resolver1.produce(packagePath)).thenReturn(empty())
         when(resolver2.produce(packagePath)).thenReturn(of(packageInfo))
     }
