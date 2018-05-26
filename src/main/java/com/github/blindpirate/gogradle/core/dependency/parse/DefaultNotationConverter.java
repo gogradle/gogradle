@@ -28,12 +28,14 @@ import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.util.Map;
 
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
+
 @Singleton
 public class DefaultNotationConverter implements NotationConverter {
     private final PackagePathResolver packagePathResolver;
 
     @Inject
-    public DefaultNotationConverter(PackagePathResolver packagePathResolver) {
+    public DefaultNotationConverter(@AllPackagePathResolvers PackagePathResolver packagePathResolver) {
         this.packagePathResolver = packagePathResolver;
     }
 

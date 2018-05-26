@@ -61,7 +61,6 @@ import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver
 import com.github.blindpirate.gogradle.core.pack.VcsPackagePathResolver;
 import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
-import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
 import com.github.blindpirate.gogradle.vcs.Bazaar;
@@ -95,6 +94,8 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import static com.github.blindpirate.gogradle.util.CollectionUtils.immutableList;
+
 /**
  * Provides configurations for Guice dependency injection.
  */
@@ -123,7 +124,7 @@ public class GogradleModule extends AbstractModule {
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
         bind(GlobalCacheManager.class).to(DefaultGlobalCacheManager.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
-        bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
+//        bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
@@ -172,7 +173,7 @@ public class GogradleModule extends AbstractModule {
             GlockDependencyFactory glockDependencyFactory,
             GopmDependencyFactory gopmDependencyFactory,
             GpmDependencyFactory gpmDependencyFactory) {
-        return CollectionUtils.immutableList(
+        return immutableList(
                 lockedDependencyManager,
                 depDependencyFactory,
                 godepDependencyFactory,
@@ -186,11 +187,15 @@ public class GogradleModule extends AbstractModule {
 
     }
 
+    /**
+     * PackagePathResolver which supports package substitution.
+     * See https://github.com/gogradle/gogradle/blob/master/docs/repository-management.md
+     */
     @Inject
     @Provides
     @Singleton
-    @DefaultPackagePathResolver.PackagePathResolvers
-    public List<PackagePathResolver> packagePathResolvers(
+    @DefaultPackagePathResolver.AllPackagePathResolvers
+    public PackagePathResolver allPackagePathResolver(
             RepositoryHandlerPathResolver repositoryHandlerPathResolver,
             BitbucketPackagePathResolver bitbucketPackagePathResolver,
             IBMDevOpsPackagePathResolver ibmDevOpsPackagePathResolver,
@@ -199,7 +204,7 @@ public class GogradleModule extends AbstractModule {
             VcsPackagePathResolver vcsPackagePathResolver,
             MetadataPackagePathResolver metadataPackagePathResolver,
             UnrecognizedPackagePathResolver unrecognizedPackagePathResolver) {
-        return CollectionUtils.immutableList(
+        return new DefaultPackagePathResolver(
                 repositoryHandlerPathResolver,
                 standardPackagePathResolver,
                 new GithubGitlabPackagePathResolver("github.com"),
@@ -213,5 +218,32 @@ public class GogradleModule extends AbstractModule {
         );
     }
 
-
+    /**
+     * PackagePathResolver which doesn't support package substitution.
+     * E.g. only produces "original" packages (specified by https://golang.org/cmd/go/#hdr-Remote_import_paths).
+     */
+    @Inject
+    @Provides
+    @Singleton
+    @DefaultPackagePathResolver.OriginalPackagePathResolvers
+    public PackagePathResolver originalPackagePathResolver(
+            BitbucketPackagePathResolver bitbucketPackagePathResolver,
+            IBMDevOpsPackagePathResolver ibmDevOpsPackagePathResolver,
+            StandardPackagePathResolver standardPackagePathResolver,
+            GlobalCachePackagePathResolver globalCachePackagePathResolver,
+            VcsPackagePathResolver vcsPackagePathResolver,
+            MetadataPackagePathResolver metadataPackagePathResolver,
+            UnrecognizedPackagePathResolver unrecognizedPackagePathResolver) {
+        return new DefaultPackagePathResolver(
+                standardPackagePathResolver,
+                new GithubGitlabPackagePathResolver("github.com"),
+                new GithubGitlabPackagePathResolver("gitlab.com"),
+                bitbucketPackagePathResolver,
+                ibmDevOpsPackagePathResolver,
+                globalCachePackagePathResolver,
+                vcsPackagePathResolver,
+                metadataPackagePathResolver,
+                unrecognizedPackagePathResolver
+        );
+    }
 }

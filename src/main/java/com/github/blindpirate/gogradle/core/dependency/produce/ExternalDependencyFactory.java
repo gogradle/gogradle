@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
 import static com.github.blindpirate.gogradle.util.DependencySetUtils.parseMany;
 import static com.github.blindpirate.gogradle.util.StringUtils.pathStartsWith;
 import static com.google.common.collect.ImmutableMap.of;
@@ -48,6 +49,7 @@ public abstract class ExternalDependencyFactory {
     protected MapNotationParser mapNotationParser;
 
     @Inject
+    @AllPackagePathResolvers
     protected PackagePathResolver packagePathResolver;
 
     @Inject
