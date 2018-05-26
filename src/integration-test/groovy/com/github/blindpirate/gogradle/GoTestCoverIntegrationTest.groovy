@@ -22,12 +22,9 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.go.GoCoverTest
 import com.github.blindpirate.gogradle.util.IOUtils
-import com.github.blindpirate.gogradle.util.ProcessUtils
 import com.github.blindpirate.gogradle.util.StringUtils
 import org.apache.commons.exec.CommandLine
 import org.apache.commons.exec.DefaultExecutor
-import org.apache.commons.exec.ExecuteException
-import org.apache.commons.exec.ExecuteResultHandler
 import org.apache.commons.exec.PumpStreamHandler
 import org.gradle.tooling.BuildException
 import org.jsoup.Jsoup
