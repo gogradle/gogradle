@@ -135,7 +135,7 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
         try {
             return super.clone();
         } catch (CloneNotSupportedException e) {
-            return null;
+            throw new RuntimeException(e);
         }
     }
 
