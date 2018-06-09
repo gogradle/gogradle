@@ -256,8 +256,8 @@ Resolution stack is:
         }
 
         @Override
-        ResolvedDependency retrieve(String name) {
-            return registeredDependencies[name]
+        Optional<ResolvedDependency> retrieve(String name) {
+            return Optional.ofNullable(registeredDependencies[name])
         }
     }
 

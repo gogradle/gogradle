@@ -17,66 +17,158 @@
 
 package com.github.blindpirate.gogradle.core.dependency;
 
-import java.nio.file.Path;
-import java.nio.file.Paths;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import com.github.blindpirate.gogradle.util.Assert;
+
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Map;
-
-import static com.github.blindpirate.gogradle.util.StringUtils.isPrefix;
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import java.util.Optional;
+import java.util.PriorityQueue;
 
 public class DefaultDependencyRegistry implements DependencyRegistry {
+    private final PackagePathResolver packagePathResolver;
+    private Map<String, PackagesInAllVersions> packages = new HashMap<>();
 
-    private Map<String, ResolvedDependency> packages = new HashMap<>();
+    public DefaultDependencyRegistry(PackagePathResolver packagePathResolver) {
+        this.packagePathResolver = packagePathResolver;
+    }
 
     @Override
-    public boolean register(ResolvedDependency dependencyToResolve) {
-        synchronized (packages) {
-            ResolvedDependency existent = retrieve(dependencyToResolve.getName());
-            if (existent == null) {
-                return registerSucceed(dependencyToResolve);
-            } else if (isPrefix(existent.getName(), dependencyToResolve.getName())) {
-                throw new IllegalStateException("Package " + existent.getName()
-                        + " conflict with " + dependencyToResolve.getName());
-            } else if (theyAreAllFirstLevel(existent, dependencyToResolve)) {
-                throw new IllegalStateException("First-level package " + dependencyToResolve.getName()
+    public synchronized boolean register(ResolvedDependency dependencyToResolve) {
+        PackagesInAllVersions allVersions = getAllVersions(dependencyToResolve.getName());
+
+        if (allVersions.isEmpty()) {
+            allVersions.add(dependencyToResolve);
+            return true;
+        }
+
+        PackageWithReferenceCount head = allVersions.head();
+        int compareResult = PackageComparator.INSTANCE.compare(dependencyToResolve, head.pkg);
+        if (currentDependencyEqualsLatestOne(compareResult)) {
+            head.referenceCount++;
+            return false;
+        } else if (currentDependencyShouldReplaceExistedOnes(compareResult)) {
+            allVersions.decreaseAllVersionsReferenceCount();
+            allVersions.add(dependencyToResolve);
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    @Override
+    public synchronized Optional<ResolvedDependency> retrieve(String name) {
+        return Optional.ofNullable(getAllVersions(name).head()).map(PackageWithReferenceCount::getPkg);
+    }
+
+    private class PackagesInAllVersions {
+        private PriorityQueue<PackageWithReferenceCount> allVersions
+                = new PriorityQueue<>(PackageWithReferenceCount.COMPARATOR);
+
+        private void add(ResolvedDependency pkg) {
+            allVersions.add(new PackageWithReferenceCount(pkg));
+        }
+
+        private PackageWithReferenceCount find(ResolvedDependency resolvedDependency) {
+            return allVersions
+                    .stream()
+                    .filter(pkgWithRC -> pkgWithRC.pkg.equals(resolvedDependency))
+                    .findFirst()
+                    .get();
+        }
+
+        private void decreaseReferenceCount(PackageWithReferenceCount head) {
+            head.referenceCount--;
+            if (head.referenceCount == 0) {
+                allVersions.remove(head);
+            }
+        }
+
+        private PackageWithReferenceCount head() {
+            return allVersions.isEmpty() ? null : allVersions.peek();
+        }
+
+        private boolean isEmpty() {
+            return allVersions.isEmpty();
+        }
+
+        private void decreaseAllVersionsReferenceCount() {
+            allVersions.forEach(this::decreaseAllDescendantsReferenceCount);
+        }
+
+        private void decreaseAllDescendantsReferenceCount(PackageWithReferenceCount head) {
+            getAllVersions(head.pkg.getName()).decreaseReferenceCount(head);
+            head.pkg.getDependencies().forEach(pkg -> {
+                PackageWithReferenceCount target = locate(pkg);
+                if (target != null) {
+                    decreaseAllDescendantsReferenceCount(target);
+                }
+            });
+        }
+    }
+
+    private static class PackageWithReferenceCount {
+        private static Comparator<PackageWithReferenceCount> COMPARATOR =
+                Comparator.comparing(PackageWithReferenceCount::getPkg, PackageComparator.INSTANCE);
+        private ResolvedDependency pkg;
+        private int referenceCount;
+
+        private ResolvedDependency getPkg() {
+            return pkg;
+        }
+
+        private PackageWithReferenceCount(ResolvedDependency pkg) {
+            this.pkg = pkg;
+            this.referenceCount = 1;
+        }
+    }
+
+    private enum PackageComparator implements Comparator<ResolvedDependency> {
+        INSTANCE;
+
+        @Override
+        public int compare(ResolvedDependency pkg1, ResolvedDependency pkg2) {
+            Assert.isTrue(pkg1.getName().equals(pkg2.getName()));
+            if (pkg1.isFirstLevel() && pkg2.isFirstLevel()) {
+                throw new IllegalStateException("First-level package " + pkg1.getName()
                         + " conflict!");
-            } else if (existent.isFirstLevel()) {
-                return false;
-            } else if (dependencyToResolve.isFirstLevel()) {
-                return registerSucceed(dependencyToResolve);
-            } else if (existentDependencyIsOutOfDate(existent, dependencyToResolve)) {
-                return registerSucceed(dependencyToResolve);
+            } else if (pkg1.isFirstLevel() && !pkg2.isFirstLevel()) {
+                return -1;
+            } else if (pkg2.isFirstLevel() && !pkg1.isFirstLevel()) {
+                return 1;
             } else {
-                return false;
+                return Long.compare(pkg2.getUpdateTime(), pkg1.getUpdateTime());
             }
         }
     }
 
-    private boolean registerSucceed(ResolvedDependency resolvedDependency) {
-        packages.put(resolvedDependency.getName(), resolvedDependency);
-        return true;
+    private boolean currentDependencyShouldReplaceExistedOnes(int compareResult) {
+        return compareResult < 0;
     }
 
-    @Override
-    public ResolvedDependency retrieve(String name) {
-        Path path = Paths.get(name);
-        for (int i = path.getNameCount(); i > 0; i--) {
-            Path subpath = path.subpath(0, i);
-            ResolvedDependency ret = packages.get(toUnixString(subpath));
-            if (ret != null) {
-                return ret;
-            }
+    private boolean currentDependencyEqualsLatestOne(int compareResult) {
+        return compareResult == 0;
+    }
+
+    private PackageWithReferenceCount locate(GolangDependency pkg) {
+        if (pkg instanceof AbstractNotationDependency && AbstractNotationDependency.class.cast(pkg).hasBeenResolved()) {
+            ResolvedDependency resolvedDependency = pkg.resolve(null);
+            return getAllVersions(pkg.getName()).find(resolvedDependency);
+        } else if (pkg instanceof ResolvedDependency) {
+            return getAllVersions(pkg.getName()).find(ResolvedDependency.class.cast(pkg));
+        } else {
+            return null;
         }
-        return null;
     }
 
-    private boolean existentDependencyIsOutOfDate(ResolvedDependency existingDependency,
-                                                  ResolvedDependency resolvedDependency) {
-        return existingDependency.getUpdateTime() < resolvedDependency.getUpdateTime();
-    }
-
-    private boolean theyAreAllFirstLevel(ResolvedDependency existedModule, ResolvedDependency resolvedDependency) {
-        return existedModule.isFirstLevel() && resolvedDependency.isFirstLevel();
+    private PackagesInAllVersions getAllVersions(String name) {
+        name = packagePathResolver.rootPath(name);
+        PackagesInAllVersions allVersions = packages.get(name);
+        if (allVersions == null) {
+            allVersions = new PackagesInAllVersions();
+            packages.put(name, allVersions);
+        }
+        return allVersions;
     }
 }

@@ -44,7 +44,7 @@ public class DependencyTreeFactory {
                                           ResolvedDependency resolvedDependency,
                                           Set<ResolvedDependency> existedDependenciesInTree) {
         ResolvedDependency finalDependency = configuration.getDependencyRegistry()
-                .retrieve(resolvedDependency.getName());
+                .retrieve(resolvedDependency.getName()).get();
 
         boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 

@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.core.dependency.DependencyRegistry;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import groovy.lang.Closure;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.util.ConfigureUtil;
@@ -31,19 +32,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GolangConfiguration {
-
     public static final String BUILD = "build";
     public static final String TEST = "test";
 
     private final String name;
     private final GolangDependencySet dependencies = new GolangDependencySet();
-    private final DependencyRegistry dependencyRegistry = new DefaultDependencyRegistry();
+    private final DependencyRegistry dependencyRegistry;
     private final List<Pair<Object, Closure>> firstLevelDependencies = new ArrayList<>();
     private final NotationParser<Object> notationParser;
 
-    public GolangConfiguration(String name, NotationParser notationParser) {
+    public GolangConfiguration(String name, NotationParser notationParser, PackagePathResolver packagePathResolver) {
         this.name = name;
         this.notationParser = notationParser;
+        this.dependencyRegistry = new DefaultDependencyRegistry(packagePathResolver);
     }
 
     public DependencyRegistry getDependencyRegistry() {

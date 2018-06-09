@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core;
 
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 
 import javax.inject.Inject;
 import javax.inject.Singleton;
@@ -32,9 +33,9 @@ public class GolangConfigurationManager {
     private final Map<String, GolangConfiguration> configurations = new HashMap<>();
 
     @Inject
-    public GolangConfigurationManager(NotationParser notationParser) {
-        configurations.put(BUILD, new GolangConfiguration(BUILD, notationParser));
-        configurations.put(TEST, new GolangConfiguration(TEST, notationParser));
+    public GolangConfigurationManager(NotationParser notationParser, PackagePathResolver packagePathResolver) {
+        configurations.put(BUILD, new GolangConfiguration(BUILD, notationParser, packagePathResolver));
+        configurations.put(TEST, new GolangConfiguration(TEST, notationParser, packagePathResolver));
     }
 
     public GolangConfiguration getByName(String name) {

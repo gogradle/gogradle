@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.core.pack;
 
 import com.github.blindpirate.gogradle.common.Factory;
 import com.github.blindpirate.gogradle.core.GolangPackage;
+import com.github.blindpirate.gogradle.core.ResolvableGolangPackage;
 
 import java.util.Optional;
 
@@ -29,4 +30,9 @@ public interface PackagePathResolver extends Factory<String, GolangPackage> {
 
     @Override
     Optional<GolangPackage> produce(String packagePath);
+
+    default String rootPath(String packagePath) {
+        GolangPackage pkg = produce(packagePath).get();
+        return ResolvableGolangPackage.class.cast(pkg).getRootPathString();
+    }
 }

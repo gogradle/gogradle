@@ -21,7 +21,7 @@ import org.junit.Test
 
 class GolangConfigurationManagerTest {
 
-    GolangConfigurationManager manager = new GolangConfigurationManager()
+    GolangConfigurationManager manager = new GolangConfigurationManager(null, null)
 
     @Test
     void 'getByName should succeed'() {
