@@ -77,7 +77,7 @@ a
         // given
         ResolvedDependency b1 = withNameAndVersion('b', 'version')
         ResolvedDependency b2 = withNameAndVersion('b', 'version')
-        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b2, false)])
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOriginalAndFinal(b1, b2, false)])
         // then
         assert root.output() == '''\
 a
@@ -93,7 +93,7 @@ a
 
         b1.subpackages = ['sub1', 'sub2']
 
-        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b2, false)])
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOriginalAndFinal(b1, b2, false)])
         // then
         assert root.output() == '''\
 a
@@ -108,7 +108,7 @@ a
 
         b1.subpackages = ['sub1', 'sub2']
 
-        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOrignalAndFinal(b1, b1, true)])
+        ReflectionUtils.setField(root, 'children', [DependencyTreeNode.withOriginalAndFinal(b1, b1, true)])
         // then
         assert root.output() == '''\
 a
@@ -154,11 +154,11 @@ a
     DependencyTreeNode node(String originalName, String finalName, boolean star) {
         ResolvedDependency original = DependencyUtils.mockResolvedDependency(originalName)
         ResolvedDependency _final = DependencyUtils.mockResolvedDependency(finalName)
-        return DependencyTreeNode.withOrignalAndFinal(original, _final, star)
+        return DependencyTreeNode.withOriginalAndFinal(original, _final, star)
     }
 
     DependencyTreeNode node(String name) {
         ResolvedDependency dependency = DependencyUtils.mockResolvedDependency(name)
-        return DependencyTreeNode.withOrignalAndFinal(dependency, dependency, false)
+        return DependencyTreeNode.withOriginalAndFinal(dependency, dependency, false)
     }
 }

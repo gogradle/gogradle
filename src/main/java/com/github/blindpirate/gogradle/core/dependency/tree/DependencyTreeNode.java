@@ -45,9 +45,9 @@ public class DependencyTreeNode implements Comparable<DependencyTreeNode>, Seria
         this.star = star;
     }
 
-    public static DependencyTreeNode withOrignalAndFinal(ResolvedDependency original,
-                                                         ResolvedDependency finalResult,
-                                                         boolean star) {
+    public static DependencyTreeNode withOriginalAndFinal(ResolvedDependency original,
+                                                          ResolvedDependency finalResult,
+                                                          boolean star) {
         return new DependencyTreeNode(original, finalResult, star);
     }
 

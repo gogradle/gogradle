@@ -48,7 +48,7 @@ public class DependencyTreeFactory {
 
         boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 
-        DependencyTreeNode node = DependencyTreeNode.withOrignalAndFinal(resolvedDependency,
+        DependencyTreeNode node = DependencyTreeNode.withOriginalAndFinal(resolvedDependency,
                 finalDependency,
                 hasExistedInTree);
 

@@ -136,10 +136,10 @@ class ResolveDependenciesTest extends TaskTest {
 
         d1.dependencies.add(d3)
 
-        DependencyTreeNode root = DependencyTreeNode.withOrignalAndFinal(rootProject, rootProject, false)
-        DependencyTreeNode node1 = DependencyTreeNode.withOrignalAndFinal(d1, d1, false)
-        DependencyTreeNode node2 = DependencyTreeNode.withOrignalAndFinal(d2, d2, false)
-        DependencyTreeNode node3 = DependencyTreeNode.withOrignalAndFinal(d3Resolved, d3Resolved, true)
+        DependencyTreeNode root = DependencyTreeNode.withOriginalAndFinal(rootProject, rootProject, false)
+        DependencyTreeNode node1 = DependencyTreeNode.withOriginalAndFinal(d1, d1, false)
+        DependencyTreeNode node2 = DependencyTreeNode.withOriginalAndFinal(d2, d2, false)
+        DependencyTreeNode node3 = DependencyTreeNode.withOriginalAndFinal(d3Resolved, d3Resolved, true)
         root.addChild(node1)
         root.addChild(node2)
         node1.addChild(node3)
