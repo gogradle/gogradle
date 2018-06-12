@@ -27,7 +27,6 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
-import com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 
 import javax.inject.Inject;
@@ -37,7 +36,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.*;
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
 import static com.github.blindpirate.gogradle.util.StringUtils.isBlank;
 
 /**
