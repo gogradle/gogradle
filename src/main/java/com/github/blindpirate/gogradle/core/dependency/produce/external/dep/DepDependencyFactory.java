@@ -32,6 +32,6 @@ public class DepDependencyFactory extends ExternalDependencyFactory {
 
     @Override
     protected List<Map<String, Object>> adapt(File file) {
-        return GopkgDotLockModel.parse(file);
+        return GopkgDotLockModel.parse(originalPackagePathResolver, file);
     }
 }

@@ -19,6 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.dep
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.dependency.produce.external.AbstractExternalDependencyFactoryTest
+import com.github.blindpirate.gogradle.core.pack.GithubGitlabPackagePathResolver
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
@@ -28,7 +29,7 @@ import org.mockito.InjectMocks
 @RunWith(GogradleRunner)
 class DepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     @InjectMocks
-    DepDependencyFactory depDependencyFactory
+    DepDependencyFactory depDependencyFactory = new DepDependencyFactory(new GithubGitlabPackagePathResolver('github.com'))
 
     @Test
     @WithResource('')
@@ -47,7 +48,9 @@ class DepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
         verifyMapParsed([name       : "github.com/Masterminds/vcs",
                          subpackages: ['...'],
                          commit     : '3084677c2c188840777bff30054f2b553729d329',
-                         tag        : "v1.11.1"])
+                         tag        : "v1.11.1",
+                         vcs        : "git",
+                         urls       : ['https://github.com/Masterminds/vcs.git', 'git@github.com:Masterminds/vcs.git']])
         verifyMapParsed([name       : "github.com/armon/go-radix",
                          branch     : 'master',
                          subpackages: ['...'],
@@ -73,6 +76,7 @@ class DepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
   packages = ["."]
   revision = "3084677c2c188840777bff30054f2b553729d329"
   version = "v1.11.1"
+  source = "github.com/Masterminds/vcs"
 
 [[projects]]
   branch = "master"

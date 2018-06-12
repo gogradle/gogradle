@@ -18,6 +18,10 @@ public enum VcsScheme {
         this.scheme = scheme;
     }
 
+    public String getScheme() {
+        return scheme;
+    }
+
     public String buildUrl(String packagePath) {
         return scheme + packagePath;
     }
