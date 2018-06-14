@@ -112,7 +112,7 @@ class DebugLogMethodInterceptorTest {
         assert argumentsCaptor.allValues[0] == 'doNothing'
         assert argumentsCaptor.allValues[2] == '[42]' // argument
         assert argumentsCaptor.allValues[3] == 'doNothing'
-        assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[5].toDouble() < 20
         assert argumentsCaptor.allValues[6] == null
 
     }
@@ -126,7 +126,7 @@ class DebugLogMethodInterceptorTest {
         assertEnterAndExit()
         assert argumentsCaptor.allValues[0] == 'doProtectedNothing'
         assert argumentsCaptor.allValues[3] == 'doProtectedNothing'
-        assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[5].toDouble() < 20
         assert argumentsCaptor.allValues[6] == null
     }
 
@@ -141,7 +141,7 @@ class DebugLogMethodInterceptorTest {
         assertEnterAndExit()
         assert argumentsCaptor.allValues[0] == 'returnNull'
         assert argumentsCaptor.allValues[3] == 'returnNull'
-        assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[5].toDouble() < 20
         assert argumentsCaptor.allValues[6] == null
     }
 
@@ -155,7 +155,7 @@ class DebugLogMethodInterceptorTest {
         assertEnterAndExit()
         assert argumentsCaptor.allValues[0] == 'returnString'
         assert argumentsCaptor.allValues[3] == 'returnString'
-        assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[5].toDouble() < 20
         assert argumentsCaptor.allValues[6] == result
     }
 
@@ -185,7 +185,7 @@ class DebugLogMethodInterceptorTest {
         assertEnterAndExit()
         assert argumentsCaptor.allValues[0] == 'throwException'
         assert argumentsCaptor.allValues[3] == 'throwException'
-        assert argumentsCaptor.allValues[5].toDouble() < 10
+        assert argumentsCaptor.allValues[5].toDouble() < 20
         assert argumentsCaptor.allValues[6].contains('IllegalStateException')
     }
 

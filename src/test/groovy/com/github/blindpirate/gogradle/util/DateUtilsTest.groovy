@@ -34,7 +34,7 @@ class DateUtilsTest {
     void 'formatting current time should succeed'() {
         String now = DateUtils.formatNow('yyyyMMddHHmmss')
         Date date = Date.parse('yyyyMMddHHmmss', now)
-        assert new Date().getTime() - date.getTime() < 1000
+        assert new Date().getTime() - date.getTime() < 2000
     }
 
     @Test(expected = IllegalStateException)
