@@ -27,13 +27,15 @@ import java.util.Map;
 
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.BUILD;
 import static com.github.blindpirate.gogradle.core.GolangConfiguration.TEST;
+import static com.github.blindpirate.gogradle.core.pack.DefaultPackagePathResolver.AllPackagePathResolvers;
 
 @Singleton
 public class GolangConfigurationManager {
     private final Map<String, GolangConfiguration> configurations = new HashMap<>();
 
     @Inject
-    public GolangConfigurationManager(NotationParser notationParser, PackagePathResolver packagePathResolver) {
+    public GolangConfigurationManager(NotationParser notationParser,
+                                      @AllPackagePathResolvers PackagePathResolver packagePathResolver) {
         configurations.put(BUILD, new GolangConfiguration(BUILD, notationParser, packagePathResolver));
         configurations.put(TEST, new GolangConfiguration(TEST, notationParser, packagePathResolver));
     }

@@ -18,6 +18,8 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import org.gradle.api.logging.Logging;
+import org.slf4j.Logger;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -26,6 +28,7 @@ import java.util.Optional;
 import java.util.PriorityQueue;
 
 public class DefaultDependencyRegistry implements DependencyRegistry {
+    private static final Logger LOGGER = Logging.getLogger(DefaultDependencyRegistry.class);
     private final PackagePathResolver packagePathResolver;
     private final Map<String, PackagesInAllVersions> packages = new HashMap<>();
 
@@ -38,6 +41,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         PackagesInAllVersions allVersions = getAllVersions(dependencyToResolve.getName());
 
         if (allVersions.isEmpty()) {
+            LOGGER.debug("{} doesn't exit in registry, add it.", dependencyToResolve);
             allVersions.add(dependencyToResolve);
             return true;
         }
@@ -45,9 +49,12 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         PackageWithReferenceCount head = allVersions.head();
         int compareResult = PackageComparator.INSTANCE.compare(dependencyToResolve, head.pkg);
         if (currentDependencyEqualsLatestOne(compareResult)) {
+            LOGGER.debug("Same version of {} already exited in registry, increase reference count to {}",
+                    dependencyToResolve, head.referenceCount);
             head.referenceCount++;
             return false;
         } else if (currentDependencyShouldReplaceExistedOnes(compareResult)) {
+            LOGGER.debug("{} is newer, replace the old version {} in registry", dependencyToResolve, head.pkg);
             allVersions.decreaseAllVersionsReferenceCount();
             allVersions.add(dependencyToResolve);
             return true;
@@ -78,6 +85,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
         private void decreaseReferenceCount(PackageWithReferenceCount head) {
             head.referenceCount--;
+            LOGGER.debug("Decrease reference count of {} to {}", head.pkg, head.referenceCount);
             if (head.referenceCount == 0) {
                 allVersions.remove(head);
             }
