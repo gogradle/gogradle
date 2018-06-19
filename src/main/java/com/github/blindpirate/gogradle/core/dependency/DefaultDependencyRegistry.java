@@ -18,7 +18,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.util.Assert;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -28,7 +27,7 @@ import java.util.PriorityQueue;
 
 public class DefaultDependencyRegistry implements DependencyRegistry {
     private final PackagePathResolver packagePathResolver;
-    private Map<String, PackagesInAllVersions> packages = new HashMap<>();
+    private final Map<String, PackagesInAllVersions> packages = new HashMap<>();
 
     public DefaultDependencyRegistry(PackagePathResolver packagePathResolver) {
         this.packagePathResolver = packagePathResolver;
@@ -70,12 +69,11 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
             allVersions.add(new PackageWithReferenceCount(pkg));
         }
 
-        private PackageWithReferenceCount find(ResolvedDependency resolvedDependency) {
+        private Optional<PackageWithReferenceCount> find(ResolvedDependency resolvedDependency) {
             return allVersions
                     .stream()
                     .filter(pkgWithRC -> pkgWithRC.pkg.equals(resolvedDependency))
-                    .findFirst()
-                    .get();
+                    .findFirst();
         }
 
         private void decreaseReferenceCount(PackageWithReferenceCount head) {
@@ -99,19 +97,17 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
         private void decreaseAllDescendantsReferenceCount(PackageWithReferenceCount head) {
             getAllVersions(head.pkg.getName()).decreaseReferenceCount(head);
-            head.pkg.getDependencies().forEach(pkg -> {
-                PackageWithReferenceCount target = locate(pkg);
-                if (target != null) {
-                    decreaseAllDescendantsReferenceCount(target);
-                }
-            });
+            head.pkg.getDependencies().stream().map(DefaultDependencyRegistry.this::locate)
+                    .filter(Optional::isPresent)
+                    .map(Optional::get)
+                    .forEach(this::decreaseAllDescendantsReferenceCount);
         }
     }
 
     private static class PackageWithReferenceCount {
-        private static Comparator<PackageWithReferenceCount> COMPARATOR =
+        private static final Comparator<PackageWithReferenceCount> COMPARATOR =
                 Comparator.comparing(PackageWithReferenceCount::getPkg, PackageComparator.INSTANCE);
-        private ResolvedDependency pkg;
+        private final ResolvedDependency pkg;
         private int referenceCount;
 
         private ResolvedDependency getPkg() {
@@ -129,7 +125,6 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
         @Override
         public int compare(ResolvedDependency pkg1, ResolvedDependency pkg2) {
-            Assert.isTrue(pkg1.getName().equals(pkg2.getName()));
             if (pkg1.isFirstLevel() && pkg2.isFirstLevel()) {
                 throw new IllegalStateException("First-level package " + pkg1.getName()
                         + " conflict!");
@@ -151,14 +146,14 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         return compareResult == 0;
     }
 
-    private PackageWithReferenceCount locate(GolangDependency pkg) {
+    private Optional<PackageWithReferenceCount> locate(GolangDependency pkg) {
         if (pkg instanceof AbstractNotationDependency && AbstractNotationDependency.class.cast(pkg).hasBeenResolved()) {
             ResolvedDependency resolvedDependency = pkg.resolve(null);
             return getAllVersions(pkg.getName()).find(resolvedDependency);
         } else if (pkg instanceof ResolvedDependency) {
             return getAllVersions(pkg.getName()).find(ResolvedDependency.class.cast(pkg));
         } else {
-            return null;
+            return Optional.empty();
         }
     }
 

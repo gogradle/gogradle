@@ -20,11 +20,9 @@ package com.github.blindpirate.gogradle.util
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.cache.ProjectCacheManager
-import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.AbstractResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
-import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
-import com.github.blindpirate.gogradle.core.dependency.produce.strategy.DependencyProduceStrategy
 import com.github.blindpirate.gogradle.vcs.VcsType
 import com.google.inject.Key
 import org.mockito.invocation.InvocationOnMock
@@ -34,7 +32,6 @@ import java.nio.file.Paths
 import java.util.function.Function
 
 import static com.github.blindpirate.gogradle.core.GolangRepository.newOriginalRepository
-import static com.github.blindpirate.gogradle.core.GolangRepository.newSubstitutedRepository
 import static org.mockito.ArgumentMatchers.any
 import static org.mockito.Mockito.*
 
@@ -63,7 +60,7 @@ class MockUtils {
         when(GogradleGlobal.INSTANCE.getInstance(Key.get(serviceClass, annoClass))).thenReturn(serviceInstance)
     }
 
-    static Object mockMutipleInterfaces(Class... interfaceClasses) {
+    static Object mockMultipleInterfaces(Class... interfaceClasses) {
         Assert.isTrue(interfaceClasses.length > 0)
         if (interfaceClasses.length == 1) {
             return mock(interfaceClasses[0])
@@ -95,20 +92,10 @@ class MockUtils {
                 .build()
     }
 
-    static VcsGolangPackage mockSubstitutedRootVcsPackage() {
-        return VcsGolangPackage.builder()
-                .withPath('github.com/user/package')
-                .withRootPath('github.com/user/package')
-                .withRepository(newSubstitutedRepository(VcsType.GIT, ['git@github.com:user/package.git', 'https://github.com/user/package.git']))
-                .build()
-    }
-
-    static DependencyProduceStrategy mockDependencyProduceStrategy() {
-        return new DependencyProduceStrategy() {
-            @Override
-            GolangDependencySet produce(ResolvedDependency dependency, File rootDir, DependencyVisitor visitor, String configurationName) {
-                return GolangDependencySet.empty()
-            }
-        }
+    static AbstractResolvedDependency mockResolvedDependency(String name, long updateTime = 0L) {
+        AbstractResolvedDependency d = mock(AbstractResolvedDependency)
+        when(d.getName()).thenReturn(name)
+        when(d.getUpdateTime()).thenReturn(updateTime)
+        return d
     }
 }
