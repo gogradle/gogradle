@@ -200,17 +200,13 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
             return doGetMetadata(packagePath);
         } catch (IOException e) {
             return Optional.empty();
-        } catch (OverlappingFileLockException e) {
-            return Optional.empty();
         }
     }
 
     private Optional<GlobalCacheMetadata> doGetMetadata(Path packagePath) throws IOException {
         File lockFile = getMetadataPath(packagePath);
-        FileChannel channel = null;
         FileLock fileLock = null;
-        try {
-            channel = new RandomAccessFile(lockFile, "r").getChannel();
+        try (FileChannel channel = new RandomAccessFile(lockFile, "r").getChannel()) {
             // Here we must use tryLock to avoid dead-lock
             fileLock = channel.tryLock(0L, Long.MAX_VALUE, true);
             if (fileLock == null) {
@@ -218,14 +214,11 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
             } else {
                 return getMetadataFromFile(channel);
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | OverlappingFileLockException e) {
             return Optional.empty();
         } finally {
             if (fileLock != null) {
                 fileLock.release();
-            }
-            if (channel != null) {
-                channel.close();
             }
         }
     }
