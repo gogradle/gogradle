@@ -205,8 +205,10 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
 
     private Optional<GlobalCacheMetadata> doGetMetadata(Path packagePath) throws IOException {
         File lockFile = getMetadataPath(packagePath);
+        FileChannel channel = null;
         FileLock fileLock = null;
-        try (FileChannel channel = new RandomAccessFile(lockFile, "r").getChannel()) {
+        try {
+            channel = new RandomAccessFile(lockFile, "r").getChannel();
             // Here we must use tryLock to avoid dead-lock
             fileLock = channel.tryLock(0L, Long.MAX_VALUE, true);
             if (fileLock == null) {
@@ -219,6 +221,9 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         } finally {
             if (fileLock != null) {
                 fileLock.release();
+            }
+            if (channel != null) {
+                channel.close();
             }
         }
     }

@@ -87,8 +87,8 @@ Nothing to see here;
 
         // then
         verify(0, getRequestedFor(anyUrl()))
-        assert new File(userhome, "go/repo/localhost:${port}/a/1a2b3c4d/commit1.go")
-        assert new File(projectRoot, "vendor/localhost:${port}/a/commit1.go")
+        assert new File(userhome, "go/repo/localhost:${port}/a/1a2b3c4d/commit1.go").exists()
+        assert new File(projectRoot, "vendor/localhost:${port}/a/commit1.go").exists()
     }
 
     @Test
