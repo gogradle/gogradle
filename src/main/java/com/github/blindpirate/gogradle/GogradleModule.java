@@ -124,7 +124,6 @@ public class GogradleModule extends AbstractModule {
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
         bind(GlobalCacheManager.class).to(DefaultGlobalCacheManager.class);
         bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
-//        bind(PackagePathResolver.class).to(DefaultPackagePathResolver.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
@@ -187,7 +186,7 @@ public class GogradleModule extends AbstractModule {
 
     }
 
-    /**
+    /*
      * PackagePathResolver which supports package substitution.
      * See https://github.com/gogradle/gogradle/blob/master/docs/repository-management.md
      */
@@ -218,7 +217,7 @@ public class GogradleModule extends AbstractModule {
         );
     }
 
-    /**
+    /*
      * PackagePathResolver which doesn't support package substitution.
      * E.g. only produces "original" packages (specified by https://golang.org/cmd/go/#hdr-Remote_import_paths).
      */
