@@ -1,6 +1,5 @@
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -31,11 +30,9 @@ import org.gradle.testkit.runner.GradleRunner
 class CrossVersionSmokeTest : IntegrationTestSupport() {
     companion object {
         @JvmField
-        public val VERSIONS = listOf(
-//                 "3.5.1",
-//                "4.0.1",
-//                "4.1",
-                "4.2.1", "4.3.1",
+        val VERSIONS = listOf(
+                "3.5.1",
+                "4.0.1", "4.1", "4.2.1", "4.3.1",
                 "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1")
     }
 
@@ -50,7 +47,7 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
         VERSIONS.forEach {
             GradleRunner.create()
                     .withProjectDir(resource)
-                    .withArguments("cover", "test", "--info")
+                    .withArguments("cover", "test", "--info", "--no-daemon")
                     .withGradleVersion(it)
                     .forwardOutput()
                     .build()
