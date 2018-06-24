@@ -23,9 +23,9 @@ import org.gradle.api.Project;
 
 public enum GogradleGlobal {
     INSTANCE;
-
+    CrossVersionSmokeTest
     public static final String GOGRADLE_VERSION = "0.9.2";
-    public static final String GOGRADLE_COMPATIBLE_VERSION = "0.8";
+    public static final String GOGRADLE_COMPATIBLE_VERSION = "0.10";
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final String GOGRADLE_BUILD_DIR_NAME = ".gogradle";
     public static final int MAX_DFS_DEPTH = 100;
