@@ -166,7 +166,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
     }
 
     private PackagesInAllVersions getAllVersions(String name) {
-        name = packagePathResolver.rootPath(name);
+        name = packagePathResolver.produce(name).get().getRootPathString();
         PackagesInAllVersions allVersions = packages.get(name);
         if (allVersions == null) {
             allVersions = new PackagesInAllVersions();

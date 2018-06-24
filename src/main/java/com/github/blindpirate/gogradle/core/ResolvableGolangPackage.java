@@ -31,10 +31,12 @@ public abstract class ResolvableGolangPackage extends GolangPackage {
         this.rootPathString = StringUtils.toUnixString(rootPath);
     }
 
+    @Override
     public String getRootPathString() {
         return rootPathString;
     }
 
+    @Override
     public Path getRootPath() {
         return Paths.get(rootPathString);
     }

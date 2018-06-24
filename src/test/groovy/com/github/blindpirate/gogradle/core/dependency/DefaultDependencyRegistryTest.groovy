@@ -18,14 +18,20 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.GolangRepository
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
 import com.github.blindpirate.gogradle.util.MockUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
+
+import javax.swing.text.html.Option
 
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock
@@ -53,10 +59,16 @@ class DefaultDependencyRegistryTest {
         when(resolvedDependency2.getDependencies()).thenReturn(GolangDependencySet.empty())
         when(resolvedDependency1.isFirstLevel()).thenReturn(false)
         when(resolvedDependency2.isFirstLevel()).thenReturn(false)
-        when(packagePathResolver.rootPath(anyString())).thenAnswer(new Answer<Object>() {
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
             @Override
             Object answer(InvocationOnMock invocation) throws Throwable {
-                return invocation.arguments[0]
+                String path = invocation.arguments[0]
+                return Optional.of(VcsGolangPackage
+                        .builder()
+                        .withPath(path)
+                        .withRootPath(path)
+                        .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, 'url'))
+                        .build())
             }
         })
     }
@@ -68,7 +80,17 @@ class DefaultDependencyRegistryTest {
 
     @Test
     void "a dependency's root should not be put"() {
-        when(packagePathResolver.rootPath(anyString())).thenReturn('resolvedDependency')
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return Optional.of(VcsGolangPackage
+                        .builder()
+                        .withPath('resolvedDependency')
+                        .withRootPath('resolvedDependency')
+                        .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, 'url'))
+                        .build())
+            }
+        })
         when(resolvedDependency2.getName()).thenReturn('resolvedDependency/sub')
 
         registry.register(resolvedDependency1)
