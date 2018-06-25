@@ -43,23 +43,27 @@ public class DependencyTreeFactory {
     private DependencyTreeNode getSubTree(GolangConfiguration configuration,
                                           ResolvedDependency resolvedDependency,
                                           Set<ResolvedDependency> existedDependenciesInTree) {
-        ResolvedDependency finalDependency = configuration.getDependencyRegistry()
-                .retrieve(resolvedDependency.getName()).get();
+        try {
+            ResolvedDependency finalDependency = configuration.getDependencyRegistry()
+                    .retrieve(resolvedDependency.getName()).get();
 
-        boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
+            boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 
-        DependencyTreeNode node = DependencyTreeNode.withOriginalAndFinal(resolvedDependency,
-                finalDependency,
-                hasExistedInTree);
+            DependencyTreeNode node = DependencyTreeNode.withOriginalAndFinal(resolvedDependency,
+                    finalDependency,
+                    hasExistedInTree);
 
-        if (!hasExistedInTree) {
-            existedDependenciesInTree.add(finalDependency);
-            for (GolangDependency dependency : finalDependency.getDependencies()) {
-                // 'cause it has been cached in AbstractNotationDependency
-                node.addChild(getSubTree(configuration, dependency.resolve(null), existedDependenciesInTree));
+            if (!hasExistedInTree) {
+                existedDependenciesInTree.add(finalDependency);
+                for (GolangDependency dependency : finalDependency.getDependencies()) {
+                    // 'cause it has been cached in AbstractNotationDependency
+                    node.addChild(getSubTree(configuration, dependency.resolve(null), existedDependenciesInTree));
+                }
             }
+            return node;
+        } catch (Exception e) {
+            throw new RuntimeException(e);
         }
-        return node;
     }
 
     private void resolve(ResolvedDependency rootProject, ResolveContext context) {

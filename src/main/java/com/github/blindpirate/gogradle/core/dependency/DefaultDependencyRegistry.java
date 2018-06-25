@@ -21,16 +21,20 @@ import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
 
+import static java.util.Comparator.comparing;
+
 public class DefaultDependencyRegistry implements DependencyRegistry {
     private static final Logger LOGGER = Logging.getLogger(DefaultDependencyRegistry.class);
     private final PackagePathResolver packagePathResolver;
-    private final Map<String, PackagesInAllVersions> packages = new HashMap<>();
+    private final Map<String, SameResolvedDependencyInAllVersions> packages = new HashMap<>();
 
     public DefaultDependencyRegistry(PackagePathResolver packagePathResolver) {
         this.packagePathResolver = packagePathResolver;
@@ -38,7 +42,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
     @Override
     public synchronized boolean register(ResolvedDependency dependencyToResolve) {
-        PackagesInAllVersions allVersions = getAllVersions(dependencyToResolve.getName());
+        SameResolvedDependencyInAllVersions allVersions = getAllVersions(dependencyToResolve.getName());
 
         if (allVersions.isEmpty()) {
             LOGGER.debug("{} doesn't exit in registry, add it.", dependencyToResolve);
@@ -46,15 +50,16 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
             return true;
         }
 
-        PackageWithReferenceCount head = allVersions.head();
-        int compareResult = PackageComparator.INSTANCE.compare(dependencyToResolve, head.pkg);
+        ResolvedDependencyWithReferenceCount head = allVersions.head();
+        int compareResult = PackageComparator.INSTANCE.compare(dependencyToResolve, head.resolvedDependency);
         if (currentDependencyEqualsLatestOne(compareResult)) {
             LOGGER.debug("Same version of {} already exited in registry, increase reference count to {}",
                     dependencyToResolve, head.referenceCount);
             head.referenceCount++;
             return false;
         } else if (currentDependencyShouldReplaceExistedOnes(compareResult)) {
-            LOGGER.debug("{} is newer, replace the old version {} in registry", dependencyToResolve, head.pkg);
+            LOGGER.debug("{} is newer, replace the old version {} in registry",
+                    dependencyToResolve, head.resolvedDependency);
             allVersions.decreaseAllVersionsReferenceCount();
             allVersions.add(dependencyToResolve);
             return true;
@@ -65,33 +70,38 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
 
     @Override
     public synchronized Optional<ResolvedDependency> retrieve(String name) {
-        return Optional.ofNullable(getAllVersions(name).head()).map(PackageWithReferenceCount::getPkg);
+        return Optional.ofNullable(getAllVersions(name).head())
+                .map(ResolvedDependencyWithReferenceCount::getResolvedDependency);
     }
 
-    private class PackagesInAllVersions {
-        private PriorityQueue<PackageWithReferenceCount> allVersions
-                = new PriorityQueue<>(PackageWithReferenceCount.COMPARATOR);
+    private class SameResolvedDependencyInAllVersions {
+        private PriorityQueue<ResolvedDependencyWithReferenceCount> allVersions
+                = new PriorityQueue<>(ResolvedDependencyWithReferenceCount.COMPARATOR);
 
         private void add(ResolvedDependency pkg) {
-            allVersions.add(new PackageWithReferenceCount(pkg));
+            allVersions.add(new ResolvedDependencyWithReferenceCount(pkg));
         }
 
-        private Optional<PackageWithReferenceCount> find(ResolvedDependency resolvedDependency) {
+        private Optional<ResolvedDependencyWithReferenceCount> find(ResolvedDependency resolvedDependency) {
             return allVersions
                     .stream()
-                    .filter(pkgWithRC -> pkgWithRC.pkg.equals(resolvedDependency))
+                    .filter(pkgWithRC -> pkgWithRC.resolvedDependency.equals(resolvedDependency))
                     .findFirst();
         }
 
-        private void decreaseReferenceCount(PackageWithReferenceCount head) {
-            head.referenceCount--;
-            LOGGER.debug("Decrease reference count of {} to {}", head.pkg, head.referenceCount);
-            if (head.referenceCount == 0) {
-                allVersions.remove(head);
+        private void decreaseReferenceCount(ResolvedDependency resolvedDependency) {
+            Optional<ResolvedDependencyWithReferenceCount> optionalTarget = find(resolvedDependency);
+            if (optionalTarget.isPresent()) {
+                ResolvedDependencyWithReferenceCount target = optionalTarget.get();
+                target.referenceCount--;
+                LOGGER.debug("Decrease reference count of {} to {}", target.resolvedDependency, target.referenceCount);
+                if (target.referenceCount == 0) {
+                    allVersions.remove(target);
+                }
             }
         }
 
-        private PackageWithReferenceCount head() {
+        private ResolvedDependencyWithReferenceCount head() {
             return allVersions.isEmpty() ? null : allVersions.peek();
         }
 
@@ -100,30 +110,36 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         }
 
         private void decreaseAllVersionsReferenceCount() {
-            allVersions.forEach(this::decreaseAllDescendantsReferenceCount);
-        }
-
-        private void decreaseAllDescendantsReferenceCount(PackageWithReferenceCount head) {
-            getAllVersions(head.pkg.getName()).decreaseReferenceCount(head);
-            head.pkg.getDependencies().stream().map(DefaultDependencyRegistry.this::locate)
-                    .filter(Optional::isPresent)
-                    .map(Optional::get)
-                    .forEach(this::decreaseAllDescendantsReferenceCount);
+            List<ResolvedDependencyWithReferenceCount> copy = new ArrayList<>(allVersions);
+            copy.stream()
+                    .map(ResolvedDependencyWithReferenceCount::getResolvedDependency)
+                    .forEach(DefaultDependencyRegistry.this::decreaseAllDescendantsReferenceCount);
         }
     }
 
-    private static class PackageWithReferenceCount {
-        private static final Comparator<PackageWithReferenceCount> COMPARATOR =
-                Comparator.comparing(PackageWithReferenceCount::getPkg, PackageComparator.INSTANCE);
-        private final ResolvedDependency pkg;
+    private void decreaseAllDescendantsReferenceCount(ResolvedDependency target) {
+        SameResolvedDependencyInAllVersions allVersions = getAllVersions(target.getName());
+        allVersions.decreaseReferenceCount(target);
+
+        target.getDependencies().stream()
+                .map(DefaultDependencyRegistry.this::toResolvedDependency)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .forEach(this::decreaseAllDescendantsReferenceCount);
+    }
+
+    private static class ResolvedDependencyWithReferenceCount {
+        private static final Comparator<ResolvedDependencyWithReferenceCount> COMPARATOR =
+                comparing(ResolvedDependencyWithReferenceCount::getResolvedDependency, PackageComparator.INSTANCE);
+        private final ResolvedDependency resolvedDependency;
         private int referenceCount;
 
-        private ResolvedDependency getPkg() {
-            return pkg;
+        private ResolvedDependency getResolvedDependency() {
+            return resolvedDependency;
         }
 
-        private PackageWithReferenceCount(ResolvedDependency pkg) {
-            this.pkg = pkg;
+        private ResolvedDependencyWithReferenceCount(ResolvedDependency resolvedDependency) {
+            this.resolvedDependency = resolvedDependency;
             this.referenceCount = 1;
         }
     }
@@ -154,22 +170,22 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         return compareResult == 0;
     }
 
-    private Optional<PackageWithReferenceCount> locate(GolangDependency pkg) {
-        if (pkg instanceof AbstractNotationDependency && AbstractNotationDependency.class.cast(pkg).hasBeenResolved()) {
-            ResolvedDependency resolvedDependency = pkg.resolve(null);
-            return getAllVersions(pkg.getName()).find(resolvedDependency);
-        } else if (pkg instanceof ResolvedDependency) {
-            return getAllVersions(pkg.getName()).find(ResolvedDependency.class.cast(pkg));
+    private Optional<ResolvedDependency> toResolvedDependency(GolangDependency dependency) {
+        if (dependency instanceof AbstractNotationDependency
+                && AbstractNotationDependency.class.cast(dependency).hasBeenResolved()) {
+            return Optional.of(dependency.resolve(null));
+        } else if (dependency instanceof ResolvedDependency) {
+            return Optional.of(ResolvedDependency.class.cast(dependency));
         } else {
             return Optional.empty();
         }
     }
 
-    private PackagesInAllVersions getAllVersions(String name) {
+    private SameResolvedDependencyInAllVersions getAllVersions(String name) {
         name = packagePathResolver.produce(name).get().getRootPathString();
-        PackagesInAllVersions allVersions = packages.get(name);
+        SameResolvedDependencyInAllVersions allVersions = packages.get(name);
         if (allVersions == null) {
-            allVersions = new PackagesInAllVersions();
+            allVersions = new SameResolvedDependencyInAllVersions();
             packages.put(name, allVersions);
         }
         return allVersions;
