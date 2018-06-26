@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
+import com.github.blindpirate.gogradle.util.Assert;
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
@@ -45,7 +46,7 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         SameResolvedDependencyInAllVersions allVersions = getAllVersions(dependencyToResolve.getName());
 
         if (allVersions.isEmpty()) {
-            LOGGER.debug("{} doesn't exit in registry, add it.", dependencyToResolve);
+            LOGGER.warn("{} doesn't exit in registry, add it.", dependencyToResolve);
             allVersions.add(dependencyToResolve);
             return true;
         }
@@ -53,18 +54,20 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         ResolvedDependencyWithReferenceCount head = allVersions.head();
         int compareResult = PackageComparator.INSTANCE.compare(dependencyToResolve, head.resolvedDependency);
         if (currentDependencyEqualsLatestOne(compareResult)) {
-            LOGGER.debug("Same version of {} already exited in registry, increase reference count to {}",
+            LOGGER.warn("Same version of {} already exited in registry, increase reference count to {}",
                     dependencyToResolve, head.referenceCount);
             head.referenceCount++;
             return false;
         } else if (currentDependencyShouldReplaceExistedOnes(compareResult)) {
-            LOGGER.debug("{} is newer, replace the old version {} in registry",
+            LOGGER.warn("{} is newer, replace the old version {} in registry",
                     dependencyToResolve, head.resolvedDependency);
             allVersions.onlyDecreaseDescendantsReferenceCount();
             allVersions.add(dependencyToResolve);
             return true;
         } else {
-            LOGGER.debug("{} is older, do nothing.", dependencyToResolve);
+            LOGGER.warn("{} is older, do nothing.", dependencyToResolve);
+            allVersions.add(dependencyToResolve);
+            Assert.isTrue(allVersions.head() == head);
             return false;
         }
     }
