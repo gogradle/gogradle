@@ -23,9 +23,11 @@ import org.slf4j.Logger;
 
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
+import java.util.stream.Collectors;
 
 import static java.util.Comparator.comparing;
 
@@ -109,9 +111,10 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         }
 
         private void onlyDecreaseDescendantsReferenceCount() {
-            allVersions.stream()
+            List<ResolvedDependency> allVersionDependencies = allVersions.stream()
                     .map(ResolvedDependencyWithReferenceCount::getResolvedDependency)
-                    .forEach(DefaultDependencyRegistry.this::decreaseAllDescendantsReferenceCount);
+                    .collect(Collectors.toList());
+            allVersionDependencies.forEach(DefaultDependencyRegistry.this::decreaseAllDescendantsReferenceCount);
         }
     }
 
