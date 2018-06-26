@@ -143,7 +143,10 @@ golang {
         return connector.connect()
     }
 
-    abstract File getProjectRoot()
+    File getProjectRoot() {
+        assert resource != null: "You should annotate the class with @WithResource !"
+        return resource
+    }
 
     String getGoBinPath() {
         return goBinPath.replace('\\', '/')

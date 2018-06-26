@@ -21,10 +21,8 @@ import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.PriorityQueue;
@@ -60,10 +58,11 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
         } else if (currentDependencyShouldReplaceExistedOnes(compareResult)) {
             LOGGER.debug("{} is newer, replace the old version {} in registry",
                     dependencyToResolve, head.resolvedDependency);
-            allVersions.decreaseAllVersionsReferenceCount();
+            allVersions.onlyDecreaseDescendantsReferenceCount();
             allVersions.add(dependencyToResolve);
             return true;
         } else {
+            LOGGER.debug("{} is older, do nothing.", dependencyToResolve);
             return false;
         }
     }
@@ -109,23 +108,26 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
             return allVersions.isEmpty();
         }
 
-        private void decreaseAllVersionsReferenceCount() {
-            List<ResolvedDependencyWithReferenceCount> copy = new ArrayList<>(allVersions);
-            copy.stream()
+        private void onlyDecreaseDescendantsReferenceCount() {
+            allVersions.stream()
                     .map(ResolvedDependencyWithReferenceCount::getResolvedDependency)
                     .forEach(DefaultDependencyRegistry.this::decreaseAllDescendantsReferenceCount);
         }
     }
 
-    private void decreaseAllDescendantsReferenceCount(ResolvedDependency target) {
+    private void decreaseSelfAndAllDescendantsReferenceCount(ResolvedDependency target) {
         SameResolvedDependencyInAllVersions allVersions = getAllVersions(target.getName());
         allVersions.decreaseReferenceCount(target);
 
+        decreaseAllDescendantsReferenceCount(target);
+    }
+
+    private void decreaseAllDescendantsReferenceCount(ResolvedDependency target) {
         target.getDependencies().stream()
                 .map(DefaultDependencyRegistry.this::toResolvedDependency)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .forEach(this::decreaseAllDescendantsReferenceCount);
+                .forEach(this::decreaseSelfAndAllDescendantsReferenceCount);
     }
 
     private static class ResolvedDependencyWithReferenceCount {
