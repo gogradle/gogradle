@@ -44,7 +44,7 @@ public class GopkgDotLockModel {
         projects.forEach(project -> {
             String source = (String) project.remove("source");
             if (source != null) {
-                if (startWithVcsScheme(source)) {
+                if (startWithVcsScheme(source) || isGitUrl(source)) {
                     project.put("url", source);
                 } else {
                     VcsGolangPackage pkg = (VcsGolangPackage) packagePathResolver.produce(source).get();
@@ -53,6 +53,10 @@ public class GopkgDotLockModel {
                 }
             }
         });
+    }
+
+    private static boolean isGitUrl(String source) {
+        return source.startsWith("git@");
     }
 
     private static boolean startWithVcsScheme(String source) {

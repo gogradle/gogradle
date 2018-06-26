@@ -59,6 +59,10 @@ class DepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
                          branch     : 'master',
                          subpackages: ['context'],
                          commit     : "66aacef3dd8a676686c7ae3716979581e8b03c47"])
+        verifyMapParsed([name       : "gopkg.in/fsnotify.v1",
+                         url        : 'git@github.com:fsnotify/fsnotify',
+                         subpackages: ['...'],
+                         commit     : "629574ca2a5df945712d3079857300b5e4da0236"])
     }
 
     String godepDotLock = '''
@@ -96,5 +100,11 @@ class DepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
   inputs-digest = "05c1cd69be2c917c0cc4b32942830c2acfa044d8200fdc94716aae48a8083702"
   solver-name = "gps-cdcl"
   solver-version = 1
+  
+[[projects]]
+  name = "gopkg.in/fsnotify.v1"
+  packages = ["."]
+  revision = "629574ca2a5df945712d3079857300b5e4da0236"
+  source = "git@github.com:fsnotify/fsnotify"  
 '''
 }
