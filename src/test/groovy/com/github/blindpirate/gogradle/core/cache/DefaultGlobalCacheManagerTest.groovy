@@ -258,6 +258,15 @@ repositories:
         assert !cacheManager.getMetadata(Paths.get('github.com/user/package')).isPresent()
     }
 
+    @Test
+    void 'empty result should be returned if the file is already locked in metadata reading'() {
+        File lockFile = new File(resource, 'go/repo/github.com/user/lock/gogradle-metadata')
+        write(lockFile, getMetadataYaml(System.currentTimeMillis()))
+        FileLock lock = new RandomAccessFile(lockFile.absolutePath, "rw").getChannel().lock()
+        assert !cacheManager.getMetadata(Paths.get('github.com/user/lock')).isPresent()
+        lock.release()
+    }
+
     class LockProcess {
         static void main(String[] args) {
             FileChannel channel = null

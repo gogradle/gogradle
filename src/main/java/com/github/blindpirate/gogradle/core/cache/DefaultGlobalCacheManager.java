@@ -36,6 +36,7 @@ import java.io.UncheckedIOException;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.FileLock;
+import java.nio.channels.OverlappingFileLockException;
 import java.nio.file.Path;
 import java.util.Optional;
 import java.util.concurrent.locks.ReentrantLock;
@@ -215,7 +216,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
             } else {
                 return getMetadataFromFile(channel);
             }
-        } catch (FileNotFoundException e) {
+        } catch (FileNotFoundException | OverlappingFileLockException e) {
             return Optional.empty();
         } finally {
             if (fileLock != null) {
