@@ -18,7 +18,6 @@
 package com.github.blindpirate.gogradle.core.dependency;
 
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
-import com.github.blindpirate.gogradle.util.Assert;
 import org.gradle.api.logging.Logging;
 import org.slf4j.Logger;
 
@@ -45,52 +44,68 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
     public synchronized boolean register(ResolvedDependency dependencyToResolve) {
         SameResolvedDependencyInAllVersions allVersions = getAllVersions(dependencyToResolve.getName());
 
-        if (allVersions.isEmpty()) {
-            LOGGER.warn("{} doesn't exit in registry, add it.", dependencyToResolve);
+        if (allVersions.noValidVersionExists()) {
+            LOGGER.debug("{} doesn't exit in registry, add it.", dependencyToResolve);
             allVersions.add(dependencyToResolve);
             return true;
         }
 
-        ResolvedDependencyWithReferenceCount head = allVersions.head();
+        ResolvedDependencyWithReferenceCount head = allVersions.headOfValidVersions();
         int compareResult = PackageComparator.INSTANCE.compare(dependencyToResolve, head.resolvedDependency);
         if (currentDependencyEqualsLatestOne(compareResult)) {
-            LOGGER.warn("Same version of {} already exited in registry, increase reference count to {}",
+            LOGGER.debug("Same version of {} already exited in registry, increase reference count to {}",
                     dependencyToResolve, head.referenceCount);
             head.referenceCount++;
             return false;
         } else if (currentDependencyShouldReplaceExistedOnes(compareResult)) {
-            LOGGER.warn("{} is newer, replace the old version {} in registry",
+            LOGGER.debug("{} is newer, replace the old version {} in registry",
                     dependencyToResolve, head.resolvedDependency);
             allVersions.onlyDecreaseDescendantsReferenceCount();
             allVersions.add(dependencyToResolve);
             return true;
         } else {
-            LOGGER.warn("{} is older, do nothing.", dependencyToResolve);
-            allVersions.add(dependencyToResolve);
-            Assert.isTrue(allVersions.head() == head);
+            LOGGER.debug("{} is older, do nothing.", dependencyToResolve);
+            allVersions.addEvictedDependency(dependencyToResolve);
             return false;
         }
     }
 
     @Override
     public synchronized Optional<ResolvedDependency> retrieve(String name) {
-        return Optional.ofNullable(getAllVersions(name).head())
-                .map(ResolvedDependencyWithReferenceCount::getResolvedDependency);
+        return getAllVersions(name).retrieve();
     }
 
     private class SameResolvedDependencyInAllVersions {
-        private PriorityQueue<ResolvedDependencyWithReferenceCount> allVersions
+        private PriorityQueue<ResolvedDependencyWithReferenceCount> validVersions
                 = new PriorityQueue<>(ResolvedDependencyWithReferenceCount.COMPARATOR);
+        private PriorityQueue<ResolvedDependency> evictedVersions
+                = new PriorityQueue<>(PackageComparator.INSTANCE);
 
-        private void add(ResolvedDependency pkg) {
-            allVersions.add(new ResolvedDependencyWithReferenceCount(pkg));
+        private void add(ResolvedDependency dependency) {
+            validVersions.add(new ResolvedDependencyWithReferenceCount(dependency));
+            evictedVersions.remove(dependency);
+        }
+
+        private void addEvictedDependency(ResolvedDependency dependency) {
+            if (!evictedVersions.contains(dependency)) {
+                // TODO maybe inefficient
+                evictedVersions.add(dependency);
+            }
         }
 
         private Optional<ResolvedDependencyWithReferenceCount> find(ResolvedDependency resolvedDependency) {
-            return allVersions
+            return validVersions
                     .stream()
                     .filter(pkgWithRC -> pkgWithRC.resolvedDependency.equals(resolvedDependency))
                     .findFirst();
+        }
+
+        private Optional<ResolvedDependency> retrieve() {
+            if (validVersions.isEmpty()) {
+                return evictedVersions.isEmpty() ? Optional.empty() : Optional.of(evictedVersions.peek());
+            } else {
+                return Optional.of(validVersions.peek().resolvedDependency);
+            }
         }
 
         private void decreaseReferenceCount(ResolvedDependency resolvedDependency) {
@@ -100,24 +115,25 @@ public class DefaultDependencyRegistry implements DependencyRegistry {
                 target.referenceCount--;
                 LOGGER.debug("Decrease reference count of {} to {}", target.resolvedDependency, target.referenceCount);
                 if (target.referenceCount == 0) {
-                    allVersions.remove(target);
+                    validVersions.remove(target);
+                    addEvictedDependency(target.resolvedDependency);
                 }
             }
         }
 
-        private ResolvedDependencyWithReferenceCount head() {
-            return allVersions.isEmpty() ? null : allVersions.peek();
-        }
-
-        private boolean isEmpty() {
-            return allVersions.isEmpty();
+        private boolean noValidVersionExists() {
+            return validVersions.isEmpty();
         }
 
         private void onlyDecreaseDescendantsReferenceCount() {
-            List<ResolvedDependency> allVersionDependencies = allVersions.stream()
+            List<ResolvedDependency> allVersionDependencies = validVersions.stream()
                     .map(ResolvedDependencyWithReferenceCount::getResolvedDependency)
                     .collect(Collectors.toList());
             allVersionDependencies.forEach(DefaultDependencyRegistry.this::decreaseAllDescendantsReferenceCount);
+        }
+
+        private ResolvedDependencyWithReferenceCount headOfValidVersions() {
+            return validVersions.peek();
         }
     }
 
