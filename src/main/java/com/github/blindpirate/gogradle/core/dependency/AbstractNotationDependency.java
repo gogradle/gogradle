@@ -57,6 +57,10 @@ public abstract class AbstractNotationDependency extends AbstractGolangDependenc
         return resolvedDependency;
     }
 
+    public boolean hasBeenResolved() {
+        return resolvedDependency != null;
+    }
+
     protected abstract ResolvedDependency doResolve(ResolveContext context);
 
     public void exclude(Map<String, Object> map) {

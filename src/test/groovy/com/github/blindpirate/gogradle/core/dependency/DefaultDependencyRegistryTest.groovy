@@ -18,11 +18,23 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
+import com.github.blindpirate.gogradle.core.GolangPackage
+import com.github.blindpirate.gogradle.core.GolangRepository
+import com.github.blindpirate.gogradle.core.VcsGolangPackage
+import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
+import com.github.blindpirate.gogradle.util.MockUtils
+import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
+import org.mockito.invocation.InvocationOnMock
+import org.mockito.stubbing.Answer
 
+import javax.swing.text.html.Option
+
+import static org.mockito.ArgumentMatchers.anyString
+import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -33,15 +45,32 @@ class DefaultDependencyRegistryTest {
     AbstractResolvedDependency resolvedDependency1
     @Mock
     AbstractResolvedDependency resolvedDependency2
+    @Mock
+    PackagePathResolver packagePathResolver
 
-    DefaultDependencyRegistry registry = new DefaultDependencyRegistry()
+    DefaultDependencyRegistry registry
 
     @Before
     void setUp() {
+        registry = new DefaultDependencyRegistry(packagePathResolver)
         when(resolvedDependency1.getName()).thenReturn("resolvedDependency")
         when(resolvedDependency2.getName()).thenReturn("resolvedDependency")
+        when(resolvedDependency1.getDependencies()).thenReturn(GolangDependencySet.empty())
+        when(resolvedDependency2.getDependencies()).thenReturn(GolangDependencySet.empty())
         when(resolvedDependency1.isFirstLevel()).thenReturn(false)
         when(resolvedDependency2.isFirstLevel()).thenReturn(false)
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                String path = invocation.arguments[0]
+                return Optional.of(VcsGolangPackage
+                        .builder()
+                        .withPath(path)
+                        .withRootPath(path)
+                        .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, 'url'))
+                        .build())
+            }
+        })
     }
 
     @Test
@@ -49,11 +78,24 @@ class DefaultDependencyRegistryTest {
         assert registry.register(resolvedDependency1)
     }
 
-    @Test(expected = IllegalStateException)
-    void 'a dependency should not be put if its prefix exists'() {
-        registry.register(resolvedDependency1)
+    @Test
+    void "a dependency's root should not be put"() {
+        when(packagePathResolver.produce(anyString())).thenAnswer(new Answer<Object>() {
+            @Override
+            Object answer(InvocationOnMock invocation) throws Throwable {
+                return Optional.of(VcsGolangPackage
+                        .builder()
+                        .withPath('resolvedDependency')
+                        .withRootPath('resolvedDependency')
+                        .withRepository(GolangRepository.newOriginalRepository(VcsType.GIT, 'url'))
+                        .build())
+            }
+        })
         when(resolvedDependency2.getName()).thenReturn('resolvedDependency/sub')
+
+        registry.register(resolvedDependency1)
         registry.register(resolvedDependency2)
+        assert registry.packages.size() == 1
     }
 
     @Test
@@ -113,11 +155,48 @@ class DefaultDependencyRegistryTest {
     }
 
     @Test
-    void 'retriving should succeed'() {
+    void 'retrieving should succeed'() {
         // when
         registry.register(resolvedDependency1)
         // then
-        assert registry.retrieve('resolvedDependency').is(resolvedDependency1)
+        assert registry.retrieve('resolvedDependency').get().is(resolvedDependency1)
     }
 
+    // https://github.com/gogradle/gogradle/issues/207
+    @Test
+    void "replaced dependency's descendants should be removed"() {
+        // given
+        AbstractResolvedDependency root = MockUtils.mockResolvedDependency('root')
+        AbstractResolvedDependency b = MockUtils.mockResolvedDependency('b')
+        AbstractResolvedDependency e1 = MockUtils.mockResolvedDependency('e', 1L)
+        AbstractResolvedDependency e2 = MockUtils.mockResolvedDependency('e', 2L)
+        AbstractResolvedDependency f1 = MockUtils.mockResolvedDependency('f', 1L)
+        AbstractResolvedDependency f2 = MockUtils.mockResolvedDependency('f', 2L)
+
+        bindDependencies(root, b, e1)
+        bindDependencies(b, e2)
+        bindDependencies(e1, f2)
+        bindDependencies(e2, f1)
+        bindDependencies(f1, [] as ResolvedDependency[])
+        bindDependencies(f2, [] as ResolvedDependency[])
+
+        // when
+        assert registry.register(root)
+        assert registry.register(e1)
+        assert registry.register(b)
+        assert registry.register(f2)
+        assert registry.register(e2)
+        assert registry.register(f1)
+
+        // then
+        assert registry.retrieve('root').get().is(root)
+        assert registry.retrieve('b').get().is(b)
+        assert registry.retrieve('e').get().is(e2)
+        assert registry.retrieve('f').get().is(f1)
+    }
+
+    private void bindDependencies(ResolvedDependency parent, ResolvedDependency... children) {
+        GolangDependencySet set = new GolangDependencySet(children as List)
+        when(parent.getDependencies()).thenReturn(set)
+    }
 }

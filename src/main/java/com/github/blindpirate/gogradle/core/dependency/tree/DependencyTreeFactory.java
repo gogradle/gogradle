@@ -22,10 +22,13 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.ResolveContext;
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency;
 import com.github.blindpirate.gogradle.core.exceptions.ResolutionStackWrappingException;
+import org.gradle.api.logging.Logging;
+import org.slf4j.Logger;
 
 import javax.inject.Singleton;
 import java.util.HashSet;
 import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import java.util.Queue;
 import java.util.Set;
 
@@ -35,6 +38,8 @@ import java.util.Set;
  */
 @Singleton
 public class DependencyTreeFactory {
+    private static final Logger LOGGER = Logging.getLogger(DependencyTreeFactory.class);
+
     public DependencyTreeNode getTree(ResolveContext context, ResolvedDependency rootProject) {
         resolve(rootProject, context);
         return getSubTree(context.getConfiguration(), rootProject, new HashSet<>());
@@ -43,8 +48,7 @@ public class DependencyTreeFactory {
     private DependencyTreeNode getSubTree(GolangConfiguration configuration,
                                           ResolvedDependency resolvedDependency,
                                           Set<ResolvedDependency> existedDependenciesInTree) {
-        ResolvedDependency finalDependency = configuration.getDependencyRegistry()
-                .retrieve(resolvedDependency.getName());
+        ResolvedDependency finalDependency = retrieve(configuration, resolvedDependency);
 
         boolean hasExistedInTree = existedDependenciesInTree.contains(finalDependency);
 
@@ -60,6 +64,16 @@ public class DependencyTreeFactory {
             }
         }
         return node;
+    }
+
+    private ResolvedDependency retrieve(GolangConfiguration configuration, ResolvedDependency resolvedDependency) {
+        try {
+            return configuration.getDependencyRegistry().retrieve(resolvedDependency.getName()).get();
+        } catch (NoSuchElementException e) {
+            LOGGER.error("BUG! Error occurred when trying to fetch " + resolvedDependency.getName()
+                    + ", please report it at https://github.com/gogradle/gogradle/issues");
+            throw e;
+        }
     }
 
     private void resolve(ResolvedDependency rootProject, ResolveContext context) {

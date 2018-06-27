@@ -22,7 +22,7 @@ import java.util.Map;
 
 /**
  * Represent a set of concrete source code, e.g. a git repository with specific commit.
- *
+ * <p>
  * Conventionally, a "ResolvedDependency" also contains its children - a set of "NotationDependency".
  */
 public interface ResolvedDependency extends GolangDependency {

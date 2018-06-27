@@ -32,9 +32,11 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
     companion object {
         @JvmField
         public val VERSIONS = listOf(
-                // "3.5.1",
-                "4.0.1", "4.1", "4.2.1", "4.3.1",
-                "4.4.1", "4.5.1", "4.6", "4.7")
+//                 "3.5.1",
+//                "4.0.1",
+//                "4.1",
+                "4.2.1", "4.3.1",
+                "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1")
     }
 
     override fun getProjectRoot(): File {

@@ -41,8 +41,16 @@ public abstract class GolangPackage implements Serializable {
         return Paths.get(pathString);
     }
 
+    public Path getRootPath() {
+        return getPath();
+    }
+
     public String getPathString() {
         return pathString;
+    }
+
+    public String getRootPathString() {
+        return getPathString();
     }
 
     public Optional<GolangPackage> resolve(Path packagePath) {

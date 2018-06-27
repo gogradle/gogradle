@@ -129,7 +129,11 @@ public class LocalDirectoryDependency extends AbstractNotationDependency impleme
 
     @Override
     public String toString() {
-        return getName() + "@" + StringUtils.toUnixString(rootDir);
+        if (rootDir == EMPTY_DIR) {
+            return getName() + "@" + "EMPTY_DIR";
+        } else {
+            return getName() + "@" + StringUtils.toUnixString(rootDir);
+        }
     }
 
     @Override

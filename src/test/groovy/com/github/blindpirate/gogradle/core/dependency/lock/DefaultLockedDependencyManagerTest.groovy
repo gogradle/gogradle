@@ -34,7 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.InjectMocks
 
-import static com.github.blindpirate.gogradle.util.MockUtils.mockMutipleInterfaces
+import static com.github.blindpirate.gogradle.util.MockUtils.mockMultipleInterfaces
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
@@ -44,10 +44,10 @@ class DefaultLockedDependencyManagerTest extends AbstractExternalDependencyFacto
 
     @InjectMocks
     DefaultLockedDependencyManager manager
-    GolangDependency dependency1 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
-    GolangDependency dependency2 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
-    GolangDependency dependency3 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
-    GolangDependency dependency4 = mockMutipleInterfaces(NotationDependency, ResolvedDependency)
+    GolangDependency dependency1 = mockMultipleInterfaces(NotationDependency, ResolvedDependency)
+    GolangDependency dependency2 = mockMultipleInterfaces(NotationDependency, ResolvedDependency)
+    GolangDependency dependency3 = mockMultipleInterfaces(NotationDependency, ResolvedDependency)
+    GolangDependency dependency4 = mockMultipleInterfaces(NotationDependency, ResolvedDependency)
 
     String LOCK_FILE_NAME = 'gogradle.lock'
     String warning = ReflectionUtils.getStaticField(DefaultLockedDependencyManager, "WARNING")

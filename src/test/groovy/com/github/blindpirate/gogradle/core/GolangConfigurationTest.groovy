@@ -29,12 +29,12 @@ import static org.mockito.Mockito.*
 
 class GolangConfigurationTest {
     NotationParser parser = mock(NotationParser)
-    GolangConfiguration configuration = new GolangConfiguration('build', parser)
+    GolangConfiguration configuration = new GolangConfiguration('build', parser, null)
 
     @Test
     void 'dependency registry should be isolated'() {
-        GolangConfiguration build = new GolangConfiguration('build', parser)
-        GolangConfiguration test = new GolangConfiguration('test', parser)
+        GolangConfiguration build = new GolangConfiguration('build', parser, null)
+        GolangConfiguration test = new GolangConfiguration('test', parser, null)
         assert build.dependencyRegistry instanceof DefaultDependencyRegistry
         assert !build.dependencyRegistry.is(test.dependencyRegistry)
     }

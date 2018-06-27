@@ -17,6 +17,8 @@
 
 package com.github.blindpirate.gogradle.core.dependency;
 
+import java.util.Optional;
+
 /**
  * Manages global dependency register.
  * When a dependency is resolved, its repo information will be registered here.
@@ -38,5 +40,5 @@ public interface DependencyRegistry {
      * @param name the name of dependency to be retrieved
      * @return the corresponding dependency, @{code null} if it does not exist in this registry
      */
-    ResolvedDependency retrieve(String name);
+    Optional<ResolvedDependency> retrieve(String name);
 }
