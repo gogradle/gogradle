@@ -121,7 +121,6 @@ public class GogradleModule extends AbstractModule {
         bind(GoBinaryManager.class).to(DefaultGoBinaryManager.class);
         bind(MapNotationParser.class).to(DefaultMapNotationParser.class);
         bind(GlobalCacheManager.class).to(DefaultGlobalCacheManager.class);
-        bind(DependencyRegistry.class).to(DefaultDependencyRegistry.class);
         bind(NotationConverter.class).to(DefaultNotationConverter.class);
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
