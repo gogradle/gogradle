@@ -37,6 +37,7 @@ import org.gradle.api.Task
 import org.gradle.api.internal.AbstractTask
 import org.gradle.api.internal.plugins.ExtensionContainerInternal
 import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.internal.service.ServiceRegistry
 import org.gradle.util.Path
 import org.junit.Before
 import org.mockito.Mock
@@ -75,6 +76,8 @@ abstract class TaskTest {
     GogradleRootProject gogradleRootProject
     @Mock
     ExtensionContainerInternal extensionContainer
+    @Mock
+    ServiceRegistry serviceRegistry
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -92,7 +95,7 @@ abstract class TaskTest {
 
     void assertTaskDependsOn(Task task, Object dependency) {
         def dependencies = ReflectionUtils.getField(task, 'dependencies')
-        Set<Object> values = ReflectionUtils.getField(dependencies, 'values')
+        Set<Object> values = ReflectionUtils.getField(dependencies, 'mutableValues')
         assert values.contains(dependency)
     }
 
@@ -113,6 +116,7 @@ abstract class TaskTest {
 
 
         when(project.getExtensions()).thenReturn(extensionContainer)
+        when(project.getServices()).thenReturn(serviceRegistry)
         when(extensionContainer.getByName(GolangPlugin.GOGRADLE_INJECTOR)).thenReturn(GogradleGlobal.INSTANCE.injector)
         T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
 
