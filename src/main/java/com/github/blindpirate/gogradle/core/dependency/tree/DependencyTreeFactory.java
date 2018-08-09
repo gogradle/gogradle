@@ -86,7 +86,7 @@ public class DependencyTreeFactory {
                 try {
                     item.dependencyToPropagate
                             .getDependencies()
-                            .stream()
+                            .parallelStream()
                             .map(dep -> createSubContextAndResolve(dep, item.context))
                             .forEach(queue::add);
                 } catch (Throwable e) {
