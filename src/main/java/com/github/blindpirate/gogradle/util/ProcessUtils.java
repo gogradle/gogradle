@@ -29,12 +29,18 @@ import java.io.UncheckedIOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 @Singleton
 public class ProcessUtils {
     private static final Logger LOGGER = Logging.getLogger(ProcessUtils.class);
 
     public static class ProcessResult {
+        private static ExecutorService threadPool = Executors.newCachedThreadPool();
         private int code;
         private String stdout;
         private String stderr;
@@ -51,12 +57,20 @@ public class ProcessUtils {
             return stderr;
         }
 
-        public ProcessResult(Process process) throws InterruptedException {
-            code = process.waitFor();
-            stdout = IOUtils.toString(process.getInputStream());
-            stderr = IOUtils.toString(process.getErrorStream());
+        private ProcessResult(int code, String stdout, String stderr) {
+            this.code = code;
+            this.stdout = stdout;
+            this.stderr = stderr;
+        }
+
+        private static ProcessResult waitForFinish(Process process) throws InterruptedException, ExecutionException {
+            Future<Integer> code = threadPool.submit((Callable<Integer>) process::waitFor);
+            Future<String> stdout = threadPool.submit(() -> IOUtils.toString(process.getInputStream()));
+            Future<String> stderr = threadPool.submit(() -> IOUtils.toString(process.getErrorStream()));
+            return new ProcessResult(code.get(), stdout.get(), stderr.get());
         }
     }
+
 
     public String getStdout(Process process) {
         String ret = getResult(process).getStdout();
@@ -86,8 +100,8 @@ public class ProcessUtils {
 
     public ProcessResult getResult(Process process) {
         try {
-            return new ProcessResult(process);
-        } catch (InterruptedException e) {
+            return ProcessResult.waitForFinish(process);
+        } catch (InterruptedException | ExecutionException e) {
             throw ExceptionHandler.uncheckException(e);
         }
     }
