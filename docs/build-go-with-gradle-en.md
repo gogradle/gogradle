@@ -65,7 +65,7 @@ Create a new file named `build.gradle` in your project root:
 
 ```
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.10' // Please use the latest version
+    id 'com.github.blindpirate.gogradle' version '0.10.2' // Please use the latest version
 }
 
 golang {
