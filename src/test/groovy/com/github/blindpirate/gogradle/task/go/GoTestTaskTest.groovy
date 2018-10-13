@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.task.go
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.task.TaskTest
+import com.github.blindpirate.gogradle.task.go.test.GoTestResultExtractor
 import com.github.blindpirate.gogradle.util.ExceptionHandler
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ReflectionUtils
@@ -38,7 +39,7 @@ import org.mockito.stubbing.Answer
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
-import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult
+import static com.github.blindpirate.gogradle.task.go.test.AbstractGoTestResultExtractor.GoTestMethodResult
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
@@ -53,13 +54,14 @@ class GoTestTaskTest extends TaskTest {
     ArgumentCaptor<List> argumentsCaptor
 
     @Mock
-    GoTestStdoutExtractor extractor
+    GoTestResultExtractor extractor
 
     @Before
     void setUp() {
         task = buildTask(GoTest)
         when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
+        when(extractor.testParams()).thenReturn(['test', '-v'])
 
         ReflectionUtils.setField(task, 'extractor', extractor)
 

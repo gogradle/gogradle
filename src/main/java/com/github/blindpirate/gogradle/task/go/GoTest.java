@@ -22,9 +22,9 @@ import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.common.LineCollector;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
+import com.github.blindpirate.gogradle.task.go.test.GoTestResultExtractor;
 import com.github.blindpirate.gogradle.unsafe.GradleInternalAPI;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.google.common.collect.Lists;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Incubating;
@@ -58,17 +58,9 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TA
 import static com.github.blindpirate.gogradle.task.go.GoCover.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
-import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
-import static com.github.blindpirate.gogradle.util.IOUtils.encodeInternally;
-import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
-import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
-import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
-import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
-import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
-import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.joining;
-import static java.util.stream.Collectors.toList;
+import static com.github.blindpirate.gogradle.util.IOUtils.*;
+import static com.github.blindpirate.gogradle.util.StringUtils.*;
+import static java.util.stream.Collectors.*;
 
 public class GoTest extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(GoTest.class);
@@ -79,7 +71,7 @@ public class GoTest extends AbstractGolangTask {
     private GolangPluginSetting setting;
 
     @Inject
-    private GoTestStdoutExtractor extractor;
+    private GoTestResultExtractor extractor;
 
     @Inject
     private BuildManager buildManager;
@@ -257,8 +249,8 @@ public class GoTest extends AbstractGolangTask {
         LineCollector lineCollector = new LineCollector();
 
         List<String> args = isCommandLineArguments()
-                ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
-                : Lists.newArrayList("test", "-v", importPath);
+                ? asStringList(extractor.testParams(), IOUtils.collectFileNames(testFiles))
+                : asStringList(extractor.testParams(), importPath);
 
 
         if (generateCoverageProfile) {
