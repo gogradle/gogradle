@@ -41,14 +41,15 @@ public class DefaultGoTestResultExtractor implements GoTestResultExtractor {
         }
     }
 
+    @SuppressWarnings({"checkstyle:magicnumber"})
     private boolean supportJsonOutput() {
         String[] version = goBinaryManager.getGoVersion().split("\\.");
         if (version.length < 2) {
             return false;
         }
-        if (Integer.valueOf(version[0]) == 1) {
-            return Integer.valueOf(version[1]) >= 10;
+        if (Integer.parseInt(version[0]) == 1) {
+            return Integer.parseInt(version[1]) >= 10;
         }
-        return Integer.valueOf(version[0]) > 1;
+        return Integer.parseInt(version[0]) > 1;
     }
 }

@@ -3,25 +3,23 @@ package com.github.blindpirate.gogradle.task.go.test;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.DeserializationContext;
-import com.fasterxml.jackson.databind.JsonDeserializer;
 import com.github.blindpirate.gogradle.task.go.PackageTestResult;
 import com.github.blindpirate.gogradle.util.DataExchange;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.testing.TestResult;
 
-import java.io.IOException;
 import java.util.Arrays;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 /**
  * Extract results from JSON outputs. Supported on Go 1.10+.
@@ -36,9 +34,9 @@ public class JsonGoTestResultExtractor extends AbstractGoTestResultExtractor {
                 .map(this::tryConvertToJson)
                 .filter(Objects::nonNull)
                 .filter(model -> model.getTest() != null) // package result
-                .collect(Collectors.groupingBy(GoTestResultJsonModel::getTest, LinkedHashMap::new, Collectors.toList()));
+                .collect(groupingBy(GoTestResultJsonModel::getTest, LinkedHashMap::new, toList()));
 
-        return jsonModels.entrySet().stream().map(this::convertToMethodResult).collect(Collectors.toList());
+        return jsonModels.entrySet().stream().map(this::convertToMethodResult).collect(toList());
     }
 
     private GoTestMethodResult convertToMethodResult(Map.Entry<String, List<GoTestResultJsonModel>> entry) {
@@ -48,7 +46,7 @@ public class JsonGoTestResultExtractor extends AbstractGoTestResultExtractor {
         String message = testEvents.stream()
                 .filter(GoTestResultJsonModel.filter(ActionType.OUTPUT))
                 .map(GoTestResultJsonModel::getOutput)
-                .collect(Collectors.joining("\n"));
+                .collect(joining("\n"));
         long duration = getResultOrFallback(testEvents).getMillisecondsDuration();
 
         return createTestMethodResult(testName, resultType, message, duration);
@@ -137,14 +135,6 @@ public class JsonGoTestResultExtractor extends AbstractGoTestResultExtractor {
 
         public static Predicate<GoTestResultJsonModel> filter(ActionType... actionTypes) {
             return model -> Arrays.asList(actionTypes).contains(model.action);
-        }
-    }
-
-    private class GoTestResultJsonDeserializer extends JsonDeserializer<GoTestResultJsonModel> {
-
-        @Override
-        public GoTestResultJsonModel deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JsonProcessingException {
-            return null;
         }
     }
 }

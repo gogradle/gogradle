@@ -58,9 +58,17 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TA
 import static com.github.blindpirate.gogradle.task.go.GoCover.COVERAGE_PROFILES_PATH;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 import static com.github.blindpirate.gogradle.util.CollectionUtils.isEmpty;
-import static com.github.blindpirate.gogradle.util.IOUtils.*;
-import static com.github.blindpirate.gogradle.util.StringUtils.*;
-import static java.util.stream.Collectors.*;
+import static com.github.blindpirate.gogradle.util.IOUtils.clearDirectory;
+import static com.github.blindpirate.gogradle.util.IOUtils.encodeInternally;
+import static com.github.blindpirate.gogradle.util.IOUtils.filterFilesRecursively;
+import static com.github.blindpirate.gogradle.util.IOUtils.forceMkdir;
+import static com.github.blindpirate.gogradle.util.IOUtils.safeListFiles;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameEndsWithAny;
+import static com.github.blindpirate.gogradle.util.StringUtils.fileNameStartsWithDotOrUnderline;
+import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
+import static java.util.stream.Collectors.groupingBy;
+import static java.util.stream.Collectors.joining;
+import static java.util.stream.Collectors.toList;
 
 public class GoTest extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(GoTest.class);

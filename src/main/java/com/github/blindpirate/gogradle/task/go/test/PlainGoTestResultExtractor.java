@@ -20,8 +20,6 @@ package com.github.blindpirate.gogradle.task.go.test;
 import com.github.blindpirate.gogradle.task.go.PackageTestResult;
 import com.google.common.collect.ImmutableMap;
 import org.apache.commons.lang3.tuple.Pair;
-import org.gradle.api.logging.Logger;
-import org.gradle.api.logging.Logging;
 import org.gradle.api.tasks.testing.TestResult;
 
 import java.util.ArrayList;
@@ -36,7 +34,6 @@ import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static java.lang.Double.parseDouble;
 
 public class PlainGoTestResultExtractor extends AbstractGoTestResultExtractor {
-    private static final Logger LOGGER = Logging.getLogger(PlainGoTestResultExtractor.class);
     private static final Map<String, TestResult.ResultType> RESULT_TYPE_MAP =
             ImmutableMap.of("PASS", TestResult.ResultType.SUCCESS,
                     "FAIL", TestResult.ResultType.FAILURE,
