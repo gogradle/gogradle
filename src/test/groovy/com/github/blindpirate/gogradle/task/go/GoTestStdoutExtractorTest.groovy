@@ -62,6 +62,33 @@ FAIL\ta\t0.006s'''
         assert result.results[0].resultType == TestResult.ResultType.FAILURE
     }
 
+    @Test
+    void 'extracting Skip result should succeed'() {
+        // given
+        IOUtils.write(resource, 'a_test.go', 'func Test_A()')
+        String stdout = '''\
+=== RUN   Test_A
+--- SKIP: Test_A (0.00s)
+PASS
+'''
+        // when
+        PackageTestResult context = PackageTestResult.builder()
+                .withPackagePath('a/b/c')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+
+        assert results.size() == 1
+
+        TestClassResult result = results[0]
+        assert result.className == 'a.b.c.a_test_DOT_go'
+        assert result.results.size() == 1
+
+        assert result.results[0].name == 'Test_A'
+        assert result.results[0].message.trim().contains('Test_A')
+        assert result.results[0].resultType == TestResult.ResultType.SKIPPED
+    }
 
     @Test
     void 'extracting Log/Error output of testing.T should succeed'() {

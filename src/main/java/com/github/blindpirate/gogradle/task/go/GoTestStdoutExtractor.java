@@ -49,7 +49,8 @@ public class GoTestStdoutExtractor {
     private static final Logger LOGGER = Logging.getLogger(GoTestStdoutExtractor.class);
     private static final Map<String, TestResult.ResultType> RESULT_TYPE_MAP =
             ImmutableMap.of("PASS", TestResult.ResultType.SUCCESS,
-                    "FAIL", TestResult.ResultType.FAILURE);
+                    "FAIL", TestResult.ResultType.FAILURE,
+                    "SKIP", TestResult.ResultType.SKIPPED);
 
     //=== RUN   TestDiffToHTML
     //--- PASS: TestDiffToHTML (0.00s)
@@ -58,6 +59,7 @@ public class GoTestStdoutExtractor {
     private static final String TEST_START = "=== RUN";
     private static final String TEST_PASS = "--- PASS";
     private static final String TEST_FAIL = "--- FAIL";
+    private static final String TEST_SKIP = "--- SKIP";
 
     private static final String SETUP_FAILED_ERROR = "[setup failed]";
     private static final String BUILD_FAILED_ERROR = "[build failed]";
@@ -196,12 +198,12 @@ public class GoTestStdoutExtractor {
 
     private GoTestMethodResult extractOneTestMethod(String testMethodName, List<String> resultLines) {
         Pattern testEndLinePattern
-                = Pattern.compile("--- (PASS|FAIL):\\s+" + testMethodName + "\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
+                = Pattern.compile("--- (PASS|FAIL|SKIP):\\s+" + testMethodName + "\\s+\\(((\\d+)(\\.\\d+)?)s\\)");
         long id = GLOBAL_COUNTER.incrementAndGet();
         String message = String.join("\n", resultLines);
 
         for (String line : resultLines) {
-            if (line.contains(TEST_PASS) || line.contains(TEST_FAIL)) {
+            if (line.contains(TEST_PASS) || line.contains(TEST_FAIL) || line.contains(TEST_SKIP)) {
                 Matcher matcher = testEndLinePattern.matcher(line);
                 if (matcher.find()) {
                     TestResult.ResultType resultType = RESULT_TYPE_MAP.get(matcher.group(1));
