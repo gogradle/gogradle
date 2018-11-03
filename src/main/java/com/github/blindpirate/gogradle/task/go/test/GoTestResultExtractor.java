@@ -10,6 +10,4 @@ import java.util.List;
  */
 public interface GoTestResultExtractor {
     List<TestClassResult> extractTestResult(PackageTestResult result);
-
-    List<String> testParams();
 }

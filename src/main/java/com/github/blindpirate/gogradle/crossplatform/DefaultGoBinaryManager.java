@@ -25,6 +25,7 @@ import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
+import com.github.zafarkhaja.semver.Version;
 import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.tuple.Pair;
@@ -50,6 +51,8 @@ import static org.apache.commons.io.FileUtils.listFiles;
 
 @Singleton
 public class DefaultGoBinaryManager implements GoBinaryManager {
+    private static final Version GO_VERSION_SUPPORTING_JSON = Version.valueOf("1.10.0");
+
     private static final Logger LOGGER = Logging.getLogger(DefaultGoBinaryManager.class);
 
     public static final String FILENAME = "go${version}.${os}-${arch}${extension}";
@@ -70,7 +73,8 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private boolean resolved = false;
     private Path binaryPath;
     private Path goroot;
-    private String goVersion;
+    private String goVersionString;
+    private Version goVersion;
 
     @Inject
     public DefaultGoBinaryManager(GolangPluginSetting setting,
@@ -96,9 +100,14 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     }
 
     @Override
+    public boolean supportTestJsonOutput() {
+        return goVersion.compareTo(GO_VERSION_SUPPORTING_JSON) >= 0;
+    }
+
+    @Override
     public String getGoVersion() {
         resolveIfNecessary();
-        return goVersion;
+        return goVersionString;
     }
 
     private void resolveIfNecessary() {
@@ -156,7 +165,20 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     private void useGoExecutableOnHost(Path goBinPathOnHost, String versionOnHost) {
         LOGGER.quiet("Found go {} in {}, use it.", versionOnHost, goBinPathOnHost);
         binaryPath = goBinPathOnHost;
-        goVersion = versionOnHost;
+        setGoVersionString(versionOnHost);
+    }
+
+    private void setGoVersionString(String version) {
+        goVersionString = version;
+        goVersion = parseGoVersion(version);
+    }
+
+    private Version parseGoVersion(String versionString) {
+        if (StringUtils.count(versionString, '.') == 1) {
+            return Version.valueOf(versionString + ".0");
+        } else {
+            return Version.valueOf(versionString);
+        }
     }
 
     private void fetchNewestStableVersion() {
@@ -210,7 +232,7 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
 
     private void fetchSpecifiedVersion(String version) {
         goroot = globalCacheManager.getGlobalGoBinCacheDir(version).toPath().resolve("go");
-        goVersion = version;
+        setGoVersionString(version);
 
         binaryPath = goroot.resolve("bin/go" + Os.getHostOs().exeExtension());
         if (!Files.exists(binaryPath)) {

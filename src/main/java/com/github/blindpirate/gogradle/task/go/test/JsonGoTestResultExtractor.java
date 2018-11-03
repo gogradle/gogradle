@@ -69,13 +69,8 @@ public class JsonGoTestResultExtractor extends AbstractGoTestResultExtractor {
         }
     }
 
-    @Override
-    public List<String> testParams() {
-        return Arrays.asList("test", "-v", "-json");
-    }
-
     private enum ActionType {
-        RUN, OUTPUT, PASS, FAIL;
+        RUN, OUTPUT, PASS, FAIL, SKIP;
 
         @JsonCreator
         private static ActionType from(String value) {
@@ -94,6 +89,8 @@ public class JsonGoTestResultExtractor extends AbstractGoTestResultExtractor {
                     return TestResult.ResultType.SUCCESS;
                 case FAIL:
                     return TestResult.ResultType.FAILURE;
+                case SKIP:
+                    return TestResult.ResultType.SKIPPED;
                 default:
                     return null;
             }

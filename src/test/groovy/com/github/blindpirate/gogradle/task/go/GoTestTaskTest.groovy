@@ -61,7 +61,6 @@ class GoTestTaskTest extends TaskTest {
         task = buildTask(GoTest)
         when(project.getProjectDir()).thenReturn(resource)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
-        when(extractor.testParams()).thenReturn(['test', '-v'])
 
         ReflectionUtils.setField(task, 'extractor', extractor)
 

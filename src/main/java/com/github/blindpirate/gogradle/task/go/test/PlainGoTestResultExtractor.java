@@ -23,7 +23,6 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.tasks.testing.TestResult;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -137,10 +136,5 @@ public class PlainGoTestResultExtractor extends AbstractGoTestResultExtractor {
             }
         }
         return createTestMethodResult(testMethodName, TestResult.ResultType.FAILURE, message, 0L);
-    }
-
-    @Override
-    public List<String> testParams() {
-        return Arrays.asList("test", "-v");
     }
 }

@@ -25,31 +25,10 @@ public class DefaultGoTestResultExtractor implements GoTestResultExtractor {
 
     @Override
     public List<TestClassResult> extractTestResult(PackageTestResult result) {
-        if (supportJsonOutput()) {
+        if (goBinaryManager.supportTestJsonOutput()) {
             return jsonGoTestResultExtractor.extractTestResult(result);
         } else {
             return plainGoTestResultExtractor.extractTestResult(result);
         }
-    }
-
-    @Override
-    public List<String> testParams() {
-        if (supportJsonOutput()) {
-            return jsonGoTestResultExtractor.testParams();
-        } else {
-            return plainGoTestResultExtractor.testParams();
-        }
-    }
-
-    @SuppressWarnings({"checkstyle:magicnumber"})
-    private boolean supportJsonOutput() {
-        String[] version = goBinaryManager.getGoVersion().split("\\.");
-        if (version.length < 2) {
-            return false;
-        }
-        if (Integer.parseInt(version[0]) == 1) {
-            return Integer.parseInt(version[1]) >= 10;
-        }
-        return Integer.parseInt(version[0]) > 1;
     }
 }

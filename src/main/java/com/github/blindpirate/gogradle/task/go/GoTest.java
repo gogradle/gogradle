@@ -43,6 +43,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -257,8 +258,8 @@ public class GoTest extends AbstractGolangTask {
         LineCollector lineCollector = new LineCollector();
 
         List<String> args = isCommandLineArguments()
-                ? asStringList(extractor.testParams(), IOUtils.collectFileNames(testFiles))
-                : asStringList(extractor.testParams(), importPath);
+                ? asStringList(determineTestParams(), IOUtils.collectFileNames(testFiles))
+                : asStringList(determineTestParams(), importPath);
 
 
         if (generateCoverageProfile) {
@@ -277,6 +278,14 @@ public class GoTest extends AbstractGolangTask {
                 .withTestFiles(testFiles)
                 .withCode(retCode)
                 .build();
+    }
+
+    private List<String> determineTestParams() {
+        if (goBinaryManager.supportTestJsonOutput()) {
+            return Arrays.asList("test", "-v", "-json");
+        } else {
+            return Arrays.asList("test", "-v");
+        }
     }
 
     private Consumer<String> determineLineConsumer(LineCollector lineCollector, String importPath) {
