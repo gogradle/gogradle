@@ -81,6 +81,34 @@ test {
     }
 
     @Test
+    @WithResource('')
+    void 'test can be skipped'() {
+        // given
+        IOUtils.write(resource, '1_test.go', '''
+package main
+
+import "testing"
+
+func Test_Skip(t *testing.T){
+    t.SkipNow()
+}
+
+func Test_Fail(t *testing.T){
+    t.Error("Failed")
+}
+
+func Test_Pass(t *testing.T){
+}
+''')
+        // then
+        try {
+            newBuild('test', 'cover', '--info')
+        } catch (BuildException e) {
+            assert stdout.toString().contains('3 completed, 1 failed, 1 skipped')
+        }
+    }
+
+    @Test
     void 'test and coverage report should be generated successfully'() {
         normalTest()
         assertNormalTestNoUpToDateResult()

@@ -297,23 +297,16 @@ public class GoTest extends AbstractGolangTask {
     }
 
     private void logResult(String packagePath, List<TestClassResult> resultOfSinglePackage) {
-        int successCount = successCount(resultOfSinglePackage);
-        int failureCount = failureCount(resultOfSinglePackage);
-        LOGGER.quiet("Test for {} finished, {} completed, {} failed",
-                packagePath,
-                successCount + failureCount,
-                failureCount);
-    }
+        int failureCount = resultOfSinglePackage.stream().mapToInt(TestClassResult::getFailuresCount).sum();
+        int skipCount = resultOfSinglePackage.stream().mapToInt(TestClassResult::getSkippedCount).sum();
+        int totalCount = resultOfSinglePackage.stream().mapToInt(TestClassResult::getTestsCount).sum();
 
-    private int successCount(List<TestClassResult> results) {
-        return results.stream()
-                .mapToInt(result ->
-                        result.getResults().size() - result.getFailuresCount())
-                .sum();
-    }
-
-    private int failureCount(List<TestClassResult> results) {
-        return results.stream().mapToInt(TestClassResult::getFailuresCount).sum();
+        if (skipCount > 0) {
+            LOGGER.quiet("Test for {} finished, {} completed, {} failed, {} skipped.",
+                    packagePath, totalCount, failureCount, skipCount);
+        } else {
+            LOGGER.quiet("Test for {} finished, {} completed, {} failed.", packagePath, totalCount, failureCount);
+        }
     }
 
     private void rewritePackageName(File reportDir) {
