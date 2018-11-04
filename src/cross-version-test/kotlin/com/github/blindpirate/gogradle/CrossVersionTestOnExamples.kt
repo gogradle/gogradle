@@ -19,6 +19,7 @@ class CrossVersionTestOnExamples {
     @Before
     fun setUp() {
         processUtils.runAndGetStdout(projectDir, "git", "reset", "HEAD", "--hard")
+        File(projectDir, "gradle.properties").writeText("org.gradle.daemon=false")
     }
 
     fun crossVersionTest(function: (String) -> Unit) {
@@ -76,7 +77,7 @@ apply plugin: 'com.github.blindpirate.gogradle'
             cleanProjectDir()
             GradleRunner.create()
                     .withProjectDir(projectDir)
-                    .withArguments(listOf(task, "--info", "--stacktrace", "--no-daemon", "-Duser.dir=" + projectDir.absolutePath))
+                    .withArguments(listOf(task, "--info", "--stacktrace", "-Duser.dir=" + projectDir.absolutePath))
                     .withGradleVersion(it)
                     .forwardOutput()
                     .build()

@@ -33,7 +33,8 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
         val VERSIONS = listOf(
                 "3.5.1",
                 "4.0.1", "4.1", "4.2.1", "4.3.1",
-                "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1")
+                "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.2"
+        )
     }
 
     override fun getProjectRoot(): File {
@@ -44,10 +45,12 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
     fun crossVersionTestShouldSucceed() {
         super.writeBuildAndSettingsDotGradle(buildDotGradleBase)
 
+        File(resource, "gradle.properties").writeText("org.gradle.daemon=false")
+
         VERSIONS.forEach {
             GradleRunner.create()
                     .withProjectDir(resource)
-                    .withArguments("cover", "test", "--info", "--no-daemon")
+                    .withArguments("cover", "test", "--info")
                     .withGradleVersion(it)
                     .forwardOutput()
                     .build()
