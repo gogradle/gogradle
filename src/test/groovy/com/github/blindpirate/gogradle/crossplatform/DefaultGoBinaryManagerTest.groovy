@@ -96,7 +96,7 @@ class DefaultGoBinaryManagerTest extends MockEnvironmentVariableSupport {
     @Test(expected = IllegalStateException)
     void 'user-specified go binary should cause an exception if it cannot be executed'() {
         // given
-        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(IOException)
+        when(processUtils.run(['/unexistent/go', 'version'], null, null)).thenThrow(UncheckedIOException)
         when(setting.getGoExecutable()).thenReturn('/unexistent/go')
         // then
         'the newest stable version will be used if local binary not exist and no version specified'()

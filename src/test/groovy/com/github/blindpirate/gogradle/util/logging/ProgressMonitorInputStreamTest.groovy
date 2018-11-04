@@ -53,7 +53,7 @@ class ProgressMonitorInputStreamTest {
     @Test
     void 'byte count read should be cached'() {
         // when
-        while (pmis.read() != -1);
+        while (pmis.read() != -1) {}
         // then
         verify(logger, times(3)).progress(anyString())
         verify(logger).progress('4 KB downloaded')
@@ -63,7 +63,7 @@ class ProgressMonitorInputStreamTest {
     @Test
     void 'reading after completed should have no side effects'() {
         // when
-        while (pmis.read() != -1);
+        while (pmis.read() != -1) {}
         pmis.read()
         // then
         verify(logger, times(3)).progress(anyString())

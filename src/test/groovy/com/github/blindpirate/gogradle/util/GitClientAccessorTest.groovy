@@ -57,7 +57,7 @@ class GitClientAccessorTest {
     void 'client should be considered as inexistent if error occurs'() {
         ProcessUtils processUtils = mock(ProcessUtils)
         accessor = new GitClientAccessor(processUtils)
-        when(processUtils.runAndGetStdout(['git', 'version'] as String[])).thenThrow(IOException)
+        when(processUtils.runAndGetStdout(['git', 'version'] as String[])).thenThrow(UncheckedIOException)
         accessor.ensureClientExists()
     }
 
