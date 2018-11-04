@@ -35,7 +35,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
         assert !godepDependencyFactory.canRecognize(resource)
     }
 
-    String GodepsDotJson = '''
+    String godepsDotJson = '''
             {
                 "ImportPath": "github.com/tools/godep",
                 "GoVersion": "go1.7",
@@ -57,7 +57,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     @Test
     void 'package with Godeps/Godeps.json should be analyzed properly'() {
         // given:
-        prepareGodepsDotJson(GodepsDotJson)
+        prepareGodepsDotJson(godepsDotJson)
 
         // when:
         godepDependencyFactory.produce(parentDependency, resource, 'build')
@@ -105,11 +105,11 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
 
     }
 
-    void prepareGodepsDotJson(String GodepsDotJson) {
-        IOUtils.write(resource, 'Godeps/Godeps.json', GodepsDotJson)
+    void prepareGodepsDotJson(String godepsDotJson) {
+        IOUtils.write(resource, 'Godeps/Godeps.json', godepsDotJson)
     }
 
-    String GodepsDotJsonWithExtraAndMissingProperties = '''
+    String godepsDotJsonWithExtraAndMissingProperties = '''
             {
                 "extraProperties":[1,"a",{"c":null}],
                 "ImportPath": "github.com/tools/godep",
@@ -120,7 +120,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     @Test
     void 'extra properties in Godeps/Godeps.json should be ignored'() {
         // given
-        prepareGodepsDotJson(GodepsDotJsonWithExtraAndMissingProperties)
+        prepareGodepsDotJson(godepsDotJsonWithExtraAndMissingProperties)
         // when
         godepDependencyFactory.produce(parentDependency, resource, 'build')
         // then

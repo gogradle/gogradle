@@ -38,7 +38,7 @@ class GlockDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
         assert !factory.canRecognize(resource)
     }
 
-    String GLOCKFILE = '''
+    static final String GLOCKFILE = '''
 bitbucket.org/tebeka/selenium 02df1758050f
 code.google.com/p/cascadia 4f03c71bc42b
 code.google.com/p/go-uuid 7dda39b2e7d5

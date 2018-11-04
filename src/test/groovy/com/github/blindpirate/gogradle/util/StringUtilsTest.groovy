@@ -19,8 +19,6 @@ package com.github.blindpirate.gogradle.util
 
 import org.junit.Test
 
-import java.nio.file.Path
-
 import static com.github.blindpirate.gogradle.util.ExceptionHandler.UncheckedException
 
 class StringUtilsTest {

@@ -18,7 +18,6 @@
 package com.github.blindpirate.gogradle.core.dependency
 
 import com.github.blindpirate.gogradle.GogradleRunner
-import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.core.GolangRepository
 import com.github.blindpirate.gogradle.core.VcsGolangPackage
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver
@@ -31,10 +30,7 @@ import org.mockito.Mock
 import org.mockito.invocation.InvocationOnMock
 import org.mockito.stubbing.Answer
 
-import javax.swing.text.html.Option
-
 import static org.mockito.ArgumentMatchers.anyString
-import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)

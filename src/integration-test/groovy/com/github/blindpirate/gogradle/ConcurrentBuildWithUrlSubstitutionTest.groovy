@@ -40,7 +40,7 @@ class ConcurrentBuildWithUrlSubstitutionTest {
     File resource
     ExecutorService threadPool = Executors.newFixedThreadPool(10)
 
-    int TOTAL_THREAD_NUM = 10
+    private static final int TOTAL_THREAD_NUM = 10
 
     GitServer gitServer
 

@@ -17,7 +17,7 @@
 
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
+
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.SourceCodeDependencyFactory
