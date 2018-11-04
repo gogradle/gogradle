@@ -219,7 +219,7 @@ func main(){
     }
 
     boolean buildUpToDate() {
-        return stdout.toString().readLines().any { it ==~ /^:build\w+ UP-TO-DATE$/ }
+        return stdout.toString().readLines().any { it ==~ /> Task :build\w+ UP-TO-DATE$/ }
     }
 
     void firstBuild() {

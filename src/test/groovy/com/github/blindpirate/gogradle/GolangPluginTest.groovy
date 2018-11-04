@@ -90,8 +90,6 @@ class GolangPluginTest {
             }
         }
 
-        resolveFirstLevelDependencies()
-
         assert getDependencySet('build').size() == 1
 
         def dependency = findFirstInDependencies()
@@ -110,18 +108,12 @@ class GolangPluginTest {
             }
         }
 
-        resolveFirstLevelDependencies()
-
         assert getDependencySet('build').size() == 1
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
         assert dependency.commit == 'commitId'
         assert dependency.version == 'commitId'
         assert dependency instanceof VcsNotationDependency
-    }
-
-    def resolveFirstLevelDependencies() {
-        getBuildConfiguration().resolveFirstLevelDependencies()
     }
 
     def getBuildConfiguration() {
@@ -165,8 +157,6 @@ class GolangPluginTest {
             }
         }
 
-        resolveFirstLevelDependencies()
-
         assert getDependencySet('build').size() == 4
 
         def ab = findFirstInDependencies('github.com/a/b')
@@ -191,8 +181,6 @@ class GolangPluginTest {
             }
         }
 
-        resolveFirstLevelDependencies()
-
         def dependency = findFirstInDependencies()
         assert dependency.name == 'github.com/a/b'
         assert dependency instanceof LocalDirectoryDependency
@@ -207,8 +195,6 @@ class GolangPluginTest {
                 }
             }
         }
-
-        resolveFirstLevelDependencies()
 
         def dependency = findFirstInDependencies()
         assert dependency instanceof LocalDirectoryDependency
@@ -230,8 +216,6 @@ class GolangPluginTest {
             }
         }
 
-        resolveFirstLevelDependencies()
-
         def ab = findFirstInDependencies('github.com/a/b')
         assert ab.tag == '1.0.0-RELEASE'
         assert getExclusionSpecs(ab).size() == 1
@@ -250,8 +234,6 @@ class GolangPluginTest {
                 build name: 'github.com/a/b', transitive: false
             }
         }
-
-        resolveFirstLevelDependencies()
 
         assert !getExclusionSpecs(findFirstInDependencies()).isEmpty()
     }

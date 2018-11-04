@@ -73,8 +73,10 @@ func main() {
         String err = stderr.toString()
         String out = stdout.toString()
         assert err.contains('first argument to Println is os.Stderr') ||
-                err.contains('Println does not take io.Writer but has first arg os.Stderr')
-        assert out.contains('vet FAILED')
+                err.contains('Println does not take io.Writer but has first arg os.Stderr') ||
+                out.contains('first argument to Println is os.Stderr') ||
+                out.contains('Println does not take io.Writer but has first arg os.Stderr')
+        assertOutputContains('vet FAILED')
     }
 
     @Test

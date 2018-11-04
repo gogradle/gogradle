@@ -57,13 +57,11 @@ class GolangConfigurationTest {
     }
 
     @Test
-    void 'resolving first level dependencies should succeed'() {
+    void 'first level dependencies should be resolved automatically before fetching dependencies'() {
         // given
         'adding first level dependency should succeed'()
         GolangDependency dependency = DependencyUtils.mockWithName(AbstractGolangDependency, '')
         when(parser.parse(Mockito.any())).thenReturn(dependency)
-        // when
-        configuration.resolveFirstLevelDependencies()
         // then
         assert configuration.dependencies.size() == 1
         verify(parser).parse([:])

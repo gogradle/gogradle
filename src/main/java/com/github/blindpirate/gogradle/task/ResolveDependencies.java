@@ -85,10 +85,8 @@ public abstract class ResolveDependencies extends AbstractGolangTask {
     @Input
     public HashSet<GolangDependency> getDependencies() {
         setGogradleGlobalContext();
-        GolangConfiguration configuration = configurationManager.getByName(getConfigurationName());
-        configuration.resolveFirstLevelDependencies();
         // elements in GolangDependency are identified by name, here we want to identify them by equals
-        return new HashSet<>(configuration.getDependencies());
+        return new HashSet<>(configurationManager.getByName(getConfigurationName()).getDependencies());
     }
 
     // INPUT 2: gogradle.lock

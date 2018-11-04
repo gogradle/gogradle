@@ -41,6 +41,8 @@ public class GolangConfiguration {
     private final List<Pair<Object, Closure>> firstLevelDependencies = new ArrayList<>();
     private final NotationParser<Object> notationParser;
 
+    private boolean resolved;
+
     public GolangConfiguration(String name, NotationParser notationParser, PackagePathResolver packagePathResolver) {
         this.name = name;
         this.notationParser = notationParser;
@@ -52,6 +54,10 @@ public class GolangConfiguration {
     }
 
     public GolangDependencySet getDependencies() {
+        if (!resolved) {
+            resolved = true;
+            firstLevelDependencies.forEach(pair -> dependencies.add(create(pair.getLeft(), pair.getRight())));
+        }
         return dependencies;
     }
 
@@ -68,10 +74,6 @@ public class GolangConfiguration {
         GolangDependency dependency = notationParser.parse(dependencyNotation);
         AbstractGolangDependency.class.cast(dependency).setFirstLevel(true);
         return ConfigureUtil.configure(configureClosure, dependency);
-    }
-
-    public void resolveFirstLevelDependencies() {
-        firstLevelDependencies.forEach(pair -> dependencies.add(create(pair.getLeft(), pair.getRight())));
     }
 
     public boolean hasFirstLevelDependencies() {

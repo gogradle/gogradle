@@ -94,7 +94,7 @@ golang {
     }
 
     void assertNotUpToDate() {
-        assert !stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
+        assertOutputNotContains(':resolveBuildDependencies UP-TO-DATE')
     }
 
     @Test
@@ -197,6 +197,7 @@ dependencies {
     }
 }
 """)
+        IOUtils.write(resource, 'project/settings.gradle', '')
         resource = new File(resource, 'project')
         build()
         build()

@@ -58,7 +58,7 @@ dependencies {
                 it.forTasks('vendor')
             }
         } catch (BuildException e) {
-            assert stderr.toString().contains("Cannot find tag")
+            assertOutputContains("Cannot find tag")
         }
 
         GitServer.addFileToRepository(repository, '2.go', '')

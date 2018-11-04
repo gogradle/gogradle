@@ -167,4 +167,12 @@ golang {
     void setUpDebug() {
         IOUtils.write(getProjectRoot(), 'gradle.properties', 'org.gradle.jvmargs=-agentlib:jdwp=transport=dt_socket,server=y,suspend=y,address=5005')
     }
+
+    void assertOutputContains(String target) {
+        assert stdout.toString().contains(target) || stderr.toString().contains(target)
+    }
+
+    void assertOutputNotContains(String target) {
+        assert !stdout.toString().contains(target) && !stderr.toString().contains(target)
+    }
 }

@@ -64,21 +64,23 @@ dependencies {
         try {
             newBuild('vendor')
         } catch (BuildException e) {
-            assert stderr.toString().replaceAll(/[a-f0-9]{40}/, '').contains("""
+            String target = """
 Cannot recognize package: unrecognized
 Resolution stack is:
 +- github.com/my/package
  +- local/b@${toUnixString(repository)}/b
-  +- localhost/a#""")
+  +- localhost/a#"""
+            assert stderr.toString().replaceAll(/[a-f0-9]{40}/, '').contains(target) ||
+                    stdout.toString().replaceAll(/[a-f0-9]{40}/, '').contains(target)
         }
     }
 
     @Test
     void 'resolution stack should be printed when resolving vendor failed'() {
         GogradleLockModel model =
-                GogradleLockModel.of([[name      : 'vendordependency/c',
+                GogradleLockModel.of([[name: 'vendordependency/c',
                                        vendorPath: 'vendor/vendordependency/c',
-                                       host      : [name: 'localhost/a', url: 'http://localhost:8080/a', commit: 'unexistent'],
+                                       host: [name: 'localhost/a', url: 'http://localhost:8080/a', commit: 'unexistent'],
                                        transitive: false
                                       ]], [])
         IOUtils.write(resource, 'gogradle.lock', DataExchange.toYaml(model))
@@ -88,14 +90,13 @@ Resolution stack is:
                 it.forTasks('vendor')
             }
         } catch (BuildException e) {
-            assert stderr.toString().contains("""\
+            assertOutputContains("""\
 Cannot resolve dependency:localhost/a: commit='unexistent', urls=[http://localhost:8080/a]
 Resolution stack is:
 +- github.com/my/package
 """)
         }
     }
-
 
     @Override
     File getProjectRoot() {
