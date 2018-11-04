@@ -35,14 +35,17 @@ import com.github.blindpirate.gogradle.support.WithMockInjector
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import org.gradle.api.Task
 import org.gradle.api.internal.AbstractTask
+import org.gradle.api.internal.GradleInternal
 import org.gradle.api.internal.plugins.ExtensionContainerInternal
 import org.gradle.api.internal.project.ProjectInternal
+import org.gradle.api.internal.project.taskfactory.TaskIdentity
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.util.Path
 import org.junit.Before
 import org.mockito.Mock
 
 import static com.github.blindpirate.gogradle.util.ReflectionUtils.setFieldSafely
+import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.mock
 import static org.mockito.Mockito.when
 
@@ -78,6 +81,8 @@ abstract class TaskTest {
     ExtensionContainerInternal extensionContainer
     @Mock
     ServiceRegistry serviceRegistry
+    @Mock
+    GradleInternal gradle
     // This is a real task container for test tasks to fetch notationDependency tasks from
     GolangTaskContainer golangTaskContainer = new GolangTaskContainer()
 
@@ -94,7 +99,7 @@ abstract class TaskTest {
     }
 
     void assertTaskDependsOn(Task task, Object dependency) {
-        def dependencies = ReflectionUtils.getField(task, 'dependencies')
+        def dependencies = task.getTaskDependencies()
         Set<Object> values = ReflectionUtils.getField(dependencies, 'mutableValues')
         assert values.contains(dependency)
     }
@@ -114,11 +119,17 @@ abstract class TaskTest {
                       gogradleRootProject    : gogradleRootProject,
                       vendorSnapshoter       : vendorSnapshoter]
 
-
         when(project.getExtensions()).thenReturn(extensionContainer)
         when(project.getServices()).thenReturn(serviceRegistry)
+
+        Path path = Path.path(taskClass.simpleName.toLowerCase())
+
+        when(project.projectPath(anyString())).thenReturn(path)
+        when(project.identityPath(anyString())).thenReturn(path)
+        when(project.getGradle()).thenReturn(gradle)
+        when(gradle.getIdentityPath()).thenReturn(Path.path('gradle'))
         when(extensionContainer.getByName(GolangPlugin.GOGRADLE_INJECTOR)).thenReturn(GogradleGlobal.INSTANCE.injector)
-        T ret = AbstractTask.injectIntoNewInstance(project, 'task', taskClass, { taskClass.newInstance() })
+        T ret = AbstractTask.injectIntoNewInstance(project, TaskIdentity.create(taskClass.simpleName.toLowerCase(), taskClass, project), { taskClass.newInstance() })
 
         fields.each { fieldName, fieldInstance ->
             setFieldSafely(ret, fieldName, fieldInstance)

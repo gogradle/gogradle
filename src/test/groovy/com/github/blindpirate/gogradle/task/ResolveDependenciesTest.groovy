@@ -20,7 +20,12 @@ package com.github.blindpirate.gogradle.task
 import com.github.blindpirate.gogradle.GogradleGlobal
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.dependency.*
+import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
+import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
+import com.github.blindpirate.gogradle.core.dependency.LocalDirectoryDependency
+import com.github.blindpirate.gogradle.core.dependency.NotationDependency
+import com.github.blindpirate.gogradle.core.dependency.ResolveContext
+import com.github.blindpirate.gogradle.core.dependency.ResolvedDependency
 import com.github.blindpirate.gogradle.core.dependency.produce.DependencyVisitor
 import com.github.blindpirate.gogradle.core.dependency.tree.DependencyTreeNode
 import com.github.blindpirate.gogradle.support.MockRefreshDependencies
@@ -33,7 +38,6 @@ import com.github.blindpirate.gogradle.vcs.VcsResolvedDependency
 import com.github.blindpirate.gogradle.vcs.git.GitNotationDependency
 import org.gradle.api.internal.tasks.TaskExecutionOutcome
 import org.gradle.api.internal.tasks.TaskStateInternal
-import org.gradle.api.tasks.TaskState
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -49,7 +53,8 @@ import static com.github.blindpirate.gogradle.core.mode.BuildMode.DEVELOP
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_TASK_NAME
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Matchers.any
-import static org.mockito.Mockito.*
+import static org.mockito.Mockito.verify
+import static org.mockito.Mockito.when
 
 @RunWith(GogradleRunner)
 @WithResource('')
@@ -151,9 +156,8 @@ class ResolveDependenciesTest extends TaskTest {
         // given
         'dependency resolution should succeed'()
         ReflectionUtils.setField(resolveBuildDependenciesTask, 'dependencyTree', null)
-        TaskState state = mock(TaskStateInternal)
-        ReflectionUtils.setField(resolveBuildDependenciesTask, 'state', state)
-        when(state.getOutcome()).thenReturn(TaskExecutionOutcome.UP_TO_DATE)
+        TaskStateInternal state = ReflectionUtils.getField(resolveBuildDependenciesTask, '_state')
+        state.outcome = TaskExecutionOutcome.UP_TO_DATE
 
         // when
         DependencyTreeNode tree = resolveBuildDependenciesTask.dependencyTree
@@ -205,7 +209,7 @@ class ResolveDependenciesTest extends TaskTest {
 
     @Test
     void 'cache binary file should be updated even if error occurred'() {
-        when(configurationManager.getByName(anyString())).thenThrow(Exception)
+        when(configurationManager.getByName(anyString())).thenThrow(RuntimeException)
         try {
             resolveBuildDependenciesTask.resolve()
         }
