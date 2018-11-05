@@ -54,7 +54,7 @@ public class JsonGoTestResultExtractor extends AbstractGoTestResultExtractor {
 
     private GoTestResultJsonModel getResultOrFallback(List<GoTestResultJsonModel> testEvents) {
         return testEvents.stream()
-                .filter(GoTestResultJsonModel.filter(ActionType.PASS, ActionType.FAIL))
+                .filter(GoTestResultJsonModel.filter(ActionType.PASS, ActionType.FAIL, ActionType.SKIP))
                 .findAny()
                 .orElseGet(GoTestResultJsonModel::new);
     }
