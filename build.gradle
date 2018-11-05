@@ -104,14 +104,24 @@ dependencies {
 }
 /************** test **************/
 // Define integration test task
-['integrationTest', 'crossVersionTest'].each { taskName ->
-    tasks.create(name: taskName, type: Test) {
+createIntegrationTest('integrationTest', 'integrationTest')
+
+["3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.2"].each {
+    def testTask = createIntegrationTest("gradle${it}CrossVersionTest", 'crossVersionTest')
+    testTask.systemProperty('test.gradle.version', it)
+    testTask.mustRunAfter 'integrationTest'
+}
+
+def createIntegrationTest(String taskName, String sourceSet) {
+    project.tasks.create(name: taskName, type: Test) {
         if (gradle.gradleVersion.startsWith('4')) {
-            testClassesDirs = sourceSets[taskName].output.classesDirs
+            testClassesDirs = sourceSets[sourceSet].output.classesDirs
         } else {
-            testClassesDir = sourceSets[taskName].output.classesDir
+            testClassesDir = sourceSets[sourceSet].output.classesDir
         }
-        classpath = sourceSets[taskName].runtimeClasspath
+        classpath = sourceSets[sourceSet].runtimeClasspath
+        dependsOn 'shadowJar'
+        mustRunAfter 'test'
     }
 }
 
@@ -122,13 +132,10 @@ project.tasks.withType(Test) {
     }
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
     it.systemProperty('GOGRADLE_ROOT', rootDir.absolutePath.replace('\\', '/'))
+    check.dependsOn(it)
 }
 
-check.dependsOn javadoc, jacocoTestReport, test, integrationTest, crossVersionTest
-integrationTest.dependsOn shadowJar
-integrationTest.mustRunAfter test
-crossVersionTest.dependsOn shadowJar
-crossVersionTest.mustRunAfter test, integrationTest
+check.dependsOn javadoc, jacocoTestReport 
 
 /************** testTop1000 **********/
 

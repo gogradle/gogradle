@@ -28,15 +28,6 @@ import org.gradle.testkit.runner.GradleRunner
 @WithResource("go-test-cover")
 @RunWith(GogradleRunner::class)
 class CrossVersionSmokeTest : IntegrationTestSupport() {
-    companion object {
-        @JvmField
-        val VERSIONS = listOf(
-                "3.5.1",
-                "4.0.1", "4.1", "4.2.1", "4.3.1",
-                "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.2"
-        )
-    }
-
     override fun getProjectRoot(): File {
         return resource
     }
@@ -47,14 +38,12 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
 
         File(resource, "gradle.properties").writeText("org.gradle.daemon=false")
 
-        VERSIONS.forEach {
-            GradleRunner.create()
-                    .withProjectDir(resource)
-                    .withArguments("cover", "test", "--info")
-                    .withGradleVersion(it)
-                    .forwardOutput()
-                    .build()
-            GoCoverTest.examineCoverageHtmls(resource)
-        }
+        GradleRunner.create()
+                .withProjectDir(resource)
+                .withArguments("cover", "test", "--info")
+                .withGradleVersion(System.getProperty("test.gradle.version"))
+                .forwardOutput()
+                .build()
+        GoCoverTest.examineCoverageHtmls(resource)
     }
 }

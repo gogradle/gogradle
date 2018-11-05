@@ -22,12 +22,7 @@ class CrossVersionTestOnExamples {
         File(projectDir, "gradle.properties").writeText("org.gradle.daemon=false")
     }
 
-    fun crossVersionTest(function: (String) -> Unit) {
-        CrossVersionSmokeTest.VERSIONS.forEach {
-            println("Start building with $it.")
-            function(it)
-        }
-    }
+    fun getTestGradleVersion() = System.getProperty("test.gradle.version")
 
     fun useDirectory(dir: String) {
         projectDir = File(System.getenv("EXAMPLES_DIR"), dir)
@@ -73,16 +68,14 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
         replaceRelativePathToAbsolutePath()
 
-        crossVersionTest {
-            cleanProjectDir()
-            GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withArguments(listOf(task, "--info", "--stacktrace", "-Duser.dir=" + projectDir.absolutePath))
-                    .withGradleVersion(it)
-                    .forwardOutput()
-                    .build()
-            assertion()
-        }
+        cleanProjectDir()
+        GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withArguments(listOf(task, "--info", "--stacktrace", "-Duser.dir=" + projectDir.absolutePath))
+                .withGradleVersion(getTestGradleVersion())
+                .forwardOutput()
+                .build()
+        assertion()
     }
 
     private fun replaceRelativePathToAbsolutePath() {
@@ -132,19 +125,17 @@ apply plugin: 'com.github.blindpirate.gogradle'
         useDirectory("multi-project")
         replaceDependenciesWithCurrentGogradleJar()
 
-        crossVersionTest {
-            cleanProjectDir()
-            GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withArguments(listOf("build", "--info"))
-                    .withGradleVersion(it)
-                    .forwardOutput()
-                    .build()
+        cleanProjectDir()
+        GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withArguments(listOf("build", "--info"))
+                .withGradleVersion(getTestGradleVersion())
+                .forwardOutput()
+                .build()
 
-            assert(processUtils.runAndGetStdout(File(projectDir, "build/libs/go1${Os.getHostOs().exeExtension()}").absolutePath).contains("I am go1"))
-            assert(processUtils.runAndGetStdout(File(projectDir, "build/libs/go2${Os.getHostOs().exeExtension()}").absolutePath).contains("I am go2"))
-            assert(File(projectDir, "build/libs/multi-project.jar").exists())
-        }
+        assert(processUtils.runAndGetStdout(File(projectDir, "build/libs/go1${Os.getHostOs().exeExtension()}").absolutePath).contains("I am go1"))
+        assert(processUtils.runAndGetStdout(File(projectDir, "build/libs/go2${Os.getHostOs().exeExtension()}").absolutePath).contains("I am go2"))
+        assert(File(projectDir, "build/libs/multi-project.jar").exists())
     }
 
     @Test
@@ -152,30 +143,26 @@ apply plugin: 'com.github.blindpirate.gogradle'
         useDirectory("failed-test")
         replacePluginsWithCurrentGogradleJar()
 
-        crossVersionTest {
-            cleanProjectDir()
-            GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withArguments(listOf("test", "--info"))
-                    .withGradleVersion(it)
-                    .forwardOutput()
-                    .buildAndFail()
+        cleanProjectDir()
+        GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withArguments(listOf("test", "--info"))
+                .withGradleVersion(getTestGradleVersion())
+                .forwardOutput()
+                .buildAndFail()
 
-            assert(IOUtils.toString(File(projectDir, ".gogradle/reports/test/index.html")).contains("33%"))
-        }
+        assert(IOUtils.toString(File(projectDir, ".gogradle/reports/test/index.html")).contains("33%"))
     }
 
     @Test
     fun testHandleTaskNameConflict() {
         useDirectory("handle-task-name-conflict")
-        crossVersionTest {
-            cleanProjectDir()
-            GradleRunner.create()
-                    .withProjectDir(projectDir)
-                    .withArguments(listOf("goBuild", "--info", "-Dgogradle.alias=true"))
-                    .withGradleVersion(it)
-                    .forwardOutput()
-                    .build()
-        }
+        cleanProjectDir()
+        GradleRunner.create()
+                .withProjectDir(projectDir)
+                .withArguments(listOf("goBuild", "--info", "-Dgogradle.alias=true"))
+                .withGradleVersion(getTestGradleVersion())
+                .forwardOutput()
+                .build()
     }
 }
