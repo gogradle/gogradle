@@ -49,7 +49,7 @@ class DefaultLockedDependencyManagerTest extends AbstractExternalDependencyFacto
     GolangDependency dependency3 = mockMultipleInterfaces(NotationDependency, ResolvedDependency)
     GolangDependency dependency4 = mockMultipleInterfaces(NotationDependency, ResolvedDependency)
 
-    String LOCK_FILE_NAME = 'gogradle.lock'
+    private static final String LOCK_FILE_NAME = 'gogradle.lock'
     String warning = ReflectionUtils.getStaticField(DefaultLockedDependencyManager, "WARNING")
     String gogradleDotLock =
             """${warning}---

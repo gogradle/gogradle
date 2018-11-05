@@ -223,8 +223,8 @@ func Test_Pass(t *testing.T){
         try {
             newBuild('test', 'cover', '--info')
         } catch (BuildException e) {
-            assert stderr.toString().contains('There are 4 failed tests')
-            assert stdout.toString().contains('FAIL: Test_A1_1')
+            assertOutputContains('There are 4 failed tests')
+            assertOutputContains('FAIL: Test_A1_1')
             examineTestReportHtmls()
         }
     }

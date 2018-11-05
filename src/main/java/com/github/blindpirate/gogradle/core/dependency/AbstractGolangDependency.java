@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.google.common.collect.ImmutableSet;
 import org.gradle.api.artifacts.Dependency;
 
+import javax.annotation.Nullable;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Objects;
@@ -99,6 +100,16 @@ public abstract class AbstractGolangDependency implements GolangDependency, Seri
     @Override
     public String getVersion() {
         throw new UnsupportedOperationException("Unsupported method getVersion is invoked!");
+    }
+
+    @Override
+    public void because(@Nullable String reason) {
+        throw new UnsupportedOperationException("Unsupported method because is invoked");
+    }
+
+    @Override
+    public String getReason() {
+        throw new UnsupportedOperationException("Unsupported method getReason is invoked");
     }
 
     @Override

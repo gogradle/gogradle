@@ -56,7 +56,7 @@ class GitMercurialDependencyManagerTest {
     VcsNotationDependency notationDependency = mockWithName(VcsNotationDependency, 'github.com/user/package')
     VcsResolvedDependency resolvedDependency = mockWithName(VcsResolvedDependency, 'github.com/user/package')
 
-    String DEFAULT_BRANCH = 'DEFAULT_BRANCH'
+    static final String DEFAULT_BRANCH = 'DEFAULT_BRANCH'
 
     @Mock
     GlobalCacheManager cacheManager
@@ -294,7 +294,7 @@ class GitMercurialDependencyManagerTest {
         // given
         withOnlyCommit(commit.id)
         IOUtils.clearDirectory(resource)
-        when(accessor.clone(pkg.urls[0], resource)).thenThrow(IOException)
+        when(accessor.clone(pkg.urls[0], resource)).thenThrow(UncheckedIOException)
         // when
         manager.resolve(resolveContext, notationDependency)
         // then

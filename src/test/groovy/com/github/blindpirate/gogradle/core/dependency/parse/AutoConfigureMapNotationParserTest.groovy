@@ -63,7 +63,7 @@ class AutoConfigureMapNotationParserTest {
     }
 
     @Test
-    void ''() {
+    void 'instance of WithDefaultConstructor'() {
         assert new AutoConfigureMapNotationParser<WithDefaultConstructor>() {
         }.parse([:]) instanceof WithDefaultConstructor
     }

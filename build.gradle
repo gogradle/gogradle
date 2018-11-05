@@ -10,6 +10,7 @@ plugins {
     id 'checkstyle'
     id 'jacoco'
     id 'antlr'
+    id 'codenarc'
     id 'com.github.kt3k.coveralls' version '2.7.1'
     id 'com.github.johnrengelman.shadow' version '1.2.4'
     id "com.gradle.plugin-publish" version "0.9.9"
@@ -86,7 +87,7 @@ dependencies {
 
     testCompile group: 'junit', name: 'junit', version: '4.11'
     testCompile group: 'com.github.stefanbirkner', name: 'system-rules', version: '1.16.1'
-    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.3.7'
+    testCompile group: 'org.mockito', name: 'mockito-core', version: '2.23.0'
     testCompile group: 'org.eclipse.jgit', name: 'org.eclipse.jgit', version: '4.5.3.201708160445-r'
     testCompile group: 'org.eclipse.jetty', name: 'jetty-server', version: '9.4.2.v20170220'
     testCompile group: 'org.eclipse.jetty', name: 'jetty-servlet', version: '9.4.2.v20170220'
@@ -103,14 +104,24 @@ dependencies {
 }
 /************** test **************/
 // Define integration test task
-['integrationTest', 'crossVersionTest'].each { taskName ->
-    tasks.create(name: taskName, type: Test) {
+createIntegrationTest('integrationTest', 'integrationTest')
+
+["3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.2"].each {
+    def testTask = createIntegrationTest("gradle${it}CrossVersionTest", 'crossVersionTest')
+    testTask.systemProperty('test.gradle.version', it)
+    testTask.mustRunAfter 'integrationTest'
+}
+
+def createIntegrationTest(String taskName, String sourceSet) {
+    project.tasks.create(name: taskName, type: Test) {
         if (gradle.gradleVersion.startsWith('4')) {
-            testClassesDirs = sourceSets[taskName].output.classesDirs
+            testClassesDirs = sourceSets[sourceSet].output.classesDirs
         } else {
-            testClassesDir = sourceSets[taskName].output.classesDir
+            testClassesDir = sourceSets[sourceSet].output.classesDir
         }
-        classpath = sourceSets[taskName].runtimeClasspath
+        classpath = sourceSets[sourceSet].runtimeClasspath
+        dependsOn 'shadowJar'
+        mustRunAfter 'test'
     }
 }
 
@@ -121,13 +132,10 @@ project.tasks.withType(Test) {
     }
     it.systemProperty("GRADLE_DIST_HOME", gradle.gradleHomeDir)
     it.systemProperty('GOGRADLE_ROOT', rootDir.absolutePath.replace('\\', '/'))
+    check.dependsOn(it)
 }
 
-check.dependsOn javadoc, jacocoTestReport, test, integrationTest, crossVersionTest
-integrationTest.dependsOn shadowJar
-integrationTest.mustRunAfter test
-crossVersionTest.dependsOn shadowJar
-crossVersionTest.mustRunAfter test, integrationTest
+check.dependsOn javadoc, jacocoTestReport 
 
 /************** testTop1000 **********/
 
@@ -253,3 +261,9 @@ shadowJar {
     }
 }
 
+
+/************ codeNarc ****************/
+
+codenarcTest {
+    exclude "**/DependencyTreeNodeTest.groovy"
+}

@@ -19,7 +19,6 @@ package com.github.blindpirate.gogradle.task
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangConfiguration
-import com.github.blindpirate.gogradle.core.dependency.GogradleRootProject
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet
 import com.github.blindpirate.gogradle.core.dependency.lock.DefaultLockedDependencyManager
 import com.github.blindpirate.gogradle.core.dependency.produce.ExternalDependencyFactory

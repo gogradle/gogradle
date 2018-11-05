@@ -60,15 +60,15 @@ class VendorWalkTest extends GogradleModuleSupport {
             it.name == 'unrecognized/a' && it.relativePathToHost == 'vendor/unrecognized/a'
         }
 
-        VendorResolvedDependency github_e_f = dependencies.find { it.name == 'github.com/e/f' }
-        assert github_e_f.dependencies.size() == 1
+        VendorResolvedDependency githubEF = dependencies.find { it.name == 'github.com/e/f' }
+        assert githubEF.dependencies.size() == 1
 
-        VendorResolvedDependency github_j_k = github_e_f.dependencies.first()
-        assert github_j_k.name == 'github.com/j/k'
-        assert github_j_k.relativePathToHost == 'vendor/github.com/e/f/vendor/github.com/j/k'
-        assert github_j_k.hostDependency == localPackage
+        VendorResolvedDependency githubJK = githubEF.dependencies.first()
+        assert githubJK.name == 'github.com/j/k'
+        assert githubJK.relativePathToHost == 'vendor/github.com/e/f/vendor/github.com/j/k'
+        assert githubJK.hostDependency == localPackage
 
-        VendorResolvedDependency unrecognized_a = dependencies.find { it.name == 'unrecognized/a' }
-        assert unrecognized_a.dependencies.isEmpty()
+        VendorResolvedDependency unrecognizedA = dependencies.find { it.name == 'unrecognized/a' }
+        assert unrecognizedA.dependencies.isEmpty()
     }
 }

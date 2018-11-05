@@ -46,7 +46,7 @@ class HgClientAccessorTest {
         // given
         ProcessUtils processUtils = mock(ProcessUtils)
         accessor = new HgClientAccessor(processUtils)
-        when(processUtils.runAndGetStdout('hg', 'version')).thenThrow(IOException)
+        when(processUtils.runAndGetStdout('hg', 'version')).thenThrow(UncheckedIOException)
 
         // then
         accessor.ensureClientExists()
