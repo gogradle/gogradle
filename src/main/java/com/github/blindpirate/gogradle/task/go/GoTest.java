@@ -22,9 +22,9 @@ import com.github.blindpirate.gogradle.build.BuildManager;
 import com.github.blindpirate.gogradle.common.LineCollector;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.task.AbstractGolangTask;
+import com.github.blindpirate.gogradle.task.go.test.GoTestResultExtractor;
 import com.github.blindpirate.gogradle.unsafe.GradleInternalAPI;
 import com.github.blindpirate.gogradle.util.IOUtils;
-import com.google.common.collect.Lists;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Incubating;
@@ -43,6 +43,7 @@ import java.io.File;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -79,7 +80,7 @@ public class GoTest extends AbstractGolangTask {
     private GolangPluginSetting setting;
 
     @Inject
-    private GoTestStdoutExtractor extractor;
+    private GoTestResultExtractor extractor;
 
     @Inject
     private BuildManager buildManager;
@@ -257,8 +258,8 @@ public class GoTest extends AbstractGolangTask {
         LineCollector lineCollector = new LineCollector();
 
         List<String> args = isCommandLineArguments()
-                ? asStringList("test", "-v", IOUtils.collectFileNames(testFiles))
-                : Lists.newArrayList("test", "-v", importPath);
+                ? asStringList(determineTestParams(), IOUtils.collectFileNames(testFiles))
+                : asStringList(determineTestParams(), importPath);
 
 
         if (generateCoverageProfile) {
@@ -277,6 +278,14 @@ public class GoTest extends AbstractGolangTask {
                 .withTestFiles(testFiles)
                 .withCode(retCode)
                 .build();
+    }
+
+    private List<String> determineTestParams() {
+        if (goBinaryManager.supportTestJsonOutput()) {
+            return Arrays.asList("test", "-v", "-json");
+        } else {
+            return Arrays.asList("test", "-v");
+        }
     }
 
     private Consumer<String> determineLineConsumer(LineCollector lineCollector, String importPath) {

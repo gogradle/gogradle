@@ -59,6 +59,8 @@ import com.github.blindpirate.gogradle.core.pack.UnrecognizedPackagePathResolver
 import com.github.blindpirate.gogradle.core.pack.VcsPackagePathResolver;
 import com.github.blindpirate.gogradle.crossplatform.DefaultGoBinaryManager;
 import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
+import com.github.blindpirate.gogradle.task.go.test.DefaultGoTestResultExtractor;
+import com.github.blindpirate.gogradle.task.go.test.GoTestResultExtractor;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
 import com.github.blindpirate.gogradle.util.logging.DebugLogMethodInterceptor;
 import com.github.blindpirate.gogradle.vcs.Bazaar;
@@ -125,6 +127,7 @@ public class GogradleModule extends AbstractModule {
         bind(BuildConstraintManager.class).to(DefaultBuildConstraintManager.class);
         bind(DependencyVisitor.class).to(DefaultDependencyVisitor.class);
         bind(LockedDependencyManager.class).to(DefaultLockedDependencyManager.class);
+        bind(GoTestResultExtractor.class).to(DefaultGoTestResultExtractor.class);
 
         bind(MapNotationParser.class).annotatedWith(Git.class).to(GitMercurialMapNotationParser.class);
         bind(NotationConverter.class).annotatedWith(Git.class).to(GitMercurialNotationConverter.class);

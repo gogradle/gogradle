@@ -11,6 +11,8 @@ env:
     - JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=256m
 jdk:
   - oraclejdk8
+go:
+  - "1.10.x"
 script: ./gradlew check --info --stacktrace --max-workers=1
 after_success:
   - ./gradlew jacocoTestReport coveralls

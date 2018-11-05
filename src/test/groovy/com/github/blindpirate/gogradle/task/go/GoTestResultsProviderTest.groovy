@@ -27,7 +27,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.mockito.Mock
 
-import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult
+import static com.github.blindpirate.gogradle.task.go.test.AbstractGoTestResultExtractor.GoTestMethodResult
 import static org.mockito.ArgumentMatchers.anyString
 import static org.mockito.Mockito.*
 

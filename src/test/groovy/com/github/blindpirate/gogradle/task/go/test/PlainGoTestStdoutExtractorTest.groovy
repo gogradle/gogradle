@@ -15,10 +15,11 @@
  *
  */
 
-package com.github.blindpirate.gogradle.task.go
+package com.github.blindpirate.gogradle.task.go.test
 
 import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.support.WithResource
+import com.github.blindpirate.gogradle.task.go.PackageTestResult
 import com.github.blindpirate.gogradle.util.IOUtils
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult
 import org.gradle.api.tasks.testing.TestResult
@@ -27,9 +28,9 @@ import org.junit.runner.RunWith
 
 @RunWith(GogradleRunner)
 @WithResource('')
-class GoTestStdoutExtractorTest {
+class PlainGoTestStdoutExtractorTest {
 
-    GoTestStdoutExtractor extractor = new GoTestStdoutExtractor()
+    PlainGoTestResultExtractor extractor = new PlainGoTestResultExtractor()
 
     File resource
 

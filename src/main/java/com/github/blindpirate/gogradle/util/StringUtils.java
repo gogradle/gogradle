@@ -107,6 +107,10 @@ public class StringUtils {
         return !a.equals(b) && b.startsWith(a);
     }
 
+    public static int count(String str, char ch) {
+        return org.apache.commons.lang3.StringUtils.countMatches(str, ch);
+    }
+
     public static String toUnixString(Path path) {
         return path.toString().replace("\\", "/");
     }

@@ -32,7 +32,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.task.go.GoTestStdoutExtractor.GoTestMethodResult;
+import static com.github.blindpirate.gogradle.task.go.test.PlainGoTestResultExtractor.GoTestMethodResult;
 
 public class GoTestResultsProvider implements TestResultsProvider {
     private List<TestClassResult> testClassResults = new ArrayList<>();
