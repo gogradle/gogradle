@@ -197,19 +197,18 @@ public class GoTest extends AbstractGolangTask {
     }
 
     private List<TestClassResult> doTest() {
-        List<TestClassResult> ret = new ArrayList<>();
-
         Map<File, List<File>> parentDirToTestFiles = determineTestPattern();
 
-        parentDirToTestFiles.forEach((parentDir, testFiles) -> {
+        return parentDirToTestFiles.entrySet().parallelStream().map(entry -> {
+            File parentDir = entry.getKey();
+            List<File> testFiles = entry.getValue();
             String packageImportPath = dirToImportPath(parentDir);
             PackageTestResult result = doSingleTest(packageImportPath, testFiles);
 
             List<TestClassResult> resultOfSinglePackage = extractor.extractTestResult(result);
             logResult(packageImportPath, resultOfSinglePackage);
-            ret.addAll(resultOfSinglePackage);
-        });
-        return ret;
+            return resultOfSinglePackage;
+        }).collect(ArrayList::new, List::addAll, List::addAll);
     }
 
     private Map<File, List<File>> determineTestPattern() {
