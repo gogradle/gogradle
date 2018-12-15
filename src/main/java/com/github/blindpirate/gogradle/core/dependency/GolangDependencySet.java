@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.GolangCloneable;
 import com.github.blindpirate.gogradle.core.cache.CacheScope;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.ExceptionHandler;
 import com.google.common.collect.ImmutableSet;
 
 import java.io.Serializable;
@@ -243,7 +244,7 @@ public class GolangDependencySet implements Set<GolangDependency>, Serializable,
             this.container.forEach(item -> ret.add((GolangDependency) item.clone()));
             return ret;
         } catch (CloneNotSupportedException e) {
-            return null;
+            throw ExceptionHandler.uncheckException(e);
         }
     }
 }

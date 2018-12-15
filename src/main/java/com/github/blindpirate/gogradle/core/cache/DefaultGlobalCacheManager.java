@@ -185,6 +185,7 @@ public class DefaultGlobalCacheManager implements GlobalCacheManager {
         return gradleHome.resolve(REPO_CACHE_PATH).resolve(packagePath).resolve(METADATA_FILE_NAME).toFile();
     }
 
+    @SuppressFBWarnings("UPM_UNCALLED_PRIVATE_METHOD")
     private File getMetadataPath(VcsGolangPackage pkg) {
         return getMetadataPath(pkg.getRootPathString());
     }

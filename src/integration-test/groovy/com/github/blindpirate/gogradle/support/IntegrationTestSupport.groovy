@@ -24,7 +24,7 @@ import edu.umd.cs.findbugs.annotations.SuppressFBWarnings
 import org.gradle.tooling.*
 import org.junit.Before
 
-@SuppressFBWarnings('SE_BAD_FIELD_INNER_CLASS')
+@SuppressFBWarnings("SE_BAD_FIELD_INNER_CLASS")
 abstract class IntegrationTestSupport {
     File resource
 

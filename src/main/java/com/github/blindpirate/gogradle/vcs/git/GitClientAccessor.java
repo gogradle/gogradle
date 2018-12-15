@@ -100,7 +100,7 @@ public class GitClientAccessor extends GitMercurialAccessor {
     public long lastCommitTimeOfPath(File repoRoot, Path relativePath) {
         return run(repoRoot,
                 asList("git", "log", "-1", "--pretty=format:%ct", toUnixString(relativePath)),
-                result -> toMilliseconds(Long.valueOf(result.getStdout().trim())));
+                result -> toMilliseconds(Long.parseLong(result.getStdout().trim())));
     }
 
     @Override

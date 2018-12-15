@@ -23,4 +23,7 @@
     <Match>
         <Package name="com.github.blindpirate.gogradle.antlr"/>
     </Match>
+    <Match>
+        <Method name="~.*getCallSiteArray.*"/>
+    </Match>
 </FindBugsFilter>

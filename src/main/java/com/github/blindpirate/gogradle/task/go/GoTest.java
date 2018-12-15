@@ -28,7 +28,7 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.gradle.api.Incubating;
-import org.gradle.api.internal.tasks.options.Option;
+import org.gradle.api.tasks.options.Option;
 import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;

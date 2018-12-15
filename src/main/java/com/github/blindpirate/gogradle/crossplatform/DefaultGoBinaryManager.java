@@ -26,7 +26,6 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.ProcessUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.zafarkhaja.semver.Version;
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.filefilter.TrueFileFilter;
 import org.apache.commons.lang3.tuple.Pair;
 import org.gradle.api.logging.Logger;
@@ -255,7 +254,6 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
                 globalCacheManager.getGlobalGoBinCacheDir(version));
     }
 
-    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     private Path downloadArchive(String version) {
         String url = injectVariables(setting.getGoBinaryDownloadTemplate(), version);
         String archiveFileName = injectVariables(FILENAME, version);
