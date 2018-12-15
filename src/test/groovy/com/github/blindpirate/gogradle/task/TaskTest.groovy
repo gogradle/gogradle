@@ -39,6 +39,7 @@ import org.gradle.api.internal.GradleInternal
 import org.gradle.api.internal.plugins.ExtensionContainerInternal
 import org.gradle.api.internal.project.ProjectInternal
 import org.gradle.api.internal.project.taskfactory.TaskIdentity
+import org.gradle.api.model.ObjectFactory
 import org.gradle.internal.service.ServiceRegistry
 import org.gradle.util.Path
 import org.junit.Before
@@ -81,6 +82,8 @@ abstract class TaskTest {
     ExtensionContainerInternal extensionContainer
     @Mock
     ServiceRegistry serviceRegistry
+    @Mock
+    ObjectFactory objectFactory
     @Mock
     GradleInternal gradle
     // This is a real task container for test tasks to fetch notationDependency tasks from
@@ -127,6 +130,7 @@ abstract class TaskTest {
         when(project.projectPath(anyString())).thenReturn(path)
         when(project.identityPath(anyString())).thenReturn(path)
         when(project.getGradle()).thenReturn(gradle)
+        when(project.getObjects()).thenReturn(objectFactory)
         when(gradle.getIdentityPath()).thenReturn(Path.path('gradle'))
         when(extensionContainer.getByName(GolangPlugin.GOGRADLE_INJECTOR)).thenReturn(GogradleGlobal.INSTANCE.injector)
         T ret = AbstractTask.injectIntoNewInstance(project, TaskIdentity.create(taskClass.simpleName.toLowerCase(), taskClass, project), { taskClass.newInstance() })

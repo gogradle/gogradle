@@ -156,7 +156,7 @@ class ResolveDependenciesTest extends TaskTest {
         // given
         'dependency resolution should succeed'()
         ReflectionUtils.setField(resolveBuildDependenciesTask, 'dependencyTree', null)
-        TaskStateInternal state = ReflectionUtils.getField(resolveBuildDependenciesTask, '_state')
+        TaskStateInternal state = ReflectionUtils.getField(resolveBuildDependenciesTask, 'state')
         state.outcome = TaskExecutionOutcome.UP_TO_DATE
 
         // when
