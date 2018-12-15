@@ -6,22 +6,24 @@ plugins {
     id 'java'
     id 'groovy'
     id 'idea'
-    id 'findbugs'
     id 'checkstyle'
     id 'jacoco'
     id 'antlr'
     id 'codenarc'
     id 'com.github.kt3k.coveralls' version '2.7.1'
-    id 'com.github.johnrengelman.shadow' version '1.2.4'
+    id 'com.github.johnrengelman.shadow' version '4.0.3'
     id "com.gradle.plugin-publish" version "0.9.9"
     id "co.riiid.gradle" version "0.4.2"
-    id "org.jetbrains.kotlin.jvm" version "1.2.0"
+    id "org.jetbrains.kotlin.jvm" version "1.3.11"
+    id "com.github.spotbugs" version "1.6.6"
 }
 
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
 version '0.10.2'
+sourceCompatibility = '1.8'
+targetCompatibility = '1.8'
 
 /************** sourcesets **************/
 sourceSets {
@@ -107,7 +109,7 @@ dependencies {
 // Define integration test task
 createIntegrationTest('integrationTest', 'integrationTest')
 
-["3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.2"].each {
+["3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.3", "5.0"].each {
     def testTask = createIntegrationTest("gradle${it}CrossVersionTest", 'crossVersionTest')
     testTask.systemProperty('test.gradle.version', it)
     testTask.mustRunAfter 'integrationTest'
@@ -115,7 +117,7 @@ createIntegrationTest('integrationTest', 'integrationTest')
 
 def createIntegrationTest(String taskName, String sourceSet) {
     project.tasks.create(name: taskName, type: Test) {
-        if (gradle.gradleVersion.startsWith('4')) {
+        if (gradle.gradleVersion.startsWith('4') || gradle.gradleVersion.startsWith("5")) {
             testClassesDirs = sourceSets[sourceSet].output.classesDirs
         } else {
             testClassesDir = sourceSets[sourceSet].output.classesDir
@@ -127,7 +129,7 @@ def createIntegrationTest(String taskName, String sourceSet) {
 }
 
 project.tasks.withType(Test) {
-    mustRunAfter findbugsMain, findbugsTest, findbugsIntegrationTest, findbugsCrossVersionTest
+    mustRunAfter spotbugsMain, spotbugsTest, spotbugsIntegrationTest, spotbugsCrossVersionTest
     if (gradle.startParameter.isOffline()) {
         it.systemProperty("TEST_ARE_OFFLINE", 'true')
     }
@@ -161,16 +163,6 @@ checkstyleTest {
     enabled = false
 }
 
-/************** findbugs **************/
-
-tasks.withType(FindBugs) {
-    reports {
-        xml.enabled false
-        html.enabled true
-    }
-    excludeFilter = file("$rootProject.projectDir/config/findbugs/exclude.xml")
-}
-
 /************** javadoc **************/
 
 javadoc {
@@ -180,7 +172,7 @@ javadoc {
 /************** coverage **************/
 
 jacoco {
-    toolVersion = "0.7.7.201606060606"
+    toolVersion = "0.8.2"
 }
 jacocoTestReport {
     reports {
@@ -259,6 +251,18 @@ tasks.withType(KotlinCompile) {
 shadowJar {
     dependencies {
         exclude 'org/gradle/**', 'groovy/**'
+    }
+}
+
+/************ spotbugs ****************/
+spotbugs {
+    excludeFilter = file("config/spotbugs/exclude.xml")
+}
+
+tasks.withType(com.github.spotbugs.SpotBugsTask) {
+    reports {
+        xml.enabled = false
+        html.enabled = true
     }
 }
 

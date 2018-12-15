@@ -41,7 +41,7 @@
     <property name="fileExtensions" value="java, extrProperties, xml"/>
 
     <module name="SuppressionFilter">
-        <property name="file" value="config/checkstyle/suppressions.xml" />
+        <property name="file" value="${config_loc}/suppressions.xml" />
     </module>
 
     <!-- Checks that a package-info.java file exists for each package.     -->

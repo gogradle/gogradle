@@ -9,11 +9,11 @@ env:
     - DEP_DIR=/home/travis/dep
     - EXAMPLES_DIR=/home/travis/examples
     - JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=256m
-jdk:
-  - oraclejdk8
 go:
   - "1.10.x"
-script: ./gradlew check --info --stacktrace --max-workers=1
+jdk:
+  - openjdk11
+script: ./gradlew check --info --stacktrace
 after_success:
   - ./gradlew jacocoTestReport coveralls
   - free -mt

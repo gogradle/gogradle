@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.util;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import groovy.lang.Closure;
 import org.gradle.util.ConfigureUtil;
 import org.joor.ReflectException;
@@ -31,6 +32,7 @@ import java.util.Optional;
 
 import static org.joor.Reflect.on;
 
+@SuppressFBWarnings("RV_RETURN_VALUE_IGNORED_INFERRED")
 public class ConfigureUtils {
     public static <T> T configureByMapQuietly(Map<?, ?> properties, T delegate) {
         if (properties.isEmpty()) {

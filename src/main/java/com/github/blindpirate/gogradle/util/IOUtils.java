@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.util;
 import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.core.dependency.install.DependencyInstallFileFilter;
 import com.github.blindpirate.gogradle.crossplatform.Os;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.filefilter.IOFileFilter;
 import org.apache.commons.io.filefilter.TrueFileFilter;
@@ -299,6 +300,7 @@ public final class IOUtils {
 
     // It is said that this method has very bad performance
     // http://stackoverflow.com/questions/453018/number-of-lines-in-a-file-in-java
+    @SuppressFBWarnings("RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE")
     public static long countLines(Path path) {
         try (Stream<String> lines = Files.lines(path)) {
             return lines.count();
