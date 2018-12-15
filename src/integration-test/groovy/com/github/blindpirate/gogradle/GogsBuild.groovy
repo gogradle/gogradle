@@ -49,7 +49,7 @@ golang {
     goVersion='1.8'
 }
 
-vet {
+goVet {
     continueOnFailure = true
 }
 
@@ -63,7 +63,7 @@ vet {
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
-            writeBuildAndSettingsDotGradle(buildDotGradle + 'test.enabled = false\n')
+            writeBuildAndSettingsDotGradle(buildDotGradle + 'goTest.enabled = false\n')
         } else {
             writeBuildAndSettingsDotGradle(buildDotGradle)
         }
@@ -101,13 +101,13 @@ dependencies {
 
     void firstBuild() {
         newBuild {
-            it.forTasks('clean', 'build', 'check', 'lock')
+            it.forTasks('goClean', 'goBuild', 'goCheck', 'goLock')
         }
     }
 
     void secondBuild() {
         newBuild {
-            it.forTasks('build', 'check')
+            it.forTasks('goBuild', 'goCheck')
         }
     }
 

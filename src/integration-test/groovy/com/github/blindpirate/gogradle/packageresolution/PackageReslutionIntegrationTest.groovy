@@ -47,7 +47,7 @@ dependencies {
         setStub()
 
         // when
-        newBuild('dependencies')
+        newBuild('goDependencies')
 
         // then
         verify(1, getRequestedFor(urlEqualTo('/a?go-get=1')))
@@ -83,7 +83,7 @@ Nothing to see here;
         writeMetadata(true)
 
         // when
-        newBuild('vendor')
+        newBuild('goVendor')
 
         // then
         verify(0, getRequestedFor(anyUrl()))
@@ -98,7 +98,7 @@ Nothing to see here;
         writeMetadata("http://anotherUrl", false)
 
         // when
-        newBuild('dependencies')
+        newBuild('goDependencies')
 
         // then
         verify(1, getRequestedFor(urlEqualTo('/a?go-get=1')))

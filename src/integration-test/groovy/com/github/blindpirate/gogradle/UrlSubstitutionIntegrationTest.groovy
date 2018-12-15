@@ -64,7 +64,7 @@ dependencies {
     @Test
     void 'url substitution should succeed'() {
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
 
         assert new File(resource, "vendor/my/awesome/project/main.go").exists()

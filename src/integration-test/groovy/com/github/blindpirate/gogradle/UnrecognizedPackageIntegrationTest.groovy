@@ -101,7 +101,7 @@ dependencies {
 
 """)
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
         assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
     }
@@ -125,7 +125,7 @@ dependencies {
 
 """)
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
         assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
     }

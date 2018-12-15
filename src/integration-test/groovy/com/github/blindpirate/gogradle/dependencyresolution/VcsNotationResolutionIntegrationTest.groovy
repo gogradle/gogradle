@@ -52,14 +52,14 @@ golang {
         gitServer.start(GitServer.DEFAULT_PORT)
 
         // when
-        newBuild('vendor')
+        newBuild('goVendor')
 
         // then
         assert new File(projectRoot, 'vendor/a/1.go').exists()
 
         // when
         gitServer.addFileToRepository(repoRoot, '2.go')
-        newBuild('vendor', '--rerun-tasks')
+        newBuild('goVendor', '--rerun-tasks')
 
         // then
         assert new File(projectRoot, 'vendor/a/2.go').exists()
@@ -70,7 +70,7 @@ golang {
         GitServer.git('checkout master', repoRoot)
 
         // then
-        newBuild('clean', 'vendor')
+        newBuild('goClean', 'goVendor')
     }
 
     @Override

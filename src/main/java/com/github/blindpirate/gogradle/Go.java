@@ -50,7 +50,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_T
  * <pre>
  * {@code
  * task myTask(type: Go) {
- *     dependsOn 'vendor'
+ *     dependsOn 'goVendor'
  *     go 'build -o /my/output/location --my-own-cmd-arguments github.com/my/package/cmd' {
  *        environment 'key1', 'value1'
  *        stdout appendTo('./my.log')

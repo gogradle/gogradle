@@ -60,7 +60,7 @@ testImports:
   - redis
 ''')
         newBuild {
-            it.forTasks('init')
+            it.forTasks('goInit')
         }
 
         assert new File(resource, 'build.gradle').text.contains('''\
@@ -72,7 +72,7 @@ dependencies {
     }
 }''')
         newBuild {
-            it.forTasks('init')
+            it.forTasks('goInit')
         }
 
         assert stdout.toString().contains('This project seems to have been initialized already, skip')
@@ -89,7 +89,7 @@ package main
 import "github.com/c/d"
 ''')
         newBuild {
-            it.forTasks('init')
+            it.forTasks('goInit')
         }
 
         assert new File(resource, 'build.gradle').text.contains('''\

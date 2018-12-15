@@ -118,7 +118,7 @@ build {
     }
 
     private boolean goInit(Path path) {
-        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'init', '--stacktrace').directory(path.toFile())
+        ProcessBuilder pb = new ProcessBuilder().command('./gradlew', 'goInit', '--stacktrace').directory(path.toFile())
         pb.redirectOutput(ProcessBuilder.Redirect.appendTo(stdout))
         pb.redirectError(ProcessBuilder.Redirect.appendTo(stderr))
 

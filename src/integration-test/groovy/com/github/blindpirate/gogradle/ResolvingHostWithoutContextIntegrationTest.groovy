@@ -63,11 +63,11 @@ dependencies {
     @Test
     void 'test'() {
         newBuild {
-            it.forTasks('lock')
+            it.forTasks('goLock')
         }
 
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
 
         assert new File(resource, 'vendor/github.com/user/b/b.go').exists()

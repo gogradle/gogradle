@@ -69,7 +69,7 @@ dependencies {
     @Test
     void 'exclusion in ancestor should succeed'() {
         newBuild {
-            it.forTasks('dependencies', 'vendor')
+            it.forTasks('goDependencies', 'goVendor')
         }
 
         assert new File(resource, 'project/vendor/a/a.go').exists()

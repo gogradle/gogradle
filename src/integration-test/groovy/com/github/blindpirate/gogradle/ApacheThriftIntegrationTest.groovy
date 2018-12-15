@@ -28,7 +28,7 @@ func Say(s string){
 
     @Test
     void 'depending on thrift should succeed'() {
-        newBuild('dependencies')
+        newBuild('goDependencies')
         assert stdout.toString().contains('''\
 github.com/my/project
 \\-- git.apache.org/thrift.git''')

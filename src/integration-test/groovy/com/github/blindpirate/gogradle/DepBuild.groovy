@@ -50,11 +50,11 @@ golang {
     goVersion='1.9'
 }
 
-build {
+goBuild {
     go 'build -o ./.gogradle/dep github.com/golang/dep/cmd/dep'
 }
 
-test.enabled = false
+goTest.enabled = false
 """)
     }
 
@@ -84,11 +84,11 @@ test.enabled = false
     }
 
     void firstBuild() {
-        newBuild('clean', 'build', 'lock')
+        newBuild('goClean', 'goBuild', 'goLock')
     }
 
     void secondBuild() {
-        newBuild('build')
+        newBuild('goBuild')
     }
 }
 

@@ -62,6 +62,7 @@ golang {
         IOUtils.write(resource, '.a.go', '')
         IOUtils.write(resource, '_a.go', '')
         IOUtils.write(resource, 'sub/testdata/a.go', '')
+        IOUtils.write(resource, 'settings.gradle', '')
     }
 
     @Test
