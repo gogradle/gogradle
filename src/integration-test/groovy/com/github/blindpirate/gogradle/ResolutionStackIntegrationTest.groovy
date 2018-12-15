@@ -62,7 +62,7 @@ dependencies {
     @Test
     void 'resolution stack should be printed'() {
         try {
-            newBuild('vendor')
+            newBuild('goVendor')
         } catch (BuildException e) {
             String target = """
 Cannot recognize package: unrecognized
@@ -87,7 +87,7 @@ Resolution stack is:
 
         try {
             newBuild {
-                it.forTasks('vendor')
+                it.forTasks('goVendor')
             }
         } catch (BuildException e) {
             assertOutputContains("""\

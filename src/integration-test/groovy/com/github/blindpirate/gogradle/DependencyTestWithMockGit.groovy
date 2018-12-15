@@ -113,7 +113,7 @@ dependencies {
 
     void firstBuild() {
         newBuild { build ->
-            build.forTasks('vendor', 'dependencies')
+            build.forTasks('goVendor', 'goDependencies')
         }
 
         System.out.println(stdout)
@@ -149,7 +149,7 @@ dependencies {
 
     void secondBuildWithUpToDate() {
         newBuild { build ->
-            build.forTasks('vendor')
+            build.forTasks('goVendor')
         }
         assert stdout.toString().contains(':resolveBuildDependencies UP-TO-DATE')
         assert stdout.toString().contains(':resolveTestDependencies UP-TO-DATE')

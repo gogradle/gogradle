@@ -55,7 +55,7 @@ dependencies {
     void 'global cache should be updated when tag not exists'() {
         try {
             newBuild {
-                it.forTasks('vendor')
+                it.forTasks('goVendor')
             }
         } catch (BuildException e) {
             assertOutputContains("Cannot find tag")
@@ -75,7 +75,7 @@ dependencies {
         }
 
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
 
         assert new File(resource, 'vendor/localhost/a/2.go').exists()

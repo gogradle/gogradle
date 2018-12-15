@@ -156,7 +156,7 @@ golang {
         IOUtils.deleteQuitely(new File(getProjectRoot(), 'gogradle.lock'))
         try {
             newBuild {
-                it.forTasks('init')
+                it.forTasks('goInit')
             }
         } finally {
             println(stdout)

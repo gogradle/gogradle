@@ -59,7 +59,7 @@ dependencies {
     @Test
     void 'incremental installation should succeed'() {
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
 
         assert new File(resource, 'vendor/localhost/a/a.go').exists()
@@ -90,7 +90,7 @@ dependencies {
 """)
 
         newBuild({
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }, ['--info'])
 
         assert new File(resource, 'vendor/localhost/a/a.go').text == ''

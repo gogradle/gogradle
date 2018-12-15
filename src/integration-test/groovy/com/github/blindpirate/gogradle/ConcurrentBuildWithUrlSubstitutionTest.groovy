@@ -156,7 +156,7 @@ golang {
 """
             writeBuildAndSettingsDotGradle(buildDotGradle)
             newBuild {
-                it.forTasks('vendor')
+                it.forTasks('goVendor')
             }
         }
     }

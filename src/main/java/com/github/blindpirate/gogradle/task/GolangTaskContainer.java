@@ -17,7 +17,6 @@
 
 package com.github.blindpirate.gogradle.task;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.task.go.GoBuild;
 import com.github.blindpirate.gogradle.task.go.GoCover;
 import com.github.blindpirate.gogradle.task.go.GoTest;
@@ -38,33 +37,25 @@ import java.util.Map;
 @Singleton
 public class GolangTaskContainer implements Iterable<Task> {
     // prepare everything
-    public static final String PREPARE_TASK_NAME = determineAlias("prepare", "goPrepare");
+    public static final String PREPARE_TASK_NAME = "goPrepare";
     // produce all dependencies by analyzing build.gradle
     public static final String RESOLVE_BUILD_DEPENDENCIES_TASK_NAME = "resolveBuildDependencies";
     public static final String RESOLVE_TEST_DEPENDENCIES_TASK_NAME = "resolveTestDependencies";
     public static final String INSTALL_DEPENDENCIES_TASK_NAME = "installDependencies";
     // show dependencies tree
-    public static final String DEPENDENCIES_TASK_NAME = determineAlias("goDependencies", "goDependencies");
+    public static final String DEPENDENCIES_TASK_NAME = "goDependencies";
 
-    public static final String INIT_TASK_NAME = determineAlias("goInit", "goInit");
-    public static final String CHECK_TASK_NAME = determineAlias("check", "goCheck");
-    public static final String LOCK_TASK_NAME = determineAlias("lock", "goLock");
-    public static final String BUILD_TASK_NAME = determineAlias("build", "goBuild");
-    public static final String CLEAN_TASK_NAME = determineAlias("clean", "goClean");
-    public static final String TEST_TASK_NAME = determineAlias("test", "goTest");
-    public static final String VENDOR_TASK_NAME = determineAlias("vendor", "goVendor");
+    public static final String INIT_TASK_NAME = "goInit";
+    public static final String CHECK_TASK_NAME = "goCheck";
+    public static final String LOCK_TASK_NAME = "goLock";
+    public static final String BUILD_TASK_NAME = "goBuild";
+    public static final String CLEAN_TASK_NAME = "goClean";
+    public static final String TEST_TASK_NAME = "goTest";
+    public static final String VENDOR_TASK_NAME = "goVendor";
     private static final String SHOW_GOPATH_GOROOT_TASK_NAME = "showGopathGoroot";
-    public static final String COVERAGE_TASK_NAME = determineAlias("cover", "goCover");
-    public static final String GOFMT_TASK_NAME = determineAlias("fmt", "gofmt");
-    public static final String GOVET_TASK_NAME = determineAlias("vet", "goVet");
-
-    private static String determineAlias(String defaultName, String aliasName) {
-        if (GogradleGlobal.isAlias()) {
-            return aliasName;
-        } else {
-            return defaultName;
-        }
-    }
+    public static final String COVERAGE_TASK_NAME = "goCover";
+    public static final String GOFMT_TASK_NAME = "gofmt";
+    public static final String GOVET_TASK_NAME = "goVet";
 
     private static final Map<String, Class<? extends Task>> TASKS =
             ImmutableMap.<String, Class<? extends Task>>builder()

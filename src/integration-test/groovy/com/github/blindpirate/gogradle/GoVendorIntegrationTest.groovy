@@ -67,7 +67,7 @@ dependencies {
     @Test
     void 'vendor task should succeed'() {
         newBuild {
-            it.forTasks('vendor')
+            it.forTasks('goVendor')
         }
 
         assert new File(resource, 'vendor/github.com/user/a/a1.go').exists()

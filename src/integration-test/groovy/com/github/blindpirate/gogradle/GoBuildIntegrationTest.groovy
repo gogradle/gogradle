@@ -111,17 +111,17 @@ func main(){
     void 'build should succeed'() {
         appendOnBuildDotGradle('''
             project.version = 1.0
-            build {
+            goBuild {
                 outputLocation = './.gogradle/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
             }
             ''')
         appendOnBuildDotGradle("""
-            build {
+            goBuild {
                 targetPlatform = 'darwin-amd64, windows-amd64, linux-386, ${Os.getHostOs()}-${Arch.getHostArch()}'
             }
             """)
 
-        newBuild('build')
+        newBuild('goBuild')
 
         assert !buildUpToDate()
 
@@ -134,7 +134,7 @@ func main(){
             new File(resource, ".gogradle/${it}").delete()
         }
 
-        newBuild('build', '-i')
+        newBuild('goBuild', '-i')
 
         assert !stdout.toString().contains(':buildDarwinAmd64 UP-TO-DATE')
         assert !stdout.toString().contains(':buildWindowsAmd64 UP-TO-DATE')
@@ -149,7 +149,7 @@ func main(){
             }
         ''')
 
-        newBuild('build')
+        newBuild('goBuild')
 
         assert runExecutable(".gogradle/myPackage-${Os.getHostOs()}-${Arch.getHostArch()}") == 'HelloWorld'
     }
@@ -175,11 +175,11 @@ func main(){
     @Test
     void 'customized build should succeed'() {
         appendOnBuildDotGradle('''
-            build {
+            goBuild {
                 go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
             }
         ''')
-        newBuild('build', '--info')
+        newBuild('goBuild', '--info')
 
         buildActionShouldExecuteOnlyOnce(stdout.toString())
         assert runExecutable("${Os.getHostOs()}_${Arch.getHostArch()}_output") == 'World'
@@ -189,10 +189,11 @@ func main(){
         List<String> lines = StringUtils.splitAndTrim(infoLog, /\n/)
 
         // :buildDarwinAmd64 (Thread[Task worker for ':',5,main]) completed. Took 0.288 secs.
-        // :build (Thread[Task worker for ':',5,main]) completed. Took 0.253 secs.)
+        // :goBuild (Thread[Task worker for ':',5,main]) completed. Took 0.253 secs.)
+        println(lines)
         List<Double> buildTimes = lines.collect {
-            if (it ==~ /^:build.*?Took ([\d.]+) secs.$/) {
-                return (it =~ /^:build.*?Took ([\d.]+) secs.$/)[0][1].toDouble()
+            if (it ==~ /^:(?:goB|b)uild.*?Took ([\d.]+) secs.$/) {
+                return (it =~ /^:(?:goB|b)uild.*?Took ([\d.]+) secs.$/)[0][1].toDouble()
             } else {
                 return null
             }
@@ -206,13 +207,13 @@ func main(){
     void 'can run multiple go command'() {
         // given
         appendOnBuildDotGradle('''
-            build {
+            goBuild {
                 go 'build -o ./out/main github.com/my/package'
                 go 'build -o ./out/sub github.com/my/package'
             }
         ''')
         // when
-        newBuild('build')
+        newBuild('goBuild')
         // then
         assert new File(resource, 'out/main').exists()
         assert new File(resource, 'out/sub').exists()
@@ -224,7 +225,7 @@ func main(){
 
     void firstBuild() {
         // when
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         // then
         assert !buildUpToDate()
     }
@@ -233,7 +234,7 @@ func main(){
     void 'no incremental build if outputLocation is not set'() {
         // given
         appendOnBuildDotGradle('''
-            build {
+            goBuild {
                 go 'build -o ./${PROJECT_NAME}-${GOOS}-${GOARCH} github.com/my/package'
             }
         ''')
@@ -241,7 +242,7 @@ func main(){
         // when
         firstBuild()
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert !buildUpToDate()
     }
 
@@ -250,7 +251,7 @@ func main(){
         // when
         firstBuild()
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert buildUpToDate()
     }
 
@@ -265,7 +266,7 @@ func main(){
             }
         ''')
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert !buildUpToDate()
     }
 
@@ -280,7 +281,7 @@ func main(){
             }
         ''')
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert !buildUpToDate()
     }
 
@@ -290,12 +291,12 @@ func main(){
         'incremental build by default'()
         // when
         appendOnBuildDotGradle('''
-            build {
+            goBuild {
                 environment 'a','b'
             }
         ''')
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert !buildUpToDate()
     }
 
@@ -307,7 +308,7 @@ func main(){
         new File(resource, 'main.go') << '\n\n'
 
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert !buildUpToDate()
     }
 
@@ -320,7 +321,7 @@ func main(){
         IOUtils.deleteQuitely(new File(resource, '.dep/dep.go'))
 
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert !buildUpToDate()
     }
 
@@ -352,7 +353,7 @@ func main(){
         new File(resource, 'main_test.go') << '\n\n'
 
         // then
-        newBuild('build', '--console=plain')
+        newBuild('goBuild', '--console=plain')
         assert buildUpToDate()
     }
 

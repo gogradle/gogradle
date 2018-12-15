@@ -61,8 +61,8 @@ allprojects {
     }
 }
 
-build.dependsOn ':go1:build'
-build.dependsOn ':go2:build'
+build.dependsOn ':go1:goBuild'
+build.dependsOn ':go2:goBuild'
 """, "include 'go1', 'go2'\nrootProject.name='multi'")
 
         IOUtils.write(resource, 'src/main/java/a/A.java', '''

@@ -72,7 +72,7 @@ dependencies {
     @Test
     void 'sub dependencies should start with b'() {
         newBuild {
-            it.forTasks('dependencies')
+            it.forTasks('goDependencies')
         }
 
         assert stdout.toString().contains('a/b:')

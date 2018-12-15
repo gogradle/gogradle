@@ -70,7 +70,7 @@ func Test_Env(t *testing.T){
 }
 ''')
         new File(resource, 'build.gradle').append('''
-test {
+goTest {
     environment('FOO','1')
 }
 ''')
@@ -102,7 +102,7 @@ func Test_Pass(t *testing.T){
 ''')
         // then
         try {
-            newBuild('test', 'cover', '--info')
+            newBuild('goTest', 'goCover', '--info')
         } catch (BuildException e) {
             assert stdout.toString().contains('3 completed, 1 failed, 1 skipped')
         }
@@ -129,15 +129,15 @@ func Test_Pass(t *testing.T){
     }
 
     def normalTest() {
-        newBuild('test', 'cover', '--info')
+        newBuild('goTest', 'goCover', '--info')
     }
 
     def assertNormalTestNoUpToDateResult() {
         assert stdout.toString().contains('1 completed, 0 failed')
         assert stdout.toString().contains('3 completed, 0 failed')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
-        assert !stdout.toString().contains(':test UP-TO-DATE')
-        assert !stdout.toString().contains(':cover UP-TO-DATE')
+        assert !stdout.toString().contains(':goTest UP-TO-DATE')
+        assert !stdout.toString().contains(':goCover UP-TO-DATE')
         assert stdout.toString().contains('=== RUN   Test_B1_1')
         assert stdout.toString().contains('Coverage of package github.com/my/project/a:')
         assert stdout.toString().contains('Coverage of package github.com/my/project/b:')
@@ -147,8 +147,8 @@ func Test_Pass(t *testing.T){
 
     def assertNormalTestUpToDateResult() {
         assert !stdout.toString().contains('1 completed, 0 failed')
-        assert stdout.toString().contains(':test UP-TO-DATE')
-        assert stdout.toString().contains(':cover UP-TO-DATE')
+        assert stdout.toString().contains(':goTest UP-TO-DATE')
+        assert stdout.toString().contains(':goCover UP-TO-DATE')
         assert stdout.toString().contains('BUILD SUCCESSFUL')
         assert !stdout.toString().contains('=== RUN   Test_B1_1')
     }
@@ -177,14 +177,14 @@ func Test_Pass(t *testing.T){
         assert stdout.contains('Found 1 files to test')
         assert stdout.contains('2 completed, 0 failed')
         assert !stdout.contains('3 completed, 0 failed')
-        assert !stdout.contains(':test UP-TO-DATE')
+        assert !stdout.contains(':goTest UP-TO-DATE')
         assert stdout.contains('BUILD SUCCESSFUL')
     }
 
     def assertTestPatternUpToDateResult(def stdout) {
         assert !stdout.contains('Found 1 files to test')
         assert !stdout.contains('2 completed, 0 failed')
-        assert stdout.contains(':test UP-TO-DATE')
+        assert stdout.contains(':goTest UP-TO-DATE')
         assert stdout.contains('BUILD SUCCESSFUL')
     }
 
@@ -198,7 +198,7 @@ func Test_Pass(t *testing.T){
         ByteArrayOutputStream out = new ByteArrayOutputStream()
 
         CommandLine cmd = new CommandLine(gradleBinPath)
-        cmd.addArguments('test', '-s', '--info')
+        cmd.addArguments('goTest', '-s', '--info')
         cmd.addArguments(args as String[])
         DefaultExecutor executor = new DefaultExecutor()
         executor.setWorkingDirectory(getProjectRoot())
@@ -221,7 +221,7 @@ func Test_Pass(t *testing.T){
         new File(resource, 'd/d1_test.go.fail').renameTo(new File(resource, 'd/d1_test.go'))
 
         try {
-            newBuild('test', 'cover', '--info')
+            newBuild('goTest', 'goCover', '--info')
         } catch (BuildException e) {
             assertOutputContains('There are 4 failed tests')
             assertOutputContains('FAIL: Test_A1_1')

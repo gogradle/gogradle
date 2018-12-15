@@ -38,8 +38,8 @@ class RealworldDependencyListIntergrationTest extends IntegrationTestSupport {
         """)
 
         try {
-            newBuild('init')
-            newBuild('dependencies')
+            newBuild('goInit')
+            newBuild('goDependencies')
         } catch (Throwable e) {
             println(stdout)
             println(stderr)

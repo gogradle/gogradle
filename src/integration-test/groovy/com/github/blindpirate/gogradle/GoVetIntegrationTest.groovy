@@ -76,14 +76,14 @@ func main() {
                 err.contains('Println does not take io.Writer but has first arg os.Stderr') ||
                 out.contains('first argument to Println is os.Stderr') ||
                 out.contains('Println does not take io.Writer but has first arg os.Stderr')
-        assertOutputContains('vet FAILED')
+        assertOutputContains('goVet FAILED')
     }
 
     @Test
     void 'exception should be thrown if error exists in project root'() {
         writeGoFileWithErrorToProjectRoot()
         try {
-            newBuild('vet')
+            newBuild('goVet')
         } catch (BuildException e) {
             vetFailed()
         }
@@ -93,7 +93,7 @@ func main() {
     void 'exception should be thrown if error exists in sub package'() {
         writeGoFileWithErrorToSub()
         try {
-            newBuild('vet')
+            newBuild('goVet')
         } catch (BuildException e) {
             vetFailed()
         }
@@ -103,17 +103,17 @@ func main() {
     void 'exception should be suppressed if continueOnFailure=true'() {
         writeGoFileWithErrorToProjectRoot()
         IOUtils.append(new File(resource, 'build.gradle'), '''
-vet {
+goVet {
     continueOnFailure = true
 }
 ''')
-        newBuild('vet')
+        newBuild('goVet')
     }
 
     @Test
     void 'code in vendor should not be vetted'() {
         writeGoFileWithErrorToVendor()
-        newBuild('vet')
+        newBuild('goVet')
     }
 
     @Override

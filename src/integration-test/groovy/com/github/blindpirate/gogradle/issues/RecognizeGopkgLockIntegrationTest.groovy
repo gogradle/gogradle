@@ -27,8 +27,8 @@ class RecognizeGopkgLockIntegrationTest extends IntegrationTestSupport {
   revision = "606f1ef31447526b908244933d5b716397a6bad8"
   source = "github.com/apache/thrift"
 ''')
-        newBuild('init')
-        newBuild('vendor')
+        newBuild('goInit')
+        newBuild('goVendor')
 
         assert new File(resource, 'vendor/git.apache.org/thrift.git').exists()
     }

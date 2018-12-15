@@ -133,7 +133,7 @@ dependencies {
 }
 ''')
         newBuild {
-            it.forTasks('vendor', 'dependencies')
+            it.forTasks('goVendor', 'goDependencies')
         }
 
         assertOnlySub1Exists()
@@ -152,7 +152,7 @@ dependencies {
 }
 ''')
         newBuild {
-            it.forTasks('vendor', 'dependencies')
+            it.forTasks('goVendor', 'goDependencies')
         }
 
         assertOnlySub1Exists()
@@ -171,14 +171,14 @@ dependencies {
 }
 ''')
         newBuild {
-            it.forTasks('lock')
+            it.forTasks('goLock')
         }
 
         List buildDeps = DataExchange.parseYaml(new File(resource, 'gogradle.lock'), GogradleLockModel).getDependencies('build')
         assert buildDeps.find { it.name == 'localhost/vcs' }.subpackages == ['sub1']
 
         newBuild {
-            it.forTasks('dependencies', 'vendor')
+            it.forTasks('goDependencies', 'goVendor')
         }
 
         assertOnlySub1Exists()
@@ -186,7 +186,7 @@ dependencies {
         assert stdout.toString().replaceAll(/[0-9a-f]{7}/, '').contains('\\-- localhost/vcs: [sub1]')
 
         newBuild({
-            it.forTasks('dependencies', 'vendor')
+            it.forTasks('goDependencies', 'goVendor')
         }, ['--rerun-tasks'])
 
         assertOnlySub1Exists()
