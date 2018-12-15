@@ -30,7 +30,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     GodepDependencyFactory godepDependencyFactory
 
     @Test
-    void 'package with Godeps/Godeps.json should be rejected'() {
+    void 'package with Godeps Godeps_json should be rejected'() {
         // then:
         assert !godepDependencyFactory.canRecognize(resource)
     }
@@ -55,7 +55,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
             '''
 
     @Test
-    void 'package with Godeps/Godeps.json should be analyzed properly'() {
+    void 'package with Godeps Godeps_json should be analyzed properly'() {
         // given:
         prepareGodepsDotJson(godepsDotJson)
 
@@ -71,7 +71,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     }
 
     @Test(expected = RuntimeException)
-    void 'corrupted Godeps.json should result in an exception'() {
+    void 'corrupted Godeps_json should result in an exception'() {
         // given
         prepareGodepsDotJson('This is a corrupted Godeps.json')
         // then
@@ -118,7 +118,7 @@ class GodepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
             '''
 
     @Test
-    void 'extra properties in Godeps/Godeps.json should be ignored'() {
+    void 'extra properties in Godeps Godeps_json should be ignored'() {
         // given
         prepareGodepsDotJson(godepsDotJsonWithExtraAndMissingProperties)
         // when

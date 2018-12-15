@@ -31,7 +31,7 @@ class CompressUtilsTest {
 
     @Test(expected = IllegalArgumentException)
     @WithResource('')
-    void 'exception should be thrown if file extension is not .tar.gz or .zip'() {
+    void 'exception should be thrown if file extension is not _tar_gz or _zip'() {
         IOUtils.write(resource, 'data.rar', '')
         CompressUtils.decompressZipOrTarGz(new File(resource, 'data.rar'), resource)
     }

@@ -8,7 +8,7 @@ class VcsPackagePathResolverTest {
     VcsPackagePathResolver resolver = new VcsPackagePathResolver()
 
     @Test
-    void 'path without .vcs should be rejected'() {
+    void 'path without _vcs should be rejected'() {
         assert resolver.cannotRecognize('a')
         assert resolver.cannotRecognize('')
         assert resolver.cannotRecognize('a.gi')
@@ -16,7 +16,7 @@ class VcsPackagePathResolverTest {
     }
 
     @Test
-    void 'path with .vcs should be accepted'() {
+    void 'path with _vcs should be accepted'() {
         assert !resolver.cannotRecognize('.git')
         assert !resolver.cannotRecognize('a.git')
         assert !resolver.cannotRecognize('a.svn')
@@ -31,7 +31,7 @@ class VcsPackagePathResolverTest {
     }
 
     @Test
-    void 'can produce package with .vcs'() {
+    void 'can produce package with _vcs'() {
         verifyVcs(VcsType.GIT, 'a.git/b', 'a.git', ['git://a.git', 'https://a.git', 'http://a.git', 'git+ssh://a.git', 'ssh://a.git'])
         verifyVcs(VcsType.MERCURIAL, 'a.hg/b/c', 'a.hg', ['https://a.hg', 'http://a.hg', 'ssh://a.hg'])
         verifyVcs(VcsType.SVN, 'a.svn/b.git/c.hg/d.bzr/e', 'a.svn', ['https://a.svn', 'http://a.svn', 'svn://a.svn', 'svn+ssh://a.svn'])

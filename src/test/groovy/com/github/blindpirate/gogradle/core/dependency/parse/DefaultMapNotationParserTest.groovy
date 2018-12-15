@@ -130,7 +130,7 @@ class DefaultMapNotationParserTest {
     }
 
     @Test
-    void 'local/sub directory package should be delegated to DirMapNotationParser'() {
+    void 'local_sub directory package should be delegated to DirMapNotationParser'() {
         // when
         parser.parse([name: 'local/sub'])
         // then

@@ -145,7 +145,7 @@ dependencies {
     }
 
     @Test
-    void 'modification to testdata/_/. go files should not make dependencies updated'() {
+    void 'modification to testdata _ dot go files should not make dependencies updated'() {
         build()
         IOUtils.write(resource, '.hidden/a.go', 'modified')
         IOUtils.write(resource, '_hidden/a.go', 'modified')
@@ -157,7 +157,7 @@ dependencies {
     }
 
     @Test
-    void 'up-to-date check should be always disabled if --refresh-dependencies or -Dgogradle.refresh=true exist'() {
+    void 'up-to-date check should be always disabled if --refresh-dependencies or -Dgogradle_refresh=true exist'() {
         build(['-Dgogradle.refresh=true'])
 
         build(['--refresh-dependencies'])

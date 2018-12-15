@@ -46,7 +46,7 @@ gopkg.in/redis.v2 = commit:e617904
 include = public|scripts|templates'''
 
     @Test
-    void 'parsing .gopmfile should succeed'() {
+    void 'parsing _gopmfile should succeed'() {
         // given
         IOUtils.write(resource, '.gopmfile', dotGopmfile)
         // when
@@ -63,7 +63,7 @@ include = public|scripts|templates'''
     }
 
     @Test
-    void 'missing [deps] should result in empty list'() {
+    void 'missing _deps_ should result in empty list'() {
         // given
         IOUtils.write(resource, '.gopmfile', '[target]\npath = github.com/gogits/gogs')
         // then
@@ -71,7 +71,7 @@ include = public|scripts|templates'''
     }
 
     @Test
-    void 'empty [deps] should result in empty list'() {
+    void 'empty _deps_ should result in empty list'() {
         // given
         IOUtils.write(resource, '.gopmfile', '''[target]
 path = github.com/gogits/gogs

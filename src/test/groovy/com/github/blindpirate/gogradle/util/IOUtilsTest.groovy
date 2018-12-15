@@ -72,13 +72,13 @@ class IOUtilsTest {
     }
 
     @Test
-    void 'safeList should succeed when File.list() return null'() {
+    void 'safeList should succeed when File_list() return null'() {
         when(mockFile.list()).thenReturn(null)
         assert IOUtils.safeList(mockFile) == []
     }
 
     @Test
-    void 'safeListFiles should succeed when File.listFiles() return null'() {
+    void 'safeListFiles should succeed when File_listFiles() return null'() {
         when(mockFile.listFiles()).thenReturn(null)
         assert IOUtils.safeListFiles(mockFile) == []
     }

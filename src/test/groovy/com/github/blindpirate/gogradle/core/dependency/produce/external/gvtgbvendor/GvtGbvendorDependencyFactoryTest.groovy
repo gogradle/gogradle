@@ -56,7 +56,7 @@ class GvtGbvendorDependencyFactoryTest extends AbstractExternalDependencyFactory
             '''
 
     @Test
-    void 'reading vendor/manifest should succeed'() {
+    void 'reading vendor manifest should succeed'() {
         // given
         IOUtils.write(resource, 'vendor/manifest', manifest)
         // when
@@ -73,7 +73,7 @@ class GvtGbvendorDependencyFactoryTest extends AbstractExternalDependencyFactory
     }
 
     @Test
-    void 'directory without vendor/manifest should be rejected'() {
+    void 'directory without vendor manifest should be rejected'() {
         assert !factory.canRecognize(resource)
     }
 

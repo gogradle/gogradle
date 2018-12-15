@@ -142,7 +142,7 @@ dependencies {
     }
 
     @Test
-    void "local/b's gogradle.lock should be ignored if subpackage specified"() {
+    void "local b's gogradle_lock should be ignored if subpackage specified"() {
         IOUtils.append(new File(resource, 'build.gradle'), '''
 dependencies {
     golang {

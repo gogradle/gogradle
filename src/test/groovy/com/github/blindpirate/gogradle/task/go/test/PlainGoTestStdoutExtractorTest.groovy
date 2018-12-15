@@ -92,7 +92,7 @@ PASS
     }
 
     @Test
-    void 'extracting Log/Error output of testing.T should succeed'() {
+    void 'extracting Log Error output of testing_T should succeed'() {
         // given
         IOUtils.write(resource, 'a_test.go', 'func Test_A1() func Test_A2() func Test_A3()')
         String stdout = '''\

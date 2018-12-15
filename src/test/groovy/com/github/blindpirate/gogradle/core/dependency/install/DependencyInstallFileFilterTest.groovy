@@ -49,23 +49,23 @@ class DependencyInstallFileFilterTest extends FileFilterTest {
 
 
     @Test
-    void '*_test.go should be rejected'() {
+    void '*_test_go should be rejected'() {
         allNamesRejected(allDescendentFilter, '_test.go', 'whatever_test.go')
     }
 
     @Test
-    void 'file with .go/.asm/.s extensioin can be accepted'() {
+    void 'file with _go _asm _s extension can be accepted'() {
         allNamesAccepted(allDescendentFilter, '1.go', 'main.go', '1.s', '1.asm', '1.h', '1.c')
         allNamesRejected(allDescendentFilter, '1', 'main', '1.jpg', 'main.java')
     }
 
     @Test
-    void 'file containing .so should be accepted'() {
+    void 'file containing _so should be accepted'() {
         allNamesAccepted(allDescendentFilter, "1.so", '1.so.1', 'libxxx.so.1.2')
     }
 
     @Test
-    void 'file starting with _ or . should be rejected'() {
+    void 'file starting with _ or dot should be rejected'() {
         allNamesRejected(allDescendentFilter, '_.go', '..go', '_main.go')
     }
 
@@ -75,7 +75,7 @@ class DependencyInstallFileFilterTest extends FileFilterTest {
     }
 
     @Test
-    void 'directory starting wtih _ or . should be rejected'() {
+    void 'directory starting wtih _ or dot should be rejected'() {
         allDirNamesRejected(allDescendentFilter, '_dir', '.dir')
     }
 

@@ -42,7 +42,7 @@ class GoCleanTest extends TaskTest {
     }
 
     @Test
-    void 'clean should succeed when .gogradle exists'() {
+    void 'clean should succeed when _gogradle exists'() {
         // given
         IOUtils.mkdir(resource, "${GOGRADLE_BUILD_DIR_NAME}/dir")
         IOUtils.write(resource, "${GOGRADLE_BUILD_DIR_NAME}/file", '')
@@ -55,7 +55,7 @@ class GoCleanTest extends TaskTest {
 
 
     @Test
-    void 'clean should succeed when .gogradle does not exit'() {
+    void 'clean should succeed when _gogradle does not exit'() {
         // when
         task.clean()
         // then

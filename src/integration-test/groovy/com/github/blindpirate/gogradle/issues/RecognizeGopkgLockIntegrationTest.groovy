@@ -17,7 +17,7 @@ class RecognizeGopkgLockIntegrationTest extends IntegrationTestSupport {
     // https://github.com/gogradle/gogradle/issues/221
     // https://github.com/census-instrumentation/opencensus-go/blob/0edc045e110a4ba034ed03dffbbaf13eeae8b25b/Gopkg.lock
     @Test
-    void "can recognize Gopkg.lock's source"() {
+    void "can recognize Gopkg_lock's source"() {
         writeBuildAndSettingsDotGradle(buildDotGradleBase)
         IOUtils.write(resource, 'Gopkg.lock', '''
 [[projects]]

@@ -72,7 +72,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'InjectionHelper.INJECTOR_INSTANCE should be assigned'() {
+    void 'InjectionHelper_INJECTOR_INSTANCE should be assigned'() {
         assert GogradleGlobal.INSTANCE.getInjector() != null
     }
 
@@ -279,7 +279,7 @@ class GolangPluginTest {
     }
 
     @Test
-    void 'abbr for DEV/REP should succeed'() {
+    void 'abbr for DEV REP should succeed'() {
         project.golang {
             buildMode = project.DEV
         }

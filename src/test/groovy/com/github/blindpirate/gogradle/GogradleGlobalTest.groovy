@@ -45,7 +45,7 @@ class GogradleGlobalTest {
 
     @Test
     @MockRefreshDependencies(false)
-    void 'jvm parameter -Dgogradle.refresh=true should succeed'() {
+    void 'jvm parameter _Dgogradle_refresh true should succeed'() {
         String originalValue = System.getProperty('gogradle.refresh')
         System.setProperty('gogradle.refresh', 'true')
 

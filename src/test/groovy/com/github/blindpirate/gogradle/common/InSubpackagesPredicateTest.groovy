@@ -48,7 +48,7 @@ import static com.github.blindpirate.gogradle.common.InSubpackagesPredicate.with
 class InSubpackagesPredicateTest extends FileFilterTest {
 
     @Test
-    void 'subpackages ... should accept everything'() {
+    void 'subpackages ___ should accept everything'() {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['...'] as Set)
         assert predicate.test(touch('a'))
         assert predicate.test(touch('.a'))
@@ -61,14 +61,14 @@ class InSubpackagesPredicateTest extends FileFilterTest {
     }
 
     @Test
-    void 'subpackage . should only accept file in rootDir'() {
+    void 'subpackage dot should only accept file in rootDir'() {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['.'] as Set)
         assert predicate.test(touch('file1'))
         assert !predicate.test(touch('dir1/file1'))
     }
 
     @Test
-    void "sub/. should only accept sub's children"() {
+    void "sub dot should only accept sub's children"() {
         InSubpackagesPredicate predicate = withRootDirAndSubpackages(resource, ['dir/.'] as Set)
         assert predicate.test(touch('dir/file'))
         assert !predicate.test(touch('dir/dir/file'))

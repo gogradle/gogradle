@@ -81,12 +81,12 @@ class GovendorDependencyFactoryTest extends AbstractExternalDependencyFactoryTes
     }
 
     @Test
-    void 'package without vendor/vendor.json should be rejected'() {
+    void 'package without vendor vendor_json should be rejected'() {
         assert !factory.canRecognize(resource)
     }
 
     @Test
-    void 'reading vendor/vendor.json should succeed'() {
+    void 'reading vendor vendor_json should succeed'() {
         // given
         prepareVendorDotJson(vendorDotJson)
         // when
@@ -106,7 +106,7 @@ class GovendorDependencyFactoryTest extends AbstractExternalDependencyFactoryTes
     }
 
     @Test(expected = RuntimeException)
-    void 'corrupted vendor.json should cause an exception'() {
+    void 'corrupted vendor_json should cause an exception'() {
         // given
         prepareVendorDotJson('This is corrupted')
         // then
