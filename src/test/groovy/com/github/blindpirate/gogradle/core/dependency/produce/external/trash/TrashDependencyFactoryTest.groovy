@@ -32,7 +32,7 @@ class TrashDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     TrashDependencyFactory factory
 
     @Test
-    void 'parsing vendor.conf should succeed'() {
+    void 'parsing vendor_conf should succeed'() {
         // given
         IOUtils.write(resource, 'vendor.conf', '''
 # package
@@ -59,7 +59,7 @@ github.com/opencontainers/runtime-spec 1c7c27d043c2a5e513a44084d2b10d77d1402b8c 
     }
 
     @Test
-    void 'parsing vendor.conf as yaml should succeed'() {
+    void 'parsing vendor_conf as yaml should succeed'() {
         // given
         IOUtils.write(resource, 'vendor.conf', '''
 import:

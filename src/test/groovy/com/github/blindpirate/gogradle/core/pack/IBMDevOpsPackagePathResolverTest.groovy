@@ -26,7 +26,7 @@ class IBMDevOpsPackagePathResolverTest {
     IBMDevOpsPackagePathResolver resolver = new IBMDevOpsPackagePathResolver()
 
     @Test
-    void 'package not starting with hub.jazz.net should be rejected'() {
+    void 'package not starting with hub_jazz_net should be rejected'() {
         assert !resolver.produce('github/a/b').isPresent()
         assert !resolver.produce('hub.jazz.net2/a/b').isPresent()
     }

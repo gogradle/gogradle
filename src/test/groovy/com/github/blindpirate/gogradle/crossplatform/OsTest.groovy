@@ -56,7 +56,7 @@ class OsTest {
     }
 
     @Test
-    void 'archive extension should be .tar.gz except on Windows'() {
+    void 'archive extension should be tar gz except on Windows'() {
         values().each {
             if (it == WINDOWS) {
                 assert it.archiveExtension() == '.zip'

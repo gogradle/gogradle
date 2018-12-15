@@ -125,7 +125,7 @@ func Whatever(){}
     }
 
     @Test
-    void 'standard/relative/blank path should be ignored'() {
+    void 'standard relative blank path should be ignored'() {
         // given
         IOUtils.write(resource, 'main.go', '''
 package main

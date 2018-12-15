@@ -52,7 +52,7 @@ class GolangPluginSettingTest {
     }
 
     @Test
-    void 'setting build mode via System.property should succeed'() {
+    void 'setting build mode via System_property should succeed'() {
         setting.buildMode = 'DEVELOP'
         assert setting.buildMode == BuildMode.DEVELOP
 

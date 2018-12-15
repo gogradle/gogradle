@@ -66,7 +66,7 @@ class GoInitTest extends TaskTest {
     }
 
     @Test
-    void 'initialization should be skipped if gogradle.lock exists'() {
+    void 'initialization should be skipped if gogradle_lock exists'() {
         // given
         IOUtils.write(resource, 'gogradle.lock', '')
         // when
@@ -76,7 +76,7 @@ class GoInitTest extends TaskTest {
     }
 
     @Test
-    void 'initialization should be skipped if dependencies in build.gradle exist'() {
+    void 'initialization should be skipped if dependencies in build_gradle exist'() {
         // given
         when(build.hasFirstLevelDependencies()).thenReturn(true)
         // when

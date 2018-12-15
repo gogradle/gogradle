@@ -74,7 +74,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     }
 
     @Test
-    void 'dependencies in build.gradle should be used in DEVELOP mode'() {
+    void 'dependencies in build_gradle should be used in DEVELOP mode'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(DEVELOP)
         when(lockedDependencyManager.canRecognize(rootDir)).thenReturn(false)
@@ -90,7 +90,7 @@ class GogradleRootProduceStrategyTest extends DependencyProduceStrategyTest {
     }
 
     @Test
-    void 'dependencies in build.gradle should be used when gogradle.lock does not exist'() {
+    void 'dependencies in build_gradle should be used when gogradle_lock does not exist'() {
         // given
         when(golangPluginSetting.getBuildMode()).thenReturn(REPRODUCIBLE)
         when(lockedDependencyManager.canRecognize(rootDir)).thenReturn(false)

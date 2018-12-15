@@ -105,7 +105,7 @@ dependencies:
     }
 
     @Test
-    void 'writing to gogradle.lock should succeed'() {
+    void 'writing to gogradle_lock should succeed'() {
         // given
         when(dependency1.toLockedNotation()).thenReturn([name: 'b', version: 'v2'])
         when(dependency2.toLockedNotation()).thenReturn([name: 'a', version: 'v1'])
@@ -119,11 +119,9 @@ dependencies:
     }
 
     @Test
-    void 'existent gogradle.lock should be overwritten'() {
+    void 'existent gogradle_lock should be overwritten'() {
         IOUtils.write(project.getProjectDir(), LOCK_FILE_NAME, 'old file content')
-        'writing to gogradle.lock should succeed'()
+        'writing to gogradle_lock should succeed'()
     }
-
-
 }
 

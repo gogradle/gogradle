@@ -38,7 +38,7 @@ class GlideDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
     }
 
     @Test
-    void 'package without glide.lock should be rejected'() {
+    void 'package without glide_lock should be rejected'() {
         assert !factory.canRecognize(resource)
     }
 
@@ -63,7 +63,7 @@ testImports:
 '''
 
     @Test
-    void 'parsing glide.lock should succeed'() {
+    void 'parsing glide_lock should succeed'() {
         // given
         prepareGlideDotLock(glideDotLock)
 
@@ -122,7 +122,7 @@ imports:
 '''
 
     @Test
-    void 'extra properties in glide.lock should succeed'() {
+    void 'extra properties in glide_lock should succeed'() {
         // given
         prepareGlideDotLock(glideDotLockWithExtraAndMissingProperties)
         // when
@@ -135,7 +135,7 @@ imports:
     }
 
     @Test
-    void 'corrupt glide.lock should not cause exception'() {
+    void 'corrupt glide_lock should not cause exception'() {
         prepareGlideDotLock('hash: xxx')
         assert factory.produce(parentDependency, resource, 'build').isEmpty()
         assert factory.produce(parentDependency, resource, 'test').isEmpty()

@@ -33,7 +33,7 @@ class DepDependencyFactoryTest extends AbstractExternalDependencyFactoryTest {
 
     @Test
     @WithResource('')
-    void 'can parse and convert Gopkg.lock'() {
+    void 'can parse and convert Gopkg_lock'() {
         // given
         IOUtils.write(resource, 'Gopkg.lock', godepDotLock)
         // when

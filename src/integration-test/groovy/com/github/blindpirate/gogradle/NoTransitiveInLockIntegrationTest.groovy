@@ -61,7 +61,7 @@ dependencies {
     }
 
     @Test
-    void 'transitive:false should be added to gogradle.lock'() {
+    void 'transitive:false should be added to gogradle_lock'() {
         newBuild {
             it.forTasks('dependencies', 'lock')
         }

@@ -61,7 +61,7 @@ class GoVetTest extends TaskTest {
     }
 
     @Test
-    void 'go vet should succeed when .go exists in root'() {
+    void 'go vet should succeed when _go exists in root'() {
         // given
         IOUtils.write(resource, 'main.go', '')
         // when
@@ -79,7 +79,7 @@ class GoVetTest extends TaskTest {
     }
 
     @Test
-    void 'go vet should succeed when .go not exists in root'() {
+    void 'go vet should succeed when _go not exists in root'() {
         // when
         task.afterEvaluate()
         task.executeTask()

@@ -39,7 +39,7 @@ class BuildModeTest {
     }
 
     @Test
-    void 'declared > locked in DEVELOP mode'() {
+    void 'declared to locked in DEVELOP mode'() {
         // when
         GolangDependencySet result = BuildMode.DEVELOP.determine(declared, locked)
         // then
@@ -47,7 +47,7 @@ class BuildModeTest {
     }
 
     @Test
-    void 'locked > declared in REPRODUCIBLE mode'() {
+    void 'locked to declared in REPRODUCIBLE mode'() {
         // when
         GolangDependencySet result = BuildMode.REPRODUCIBLE.determine(declared, locked)
         // then

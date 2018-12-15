@@ -101,7 +101,7 @@ repositories {
     }
 
     @Test
-    void 'dependency in build.gradle should be used in DEVELOP'() {
+    void 'dependency in build_gradle should be used in DEVELOP'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
         newBuild('lock', 'vendor')
         assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
