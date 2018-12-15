@@ -239,7 +239,7 @@ FAIL\tgithub.com/gogits/gogs/models\t0.074s'''
     }
 
     @Test
-    void 'extracting results from stdout with [setup failed] should succeed'() {
+    void 'extracting results from stdout with _setup failed_ should succeed'() {
         // given
         String stdout = '''\
 # github.com/gogits/gogs/models
@@ -262,7 +262,7 @@ FAIL\tgithub.com/gogits/gogs/models [setup failed]'''
     }
 
     @Test
-    void 'extracting results from stdout with [build failed] should succeed'() {
+    void 'extracting results from stdout with _build failed_ should succeed'() {
         // given
         String stdout = '''\
 # a

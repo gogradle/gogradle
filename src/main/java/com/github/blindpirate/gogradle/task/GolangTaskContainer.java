@@ -44,9 +44,9 @@ public class GolangTaskContainer implements Iterable<Task> {
     public static final String RESOLVE_TEST_DEPENDENCIES_TASK_NAME = "resolveTestDependencies";
     public static final String INSTALL_DEPENDENCIES_TASK_NAME = "installDependencies";
     // show dependencies tree
-    public static final String DEPENDENCIES_TASK_NAME = determineAlias("dependencies", "goDependencies");
+    public static final String DEPENDENCIES_TASK_NAME = determineAlias("goDependencies", "goDependencies");
 
-    public static final String INIT_TASK_NAME = determineAlias("init", "goInit");
+    public static final String INIT_TASK_NAME = determineAlias("goInit", "goInit");
     public static final String CHECK_TASK_NAME = determineAlias("check", "goCheck");
     public static final String LOCK_TASK_NAME = determineAlias("lock", "goLock");
     public static final String BUILD_TASK_NAME = determineAlias("build", "goBuild");
