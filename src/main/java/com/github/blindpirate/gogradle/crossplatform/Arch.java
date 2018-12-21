@@ -66,6 +66,8 @@ public enum Arch {
             .put("i686", I386)
             .put("arm", ARM)
             .put("arm32", ARM)
+            .put("aarch64", ARM64)
+            .put("arm64", ARM64)
             .put("ppc", PPC)
             .put("ppc32", PPC)
             .put("ppc64", PPC64)
