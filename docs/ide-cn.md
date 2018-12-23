@@ -6,7 +6,7 @@ Go语言是一门静态类型语言，因此许多IDE对其提供了支持，如
 将Gogradle与IDE集成的步骤是：
 
 - 安装IDE
-- 运行`gradlew vendor`安装依赖到项目中
+- 运行`gradlew goVendor`安装依赖到项目中
 - 运行`gradlew showGopathGoroot`或者`gradlew sGG`打印项目的`GOPATH`和`GOROOT`
 - 使用上述`GOROOT`和`GOPATH`配置IDE
 - 开始开发！

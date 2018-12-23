@@ -4,7 +4,7 @@
 
 若需要为Gradle设置代理，可以在`gradlew`命令中增加参数（以Shadowsocks为例）：
 
-```./gradlew build -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080```
+```./gradlew goBuild -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080```
 
 其他命令类似。
 

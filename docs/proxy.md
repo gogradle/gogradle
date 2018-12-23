@@ -2,7 +2,7 @@
 
 To set a proxy, you can add arguments in `gradlew`: 
 
-```./gradlew build -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080```
+```./gradlew goBuild -DsocksProxyHost=127.0.0.1 -DsocksProxyPort=1080```
 
 And it is the same for other `gradlew` command.
 

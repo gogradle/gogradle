@@ -7,7 +7,7 @@ Theoretically, any IDE which supports standard vendor mechanism can integrate Go
 Steps to integrate Gogradle with IDE:
 
 - Install IDE
-- Run `gradlew vendor` to install all dependencies to vendor
+- Run `gradlew goVendor` to install all dependencies to vendor
 - Run `gradlew showGopathGoroot` or `gradlew sGG` to print `GOPATH` and `GOROOT` of your project
 - Configure your IDE with `GOROOT` and `GOPATH` above
 - Start work!
