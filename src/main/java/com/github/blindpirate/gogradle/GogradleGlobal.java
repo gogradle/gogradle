@@ -31,7 +31,6 @@ public enum GogradleGlobal {
     public static final int MAX_DFS_DEPTH = 100;
     public static final String GOGRADLE_REFRESH = "gogradle.refresh";
     public static final String GOGRADLE_MODE = "gogradle.mode";
-    public static final String GOGRADLE_ALIAS = "gogradle.alias";
 
     // For multi-project
     private ThreadLocal<Injector> currentInjector = new ThreadLocal<>();
@@ -59,10 +58,6 @@ public enum GogradleGlobal {
     public static boolean isRefreshDependencies() {
         return getInstance(Project.class).getGradle().getStartParameter().isRefreshDependencies()
                 || "true".equals(System.getProperty(GOGRADLE_REFRESH));
-    }
-
-    public static boolean isAlias() {
-        return "true".equals(System.getProperty(GOGRADLE_ALIAS));
     }
 
     public static String getMode() {
