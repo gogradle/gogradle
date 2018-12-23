@@ -76,9 +76,9 @@ golang {
 Enter your project root and run
 
 ```
-./gradlew init # *nix
+./gradlew goInit # *nix
 
-gradlew init # Windows
+gradlew goInit # Windows
 ```
 
 Hereinafter, we will use uniform command form `gradlew <task>` on both *nix and Windows. This command will scan your project and find dependencies. Particularly, if you used one of `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm` tools, Gogradle can recognize its configuration files.
@@ -87,7 +87,7 @@ Hereinafter, we will use uniform command form `gradlew <task>` on both *nix and 
 
 ### Build
 
-Run `gradlew build` in project root. It will resolve all dependencies and transitive dependencies, resolve conflict, and install them into project root and invoke `go build`.
+Run `gradlew goBuild` in project root. It will resolve all dependencies and transitive dependencies, resolve conflict, and install them into project root and invoke `go build`.
 
 You may have doubts, WTF, I haven't installed Go! It's OK, if Gogradle fails to find Go on your machine, it will download and install latest version of Go automatically. 
 
@@ -95,15 +95,15 @@ And it's not required to set `GOPATH`. If Gogradle find you haven't set a `GOPAT
 
 Of course, if you have already installed Go and set `GOPATH`, Gogradle will use them directly.
 
-See [build task](https://github.com/gogradle/gogradle/blob/master/docs/tasks.md#build) for more details.
+See [goBuild task](https://github.com/gogradle/gogradle/blob/master/docs/tasks.md#goBuild) for more details.
 
 ![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/build.png)
 
-This is a snapshot of `build` task, you can see tasks executed.
+This is a snapshot of `goBuild` task, you can see tasks executed.
 
 ### Test
 
-Run `gradlew test` in project root. It will test each package and generate test/coverage report in HTML format as mentioned above. Does it looks better than native `go test`?
+Run `gradlew goTest` in project root. It will test each package and generate test/coverage report in HTML format as mentioned above. Does it looks better than native `go test`?
 
 ![1](https://raw.githubusercontent.com/blindpirate/gogradle/master/docs/images/failedtest.png)
 
@@ -113,11 +113,11 @@ This build failed due to several failed tests. The output indicates the location
 
 ### Check
 
-Gogradle put several comman code check task into a `check` task. By default, it is out-of-the-box and depends on `vet`/`fmt` and `cover`.
+Gogradle put several comman code check task into a `goCheck` task. By default, it is out-of-the-box and depends on `goVet`/`gofmt` and `goCover`.
 
 ![1](http://gogradle.oss-cn-hongkong.aliyuncs.com/check.png)
 
-In this build, `check` is executed because `build` depends on `check`.
+In this build, `goCheck` is executed because `build` depends on `goCheck`.
 
 See [Tasks in Gogradle](https://github.com/gogradle/gogradle/blob/master/docs/tasks.md) for more details.
 
@@ -177,7 +177,7 @@ See [Dependency Management](https://github.com/gogradle/gogradle/blob/master/doc
 In the course of dependency management, we will encounter package conflict inevitably and have to deal with it manully. In this case, we can use:
 
 ```
-gradlew dependencies
+gradlew goDependencies
 ```
 
 It will print current dependecny tree:

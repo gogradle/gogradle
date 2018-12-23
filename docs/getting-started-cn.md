@@ -24,9 +24,9 @@ golang {
 如果你之前使用的是`glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`之一，请运行
 
 ```
-./gradlew init # *nix
+./gradlew goInit # *nix
 
-gradlew init # Windows
+gradlew goInit # Windows
 ```
 
 来进行迁移，这会将外部依赖工具的依赖声明导入`build.gradle`。此外，你也可以令Gogradle生成自己的锁定文件`gogradle.lock`。详见[依赖锁定](#依赖锁定)一节。
@@ -60,9 +60,9 @@ golang {
 进入项目目录，运行
 
 ```
-./gradlew vendor # *nix
+./gradlew goVendor # *nix
 
-gradlew vendor # Windows
+gradlew goVendor # Windows
 ```
 
 在下文中，`gradlew`命令将以统一的`gradlew <task>`形式给出，不再区分平台。
@@ -82,35 +82,35 @@ Gogradle会按照`build.gradle`或者`gogradle.lock`（稍后提及）文件的�
 进入项目目录，运行
 
 ```
-./gradlew build # *nix
+./gradlew goBuild # *nix
 
-gradlew build # Windows
+gradlew goBuild # Windows
 ```
 
-`build`任务默认[依赖](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies)`resolveBuildDependencies`任务，因此，即使你并未指明执行`resolveBuildDependencies`任务，Gradle仍然会先运行`resolveBuildDependencies`，这与`make`类似。这意味着，在`build`任务执行时，`resolveBuildDependencies`任务已经执行完毕，并将所有的依赖包安装在了`vendor`目录中。默认情况下，`build`任务等价于调用`go build <current package path> -o <output location>`，你可以对其进行进一步的配置，详见[build任务](./tasks-cn.md#build)。
+`goBuild`任务默认[依赖](https://docs.gradle.org/current/userguide/tutorial_using_tasks.html#sec:task_dependencies)`resolveBuildDependencies`任务，因此，即使你并未指明执行`resolveBuildDependencies`任务，Gradle仍然会先运行`resolveBuildDependencies`，这与`make`类似。这意味着，在`build`任务执行时，`resolveBuildDependencies`任务已经执行完毕，并将所有的依赖包安装在了`vendor`目录中。默认情况下，`build`任务等价于调用`go build <current package path> -o <output location>`，你可以对其进行进一步的配置，详见[goBuild任务](./tasks-cn.md#goBuild)。
 
 ## 测试Go项目
 
 进入项目目录，运行 
 
 ```
-gradlew test
+gradlew goTest
 ```
 
 测试指定文件：
 
 ```
-gradlew test --tests main_test.go // 指定一个测试文件
-gradlew test --tests *_test.go // 通配符测试
+gradlew goTest --tests main_test.go // 指定一个测试文件
+gradlew goTest --tests *_test.go // 通配符测试
 ```
 
 若希望构建在测试完成之后进行，只需在`build.gradle`中添加
 
 ```groovy
-build.dependsOn test
+goBuild.dependsOn goTest
 ```
 
-HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`目录。更多细节，请参阅[test任务](./tasks-cn.md#test)。
+HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`目录。更多细节，请参阅[goTest任务](./tasks-cn.md#goTest)。
 
 ## 自定义任务
 
@@ -120,19 +120,19 @@ HTML格式的测试报告会被放置在`<project root>/.gogradle/reports/test`�
 
 ```groovy
 task golint(type: com.github.blindpirate.gogradle.Go) {
-    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
+    dependsOn goVendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     environment MY_OWN_ENV1: 'value1', MY_OWN_ENV1: 'value2' // 设置要运行命令的环境变量
     run 'golint github.com/my/project' // 指定任务中运行的命令
 }
 
-check.dependsOn golint
+goCheck.dependsOn golint
 ```
 
 注意，这种语法中不支持`stdout`和`stderr`的重定向，以及管道操作。如果你希望进行重定向，例如实现一个跨平台的[`tee`](https://en.wikipedia.org/wiki/Tee_(command))，需要利用`Groovy`的[闭包](http://groovy-lang.org/closures.html)：
 
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
-    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
+    dependsOn goVendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     go('build -v github.com/my/project') {
         stdout { stdoutLine ->
             println stdoutLine
@@ -150,7 +150,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 
 ```
 task myTee(type: com.github.blindpirate.gogradle.Go){
-    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
+    dependsOn goVendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     go('build -v github.com/my/project') {
         stdout writeTo('stdout.txt')
         stderr appendTo('/this/is/absolute/path/stderr.txt')
@@ -164,7 +164,7 @@ task myTee(type: com.github.blindpirate.gogradle.Go){
 
 ```
 task outputToDevNull(type: com.github.blindpirate.gogradle.Go){
-    dependsOn vendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
+    dependsOn goVendor // 令此任务依赖vendor任务，这样才能保证任务执行时所有依赖包都已经被安装到了vendor中
     go('build -v github.com/my/project') {
         stdout devNull()
         stderr devNull()
@@ -202,7 +202,7 @@ dependencies {
 ## 查看依赖
 
 ```
-gradlew dependencies
+gradlew goDependencies
 ```
 
 输出如下：
@@ -228,12 +228,12 @@ github.com/aws/aws-sdk-go
 
 ```
 
-这是[aws-sdk-go](https://github.com/aws/aws-sdk-go)项目在`31484500fe`时，执行`init`自动导入后生成的依赖树。其中，箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点之前已经显示过，因此忽略其后代。
+这是[aws-sdk-go](https://github.com/aws/aws-sdk-go)项目在`31484500fe`时，执行`goInit`自动导入后生成的依赖树。其中，箭头(->)代表该依赖包与其他依赖包冲突，因此被解析成了另外一个版本；星号(*)代表本节点之前已经显示过，因此忽略其后代。
 
 ## 依赖锁定
 
 ```
-gradlew lock
+gradlew goLock
 ```
 
 这会在项目目录下生成一个`gogradle.lock`文件，其中记录了本项目的所有的依赖包。`gogradle.lock`是Gogradle推荐的依赖锁定方式。

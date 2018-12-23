@@ -205,7 +205,7 @@ Gogradle解决依赖的策略是：
 Gogradle推荐将此文件提交到源代码管理系统中。可以通过
 
 ```
-gradlew lock 
+gradlew goLock 
 ```
 
 生成依赖锁定文件。
