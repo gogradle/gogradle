@@ -40,7 +40,7 @@ class CrossVersionSmokeTest : IntegrationTestSupport() {
 
         GradleRunner.create()
                 .withProjectDir(resource)
-                .withArguments("cover", "test", "--info")
+                .withArguments("goCover", "goTest", "--info")
                 .withGradleVersion(System.getProperty("test.gradle.version"))
                 .forwardOutput()
                 .build()
