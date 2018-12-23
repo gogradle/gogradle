@@ -109,7 +109,11 @@ dependencies {
 // Define integration test task
 createIntegrationTest('integrationTest', 'integrationTest')
 
-["3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.3", "5.0"].each {
+List<String> gradleVersionsToBeTested = JavaVersion.current().isJava9Compatible()
+        ? ["4.8.1", "4.9", "4.10.3", "5.0"]
+        : ["3.5.1", "4.0.1", "4.1", "4.2.1", "4.3.1", "4.4.1", "4.5.1", "4.6", "4.7", "4.8.1", "4.9", "4.10.3", "5.0"]
+
+gradleVersionsToBeTested.each {
     def testTask = createIntegrationTest("gradle${it}CrossVersionTest", 'crossVersionTest')
     testTask.systemProperty('test.gradle.version', it)
     testTask.mustRunAfter 'integrationTest'
@@ -138,7 +142,7 @@ project.tasks.withType(Test) {
     check.dependsOn(it)
 }
 
-check.dependsOn javadoc, jacocoTestReport 
+check.dependsOn javadoc, jacocoTestReport
 
 /************** testTop1000 **********/
 
