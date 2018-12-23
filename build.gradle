@@ -250,7 +250,7 @@ tasks.withType(KotlinCompile) {
 
 shadowJar {
     dependencies {
-        exclude 'org/gradle/**', 'groovy/**'
+        exclude 'org/gradle/**', 'groovy/**', 'org/codehaus/groovy/**', 'META-INF/services/org.codehaus.groovy*'
     }
 }
 
