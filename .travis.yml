@@ -12,7 +12,7 @@ env:
 go:
   - "1.10.x"
 jdk:
-  - oraclejdk8
+  - openjdk8
   - openjdk11
 script: ./gradlew check --info --stacktrace
 after_success:
