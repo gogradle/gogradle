@@ -90,7 +90,7 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
     @Test
     fun testBuildSubpackageAndCrossCompile() {
-        testOneExample("build-subpackage-and-cross-compile", "build") {
+        testOneExample("build-subpackage-and-cross-compile", "goBuild") {
             listOf("StringReverse_darwin_amd64", "StringReverse_linux_386", "StringReverse_windows_amd64.exe").forEach {
                 assert(File(projectDir, it).exists())
             }
@@ -100,14 +100,14 @@ apply plugin: 'com.github.blindpirate.gogradle'
     @Test
     @OnlyWhen(value = "'golint'.execute()", ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
     fun testGofmtVetGolint() {
-        testOneExample("gofmt-vet-golint", "build") {
+        testOneExample("gofmt-vet-golint", "goBuild") {
             assert(IOUtils.toString(File(projectDir, "stdout.txt")).contains("should not use dot imports"))
         }
     }
 
     @Test
     fun testTypicalBuild() {
-        testOneExample("typical-build", "build") {
+        testOneExample("typical-build", "goBuild") {
             assert(File(projectDir, "StringReverse${Os.getHostOs().exeExtension()}").exists())
             assert(processUtils.runAndGetStdout(File(projectDir, "StringReverse${Os.getHostOs().exeExtension()}").absolutePath) == "Hello, Go examples!\n")
         }
@@ -115,7 +115,7 @@ apply plugin: 'com.github.blindpirate.gogradle'
 
     @Test
     fun testRepositoryManagement() {
-        testOneExample("repository-management", "build") {
+        testOneExample("repository-management", "goBuild") {
             assert(processUtils.runAndGetStdout(File(projectDir, "output${Os.getHostOs().exeExtension()}").absolutePath) == "I am a private repo\n")
         }
     }
@@ -146,23 +146,11 @@ apply plugin: 'com.github.blindpirate.gogradle'
         cleanProjectDir()
         GradleRunner.create()
                 .withProjectDir(projectDir)
-                .withArguments(listOf("test", "--info"))
+                .withArguments(listOf("goTest", "--info"))
                 .withGradleVersion(getTestGradleVersion())
                 .forwardOutput()
                 .buildAndFail()
 
         assert(IOUtils.toString(File(projectDir, ".gogradle/reports/test/index.html")).contains("33%"))
-    }
-
-    @Test
-    fun testHandleTaskNameConflict() {
-        useDirectory("handle-task-name-conflict")
-        cleanProjectDir()
-        GradleRunner.create()
-                .withProjectDir(projectDir)
-                .withArguments(listOf("goBuild", "--info", "-Dgogradle.alias=true"))
-                .withGradleVersion(getTestGradleVersion())
-                .forwardOutput()
-                .build()
     }
 }
