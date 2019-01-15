@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.core.GolangPackage;
 import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.Assert;
+import com.github.blindpirate.gogradle.util.http.HttpResponse;
 import com.github.blindpirate.gogradle.util.HttpUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.util.logging.DebugLog;
@@ -70,25 +71,25 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
 
     private Optional<GolangPackage> fetchViaWeb(String packagePath, String url) {
         try {
-            String html = fetchHtml(url);
+            HttpResponse response = fetchHtml(url);
+            Optional<GoImportMetaTag> metaTag = findMatchedMetaTagFromResponse(packagePath, response);
 
-            Document document = Jsoup.parse(html);
-            Elements elements = document.select("meta[name=go-import]");
-
-            Optional<GoImportMetaTag> metaTag = findMatchedMetaTag(packagePath, url, elements);
             if (!metaTag.isPresent()) {
-                LOGGER.debug("Cannot find matched meta tag in response of {}", url);
+                response.checkValidity();
+                LOGGER.info("Cannot find matched meta tag in response of {}", url);
                 return Optional.empty();
             }
-            return Optional.of(buildPackageInfo(packagePath, metaTag.get()));
+            return metaTag.map((tag) -> buildPackageInfo(packagePath, tag));
         } catch (IOException e) {
             LOGGER.info("Exception in accessing {}", url, e);
             return Optional.empty();
         }
-
     }
 
-    private Optional<GoImportMetaTag> findMatchedMetaTag(String packagePath, String url, Elements elements) {
+    private Optional<GoImportMetaTag> findMatchedMetaTagFromResponse(String packagePath, HttpResponse response)
+            throws IOException {
+        Document document = Jsoup.parse(response.readHtml());
+        Elements elements = document.select("meta[name=go-import]");
         return elements.stream()
                 .map(element -> new GoImportMetaTag(element.attr("content")))
                 .filter(tag -> packagePath.startsWith(tag.rootPath))
@@ -104,10 +105,10 @@ public class MetadataPackagePathResolver implements PackagePathResolver {
                 .build();
     }
 
-    private String fetchHtml(String url) throws IOException {
+    private HttpResponse fetchHtml(String url) throws IOException {
         String realUrl = httpUtils.appendQueryParams(url, ImmutableMap.of("go-get", "1"));
         Map<String, String> headers = ImmutableMap.of(HttpUtils.USER_AGENT, GO_USER_AGENT);
-        return httpUtils.get(realUrl, headers);
+        return httpUtils.getResponse(realUrl, headers);
     }
 
 
