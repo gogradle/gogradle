@@ -13,7 +13,7 @@ Before starting your work, you don't need to install Go and set `GOPATH`, of cou
 
 ```groovy
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.10.2'
+    id 'com.github.blindpirate.gogradle' version '0.10.3'
 }
 
 golang {
