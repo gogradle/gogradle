@@ -23,6 +23,7 @@ import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.when
 @RunWith(GogradleRunner)
 @WithResource('test-for-gogradle-hg.zip')
 @OnlyWhen(value = '"hg version".execute().text.contains("Mercurial")', ignoreTestWhenException = OnlyWhen.ExceptionStrategy.TRUE)
+@Ignore
 class HgClientAccessorTest {
 
     File resource
