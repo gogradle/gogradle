@@ -17,7 +17,10 @@
 
 package com.github.blindpirate.gogradle.util;
 
+import com.github.blindpirate.gogradle.util.http.HttpResponse;
 import com.github.blindpirate.gogradle.util.logging.ProgressMonitorInputStream;
+import org.gradle.api.logging.Logging;
+import org.slf4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -38,6 +41,7 @@ import static com.github.blindpirate.gogradle.GogradleGlobal.DEFAULT_CHARSET;
  * To support mocking, it does not use public static method intentionally.
  */
 public class HttpUtils {
+    private static final Logger LOGGER = Logging.getLogger(HttpUtils.class);
     public static final String GET_METHOD = "GET";
     public static final String POST_METHOD = "POST";
     public static final String USER_AGENT = "user-agent";
@@ -45,19 +49,30 @@ public class HttpUtils {
     private static final int FOUR_KB = 4096;
     private static final int HTTP_INTERNAL_REDIRECTION = 307;
 
+    /**
+     * Perform a HTTP request and get response html string.
+     * Expect 2xx response code, otherwise throw IOException.
+     *
+     * @param url the url
+     * @return the response html
+     * @throws IOException if response code is not 2xx
+     */
     public String get(String url) throws IOException {
         return get(url, null);
     }
 
-    public String get(String url,
-                      Map<String, String> headers) throws IOException {
+    public String get(String url, Map<String, String> headers) throws IOException {
         return fetch(GET_METHOD, url, null, headers);
+    }
+
+    public HttpResponse getResponse(String url, Map<String, String> headers) throws IOException {
+        return fetchHttpResponse(GET_METHOD, url, null, headers);
     }
 
     /**
      * Append query parameters to given url
      *
-     * @param url    Url as string
+     * @param url Url as string
      * @param params Map with query parameters
      * @return url        Url with query parameters appended
      */
@@ -88,21 +103,28 @@ public class HttpUtils {
     /**
      * Send a request
      *
-     * @param method  HTTP method, for example "GET" or "POST"
-     * @param url     Url as string
-     * @param body    Request body as string
+     * @param method HTTP method, for example "GET" or "POST"
+     * @param url Url as string
+     * @param body Request body as string
      * @param headers Optional map with headers
      * @return response   Response as string
      * @throws IOException the exception thrown
      */
     private String fetch(String method, String url, String body,
                          Map<String, String> headers) throws IOException {
-        try (InputStream is = fetchAsInputStream(method, url, body, headers)) {
-            return IOUtils.toString(is);
-        }
+        HttpResponse response = fetchHttpResponse(method, url, body, headers);
+        response.checkValidity();
+        return response.readHtml();
     }
 
     private InputStream fetchAsInputStream(String method, String url, String body,
+                                           Map<String, String> headers) throws IOException {
+        HttpResponse response = fetchHttpResponse(method, url, body, headers);
+        response.checkValidity();
+        return response.getResponseStream();
+    }
+
+    private HttpResponse fetchHttpResponse(String method, String url, String body,
                                            Map<String, String> headers) throws IOException {
         if (headers != null && headers.containsKey(USER_AGENT)) {
             System.setProperty("http.agent", headers.get(USER_AGENT));
@@ -139,15 +161,16 @@ public class HttpUtils {
                 || conn.getResponseCode() == HttpURLConnection.HTTP_MOVED_TEMP
                 || conn.getResponseCode() == HTTP_INTERNAL_REDIRECTION) {
             String location = conn.getHeaderField("Location");
-            return fetchAsInputStream(method, location, body, headers);
-        }
-        if (conn.getResponseCode() != HttpURLConnection.HTTP_OK) {
-            throw new IOException("Error in accessing " + url
-                    + ", http response code: " + conn.getResponseCode());
+            return fetchHttpResponse(method, location, body, headers);
         }
 
-        // response
-        return conn.getInputStream();
+        try {
+            return HttpResponse.of(url, conn.getResponseCode(), conn.getInputStream());
+        } catch (IOException e) {
+            LOGGER.debug("Error when accessing {} with {}", url, headers, e);
+            return HttpResponse.of(url, conn.getResponseCode(), conn.getErrorStream());
+        }
+
     }
 
     public void download(String url, Path filePath) throws IOException {

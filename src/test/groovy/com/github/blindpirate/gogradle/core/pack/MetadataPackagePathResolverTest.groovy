@@ -21,6 +21,7 @@ import com.github.blindpirate.gogradle.GogradleRunner
 import com.github.blindpirate.gogradle.core.GolangPackage
 import com.github.blindpirate.gogradle.support.MockOffline
 import com.github.blindpirate.gogradle.util.HttpUtils
+import com.github.blindpirate.gogradle.util.http.HttpResponse
 import com.github.blindpirate.gogradle.vcs.VcsType
 import org.junit.Before
 import org.junit.Test
@@ -57,12 +58,21 @@ class MetadataPackagePathResolverTest {
     }
 
     @Test
-    void 'get package info from go-import meta tag should succeed'() {
+    void 'get package info from go-import meta tag should succeed with 200'() {
+        canParseMetaTagWith(200)
+    }
+
+    @Test
+    void 'get package info from go-import meta tag should succeed with 404'() {
+        canParseMetaTagWith(404)
+    }
+
+    private void canParseMetaTagWith(int code) {
         // given
         String packagePath = 'example.org/pkg/foo'
         String realUrl = 'https://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git https://code.org/r/p/exproj">'
-        when(httpUtils.get(realUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.getResponse(realUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag, code))
 
         // when
         GolangPackage info = resolver.produce(packagePath).get()
@@ -81,14 +91,14 @@ class MetadataPackagePathResolverTest {
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
         String realHttpUrl = 'http://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git https://code.org/r/p/exproj">'
-        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenThrow(new IOException())
-        when(httpUtils.get(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.getResponse(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenThrow(new IOException())
+        when(httpUtils.getResponse(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
 
         // when
         resolver.produce(packagePath).get()
 
         // then
-        verify(httpUtils).get(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])
+        verify(httpUtils).getResponse(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])
     }
 
     @Test
@@ -97,8 +107,8 @@ class MetadataPackagePathResolverTest {
         String packagePath = 'example.org/pkg/foo'
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
         String realHttpUrl = 'http://example.org/pkg/foo?go-get=1'
-        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(''))
-        when(httpUtils.get(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(''))
+        when(httpUtils.getResponse(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(''))
+        when(httpUtils.getResponse(realHttpUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(''))
 
         // then
         assert !resolver.produce(packagePath).isPresent()
@@ -110,7 +120,7 @@ class MetadataPackagePathResolverTest {
         String packagePath = 'example.org/pkg/foo'
         String realHttpsUrl = 'https://example.org/pkg/foo?go-get=1'
         String metaTag = '<meta name="go-import" content="example.org git">'
-        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.getResponse(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
 
         // then
         resolver.produce(packagePath)
@@ -126,7 +136,7 @@ class MetadataPackagePathResolverTest {
         <meta name="go-import" content="bazil.org/fuse git https://github.com/bazil/fuse">
         <meta name="go-import" content="bazil.org/bolt-mount git https://github.com/bazil/bolt-mount">
         '''
-        when(httpUtils.get(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
+        when(httpUtils.getResponse(realHttpsUrl, [(USER_AGENT): GO_USER_AGENT])).thenReturn(tagInHtml(metaTag))
         // when
         GolangPackage pkg = resolver.produce(packagePath).get()
         // then
@@ -135,7 +145,11 @@ class MetadataPackagePathResolverTest {
         assert pkg.vcsType == VcsType.GIT
     }
 
-    String tagInHtml(String s) {
-        return "<html><header>${s}</header><body></body></html>"
+    HttpResponse tagInHtml(String s) {
+        return tagInHtml(s, 200)
+    }
+
+    HttpResponse tagInHtml(String s, int code) {
+        return HttpResponse.of("url", code, new ByteArrayInputStream("<html><header>${s}</header><body></body></html>".bytes))
     }
 }
