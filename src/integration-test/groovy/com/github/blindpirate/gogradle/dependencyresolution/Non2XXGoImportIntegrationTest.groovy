@@ -30,7 +30,7 @@ class Non2XXGoImportIntegrationTest extends IntegrationTestSupport {
         """)
 
         try {
-            newBuild('dependencies')
+            newBuild('goDependencies')
             assert stdout.toString().contains('\\-- gonum.org/v1/gonum')
         } catch (Throwable e) {
             println(stdout)
