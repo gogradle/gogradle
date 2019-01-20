@@ -5,8 +5,6 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.WithIsolatedUserhome
 import com.github.blindpirate.gogradle.support.WithMockGo
 import com.github.blindpirate.gogradle.support.WithResource
-import com.github.blindpirate.gogradle.util.ProcessUtils
-import com.github.blindpirate.gogradle.util.StringUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
