@@ -31,5 +31,8 @@ Most of the tasks are renamed as follows:
 | fmt                      | gofmt                    | 
 | check                    | goCheck                  | 
 
+Please be aware of this change and consult [Tasks](https://github.com/gogradle/gogradle/blob/v0.10.3/docs/tasks.md) for more details.
 
-Please be aware of this change and consult [Tasks](./docs/tasks.md) for more details.
+### Fixed bugs
+
+[etcd dependency creates near infinite vendor folder hierarchy](https://github.com/gogradle/gogradle/issues/274)
