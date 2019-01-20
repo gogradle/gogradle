@@ -24,6 +24,9 @@ import com.github.blindpirate.gogradle.util.IOUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import java.nio.file.Files
+import java.nio.file.Paths
+
 @RunWith(GogradleRunner)
 @WithResource('')
 class DependencyInstallFileFilterTest extends FileFilterTest {
@@ -46,7 +49,6 @@ class DependencyInstallFileFilterTest extends FileFilterTest {
             assert !filter.accept(touch(it))
         }
     }
-
 
     @Test
     void '*_test_go should be rejected'() {
@@ -85,6 +87,20 @@ class DependencyInstallFileFilterTest extends FileFilterTest {
         IOUtils.write(resource, '_main.go', '')
 
         assert !allDescendentFilter.accept(resource)
+    }
+
+    @Test
+    void 'relative symlink should be rejected'() {
+        Files.createSymbolicLink(resource.toPath().resolve('link'), Paths.get(".."))
+
+        assert !allDescendentFilter.accept(new File(resource, 'link'))
+    }
+
+    @Test
+    void 'absolute symlink should be rejected'() {
+        Files.createSymbolicLink(resource.toPath().resolve('link'), resource.toPath())
+
+        assert !allDescendentFilter.accept(new File(resource, 'link'))
     }
 
     @Test
