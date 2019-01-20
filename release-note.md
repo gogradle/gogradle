@@ -30,3 +30,6 @@ Most of the tasks are renamed as follows:
 | vet                      | goVet                    | 
 | fmt                      | gofmt                    | 
 | check                    | goCheck                  | 
+
+
+Please be aware of this change and consult [Tasks](./docs/tasks.md) for more details.
