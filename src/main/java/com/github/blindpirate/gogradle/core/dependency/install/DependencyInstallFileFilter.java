@@ -22,6 +22,7 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.nio.file.Files;
 import java.util.List;
 import java.util.Set;
 
@@ -47,12 +48,13 @@ public class DependencyInstallFileFilter implements FileFilter {
 
     @Override
     public boolean accept(File pathname) {
-        if (pathname.isDirectory()) {
+        if (Files.isSymbolicLink(pathname.toPath())) {
+            return false;
+        } else if (pathname.isDirectory()) {
             return acceptDirectory(pathname);
         } else if (pathname.isFile()) {
             return inSubpackagesPredicate.test(pathname) && acceptFile(pathname);
         } else {
-            // symbolic links
             return false;
         }
     }
