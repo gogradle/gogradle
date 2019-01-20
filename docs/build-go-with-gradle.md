@@ -70,7 +70,7 @@ Gogradle所需的一切仅仅是一个JVM。现在你需要安装JDK或者JRE 8+
 
 ```
 plugins {
-    id 'com.github.blindpirate.gogradle' version '0.10.2' // 请使用当前的最新版本
+    id 'com.github.blindpirate.gogradle' version '0.11' // 请使用当前的最新版本
 }
 
 golang {
