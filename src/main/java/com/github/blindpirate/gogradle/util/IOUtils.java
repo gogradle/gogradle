@@ -37,6 +37,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.file.FileVisitOption;
 import java.nio.file.FileVisitResult;
@@ -125,7 +126,7 @@ public final class IOUtils {
     }
 
     public static byte[] toByteArray(ByteBuffer buf) {
-        buf.position(0);
+        ((Buffer) buf).position(0);
         byte[] ret = new byte[buf.remaining()];
         buf.get(ret);
         return ret;
