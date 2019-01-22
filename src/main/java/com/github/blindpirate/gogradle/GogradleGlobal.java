@@ -24,7 +24,7 @@ import org.gradle.api.Project;
 public enum GogradleGlobal {
     INSTANCE;
 
-    public static final String GOGRADLE_VERSION = "0.11";
+    public static final String GOGRADLE_VERSION = "0.11.1";
     public static final String GOGRADLE_COMPATIBLE_VERSION = "0.10";
     public static final String DEFAULT_CHARSET = "UTF-8";
     public static final String GOGRADLE_BUILD_DIR_NAME = ".gogradle";
