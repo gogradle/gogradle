@@ -20,7 +20,6 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
 
-import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
