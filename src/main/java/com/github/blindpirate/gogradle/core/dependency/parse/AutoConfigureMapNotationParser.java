@@ -20,6 +20,7 @@ package com.github.blindpirate.gogradle.core.dependency.parse;
 import com.github.blindpirate.gogradle.core.dependency.NotationDependency;
 import com.github.blindpirate.gogradle.util.ConfigureUtils;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.util.Map;
@@ -29,12 +30,12 @@ public abstract class AutoConfigureMapNotationParser<T extends NotationDependenc
     public NotationDependency parse(Map<String, Object> notationMap) {
         try {
             preConfigure(notationMap);
-            NotationDependency ret = determineDependencyClass(notationMap).newInstance();
+            NotationDependency ret = determineDependencyClass(notationMap).getConstructor().newInstance();
             ConfigureUtils.configureByMapQuietly(notationMap, ret);
 
             postConfigure(notationMap, ret);
             return ret;
-        } catch (InstantiationException | IllegalAccessException e) {
+        } catch (InstantiationException | IllegalAccessException | NoSuchMethodException | InvocationTargetException e) {
             throw new IllegalStateException("Dependency class must have an accessible default constructor!");
         }
     }

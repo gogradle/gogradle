@@ -25,7 +25,7 @@ class UtilsCommonTest {
     void 'useless test for invoking constructor of util class'() {
         ClassPath.from(IOUtils.classLoader).getTopLevelClasses('com.github.blindpirate.gogradle.util').each {
             if (!it.name.endsWith('Test')) {
-                it.load().newInstance()
+                it.load().getConstructor().newInstance()
             }
         }
     }
