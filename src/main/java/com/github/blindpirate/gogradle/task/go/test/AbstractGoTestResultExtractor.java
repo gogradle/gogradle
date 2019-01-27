@@ -91,10 +91,21 @@ public abstract class AbstractGoTestResultExtractor implements GoTestResultExtra
         return testFileContents
                 .entrySet()
                 .stream()
-                .filter(entry -> entry.getValue().contains(methodName))
+                .filter(entry -> testFileContainsTestMethodName(entry, methodName))
                 .findFirst()
                 .get()
                 .getKey();
+    }
+
+    private boolean testFileContainsTestMethodName(Map.Entry<File, String> entry, String methodName) {
+        // methodName can be paramterized, e.g. Test_keyLessThan/a<b
+        // we simply remove all characters after '/'
+        int indexOfSlash = methodName.indexOf('/');
+        if (indexOfSlash == -1) {
+            return entry.getValue().contains(methodName);
+        } else {
+            return entry.getValue().contains(methodName.substring(0, indexOfSlash));
+        }
     }
 
     private boolean stdoutContains(PackageTestResult result, String error) {

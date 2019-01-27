@@ -89,4 +89,147 @@ class JsonGoTestStdoutExtractorTest {
         assert result1.results[0].message.trim().contains('Test_A2_1')
         assert result1.results[0].resultType == TestResult.ResultType.SUCCESS
     }
+
+    // https://github.com/gogradle/gogradle/issues/276
+    @Test
+    void 'can extract parameterized test result'() {
+        // given
+        IOUtils.write(resource, "datastore_test.go", '''
+func Test_keyLessThan(t *testing.T) {
+    tsts := []struct {
+        a      *datastore.Key
+        b      *datastore.Key
+        expect bool
+        name   string
+    }{
+        {
+            name:   "a<b",
+            a:      datastore.NameKey("A", "a", nil),
+            b:      datastore.NameKey("A", "b", nil),
+            expect: true,
+        },
+        {
+            name:   "b>a",
+            a:      datastore.NameKey("A", "b", nil),
+            b:      datastore.NameKey("A", "a", nil),
+            expect: false,
+        },
+        {
+            name:   "a=a",
+            a:      datastore.NameKey("A", "a", nil),
+            b:      datastore.NameKey("A", "a", nil),
+            expect: false,
+        },
+        {
+            name:   "a.a<b",
+            a:      datastore.NameKey("A", "a", nil),
+            b:      datastore.NameKey("A", "a", datastore.NameKey("A", "b", nil)),
+            expect: true,
+        },
+        {
+            name:   "a.a<a.b",
+            a:      datastore.NameKey("A", "a", datastore.NameKey("A", "a", nil)),
+            b:      datastore.NameKey("A", "a", datastore.NameKey("A", "b", nil)),
+            expect: true,
+        },
+        {
+            name:   "a.b>a.a",
+            a:      datastore.NameKey("A", "a", datastore.NameKey("A", "b", nil)),
+            b:      datastore.NameKey("A", "a", datastore.NameKey("A", "a", nil)),
+            expect: false,
+        },
+        {
+            name:   "a.a=a.a",
+            a:      datastore.NameKey("A", "a", datastore.NameKey("A", "a", nil)),
+            b:      datastore.NameKey("A", "a", datastore.NameKey("A", "a", nil)),
+            expect: false,
+        },
+        {
+            name:   "4dda<A",
+            a:      datastore.NameKey("A", "4dda", nil),
+            b:      datastore.NameKey("A", "A", nil),
+            expect: true,
+        },
+    }
+    for n := range tsts {
+        index := n
+        t.Run(tsts[index].name, func(t *testing.T) {
+            got := keyLessThan(tsts[index].a, tsts[index].b)
+            if tsts[index].expect != got {
+                t.Fail()
+            }
+        })
+    }
+}
+''')
+        String stdout = '''\
+{"Time":"2019-01-23T17:06:20.437250944+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Output":"2019/01/23 17:06:20 Func for func(reflect.Type, []uint8) (typex.T, error) already registered. Overwriting.\\n"}
+{"Time":"2019-01-23T17:06:20.437615238+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan"}
+{"Time":"2019-01-23T17:06:20.437622508+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan","Output":"=== RUN   Test_keyLessThan\\n"}
+{"Time":"2019-01-23T17:06:20.437630822+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a\\u003cb"}
+{"Time":"2019-01-23T17:06:20.437638036+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a\\u003cb","Output":"=== RUN   Test_keyLessThan/a\\u003cb\\n"}
+{"Time":"2019-01-23T17:06:20.437643205+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/b\\u003ea"}
+{"Time":"2019-01-23T17:06:20.437649224+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/b\\u003ea","Output":"=== RUN   Test_keyLessThan/b\\u003ea\\n"}
+{"Time":"2019-01-23T17:06:20.437653965+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a=a"}
+{"Time":"2019-01-23T17:06:20.43765827+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a=a","Output":"=== RUN   Test_keyLessThan/a=a\\n"}
+{"Time":"2019-01-23T17:06:20.437663358+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003cb"}
+{"Time":"2019-01-23T17:06:20.437667819+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003cb","Output":"=== RUN   Test_keyLessThan/a.a\\u003cb\\n"}
+{"Time":"2019-01-23T17:06:20.437672455+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003ca.b"}
+{"Time":"2019-01-23T17:06:20.437676701+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003ca.b","Output":"=== RUN   Test_keyLessThan/a.a\\u003ca.b\\n"}
+{"Time":"2019-01-23T17:06:20.43768485+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.b\\u003ea.a"}
+{"Time":"2019-01-23T17:06:20.437693009+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.b\\u003ea.a","Output":"=== RUN   Test_keyLessThan/a.b\\u003ea.a\\n"}
+{"Time":"2019-01-23T17:06:20.437701737+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a=a.a"}
+{"Time":"2019-01-23T17:06:20.437708012+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a=a.a","Output":"=== RUN   Test_keyLessThan/a.a=a.a\\n"}
+{"Time":"2019-01-23T17:06:20.437713257+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/4dda\\u003cA"}
+{"Time":"2019-01-23T17:06:20.437717637+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/4dda\\u003cA","Output":"=== RUN   Test_keyLessThan/4dda\\u003cA\\n"}
+{"Time":"2019-01-23T17:06:20.437726371+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan","Output":"--- PASS: Test_keyLessThan (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437735311+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a\\u003cb","Output":"    --- PASS: Test_keyLessThan/a\\u003cb (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437742561+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a\\u003cb","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437755604+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/b\\u003ea","Output":"    --- PASS: Test_keyLessThan/b\\u003ea (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437760812+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/b\\u003ea","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437765648+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a=a","Output":"    --- PASS: Test_keyLessThan/a=a (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437770428+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a=a","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437777869+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003cb","Output":"    --- PASS: Test_keyLessThan/a.a\\u003cb (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437783338+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003cb","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437795337+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003ca.b","Output":"    --- PASS: Test_keyLessThan/a.a\\u003ca.b (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.43780042+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a\\u003ca.b","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437804962+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.b\\u003ea.a","Output":"    --- PASS: Test_keyLessThan/a.b\\u003ea.a (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.4378098+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.b\\u003ea.a","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.43781812+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a=a.a","Output":"    --- PASS: Test_keyLessThan/a.a=a.a (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437823309+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/a.a=a.a","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437827724+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/4dda\\u003cA","Output":"    --- PASS: Test_keyLessThan/4dda\\u003cA (0.00s)\\n"}
+{"Time":"2019-01-23T17:06:20.437832554+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan/4dda\\u003cA","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437836563+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Test":"Test_keyLessThan","Elapsed":0}
+{"Time":"2019-01-23T17:06:20.437860549+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Output":"PASS\\n"}
+{"Time":"2019-01-23T17:06:20.438077604+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Output":"coverage: 17.2% of statements\\n"}
+{"Time":"2019-01-23T17:06:20.4396444+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Output":"ok  \\tgithub.com/apache/beam/sdks/go/pkg/beam/io/datastoreio\\t0.018s\\tcoverage: 17.2% of statements\\n"}
+{"Time":"2019-01-23T17:06:20.439676579+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/io/datastoreio","Elapsed":0.018}
+'''
+        // when
+        PackageTestResult context = PackageTestResult.builder()
+                .withPackagePath('github.com/apache/beam/sdks/go/pkg/beam/io')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+
+        // then
+        assert results.size() == 1
+
+        assert results[0].className == 'github_DOT_com.apache.beam.sdks.go.pkg.beam.io.datastore_test_DOT_go'
+        assert results[0].results.size() == 9
+
+        assert results[0].results.collect { it.name } == [
+                'Test_keyLessThan',
+                'Test_keyLessThan/a<b',
+                'Test_keyLessThan/b>a',
+                'Test_keyLessThan/a=a',
+                'Test_keyLessThan/a.a<b',
+                'Test_keyLessThan/a.a<a.b',
+                'Test_keyLessThan/a.b>a.a',
+                'Test_keyLessThan/a.a=a.a',
+                'Test_keyLessThan/4dda<A'
+        ]
+        assert results[0].results.every { it.resultType == TestResult.ResultType.SUCCESS }
+    }
 }

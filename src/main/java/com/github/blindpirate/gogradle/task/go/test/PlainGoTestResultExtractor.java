@@ -32,6 +32,7 @@ import java.util.regex.Pattern;
 import static com.github.blindpirate.gogradle.util.DateUtils.toMilliseconds;
 import static java.lang.Double.parseDouble;
 
+@Deprecated
 public class PlainGoTestResultExtractor extends AbstractGoTestResultExtractor {
     private static final Map<String, TestResult.ResultType> RESULT_TYPE_MAP =
             ImmutableMap.of("PASS", TestResult.ResultType.SUCCESS,

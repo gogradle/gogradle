@@ -219,11 +219,13 @@ func Test_Pass(t *testing.T){
         new File(resource, 'c/c1_test.go.fail').renameTo(new File(resource, 'c/c1_test.go'))
         new File(resource, 'd/d1.go.fail').renameTo(new File(resource, 'd/d1.go'))
         new File(resource, 'd/d1_test.go.fail').renameTo(new File(resource, 'd/d1_test.go'))
+        new File(resource, 'e/e_test.go').delete()
+        new File(resource, 'e/e_test.go.fail').renameTo(new File(resource, 'e/e_test.go'))
 
         try {
             newBuild('goTest', 'goCover', '--info')
         } catch (BuildException e) {
-            assertOutputContains('There are 4 failed tests')
+            assertOutputContains('There are 6 failed tests')
             assertOutputContains('FAIL: Test_A1_1')
             examineTestReportHtmls()
         }
@@ -234,29 +236,28 @@ func Test_Pass(t *testing.T){
         Document index = Jsoup.parse(indexHtml)
         // our rewrite script
         assert indexHtml.contains('h1,li>a,td>a,.breadcrumbs>a')
-        assert index.select('#tests>.counter')[0].text() == '6'
-        assert index.select('#failures>.counter')[0].text() == '4'
+        assert index.select('#tests>.counter')[0].text() == '11'
+        assert index.select('#failures>.counter')[0].text() == '6'
 
-        String aHtml = IOUtils.toString(new File(resource, '.gogradle/reports/test/packages/github_DOT_com.my.project.a.html'))
-        Document a = Jsoup.parse(aHtml)
-        assert aHtml.contains('h1,li>a,td>a,.breadcrumbs>a')
-        assert a.select('#tests>.counter')[0].text() == '3'
-        assert a.select('#failures>.counter')[0].text() == '1'
+        verifyTestHtml('.gogradle/reports/test/packages/github_DOT_com.my.project.a.html', 3, 1)
+        verifyTestHtml('.gogradle/reports/test/classes/github_DOT_com.my.project.a.a1_test_DOT_go.html', 2, 1)
+        verifyTestHtml('.gogradle/reports/test/classes/github_DOT_com.my.project.e.e_test_DOT_go.html', 5, 2)
 
-        String a1Html = IOUtils.toString(new File(resource, '.gogradle/reports/test/classes/github_DOT_com.my.project.a.a1_test_DOT_go.html'))
-        Document a1 = Jsoup.parse(a1Html)
-        assert a1Html.contains('h1,li>a,td>a,.breadcrumbs>a')
-        assert a1.select('#tests>.counter')[0].text() == '2'
-        assert a1.select('#failures>.counter')[0].text() == '1'
-
-        ['a', 'b', 'c', 'd'].each {
+        ['a', 'b', 'c', 'd', 'e'].each {
             assert new File(resource, ".gogradle/reports/test/packages/github_DOT_com.my.project.${it}.html").exists()
         }
 
         ['a1', 'a2'].each {
             assert new File(resource, ".gogradle/reports/test/classes/github_DOT_com.my.project.a.${it}_test_DOT_go.html").exists()
         }
+    }
 
+    void verifyTestHtml(String file, int expectedTestCount, int expectedFailureCount) {
+        String html = IOUtils.toString(new File(resource, file))
+        Document doc = Jsoup.parse(html)
+        assert html.contains('h1,li>a,td>a,.breadcrumbs>a')
+        assert doc.select('#tests>.counter')[0].text().toInteger() == expectedTestCount
+        assert doc.select('#failures>.counter')[0].text().toInteger() == expectedFailureCount
     }
 
     @Override
