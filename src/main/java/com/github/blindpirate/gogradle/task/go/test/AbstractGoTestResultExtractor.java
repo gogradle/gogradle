@@ -6,7 +6,6 @@ import org.gradle.api.internal.tasks.testing.junit.result.TestClassResult;
 import org.gradle.api.internal.tasks.testing.junit.result.TestMethodResult;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.tasks.testing.TestResult;
 
 import java.io.File;
 import java.util.LinkedHashMap;
@@ -19,6 +18,8 @@ import static java.util.Arrays.asList;
 import static java.util.stream.Collectors.groupingBy;
 import static java.util.stream.Collectors.toList;
 import static java.util.stream.Collectors.toMap;
+import static org.gradle.api.tasks.testing.TestResult.ResultType;
+import static org.gradle.api.tasks.testing.TestResult.ResultType.FAILURE;
 
 public abstract class AbstractGoTestResultExtractor implements GoTestResultExtractor {
     private static final Logger LOGGER = Logging.getLogger(AbstractGoTestResultExtractor.class);
@@ -28,6 +29,9 @@ public abstract class AbstractGoTestResultExtractor implements GoTestResultExtra
     private static final String CANNOT_FIND_PACKAGE_ERROR = "cannot find package";
     private static final String RETURN_NON_ZERO = "go test return ";
     protected static final String TEST_START = "=== RUN";
+    protected static final String TEST_PASS = "--- PASS";
+    protected static final String TEST_FAIL = "--- FAIL";
+    protected static final String TEST_SKIP = "--- SKIP";
 
     protected static final AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
 
@@ -80,33 +84,23 @@ public abstract class AbstractGoTestResultExtractor implements GoTestResultExtra
                                                                 Map<File, String> testFiles) {
         return results.stream()
                 .collect(groupingBy(
-                        result -> findTestFileOfMethod(testFiles, result.getName()),
+                        result -> findTestFileOfMethod(testFiles, result.getGoTestMethodName()),
                         LinkedHashMap::new,
                         toList()
                 ));
     }
 
-    private File findTestFileOfMethod(Map<File, String> testFileContents, String methodName) {
+    private File findTestFileOfMethod(Map<File, String> testFileContents, String goTestMethodName) {
         LOGGER.debug("trying to find {} in test files.");
         return testFileContents
                 .entrySet()
                 .stream()
-                .filter(entry -> testFileContainsTestMethodName(entry, methodName))
+                .filter(entry -> entry.getValue().contains(goTestMethodName))
                 .findFirst()
                 .get()
                 .getKey();
     }
 
-    private boolean testFileContainsTestMethodName(Map.Entry<File, String> entry, String methodName) {
-        // methodName can be paramterized, e.g. Test_keyLessThan/a<b
-        // we simply remove all characters after '/'
-        int indexOfSlash = methodName.indexOf('/');
-        if (indexOfSlash == -1) {
-            return entry.getValue().contains(methodName);
-        } else {
-            return entry.getValue().contains(methodName.substring(0, indexOfSlash));
-        }
-    }
 
     private boolean stdoutContains(PackageTestResult result, String error) {
         return result.getStdout().stream().anyMatch(s -> s.contains(error));
@@ -118,12 +112,8 @@ public abstract class AbstractGoTestResultExtractor implements GoTestResultExtra
 
     private List<TestClassResult> testFailToStartUpResult(PackageTestResult testResult, String reason) {
         String message = String.join("\n", testResult.getStdout());
-        GoTestMethodResult ret = new GoTestMethodResult(GLOBAL_COUNTER.incrementAndGet(),
-                reason,
-                TestResult.ResultType.FAILURE,
-                0L,
-                0L,
-                message);
+
+        GoTestMethodResult ret = createTestMethodResult(reason, FAILURE, message, 0L);
 
         ret.addFailure(message, message, message);
 
@@ -141,37 +131,57 @@ public abstract class AbstractGoTestResultExtractor implements GoTestResultExtra
         return escapedPackagePath.replaceAll("%2F", ".") + "." + fileName.replaceAll("\\.", "_DOT_");
     }
 
-    protected GoTestMethodResult createTestMethodResult(String methodName,
-                                                        TestResult.ResultType resultType,
+    protected GoTestMethodResult createTestMethodResult(String testName,
+                                                        ResultType resultType,
                                                         String message,
                                                         long duration) {
-        GoTestMethodResult result = new GoTestMethodResult(GLOBAL_COUNTER.incrementAndGet(),
-                methodName,
+        GoTestMethodResult result = new GoTestMethodResult(
+                testName,
+                extractGoTestMethodName(testName),
                 resultType,
                 duration,
                 0L,
                 message);
-        if (TestResult.ResultType.FAILURE == resultType) {
+        if (FAILURE == resultType) {
             result.addFailure(message, message, message);
         }
         return result;
     }
 
+    private static String extractGoTestMethodName(String testName) {
+        // methodName can be parameterized, e.g. Test_keyLessThan/a<b
+        // we simply remove all characters after '/'
+        int indexOfSlash = testName.indexOf('/');
+        if (indexOfSlash == -1) {
+            return testName;
+        } else {
+            return testName.substring(0, indexOfSlash);
+        }
+    }
+
     public static class GoTestMethodResult extends TestMethodResult {
+        private String goTestMethodName;
         private String message;
 
         public String getMessage() {
             return message;
         }
 
-        public GoTestMethodResult(long id,
-                                  String name,
-                                  TestResult.ResultType resultType,
+        public String getGoTestMethodName() {
+            return goTestMethodName;
+        }
+
+        public GoTestMethodResult(String name,
+                                  String goTestMethodName,
+                                  ResultType resultType,
                                   long duration,
                                   long endTime,
                                   String message) {
-            super(id, name, resultType, duration, endTime);
+            super(GLOBAL_COUNTER.incrementAndGet(), name, resultType, duration, 0L);
             this.message = message;
+            this.goTestMethodName = goTestMethodName;
         }
     }
+
+
 }

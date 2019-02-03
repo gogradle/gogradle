@@ -44,13 +44,13 @@ class GoTestResultsProviderTest {
     @Before
     void setUp() {
         TestClassResult classResult1 = new TestClassResult(1L, 'className', 2L)
-        GoTestMethodResult methodResult11 = new GoTestMethodResult(3L, 'methodName1', TestResult.ResultType.SUCCESS, 4L, 5L, '')
-        GoTestMethodResult methodResult12 = new GoTestMethodResult(6L, 'methodName2', TestResult.ResultType.FAILURE, 6L, 7L, 'failure message')
+        GoTestMethodResult methodResult11 = new GoTestMethodResult('methodName1', 'methodName1', TestResult.ResultType.SUCCESS, 4L, 5L, '')
+        GoTestMethodResult methodResult12 = new GoTestMethodResult('methodName2', 'methodName2', TestResult.ResultType.FAILURE, 6L, 7L, 'failure message')
         classResult1.add(methodResult11)
         classResult1.add(methodResult12)
 
         TestClassResult classResult2 = new TestClassResult(11L, 'className2', 12L)
-        classResult2.add(new GoTestMethodResult(13L, 'methodName3', TestResult.ResultType.SUCCESS, 14L, 15L, '  '))
+        classResult2.add(new GoTestMethodResult('methodName3', 'methodName3', TestResult.ResultType.SUCCESS, 14L, 15L, '  '))
 
         classResults = [classResult1, classResult2]
         provider = new GoTestResultsProvider(classResults)
