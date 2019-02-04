@@ -28,10 +28,10 @@ public abstract class AbstractGoTestResultExtractor implements GoTestResultExtra
     private static final String CANNOT_LOAD_PACKAGE_ERROR = "can't load package";
     private static final String CANNOT_FIND_PACKAGE_ERROR = "cannot find package";
     private static final String RETURN_NON_ZERO = "go test return ";
-    protected static final String TEST_START = "=== RUN";
-    protected static final String TEST_PASS = "--- PASS";
-    protected static final String TEST_FAIL = "--- FAIL";
-    protected static final String TEST_SKIP = "--- SKIP";
+    static final String TEST_START = "=== RUN";
+    static final String TEST_PASS = "--- PASS";
+    static final String TEST_FAIL = "--- FAIL";
+    static final String TEST_SKIP = "--- SKIP";
 
     protected static final AtomicLong GLOBAL_COUNTER = new AtomicLong(0);
 
