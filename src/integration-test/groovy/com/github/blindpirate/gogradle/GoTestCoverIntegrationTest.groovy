@@ -112,6 +112,7 @@ func Test_Pass(t *testing.T){
     void 'test and coverage report should be generated successfully'() {
         normalTest()
         assertNormalTestNoUpToDateResult()
+        assertTestResults(13, 0, 0)
         GoCoverTest.examineCoverageHtmls(resource)
 
         normalTest()
@@ -221,23 +222,20 @@ func Test_Pass(t *testing.T){
         new File(resource, 'd/d1_test.go.fail').renameTo(new File(resource, 'd/d1_test.go'))
         new File(resource, 'e/e_test.go').delete()
         new File(resource, 'e/e_test.go.fail').renameTo(new File(resource, 'e/e_test.go'))
+        new File(resource, 'f/f_test.go').delete()
+        new File(resource, 'f/f_test.go.fail').renameTo(new File(resource, 'f/f_test.go'))
 
         try {
             newBuild('goTest', 'goCover', '--info')
         } catch (BuildException e) {
-            assertOutputContains('There are 6 failed tests')
+            assertOutputContains('There are 9 failed tests')
             assertOutputContains('FAIL: Test_A1_1')
             examineTestReportHtmls()
         }
     }
 
     void examineTestReportHtmls() {
-        String indexHtml = new File(resource, '.gogradle/reports/test/index.html').text
-        Document index = Jsoup.parse(indexHtml)
-        // our rewrite script
-        assert indexHtml.contains('h1,li>a,td>a,.breadcrumbs>a')
-        assert index.select('#tests>.counter')[0].text() == '11'
-        assert index.select('#failures>.counter')[0].text() == '6'
+        assertTestResults(16, 9, 0)
 
         verifyTestHtml('.gogradle/reports/test/packages/github_DOT_com.my.project.a.html', 3, 1)
         verifyTestHtml('.gogradle/reports/test/classes/github_DOT_com.my.project.a.a1_test_DOT_go.html', 2, 1)
@@ -250,6 +248,16 @@ func Test_Pass(t *testing.T){
         ['a1', 'a2'].each {
             assert new File(resource, ".gogradle/reports/test/classes/github_DOT_com.my.project.a.${it}_test_DOT_go.html").exists()
         }
+    }
+
+    void assertTestResults(int total, int failure, int ignore) {
+        String indexHtml = new File(resource, '.gogradle/reports/test/index.html').text
+        Document index = Jsoup.parse(indexHtml)
+        // our rewrite script
+        assert indexHtml.contains('h1,li>a,td>a,.breadcrumbs>a')
+        assert index.select('#tests>.counter')[0].text().toInteger() == total
+        assert index.select('#failures>.counter')[0].text().toInteger() == failure
+        assert index.select('#ignored>.counter')[0].text().toInteger() == ignore
     }
 
     void verifyTestHtml(String file, int expectedTestCount, int expectedFailureCount) {

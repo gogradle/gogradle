@@ -232,4 +232,124 @@ func Test_keyLessThan(t *testing.T) {
         ]
         assert results[0].results.every { it.resultType == TestResult.ResultType.SUCCESS }
     }
+
+    // https://github.com/gogradle/gogradle/issues/276
+    @Test
+    void 'can extract more test results'() {
+        // given
+        IOUtils.write(resource, "metrics_test.go", '''
+package metrics
+
+import (
+    "context"
+    "fmt"
+    "testing"
+    "time"
+)
+
+// bID is a bundleId to use in the tests, if nothing more specific is needed.
+const bID = "bID"
+
+func ctxWith(b, pt string) context.Context {
+    ctx := context.Background()
+    ctx = SetPTransformID(ctx, pt)
+    ctx = SetBundleID(ctx, b)
+    return ctx
+}
+
+func TestCounter_Inc(t *testing.T) {
+    tests := []struct {
+        ns, n, key string // Counter name and PTransform context
+        inc        int64
+        value      int64 // Internal variable to check
+    }{
+        {ns: "inc1", n: "count", key: "A", inc: 1, value: 1},
+        {ns: "inc1", n: "count", key: "A", inc: 1, value: 2},
+        {ns: "inc1", n: "ticker", key: "A", inc: 1, value: 1},
+        {ns: "inc1", n: "ticker", key: "A", inc: 2, value: 3},
+        {ns: "inc1", n: "count", key: "B", inc: 1, value: 1},
+        {ns: "inc1", n: "count", key: "B", inc: 1, value: 2},
+        {ns: "inc1", n: "ticker", key: "B", inc: 1, value: 1},
+        {ns: "inc1", n: "ticker", key: "B", inc: 2, value: 3},
+        {ns: "inc2", n: "count", key: "A", inc: 1, value: 1},
+        {ns: "inc2", n: "count", key: "A", inc: 1, value: 2},
+        {ns: "inc2", n: "ticker", key: "A", inc: 1, value: 1},
+        {ns: "inc2", n: "ticker", key: "A", inc: 2, value: 3},
+        {ns: "inc2", n: "count", key: "B", inc: 1, value: 1},
+        {ns: "inc2", n: "count", key: "B", inc: 1, value: 2},
+        {ns: "inc2", n: "ticker", key: "B", inc: 1, value: 1},
+        {ns: "inc2", n: "ticker", key: "B", inc: 2, value: 3},
+    }
+
+    for _, test := range tests {
+        t.Run(fmt.Sprintf("add %d to %s.%s[%q] value: %d", test.inc, test.ns, test.n, test.key, test.value),
+            func(t *testing.T) {
+                m := NewCounter(test.ns, test.n)
+                ctx := ctxWith(bID, test.key)
+                m.Inc(ctx, test.inc)
+
+                key := key{name: name{namespace: test.ns, name: test.n}, bundle: bID, ptransform: test.key}
+                countersMu.Lock()
+                c, ok := counters[key]
+                countersMu.Unlock()
+                if !ok {
+                    t.Fatalf("Unable to find Counter for key %v", key)
+                }
+                if got, want := c.value, test.value; got != want {
+                    t.Errorf("GetCounter(%q,%q).Inc(%s, %d) c.value got %v, want %v", test.ns, test.n, test.key, test.inc, got, want)
+                }
+            })
+    }
+}
+''')
+
+        String stdout='''\
+{"Time":"2019-01-27T17:57:12.021037965+01:00","Action":"run","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc"}
+{"Time":"2019-01-27T17:57:12.021301568+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc","Output":"=== RUN   TestCounter_Inc\\n"}
+{"Time":"2019-01-27T17:57:12.02131797+01:00","Action":"run   testcounter_inc/add_1_to_inc1.count[\\"a\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1"}
+{"Time":"2019-01-27T17:57:12.021332794+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1","Output":"=== RUN   TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_1\\n"}
+{"Time":"2019-01-27T17:57:12.021341639+01:00","Action":"run   testcounter_inc/add_1_to_inc1.count[\\"a\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_2"}
+{"Time":"2019-01-27T17:57:12.021346823+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_2","Output":"=== RUN   TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_2\\n"}
+{"Time":"2019-01-27T17:57:12.021351578+01:00","Action":"run   testcounter_inc/add_1_to_inc1.ticker[\\"a\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1"}
+{"Time":"2019-01-27T17:57:12.021355621+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1","Output":"=== RUN   TestCounter_Inc/add_1_to_inc1.ticker[\\"A\\"]_value:_1\\n"}
+{"Time":"2019-01-27T17:57:12.021361017+01:00","Action":"run   testcounter_inc/add_2_to_inc1.ticker[\\"a\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_3"}
+{"Time":"2019-01-27T17:57:12.021365203+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_3","Output":"=== RUN   TestCounter_Inc/add_2_to_inc1.ticker[\\"A\\"]_value:_3\\n"}
+{"Time":"2019-01-27T17:57:12.021371433+01:00","Action":"run   testcounter_inc/add_1_to_inc1.count[\\"b\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1"}
+{"Time":"2019-01-27T17:57:12.021375709+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1","Output":"=== RUN   TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_1\\n"}
+{"Time":"2019-01-27T17:57:12.021380287+01:00","Action":"run   testcounter_inc/add_1_to_inc1.count[\\"b\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_2"}
+{"Time":"2019-01-27T17:57:12.021385064+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_2","Output":"=== RUN   TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_2\\n"}
+{"Time":"2019-01-27T17:57:12.021389703+01:00","Action":"run   testcounter_inc/add_1_to_inc1.ticker[\\"b\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1"}
+{"Time":"2019-01-27T17:57:12.021393621+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_1","Output":"=== RUN   TestCounter_Inc/add_1_to_inc1.ticker[\\"B\\"]_value:_1\\n"}
+{"Time":"2019-01-27T17:57:12.021398155+01:00","Action":"run   testcounter_inc/add_2_to_inc1.ticker[\\"b\\"]_value","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_3"}
+{"Time":"2019-01-27T17:57:12.021404358+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"_3","Output":"=== RUN   TestCounter_Inc/add_2_to_inc1.ticker[\\"B\\"]_value:_3\\n"}
+{"Time":"2019-01-27T17:57:12.021500234+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc","Output":"--- PASS: TestCounter_Inc (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021506429+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_1","Output":"    --- PASS: TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_1 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021516845+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_1","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021537627+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_2","Output":"    --- PASS: TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_2 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021543019+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"A\\"]_value:_2","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021547579+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.ticker[\\"A\\"]_value:_1","Output":"    --- PASS: TestCounter_Inc/add_1_to_inc1.ticker[\\"A\\"]_value:_1 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021552613+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.ticker[\\"A\\"]_value:_1","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021557023+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_2_to_inc1.ticker[\\"A\\"]_value:_3","Output":"    --- PASS: TestCounter_Inc/add_2_to_inc1.ticker[\\"A\\"]_value:_3 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021564822+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_2_to_inc1.ticker[\\"A\\"]_value:_3","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021569179+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_1","Output":"    --- PASS: TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_1 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021574063+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_1","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021578314+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_2","Output":"    --- PASS: TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_2 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021584868+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.count[\\"B\\"]_value:_2","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021593884+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.ticker[\\"B\\"]_value:_1","Output":"    --- PASS: TestCounter_Inc/add_1_to_inc1.ticker[\\"B\\"]_value:_1 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021598969+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_1_to_inc1.ticker[\\"B\\"]_value:_1","Elapsed":0}
+{"Time":"2019-01-27T17:57:12.021603283+01:00","Action":"output","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_2_to_inc1.ticker[\\"B\\"]_value:_3","Output":"    --- PASS: TestCounter_Inc/add_2_to_inc1.ticker[\\"B\\"]_value:_3 (0.00s)\\n"}
+{"Time":"2019-01-27T17:57:12.021608187+01:00","Action":"pass","Package":"github.com/apache/beam/sdks/go/pkg/beam/core/metrics","Test":"TestCounter_Inc/add_2_to_inc1.ticker[\\"B\\"]_value:_3","Elapsed":0}
+'''
+        // when
+        PackageTestResult context = PackageTestResult.builder()
+                .withPackagePath('github.com/apache/beam/sdks/go/pkg/beam/core/metrics')
+                .withStdout(stdout.split(/\n/) as List)
+                .withTestFiles(resource.listFiles() as List)
+                .build()
+        List<TestClassResult> results = extractor.extractTestResult(context)
+
+        // then
+        assert results.size() == 1
+        assert results[0].results.size() == 9
+    }
 }

@@ -169,8 +169,8 @@ class GoTestTaskTest extends TaskTest {
     void 'successful and failed result should be counted correctly'() {
         // given
         TestClassResult result = new TestClassResult(1L, 'className', 2L)
-        result.add(new GoTestMethodResult(1L, 'methodName', TestResult.ResultType.FAILURE, 2L, 3L, ''))
-        result.add(new GoTestMethodResult(1L, 'methodName', TestResult.ResultType.SUCCESS, 2L, 3L, ''))
+        result.add(new GoTestMethodResult('methodName', 'methodName', TestResult.ResultType.FAILURE, 2L, 3L, ''))
+        result.add(new GoTestMethodResult('methodName', 'methodName', TestResult.ResultType.SUCCESS, 2L, 3L, ''))
         when(extractor.extractTestResult(any(PackageTestResult))).thenReturn([result])
 
         ReflectionUtils.setField(task, 'testNamePattern', ['a1*'])

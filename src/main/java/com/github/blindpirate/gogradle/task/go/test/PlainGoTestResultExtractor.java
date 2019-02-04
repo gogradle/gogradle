@@ -44,10 +44,6 @@ public class PlainGoTestResultExtractor extends AbstractGoTestResultExtractor {
     private static final Pattern TEST_START_LINE_PATTERN
             = Pattern.compile("=== RUN\\s+(\\w+)(/?)");
 
-    private static final String TEST_PASS = "--- PASS";
-    private static final String TEST_FAIL = "--- FAIL";
-    private static final String TEST_SKIP = "--- SKIP";
-
     protected List<GoTestMethodResult> extractMethodResults(PackageTestResult packageTestResult) {
         List<String> stdout = removeTailMessages(packageTestResult.getStdout());
         List<Pair<Integer, String>> testStartIndicesAndNames = extractStartIndiceAndTestMethodNames(stdout);
