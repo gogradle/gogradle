@@ -256,6 +256,7 @@ shadowJar {
     dependencies {
         exclude 'org/gradle/**', 'groovy/**', 'org/codehaus/groovy/**', 'META-INF/services/org.codehaus.groovy*'
     }
+    archiveClassifier = 'all'
 }
 
 /************ spotbugs ****************/
