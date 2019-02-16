@@ -106,7 +106,8 @@ public class GoBuild extends Go {
             subTask.getInputs().files((Callable<Collection<File>>)
                     () -> GoSourceCodeFilter.filterGoFiles(getProjectDir(), PROJECT_AND_VENDOR_BUILD_FILES));
 
-            subTask.getOutputs().file(new File(getProjectDir(), getRenderedOutputLocation(os, arch)));
+
+            subTask.getOutputs().file(getRenderedOutputLocation(os, arch));
 
             Map<String, Object> inputProperties = new HashMap<>();
             inputProperties.put("buildTags", (Callable<List<String>>) () -> setting.getBuildTags());
@@ -116,11 +117,18 @@ public class GoBuild extends Go {
         }
     }
 
-    private String getRenderedOutputLocation(Os os, Arch arch) {
+    private File getRenderedOutputLocation(Os os, Arch arch) {
         Map<String, Object> context = new HashMap<>(getEffectiveEnvironment(os, arch));
         context.put("PROJECT_NAME", getProject().getName());
         context.put("PROJECT_VERSION", getProject().getVersion());
-        return StringUtils.render(getOutputLocation(), context);
+        String renderedOutputLocation = StringUtils.render(getOutputLocation(), context);
+
+        File result = new File(renderedOutputLocation);
+        if (result.isAbsolute()) {
+            return result;
+        } else {
+            return new File(getProjectDir(), renderedOutputLocation);
+        }
     }
 
     public String getOutputLocation() {
