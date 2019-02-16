@@ -14,7 +14,7 @@ go:
 jdk:
   - openjdk8
   - openjdk11
-script: ./gradlew iT --info --stacktrace
+script: ./gradlew check --info --stacktrace
 after_success:
   - ./gradlew jacocoTestReport coveralls
   - free -mt
