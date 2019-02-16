@@ -106,7 +106,6 @@ public class GoBuild extends Go {
             subTask.getInputs().files((Callable<Collection<File>>)
                     () -> GoSourceCodeFilter.filterGoFiles(getProjectDir(), PROJECT_AND_VENDOR_BUILD_FILES));
 
-
             subTask.getOutputs().file(getRenderedOutputLocation(os, arch));
 
             Map<String, Object> inputProperties = new HashMap<>();
