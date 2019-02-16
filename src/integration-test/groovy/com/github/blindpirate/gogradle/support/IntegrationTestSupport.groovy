@@ -54,6 +54,7 @@ golang {
     packagePath = 'github.com/my/project'
 }
 """
+        println("build.gradle content: $buildDotGradleBase")
         if (userhome != null) {
             buildDotGradleBase = "System.setProperty('gradle.user.home','${StringUtils.toUnixString(userhome)}')" + buildDotGradleBase
         }
