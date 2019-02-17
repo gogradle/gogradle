@@ -21,7 +21,7 @@ plugins {
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'
-version '0.11.2'
+version '0.11.3'
 sourceCompatibility = '1.8'
 targetCompatibility = '1.8'
 
