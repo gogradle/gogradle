@@ -146,7 +146,7 @@ func main(){
     void 'can set absolute output location'() {
         appendOnBuildDotGradle('''
             goBuild {
-                outputLocation = project.buildDir.absolutePath + '/result/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
+                outputLocation = project.buildDir.absolutePath.replace('\\\\', '/') + '/result/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
             }
             
             task clean {
