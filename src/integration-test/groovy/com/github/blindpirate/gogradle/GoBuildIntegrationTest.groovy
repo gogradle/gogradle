@@ -141,6 +141,34 @@ func main(){
         assert !stdout.toString().contains(':buildLinux386 UP-TO-DATE')
     }
 
+    // https://github.com/gogradle/gogradle/issues/279
+    @Test
+    void 'can set absolute output location'() {
+        appendOnBuildDotGradle('''
+            goBuild {
+                outputLocation = project.buildDir.absolutePath + '/result/${PROJECT_NAME}-${PROJECT_VERSION}-${GOOS}-${GOARCH}'
+            }
+            
+            task clean {
+                doLast { delete project.buildDir }
+            }
+            ''')
+
+        newBuild('goBuild')
+
+        assert !buildUpToDate()
+        assert new File(resource, 'build/result').listFiles().size() == 1
+
+        newBuild('clean')
+
+        assert !new File(resource, 'build').exists()
+
+        newBuild('goBuild')
+
+        assert !buildUpToDate()
+        assert new File(resource, 'build/result').listFiles().size() == 1
+    }
+
     @Test
     void 'build with build tags should succeed'() {
         appendOnBuildDotGradle('''
