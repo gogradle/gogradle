@@ -45,7 +45,7 @@ public class GoVet extends Go {
 
     private void vet(List<String> fileNames) {
         if (!fileNames.isEmpty()) {
-            go(CollectionUtils.asStringList("tool", "vet", fileNames));
+            go(CollectionUtils.asStringList("vet", fileNames));
         }
     }
 
