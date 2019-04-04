@@ -25,6 +25,7 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
+import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
@@ -39,13 +40,19 @@ public class GoInstall extends AbstractGolangTask {
 
     @Inject
     private VendorSnapshoter vendorSnapshoter;
-
+    @Input
+    private String vendorTargetDir = "vendor";
     private File vendorDir;
 
+    public void setVendorTargetDir(String vendorTargetDir) {
+        this.vendorTargetDir = vendorTargetDir;
+    }
+
     public GoInstall() {
+        setGogradleGlobalContext();
         setGroup(null);
         mustRunAfter(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
-        vendorDir = new File(getProjectDir(), "vendor");
+        vendorDir = new File(getProjectDir(), vendorTargetDir);
     }
 
     @TaskAction
@@ -72,7 +79,7 @@ public class GoInstall extends AbstractGolangTask {
     }
 
     private void installIfNecessary(GolangDependency dependency) {
-        File targetDir = new File(getProjectDir(), "vendor/" + dependency.getName());
+        File targetDir = new File(getProjectDir(), vendorTargetDir + "/" + dependency.getName());
         IOUtils.forceMkdir(targetDir);
         if (IOUtils.dirIsEmpty(targetDir)) {
             ResolvedDependency resolvedDependency = (ResolvedDependency) dependency;
@@ -98,4 +105,5 @@ public class GoInstall extends AbstractGolangTask {
 
         return vendorSnapshoter.isUpToDate(resolvedDependency, currentDir);
     }
+
 }
