@@ -26,6 +26,7 @@ import com.github.blindpirate.gogradle.util.StringUtils;
 import javax.inject.Inject;
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -70,6 +71,7 @@ public class GoVet extends Go {
                 .filter(File::isDirectory)
                 .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
                 .filter(file -> !VENDOR_DIRECTORY.equals(file.getName()))
+                .filter(file -> Arrays.stream(file.list()).allMatch(fileName -> fileName.endsWith(".go")))
                 .map(StringUtils::toUnixString)
                 .collect(Collectors.toList());
         List<String> subDirs = new ArrayList<>();
