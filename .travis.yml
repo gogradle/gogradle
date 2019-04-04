@@ -10,7 +10,7 @@ env:
     - EXAMPLES_DIR=/home/travis/examples
     - JAVA_OPTS=-Xmx1024m -XX:MaxPermSize=256m
 go:
-  - "1.10.x"
+  - "1.12.x"
 jdk:
   - openjdk8
   - openjdk11
