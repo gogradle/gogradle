@@ -18,11 +18,14 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
+import javax.inject.Inject;
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -30,6 +33,10 @@ import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDepe
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
 
 public class GoVet extends Go {
+
+    @Inject
+    private GolangPluginSetting setting;
+
     public GoVet() {
         setDescription("Run 'go vet' (https://golang.org/cmd/vet).");
         dependsOn(VENDOR_TASK_NAME);
@@ -59,12 +66,17 @@ public class GoVet extends Go {
     }
 
     private List<String> allSubDirectories() {
-        return IOUtils.safeListFiles(getProjectDir()).stream()
+        List<String> rawSubDirList = IOUtils.safeListFiles(getProjectDir()).stream()
                 .filter(File::isDirectory)
                 .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
                 .filter(file -> !VENDOR_DIRECTORY.equals(file.getName()))
                 .map(StringUtils::toUnixString)
                 .collect(Collectors.toList());
+        List<String> subDirs = new ArrayList<>();
+        for (String string : rawSubDirList) {
+            subDirs.add(string.replace(getProjectDir().getAbsolutePath(), setting.getPackagePath()));
+        }
+        return subDirs;
     }
 
 }

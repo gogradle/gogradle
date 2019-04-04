@@ -75,7 +75,7 @@ class GoVetTest extends TaskTest {
         List secondCall = captor.allValues[1]
 
         assert firstCall == ['vet', toUnixString(new File(resource, 'main.go'))]
-        assert secondCall == ['vet', toUnixString(new File(resource, 'sub'))]
+        assert secondCall == ['vet', toUnixString(setting.getPackagePath() + '/sub')]
     }
 
     @Test
@@ -85,7 +85,7 @@ class GoVetTest extends TaskTest {
         task.executeTask()
         // then
         verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
-        assert captor.value == ['vet', toUnixString(new File(resource, 'sub'))]
+        assert captor.value == ['vet', setting.getPackagePath() + '/sub']
     }
 
     @Test
