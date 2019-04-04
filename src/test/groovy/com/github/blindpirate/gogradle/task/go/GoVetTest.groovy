@@ -74,8 +74,8 @@ class GoVetTest extends TaskTest {
         List firstCall = captor.allValues[0]
         List secondCall = captor.allValues[1]
 
-        assert firstCall == ['tool', 'vet', toUnixString(new File(resource, 'main.go'))]
-        assert secondCall == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
+        assert firstCall == ['vet', toUnixString(new File(resource, 'main.go'))]
+        assert secondCall == ['vet', toUnixString(setting.getPackagePath() + '/sub')]
     }
 
     @Test
@@ -85,13 +85,13 @@ class GoVetTest extends TaskTest {
         task.executeTask()
         // then
         verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
-        assert captor.value == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
+        assert captor.value == ['vet', setting.getPackagePath() + '/sub']
     }
 
     @Test
     void 'custom action should be executed if specified'() {
         // given
-        task.go('tool vet xxx') {
+        task.go('vet xxx') {
             stderr {}
         }
         task.continueOnFailure = true
@@ -102,7 +102,7 @@ class GoVetTest extends TaskTest {
         ArgumentCaptor captor1 = ArgumentCaptor.forClass(Consumer)
         ArgumentCaptor captor2 = ArgumentCaptor.forClass(Consumer)
         verify(buildManager).go(captor.capture(), anyMap(), captor1.capture(), captor2.capture(), eq(true))
-        assert captor.value == ['tool', 'vet', 'xxx']
+        assert captor.value == ['vet', 'xxx']
         assert captor1.value.class.name.contains('Lambda')
         assert captor2.value.class.name.contains('Go$ClosureLineConsumer')
     }
