@@ -86,12 +86,12 @@ class ConcurrentBuildWithUrlSubstitutionTest {
         futures.each { println(it.get()) }
 
         (1..TOTAL_THREAD_NUM / 2).each {
-            assert new File(resource, "project${it}/vendor/github.com/my/project/1.go").exists()
-            assert !new File(resource, "project${it}/vendor/github.com/my/project/2.go").exists()
+            assert new File(resource, "project${it}/vendor/src/github.com/my/project/1.go").exists()
+            assert !new File(resource, "project${it}/vendor/src/github.com/my/project/2.go").exists()
         }
         (TOTAL_THREAD_NUM / 2 + 1..TOTAL_THREAD_NUM).each {
-            assert !new File(resource, "project${it}/vendor/github.com/my/project/1.go").exists()
-            assert new File(resource, "project${it}/vendor/github.com/my/project/2.go").exists()
+            assert !new File(resource, "project${it}/vendor/src/github.com/my/project/1.go").exists()
+            assert new File(resource, "project${it}/vendor/src/github.com/my/project/2.go").exists()
         }
 
         def metadata = DataExchange.parseYaml(new File(userhome, 'go/repo/github.com/my/project/gogradle-metadata').text, GlobalCacheMetadata)
