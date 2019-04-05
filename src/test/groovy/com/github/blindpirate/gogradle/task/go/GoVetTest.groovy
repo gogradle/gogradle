@@ -40,6 +40,7 @@ class GoVetTest extends TaskTest {
     GoVet task
 
     File resource
+    String packageName = 'github.com/my/package'
 
     @Captor
     ArgumentCaptor<List> captor
@@ -47,13 +48,13 @@ class GoVetTest extends TaskTest {
     @Before
     void setUp() {
         task = buildTask(GoVet)
-        when(setting.getPackagePath()).thenReturn('github.com/my/package')
+        when(setting.getPackagePath()).thenReturn(packageName)
         when(project.getProjectDir()).thenReturn(resource)
-        IOUtils.mkdir(resource, 'src')
-        IOUtils.mkdir(resource, '.dir')
-        IOUtils.mkdir(resource, '_dir')
+        IOUtils.mkdir(resource, "src/${packageName}")
+        IOUtils.mkdir(resource, "src/${packageName}/cmd")
+        IOUtils.mkdir(resource, 'src/.dir')
+        IOUtils.mkdir(resource, 'src/_dir')
         IOUtils.mkdir(resource, 'vendor')
-        IOUtils.mkdir(resource, 'sub')
     }
 
     @Test
@@ -62,32 +63,21 @@ class GoVetTest extends TaskTest {
     }
 
     @Test
-    void 'go vet should succeed when _go exists in root'() {
+    void 'go vet should succeed when _go exists in src'() {
         // given
-        IOUtils.write(resource, 'main.go', '')
+        IOUtils.write(resource, "src/${packageName}/cmd/main.go", '')
         // when
         task.afterEvaluate()
         task.executeTask()
         // then
-        verify(buildManager, times(2)).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
+        verify(buildManager, times(1)).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
 
-        assert captor.allValues.size() == 2
+        assert captor.allValues.size() == 1
         List firstCall = captor.allValues[0]
-        List secondCall = captor.allValues[1]
 
-        assert firstCall == ['vet', toUnixString(new File(resource, 'main.go'))]
-        assert secondCall == ['vet', toUnixString(setting.getPackagePath() + '/sub')]
+        assert firstCall == ['vet', toUnixString(new File(resource, "src/${packageName}/cmd/main.go"))]
     }
 
-    @Test
-    void 'go vet should succeed when _go not exists in root'() {
-        // when
-        task.afterEvaluate()
-        task.executeTask()
-        // then
-        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
-        assert captor.value == ['vet', setting.getPackagePath() + '/sub']
-    }
 
     @Test
     void 'custom action should be executed if specified'() {

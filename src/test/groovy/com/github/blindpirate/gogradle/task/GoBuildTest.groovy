@@ -75,7 +75,7 @@ class GoBuildTest extends TaskTest {
         // when
         task.afterEvaluate()
         // then
-        assert tasks[taskName].goActions[0].args == ['build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
+        assert tasks[taskName].goActions[0].args == ['build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package/cmd/']
         assert tasks[taskName].environment == [GOOS: Os.getHostOs().toString(), GOARCH: Arch.getHostArch().toString(), GOEXE: Os.getHostOs().exeExtension()]
     }
 
@@ -86,7 +86,7 @@ class GoBuildTest extends TaskTest {
         task.afterEvaluate()
         // then
         ['buildDarwinAmd64', 'buildLinux386', 'buildWindowsAmd64'].each {
-            assert tasks[it].goActions[0].args == ['build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package']
+            assert tasks[it].goActions[0].args == ['build', '-o', './.gogradle/${PROJECT_NAME}-${GOOS}-${GOARCH}', 'my/package/cmd/']
         }
 
         assert tasks['buildDarwinAmd64'].environment == [GOOS: 'darwin', GOARCH: 'amd64', GOEXE: '']
@@ -122,7 +122,7 @@ class GoBuildTest extends TaskTest {
         task.outputLocation = 'outputlocation'
         task.afterEvaluate()
         // then
-        assert tasks[taskName].goActions[0].args == ['build', '-o', 'outputlocation', 'my/package']
+        assert tasks[taskName].goActions[0].args == ['build', '-o', 'outputlocation', 'my/package/cmd/']
     }
 
     @Test
