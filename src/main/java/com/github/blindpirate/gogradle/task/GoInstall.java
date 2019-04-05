@@ -77,7 +77,7 @@ public class GoInstall extends AbstractGolangTask {
 
     private void defineVendorDir() {
         if (setting.getVendorTargetDir() != null) {
-            vendorDir = new File(getProjectDir(), setting.getVendorTargetDir() + "/src");
+            vendorDir = new File(setting.getVendorTargetDir() + "/src");
         } else {
             vendorDir = new File(getProjectDir(), "/vendor/src");
         }
