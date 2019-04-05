@@ -17,6 +17,7 @@
 
 package com.github.blindpirate.gogradle.task;
 
+import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.cache.VendorSnapshoter;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependency;
 import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
@@ -25,7 +26,6 @@ import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import org.gradle.api.logging.Logger;
 import org.gradle.api.logging.Logging;
-import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.TaskAction;
 
 import javax.inject.Inject;
@@ -39,25 +39,22 @@ public class GoInstall extends AbstractGolangTask {
     private static final Logger LOGGER = Logging.getLogger(GoInstall.class);
 
     @Inject
+    private GolangPluginSetting setting;
+    @Inject
     private VendorSnapshoter vendorSnapshoter;
-    @Input
-    private String vendorTargetDir = "vendor";
     private File vendorDir;
 
-    public void setVendorTargetDir(String vendorTargetDir) {
-        this.vendorTargetDir = vendorTargetDir;
-    }
 
     public GoInstall() {
         setGogradleGlobalContext();
         setGroup(null);
         mustRunAfter(RESOLVE_BUILD_DEPENDENCIES_TASK_NAME, RESOLVE_TEST_DEPENDENCIES_TASK_NAME);
-        vendorDir = new File(getProjectDir(), vendorTargetDir);
     }
 
     @TaskAction
     public void installDependenciesToVendor() {
         setGogradleGlobalContext();
+        defineVendorDir();
 
         IOUtils.forceMkdir(vendorDir);
         vendorSnapshoter.loadPersistenceCache();
@@ -78,8 +75,16 @@ public class GoInstall extends AbstractGolangTask {
         IOUtils.safeListFiles(vendorDir).stream().filter(File::isFile).forEach(IOUtils::deleteQuitely);
     }
 
+    private void defineVendorDir() {
+        if (setting.getVendorTargetDir() != null) {
+            vendorDir = new File(getProjectDir(), setting.getVendorTargetDir() + "/src");
+        } else {
+            vendorDir = new File(getProjectDir(), "/vendor/src");
+        }
+    }
+
     private void installIfNecessary(GolangDependency dependency) {
-        File targetDir = new File(getProjectDir(), vendorTargetDir + "/" + dependency.getName());
+        File targetDir = new File(vendorDir + "/" + dependency.getName());
         IOUtils.forceMkdir(targetDir);
         if (IOUtils.dirIsEmpty(targetDir)) {
             ResolvedDependency resolvedDependency = (ResolvedDependency) dependency;

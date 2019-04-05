@@ -65,6 +65,9 @@ public class GolangPluginSetting {
     private BuildMode buildMode = REPRODUCIBLE;
 
     private String packagePath;
+    private String vendorTargetDir;
+
+
     private List<String> buildTags = new ArrayList<>();
     private long globalCacheSecond = 5 * 60;
 
@@ -77,6 +80,7 @@ public class GolangPluginSetting {
 
     private Set<String> ignoredPackages = new HashSet<>();
     private boolean userHasCustomizedIgnoredPackages = false;
+
 
     public String getGoRoot() {
         return goRoot;
@@ -225,5 +229,13 @@ public class GolangPluginSetting {
 
     private void verifyPackagePath() {
         Assert.isTrue(isNotBlank(packagePath), "Package's import path must be specified!");
+    }
+
+    public void setVendorTargetDir(String vendorTargetDir) {
+        this.vendorTargetDir = vendorTargetDir;
+    }
+
+    public String getVendorTargetDir() {
+        return vendorTargetDir;
     }
 }
