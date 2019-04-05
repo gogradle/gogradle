@@ -141,10 +141,22 @@ public class GoBuild extends Go {
 
     private void configureActions(Go subTask) {
         if (noCustomActions()) {
-            subTask.go(Arrays.asList("build", "-o", getOutputLocation(), setting.getPackagePath()));
+            subTask.go(Arrays.asList("build", "-o", getOutputLocation(), configureMainApplication()));
         } else {
             goActions.forEach(subTask::addGoAction);
         }
+    }
+
+    private String configureMainApplication() {
+        if (setting.getMainApplicationPath() != null) {
+            return setting.getMainApplicationPath();
+        } else if (setting.getApplicationName() != null) {
+            return String.join("/",
+                    setting.getPackagePath(),
+                    "/cmd/",
+                    setting.getApplicationName());
+        }
+        return setting.getPackagePath() + "/cmd/";
     }
 
     private void configureEnvironment(Os os, Arch arch, Go task) {

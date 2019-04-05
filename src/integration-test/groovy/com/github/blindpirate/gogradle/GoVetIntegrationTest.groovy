@@ -58,15 +58,15 @@ func main() {
 
 
     void writeGoFileWithErrorToProjectRoot() {
-        IOUtils.write(resource, 'main.go', goFileWithVetError)
+        IOUtils.write(resource, 'src/main.go', goFileWithVetError)
     }
 
     void writeGoFileWithErrorToVendor() {
-        IOUtils.write(resource, 'vendor/main.go', goFileWithVetError)
+        IOUtils.write(resource, 'vendor/src/main.go', goFileWithVetError)
     }
 
     void writeGoFileWithErrorToSub() {
-        IOUtils.write(resource, 'sub/main.go', goFileWithVetError)
+        IOUtils.write(resource, 'src/sub/main.go', goFileWithVetError)
     }
 
     void vetFailed() {

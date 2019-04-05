@@ -56,6 +56,7 @@ public class GoPrepare extends DefaultTask {
     public void prepare() {
         setting.verify();
         goBinaryManager.getBinaryPath();
+        buildManager.createProjectLayoutIfNotExist();
         buildManager.prepareProjectGopathIfNecessary();
         buildConstraintManager.prepareConstraints();
         gogradleRootProject.setName(setting.getPackagePath());

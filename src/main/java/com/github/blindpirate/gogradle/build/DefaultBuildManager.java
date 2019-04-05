@@ -17,7 +17,6 @@
 
 package com.github.blindpirate.gogradle.build;
 
-import com.github.blindpirate.gogradle.GogradleGlobal;
 import com.github.blindpirate.gogradle.GolangPluginSetting;
 import com.github.blindpirate.gogradle.core.exceptions.BuildException;
 import com.github.blindpirate.gogradle.crossplatform.Arch;
@@ -36,17 +35,15 @@ import org.gradle.api.logging.Logging;
 import javax.inject.Inject;
 import javax.inject.Singleton;
 import java.io.File;
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import java.util.Set;
+
 import java.util.concurrent.CountDownLatch;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -69,8 +66,8 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 
 @Singleton
 public class DefaultBuildManager implements BuildManager {
-    private static final String PROJECT_GOPATH = "project_gopath";
     private static final String SRC = "src";
+    private static final List<String> PROJECT_LAYOUT_DIRS = Arrays.asList("cmd", "internal", "pkg");
     private static final Set<String> TOOL_COMMANDS_SUPPORTING_BUILD_TAG = ImmutableSet.of("vet");
 
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
@@ -80,7 +77,7 @@ public class DefaultBuildManager implements BuildManager {
     private final GolangPluginSetting setting;
     private final ProcessUtils processUtils;
     private String gopath;
-    private List<Path> gopaths;
+    private List<Path> gopaths = new ArrayList<>();
 
     @Inject
     public DefaultBuildManager(Project project,
@@ -98,16 +95,13 @@ public class DefaultBuildManager implements BuildManager {
         String systemGopath = System.getenv("GOPATH");
         if (currentProjectMatchesGopath(systemGopath)) {
             LOGGER.quiet("Found global GOPATH: {}.", systemGopath);
-            gopath = systemGopath;
-            gopaths = Arrays.stream(systemGopath.split(File.pathSeparator))
-                    .map(Paths::get).collect(Collectors.toList());
-        } else {
-            createProjectSymbolicLinkIfNotExist();
-            Path path = getGogradleBuildDir().resolve(PROJECT_GOPATH).toAbsolutePath();
-            gopath = StringUtils.toUnixString(path);
-            gopaths = Collections.singletonList(path);
-            LOGGER.quiet("Use project GOPATH: {}", gopath);
+            gopaths.addAll(Arrays.stream(systemGopath.split(File.pathSeparator))
+                    .map(Paths::get).collect(Collectors.toList()));
         }
+        gopaths.add(getProjectDir());
+        gopaths.add(getVendorDir());
+        gopath = joinGopaths();
+        LOGGER.quiet("Use project GOPATH: {}", gopath);
     }
 
     private boolean currentProjectMatchesGopath(String systemGopath) {
@@ -125,29 +119,35 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
-    private void createProjectSymbolicLinkIfNotExist() {
-        Path link = getGogradleBuildDir()
-                .resolve(PROJECT_GOPATH)
-                .resolve(SRC)
-                .resolve(setting.getPackagePath());
-        if (!link.toFile().exists()) {
-            forceMkdir(link.getParent().toFile());
-            Path targetPath = project.getProjectDir().toPath();
-            createSymbolicLink(link, link.getParent().relativize(targetPath));
+
+    public void createProjectLayoutIfNotExist() {
+
+        if (!getProjectDir().resolve(SRC).toFile().exists()) {
+            forceMkdir(getProjectDir().resolve(SRC).toFile());
+        }
+        List<String> finalProjectDirs = new ArrayList<>();
+        finalProjectDirs.addAll(PROJECT_LAYOUT_DIRS);
+        if (setting.getApplicationName() != null) {
+            finalProjectDirs.add("cmd/" + setting.getApplicationName());
+        }
+        for (String dir : finalProjectDirs) {
+            Path path = getProjectDir()
+                    .resolve(SRC)
+                    .resolve(setting.getPackagePath())
+                    .resolve(dir);
+
+            if (!path.toFile().exists()) {
+                forceMkdir(path.toFile());
+            }
         }
     }
 
-    private void createSymbolicLink(Path link, Path target) {
-        try {
-            Files.createSymbolicLink(link, target);
-        } catch (IOException e) {
-            throw BuildException.cannotCreateSymbolicLink(link, e);
-        }
+    private Path getProjectDir() {
+        return project.getProjectDir().toPath().toAbsolutePath();
     }
 
-    private Path getGogradleBuildDir() {
-        return project.getProjectDir().toPath()
-                .resolve(GogradleGlobal.GOGRADLE_BUILD_DIR_NAME);
+    private Path getVendorDir() {
+        return Paths.get(setting.getVendorTargetDir()).toAbsolutePath();
     }
 
     @Override
@@ -170,7 +170,7 @@ public class DefaultBuildManager implements BuildManager {
         // https://golang.org/cmd/go/#hdr-Compile_packages_and_dependencies
         ret.add(tagsOffset, "-tags");
 
-        String tagsArg = setting.getBuildTags().stream().collect(Collectors.joining(" "));
+        String tagsArg = String.join(" ", setting.getBuildTags());
         ret.add(tagsOffset + 1, "'" + tagsArg + "'");
         return ret;
     }
@@ -273,13 +273,20 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     private Map<String, String> determineEnv(Map<String, String> env) {
-        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", getGopath(),
+        Map<String, String> defaultEnvs = MapUtils.asMap("GOPATH", joinGopaths(),
                 "GOROOT", toUnixString(goBinaryManager.getGoroot().toAbsolutePath()),
                 "GOOS", Os.getHostOs().toString(),
                 "GOEXE", Os.getHostOs().exeExtension(),
                 "GOARCH", Arch.getHostArch().toString());
         defaultEnvs.putAll(env);
         return defaultEnvs;
+    }
+
+    private String joinGopaths() {
+        String joinedGoPaths = gopaths.stream()
+                .map(Path::toString)
+                .collect(Collectors.joining(":")); // "John, Anna, Paul
+        return joinedGoPaths;
     }
 
     private String getGoBinary() {

@@ -242,6 +242,9 @@ public final class IOUtils {
         return FileUtils.listFiles(dir, filter, filter);
     }
 
+    public static Boolean directoryContainFiles(File dir, IOFileFilter filter) {
+       return  FileUtils.listFiles(dir, filter, filter).isEmpty();
+    }
     public static Collection<File> filterFilesRecursively(File dir, IOFileFilter fileFilter, IOFileFilter dirFilter) {
         return FileUtils.listFiles(dir, fileFilter, dirFilter);
     }

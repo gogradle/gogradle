@@ -49,6 +49,7 @@ class GoVetTest extends TaskTest {
         task = buildTask(GoVet)
         when(setting.getPackagePath()).thenReturn('github.com/my/package')
         when(project.getProjectDir()).thenReturn(resource)
+        IOUtils.mkdir(resource, 'src')
         IOUtils.mkdir(resource, '.dir')
         IOUtils.mkdir(resource, '_dir')
         IOUtils.mkdir(resource, 'vendor')

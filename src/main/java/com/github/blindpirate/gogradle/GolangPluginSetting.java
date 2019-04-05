@@ -65,6 +65,8 @@ public class GolangPluginSetting {
     private BuildMode buildMode = REPRODUCIBLE;
 
     private String packagePath;
+    private String mainApplicationPath;
+    private String applicationName;
     private String vendorTargetDir;
 
 
@@ -237,5 +239,21 @@ public class GolangPluginSetting {
 
     public String getVendorTargetDir() {
         return vendorTargetDir;
+    }
+
+    public String getMainApplicationPath() {
+        return mainApplicationPath;
+    }
+
+    public void setMainApplicationPath(String mainApplicationPath) {
+        this.mainApplicationPath = mainApplicationPath;
+    }
+
+    public String getApplicationName() {
+        return applicationName;
+    }
+
+    public void setApplicationName(String applicationName) {
+        this.applicationName = applicationName;
     }
 }

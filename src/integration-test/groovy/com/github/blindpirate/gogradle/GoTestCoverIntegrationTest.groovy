@@ -48,7 +48,7 @@ golang {
 }
 """
         writeBuildAndSettingsDotGradle(buildDotGradle)
-        IOUtils.clearDirectory(new File(resource, '.gogradle'))
+        IOUtils.clearDirectory(new File(resource, 'src/'))
     }
 
     @Test

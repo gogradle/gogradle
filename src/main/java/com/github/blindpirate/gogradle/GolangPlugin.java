@@ -65,6 +65,7 @@ public class GolangPlugin implements Plugin<Project> {
         project.getExtensions().add(GOGRADLE_INJECTOR, this.injector);
         GogradleGlobal.INSTANCE.setCurrentProject(project);
         settings = injector.getInstance(GolangPluginSetting.class);
+        settings.setVendorTargetDir(project.getProjectDir().getAbsolutePath() + "/vendor");
         golangTaskContainer = injector.getInstance(GolangTaskContainer.class).init(project, injector);
         golangRepositoryHandler = injector.getInstance(GolangRepositoryHandler.class);
         Arrays.asList(BuildMode.values()).forEach(mode -> {

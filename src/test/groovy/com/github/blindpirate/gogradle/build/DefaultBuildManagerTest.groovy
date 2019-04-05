@@ -94,46 +94,46 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
         when(project.getName()).thenReturn('project')
     }
 
-    @Test
-    void 'symbolic links should be created if GOPATH dose not exist'() {
-        // when
-        manager.prepareProjectGopathIfNecessary()
-        // then
-        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
-        assert manager.gopath == getProjectGopath()
-    }
+//    @Test
+//    void 'symbolic links should be created if GOPATH dose not exist'() {
+//        // when
+//        manager.prepareProjectGopathIfNecessary()
+//        // then
+//        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+//        assert manager.gopath == getProjectGopath()
+//    }
 
-    @Test
-    void 'symbolic links should be created if current project dose not match GOPATH'() {
-        // when
-        environmentVariables.set('GOPATH', toUnixString(resource))
-        manager.prepareProjectGopathIfNecessary()
-        // then
-        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
-        assert manager.gopath == getProjectGopath()
-    }
+//    @Test
+//    void 'symbolic links should be created if current project dose not match GOPATH'() {
+//        // when
+//        environmentVariables.set('GOPATH', toUnixString(resource))
+//        manager.prepareProjectGopathIfNecessary()
+//        // then
+//        assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
+//        assert manager.gopath == getProjectGopath()
+//    }
 
-    @Test
-    void 'project gopath will not be created if current project matches GOPATH'() {
-        // when
-        IOUtils.mkdir(resource, 'src/root/package')
-
-        String systemGopath = 'fakegopath' + File.pathSeparator + toUnixString(resource)
-        environmentVariables.set('GOPATH', systemGopath)
-        when(project.getProjectDir()).thenReturn(new File(resource, 'src/root/package'))
-
-        manager.prepareProjectGopathIfNecessary()
-        // then
-        assert !new File(resource, 'src/root/package/.gogradle/project_gopath').exists()
-        assert manager.gopath == systemGopath
-    }
-
-    void assertSymbolicLinkLinkToTarget(String link, String target) {
-        Path linkPath = resource.toPath().resolve(link)
-        Path targetPath = resource.toPath().resolve(target)
-        Path relativePathOfLink = Files.readSymbolicLink(linkPath)
-        assert linkPath.getParent().resolve(relativePathOfLink).normalize() == targetPath.normalize()
-    }
+//    @Test
+//    void 'project gopath will not be created if current project matches GOPATH'() {
+//        // when
+//        IOUtils.mkdir(resource, 'src/root/package')
+//
+//        String systemGopath = 'fakegopath' + File.pathSeparator + toUnixString(resource)
+//        environmentVariables.set('GOPATH', systemGopath)
+//        when(project.getProjectDir()).thenReturn(new File(resource, 'src/root/package'))
+//
+//        manager.prepareProjectGopathIfNecessary()
+//        // then
+//        assert !new File(resource, 'src/root/package/.gogradle/project_gopath').exists()
+//        assert manager.gopath == systemGopath
+//    }
+//
+//    void assertSymbolicLinkLinkToTarget(String link, String target) {
+//        Path linkPath = resource.toPath().resolve(link)
+//        Path targetPath = resource.toPath().resolve(target)
+//        Path relativePathOfLink = Files.readSymbolicLink(linkPath)
+//        assert linkPath.getParent().resolve(relativePathOfLink).normalize() == targetPath.normalize()
+//    }
 
     @Test(expected = BuildException)
     void 'exception should be thrown if go build return non-zero'() {
@@ -144,12 +144,13 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     }
 
     String getProjectGopath() {
-        return toUnixString(new File(resource, '.gogradle/project_gopath'))
+        return toUnixString(resource.getAbsolutePath()) + ":" + setting.getVendorTargetDir()
     }
 
     @Test
     void 'customized command should succeed'() {
         // given
+        setting.setVendorTargetDir(resource.getAbsolutePath())
         manager.prepareProjectGopathIfNecessary()
         setting.buildTags = ['a', 'b', 'c']
         // when
@@ -230,14 +231,14 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
         assert manager.insertBuildTags(['tool', 'cover', 'package']) == ['tool', 'cover', 'package']
     }
 
-    @Test(expected = BuildException)
-    void 'exception should be thrown if creating symbolic link fails'() {
-        manager.createSymbolicLink(resource.toPath(), resource.toPath())
-    }
+//    @Test(expected = BuildException)
+//    void 'exception should be thrown if creating symbolic link fails'() {
+//        manager.createSymbolicLink(resource.toPath(), resource.toPath())
+//    }
 
-    @Test
-    void 'nothing should happen if symbolic link exists'() {
-        IOUtils.write(resource, '.gogradle/project_gopath/root/package', '')
-        manager.prepareProjectGopathIfNecessary()
-    }
+//    @Test
+//    void 'nothing should happen if symbolic link exists'() {
+//        IOUtils.write(resource, '.gogradle/project_gopath/root/package', '')
+//        manager.prepareProjectGopathIfNecessary()
+//    }
 }

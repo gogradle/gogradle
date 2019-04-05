@@ -77,14 +77,14 @@ func Say(s string){
     fmt.Println(s)
 }
 ''')
-        IOUtils.write(resource, 'go1/main.go', '''
+        IOUtils.write(resource, 'go1/src/go1/main.go', '''
 package go1
 import "my/common"
 func main(){
     common.Say("go1")
 }
 ''')
-        IOUtils.write(resource, 'go2/main.go', '''
+        IOUtils.write(resource, 'go2/src/go2/main.go', '''
 package go2
 import "my/common"
 func main(){
