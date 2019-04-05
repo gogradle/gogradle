@@ -30,7 +30,7 @@ class RecognizeGopkgLockIntegrationTest extends IntegrationTestSupport {
         newBuild('goInit')
         newBuild('goVendor')
 
-        assert new File(resource, 'vendor/git.apache.org/thrift.git').exists()
+        assert new File(resource, 'vendor/src/git.apache.org/thrift.git').exists()
     }
 
     @Override

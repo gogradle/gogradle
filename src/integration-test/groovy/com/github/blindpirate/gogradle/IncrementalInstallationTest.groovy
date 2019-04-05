@@ -62,11 +62,11 @@ dependencies {
             it.forTasks('goVendor')
         }
 
-        assert new File(resource, 'vendor/localhost/a/a.go').exists()
-        assert new File(resource, 'vendor/localhost/b/b.go').exists()
-        assert new File(resource, 'vendor/localhost/c/c.go').exists()
+        assert new File(resource, 'vendor/src/localhost/a/a.go').exists()
+        assert new File(resource, 'vendor/src/localhost/b/b.go').exists()
+        assert new File(resource, 'vendor/src/localhost/c/c.go').exists()
 
-        IOUtils.write(resource, 'vendor/localhost/a/a.go', 'modified')
+        IOUtils.write(resource, 'vendor/src/localhost/a/a.go', 'modified')
 
         writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
@@ -93,9 +93,9 @@ dependencies {
             it.forTasks('goVendor')
         }, ['--info'])
 
-        assert new File(resource, 'vendor/localhost/a/a.go').text == ''
+        assert new File(resource, 'vendor/src/localhost/a/a.go').text == ''
         assert stdout.toString().contains('b is up-to-date')
-        assert !new File(resource, 'vendor/localhost/c').exists()
+        assert !new File(resource, 'vendor/src/localhost/c').exists()
     }
 
     @Override

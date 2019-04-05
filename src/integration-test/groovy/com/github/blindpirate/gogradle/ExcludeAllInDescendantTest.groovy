@@ -72,11 +72,11 @@ dependencies {
             it.forTasks('goDependencies', 'goVendor')
         }
 
-        assert new File(resource, 'project/vendor/a/a.go').exists()
-        assert new File(resource, 'project/vendor/b/b.go').exists()
-        assert new File(resource, 'project/vendor/c/c.go').exists()
-        assert new File(resource, 'project/vendor/d/d.go').exists()
-        assert !new File(resource, 'project/vendor/e').exists()
+        assert new File(resource, 'project/vendor/src/a/a.go').exists()
+        assert new File(resource, 'project/vendor/src/b/b.go').exists()
+        assert new File(resource, 'project/vendor/src/c/c.go').exists()
+        assert new File(resource, 'project/vendor/src/d/d.go').exists()
+        assert !new File(resource, 'project/vendor/src/e').exists()
     }
 
     @Override

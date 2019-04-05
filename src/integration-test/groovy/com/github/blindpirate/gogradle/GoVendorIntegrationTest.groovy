@@ -39,9 +39,9 @@ class GoVendorIntegrationTest extends IntegrationTestSupport {
 
     @Before
     void setUp() {
-        IOUtils.write(resource, 'vendor/github.com/user/a/a.go', '')
-        IOUtils.write(resource, 'vendor/github.com/user/a/vendor/github.com/user/b/b.go', '')
-        IOUtils.write(resource, 'vendor/vendor.json', '')
+        IOUtils.write(resource, 'vendor/src/github.com/user/a/a.go', '')
+        IOUtils.write(resource, 'vendor/src/github.com/user/a/vendor/github.com/user/b/b.go', '')
+        IOUtils.write(resource, 'vendor/src/vendor.json', '')
 
         IOUtils.write(resource, '.tmp/b1/b1.go', '')
         IOUtils.write(resource, '.tmp/b1/vendor/github.com/user/a/a1.go', '')
@@ -70,13 +70,13 @@ dependencies {
             it.forTasks('goVendor')
         }
 
-        assert new File(resource, 'vendor/github.com/user/a/a1.go').exists()
-        assert !new File(resource, 'vendor/github.com/user/a/vendor').exists()
-        assert new File(resource, 'vendor/github.com/user/b/b1.go').exists()
-        assert !new File(resource, 'vendor/github.com/user/b/vendor').exists()
-        assert new File(resource, 'vendor/github.com/user/c/c1.go').exists()
-        assert new File(resource, 'vendor/github.com/user/d/d.go').exists()
-        assert !new File(resource, 'vendor/vendor.json').exists()
+        assert new File(resource, 'vendor/src/github.com/user/a/a1.go').exists()
+        assert !new File(resource, 'vendor/src/github.com/user/a/vendor').exists()
+        assert new File(resource, 'vendor/src/github.com/user/b/b1.go').exists()
+        assert !new File(resource, 'vendor/src/github.com/user/b/vendor').exists()
+        assert new File(resource, 'vendor/src/github.com/user/c/c1.go').exists()
+        assert new File(resource, 'vendor/src/github.com/user/d/d.go').exists()
+        assert !new File(resource, 'vendor/src/vendor.json').exists()
     }
 
     @Override

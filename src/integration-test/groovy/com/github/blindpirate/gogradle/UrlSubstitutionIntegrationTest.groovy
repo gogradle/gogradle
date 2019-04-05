@@ -28,7 +28,6 @@ import org.junit.runner.RunWith
 @WithIsolatedUserhome
 @WithGitRepo(repoName = 'myawesomeproject', fileName = 'main.go')
 class UrlSubstitutionIntegrationTest extends IntegrationTestSupport {
-
     @Before
     void setUp() {
         String buildDotGradle = """
@@ -67,6 +66,6 @@ dependencies {
             it.forTasks('goVendor')
         }
 
-        assert new File(resource, "vendor/my/awesome/project/main.go").exists()
+        assert new File(resource, "vendor/src/my/awesome/project/main.go").exists()
     }
 }

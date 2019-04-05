@@ -49,30 +49,31 @@ class GoInstallTest extends TaskTest {
     /*
    projectRoot
     \--vendor
-        |-- github.com
-        |   \-- user
-        |       |-- a up-to-date
-        |       |   \- vendor
-        |       |-- b out-of-date
-        |       \-- c not exist
-        |
-        \-- f local directory
+      \-- src
+        \-- github.com
+            |   \-- user
+            |       |-- a up-to-date
+            |       |   \- vendor
+            |       |-- b out-of-date
+            |       \-- c not exist
+            |
+            \-- f local directory
      */
 
     @Test
     void 'installation should succeed'() {
         // given
-        ['a', 'b', 'c'].each { IOUtils.write(resource, "vendor/github.com/user/${it}/${it}.go", '') }
-        ['f'].each { IOUtils.write(resource, "vendor/${it}/${it}.go", '') }
+        ['a', 'b', 'c'].each { IOUtils.write(resource, "vendor/src/github.com/user/${it}/${it}.go", '') }
+        ['f'].each { IOUtils.write(resource, "vendor/src/${it}/${it}.go", '') }
 
 
         ResolvedDependency a = mockResolvedDependency('github.com/user/a')
         ResolvedDependency b = mockResolvedDependency('github.com/user/b')
-        when(vendorSnapshoter.isUpToDate(a, new File(resource, 'vendor/github.com/user/a'))).thenReturn(true)
-        when(vendorSnapshoter.isUpToDate(b, new File(resource, 'vendor/github.com/user/b'))).thenReturn(false)
+        when(vendorSnapshoter.isUpToDate(a, new File(resource, 'vendor/src/github.com/user/a'))).thenReturn(true)
+        when(vendorSnapshoter.isUpToDate(b, new File(resource, 'vendor/src/github.com/user/b'))).thenReturn(false)
 
         LocalDirectoryDependency f = mockWithName(LocalDirectoryDependency, 'f')
-        when(vendorSnapshoter.isUpToDate(f, new File(resource, 'vendor/f'))).thenReturn(false)
+        when(vendorSnapshoter.isUpToDate(f, new File(resource, 'vendor/src/f'))).thenReturn(false)
 
         ResolvedDependency b2 = mockResolvedDependency('github.com/user/b')
 
@@ -85,18 +86,18 @@ class GoInstallTest extends TaskTest {
         task.installDependenciesToVendor()
 
         // then
-        verify(a, times(0)).installTo(new File(resource, 'vendor/github.com/user/a'))
-        assert !new File(resource, 'vendor/github.com/user/a/vendor').exists()
-        assert new File(resource, 'vendor/github.com/user/a/a.go').exists()
+        verify(a, times(0)).installTo(new File(resource, 'vendor/src/github.com/user/a'))
+        assert !new File(resource, 'vendor/src/github.com/user/a/vendor').exists()
+        assert new File(resource, 'vendor/src/github.com/user/a/a.go').exists()
 
-        verify(b).installTo(new File(resource, 'vendor/github.com/user/b'))
-        verify(b2, times(0)).installTo(new File(resource, 'vendor/github.com/user/b'))
-        assert IOUtils.dirIsEmpty(new File(resource, 'vendor/github.com/user/b'))
+        verify(b).installTo(new File(resource, 'vendor/src/github.com/user/b'))
+        verify(b2, times(0)).installTo(new File(resource, 'vendor/src/github.com/user/b'))
+        assert IOUtils.dirIsEmpty(new File(resource, 'vendor/src/github.com/user/b'))
 
-        assert !new File(resource, 'vendor/github.com/user/c').exists()
+        assert !new File(resource, 'vendor/src/github.com/user/c').exists()
 
-        verify(f).installTo(new File(resource, 'vendor/f'))
-        assert IOUtils.dirIsEmpty(new File(resource, 'vendor/f'))
+        verify(f).installTo(new File(resource, 'vendor/src/f'))
+        assert IOUtils.dirIsEmpty(new File(resource, 'vendor/src/f'))
     }
 
     @Test
@@ -104,10 +105,10 @@ class GoInstallTest extends TaskTest {
         // given
         when(golangTaskContainer.get(ResolveBuildDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
         when(golangTaskContainer.get(ResolveTestDependencies).getFlatDependencies()).thenReturn(GolangDependencySet.empty())
-        IOUtils.write(resource, 'vendor/vendor.json', '')
+        IOUtils.write(resource, 'vendor/src/vendor.json', '')
         // when
         task.installDependenciesToVendor()
         // then
-        assert !new File(resource, 'vendor/vendor.json').exists()
+        assert !new File(resource, 'vendor/src/vendor.json').exists()
     }
 }
