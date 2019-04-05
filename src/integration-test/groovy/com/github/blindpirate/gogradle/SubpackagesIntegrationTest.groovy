@@ -203,9 +203,9 @@ dependencies {
     }
 
     void assertOnlySub1Exists() {
-        assert new File(resource, 'vendor/localhost/vcs/sub1/sub1.go').exists()
-        assert !new File(resource, 'vendor/localhost/vcs/sub2').exists()
-        assert !new File(resource, 'vendor/localhost/vcs/vcs.go').exists()
+        assert new File(resource, 'vendor/src/localhost/vcs/sub1/sub1.go').exists()
+        assert !new File(resource, 'vendor/src/localhost/vcs/sub2').exists()
+        assert !new File(resource, 'vendor/src/localhost/vcs/vcs.go').exists()
     }
 
     @Override
