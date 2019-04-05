@@ -103,7 +103,7 @@ dependencies {
         newBuild {
             it.forTasks('goVendor')
         }
-        assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
+        assert new File(resource, 'project/vendor/src/unrecognized2/helloworld.go').exists()
     }
 
     // https://github.com/gogradle/gogradle/issues/141
@@ -127,7 +127,7 @@ dependencies {
         newBuild {
             it.forTasks('goVendor')
         }
-        assert new File(resource, 'project/vendor/unrecognized2/helloworld.go').exists()
+        assert new File(resource, 'project/vendor/src/unrecognized2/helloworld.go').exists()
     }
 
     @Test

@@ -55,14 +55,14 @@ golang {
         newBuild('goVendor')
 
         // then
-        assert new File(projectRoot, 'vendor/a/1.go').exists()
+        assert new File(projectRoot, 'vendor/src/a/1.go').exists()
 
         // when
         gitServer.addFileToRepository(repoRoot, '2.go')
         newBuild('goVendor', '--rerun-tasks')
 
         // then
-        assert new File(projectRoot, 'vendor/a/2.go').exists()
+        assert new File(projectRoot, 'vendor/src/a/2.go').exists()
 
         // when
         // https://github.com/gogradle/gogradle/issues/184#issuecomment-355498314

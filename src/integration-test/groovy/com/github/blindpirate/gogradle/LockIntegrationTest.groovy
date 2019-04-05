@@ -104,8 +104,8 @@ repositories {
     void 'dependency in build_gradle should be used in DEVELOP'() {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}')
         newBuild('goLock', 'goVendor')
-        assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
-        assert new File(resource, 'vendor/github.com/my/b/b1.go').exists()
+        assert new File(resource, 'vendor/src/github.com/my/a/a2.go').exists()
+        assert new File(resource, 'vendor/src/github.com/my/b/b1.go').exists()
 
         Map a = getLockedDependency('build')[0]
         assert a.name == 'github.com/my/a'
@@ -123,7 +123,7 @@ repositories {
     @Test
     void 'locked dependency should be used in REPRODUCIBLE'() {
         newBuild('goLock', 'goVendor')
-        assert new File(resource, 'vendor/github.com/my/a/a1.go').exists()
+        assert new File(resource, 'vendor/src/github.com/my/a/a1.go').exists()
 
         Map a = getLockedDependency('build')[0]
         assert getLockedDependency('test').isEmpty()
@@ -140,7 +140,7 @@ repositories {
 
         deleteDependencyTreeCache()
         newBuild('goVendor')
-        assert new File(resource, 'vendor/github.com/my/a/a1.go').exists()
+        assert new File(resource, 'vendor/src/github.com/my/a/a1.go').exists()
         assert stdout.toString().contains('Resolving cached')
     }
 
@@ -154,7 +154,7 @@ repositories {
         IOUtils.append(new File(resource, 'build.gradle'), 'golang {buildMode=DEV}\n')
 
         newBuild('goVendor')
-        assert new File(resource, 'vendor/github.com/my/a/a2.go').exists()
+        assert new File(resource, 'vendor/src/github.com/my/a/a2.go').exists()
 
         GitServer.addFileToRepository(new File(repositories, 'a2'), 'commit2.go', '')
 
@@ -163,7 +163,7 @@ repositories {
 
         IOUtils.append(new File(resource, 'build.gradle'), 'golang { globalCacheFor(0, MINUTE) }')
         newBuild('--refresh-dependencies', 'goVendor')
-        assert new File(resource, 'vendor/github.com/my/a/commit2.go').exists()
+        assert new File(resource, 'vendor/src/github.com/my/a/commit2.go').exists()
     }
 
     void deleteDependencyTreeCache() {

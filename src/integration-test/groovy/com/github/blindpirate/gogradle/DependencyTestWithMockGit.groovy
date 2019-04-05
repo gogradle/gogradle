@@ -181,7 +181,7 @@ dependencies {
 
     void assertDependenciesAre(Map<String, String> finalDependencies) {
         finalDependencies.each { packageName, commit ->
-            assert new File(projectRoot, "vendor/${packageName}/${commit}.go").exists()
+            assert new File(projectRoot, "vendor/src/${packageName}/${commit}.go").exists()
         }
     }
     /*
