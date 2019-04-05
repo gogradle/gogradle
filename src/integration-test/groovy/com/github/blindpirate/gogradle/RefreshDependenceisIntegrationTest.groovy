@@ -78,7 +78,7 @@ dependencies {
             it.forTasks('goVendor')
         }
 
-        assert new File(resource, 'vendor/localhost/a/2.go').exists()
+        assert new File(resource, 'vendor/src/localhost/a/2.go').exists()
     }
 
     @Override
