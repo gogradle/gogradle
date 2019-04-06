@@ -45,7 +45,7 @@ dependencies {
     }
 }
 """
-        IOUtils.write(resource, 'hello.go', helloDotGo)
+        IOUtils.write(resource, 'src/example/cmd/hello.go', helloDotGo)
         writeBuildAndSettingsDotGradle(buildDotGradle)
     }
 
@@ -73,8 +73,9 @@ dependencies {
         assert stdout.toString().contains(":resolveBuildDependencies UP-TO-DATE")
     }
 
+
     void buildAgainAndAgain() {
-        IOUtils.write(resource, 'hello.go', helloDotGo + " ")
+        IOUtils.write(resource, 'src/example/cmd/hello.go', helloDotGo + " ")
 
         newBuild { build ->
             build.forTasks('goDependencies')

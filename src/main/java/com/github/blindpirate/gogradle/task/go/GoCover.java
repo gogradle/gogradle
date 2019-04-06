@@ -43,7 +43,6 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.net.URL;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
@@ -236,8 +235,8 @@ public class GoCover extends AbstractGolangTask {
     }
 
     private long countLinesInFile(String filePath) {
-        Path relativePath = Paths.get(setting.getPackagePath()).relativize(Paths.get(filePath));
-        return countLines(getProjectDir().toPath().resolve(relativePath));
+        Path relativePath = getProjectDir().toPath().resolve("src").resolve(filePath).toAbsolutePath();
+        return countLines(getProjectDir().toPath().resolve("src").resolve(relativePath));
     }
 
     private void analyzeProfile(File profile) {

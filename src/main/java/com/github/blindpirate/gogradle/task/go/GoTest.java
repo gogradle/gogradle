@@ -41,7 +41,6 @@ import org.gradle.api.tasks.TaskAction;
 import javax.inject.Inject;
 import java.io.File;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -187,8 +186,7 @@ public class GoTest extends AbstractGolangTask {
     }
 
     private String dirToImportPath(File dir) {
-        Path relativeToProjectRoot = getProjectDir().toPath().relativize(dir.toPath());
-        Path importPath = Paths.get(setting.getPackagePath()).resolve(relativeToProjectRoot);
+        Path importPath = getProjectDir().toPath().resolve("src").relativize(dir.toPath());
         return toUnixString(importPath);
     }
 
@@ -214,12 +212,13 @@ public class GoTest extends AbstractGolangTask {
     }
 
     private Map<File, List<File>> determineTestPattern() {
+        File srcDir = getProjectDir().toPath().resolve("src").toFile();
         if (isEmpty(testNamePattern)) {
             // https://golang.org/cmd/go/#hdr-Description_of_package_lists
-            Collection<File> allTestFiles = filterGoFiles(getProjectDir(), PROJECT_TEST_FILES_ONLY);
+            Collection<File> allTestFiles = filterGoFiles(srcDir, PROJECT_TEST_FILES_ONLY);
             return groupByParentDir(allTestFiles);
         } else {
-            Collection<File> filesMatchingPatterns = filterTestsMatchingPattern(getProjectDir(), testNamePattern);
+            Collection<File> filesMatchingPatterns = filterTestsMatchingPattern(srcDir, testNamePattern);
 
             if (filesMatchingPatterns.isEmpty()) {
                 LOGGER.quiet("No tests matching " + testNamePattern.stream().collect(joining("/")) + ", skip.");

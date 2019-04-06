@@ -61,7 +61,7 @@ class GoBuildIntegrationTest extends IntegrationTestSupport {
 
 package main
 
-import "github.com/my/package/print"
+import "github.com/my/package/internal/print"
 
 func main(){
     print.PrintHello() 
@@ -72,7 +72,7 @@ func main(){
 
 package main
 
-import "github.com/my/package/print"
+import "github.com/my/package/internal/print"
 
 func main(){
     print.PrintHello()
@@ -93,17 +93,17 @@ func PrintWorld(){
 '''
         subMainDotGo = '''
 package main
-import "github.com/my/package/print"
+import "github.com/my/package/internal/print"
 
 func main(){
     print.PrintWorld() 
 }
 '''
 
-        IOUtils.write(resource, 'main.go', mainDotGo)
-        IOUtils.write(resource, 'mainWithBuildTag.go', mainWithBuildTagDotGo)
-        IOUtils.write(resource, 'print/print.go', printDotGo)
-        IOUtils.write(resource, 'sub/main.go', subMainDotGo)
+        IOUtils.write(resource, 'src/github.com/my/package/cmd/main.go', mainDotGo)
+        IOUtils.write(resource, 'src/github.com/my/package/cmd/mainWithBuildTag.go', mainWithBuildTagDotGo)
+        IOUtils.write(resource, 'src/github.com/my/package/internal/print/print.go', printDotGo)
+        IOUtils.write(resource, 'src/github.com/my/package/cmd/mypackage/main.go', subMainDotGo)
         writeBuildAndSettingsDotGradle(buildDotGradle, settingDotGradle)
     }
 
@@ -204,7 +204,7 @@ func main(){
     void 'customized build should succeed'() {
         appendOnBuildDotGradle('''
             goBuild {
-                go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/sub'
+                go 'build -o ${GOOS}_${GOARCH}_output github.com/my/package/cmd/mypackage'
             }
         ''')
         newBuild('goBuild', '--info')
@@ -236,8 +236,8 @@ func main(){
         // given
         appendOnBuildDotGradle('''
             goBuild {
-                go 'build -o ./out/main github.com/my/package'
-                go 'build -o ./out/sub github.com/my/package'
+                go 'build -o ./out/main github.com/my/package/cmd'
+                go 'build -o ./out/sub github.com/my/package/cmd'
             }
         ''')
         // when
@@ -263,7 +263,7 @@ func main(){
         // given
         appendOnBuildDotGradle('''
             goBuild {
-                go 'build -o ./${PROJECT_NAME}-${GOOS}-${GOARCH} github.com/my/package'
+                go 'build -o ./${PROJECT_NAME}-${GOOS}-${GOARCH} github.com/my/package/cmd'
             }
         ''')
 
@@ -333,7 +333,7 @@ func main(){
         // given
         'incremental build by default'()
         // when
-        new File(resource, 'main.go') << '\n\n'
+        new File(resource, 'src/github.com/my/package/cmd/main.go') << '\n\n'
 
         // then
         newBuild('goBuild', '--console=plain')
@@ -368,7 +368,7 @@ func main(){
     @Test
     void 'modification to test go files does not cause build out-of-date'() {
         // given
-        IOUtils.write(resource, 'main_test.go', '''
+        IOUtils.write(resource, 'src/github.com/my/package/test/main_test.go', '''
         package main
 
         import "testing"
@@ -378,7 +378,7 @@ func main(){
         ''')
         'incremental build by default'()
         // when
-        new File(resource, 'main_test.go') << '\n\n'
+        new File(resource, 'src/github.com/my/package/test/main_test.go') << '\n\n'
 
         // then
         newBuild('goBuild', '--console=plain')

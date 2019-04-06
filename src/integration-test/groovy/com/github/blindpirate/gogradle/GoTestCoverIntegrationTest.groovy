@@ -48,19 +48,17 @@ golang {
 }
 """
         writeBuildAndSettingsDotGradle(buildDotGradle)
-        IOUtils.clearDirectory(new File(resource, 'src/'))
+        IOUtils.clearDirectory(new File(resource, '.gogradle'))
     }
 
     @Test
     @WithResource('')
     void 'setting env in test should succeed'() {
         // given
-        IOUtils.write(resource, '1_test.go', '''
+        IOUtils.write(resource, 'src/github.com/my/project/1_test.go', '''
 package main
-
 import "testing"
 import "os"
-
 func Test_Env(t *testing.T){
     if "1" == os.Getenv("FOO") {
          t.Log("Passed")
@@ -84,19 +82,15 @@ goTest {
     @WithResource('')
     void 'test can be skipped'() {
         // given
-        IOUtils.write(resource, '1_test.go', '''
+        IOUtils.write(resource, 'src/github.com/my/project/1_test.go', '''
 package main
-
 import "testing"
-
 func Test_Skip(t *testing.T){
     t.SkipNow()
 }
-
 func Test_Fail(t *testing.T){
     t.Error("Failed")
 }
-
 func Test_Pass(t *testing.T){
 }
 ''')
@@ -119,7 +113,7 @@ func Test_Pass(t *testing.T){
         assertNormalTestUpToDateResult()
 
         // append at head to change the coverage profile
-        IOUtils.write(resource, 'a/a1.go', '\n\n\n' + new File(resource, 'a/a1.go').text)
+        IOUtils.write(resource, "src/github.com/my/project/a/a1.go", '\n\n\n' + new File(resource, 'src/github.com/my/project/a/a1.go').text)
         normalTest()
         assertNormalTestNoUpToDateResult()
 

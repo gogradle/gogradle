@@ -49,6 +49,7 @@ class GoTestTaskTest extends TaskTest {
     GoTest task
 
     File resource
+    String packageName="github.com/my/package"
 
     @Captor
     ArgumentCaptor<List> argumentsCaptor
@@ -60,25 +61,25 @@ class GoTestTaskTest extends TaskTest {
     void setUp() {
         task = buildTask(GoTest)
         when(project.getProjectDir()).thenReturn(resource)
-        when(setting.getPackagePath()).thenReturn('github.com/my/package')
+        when(setting.getPackagePath()).thenReturn(packageName)
 
         ReflectionUtils.setField(task, 'extractor', extractor)
 
-        IOUtils.write(resource, 'a/a1_test.go', '')
-        IOUtils.write(resource, 'a/_a1_test.go', '')
-        IOUtils.write(resource, 'a/a2_test.go', '')
-        IOUtils.write(resource, 'a/.a2_test.go', '')
-        IOUtils.write(resource, 'a/a1.go', '')
-        IOUtils.write(resource, 'a/a2.go', '')
+        IOUtils.write(resource, "src/${packageName}/a/a1_test.go", '')
+        IOUtils.write(resource, "src/${packageName}/a/_a1_test.go", '')
+        IOUtils.write(resource, "src/${packageName}/a/a2_test.go", '')
+        IOUtils.write(resource, "src/${packageName}/a/.a2_test.go", "")
+        IOUtils.write(resource, "src/${packageName}/a/a1.go", '')
+        IOUtils.write(resource, "src/${packageName}/a/a2.go", "")
 
-        IOUtils.write(resource, 'b/b1_test.go', '')
-        IOUtils.write(resource, 'b/b2_test.go', '')
-        IOUtils.write(resource, 'b/b1.go', '')
-        IOUtils.write(resource, 'b/b2.go', '')
+        IOUtils.write(resource, "src/${packageName}/b/b1_test.go", "")
+        IOUtils.write(resource, "src/${packageName}/b/b2_test.go", "")
+        IOUtils.write(resource, "src/${packageName}/b/b1.go", "")
+        IOUtils.write(resource, "src/${packageName}/b/b2.go", "")
 
-        IOUtils.write(resource, 'c/testdata/c_test.go', '')
-        IOUtils.write(resource, 'c/c.go', '')
-        IOUtils.write(resource, 'c/c.nongo', '')
+        IOUtils.write(resource, "src/${packageName}/c/testdata/c_test.go", "")
+        IOUtils.write(resource, "src/${packageName}/c/c.go", "")
+        IOUtils.write(resource, "src/${packageName}/c/c.nongo", "")
 
         IOUtils.mkdir(resource, 'd')
         IOUtils.mkdir(resource, 'vendor')
@@ -138,8 +139,8 @@ class GoTestTaskTest extends TaskTest {
         List<String> args = argumentsCaptor.getValue()
         assert args.size() == 6
         assert args[0..1] == ['test', '-v']
-        assert ['a/a1_test.go', 'a/a1.go', 'a/a2.go'].any {
-            args.contains(StringUtils.toUnixString(new File(resource, it)))
+        assert ["a/a1_test.go", "a/a1.go", "a/a2.go"].any {
+            args.contains(StringUtils.toUnixString(new File(resource, "src/${packageName}/${it}")))
         }
     }
 
