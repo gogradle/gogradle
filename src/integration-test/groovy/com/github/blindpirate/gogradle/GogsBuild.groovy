@@ -24,7 +24,6 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
-import org.apache.commons.io.FilenameUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
