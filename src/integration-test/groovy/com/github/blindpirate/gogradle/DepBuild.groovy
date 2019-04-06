@@ -39,14 +39,27 @@ class DepBuild extends IntegrationTestSupport {
         return new File(System.getenv('DEP_DIR'))
     }
 
+    def packageName = 'github.com/gogits/gogs'
+
+    def createSymLink() {
+        Path link = Paths.get(resource.getAbsolutePath(), "src", packageName)
+        if (!link.getParent().toFile().exists()){
+            IOUtils.forceMkdir(link.getParent().toFile())
+        }
+        if (!link.toFile().exists()) {
+            Files.createSymbolicLink(link, resource.toPath())
+        }
+    }
+
     @Before
     void setUp() {
         processUtils.run(['git', 'reset', "HEAD", '--hard'], null, getProjectRoot())
+        createSymLink()
         writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
 
 golang {
-    packagePath="github.com/golang/dep"
+    packagePath="${packageName}"
     goVersion='1.9'
 }
 

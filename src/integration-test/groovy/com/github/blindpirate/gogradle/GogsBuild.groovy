@@ -24,15 +24,31 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import org.apache.commons.io.FilenameUtils
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
 @RunWith(GogradleRunner)
 @OnlyWhen("System.getenv('GOGS_DIR')!=null&&'git version'.execute()")
 class GogsBuild extends IntegrationTestSupport {
     File resource = new File(System.getenv('GOGS_DIR'))
+
+
+    def packageName = 'github.com/gogits/gogs'
+
+    def createSymLink() {
+        Path link = Paths.get(resource.getAbsolutePath(), "src", packageName)
+        if (!link.getParent().toFile().exists()){
+            IOUtils.forceMkdir(link.getParent().toFile())
+        }
+        if (!link.toFile().exists()) {
+            Files.createSymbolicLink(link, resource.toPath())
+        }
+    }
 
     ProcessUtils processUtils = new ProcessUtils()
 
@@ -45,7 +61,7 @@ buildscript {
 apply plugin: 'com.github.blindpirate.gogradle'
 
 golang {
-    packagePath="github.com/gogits/gogs"
+    packagePath="${packageName}"
     goVersion='1.8'
 }
 
@@ -61,6 +77,8 @@ goVet {
         // v0.11
         assert processUtils.run(['git', 'checkout', '348c75c91b95ce7fb0f6dac263aa7290f2319e1b', '-f'], null, resource).waitFor() == 0
 
+
+        createSymLink()
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {
             writeBuildAndSettingsDotGradle(buildDotGradle + 'goTest.enabled = false\n')
