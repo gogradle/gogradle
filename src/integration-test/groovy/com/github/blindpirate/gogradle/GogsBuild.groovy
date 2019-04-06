@@ -17,13 +17,14 @@
 
 package com.github.blindpirate.gogradle
 
-import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.AccessWeb
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -31,90 +32,75 @@ import java.nio.file.Files
 import java.nio.file.Path
 import java.nio.file.Paths
 
+@WithResource('')
 @RunWith(GogradleRunner)
-@OnlyWhen("System.getenv('GOGS_DIR')!=null&&'git version'.execute()")
+@OnlyWhen("System.getenv('GOGS_DIR')!=null")
 class GogsBuild extends IntegrationTestSupport {
-    File resource = new File(System.getenv('GOGS_DIR'))
+//    = new File()
 
-
-    def packageName = 'github.com/gogits/gogs'
+File resource =new File("/tmp/gogsbuild")
+    def packageName = 'github.com/gogs/gogs'
+    def outputLocation
 
     def createSymLink() {
         Path link = Paths.get(resource.getAbsolutePath(), "src", packageName)
-        if (!link.getParent().toFile().exists()){
+        Path targetDir = Paths.get(System.getenv('GOGS_DIR'))
+        if (!link.getParent().toFile().exists()) {
             IOUtils.forceMkdir(link.getParent().toFile())
-        }
-        if (!link.toFile().exists()) {
-            Files.createSymbolicLink(link, resource.toPath())
+            Files.createSymbolicLink(link, targetDir)
         }
     }
 
     ProcessUtils processUtils = new ProcessUtils()
 
-    String buildDotGradle = """
-buildscript {
-    dependencies {
-        classpath files("${System.getProperty('GOGRADLE_ROOT')}/build/libs/gogradle-${GogradleGlobal.GOGRADLE_VERSION}-all.jar")
-    }
-}
-apply plugin: 'com.github.blindpirate.gogradle'
+    @Before
+    void setUp() {
+         outputLocation="${resource.toPath().toAbsolutePath().toString()}/build/bin/gogs"
+//        outputLocation="/tmp/build/bin/gogs"
+        writeBuildAndSettingsDotGradle("""
+${buildDotGradleBase}
 
 golang {
     packagePath="${packageName}"
-    goVersion='1.8'
+    mainApplicationPath="${packageName}"
 }
-
+goBuild {
+    outputLocation="${outputLocation}"
+}
 goVet {
     continueOnFailure = true
 }
-
-"""
-
-    @Test
-    @AccessWeb
-    void 'gogs should be built successfully'() {
-        // v0.11
-        assert processUtils.run(['git', 'checkout', '348c75c91b95ce7fb0f6dac263aa7290f2319e1b', '-f'], null, resource).waitFor() == 0
-
-
-        createSymLink()
-        // I don't know why it will fail on Windows
-        if (Os.getHostOs() == Os.WINDOWS) {
-            writeBuildAndSettingsDotGradle(buildDotGradle + 'goTest.enabled = false\n')
-        } else {
-            writeBuildAndSettingsDotGradle(buildDotGradle)
-        }
-
-        init()
-
-        addMissingDependencies()
-
-        firstBuild()
-
-        File firstBuildResult = getOutputExecutable()
-//        long lastModified = firstBuildResult.lastModified()
-//        String md5 = DigestUtils.md5Hex(new FileInputStream(firstBuildResult))
-        assert processUtils.getStdout(processUtils.run(firstBuildResult.absolutePath)).contains('Gogs')
-        assert new File(resource, 'gogradle.lock').exists()
-
-//        secondBuild()
-//
-//        File secondBuildResult = getOutputExecutable()
-//        assert processUtils.getStdout(processUtils.run(secondBuildResult.absolutePath)).contains('Gogs')
-//        assert secondBuildResult.lastModified() > lastModified
-//        assert DigestUtils.md5Hex(new FileInputStream(secondBuildResult)) == md5
-    }
-
-    void addMissingDependencies() {
-        // I don't know why this is missing in vendor.json
-        IOUtils.append(new File(resource, 'build.gradle'), '''
 dependencies {
     golang {
         build 'gopkg.in/bufio.v1'
     }
 }
-''')
+"""
+        )
+        createSymLink()
+        assert Files.exists(getProjectRoot().toPath().resolve("src").resolve(packageName))
     }
+
+    @Test
+    @AccessWeb
+    void 'gogs should be built successfully'() {
+        // v0.11
+
+        // I don't know why it will fail on Windows
+        if (Os.getHostOs() == Os.WINDOWS) {
+            IOUtils.append(new File(resource, 'build.gradle'), 'goTest.enabled = false\n')
+        }
+
+        init()
+
+        firstBuild()
+
+        File firstBuildResult = getOutputExecutable()
+        assert processUtils.getStdout(processUtils.run(firstBuildResult.absolutePath)).contains('Gogs')
+        assert new File(resource, 'gogradle.lock').exists()
+
+    }
+
 
     void firstBuild() {
         newBuild {
@@ -122,14 +108,10 @@ dependencies {
         }
     }
 
-    void secondBuild() {
-        newBuild {
-            it.forTasks('goBuild', 'goCheck')
-        }
-    }
-
     File getOutputExecutable() {
-        Path gogsBinPath = resource.toPath().resolve(".gogradle/gogs-${Os.getHostOs()}-${Arch.getHostArch()}")
+
+        println(resource.toPath().resolve(".gogradle/").toFile().listFiles())
+        Path gogsBinPath = Paths.get(outputLocation)
         if (Os.getHostOs() == Os.WINDOWS) {
             gogsBinPath.renameTo(gogsBinPath.toString() + '.exe')
         }
