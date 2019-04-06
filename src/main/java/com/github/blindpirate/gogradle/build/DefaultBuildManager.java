@@ -67,7 +67,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString;
 @Singleton
 public class DefaultBuildManager implements BuildManager {
     private static final String SRC = "src";
-    private static final List<String> PROJECT_LAYOUT_DIRS = Arrays.asList("cmd", "internal", "pkg","test");
+    private static final List<String> PROJECT_LAYOUT_DIRS = Arrays.asList("cmd", "internal", "pkg", "test");
     private static final Set<String> TOOL_COMMANDS_SUPPORTING_BUILD_TAG = ImmutableSet.of("vet");
 
     private static final Logger LOGGER = Logging.getLogger(DefaultBuildManager.class);
