@@ -20,40 +20,47 @@ package com.github.blindpirate.gogradle
 import com.github.blindpirate.gogradle.crossplatform.Os
 import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
+import com.github.blindpirate.gogradle.support.WithResource
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
+import java.nio.file.Files
 import java.nio.file.Path
+import java.nio.file.Paths
 
+@WithResource('')
 @RunWith(GogradleRunner)
-@OnlyWhen("System.getenv('DEP_DIR')!=null&&'git version'.execute()")
+@OnlyWhen("System.getenv('DEP_DIR')")
 class DepBuild extends IntegrationTestSupport {
 
+    File resource
+    def outputLocation
+    def packageName = 'github.com/golang/dep'
     ProcessUtils processUtils = new ProcessUtils()
-
-    @Override
-    File getProjectRoot() {
-        return new File(System.getenv('DEP_DIR'))
-    }
-
-    def packageName = 'github.com/gogits/gogs'
 
     def createSymLink() {
         Path link = Paths.get(resource.getAbsolutePath(), "src", packageName)
-        if (!link.getParent().toFile().exists()){
+        Path targetDir = Paths.get(System.getenv('DEP_DIR'))
+        if (!link.getParent().toFile().exists()) {
             IOUtils.forceMkdir(link.getParent().toFile())
+            Files.createSymbolicLink(link, targetDir)
         }
-        if (!link.toFile().exists()) {
-            Files.createSymbolicLink(link, resource.toPath())
-        }
+        assert link.toFile().exists()
     }
+
+    @Override
+    File getProjectRoot() {
+        return resource
+    }
+
+
 
     @Before
     void setUp() {
-        processUtils.run(['git', 'reset', "HEAD", '--hard'], null, getProjectRoot())
+        outputLocation="${resource.toPath().toAbsolutePath().toString()}/build/bin/dep"
         createSymLink()
         writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
@@ -61,10 +68,12 @@ ${buildDotGradleBase}
 golang {
     packagePath="${packageName}"
     goVersion='1.9'
+    applicationName ='dep'
+    
 }
 
 goBuild {
-    go 'build -o ./.gogradle/dep github.com/golang/dep/cmd/dep'
+    outputLocation="${outputLocation}"
 }
 
 goTest.enabled = false
@@ -86,10 +95,10 @@ goTest.enabled = false
     }
 
     def verifyDepBin() {
-        File depBinary = new File(projectRoot, '.gogradle/dep')
-        Path gogsBinPath = getProjectRoot().toPath().resolve(".gogradle/dep")
+        File depBinary = new File(outputLocation)
+        Path gogsBinPath = Paths.get(outputLocation)
         if (Os.getHostOs() == Os.WINDOWS) {
-            new File(projectRoot, '.gogradle/dep').toPath().renameTo(depBinary.absolutePath + '.exe')
+            new File(outputLocation).toPath().renameTo(depBinary.absolutePath + '.exe')
         }
         IOUtils.chmodAddX(gogsBinPath)
         // I don't know why dep prints command to stderr...

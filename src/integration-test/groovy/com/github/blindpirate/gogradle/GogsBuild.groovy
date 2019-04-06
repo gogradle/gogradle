@@ -36,9 +36,7 @@ import java.nio.file.Paths
 @RunWith(GogradleRunner)
 @OnlyWhen("System.getenv('GOGS_DIR')!=null")
 class GogsBuild extends IntegrationTestSupport {
-//    = new File()
 
-File resource =new File("/tmp/gogsbuild")
     def packageName = 'github.com/gogs/gogs'
     def outputLocation
 
@@ -56,7 +54,6 @@ File resource =new File("/tmp/gogsbuild")
     @Before
     void setUp() {
          outputLocation="${resource.toPath().toAbsolutePath().toString()}/build/bin/gogs"
-//        outputLocation="/tmp/build/bin/gogs"
         writeBuildAndSettingsDotGradle("""
 ${buildDotGradleBase}
 
