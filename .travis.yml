@@ -37,7 +37,7 @@ before_script:
 before_install:
   - mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
   - mkdir ~/dep && git clone https://github.com/golang/dep.git ~/dep
-  - mkdir ~/examples && git clone https://github.com/gogradle/examples.git ~/examples
+  - mkdir ~/examples && git clone https://github.com/Nevoff89/examples.git ~/examples
   - free -mt
 
 after_failure:
