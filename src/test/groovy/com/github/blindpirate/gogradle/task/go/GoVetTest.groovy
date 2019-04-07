@@ -75,7 +75,7 @@ class GoVetTest extends TaskTest {
         assert captor.allValues.size() == 1
         List firstCall = captor.allValues[0]
 
-        assert firstCall == ['vet', toUnixString(new File(resource, "src/${packageName}/cmd/main.go"))]
+        assert firstCall == ['vet', toUnixString(new File(resource, "src/${packageName}/cmd"))]
     }
 
 
