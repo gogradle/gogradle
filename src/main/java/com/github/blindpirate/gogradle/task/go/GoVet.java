@@ -70,7 +70,7 @@ public class GoVet extends Go {
                     .filter(File::isFile)
                     .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
                     .filter(file -> StringUtils.endsWithAny(file.getName(), ".go"))
-                    .map(StringUtils::toUnixString)
+                    .map(File::getParent)
                     .collect(Collectors.toList());
         }
         return Collections.emptyList();
