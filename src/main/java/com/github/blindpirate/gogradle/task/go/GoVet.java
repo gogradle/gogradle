@@ -45,7 +45,9 @@ public class GoVet extends Go {
 
     private void vet(List<String> fileNames) {
         if (!fileNames.isEmpty()) {
-            go(CollectionUtils.asStringList("tool", "vet", fileNames));
+            // Issue #287: `go tool vet` is deprecated in Go 1.12.
+            // @see https://go-review.googlesource.com/c/go/+/152161/3/doc/go1.12.html
+            go(CollectionUtils.asStringList("vet", fileNames));
         }
     }
 
