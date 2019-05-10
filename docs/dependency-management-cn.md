@@ -166,7 +166,7 @@ Gogradle按照[Go语言默认的方式](https://golang.org/cmd/go/#hdr-Relative_
 
 ## 依赖解析
 
-依赖解析即将依赖包解析成实际代码的过程。这个过程通常需要借助源代码管理系统，如Git。
+依赖解析，即将依赖包解析成实际代码的过程。这个过程通常需要借助源代码管理系统，如Git。
 Gogradle的目标是支持Go语言原生支持的全部四种（Git/Mercurial/Svn/Bazaar）源代码管理工具，不过当前只实现了Git和Mercurial。
 
 ## 传递性依赖
