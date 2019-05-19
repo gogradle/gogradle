@@ -178,9 +178,9 @@ task outputToDevNull(type: com.github.blindpirate.gogradle.Go){
 }
 ```
 
-这段代码指示Gogradle执行`go build -v github.com/my/project`，并将标准输入和标准输出丢弃。如果`go`进程的返回值不会0，则打印之。你可能会问，这么冗长复杂的命令，我为什么不用Shell和`make`实现呢？
+这段代码指示Gogradle执行`go build -v github.com/my/project`，并将标准输入和标准输出丢弃。如果`go`进程的返回值不为0，则打印之。你可能会问，这么冗长复杂的命令，我为什么不用`Shell`和`make`实现呢？
 
-答案是，第一，Shell跨平台能力差，而这里的所有的代码都是可以跨平台的；第二，这里可以编写任意的`Groovy`代码，引用JVM生态系统（Java/Groovy/Scala/Kotlin, etc）中的任何类库。
+答案是，第一，Shell跨平台能力差，而这里的所有的代码都是可以跨平台的；第二，这里可以编写任意的`Groovy`代码，引用JVM生态系统（Java/Groovy/Scala/Kotlin, etc.）中的任何类库。
 
 ## 添加依赖
 
