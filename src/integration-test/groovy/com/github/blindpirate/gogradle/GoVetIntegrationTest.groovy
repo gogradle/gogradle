@@ -69,6 +69,15 @@ func main() {
         IOUtils.write(resource, 'sub/main.go', goFileWithVetError)
     }
 
+    void writeGoodGoFileToRoot() {
+        IOUtils.write(resource, 'main.go', '''package main
+  
+func Main() {
+}
+
+''')
+    }
+
     void vetFailed() {
         String err = stderr.toString()
         String out = stdout.toString()
@@ -112,8 +121,16 @@ goVet {
 
     @Test
     void 'code in vendor should not be vetted'() {
+        writeGoodGoFileToRoot()
         writeGoFileWithErrorToVendor()
         newBuild('goVet')
+    }
+
+    @Test
+    void 'code in vendor should not be vetted if no files found'() {
+        writeGoFileWithErrorToVendor()
+        newBuild('goVet')
+        assert stdout.toString().contains('No valid packages found, skip')
     }
 
     @Override

@@ -51,6 +51,7 @@ import static org.apache.commons.io.FileUtils.listFiles;
 @Singleton
 public class DefaultGoBinaryManager implements GoBinaryManager {
     private static final Version GO_VERSION_SUPPORTING_JSON = Version.valueOf("1.10.0");
+    private static final Version GO_VET_IGNORING_VENDOR = Version.valueOf("1.9.0");
 
     private static final Logger LOGGER = Logging.getLogger(DefaultGoBinaryManager.class);
 
@@ -101,6 +102,11 @@ public class DefaultGoBinaryManager implements GoBinaryManager {
     @Override
     public boolean supportTestJsonOutput() {
         return goVersion.compareTo(GO_VERSION_SUPPORTING_JSON) >= 0;
+    }
+
+    @Override
+    public boolean goVetIgnoreVendor() {
+        return goVersion.compareTo(GO_VET_IGNORING_VENDOR) >= 0;
     }
 
     @Override

@@ -27,4 +27,6 @@ public interface GoBinaryManager {
     Path getGoroot();
 
     boolean supportTestJsonOutput();
+
+    boolean goVetIgnoreVendor();
 }
