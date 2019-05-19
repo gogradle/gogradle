@@ -30,7 +30,6 @@ import org.mockito.Captor
 import java.util.function.Consumer
 
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME
-import static com.github.blindpirate.gogradle.util.StringUtils.toUnixString
 import static org.mockito.ArgumentMatchers.*
 import static org.mockito.Mockito.*
 
@@ -61,21 +60,38 @@ class GoVetTest extends TaskTest {
     }
 
     @Test
-    void 'go vet should succeed when _go exists in root'() {
+    void 'go vet should succeed when go vet not ignore vendor'() {
         // given
         IOUtils.write(resource, 'main.go', '')
+        IOUtils.write(resource, 'sub/sub.go', '')
         // when
+        when(goBinaryManager.goVetIgnoreVendor()).thenReturn(false)
         task.afterEvaluate()
         task.executeTask()
         // then
-        verify(buildManager, times(2)).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
 
-        assert captor.allValues.size() == 2
-        List firstCall = captor.allValues[0]
-        List secondCall = captor.allValues[1]
+        assert captor.allValues.size() == 1
 
-        assert firstCall == ['tool', 'vet', toUnixString(new File(resource, 'main.go'))]
-        assert secondCall == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
+        assert captor.allValues[0] == ['vet', 'github.com/my/package', 'github.com/my/package/sub']
+    }
+
+    @Test
+    void 'go vet should succeed when go vet ignore vendor and global gopath'() {
+        // given
+        IOUtils.write(resource, 'main.go', '')
+        IOUtils.write(resource, 'sub/sub.go', '')
+        // when
+        when(goBinaryManager.goVetIgnoreVendor()).thenReturn(true)
+        when(buildManager.getGopath()).thenReturn("/global/gopath")
+        task.afterEvaluate()
+        task.executeTask()
+        // then
+        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
+
+        assert captor.allValues.size() == 1
+
+        assert captor.allValues[0] == ['vet', 'github.com/my/package/...']
     }
 
     @Test
@@ -84,8 +100,7 @@ class GoVetTest extends TaskTest {
         task.afterEvaluate()
         task.executeTask()
         // then
-        verify(buildManager).go(captor.capture(), anyMap(), any(Consumer), any(Consumer), eq(false))
-        assert captor.value == ['tool', 'vet', toUnixString(new File(resource, 'sub'))]
+        verify(buildManager, never()).go(anyList(), anyMap(), any(Consumer), any(Consumer), anyBoolean())
     }
 
     @Test

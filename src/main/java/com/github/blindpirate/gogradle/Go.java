@@ -61,7 +61,7 @@ import static com.github.blindpirate.gogradle.task.GolangTaskContainer.PREPARE_T
  * </pre>
  */
 public class Go extends AbstractGolangTask {
-    private static final Logger LOGGER = Logging.getLogger(Go.class);
+    protected static final Logger LOGGER = Logging.getLogger(Go.class);
 
     protected BuildManager buildManager;
     protected Consumer<String> stdoutLineConsumer;
@@ -207,6 +207,11 @@ public class Go extends AbstractGolangTask {
         private Consumer<String> stderrLineConsumer;
         private Map<String, String> environment = new HashMap<>();
         private Boolean continueOnFailure;
+
+        protected GoAction() {
+            args = null;
+            function = null;
+        }
 
         private GoAction(List<String> args, BuildFunction function) {
             this.args = args;

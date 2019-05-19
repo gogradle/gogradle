@@ -54,6 +54,11 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
         PROJECT_TEST_FILES_ONLY(false, true, false),
 
         /**
+         * PROJECT_BUILD_FILES_ONLY + PROJECT_TEST_FILES_ONLY
+         */
+        PROJECT_ALL_FILES_ONLY(true, true, false),
+
+        /**
          * All non-test go files in project directory as well as all non-test go files in vendor directory
          */
         PROJECT_AND_VENDOR_BUILD_FILES(true, false, true),
@@ -95,6 +100,7 @@ public class GoSourceCodeFilter extends AbstractFileFilter {
 
     /**
      * Filters tests files with specific patterns. Wildcards are supported.
+     *
      * @param projectDir the project root directory.
      * @param patterns the pattern list
      * @return all files in the project directory (recursively) matching the patterns

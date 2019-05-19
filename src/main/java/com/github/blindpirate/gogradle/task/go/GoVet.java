@@ -18,53 +18,96 @@
 package com.github.blindpirate.gogradle.task.go;
 
 import com.github.blindpirate.gogradle.Go;
+import com.github.blindpirate.gogradle.GolangPluginSetting;
+import com.github.blindpirate.gogradle.common.GoSourceCodeFilter;
+import com.github.blindpirate.gogradle.crossplatform.GoBinaryManager;
 import com.github.blindpirate.gogradle.util.CollectionUtils;
-import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
 
+import javax.inject.Inject;
 import java.io.File;
+import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static com.github.blindpirate.gogradle.core.dependency.produce.VendorDependencyFactory.VENDOR_DIRECTORY;
+import static com.github.blindpirate.gogradle.common.GoSourceCodeFilter.SourceSetType.PROJECT_ALL_FILES_ONLY;
 import static com.github.blindpirate.gogradle.task.GolangTaskContainer.VENDOR_TASK_NAME;
+import static com.github.blindpirate.gogradle.util.CollectionUtils.asStringList;
 
 public class GoVet extends Go {
+    @Inject
+    private GolangPluginSetting setting;
+    @Inject
+    private GoBinaryManager goBinaryManager;
+
+    private boolean verbose;
+
     public GoVet() {
         setDescription("Run 'go vet' (https://golang.org/cmd/vet).");
         dependsOn(VENDOR_TASK_NAME);
     }
 
+    public boolean isVerbose() {
+        return verbose;
+    }
+
+    public void setVerbose(boolean verbose) {
+        this.verbose = verbose;
+    }
+
     @Override
     public void afterEvaluate() {
         if (CollectionUtils.isEmpty(goActions)) {
-            vet(allSubGoFiles());
-            vet(allSubDirectories());
+            defaultVet();
         }
     }
 
-    private void vet(List<String> fileNames) {
-        if (!fileNames.isEmpty()) {
-            go(CollectionUtils.asStringList("tool", "vet", fileNames));
+    private void defaultVet() {
+        // Issue #287: `go tool vet` is deprecated in Go 1.12.
+        // @see https://go-review.googlesource.com/c/go/+/152161/3/doc/go1.12.html
+        goActions.add(new GoAction() {
+            @Override
+            public Integer get() {
+                List<String> packagesToVet = getPackagesToVet();
+
+                if (packagesToVet.isEmpty()) {
+                    LOGGER.quiet("No valid packages found, skip.");
+                    return 0;
+                }
+                List<String> vetCommands = verbose
+                        ? asStringList("vet", "-v", packagesToVet)
+                        : asStringList("vet", packagesToVet);
+                return buildManager.go(vetCommands,
+                        getEnvironment(),
+                        getStdoutLineConsumer(),
+                        getStderrLineConsumer(),
+                        isContinueOnFailure());
+            }
+        });
+    }
+
+    private List<String> getPackagesToVet() {
+        if (goBinaryManager.goVetIgnoreVendor() && !isProjectGopath()) {
+            return Collections.singletonList(setting.getPackagePath() + "/...");
+        } else {
+            return new ArrayList<>(GoSourceCodeFilter.filterGoFiles(getProjectDir(), PROJECT_ALL_FILES_ONLY).stream()
+                    .map(File::getParentFile)
+                    .map(this::getPackagePath)
+                    .collect(Collectors.toSet()));
         }
     }
 
-    private List<String> allSubGoFiles() {
-        return IOUtils.safeListFiles(getProjectDir()).stream()
-                .filter(File::isFile)
-                .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
-                .filter(file -> StringUtils.endsWithAny(file.getName(), ".go"))
-                .map(StringUtils::toUnixString)
-                .collect(Collectors.toList());
+    private String getPackagePath(File subDirPath) {
+        if (subDirPath.equals(getProjectDir())) {
+            return setting.getPackagePath();
+        }
+        Path relativePath = getProjectDir().toPath().relativize(subDirPath.toPath());
+        return setting.getPackagePath() + "/" + StringUtils.toUnixString(relativePath);
     }
 
-    private List<String> allSubDirectories() {
-        return IOUtils.safeListFiles(getProjectDir()).stream()
-                .filter(File::isDirectory)
-                .filter(file -> !StringUtils.startsWithAny(file.getName(), "_", "."))
-                .filter(file -> !VENDOR_DIRECTORY.equals(file.getName()))
-                .map(StringUtils::toUnixString)
-                .collect(Collectors.toList());
+    private boolean isProjectGopath() {
+        return buildManager.getGopath().contains(".gogradle/project_gopath");
     }
-
 }
