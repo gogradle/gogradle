@@ -76,7 +76,9 @@ public class GoVet extends Go {
                     LOGGER.quiet("No valid packages found, skip.");
                     return 0;
                 }
-                List<String> vetCommands = verbose ? asStringList("vet", "-v", packagesToVet) : asStringList("vet", packagesToVet);
+                List<String> vetCommands = verbose
+                        ? asStringList("vet", "-v", packagesToVet)
+                        : asStringList("vet", packagesToVet);
                 return buildManager.go(vetCommands,
                         getEnvironment(),
                         getStdoutLineConsumer(),
