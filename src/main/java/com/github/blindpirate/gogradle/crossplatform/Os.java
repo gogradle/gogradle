@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Optional;
 
+import static org.apache.commons.lang3.SystemUtils.IS_OS_AIX;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_FREE_BSD;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX;
 import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC_OSX;
@@ -32,6 +33,7 @@ import static org.apache.commons.lang3.SystemUtils.IS_OS_ZOS;
 
 // https://github.com/golang/go/blob/master/src/go/build/syslist.go
 public enum Os {
+    AIX,
     ANDROID,
     DARWIN,
     DRAGONFLY,
@@ -86,6 +88,7 @@ public enum Os {
     }
 
     private static final Map<Os, Boolean> OS_DETECTION_MAP = ImmutableMap.<Os, Boolean>builder()
+            .put(AIX, IS_OS_AIX)
             .put(LINUX, IS_OS_LINUX)
             .put(WINDOWS, IS_OS_WINDOWS)
             .put(DARWIN, IS_OS_MAC_OSX)
