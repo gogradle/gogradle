@@ -27,7 +27,7 @@ Gogradle is a [Gradle](https://gradle.org) plugin which provide modern build sup
 
 - `make` has a very steep learning curve, thus many people (like me) aren't good at it; Gradle use a DSL with similar syntax to Java to describe a build, which is easier for me.
 - `Makefile` and `Shell` have cross-platform issues, especially on Windows. Thanks to Gradle and JVM, Gogradle provide an excellent cross-platform support and can leverage the whole Java ecosystem
-- There're many mature [plugins](https://plugins.gradle.org) in Gradle ecosystem, and it's easy for youself to implement a plugin to reuse your build code
+- There're many mature [plugins](https://plugins.gradle.org) in Gradle ecosystem, and it's easy for yourself to implement a plugin to reuse your build code
 - Gogradle supports project-scoped `GOPATH`, if you prefer
 - Gogradle supports existence and switch of multi-version of Go
 - There's plenty of [package management tools](https://github.com/blindpirate/report-of-go-package-management-tool) in Go community which are not compatible with each other.
