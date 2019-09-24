@@ -37,6 +37,7 @@ import org.gradle.api.tasks.InputFiles;
 import org.gradle.api.tasks.Optional;
 import org.gradle.api.tasks.OutputDirectory;
 import org.gradle.api.tasks.TaskAction;
+import org.gradle.internal.Pair;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -94,6 +95,8 @@ public class GoTest extends AbstractGolangTask {
 
     private boolean continueOnFailure;
 
+    private boolean streamGoTestOutput;
+
     private Map<String, String> environment = new HashMap<>();
 
     public GoTest() {
@@ -117,6 +120,10 @@ public class GoTest extends AbstractGolangTask {
 
     public void setContinueOnFailure(boolean continueOnFailure) {
         this.continueOnFailure = continueOnFailure;
+    }
+
+    public void setStreamGoTestOutput(boolean streamGoTestOutput) {
+        this.streamGoTestOutput = streamGoTestOutput;
     }
 
     public void setGenerateCoverageProfile(boolean generateCoverageProfile) {
@@ -268,9 +275,9 @@ public class GoTest extends AbstractGolangTask {
             args.add("-coverprofile=" + toUnixString(profilesPath.getAbsolutePath()));
         }
 
-        Consumer<String> consumer = determineLineConsumer(lineCollector, importPath);
+        Pair<Consumer<String>, Consumer<String>> consumers = determineLineConsumers(lineCollector, importPath);
 
-        int retCode = buildManager.go(args, environment, consumer, consumer, true);
+        int retCode = buildManager.go(args, environment, consumers.left, consumers.right, true);
 
         return PackageTestResult.builder()
                 .withPackagePath(importPath)
@@ -288,16 +295,16 @@ public class GoTest extends AbstractGolangTask {
         }
     }
 
-    private Consumer<String> determineLineConsumer(LineCollector lineCollector, String importPath) {
-        if (!LOGGER.isInfoEnabled()) {
-            return lineCollector;
+    private Pair<Consumer<String>, Consumer<String>> determineLineConsumers(LineCollector lineCollector, String importPath) {
+        if (!LOGGER.isInfoEnabled() && !streamGoTestOutput) {
+            return Pair.of(lineCollector, lineCollector);
         } else {
             if (isCommandLineArguments()) {
-                LOGGER.info("Result:");
+                LOGGER.quiet("Result:");
             } else {
-                LOGGER.info("Result of package {}:", importPath);
+                LOGGER.quiet("Result of package {}:", importPath);
             }
-            return lineCollector.andThen(LOGGER::info);
+            return Pair.of(lineCollector.andThen(LOGGER::quiet), lineCollector.andThen(LOGGER::error));
         }
     }
 
