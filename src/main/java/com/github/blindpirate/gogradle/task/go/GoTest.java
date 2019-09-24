@@ -295,7 +295,8 @@ public class GoTest extends AbstractGolangTask {
         }
     }
 
-    private Pair<Consumer<String>, Consumer<String>> determineLineConsumers(LineCollector lineCollector, String importPath) {
+    private Pair<Consumer<String>, Consumer<String>> determineLineConsumers(LineCollector lineCollector,
+                                                                            String importPath) {
         if (!LOGGER.isInfoEnabled() && !streamGoTestOutput) {
             return Pair.of(lineCollector, lineCollector);
         } else {
