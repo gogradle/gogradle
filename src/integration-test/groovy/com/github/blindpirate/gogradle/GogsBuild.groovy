@@ -59,7 +59,11 @@ goVet {
     @AccessWeb
     void 'gogs should be built successfully'() {
         // v0.11
-        assert processUtils.run(['git', 'checkout', '348c75c91b95ce7fb0f6dac263aa7290f2319e1b', '-f'], null, resource).waitFor() == 0
+        if (System.getenv('GITHUB_WORKFLOW')) {
+            assert processUtils.run(['/usr/local/bin/git', 'checkout', '348c75c91b95ce7fb0f6dac263aa7290f2319e1b', '-f'], null, resource).waitFor() == 0
+        } else {
+            assert processUtils.run(['git', 'checkout', '348c75c91b95ce7fb0f6dac263aa7290f2319e1b', '-f'], null, resource).waitFor() == 0
+        }
 
         // I don't know why it will fail on Windows
         if (Os.getHostOs() == Os.WINDOWS) {

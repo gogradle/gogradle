@@ -41,8 +41,6 @@ jobs:
         mkdir ~/examples && git clone https://github.com/gogradle/examples.git ~/examples
     - name: Show Gradle version
       run: ./gradlew --version
-    - name: Which git
-      run: which git
     - name: Build with Gradle
       run: ./gradlew check --info --stacktrace
       env:
