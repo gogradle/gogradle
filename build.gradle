@@ -14,8 +14,8 @@ plugins {
     id 'com.github.johnrengelman.shadow' version '4.0.3'
     id "com.gradle.plugin-publish" version "0.9.9"
     id "co.riiid.gradle" version "0.4.2"
-    id "org.jetbrains.kotlin.jvm" version "1.3.11"
-    id "com.github.spotbugs" version "1.6.6"
+    id "org.jetbrains.kotlin.jvm" version "1.3.72"
+    id "com.github.spotbugs" version "4.0.5"
 }
 
 apply from: 'config/scripts/coverage.gradle'
@@ -121,7 +121,7 @@ gradleVersionsToBeTested.each {
 
 def createIntegrationTest(String taskName, String sourceSet) {
     project.tasks.create(name: taskName, type: Test) {
-        if (gradle.gradleVersion.startsWith('4') || gradle.gradleVersion.startsWith("5")) {
+        if (gradle.gradleVersion.startsWith('4.') || gradle.gradleVersion.startsWith("5.") || gradle.gradleVersion.startsWith("6.")) {
             testClassesDirs = sourceSets[sourceSet].output.classesDirs
         } else {
             testClassesDir = sourceSets[sourceSet].output.classesDir
@@ -176,7 +176,7 @@ javadoc {
 /************** coverage **************/
 
 jacoco {
-    toolVersion = "0.8.2"
+    toolVersion = "0.8.5"
 }
 jacocoTestReport {
     reports {
@@ -184,7 +184,7 @@ jacocoTestReport {
         html.enabled = true
     }
     afterEvaluate {
-        classDirectories = files(classDirectories.files.collect {
+        classDirectories.setFrom(classDirectories.files.collect {
             fileTree(dir: it,
                     exclude:
                             ['com/github/blindpirate/gogradle/antlr/**',
@@ -264,7 +264,7 @@ spotbugs {
     excludeFilter = file("config/spotbugs/exclude.xml")
 }
 
-tasks.withType(com.github.spotbugs.SpotBugsTask) {
+spotbugsMain {
     reports {
         xml.enabled = false
         html.enabled = true
