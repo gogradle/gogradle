@@ -24,12 +24,15 @@ import com.github.blindpirate.gogradle.support.IntegrationTestSupport
 import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.blindpirate.gogradle.util.ProcessUtils
+import org.junit.Ignore
 import org.junit.Test
 import org.junit.runner.RunWith
 
 import java.nio.file.Path
 
+// Ignore because GitHub actions has no git available on PATH
 @RunWith(GogradleRunner)
+@Ignore
 @OnlyWhen("System.getenv('GOGS_DIR')!=null&&'git version'.execute()")
 class GogsBuild extends IntegrationTestSupport {
     File resource = new File(System.getenv('GOGS_DIR'))
