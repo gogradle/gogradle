@@ -18,6 +18,7 @@ plugins {
     id "com.github.spotbugs" version "4.0.5"
 }
 
+println System.getenv("PATH")
 apply from: 'config/scripts/coverage.gradle'
 
 group 'com.github.blindpirate'

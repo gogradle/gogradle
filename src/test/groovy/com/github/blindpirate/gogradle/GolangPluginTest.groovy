@@ -25,6 +25,7 @@ import com.github.blindpirate.gogradle.core.mode.BuildMode
 import com.github.blindpirate.gogradle.core.pack.GloballyIgnoredPackages
 import com.github.blindpirate.gogradle.crossplatform.Arch
 import com.github.blindpirate.gogradle.crossplatform.Os
+import com.github.blindpirate.gogradle.support.OnlyWhen
 import com.github.blindpirate.gogradle.support.WithProject
 import com.github.blindpirate.gogradle.util.ReflectionUtils
 import com.github.blindpirate.gogradle.vcs.Git
@@ -50,6 +51,7 @@ import static com.github.blindpirate.gogradle.util.StringUtils.capitalizeFirstLe
 
 @RunWith(GogradleRunner)
 @WithProject
+@OnlyWhen("System.getenv('DEP_DIR')!=null&&'git version'.execute()")
 class GolangPluginTest {
 
     Project project
