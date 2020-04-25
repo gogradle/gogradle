@@ -44,7 +44,7 @@ jobs:
     - name: Show Gradle version
       run: ./gradlew --version
     - name: Build with Gradle
-      run: ./gradlew check --info --stacktrace
+      run: ./gradlew iT --info --stacktrace
       env:
         GOGS_DIR: /home/travis/gogs
         DEP_DIR: /home/travis/dep
