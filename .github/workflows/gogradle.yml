@@ -1,0 +1,64 @@
+name: gogradle
+
+on:
+  push:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md' 
+  pull_request:
+    paths-ignore:
+      - 'docs/**'
+      - '**/*.md'
+
+jobs:
+  run:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        java: [8, 11]
+        os: [ubuntu-latest, macOS-latest]
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up JDK ${{ matrix.java }}
+      uses: actions/setup-java@v1
+      with:
+        java-version: ${{ matrix.java }}
+    - name: Cache Gradle user home
+      uses: actions/cache@v1
+      env:
+        cache-name: cache-gradle-user-home
+      with:
+        path: ~/.gradle
+        key: ${{ runner.os }}-${{ hashFiles('**/*.gradle.kts') }}
+        restore-keys: |
+          ${{ runner.os }}-
+    - name: Set up test resources
+      run: |
+        git config --global user.email 'zhangbodut@gmail.com'
+        git config --global user.name 'Bo'
+        mkdir /tmp/gogs && git clone https://github.com/gogits/gogs.git /tmp/gogs
+        mkdir /tmp/dep && git clone https://github.com/golang/dep.git /tmp/dep
+        mkdir /tmp/examples && git clone https://github.com/gogradle/examples.git /tmp/examples
+    - name: Run git
+      run: git version
+    - name: Show Gradle version
+      run: ./gradlew --version
+    - name: Build with Gradle
+      run: ./gradlew iT --info --stacktrace
+      env:
+        GOGS_DIR: /tmp/gogs
+        DEP_DIR: /tmp/dep
+        EXAMPLES_DIR: /tmp/examples
+        JAVA_OPTS: -Xmx1024m -XX:MaxPermSize=256m
+    - name: After success
+      run: ./gradlew jacocoTestReport coveralls
+      if: success()
+    - name: After failure
+      run: |
+        cat /tmp/gogs/.gogradle/reports/test/packages/*
+        cat /tmp/gogs/.gogradle/reports/test/classes/*
+        cat /tmp/gogs/.gogradle/reports/test/index.html
+      if: failure()
+
+
+

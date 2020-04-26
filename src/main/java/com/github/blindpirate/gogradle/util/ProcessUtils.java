@@ -118,7 +118,7 @@ public class ProcessUtils {
             }
             return pb.start();
         } catch (IOException e) {
-            throw new UncheckedIOException(e);
+            throw new UncheckedIOException("PATH: " + System.getenv("PATH"), e);
         }
     }
 
