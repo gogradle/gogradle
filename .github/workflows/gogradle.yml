@@ -46,18 +46,18 @@ jobs:
     - name: Build with Gradle
       run: ./gradlew iT --info --stacktrace
       env:
-        GOGS_DIR: /home/travis/gogs
-        DEP_DIR: /home/travis/dep
-        EXAMPLES_DIR: /home/travis/examples
+        GOGS_DIR: /tmp/gogs
+        DEP_DIR: /tmp/dep
+        EXAMPLES_DIR: /tmp/examples
         JAVA_OPTS: -Xmx1024m -XX:MaxPermSize=256m
     - name: After success
       run: ./gradlew jacocoTestReport coveralls
       if: success()
     - name: After failure
       run: |
-        cat /home/travis/gogs/.gogradle/reports/test/packages/*
-        cat /home/travis/gogs/.gogradle/reports/test/classes/*
-        cat /home/travis/gogs/.gogradle/reports/test/index.html
+        cat /tmp/gogs/.gogradle/reports/test/packages/*
+        cat /tmp/gogs/.gogradle/reports/test/classes/*
+        cat /tmp/gogs/.gogradle/reports/test/index.html
       if: failure()
 
 
