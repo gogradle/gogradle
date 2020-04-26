@@ -5,8 +5,7 @@
 
 [中文文档](./README_CN.md)
 
-[![Build Status](https://travis-ci.org/gogradle/gogradle.svg?branch=master)](https://travis-ci.org/gogradle/gogradle)
-[![Build Status](https://ci.appveyor.com/api/projects/status/github/gogradle/gogradle?branch=master&svg=true&passingText=windows%20build%20passing&failingText=windows%20build%20failing)](https://ci.appveyor.com/api/projects/status/github/gogradle/gogradle?branch=master&svg=true&passingText=windows%20build%20passing&failingText=windows%20build%20failing)
+![gogradle](https://github.com/gogradle/gogradle/workflows/gogradle/badge.svg)
 [![Coverage Status](https://coveralls.io/repos/github/blindpirate/gogradle/badge.svg?branch=master)](https://coveralls.io/github/blindpirate/gogradle?branch=master)
 [![Java 8+](https://img.shields.io/badge/java-8+-4c7e9f.svg)](http://java.oracle.com)
 [![Apache License 2](https://img.shields.io/badge/license-APL2-blue.svg)](http://www.apache.org/licenses/LICENSE-2.0.txt)
