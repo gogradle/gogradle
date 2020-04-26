@@ -36,9 +36,9 @@ jobs:
       run: |
         git config --global user.email 'zhangbodut@gmail.com'
         git config --global user.name 'Bo'
-        mkdir ~/gogs && git clone https://github.com/gogits/gogs.git ~/gogs
-        mkdir ~/dep && git clone https://github.com/golang/dep.git ~/dep
-        mkdir ~/examples && git clone https://github.com/gogradle/examples.git ~/examples
+        mkdir /tmp/gogs && git clone https://github.com/gogits/gogs.git /tmp/gogs
+        mkdir /tmp/dep && git clone https://github.com/golang/dep.git /tmp/dep
+        mkdir /tmp/examples && git clone https://github.com/gogradle/examples.git /tmp/examples
     - name: Run git
       run: git version
     - name: Show Gradle version
