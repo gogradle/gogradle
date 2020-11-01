@@ -55,7 +55,7 @@ class GoPrepareTest extends TaskTest {
         // then
         verify(setting).verify()
         verify(goBinaryManager).getBinaryPath()
-        verify(buildManager).prepareProjectGopathIfNecessary()
+        verify(buildManager).prepareProjectGopath()
         verify(buildConstraintManager).prepareConstraints()
     }
 

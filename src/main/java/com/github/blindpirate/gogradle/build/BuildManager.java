@@ -29,7 +29,7 @@ public interface BuildManager {
     /**
      * Determine GOPATH to be used. If global GOPATH doesn't exist, a project-level GOPATH will be prepared.
      */
-    void prepareProjectGopathIfNecessary();
+    void prepareProjectGopath();
 
     /**
      * Get GOPATH in this build.

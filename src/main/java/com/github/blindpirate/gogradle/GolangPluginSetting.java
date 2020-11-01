@@ -78,6 +78,16 @@ public class GolangPluginSetting {
     private Set<String> ignoredPackages = new HashSet<>();
     private boolean userHasCustomizedIgnoredPackages = false;
 
+    public boolean isGomodMode() {
+        return gomodMode;
+    }
+
+    public void setGomodMode(boolean gomodMode) {
+        this.gomodMode = gomodMode;
+    }
+
+    private boolean gomodMode = false;
+
     public String getGoRoot() {
         return goRoot;
     }

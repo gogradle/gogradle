@@ -94,7 +94,24 @@ public class DefaultBuildManager implements BuildManager {
     }
 
     @Override
-    public void prepareProjectGopathIfNecessary() {
+    public void prepareProjectGopath() {
+        if (setting.isGomodMode()) {
+            prepareProjectGopathForGoMod();
+        } else {
+            prepareProjectGopathIfNecessary();
+        }
+    }
+
+    private void prepareProjectGopathForGoMod() {
+        gopath = System.getenv("GOPATH");
+        if (gopath == null) {
+            gopath = project.getBuildDir().toPath().resolve("gopath").toAbsolutePath().toString();
+        }
+
+        LOGGER.quiet("GOPATH: {}.", gopath);
+    }
+
+    private void prepareProjectGopathIfNecessary() {
         String systemGopath = System.getenv("GOPATH");
         if (currentProjectMatchesGopath(systemGopath)) {
             LOGGER.quiet("Found global GOPATH: {}.", systemGopath);

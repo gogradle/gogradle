@@ -97,7 +97,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     @Test
     void 'symbolic links should be created if GOPATH dose not exist'() {
         // when
-        manager.prepareProjectGopathIfNecessary()
+        manager.prepareProjectGopath()
         // then
         assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
         assert manager.gopath == getProjectGopath()
@@ -107,7 +107,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     void 'symbolic links should be created if current project dose not match GOPATH'() {
         // when
         environmentVariables.set('GOPATH', toUnixString(resource))
-        manager.prepareProjectGopathIfNecessary()
+        manager.prepareProjectGopath()
         // then
         assertSymbolicLinkLinkToTarget('.gogradle/project_gopath/src/root/package', '.')
         assert manager.gopath == getProjectGopath()
@@ -122,7 +122,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
         environmentVariables.set('GOPATH', systemGopath)
         when(project.getProjectDir()).thenReturn(new File(resource, 'src/root/package'))
 
-        manager.prepareProjectGopathIfNecessary()
+        manager.prepareProjectGopath()
         // then
         assert !new File(resource, 'src/root/package/.gogradle/project_gopath').exists()
         assert manager.gopath == systemGopath
@@ -150,7 +150,7 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     @Test
     void 'customized command should succeed'() {
         // given
-        manager.prepareProjectGopathIfNecessary()
+        manager.prepareProjectGopath()
         setting.buildTags = ['a', 'b', 'c']
         // when
         int retcode = manager.run(['golint'], [:], null, null)
@@ -238,6 +238,6 @@ class DefaultBuildManagerTest extends MockEnvironmentVariableSupport {
     @Test
     void 'nothing should happen if symbolic link exists'() {
         IOUtils.write(resource, '.gogradle/project_gopath/root/package', '')
-        manager.prepareProjectGopathIfNecessary()
+        manager.prepareProjectGopath()
     }
 }
