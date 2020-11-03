@@ -7,6 +7,7 @@ import com.github.blindpirate.gogradle.util.DataExchange
 import com.github.blindpirate.gogradle.util.IOUtils
 import com.github.tomakehurst.wiremock.junit.WireMockRule
 import org.junit.Before
+import org.junit.Ignore
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -14,6 +15,7 @@ import org.junit.runner.RunWith
 import static com.github.tomakehurst.wiremock.client.WireMock.*
 import static com.github.tomakehurst.wiremock.core.WireMockConfiguration.wireMockConfig
 
+@Ignore
 @RunWith(GogradleRunner)
 @WithResource
 @WithIsolatedUserhome
