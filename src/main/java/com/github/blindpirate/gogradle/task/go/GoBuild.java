@@ -26,7 +26,7 @@ import com.github.blindpirate.gogradle.crossplatform.Os;
 import com.github.blindpirate.gogradle.util.Assert;
 import com.github.blindpirate.gogradle.util.MapUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Maps;
 
 import javax.inject.Inject;
 import java.io.File;
@@ -62,7 +62,7 @@ public class GoBuild extends Go {
 
     private String outputLocation;
 
-    private List<Pair<Os, Arch>> targetPlatforms = singletonList(Pair.of(Os.getHostOs(), Arch.getHostArch()));
+    private List<Map.Entry<Os, Arch>> targetPlatforms = singletonList(Maps.immutableEntry(Os.getHostOs(), Arch.getHostArch()));
 
     public GoBuild() {
         setDescription("Run build and generate output.");
@@ -74,9 +74,9 @@ public class GoBuild extends Go {
 
     @Override
     public void afterEvaluate() {
-        targetPlatforms.forEach(osArchPair -> {
-            Os os = osArchPair.getLeft();
-            Arch arch = osArchPair.getRight();
+        targetPlatforms.forEach(osArchMap -> {
+            Os os = osArchMap.getKey();
+            Arch arch = osArchMap.getValue();
 
             Go task = createSingleGoTask(os, arch);
             task.dependsOn(INSTALL_DEPENDENCIES_TASK_NAME, RESOLVE_BUILD_DEPENDENCIES_TASK_NAME);
@@ -181,16 +181,16 @@ public class GoBuild extends Go {
         targetPlatforms = new ArrayList<>(new LinkedHashSet<>(targetPlatforms));
     }
 
-    private List<Pair<Os, Arch>> extractPlatforms(String targetPlatform) {
+    private List<Map.Entry<Os, Arch>> extractPlatforms(String targetPlatform) {
         String[] platforms = splitAndTrim(targetPlatform, ",");
         return Stream.of(platforms).map(this::extractOne).collect(toList());
     }
 
-    private Pair<Os, Arch> extractOne(String osAndArch) {
+    private Map.Entry<Os, Arch> extractOne(String osAndArch) {
         String[] osArch = splitAndTrim(osAndArch, "\\-");
         Os os = Os.of(osArch[0]);
         Arch arch = Arch.of(osArch[1]);
-        return Pair.of(os, arch);
+        return Maps.immutableEntry(os, arch);
     }
 
     private Map<String, String> getEffectiveEnvironment(Os os, Arch arch) {

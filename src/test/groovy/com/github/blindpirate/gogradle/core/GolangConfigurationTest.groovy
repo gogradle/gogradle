@@ -51,8 +51,8 @@ class GolangConfigurationTest {
         // then
         List firstLevelDependencies = configuration.firstLevelDependencies
         assert firstLevelDependencies.size() == 1
-        assert firstLevelDependencies[0].left == [:]
-        assert firstLevelDependencies[0].right() == 1
+        assert firstLevelDependencies[0].key == [:]
+        assert firstLevelDependencies[0].value() == 1
         assert configuration.hasFirstLevelDependencies()
     }
 

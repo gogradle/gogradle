@@ -19,7 +19,7 @@ package com.github.blindpirate.gogradle.core.dependency.produce.external.gopm;
 
 import com.github.blindpirate.gogradle.util.IOUtils;
 import com.github.blindpirate.gogradle.util.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Maps;
 
 import java.io.File;
 import java.util.Collections;
@@ -101,17 +101,17 @@ public class GopmfileParser {
                 .collect(Collectors.toList());
     }
 
-    private Pair<String, String> parseLine(String line) {
+    private Map.Entry<String, String> parseLine(String line) {
         String[] nameAndValue = splitAndTrim(line, "=");
         String name = nameAndValue[0];
         String value = nameAndValue.length > 1 ? nameAndValue[1] : "";
-        return Pair.of(name, value);
+        return Maps.immutableEntry(name, value);
 
     }
 
-    private Map<String, Object> toNotation(Pair<String, String> nameAndValue) {
-        String name = nameAndValue.getLeft();
-        String value = nameAndValue.getRight();
+    private Map<String, Object> toNotation(Map.Entry<String, String> nameAndValue) {
+        String name = nameAndValue.getKey();
+        String value = nameAndValue.getValue();
 
         Map<String, Object> ret = new HashMap<>();
         ret.put(NAME_KEY, name);
