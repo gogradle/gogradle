@@ -95,7 +95,7 @@ For example, to add a task to run [`golint`](https://github.com/golang/lint), ad
 ```groovy
 task golint(type: com.github.blindpirate.gogradle.Go) {
     dependsOn goVendor // make this task depend on vendor task to guarantee all dependency packages are installed into vendor 
-    environment MY_OWN_ENV1: 'value1', MY_OWN_ENV1: 'value2' // set environment variables
+    environment MY_OWN_ENV1: 'value1', MY_OWN_ENV2: 'value2' // set environment variables
     run 'golint github.com/my/project' // specify the command in task
 }
 
