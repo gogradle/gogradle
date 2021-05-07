@@ -176,25 +176,27 @@ class GoBuildTest extends TaskTest {
 
     @Test
     void 'setting target platform should succeed'() {
-        task.targetPlatform = 'windows-amd64, linux-amd64, linux-386'
+        task.targetPlatform = 'windows-amd64, linux-amd64, linux-386, darwin-amd64'
         assertTargetPlatforms()
     }
 
     @Test
     void 'duplicates should be removed'() {
-        task.targetPlatform = 'windows-amd64, linux-amd64, linux-386,windows-amd64'
+        task.targetPlatform = 'windows-amd64, linux-amd64, linux-386, windows-amd64, darwin-amd64'
         assertTargetPlatforms()
 
         task.targetPlatform = ['windows-amd64', 'linux-amd64', 'linux-386', 'windows-amd64']
     }
 
     private void assertTargetPlatforms() {
-        assert task.targetPlatforms[0].left == Os.WINDOWS
-        assert task.targetPlatforms[0].right == Arch.AMD64
-        assert task.targetPlatforms[1].left == Os.LINUX
-        assert task.targetPlatforms[1].right == Arch.AMD64
-        assert task.targetPlatforms[2].left == Os.LINUX
-        assert task.targetPlatforms[2].right == Arch.I386
+        assert task.targetPlatforms[0].key == Os.WINDOWS
+        assert task.targetPlatforms[0].value == Arch.AMD64
+        assert task.targetPlatforms[1].key == Os.LINUX
+        assert task.targetPlatforms[1].value == Arch.AMD64
+        assert task.targetPlatforms[2].key == Os.LINUX
+        assert task.targetPlatforms[2].value == Arch.I386
+        assert task.targetPlatforms[3].key == Os.DARWIN
+        assert task.targetPlatforms[3].value == Arch.AMD64
     }
 
     @Test

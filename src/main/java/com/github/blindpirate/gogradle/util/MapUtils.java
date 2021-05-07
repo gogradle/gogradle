@@ -17,7 +17,7 @@
 
 package com.github.blindpirate.gogradle.util;
 
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Maps;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -44,61 +44,61 @@ public class MapUtils {
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2) {
-        return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
+        return asMap(new Map.Entry[]{Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2)});
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3) {
-        return asMap(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3));
+        return asMap(Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2), Maps.immutableEntry(k3, v3));
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        return asMap(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4)});
+        return asMap(new Map.Entry[]{Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2), Maps.immutableEntry(k3, v3), Maps.immutableEntry(k4, v4)});
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-        return asMap(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4), Pair.of(k5, v5));
+        return asMap(Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2), Maps.immutableEntry(k3, v3), Maps.immutableEntry(k4, v4), Maps.immutableEntry(k5, v5));
     }
 
-    private static <K, V> Map<K, V> asMap(Pair<K, V>... entries) {
+    private static <K, V> Map<K, V> asMap(Map.Entry<K, V>... entries) {
         Map<K, V> ret = new HashMap<>();
-        for (Pair<K, V> entry : entries) {
-            ret.put(entry.getLeft(), entry.getRight());
+        for (Map.Entry<K, V> entry : entries) {
+            ret.put(entry.getKey(), entry.getValue());
         }
         return ret;
     }
 
     public static <K, V> Map<K, V> asMapWithoutNull(K k, V v) {
-        return asMapWithoutNull(Pair.of(k, v));
+        return asMapWithoutNull(Maps.immutableEntry(k, v));
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2, K k3, V v3) {
-        return asMapWithoutNull(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3));
+        return asMapWithoutNull(Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2), Maps.immutableEntry(k3, v3));
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2) {
-        return asMapWithoutNull(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2)});
+        return asMapWithoutNull(new Map.Entry[]{Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2)});
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4) {
-        return asMapWithoutNull(new Pair[]{Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4)});
+        return asMapWithoutNull(new Map.Entry[]{Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2), Maps.immutableEntry(k3, v3), Maps.immutableEntry(k4, v4)});
     }
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMapWithoutNull(K k1, V v1, K k2, V v2, K k3, V v3, K k4, V v4, K k5, V v5) {
-        return asMapWithoutNull(Pair.of(k1, v1), Pair.of(k2, v2), Pair.of(k3, v3), Pair.of(k4, v4), Pair.of(k5, v5));
+        return asMapWithoutNull(Maps.immutableEntry(k1, v1), Maps.immutableEntry(k2, v2), Maps.immutableEntry(k3, v3), Maps.immutableEntry(k4, v4), Maps.immutableEntry(k5, v5));
     }
 
-    private static <K, V> Map<K, V> asMapWithoutNull(Pair<K, V>... entries) {
+    private static <K, V> Map<K, V> asMapWithoutNull(Map.Entry<K, V>... entries) {
         Map<K, V> ret = new HashMap<>();
-        for (Pair<K, V> entry : entries) {
-            if (entry.getLeft() != null && entry.getRight() != null) {
-                ret.put(entry.getLeft(), entry.getRight());
+        for (Map.Entry<K, V> entry : entries) {
+            if (entry.getKey() != null && entry.getValue() != null) {
+                ret.put(entry.getKey(), entry.getValue());
             }
         }
         return ret;
@@ -106,6 +106,6 @@ public class MapUtils {
 
     @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> asMap(K k, V v) {
-        return asMapWithoutNull(Pair.of(k, v));
+        return asMapWithoutNull(Maps.immutableEntry(k, v));
     }
 }

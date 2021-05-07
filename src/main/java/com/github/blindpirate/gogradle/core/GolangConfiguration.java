@@ -25,11 +25,12 @@ import com.github.blindpirate.gogradle.core.dependency.GolangDependencySet;
 import com.github.blindpirate.gogradle.core.dependency.parse.NotationParser;
 import com.github.blindpirate.gogradle.core.pack.PackagePathResolver;
 import groovy.lang.Closure;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Maps;
 import org.gradle.util.ConfigureUtil;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class GolangConfiguration {
     public static final String BUILD = "build";
@@ -38,7 +39,7 @@ public class GolangConfiguration {
     private final String name;
     private final GolangDependencySet dependencies = new GolangDependencySet();
     private final DependencyRegistry dependencyRegistry;
-    private final List<Pair<Object, Closure>> firstLevelDependencies = new ArrayList<>();
+    private final List<Map.Entry<Object, Closure>> firstLevelDependencies = new ArrayList<>();
     private final NotationParser<Object> notationParser;
 
     private boolean resolved;
@@ -56,7 +57,7 @@ public class GolangConfiguration {
     public GolangDependencySet getDependencies() {
         if (!resolved) {
             resolved = true;
-            firstLevelDependencies.forEach(pair -> dependencies.add(create(pair.getLeft(), pair.getRight())));
+            firstLevelDependencies.forEach(pair -> dependencies.add(create(pair.getKey(), pair.getValue())));
         }
         return dependencies;
     }
@@ -66,7 +67,7 @@ public class GolangConfiguration {
     }
 
     public void addFirstLevelDependency(Object notation, Closure closure) {
-        firstLevelDependencies.add(Pair.of(notation, closure));
+        firstLevelDependencies.add(Maps.immutableEntry(notation, closure));
     }
 
     public GolangDependency create(Object dependencyNotation, Closure configureClosure) {

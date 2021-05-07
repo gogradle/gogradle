@@ -24,3 +24,8 @@ gradle-app.setting
 
 # ANTLR tokens
 *.tokens
+
+dep/
+gogs/
+examples/
+.DS_Store

@@ -22,14 +22,7 @@ import com.google.common.collect.ImmutableMap;
 import java.util.Map;
 import java.util.Optional;
 
-import static org.apache.commons.lang3.SystemUtils.IS_OS_AIX;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_FREE_BSD;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_LINUX;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_MAC_OSX;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_NET_BSD;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_SOLARIS;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_WINDOWS;
-import static org.apache.commons.lang3.SystemUtils.IS_OS_ZOS;
+import static org.apache.commons.lang3.SystemUtils.*;
 
 // https://github.com/golang/go/blob/master/src/go/build/syslist.go
 public enum Os {
@@ -95,7 +88,7 @@ public enum Os {
             .put(FREEBSD, IS_OS_FREE_BSD)
             .put(NETBSD, IS_OS_NET_BSD)
             .put(SOLARIS, IS_OS_SOLARIS)
-            .put(ZOS, IS_OS_ZOS)
+            .put(ZOS, false)
             .build();
 
     private static Os detectOs() {

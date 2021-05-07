@@ -5,8 +5,9 @@ import com.github.blindpirate.gogradle.core.GolangRepository;
 import com.github.blindpirate.gogradle.core.VcsGolangPackage;
 import com.github.blindpirate.gogradle.util.StringUtils;
 import com.github.blindpirate.gogradle.vcs.VcsType;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Maps;
 
+import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Stream;
 
@@ -16,13 +17,13 @@ import static java.util.stream.Collectors.toList;
 public class VcsPackagePathResolver extends AbstractPackagePathResolver {
     @Override
     protected GolangPackage doProduce(String packagePath) {
-        Pair<String, VcsType> rootPathAndVcsType = StringUtils.eachSubPath(packagePath)
-                .map(subPath -> Pair.of(subPath, findEndingVcs(subPath)))
-                .filter((Pair<String, VcsType> pair) -> pair.getRight() != null)
+        Map.Entry<String, VcsType> rootPathAndVcsType = StringUtils.eachSubPath(packagePath)
+                .map(subPath -> Maps.immutableEntry(subPath, findEndingVcs(subPath)))
+                .filter((Map.Entry<String, VcsType> pair) -> pair.getValue() != null)
                 .findFirst().get();
 
-        String rootPath = rootPathAndVcsType.getLeft();
-        VcsType vcsType = rootPathAndVcsType.getRight();
+        String rootPath = rootPathAndVcsType.getKey();
+        VcsType vcsType = rootPathAndVcsType.getValue();
         GolangRepository repository = newOriginalRepository(vcsType,
                 vcsType.getSchemes().stream().map(scheme -> scheme.buildUrl(rootPath)).collect(toList()));
 

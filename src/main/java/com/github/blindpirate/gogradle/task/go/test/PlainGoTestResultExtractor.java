@@ -19,7 +19,7 @@ package com.github.blindpirate.gogradle.task.go.test;
 
 import com.github.blindpirate.gogradle.task.go.PackageTestResult;
 import com.google.common.collect.ImmutableMap;
-import org.apache.commons.lang3.tuple.Pair;
+import com.google.common.collect.Maps;
 import org.gradle.api.tasks.testing.TestResult;
 
 import java.util.ArrayList;
@@ -46,15 +46,15 @@ public class PlainGoTestResultExtractor extends AbstractGoTestResultExtractor {
 
     protected List<GoTestMethodResult> extractMethodResults(PackageTestResult packageTestResult) {
         List<String> stdout = removeTailMessages(packageTestResult.getStdout());
-        List<Pair<Integer, String>> testStartIndicesAndNames = extractStartIndiceAndTestMethodNames(stdout);
+        List<Map.Entry<Integer, String>> testStartIndicesAndNames = extractStartIndiceAndTestMethodNames(stdout);
 
         List<GoTestMethodResult> ret = new ArrayList<>();
         for (int i = 0; i < testStartIndicesAndNames.size(); ++i) {
-            int currentIndex = testStartIndicesAndNames.get(i).getLeft();
-            String currentMethodName = testStartIndicesAndNames.get(i).getRight();
+            int currentIndex = testStartIndicesAndNames.get(i).getKey();
+            String currentMethodName = testStartIndicesAndNames.get(i).getValue();
             int nextIndex = i == testStartIndicesAndNames.size() - 1
                     ? stdout.size()
-                    : testStartIndicesAndNames.get(i + 1).getLeft();
+                    : testStartIndicesAndNames.get(i + 1).getKey();
             ret.add(extractOneTestMethod(currentMethodName, stdout.subList(currentIndex, nextIndex)));
         }
 
@@ -89,13 +89,13 @@ public class PlainGoTestResultExtractor extends AbstractGoTestResultExtractor {
         return stdout;
     }
 
-    private List<Pair<Integer, String>> extractStartIndiceAndTestMethodNames(List<String> stdout) {
-        List<Pair<Integer, String>> ret = new ArrayList<>();
+    private List<Map.Entry<Integer, String>> extractStartIndiceAndTestMethodNames(List<String> stdout) {
+        List<Map.Entry<Integer, String>> ret = new ArrayList<>();
 
         for (int i = 0; i < stdout.size(); ++i) {
             Optional<String> testName = getRootTestNameFromLine(stdout.get(i));
             if (testName.isPresent()) {
-                ret.add(Pair.of(i, testName.get()));
+                ret.add(Maps.immutableEntry(i, testName.get()));
             }
         }
         return ret;

@@ -18,6 +18,7 @@
 package com.github.blindpirate.gogradle.util
 
 import org.joor.Reflect
+import org.powermock.reflect.Whitebox
 
 import java.lang.reflect.Field
 import java.lang.reflect.InvocationTargetException
@@ -44,13 +45,7 @@ class ReflectionUtils {
     // WARNING: do not set a static final field after getting it first
     // it will cause issues
     static void setStaticFinalField(Class targetClass, String fieldName, Object value) {
-        Field field = org.gradle.internal.impldep.org.codehaus.plexus.util.ReflectionUtils
-                .getFieldByNameIncludingSuperclasses(fieldName, targetClass)
-        field.setAccessible(true)
-        Field modifiersField = Field.class.getDeclaredField('modifiers')
-        modifiersField.setAccessible(true)
-        modifiersField.setInt(field, field.getModifiers() & ~Modifier.FINAL)
-        field.set(null, value)
+        Whitebox.setInternalState(targetClass, fieldName, value);
     }
 
     static Object getStaticField(Class target, String fieldName) {
