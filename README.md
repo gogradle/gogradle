@@ -20,30 +20,30 @@ Gogradle is a gradle plugin which provides support for building golang.
 
 ## What is Gogradle?
 
-Gogradle is a [Gradle](https://gradle.org) plugin which provide modern build support for [Golang](https://golang.org/). Gogradle is deeply inspired by [glide](https://github.com/Masterminds/glide)(I need to pay respect for it). You can simply think Gogradle as `glide`+`make`.
+Gogradle is a [Gradle](https://gradle.org) plugin which provides modern build support for [Golang](https://golang.org/). Gogradle is deeply inspired by [glide](https://github.com/Masterminds/glide)(I need to pay respect for it). You can simply think of Gogradle as `glide`+`make`.
 
 ## Why Gogradle?
 
-- `make` has a very steep learning curve, thus many people (like me) aren't good at it; Gradle use a DSL with similar syntax to Java to describe a build, which is easier for me.
-- `Makefile` and `Shell` have cross-platform issues, especially on Windows. Thanks to Gradle and JVM, Gogradle provide an excellent cross-platform support and can leverage the whole Java ecosystem
-- There're many mature [plugins](https://plugins.gradle.org) in Gradle ecosystem, and it's easy for yourself to implement a plugin to reuse your build code
+- `make` has a very steep learning curve, thus many people (like me) aren't good at it; Gradle uses a DSL with similar syntax to Java to describe a build, which is easier for me.
+- `Makefile` and `Shell` have cross-platform issues, especially on Windows. Thanks to Gradle and JVM, Gogradle provides excellent cross-platform support and can leverage the whole Java ecosystem
+- There are many mature [plugins](https://plugins.gradle.org) in the Gradle ecosystem, and it's easy for you to implement a plugin to reuse your build code
 - Gogradle supports project-scoped `GOPATH`, if you prefer
 - Gogradle supports existence and switch of multi-version of Go
-- There's plenty of [package management tools](https://github.com/blindpirate/report-of-go-package-management-tool) in Go community which are not compatible with each other.
+- There's plenty of [package management tools](https://github.com/blindpirate/report-of-go-package-management-tool) in the Go community which are not compatible with each other.
   - Gogradle provides a [migration command](./docs/getting-started-cn.md#Start) which enables you to migrate from other tools.
-  - Gogradle is compatible with `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`. When retrieving a dependency package's transitive dependencies, it can recognized lock files of these tools.
-- Gogradle has a long-term and active development support
+  - Gogradle is compatible with `glide/glock/godep/gom/gopm/govendor/gvt/gbvendor/trash/gpm`. When retrieving a dependency package's transitive dependencies, it can recognize the lock files of these tools.
+- Gogradle has long-term and active development support
 
 Gogradle implements most features of `glide` and adds some extra features:
 
-- Test and coverage reports generation
+- Test and coverage report generation
 - Multi-version management of Go
 - IDE support
 - Declaration and substitution of repositories, which can be used as mirror repositories
 
-If you puzzled over these issues, or you were a Java developer and familiar with Gradle, Gogradle is your choice!  
+If you are puzzled over these issues, or you were a Java developer and familiar with Gradle, Gogradle is your choice!  
 
-Gogradle's objective is not replacing other tools, it only provides an option for developers.
+Gogradle's objective is not to replace other tools, it only provides an option for developers.
 
 Gogradle is NOT a toy. 52% of its code are tests to assure its quality. We also tested [Github's top 1000 Go repositories](https://github.com/search?l=&o=desc&q=stars%3A%3E1+language%3AGo&ref=advsearch&s=stars&type=Repositories&utf8=%E2%9C%93) as real world scenarios.
 
